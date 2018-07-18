@@ -1,4 +1,4 @@
-package com.kairos.persistance.model.master_data.asset_management;
+package com.kairos.persistance.model.master_data.default_asset_setting;
 
 
 import com.kairos.dto.OrganizationSubTypeDTO;

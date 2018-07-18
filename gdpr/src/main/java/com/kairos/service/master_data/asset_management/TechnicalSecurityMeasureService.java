@@ -5,7 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.persistance.model.master_data.asset_management.TechnicalSecurityMeasure;
+import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistance.repository.master_data.asset_management.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;

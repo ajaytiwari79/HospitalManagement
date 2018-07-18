@@ -1,6 +1,6 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
 
-import com.kairos.persistance.model.master_data.processing_activity_masterdata.AccessorParty;
+import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

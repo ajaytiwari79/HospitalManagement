@@ -47,9 +47,10 @@ public class VrpTaskPlanningSolver {
         }
         solverFactory = SolverFactory.createFromXmlFile(new File(vrpXmlFilePath));
         if(drlFileList!=null && !drlFileList.isEmpty()){
+            log.info("no of drool files"+drlFileList.size());
             solverFactory.getSolverConfig().getScoreDirectorFactoryConfig().setScoreDrlFileList(drlFileList);
             solverFactory.getSolverConfig().setTerminationConfig(new TerminationConfig().withMinutesSpentLimit((long)terminationTime));
-          //  solverFactory.getSolverConfig().setMoveThreadCount(String.valueOf(numberOfThread));
+            //solverFactory.getSolverConfig().setMoveThreadCount(String.valueOf(numberOfThread));
         }
         solver = solverFactory.buildSolver();
     }
@@ -190,11 +191,11 @@ public class VrpTaskPlanningSolver {
             DroolsScoreDirector<VrpTaskPlanningSolution> director=(DroolsScoreDirector<VrpTaskPlanningSolution>)solver.getScoreDirectorFactory().buildScoreDirector();
 
             director.setWorkingSolution(solution);
-            Map<Task,Indictment> indictmentMap=(Map)director.getIndictmentMap();
+            Map<Object,Indictment> indictmentMap=(Map)director.getIndictmentMap();
             printSolutionInformation( solution);
             //log.info(solver.explainBestScore());
-            getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
-            return new Object[]{solution,indictmentMap};
+            //getxStream().toXML(solution,new FileWriter("src/main/resources/solution.xml"));
+            return new Object[]{solution,indictmentMap,director.getConstraintMatchTotals()};
         }catch (Exception e){
             e.printStackTrace();
             //throw  e;
@@ -271,6 +272,7 @@ public class VrpTaskPlanningSolver {
             log.info(constraintMatchTotal.getConstraintName() + ":" + "Total:" + constraintMatchTotal.toString() + "==" + "Reason(entities):");
             constraintMatchTotal.getConstraintMatchSet().forEach(constraintMatch -> {
                 constraintMatch.getJustificationList().forEach(o -> {
+
                     log.info(constraintMatch.getScore()+"---" + o+"---------"+(o instanceof Task?((Task)o).getShift()+""+((Task)o).getSkills():""));
                 });
             });
