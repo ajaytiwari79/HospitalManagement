@@ -237,7 +237,7 @@ public class ShiftService extends MongoBaseService {
         shiftQueryResult.setTimeType(timeType);
         //anil m2 notify event for updating staffing level
         boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
-        if (timeType.equals(TimeTypes.WORKING_TYPE)) {
+        if (timeType.equals(TimeTypes.WORKING_TYPE.toString())) {
             applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, mainShift, false, null, isShiftForPreence));
         }
         return shiftQueryResult;
@@ -431,7 +431,7 @@ public class ShiftService extends MongoBaseService {
             shifts.add(shift);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
             boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
-            if (timeType.equals(TimeTypes.WORKING_TYPE)) {
+            if (timeType.equals(TimeTypes.WORKING_TYPE.toString())) {
                 applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null, isShiftForPreence));
             }
         }
@@ -483,7 +483,7 @@ public class ShiftService extends MongoBaseService {
         Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
         //anil m2 notify event for updating staffing level
         boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
-        if (activityWrapper.getTimeType().equals(TimeTypes.WORKING_TYPE)) {
+        if (activityWrapper.getTimeType().equals(TimeTypes.WORKING_TYPE.toString())) {
             applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
                     true, oldStateOfShift, isShiftForPreence, false, activityChangeStatus(activityOld, activity) == ACTIVITY_CHANGED_FROM_ABSENCE_TO_PRESENCE
                     , activityChangeStatus(activityOld, activity) == ACTIVITY_CHANGED_FROM_PRESENCE_TO_ABSENCE));

@@ -153,5 +153,8 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "organizationServices: CASE WHEN service_subService IS NOT NULL THEN collect (service_subService) ELSE [] END} as service_SubService_ORG with or,{name: or.name,id:id(or),organizationSubTypes: CASE WHEN service_SubService_ORG IS NOT NULL THEN collect (service_SubService_ORG) ELSE [] END} as organizationType return organizationType")
     List<Map> getAllOrganizationTypeAndServiceAndSubServices(Long countryId);
 
+    @Query("MATCH (organizationSubType:OrganizationType)<-[:" +HAS_SUB_TYPE + "]-(organizationType:OrganizationType) where id(organizationSubType)={0} return id(organizationType)")
+    Long findOrganizationTypeIdBySubTypeId(Long organizationSubTypeId);
+
 
 }

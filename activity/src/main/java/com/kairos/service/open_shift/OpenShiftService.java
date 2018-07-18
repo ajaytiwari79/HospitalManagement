@@ -267,7 +267,7 @@ public class OpenShiftService extends MongoBaseService {
     private boolean assignShiftToStaff(OpenShift openShift, Long unitId, List<Long> staffIds, Order order) {
         List<StaffUnitPositionDetails> unitPositionDetails = genericIntegrationService.getStaffIdAndUnitPositionId(unitId, staffIds, order.getExpertiseId());
         unitPositionDetails.forEach(unitPositionDetail -> {
-            if (Optional.ofNullable(unitPositionDetail.getId()).isPresent()) {
+            if (!Optional.ofNullable(unitPositionDetail.getId()).isPresent()) {
                 return;
             }
             ShiftDTO shiftDTO = new ShiftDTO(openShift.getActivityId(), unitId, unitPositionDetail.getStaffId(), unitPositionDetail.getId(), DateUtils.asLocalDate(openShift.getStartDate()),
