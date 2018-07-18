@@ -13,6 +13,8 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompositeActivityDTO {
     private BigInteger id;
+    // TODO CHECK HOW TO UPDATE ID DYNAMICALLY
+    private BigInteger compositeId;
     private String name;
     private String description;
     private Long countryId;
@@ -123,5 +125,13 @@ public class CompositeActivityDTO {
 
     public void setAllowedAfter(Boolean allowedAfter) {
         this.allowedAfter = allowedAfter;
+    }
+
+    public BigInteger getCompositeId() {
+        return compositeId;
+    }
+
+    public void setCompositeId(BigInteger compositeId) {
+        this.compositeId = compositeId;
     }
 }

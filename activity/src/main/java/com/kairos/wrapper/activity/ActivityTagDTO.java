@@ -33,8 +33,6 @@ public class ActivityTagDTO {
     private PermissionsActivityTab permissionsActivityTab;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Set<BigInteger> restrictedActivitiesBefore;
-    private Set<BigInteger> restrictedActivitiesAfter;
     private TimeCalculationActivityTab timeCalculationActivityTab;
 
     private Long parentId;
@@ -181,21 +179,7 @@ public class ActivityTagDTO {
         this.balanceSettingsActivityTab = balanceSettingsActivityTab;
     }
 
-    public Set<BigInteger> getRestrictedActivitiesBefore() {
-        return restrictedActivitiesBefore;
-    }
 
-    public void setRestrictedActivitiesBefore(Set<BigInteger> restrictedActivitiesBefore) {
-        this.restrictedActivitiesBefore = restrictedActivitiesBefore;
-    }
-
-    public Set<BigInteger> getRestrictedActivitiesAfter() {
-        return restrictedActivitiesAfter;
-    }
-
-    public void setRestrictedActivitiesAfter(Set<BigInteger> restrictedActivitiesAfter) {
-        this.restrictedActivitiesAfter = restrictedActivitiesAfter;
-    }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
         this.id = activity.getId();

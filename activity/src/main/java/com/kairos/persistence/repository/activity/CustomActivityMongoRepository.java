@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.activity.CompositeActivityDTO;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.user.staff.staff_settings.StaffActivitySettingDTO;
@@ -21,7 +22,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityTagDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds);
 
-    List<ActivityDTO> findAllActivitiesWithDataByIds(Set<BigInteger> activityIds);
+    List<CompositeActivityDTO> getCompositeActivities(BigInteger activityIds);
 
     List<ActivityTagDTO> findAllActivityByCountry(long countryId);
 
@@ -32,8 +33,6 @@ public interface CustomActivityMongoRepository {
     List<OrganizationActivityDTO> findAllActivityOfUnitsByParentActivity(List<BigInteger> parentActivityIds, List<Long> unitIds);
 
     List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId);
-
-    //List<ActivityDTO> findAllActivitiesWithDataByIds(List<BigInteger> activityIds);
 
     List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted);
 

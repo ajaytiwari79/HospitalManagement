@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.activity.CompositeActivityDTO;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
@@ -80,12 +81,23 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     }
 
-    public List<ActivityDTO> findAllActivitiesWithDataByIds(Set<BigInteger> activityIds) {
+    public List<CompositeActivityDTO> getCompositeActivities(BigInteger activityId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("_id").in(activityIds).and("deleted").is(false)),
-                project("name", "generalActivityTab"));
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+                match(Criteria.where("_id").is(activityId).and("deleted").is(false)),
+                unwind("compositeActivities", true),
+                graphLookup("activities").startWith("$compositeActivities.activityId")
+                        .connectFrom("compositeActivities.activityId").connectTo("_id").maxDepth(0).as("compositeActivitiesObject"),
+                unwind("$compositeActivitiesObject", true),
+                project()
+                        .and("compositeActivitiesObject.name").as("name")
+                        .and("compositeActivities.activityId").as("id")
+                        .and("compositeActivities.activityId").as("compositeId")
+                        .and("compositeActivitiesObject.generalActivityTab").as("generalActivityTab")
+                        .and("compositeActivities.allowedBefore").as("allowedBefore")
+                        .and("compositeActivities.allowedAfter").as("allowedAfter")
+        );
+        AggregationResults<CompositeActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, CompositeActivityDTO.class);
         return result.getMappedResults();
 
     }
@@ -165,7 +177,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-    // TODO FIX VIPUL if problem
+
     public List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),

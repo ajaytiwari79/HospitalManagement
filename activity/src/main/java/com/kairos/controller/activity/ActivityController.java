@@ -180,7 +180,7 @@ public class ActivityController {
     @ApiOperation("Update compositeShifts Tab of Activity")
     @PutMapping(value = "/activity/{activityId}/compositeShifts")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateCompositeShiftTabOfActivity(@PathVariable BigInteger activityId,@RequestBody CompositeShiftActivityDTO compositeShiftActivityDTO) {
+    ResponseEntity<Map<String, Object>> updateCompositeShiftTabOfActivity(@PathVariable BigInteger activityId,@RequestBody List<CompositeShiftActivityDTO> compositeShiftActivityDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateCompositeShiftTabOfActivity(activityId,compositeShiftActivityDTO));
     }
 

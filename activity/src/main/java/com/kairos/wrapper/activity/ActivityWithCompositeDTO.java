@@ -108,4 +108,5 @@ public class ActivityWithCompositeDTO {
     public void setSkillActivityTab(SkillActivityTab skillActivityTab) {
         this.skillActivityTab = skillActivityTab;
     }
+
 }

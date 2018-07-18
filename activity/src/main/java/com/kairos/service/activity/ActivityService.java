@@ -2,6 +2,7 @@ package com.kairos.service.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
+import com.kairos.activity.activity.CompositeActivityDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
 import com.kairos.activity.activity.activity_tabs.*;
 import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
@@ -406,7 +407,7 @@ public class ActivityService extends MongoBaseService {
 
     }
 
-    public CompositeShiftActivityDTO updateCompositeShiftTabOfActivity(BigInteger activityId, CompositeShiftActivityDTO compositeShiftActivityDTO) {
+    public List<CompositeShiftActivityDTO> updateCompositeShiftTabOfActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
@@ -416,14 +417,14 @@ public class ActivityService extends MongoBaseService {
         if (activityMatchedCount != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
-        CompositeActivity compositeActivity = new CompositeActivity(compositeShiftActivityDTO.getActivityId(),compositeShiftActivityDTO.isAllowedBefore(),compositeShiftActivityDTO.isAllowedAfter());
-        if (activity.getCompositeActivities().isEmpty()) {
-            activity.setCompositeActivities(Collections.singletonList(compositeActivity));
-        } else {
-            activity.getCompositeActivities().add(compositeActivity);
-        }
+        List<CompositeActivity> compositeActivities = new ArrayList<>();
+        compositeShiftActivityDTOs.forEach(compositeShiftActivityDTO -> {
+            compositeActivities.add(new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter()));
+        });
+
+        activity.setCompositeActivities(compositeActivities);
         save(activity);
-        return compositeShiftActivityDTO;
+        return compositeShiftActivityDTOs;
 
     }
 
@@ -436,18 +437,8 @@ public class ActivityService extends MongoBaseService {
         return activityTabsWrapper;
     }
 
-    public List<ActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (activity == null) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
-        }
-        Set<BigInteger> compositeShiftIds = new HashSet<>();
-        if (Optional.ofNullable(activity.getCompositeActivities()).isPresent())
-            compositeShiftIds = activity.getCompositeActivities().stream().map(CompositeActivity::getActivityId).collect(Collectors.toSet());
-        List<ActivityDTO> activityDTOS;
-        activityDTOS = compositeShiftIds.isEmpty() ? new ArrayList<>() : activityMongoRepository.findAllActivitiesWithDataByIds(compositeShiftIds);
-
-        return activityDTOS;
+    public List<CompositeActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
+        return activityMongoRepository.getCompositeActivities(activityId);
     }
 
     public ActivityTabsWrapper updateIndividualPointsTab(IndividualPointsActivityTabDTO individualPointsDTO) {
