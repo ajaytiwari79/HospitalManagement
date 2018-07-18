@@ -171,16 +171,22 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public boolean deleteTimeType(BigInteger timeTypeId, Long countryId) {
+
         List<Activity> activity = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllChildByParentId(timeTypeId, countryId);
         if (activity.isEmpty() && timeTypes.isEmpty()) {
-            activityCategoryService.removeTimeTypeRelatedCategory(countryId, timeTypeId);
             TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
-            timeType.setDeleted(true);
-            save(timeType);
+            if(timeType.getUpperLevelTimeTypeId()==null){
+                //User Cannot Delete TimeType of Second Level
+                exceptionService.actionNotPermittedException("message.timetype.deletion.notAllowed", timeType.getLabel());
+            }else {
+                activityCategoryService.removeTimeTypeRelatedCategory(countryId, timeTypeId);
+                timeType.setDeleted(true);
+                save(timeType);
+            }
         } else exceptionService.timeTypeLinkedException("message.timetype.linked");
 
-        return false;
+        return true;
     }
 
 
