@@ -88,7 +88,7 @@ public class StaffActivitySettingController {
     @ApiOperation("update bulk Staff Personalized activity settings")
     @PutMapping(value = "/staff_activity_setting/staff/{staffId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateStaffActivitySettings(@PathVariable Long unitId,@PathVariable Long staffId, @RequestBody @Valid List<StaffActivitySettingDTO> staffActivitySettingDTO) {
+    public ResponseEntity<Map<String, Object>> updateBulkStaffActivitySettings(@PathVariable Long unitId,@PathVariable Long staffId, @RequestBody @Valid List<StaffActivitySettingDTO> staffActivitySettingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.updateBulkStaffActivitySettings(unitId,staffId,staffActivitySettingDTO));
     }
 }
