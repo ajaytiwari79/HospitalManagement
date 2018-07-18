@@ -328,6 +328,8 @@ public class SolverConfigService {
         return true;*//*
     }*/
 
+
+
     public SolverConfig getSolverConfigByDTO(SolverConfigDTO solverConfigDTO){
         SolverConfig solverConfig = new SolverConfig();
         solverConfig.setTerminationSeconds(solverConfigDTO.getTerminationTime());

@@ -12,11 +12,16 @@ import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.appConfig.appConfig.AppConfig;
 import com.planner.constants.AppConstants;
 import com.planner.domain.staff.PlanningShift;
+import com.planner.domain.vrpPlanning.ConstraintScore;
+import com.planner.domain.vrpPlanning.Score;
+import com.planner.domain.vrpPlanning.VRPIndictment;
 import com.planner.domain.vrpPlanning.VRPPlanningSolution;
+import com.planner.repository.vrpPlanning.IndictmentMongoRepository;
 import com.planner.repository.vrpPlanning.VRPPlanningMongoRepository;
 import com.planner.service.Client.PlannerRestClient;
 import com.planner.service.vrpService.VRPGeneratorService;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
+import org.optaplanner.core.api.score.constraint.ConstraintMatchTotal;
 import org.optaplanner.core.api.score.constraint.Indictment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +30,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -38,6 +44,7 @@ public class VRPPlannerService {
     private VRPGeneratorService vrpGeneratorService;
     @Autowired private VRPPlanningMongoRepository vrpPlanningMongoRepository;
     @Autowired private PlannerRestClient plannerRestClient;
+    @Autowired private IndictmentMongoRepository indictmentMongoRepository;
     //This must not be serialized and this is an active solvers runtimes
     private transient Map<String,VrpTaskPlanningSolver> runningSolversPerProblem=new ConcurrentHashMap<>();
     @Autowired private AppConfig appConfig;
@@ -50,7 +57,10 @@ public class VRPPlannerService {
         Object[] solutionAndIndictment=solver.solveProblemOnRequest(solution);
         runningSolversPerProblem.remove(solution.getSolverConfigId().toString());
         solution = (VrpTaskPlanningSolution)solutionAndIndictment[0];
-        Object[] solvedTasks = getSolvedTasks(solution.getShifts(), (Map<Task,Indictment>)solutionAndIndictment[1]);
+        Collection<ConstraintMatchTotal> constraintMatchTotals = (Collection<ConstraintMatchTotal>) solutionAndIndictment[2];
+        saveIndictment(vrpTaskPlanningDTO.getSolverConfig().getId(),constraintMatchTotals);
+        Map<Object,Indictment> indictment = (Map<Object,Indictment>)solutionAndIndictment[1];
+        Object[] solvedTasks = getSolvedTasks(solution.getShifts(), indictment);
         VRPPlanningSolution vrpPlanningSolution = new VRPPlanningSolution(solution.getSolverConfigId(),(List<PlanningShift>) solvedTasks[0],solution.getEmployees(),(List<com.planner.domain.task.Task>) solvedTasks[1],(List<com.planner.domain.task.Task>) solvedTasks[2],new ArrayList<>());
         vrpPlanningSolution.setId(solution.getId());
         vrpPlanningMongoRepository.save(vrpPlanningSolution);
@@ -58,6 +68,24 @@ public class VRPPlannerService {
             plannerRestClient.publish(null, vrpTaskPlanningDTO.getSolverConfig().getUnitId(), IntegrationOperation.CREATE, vrpTaskPlanningDTO.getSolverConfig().getId());
         }
     }
+
+    private void saveIndictment(BigInteger solverConfigId, Collection<ConstraintMatchTotal> constraintMatchTotals){
+        List<ConstraintScore> constraintScores = new ArrayList<>();
+        int hard = 0;
+        int medium = 0;
+        int soft = 0;
+        for (ConstraintMatchTotal constraintMatchTotal : constraintMatchTotals) {
+            HardMediumSoftLongScore hardMediumSoftLongScore = (HardMediumSoftLongScore)constraintMatchTotal.getScoreTotal();
+            Score score = new Score((int)hardMediumSoftLongScore.getHardScore(),(int)hardMediumSoftLongScore.getMediumScore(),(int)hardMediumSoftLongScore.getSoftScore());
+            constraintScores.add(new ConstraintScore(constraintMatchTotal.getConstraintName(),score));
+
+            hard+=hardMediumSoftLongScore.getHardScore();
+            medium+=hardMediumSoftLongScore.getMediumScore();
+            soft+=hardMediumSoftLongScore.getSoftScore();
+        }
+        indictmentMongoRepository.save(new VRPIndictment(solverConfigId,new Score(hard,medium,soft),constraintScores));
+    }
+
 
     //TODO make this run on problemId(submissionId) rather than solverConfigId
    // @Async
@@ -105,7 +133,7 @@ public class VRPPlannerService {
         return drlFiles;
     }
 
-    private Object[] getSolvedTasks(List<Shift> shifts, Map<Task, Indictment> indictmentMap) {
+    private Object[] getSolvedTasks(List<Shift> shifts, Map<Object, Indictment> indictmentMap) {
         List<com.planner.domain.task.Task> tasks = new ArrayList<>();
         List<com.planner.domain.task.Task> drivedTaskList = new ArrayList<>();
         List<PlanningShift> planningShifts = new ArrayList<>(shifts.size());
@@ -165,11 +193,11 @@ public class VRPPlannerService {
     }
 
 
-    private Map<String, Indictment> getIndictmentMap(Map<Task, Indictment> indictmentMap) {
+    private Map<String, Indictment> getIndictmentMap(Map<Object, Indictment> indictmentMap) {
         Map<String, Indictment> taskIndictmentMap = new HashMap<>(indictmentMap.size());
         indictmentMap.entrySet().forEach(i -> {
             if (i.getKey() instanceof Task) {
-                taskIndictmentMap.put(i.getKey().getId(), i.getValue());
+                taskIndictmentMap.put(((Task)i.getKey()).getId(), i.getValue());
             }
         });
         return taskIndictmentMap;

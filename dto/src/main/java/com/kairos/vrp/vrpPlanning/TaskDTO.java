@@ -23,6 +23,7 @@ public class TaskDTO {
     private Double longitude;
     private Set<String> skills;
     private int duration;
+    private int actualDuration;
     private String streetName;
     private int drivingDistance;
     private int houseNo;
@@ -60,6 +61,14 @@ public class TaskDTO {
         this.city = city;
     }
 
+
+    public int getActualDuration() {
+        return actualDuration;
+    }
+
+    public void setActualDuration(int actualDuration) {
+        this.actualDuration = actualDuration;
+    }
 
     public boolean isEscalated() {
         return escalated;
