@@ -83,12 +83,28 @@ public class TemplateTypeService extends MongoBaseService {
     }
 
 
-    public TemplateType getTemplateByById(BigInteger templateId, Long countryId) {
+    public TemplateType getTemplateById(BigInteger templateId, Long countryId) {
         TemplateType template = templateTypeRepository.findByIdAndNonDeleted(templateId, countryId);
         if (java.util.Optional.ofNullable(template).isPresent()) {
             return template;
         } else
             throw new DataNotExists("Template for template type ->" + templateId + " Not exists");
+    }
+
+
+
+    public List<TemplateType> getTemplateByIdsList(List<BigInteger> templateIds, Long countryId) {
+        List<TemplateType> templates = templateTypeRepository.findTemplateTypeByIdsList(countryId,templateIds);
+        List<BigInteger> ids=new ArrayList<>();
+        templates.forEach(templateType -> {
+            ids.add(templateType.getId());
+        });
+        templateIds.removeAll(ids);
+        if (!templateIds.isEmpty()) {
+           exceptionService.dataNotFoundByIdException("message.dataNotFound","Template type",templateIds.get(0));
+        }
+        return templates;
+
     }
 
 
