@@ -748,10 +748,11 @@ public class ShiftService extends MongoBaseService {
         shiftWithActivityDTO.setActivity(activity);
         shiftWithActivityDTO.setUnitId(unitId);
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
-        //validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
+        validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         ShiftQueryResult shiftQueryResult;
         if (shiftDTO.getSubShifts().size() == 0) {
             shift = buildShift(shiftDTO);
+            shift.setUnitId(unitId);
             shift.setMainShift(true);
             save(shift);
             shiftQueryResult = shift.getShiftQueryResult();
