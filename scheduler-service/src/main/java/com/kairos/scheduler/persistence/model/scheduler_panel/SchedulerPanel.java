@@ -40,15 +40,24 @@ public class SchedulerPanel extends MongoBaseEntity {
     private BigInteger integrationConfigurationId;
     private JobType jobType;
     private JobSubType jobSubType;
-    private boolean isOneTimeTrigger;
+    private boolean oneTimeTrigger;
     private LocalDateTime oneTimeTriggerDate;
+    private BigInteger entityId;
+
+    public BigInteger getEntityId() {
+        return entityId;
+    }
+
+    public void setEntityId(BigInteger entityId) {
+        this.entityId = entityId;
+    }
 
     public boolean isOneTimeTrigger() {
-        return isOneTimeTrigger;
+        return oneTimeTrigger;
     }
 
     public void setOneTimeTrigger(boolean oneTimeTrigger) {
-        isOneTimeTrigger = oneTimeTrigger;
+        this.oneTimeTrigger = oneTimeTrigger;
     }
 
     public LocalDateTime getOneTimeTriggerDate() {

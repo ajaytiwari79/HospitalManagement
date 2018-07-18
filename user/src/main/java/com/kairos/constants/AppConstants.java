@@ -209,5 +209,6 @@ public class AppConstants {
 
     //Tomtom
     public static final String TOMTOM_KEY = "key";
+    public static final String SCHEDULER_TO_USER_QUEUE_TOPIC = "SchedulerToUserQueue";
 
 }

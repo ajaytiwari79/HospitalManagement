@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 //import com.planner.appConfig.UserContextInterceptor;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -22,6 +24,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 //import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
@@ -77,13 +81,16 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
     }
 */
 
-    @Bean("objectMapperJackson")
+    @Bean("objectMapper")
     @Primary
     public ObjectMapper serializingObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer());
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer());
+       // javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer());
+        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ISO_DATE_TIME));
+
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.registerModule(javaTimeModule);
@@ -96,4 +103,5 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
         mappingJackson2HttpMessageConverter.setPrettyPrint(true);
         return mappingJackson2HttpMessageConverter;
     }
+
 }

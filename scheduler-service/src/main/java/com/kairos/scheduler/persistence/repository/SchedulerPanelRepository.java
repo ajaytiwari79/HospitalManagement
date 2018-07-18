@@ -1,6 +1,8 @@
 package com.kairos.scheduler.persistence.repository;
 
+import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
+import org.bouncycastle.util.test.FixedSecureRandom;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +14,7 @@ public interface SchedulerPanelRepository extends MongoRepository<SchedulerPanel
 
     List<SchedulerPanel> findByUnitId(long unitId);
     List<SchedulerPanel> findByActive(boolean active);
+
+    SchedulerPanel findByJobSubTypeAndEntityIdAndUnitId(JobSubType jobSubType, BigInteger entityId, Long unitId);
 
 }

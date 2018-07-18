@@ -596,4 +596,13 @@ public class DateUtils {
     public static LocalDateTime getLocalDateTimeFromZoneId(ZoneId unitTimeZone) {
         return LocalDateTime.now(unitTimeZone);
     }
+
+    public static Long getEndOfDayMillisforUnitFromEpoch(ZoneId zone,Long dateMillis) {
+        LocalDate date = Instant.ofEpochMilli(dateMillis).atZone(ZoneId.systemDefault()).toLocalDate();
+        ZonedDateTime zdt = ZonedDateTime.of(date,LocalTime.MAX,zone);
+        return zdt.toInstant().toEpochMilli();
+    }
+    public static LocalDateTime getLocalDatetimeFromLong(Long millis) {
+        return Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
 }

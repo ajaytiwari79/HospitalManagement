@@ -36,6 +36,41 @@ public class KairosScheduleJobDTO {
     private JobSubType jobSubType;
     private BigInteger entityId;
     private IntegrationOperation integrationOperation;
+    private boolean oneTimeTrigger;
+    private Long oneTimeTriggerDateMillis;
+
+    public KairosScheduleJobDTO() {
+
+    }
+    public KairosScheduleJobDTO(Long unitId, JobType jobType, JobSubType jobSubType, BigInteger entityId,IntegrationOperation operation,
+                                Long oneTimeTriggerDateMillis, boolean oneTimeTrigger) {
+
+        this.unitId = unitId;
+        this.jobType = jobType;
+        this.jobSubType = jobSubType;
+        this.entityId = entityId;
+        this.integrationOperation = operation;
+        this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
+        this.oneTimeTrigger = oneTimeTrigger;
+    }
+
+    public Long getOneTimeTriggerDateMillis() {
+        return oneTimeTriggerDateMillis;
+    }
+
+    public void setOneTimeTriggerDateMillis(Long oneTimeTriggerDateMillis) {
+        this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
+    }
+
+    public boolean isOneTimeTrigger() {
+        return oneTimeTrigger;
+    }
+
+    public void setOneTimeTrigger(boolean oneTimeTrigger) {
+        this.oneTimeTrigger = oneTimeTrigger;
+    }
+
+
 
 
     public BigInteger getEntityId() {

@@ -2,7 +2,6 @@ package com.kairos.kafka.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.KairosSchedulerExecutorDTO;
-import com.kairos.dto.QueueDTO;
 import com.kairos.service.kafka.JobQueueExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 
+import static com.kairos.constants.AppConstants.SCHEDULER_TO_USER_QUEUE_TOPIC;
+
 @Component
 public class ShcedulerToUserQueueListener {
 
@@ -18,7 +19,7 @@ public class ShcedulerToUserQueueListener {
     @Inject
     private JobQueueExecutor schedulerToUserQueueService;
 
-    @KafkaListener(topics="SchedulerToUserQueue")
+    @KafkaListener(topics=SCHEDULER_TO_USER_QUEUE_TOPIC)
     public void processMessage(String message) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -28,6 +29,7 @@ public class ShcedulerToUserQueueListener {
             //storage.put(content);
         }
         catch(Exception e) {
+            logger.error(e.getMessage(),e);
 
         }
     }

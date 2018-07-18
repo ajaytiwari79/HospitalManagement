@@ -75,6 +75,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 		JavaTimeModule javaTimeModule = new JavaTimeModule();
 		javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer());
 		javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer());
+
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		objectMapper.registerModule(javaTimeModule);

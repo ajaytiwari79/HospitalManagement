@@ -16,6 +16,8 @@ import com.kairos.persistence.repository.user.control_panel.jobDetails.JobDetail
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
 */
 import com.kairos.dto.KairosSchedulerLogsDTO;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationConfiguration;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
@@ -81,12 +83,15 @@ public class SchedulerPanelService extends MongoBaseService {
 
     public SchedulerPanel createSchedulerPanel(long unitId, SchedulerPanel schedulerPanel, BigInteger integrationConfigurationId) {
         logger.info("integrationConfigurationId-----> "+integrationConfigurationId);
-        Optional<IntegrationConfiguration> integrationConfigurationOpt = integrationConfigurationRepository.findById(integrationConfigurationId);
-        IntegrationConfiguration integrationConfiguration = integrationConfigurationOpt.isPresent()?integrationConfigurationOpt.get(): null;
-        schedulerPanel.setProcessType(integrationConfiguration.getName());
-        schedulerPanel.setIntegrationConfigurationId(integrationConfigurationId);
-        String interval = intervalStringBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getRunOnce());
-        schedulerPanel.setInterval(interval);
+        if(Optional.ofNullable(integrationConfigurationId).isPresent()) {
+            Optional<IntegrationConfiguration> integrationConfigurationOpt = integrationConfigurationRepository.findById(integrationConfigurationId);
+            IntegrationConfiguration integrationConfiguration = integrationConfigurationOpt.isPresent()?integrationConfigurationOpt.get(): null;
+            schedulerPanel.setIntegrationConfigurationId(integrationConfigurationId);
+
+        }
+
+        //schedulerPanel.setProcessType(integrationConfiguration.getName());
+        String interval;
         String cronExpression;
 
         if(!schedulerPanel.isOneTimeTrigger()) {
@@ -95,8 +100,10 @@ public class SchedulerPanelService extends MongoBaseService {
             } else
                 cronExpression = cronExpressionRunOnceBuilder(schedulerPanel.getDays(), schedulerPanel.getRunOnce());
             schedulerPanel.setCronExpression(cronExpression);
-        }
+           interval = intervalStringBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getRunOnce());
+            schedulerPanel.setInterval(interval);
 
+        }
 
         schedulerPanel.setActive(true);
 
@@ -121,21 +128,36 @@ public class SchedulerPanelService extends MongoBaseService {
 
         }
 
-        String interval = intervalStringBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getRunOnce());
-        panel.setInterval(interval);
-
-
+        String interval;
         String cronExpression;
 
-        if(schedulerPanel.getRunOnce() == null) {
-            cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getStartMinute(), schedulerPanel.getSelectedHours());
-        } else
-            cronExpression = cronExpressionRunOnceBuilder(schedulerPanel.getDays(), schedulerPanel.getRunOnce());
-        panel.setCronExpression(cronExpression);
+        if(schedulerPanel.isOneTimeTrigger()) {
+            interval = intervalStringBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getRunOnce());
+            panel.setInterval(interval);
+            if(schedulerPanel.getRunOnce() == null) {
+                cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getStartMinute(), schedulerPanel.getSelectedHours());
+            } else
+                cronExpression = cronExpressionRunOnceBuilder(schedulerPanel.getDays(), schedulerPanel.getRunOnce());
+            panel.setCronExpression(cronExpression);
+
+        }
+
         save(panel);
         dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
         dynamicCronScheduler.startCronJob(panel);
         return  panel;
+    }
+
+    public void updateSchedulerPanelByJobSubTypeAndEntityId(SchedulerPanel schedulerPanel) {
+
+        SchedulerPanel schedulerPanelDB = schedulerPanelRepository.findByJobSubTypeAndEntityIdAndUnitId(schedulerPanel.getJobSubType(),schedulerPanel.getEntityId(),schedulerPanel.getUnitId());
+       if(!Optional.ofNullable(schedulerPanelDB).isPresent()) {
+           throw new DataNotFoundByIdException("scheduler Panel not found by entityID");
+       }
+        schedulerPanelDB.setOneTimeTriggerDate(schedulerPanel.getOneTimeTriggerDate());
+        save(schedulerPanelDB);
+        dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanelDB.getId());
+        dynamicCronScheduler.startCronJob(schedulerPanel);
     }
 
     public Map<String, Object> findSchedulerPanelById(BigInteger schedulerPanelId) {
@@ -274,6 +296,17 @@ public class SchedulerPanelService extends MongoBaseService {
             return false;
         }
     }
+    public void deleteJobBySubTypeAndEntityId(SchedulerPanel schedulerPanel) {
+
+        SchedulerPanel schedulerPanelDB = schedulerPanelRepository.findByJobSubTypeAndEntityIdAndUnitId(schedulerPanel.getJobSubType(),schedulerPanel.getEntityId(),
+                schedulerPanel.getUnitId());
+        if(!Optional.ofNullable(schedulerPanelDB).isPresent()) {
+            throw new DataNotFoundByIdException("Scheduler Panel not found by entity id");
+        }
+        schedulerPanelDB.setDeleted(true);
+        schedulerPanelDB.setActive(false);
+        save(schedulerPanelDB);
+    }
 
 
     /**
@@ -302,9 +335,6 @@ public class SchedulerPanelService extends MongoBaseService {
 
 
     }
-
-
-
 
     public Long getControlPanelUnitId(BigInteger schedulerPanelId){
         Optional<SchedulerPanel> panel = schedulerPanelRepository.findById(schedulerPanelId);

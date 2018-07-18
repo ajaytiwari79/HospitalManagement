@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 
+import static com.kairos.scheduler.constants.AppConstants.USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC;
+
 @Component
 public class UserToSchedulerLogsQueueListener {
 
@@ -18,7 +20,7 @@ public class UserToSchedulerLogsQueueListener {
     @Inject
     private SchedulerPanelService schedulerPanelService;
 
-    @KafkaListener(topics="UserToSchedulerLogsQueue")
+    @KafkaListener(topics=USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC)
     public void processMessage(String message) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -27,6 +29,7 @@ public class UserToSchedulerLogsQueueListener {
             logger.info("Job Details--------------------->"+schedulerLogs.getResult()+schedulerLogs.getStarted());
         }
         catch(Exception e) {
+            logger.error(e.getMessage(),e);
 
         }
     }

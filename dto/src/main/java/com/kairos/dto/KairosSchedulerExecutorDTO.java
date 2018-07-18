@@ -20,8 +20,16 @@ public class KairosSchedulerExecutorDTO {
     public KairosSchedulerExecutorDTO() {
 
     }
-    public KairosSchedulerExecutorDTO(JobType jobType,JobSubType jobSubType, BigInteger entityId, OperationType operationType,
+    public KairosSchedulerExecutorDTO(BigInteger id,Long unitId,JobType jobType,JobSubType jobSubType, BigInteger entityId, OperationType operationType,
                                       IntegrationConfigurationDTO integrationConfigurationDTO) {
+
+        this.id = id;
+        this.unitId = unitId;
+        this.jobType = jobType;
+        this.jobSubType = jobSubType;
+        this.entityId = entityId;
+        this.operationType = operationType;
+        this.integrationConfigurationDTO = integrationConfigurationDTO;
 
     }
 

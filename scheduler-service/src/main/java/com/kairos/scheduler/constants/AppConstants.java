@@ -23,5 +23,7 @@ public class AppConstants {
     public static final String IMPORT_TIMECARE_SHIFTS_PATH = "/opt/infra/data-integration/GetAllWorkShiftsByWorkPlaceId.ktr";
     public final static String SCHEDULER_PANEL_INTERVAL_STRING = ". Every {0} minutes during selected hours.";
     public final static String SCHEDULER_PANEL_RUN_ONCE_STRING = ". At {0}.";
+    public final static String USER_TO_SCHEDULER_JOB_QUEUE_TOPIC = "UserToSchedulerJobQueue";
+    public final static String USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC = "UserToSchedulerLogsQueue";
 
 }

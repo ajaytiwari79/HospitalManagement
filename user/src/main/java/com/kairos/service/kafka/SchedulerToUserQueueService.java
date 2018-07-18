@@ -2,8 +2,6 @@ package com.kairos.service.kafka;
 
 import java.util.List;
 import com.kairos.dto.KairosSchedulerExecutorDTO;
-import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
 import com.kairos.service.scheduler.IntegrationJobsExecutorService;
 import com.kairos.service.staff.EmploymentService;
 import org.springframework.stereotype.Service;
