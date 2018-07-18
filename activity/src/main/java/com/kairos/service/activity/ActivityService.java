@@ -416,7 +416,7 @@ public class ActivityService extends MongoBaseService {
         if (activityMatchedCount != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
-        CompositeActivity compositeActivity = new CompositeActivity(compositeShiftActivityDTO.getActivityId(),compositeShiftActivityDTO.isRestrictedBefore(),compositeShiftActivityDTO.isRestrictedAfter());
+        CompositeActivity compositeActivity = new CompositeActivity(compositeShiftActivityDTO.getActivityId(),compositeShiftActivityDTO.isAllowedBefore(),compositeShiftActivityDTO.isAllowedAfter());
         if (activity.getCompositeActivities().isEmpty()) {
             activity.setCompositeActivities(Collections.singletonList(compositeActivity));
         } else {

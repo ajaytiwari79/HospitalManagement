@@ -3,9 +3,6 @@ package com.kairos.activity.activity.activity_tabs;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * Created by vipul on 23/8/17.
@@ -14,8 +11,8 @@ import java.util.Set;
 public class CompositeShiftActivityDTO {
 
     private BigInteger activityId;
-    private boolean restrictedBefore;
-    private boolean restrictedAfter;
+    private boolean allowedBefore;
+    private boolean allowedAfter;
 
     public CompositeShiftActivityDTO() {
         // DC
@@ -29,19 +26,19 @@ public class CompositeShiftActivityDTO {
         this.activityId = activityId;
     }
 
-    public boolean isRestrictedBefore() {
-        return restrictedBefore;
+    public boolean isAllowedBefore() {
+        return allowedBefore;
     }
 
-    public void setRestrictedBefore(boolean restrictedBefore) {
-        this.restrictedBefore = restrictedBefore;
+    public void setAllowedBefore(boolean allowedBefore) {
+        this.allowedBefore = allowedBefore;
     }
 
-    public boolean isRestrictedAfter() {
-        return restrictedAfter;
+    public boolean isAllowedAfter() {
+        return allowedAfter;
     }
 
-    public void setRestrictedAfter(boolean restrictedAfter) {
-        this.restrictedAfter = restrictedAfter;
+    public void setAllowedAfter(boolean allowedAfter) {
+        this.allowedAfter = allowedAfter;
     }
 }

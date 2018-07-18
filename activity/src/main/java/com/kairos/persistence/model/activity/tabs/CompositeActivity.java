@@ -2,8 +2,6 @@ package com.kairos.persistence.model.activity.tabs;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by vipul on 23/8/17.
@@ -12,17 +10,17 @@ import java.util.Set;
 public class CompositeActivity implements Serializable {
 
     private BigInteger activityId;
-    private boolean restrictedBefore;
-    private boolean restrictedAfter;
+    private boolean allowedBefore;
+    private boolean allowedAfter;
 
     public CompositeActivity() {
         // DC
     }
 
-    public CompositeActivity(BigInteger activityId, boolean restrictedBefore, boolean restrictedAfter) {
+    public CompositeActivity(BigInteger activityId, boolean allowedBefore, boolean allowedAfter) {
         this.activityId = activityId;
-        this.restrictedBefore = restrictedBefore;
-        this.restrictedAfter = restrictedAfter;
+        this.allowedBefore = allowedBefore;
+        this.allowedAfter = allowedAfter;
     }
 
     public BigInteger getActivityId() {
@@ -33,19 +31,19 @@ public class CompositeActivity implements Serializable {
         this.activityId = activityId;
     }
 
-    public boolean isRestrictedBefore() {
-        return restrictedBefore;
+    public boolean isAllowedBefore() {
+        return allowedBefore;
     }
 
-    public void setRestrictedBefore(boolean restrictedBefore) {
-        this.restrictedBefore = restrictedBefore;
+    public void setAllowedBefore(boolean allowedBefore) {
+        this.allowedBefore = allowedBefore;
     }
 
-    public boolean isRestrictedAfter() {
-        return restrictedAfter;
+    public boolean isAllowedAfter() {
+        return allowedAfter;
     }
 
-    public void setRestrictedAfter(boolean restrictedAfter) {
-        this.restrictedAfter = restrictedAfter;
+    public void setAllowedAfter(boolean allowedAfter) {
+        this.allowedAfter = allowedAfter;
     }
 }

@@ -18,12 +18,12 @@ public class CompositeActivityDTO {
     private Long countryId;
     private BigInteger categoryId;
     private String categoryName;
-    private Long unitId = -1L;
-    private boolean isParentActivity = true;
+    private Long unitId ;
+    private boolean isParentActivity ;
     private GeneralActivityTabDTO generalActivityTab;
     private Long countryActivityId;
-    private Boolean restrictedBefore;
-    private Boolean restrictedAfter;
+    private Boolean allowedBefore;
+    private Boolean allowedAfter;
 
     public CompositeActivityDTO() {
         //default Constructor
@@ -109,19 +109,19 @@ public class CompositeActivityDTO {
         this.countryActivityId = countryActivityId;
     }
 
-    public Boolean getRestrictedBefore() {
-        return restrictedBefore;
+    public Boolean getAllowedBefore() {
+        return allowedBefore;
     }
 
-    public void setRestrictedBefore(Boolean restrictedBefore) {
-        this.restrictedBefore = restrictedBefore;
+    public void setAllowedBefore(Boolean allowedBefore) {
+        this.allowedBefore = allowedBefore;
     }
 
-    public Boolean getRestrictedAfter() {
-        return restrictedAfter;
+    public Boolean getAllowedAfter() {
+        return allowedAfter;
     }
 
-    public void setRestrictedAfter(Boolean restrictedAfter) {
-        this.restrictedAfter = restrictedAfter;
+    public void setAllowedAfter(Boolean allowedAfter) {
+        this.allowedAfter = allowedAfter;
     }
 }

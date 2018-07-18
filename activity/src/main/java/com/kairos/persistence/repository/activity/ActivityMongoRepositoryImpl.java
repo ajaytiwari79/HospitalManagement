@@ -354,10 +354,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public ActivityWrapper findActivityAndTimeTypeByActivityId(BigInteger activityId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("id").is(activityId).and("deleted").is(false)),
-                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
-                        "timeType"),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id","timeType"),
                 project().and("name").as("activity.name").and("description").as("activity.description")
                         .and("countryId").as("activity.countryId").and("expertises").as("activity.expertises")
+                        .and("id").as("activity.id")
                         .and("organizationTypes").as("activity.organizationTypes").and("organizationSubTypes").as("activity.organizationSubTypes")
                         .and("regions").as("activity.regions").and("levels").as("activity.levels")
                         .and("employmentTypes").as("activity.employmentTypes").and("tags").as("activity.tags")
@@ -365,8 +365,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         and("parentId").as("activity.parentId").and("isParentActivity").as("activity.isParentActivity").and("generalActivityTab").as("activity.generalActivityTab")
                         .and("balanceSettingsActivityTab").as("activity.balanceSettingsActivityTab")
                         .and("rulesActivityTab").as("activity.rulesActivityTab").and("individualPointsActivityTab").as("activity.individualPointsActivityTab")
-                        .and("timeCalculationActivityTab").as("activity.timeCalculationActivityTab")
-                        .and("compositeShiftActivityTab").as("activity.compositeShiftActivityTab").
+                        .and("timeCalculationActivityTab").as("activity.timeCalculationActivityTab").
                         and("compositeActivities").as("activity.compositeActivities")
                         .and("notesActivityTab").as("activity.notesActivityTab")
                         .and("communicationActivityTab").as("activity.communicationActivityTab")
