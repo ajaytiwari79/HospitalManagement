@@ -56,7 +56,10 @@ public class ClauseDTO {
     @NotEmpty
     private Set<BigInteger> accountTypes;
 
-    private BigInteger templateType;
+
+    @NotNull(message = "Template Type cannot be null")
+    @NotEmpty(message = "Template Type Can't be empty")
+    private List<BigInteger> templateTypes;
 
     private List<Long> organizationList;
 
@@ -68,9 +71,13 @@ public class ClauseDTO {
         this.organizationList = organizationList;
     }
 
-    public BigInteger getTemplateType() { return templateType; }
+    public List<BigInteger> getTemplateTypes() {
+        return templateTypes;
+    }
 
-    public void setTemplateType(BigInteger templateType) { this.templateType = templateType; }
+    public void setTemplateTypes(List<BigInteger> templateTypes) {
+        this.templateTypes = templateTypes;
+    }
 
     public String getTitle() {
         return title;

@@ -160,14 +160,21 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String addNonDeletedTemplateTypeToAgreementTemplate() {
+    public static String addNonDeletedTemplateTyeField() {
         return  " {  '$addFields':" +
-                "                {'templateType':" +
+                "                {'templateTypes':" +
                 "                {'$filter' : { " +
-                "                'input': '$templateType'," +
+                "                'input': '$templateTypes'," +
                 "                'as': 'templateType', " +
                 "                'cond': {'$eq': ['$$templateType.deleted', false ]}" +
                 "                }}}}" ;
 
     }
+
+
+
+
+  
+
+
 }

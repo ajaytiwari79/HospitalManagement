@@ -47,11 +47,8 @@ public class Clause extends MongoBaseEntity {
 
     private BigInteger parentClauseId;
 
-    private BigInteger templateType;
+    private List<BigInteger> templateTypes;
 
-    public BigInteger getTemplateType() {
-        return templateType;
-    }
 
     public List<Long> getOrganizationList() {
         return organizationList;
@@ -61,8 +58,12 @@ public class Clause extends MongoBaseEntity {
         this.organizationList = organizationList;
     }
 
-    public void setTemplateType(BigInteger templateType) {
-        this.templateType = templateType;
+    public List<BigInteger> getTemplateTypes() {
+        return templateTypes;
+    }
+
+    public void setTemplateTypes(List<BigInteger> templateTypes) {
+        this.templateTypes = templateTypes;
     }
 
     public Long getCountryId() {
