@@ -754,6 +754,7 @@ public class ShiftService extends MongoBaseService {
         ShiftQueryResult shiftQueryResult;
         if (shiftDTO.getSubShifts().size() == 0) {
             shift = buildShift(shiftDTO);
+            shift.setUnitId(unitId);
             shift.setMainShift(true);
             save(shift);
             shiftQueryResult = shift.getShiftQueryResult();

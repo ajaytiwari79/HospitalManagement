@@ -66,7 +66,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         if (Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Policy Agreement Template ", policyAgreementTemplateDto.getName());
         }
-        templateTypeService.getTemplateByById(policyAgreementTemplateDto.getTemplateTypeId(), countryId);
+        templateTypeService.getTemplateById(policyAgreementTemplateDto.getTemplateTypeId(), countryId);
         List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, policyAgreementTemplateDto.getAccountTypes());
         PolicyAgreementTemplate newPolicyAgreementTemplate = new PolicyAgreementTemplate(policyAgreementTemplateDto.getName(), policyAgreementTemplateDto.getDescription(), countryId, policyAgreementTemplateDto.getOrganizationTypes()
                 , policyAgreementTemplateDto.getOrganizationSubTypes(), policyAgreementTemplateDto.getOrganizationServices(), policyAgreementTemplateDto.getOrganizationSubServices());

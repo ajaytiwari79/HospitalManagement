@@ -28,7 +28,7 @@ public interface MasterProcessingActivityRepository extends MongoRepository<Mast
     @Query("{deleted:false,countryId:?0,organizationId:?1,name:?2}")
     MasterProcessingActivity findByNameAndCountryId(Long countryId,Long organizationId,String name);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2},isSubProcess:false}")
+    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2},isSubProcess:true}")
     List<MasterProcessingActivity> getAllMasterSubProcessingActivityByIds(Long countryId,Long organizationId,List<BigInteger> subProcessingActivityIds);
 
 }
