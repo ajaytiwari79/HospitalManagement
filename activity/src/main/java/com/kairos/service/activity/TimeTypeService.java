@@ -176,7 +176,7 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllChildByParentId(timeTypeId, countryId);
         if (activity.isEmpty() && timeTypes.isEmpty()) {
             TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
-            if(timeType.getUpperLevelTimeTypeId()==null){
+            if(timeType!=null && timeType.getUpperLevelTimeTypeId()==null){
                 //User Cannot Delete TimeType of Second Level
                 exceptionService.actionNotPermittedException("message.timetype.deletion.notAllowed", timeType.getLabel());
             }else {
