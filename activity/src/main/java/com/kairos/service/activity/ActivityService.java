@@ -281,7 +281,6 @@ public class ActivityService extends MongoBaseService {
         }
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
         generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
-        generalDTO.setTextColor(activity.getGeneralActivityTab().getTextColor());
         GeneralActivityTab generalTab = new GeneralActivityTab();
         ObjectMapperUtils.copyProperties(generalDTO, generalTab);
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
@@ -351,7 +350,6 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.timetype.notfound");
         }
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
-        activity.getGeneralActivityTab().setTextColor(timeType.getTextColor());
         activity.getGeneralActivityTab().setColorPresent(true);
         activity.setBalanceSettingsActivityTab(balanceSettingsTab);
         //updating activity category based on time type
