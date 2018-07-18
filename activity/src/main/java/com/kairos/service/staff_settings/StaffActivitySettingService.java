@@ -80,11 +80,15 @@ public class StaffActivitySettingService extends MongoBaseService {
 
 
    public StaffActivitySettingDTO getStaffActivitySettingsById(Long unitId,BigInteger staffActivitySettingId){
-        return staffActivitySettingRepository.findByIdAndUnitIdAndDeletedFalse(unitId,staffActivitySettingId);
+        return staffActivitySettingRepository.findByIdAndUnitIdAndDeletedFalse(staffActivitySettingId,unitId);
     }
 
 
    public List<StaffActivitySettingDTO> updateBulkStaffActivitySettings(Long unitId,Long staffId,List<StaffActivitySettingDTO> staffActivitySettings){
+        staffActivitySettings.forEach(staffActivitySetting->{
+            staffActivitySetting.setUnitId(unitId);
+            staffActivitySetting.setStaffId(staffId);
+        });
         List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyProperties(staffActivitySettings,StaffActivitySetting.class);
         save(staffActivitySettingsList);
         return staffActivitySettings;
