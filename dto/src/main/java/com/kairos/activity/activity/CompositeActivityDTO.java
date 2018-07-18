@@ -22,6 +22,8 @@ public class CompositeActivityDTO {
     private boolean isParentActivity = true;
     private GeneralActivityTabDTO generalActivityTab;
     private Long countryActivityId;
+    private Boolean restrictedBefore;
+    private Boolean restrictedAfter;
 
     public CompositeActivityDTO() {
         //default Constructor
@@ -105,5 +107,21 @@ public class CompositeActivityDTO {
 
     public void setCountryActivityId(Long countryActivityId) {
         this.countryActivityId = countryActivityId;
+    }
+
+    public Boolean getRestrictedBefore() {
+        return restrictedBefore;
+    }
+
+    public void setRestrictedBefore(Boolean restrictedBefore) {
+        this.restrictedBefore = restrictedBefore;
+    }
+
+    public Boolean getRestrictedAfter() {
+        return restrictedAfter;
+    }
+
+    public void setRestrictedAfter(Boolean restrictedAfter) {
+        this.restrictedAfter = restrictedAfter;
     }
 }

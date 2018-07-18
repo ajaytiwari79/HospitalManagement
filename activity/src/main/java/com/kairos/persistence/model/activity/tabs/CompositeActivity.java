@@ -9,14 +9,20 @@ import java.util.Set;
  * Created by vipul on 23/8/17.
  */
 
-public class CompositeShiftActivityTab implements Serializable {
+public class CompositeActivity implements Serializable {
 
     private BigInteger activityId;
     private boolean restrictedBefore;
     private boolean restrictedAfter;
 
-    public CompositeShiftActivityTab() {
+    public CompositeActivity() {
         // DC
+    }
+
+    public CompositeActivity(BigInteger activityId, boolean restrictedBefore, boolean restrictedAfter) {
+        this.activityId = activityId;
+        this.restrictedBefore = restrictedBefore;
+        this.restrictedAfter = restrictedAfter;
     }
 
     public BigInteger getActivityId() {

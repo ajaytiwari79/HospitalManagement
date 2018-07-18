@@ -68,6 +68,7 @@ public class ActivityWithCompositeDTO {
         this.compositeActivities = compositeActivities;
     }
 
+
     public GeneralActivityTab getGeneralActivityTab() {
         return generalActivityTab;
     }

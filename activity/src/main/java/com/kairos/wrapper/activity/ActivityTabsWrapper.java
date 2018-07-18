@@ -10,7 +10,6 @@ import com.kairos.user.country.day_type.DayType;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by pawanmandhan on 23/8/17.
@@ -29,7 +28,7 @@ public class ActivityTabsWrapper {
 
 
     private TimeCalculationActivityTab timeCalculationActivityTab;
-    private CompositeShiftActivityTab compositeShiftActivityTab;
+    private CompositeActivity compositeActivity;
 
     private NotesActivityTab notesActivityTab;
     private CommunicationActivityTab communicationActivityTab;
@@ -196,12 +195,12 @@ public class ActivityTabsWrapper {
 
     }
 
-    public CompositeShiftActivityTab getCompositeShiftActivityTab() {
-        return compositeShiftActivityTab;
+    public CompositeActivity getCompositeActivity() {
+        return compositeActivity;
     }
 
-    public void setCompositeShiftActivityTab(CompositeShiftActivityTab compositeShiftActivityTab) {
-        this.compositeShiftActivityTab = compositeShiftActivityTab;
+    public void setCompositeActivity(CompositeActivity compositeActivity) {
+        this.compositeActivity = compositeActivity;
     }
 
     public NotesActivityTab getNotesActivityTab() {

@@ -406,17 +406,22 @@ public class ActivityService extends MongoBaseService {
 
     }
 
-    public CompositeShiftActivityDTO updateCompositeShiftTabOfActivity(CompositeShiftActivityDTO compositeShiftActivityDTO) {
-        Activity activity = activityMongoRepository.findOne(compositeShiftActivityDTO.getActivityId());
+    public CompositeShiftActivityDTO updateCompositeShiftTabOfActivity(BigInteger activityId, CompositeShiftActivityDTO compositeShiftActivityDTO) {
+        Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", compositeShiftActivityDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         Set<BigInteger> compositeShiftIds = new HashSet<>();
         Integer activityMatchedCount = activityMongoRepository.findAllActivityByIds(compositeShiftIds);
         if (activityMatchedCount != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
-
+        CompositeActivity compositeActivity = new CompositeActivity(compositeShiftActivityDTO.getActivityId(),compositeShiftActivityDTO.isRestrictedBefore(),compositeShiftActivityDTO.isRestrictedAfter());
+        if (activity.getCompositeActivities().isEmpty()) {
+            activity.setCompositeActivities(Collections.singletonList(compositeActivity));
+        } else {
+            activity.getCompositeActivities().add(compositeActivity);
+        }
         save(activity);
         return compositeShiftActivityDTO;
 
@@ -431,24 +436,18 @@ public class ActivityService extends MongoBaseService {
         return activityTabsWrapper;
     }
 
-    public Map<String, List<ActivityDTO>> getCompositeShiftTabOfActivity(BigInteger activityId) {
+    public List<ActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (activity == null) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         Set<BigInteger> compositeShiftIds = new HashSet<>();
-        compositeShiftIds.addAll(activity.getRestrictedActivitiesAfter());
-        compositeShiftIds.addAll(activity.getRestrictedActivitiesBefore());
+        if (Optional.ofNullable(activity.getCompositeActivities()).isPresent())
+            compositeShiftIds = activity.getCompositeActivities().stream().map(CompositeActivity::getActivityId).collect(Collectors.toSet());
         List<ActivityDTO> activityDTOS;
         activityDTOS = compositeShiftIds.isEmpty() ? new ArrayList<>() : activityMongoRepository.findAllActivitiesWithDataByIds(compositeShiftIds);
 
-
-        Map<String, List<ActivityDTO>> response = new HashMap<>();
-        response.put("restrictedActivitiesAfter", activityDTOS.stream().filter(currentActivity -> (activity.getRestrictedActivitiesAfter().contains(currentActivity.getId()))).collect(Collectors.toList()));
-        response.put("restrictedActivitiesBefore", activityDTOS.stream().filter(currentActivity -> (activity.getRestrictedActivitiesBefore().contains(currentActivity.getId()))).collect(Collectors.toList()));
-        return response;
-
-
+        return activityDTOS;
     }
 
     public ActivityTabsWrapper updateIndividualPointsTab(IndividualPointsActivityTabDTO individualPointsDTO) {

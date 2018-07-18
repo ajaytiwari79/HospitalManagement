@@ -34,8 +34,6 @@ public class ActivityDTO {
     private TimeCalculationActivityDTO timeCalculationActivityTab;
     private List<ActivityDTO> compositeActivities;
 
-    private Set<ActivityDTO> restrictedActivitiesBefore;
-    private Set<ActivityDTO> restrictedActivitiesAfter;
     private BalanceSettingActivityTabDTO balanceSettingsActivityTab;
     private Long countryActivityId;
     private TimeTypeDTO timeType;
@@ -222,21 +220,6 @@ public class ActivityDTO {
         this.balanceSettingsActivityTab = balanceSettingsActivityTab;
     }
 
-    public Set<ActivityDTO> getRestrictedActivitiesBefore() {
-        return restrictedActivitiesBefore;
-    }
-
-    public void setRestrictedActivitiesBefore(Set<ActivityDTO> restrictedActivitiesBefore) {
-        this.restrictedActivitiesBefore = restrictedActivitiesBefore;
-    }
-
-    public Set<ActivityDTO> getRestrictedActivitiesAfter() {
-        return restrictedActivitiesAfter;
-    }
-
-    public void setRestrictedActivitiesAfter(Set<ActivityDTO> restrictedActivitiesAfter) {
-        this.restrictedActivitiesAfter = restrictedActivitiesAfter;
-    }
 
     public ActivityDTO(String name, String description, Long countryId, String categoryName, Long unitId, boolean isParentActivity) {
         this.name = name;
