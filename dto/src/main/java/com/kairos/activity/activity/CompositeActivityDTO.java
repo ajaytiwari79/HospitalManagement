@@ -9,7 +9,7 @@ import java.math.BigInteger;
 /**
  * Created by pavan on 8/2/18.
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompositeActivityDTO {
     private BigInteger id;
@@ -21,7 +21,6 @@ public class CompositeActivityDTO {
     private BigInteger categoryId;
     private String categoryName;
     private Long unitId ;
-    private boolean isParentActivity ;
     private GeneralActivityTabDTO generalActivityTab;
     private Long countryActivityId;
     private Boolean allowedBefore;
@@ -87,13 +86,6 @@ public class CompositeActivityDTO {
         this.unitId = unitId;
     }
 
-    public boolean isParentActivity() {
-        return isParentActivity;
-    }
-
-    public void setParentActivity(boolean parentActivity) {
-        isParentActivity = parentActivity;
-    }
 
     public GeneralActivityTabDTO getGeneralActivityTab() {
         return generalActivityTab;

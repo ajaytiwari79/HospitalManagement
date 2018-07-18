@@ -91,7 +91,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 unwind("$compositeActivitiesObject", true),
                 project()
                         .and("compositeActivitiesObject.name").as("name")
-                        .and("compositeActivities.activityId").as("id")
+                        .andExclude("_id")
                         .and("compositeActivities.activityId").as("compositeId")
                         .and("compositeActivitiesObject.generalActivityTab").as("generalActivityTab")
                         .and("compositeActivities.allowedBefore").as("allowedBefore")

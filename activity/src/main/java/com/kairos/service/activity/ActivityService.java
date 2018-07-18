@@ -407,7 +407,7 @@ public class ActivityService extends MongoBaseService {
 
     }
 
-    public List<CompositeShiftActivityDTO> updateCompositeShiftTabOfActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {
+    public List<CompositeShiftActivityDTO> assignCompositeActivitiesInActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
@@ -439,7 +439,15 @@ public class ActivityService extends MongoBaseService {
     }
 
     public List<CompositeActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
-        return activityMongoRepository.getCompositeActivities(activityId);
+        Activity activity = activityMongoRepository.findOne(activityId);
+        if (!Optional.ofNullable(activity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
+        }
+        List<CompositeActivityDTO> compositeActivities= new ArrayList<>();
+        if (Optional.ofNullable(activity.getCompositeActivities()).isPresent() && !activity.getCompositeActivities().isEmpty()){
+             compositeActivities = activityMongoRepository.getCompositeActivities(activityId);
+        }
+        return compositeActivities;
     }
 
     public ActivityTabsWrapper updateIndividualPointsTab(IndividualPointsActivityTabDTO individualPointsDTO) {
