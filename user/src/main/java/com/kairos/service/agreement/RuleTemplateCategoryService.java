@@ -178,21 +178,6 @@ public class RuleTemplateCategoryService extends UserBaseService {
         return response;
     }
 
-
-    /*public RuleTemplateWrapper getRulesTemplateCategoryByUnit(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
-            throw new DataNotFoundByIdException("Organization does not exist");
-        }
-        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryRepository.getRuleTemplateCategoryByUnitId(unitId);
-        List<RuleTemplateResponseDTO> templateList = wtaBaseRuleTemplateGraphRepository.getWTABaseRuleTemplateByUnitId(unitId);
-        RuleTemplateWrapper ruleTemplateWrapper = new RuleTemplateWrapper();
-        ruleTemplateWrapper.setCategoryList(categoryList);
-        ruleTemplateWrapper.setTemplateList(templateList);
-
-        return ruleTemplateWrapper;
-
-    }*/
     // creating default rule template category NONE
     public void createDefaultRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
         save(ruleTemplateCategory);
@@ -208,16 +193,14 @@ public class RuleTemplateCategoryService extends UserBaseService {
     public Map<String, Object> createRuleTemplateCategory(long countryId, RuleTemplateCategoryCTADTO ruleTemplateCategoryDTO) {
 
         String name = "(?i)" + ruleTemplateCategoryDTO.getName();
-        int ruleFound = countryGraphRepository.checkDuplicateRuleTemplateCategory(countryId, RuleTemplateCategoryType.CTA, name);
-
-        if (ruleFound != 0) {
-            exceptionService.duplicateDataException("message.ruleTemplate.category.duplicate", name);
+        RuleTemplateCategory ruleTemplateCategory;
+        ruleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(name, RuleTemplateCategoryType.CTA);
+        Country country = countryService.getCountryById(countryId);
+        if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
+            ruleTemplateCategory = new RuleTemplateCategory(ruleTemplateCategoryDTO.getName(), RuleTemplateCategoryType.CTA);
+            country.addRuleTemplateCategory(ruleTemplateCategory);
         }
 
-        Country country = countryService.getCountryById(countryId);
-        RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory(ruleTemplateCategoryDTO.getName(), RuleTemplateCategoryType.CTA);
-
-        country.addRuleTemplateCategory(ruleTemplateCategory);
         save(country);
         ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateCategoryDTO.getRuleTemplateIds(), ruleTemplateCategory.getName());
         // TODO fix need with Front end harish Modi

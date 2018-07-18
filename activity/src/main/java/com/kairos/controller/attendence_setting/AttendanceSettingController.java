@@ -29,8 +29,8 @@ public class AttendanceSettingController {
     }
 
     @PostMapping(value = "/attendance_setting")
-    public ResponseEntity<Map<String,Object>> updateAttendanceSetting(@RequestParam(value = "unitId",required=false) Long unitId,@RequestParam("checkIn") boolean checkIn){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.updateAttendanceSetting(unitId,checkIn));
+    public ResponseEntity<Map<String,Object>> updateAttendanceSetting(@RequestParam(value = "unitId",required=false) Long unitId,@RequestParam(value = "reasonCodeId",required=false) Long reasonCodeId,@RequestParam("checkIn") boolean checkIn){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.updateAttendanceSetting(unitId,reasonCodeId,checkIn));
     }
 
 }

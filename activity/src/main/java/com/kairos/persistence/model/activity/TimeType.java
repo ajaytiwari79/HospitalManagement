@@ -38,10 +38,12 @@ public class TimeType extends MongoBaseEntity{
 
     public TimeType() {}
 
-    public TimeType(TimeTypes timeTypes, String label, String description) {
+    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,String textColor) {
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
+        this.backgroundColor=backgroundColor;
+        this.textColor=textColor;
         this.leafNode = true;
     }
 

@@ -20,23 +20,23 @@ import java.util.Set;
 public interface TemplateTypeMongoRepository extends MongoRepository<TemplateType,BigInteger> {
 
 
-    @Query("{templateName:?0,deleted:false}")
+    @Query("{name:?0,deleted:false}")
     TemplateType findByTemplateName(String templateName);
 
     TemplateType findByid(BigInteger id);
 
-    @Query("{countryId:?0,templateName:?1,deleted:false}")
+    @Query("{countryId:?0,name:?1,deleted:false}")
     TemplateType findByTemplateNameAndIsDeleted(Long countryId,String templateName);
 
 
-    @Query("{deleted:false,templateName:?0,countryId:?1}")
+    @Query("{deleted:false,name:?0,countryId:?1}")
     TemplateType findByIdAndNameDeleted(String templateName,Long countryId);
 
     @Query("{deleted:false,_id:?0,countryId:?1}")
     TemplateType findByIdAndNonDeleted(BigInteger id,Long countryId);
 
 
-    @Query("{templateName:{$in:?0},deleted:false}")
+    @Query("{name:{$in:?0},deleted:false}")
     List<TemplateType> findByNameList(Set<String> templateName);
 
 

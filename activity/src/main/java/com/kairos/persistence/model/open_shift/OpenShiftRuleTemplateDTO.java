@@ -2,6 +2,7 @@ package com.kairos.persistence.model.open_shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.open_shift.Priority;
 import com.kairos.enums.AllowedLength;
 import com.kairos.enums.OpenShiftRuleTemplateType;
 import com.kairos.activity.open_shift.ActivitiesPerTimeType;
@@ -33,6 +34,7 @@ public class OpenShiftRuleTemplateDTO {
     private ShiftAssignmentCriteria shiftAssignmentCriteria;
     private BigInteger openShiftIntervalId;
     private PlannerNotificationInfo plannerNotificationInfo;
+    private Priority priority;
 
 
     public OpenShiftRuleTemplateDTO() {
@@ -189,5 +191,13 @@ public class OpenShiftRuleTemplateDTO {
 
     public void setRuleTemplateType(OpenShiftRuleTemplateType ruleTemplateType) {
         this.ruleTemplateType = ruleTemplateType;
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
     }
 }

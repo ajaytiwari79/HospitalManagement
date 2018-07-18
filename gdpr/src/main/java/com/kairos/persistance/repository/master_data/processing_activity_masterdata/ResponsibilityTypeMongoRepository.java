@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
 
 
-import com.kairos.persistance.model.master_data.processing_activity_masterdata.ResponsibilityType;
+import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

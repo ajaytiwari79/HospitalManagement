@@ -14,9 +14,8 @@ public class AgreementSection extends MongoBaseEntity {
 
 
     @NotNullOrEmpty(message = "Section Title cannot be empty")
-    private String title;
+    private String name;
 
-    @NotNull
     private List<BigInteger> clauses;
 
     private Long countryId;
@@ -37,19 +36,17 @@ public class AgreementSection extends MongoBaseEntity {
         this.clauses = clauses;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
-
-   public AgreementSection(Long countryId ,String title,List<BigInteger> clauses)
+    public AgreementSection(Long countryId , String name)
     {
-        this.title=title;
-        this.clauses=clauses;
+        this.name=name;
         this.countryId=countryId;
     }
 public AgreementSection(){ }

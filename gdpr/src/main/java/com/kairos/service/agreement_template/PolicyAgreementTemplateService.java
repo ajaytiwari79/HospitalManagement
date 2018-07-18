@@ -3,23 +3,22 @@ package com.kairos.service.agreement_template;
 
 import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.PolicyAgreementTemplateDTO;
-import com.kairos.persistance.model.agreement_template.AgreementSection;
+import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistance.model.template_type.TemplateType;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
-import com.kairos.persistance.repository.template_type.TemplateTypeMongoRepository;
-import com.kairos.response.dto.master_data.PolicyAgreementTemplateResponseDTO;
+import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.template_type.TemplateTypeService;
 import com.kairos.utils.ComparisonUtils;
-import com.kairos.utils.userContext.UserContext;
+import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -50,159 +49,105 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private TemplateTypeMongoRepository templateTypeMongoRepository;
-
-    //todo working on it
-    public PolicyAgreementTemplate createPolicyAgreementTemplate(Long countryId, Long organizationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto)  {
-
-        String name = policyAgreementTemplateDto.getName();
-        if (policyAgreementTemplateRepository.findByName(name) != null) {
-            throw new DuplicateDataException("policy document template With name " + name + " already exist");
-        } else {
+    private TemplateTypeService templateTypeService;
 
 
-            List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
-            Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
-            Map<String, Object> sections = new HashMap<>();
-            PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(countryId, name, policyAgreementTemplateDto.getDescription());
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param policyAgreementTemplateDto
+     * @return return object of basic policy agreement template.
+     * @description this method creates a basic policy Agreement template with basic detail about organization type,
+     * organizationSubTypes ,service Category and sub service Category.
+     */
+    public PolicyAgreementTemplate createBasicPolicyAgreementTemplate(Long countryId, Long organizationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
 
-            if(policyAgreementTemplateDto.getTemplateTypeId()!=null){
-                TemplateType exits =templateTypeMongoRepository.findByid(policyAgreementTemplateDto.getTemplateTypeId());
-                if (java.util.Optional.ofNullable(exits).isPresent()) {
-                    policyAgreementTemplate.setTemplateTypeId(policyAgreementTemplateDto.getTemplateTypeId());
-                } else {
-                    throw new DataNotExists("Template Id ->" + exits + " Not exists");
-                }
+        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByName(countryId, organizationId, policyAgreementTemplateDto.getName());
+        if (Optional.ofNullable(policyAgreementTemplate).isPresent()) {
+            exceptionService.duplicateDataException("message.duplicate", "Policy Agreement Template ", policyAgreementTemplateDto.getName());
+        }
+        templateTypeService.getTemplateByById(policyAgreementTemplateDto.getTemplateTypeId(), countryId);
+        List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, policyAgreementTemplateDto.getAccountTypes());
+        PolicyAgreementTemplate newPolicyAgreementTemplate = new PolicyAgreementTemplate(policyAgreementTemplateDto.getName(), policyAgreementTemplateDto.getDescription(), countryId, policyAgreementTemplateDto.getOrganizationTypes()
+                , policyAgreementTemplateDto.getOrganizationSubTypes(), policyAgreementTemplateDto.getOrganizationServices(), policyAgreementTemplateDto.getOrganizationSubServices());
+        newPolicyAgreementTemplate.setAccountTypes(accountTypes);
+        newPolicyAgreementTemplate.setTemplateType(policyAgreementTemplateDto.getTemplateTypeId());
+        newPolicyAgreementTemplate.setOrganizationId(organizationId);
+        try {
+            newPolicyAgreementTemplate = policyAgreementTemplateRepository.save(sequenceGenerator(newPolicyAgreementTemplate));
+        } catch (MongoException e) {
+            LOGGER.info(e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return newPolicyAgreementTemplate;
+
+    }
+
+
+    /**@description -method getPolicyAgreementWithSectionsAndClausesById()  uses Mongo QUuery which  return agreement template with sections and clauses if agreementSections is  present ,if not agreementSections present then
+     * it return agreementSections as agreementSections[ {} ] from data base ,which is converted into AgreementSectionResponseDTO[{id=null ,name=null}], thats  why we are checking if id is null present then simply add new agreementSections[]
+     * instead of agreementSections[ {} ] .
+     * @param countryId
+     * @param organizationId
+     * @param id
+     * @return
+     */
+    public PolicyAgreementTemplateResponseDTO getPolicyAgreementTemplateWithAgreementSectionAndClausesById(Long countryId, Long organizationId, BigInteger id) {
+        PolicyAgreementTemplateResponseDTO policyAgreementTemplateResponseDTO = policyAgreementTemplateRepository.getPolicyAgreementWithSectionsAndClausesById(countryId, organizationId, id);
+        if (policyAgreementTemplateResponseDTO.getAgreementSections().get(0).getId()==null) {
+            policyAgreementTemplateResponseDTO.setAgreementSections(new ArrayList<>());
+        }
+        return policyAgreementTemplateResponseDTO;
+
+    }
+
+
+    /**@description -method getAllPolicyAgreementWithSectionsAndClauses()  uses Mongo QUuery which  return agreement template with sections and clauses if agreementSections is  present ,if not agreementSections present then
+     * it return agreementSections as agreementSections[ {} ] from data base ,which is converted into AgreementSectionResponseDTO[{id=null ,name=null}], thats  why we are checking if id is null present then simply add new agreementSections[]
+     * instead of agreementSections[ {} ] .
+     * @param countryId
+     * @param organizationId
+     * @return -method return list all policy Agreement Template with sections and Clauses
+     */
+    public List<PolicyAgreementTemplateResponseDTO> getAllPolicyAgreementTemplateWithAgreementSectionAndClauses(Long countryId, Long organizationId) {
+        List<PolicyAgreementTemplateResponseDTO> policyAgreementTemplateResponseDTOList = policyAgreementTemplateRepository.getAllPolicyAgreementWithSectionsAndClauses(countryId, organizationId);
+        policyAgreementTemplateResponseDTOList.forEach(policyAgreementTemplateResponseDTO -> {
+
+            if (policyAgreementTemplateResponseDTO.getAgreementSections().get(0).getId()==null) {
+                policyAgreementTemplateResponseDTO.setAgreementSections(new ArrayList<>());
             }
-            else {
-                throw new DataNotExists("Template Id  Not Null or Empty");
-            }
-
-            if (accountTypeService.getAccountTypeList(countryId, accountTypeIds).size() != 0) {
-                policyAgreementTemplate.setAccountTypes(accountTypeIds);
-
-                if (policyAgreementTemplateDto.getOrganizationTypes() != null && policyAgreementTemplateDto.getOrganizationTypes().size() != 0) {
-                    policyAgreementTemplate.setOrganizationTypes(policyAgreementTemplateDto.getOrganizationTypes());
-
-                }
-                if (policyAgreementTemplateDto.getOrganizationSubTypes() != null && policyAgreementTemplateDto.getOrganizationSubTypes().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubTypes(policyAgreementTemplateDto.getOrganizationSubTypes());
-
-                }
-                if (policyAgreementTemplateDto.getOrganizationServices() != null && policyAgreementTemplateDto.getOrganizationServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationServices(policyAgreementTemplateDto.getOrganizationServices());
-
-                }
-                if (policyAgreementTemplateDto.getOrganizationSubServices() != null && policyAgreementTemplateDto.getOrganizationSubServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationSubServices());
-
-                }
-                if (agreementSection.size() != 0) {
-                    sections = agreementSectionService.createAgreementSections(agreementSection);
-                    policyAgreementTemplate.setAgreementSections((Set<BigInteger>) sections.get("ids"));
-                }
-                policyAgreementTemplate.setCountryId(countryId);
-                policyAgreementTemplate = sequenceGenerator(policyAgreementTemplate);
-            } else {
-                exceptionService.illegalArgumentException("account type not exist ");
-            }
-            return policyAgreementTemplate;
-
-        }
+        });
+        return policyAgreementTemplateResponseDTOList;
 
     }
 
 
-    public PolicyAgreementTemplateResponseDTO getPolicyAgreementTemplateById(Long countryId, BigInteger id) {
-        PolicyAgreementTemplateResponseDTO exist = policyAgreementTemplateRepository.getPolicyAgreementWithDataById(countryId, id);
-        if (Optional.ofNullable(exist).isPresent()) {
-            return exist;
+    public Boolean deletePolicyAgreementTemplate(Long countryId,Long organizationId,BigInteger id) {
+
+        PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        if (!Optional.ofNullable(exist).isPresent()) {
+           exceptionService.dataNotFoundByIdException("message.dataNotFound","Policy Agreement Template ",id);
         }
-        throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
-    }
-
-
-    public List<PolicyAgreementTemplateResponseDTO> getPolicyAgreementTemplateWithData() {
-        List<PolicyAgreementTemplateResponseDTO> exist = policyAgreementTemplateRepository.getPolicyAgreementWithData(UserContext.getCountryId());
-        if (exist.size() != 0) {
-            return exist;
-        }
-        throw new DataNotExists("policy agreement template ");
-    }
-
-
-    public Boolean deletePolicyAgreementTemplate(BigInteger id) {
-
-        PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByid(id);
-        if (Optional.ofNullable(exist).isPresent()) {
-            exist.setDeleted(true);
-            sequenceGenerator(exist);
-            return true;
-        }
-        throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
+        delete(exist);
+        return true;
 
     }
 
 
-    public PolicyAgreementTemplate updatePolicyAgreementTemplate(Long countryId, Long organizationId, BigInteger id, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
+    /*public PolicyAgreementTemplate updatePolicyAgreementTemplate(Long countryId, Long organizationId, BigInteger id, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
 
-        PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(id);
+        PolicyAgreementTemplate exist = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("policy agreement template not exist for id " + id);
+
         } else {
-            PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate();
-            List<AgreementSection> agreementSection = policyAgreementTemplateDto.getAgreementSections();
-            Map<String, Object> sections = new HashMap<>();
-            Set<BigInteger> accountTypeIds = policyAgreementTemplateDto.getAccountTypes();
-
-            if(policyAgreementTemplateDto.getTemplateTypeId()!=null){
-                TemplateType exits =templateTypeMongoRepository.findByid(policyAgreementTemplateDto.getTemplateTypeId());
-                if (java.util.Optional.ofNullable(exits).isPresent()) {
-                    policyAgreementTemplate.setTemplateTypeId(policyAgreementTemplateDto.getTemplateTypeId());
-                } else {
-                    throw new DataNotExists("Template Id ->" + exits + " Not exists");
-                }
-            }
-            else {
-                throw new DataNotExists("Template Id  Not Null or Empty");
-            }
-
-            if (accountTypeService.getAccountTypeList(countryId, accountTypeIds).size() != 0) {
-                policyAgreementTemplate.setAccountTypes(accountTypeIds);
-                if (policyAgreementTemplateDto.getOrganizationTypes() != null && policyAgreementTemplateDto.getOrganizationTypes().size() != 0) {
-                    policyAgreementTemplate.setOrganizationTypes(policyAgreementTemplateDto.getOrganizationTypes());
-
-                }
-                if (policyAgreementTemplateDto.getOrganizationSubTypes() != null && policyAgreementTemplateDto.getOrganizationSubTypes().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubTypes(policyAgreementTemplateDto.getOrganizationSubTypes());
-
-                }
-                if (policyAgreementTemplateDto.getOrganizationServices() != null && policyAgreementTemplateDto.getOrganizationServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationServices(policyAgreementTemplateDto.getOrganizationServices());
-
-                }
-                if (policyAgreementTemplateDto.getOrganizationSubServices() != null && policyAgreementTemplateDto.getOrganizationSubServices().size() != 0) {
-                    policyAgreementTemplate.setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationSubServices());
-
-                }
-                if (agreementSection.size() != 0) {
-                    sections = agreementSectionService.createAgreementSections(agreementSection);
-                    policyAgreementTemplate.setAgreementSections((Set<BigInteger>) sections.get("ids"));
-                }
-
-                exist.setAccountTypes(accountTypeIds);
-                exist.setName(policyAgreementTemplateDto.getName());
-                exist.setDescription(policyAgreementTemplateDto.getDescription());
-            } else {
-                exceptionService.illegalArgumentException("account type not exist ");
-            }
-            return sequenceGenerator(exist);
-
+            exceptionService.illegalArgumentException("account type not exist ");
         }
+        return sequenceGenerator(exist);
 
-
-    }
-
+    }*/
 
 
 }
+
+
