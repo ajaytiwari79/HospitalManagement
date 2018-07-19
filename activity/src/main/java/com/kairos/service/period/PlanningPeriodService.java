@@ -136,76 +136,42 @@ public class PlanningPeriodService extends MongoBaseService {
             if(!Optional.ofNullable(phases).isPresent()){
                 exceptionService.dataNotFoundByIdException("message.organization.phases", unitId);
             }
-            List<PlanningPeriod> planningPeriods = new ArrayList<PlanningPeriod>();
             save(requestPlanningPeriods);
             // Create planning period of request phase after deletion of older one
             requestPlanningPeriodsDateRanges.forEach((k,v)->{
-                createMigratedPlanningPeriodForTimeDuration(k,v, unitId, planningPeriodDTO, phases, planningPeriods);
+                createMigratedPlanningPeriodForTimeDuration(k,v, unitId, planningPeriodDTO, phases);
             });
-            createGapPlanningPeriod(unitId, planningPeriodDTO, phases, planningPeriods);
+            createPlanningPeriodForGap(unitId, planningPeriodDTO, phases);
         }
     return true;
     }
 
-    public void createMigratedPlanningPeriodForTimeDuration(LocalDate oldStartDate, LocalDate endDate, Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> phases, List<PlanningPeriod> planningPeriods){
+    public void createMigratedPlanningPeriodForTimeDuration(LocalDate oldStartDate, LocalDate endDate, Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> phases){
         //delete planning periods between given dates done in  migratePlanningPeriods and set active property false
         //  create new periods with the update planning period type
         //done Check if start date id correct date ( either monday or 1st day of month)
         // done Add planning period for earlier days from monday or first day of month
+        // Add planning period for last days till monday or first day of month
         List<LocalDate> startDateList=getListOfStartDateInWeek(oldStartDate,endDate, planningPeriodDTO);
         for (LocalDate startDate:startDateList){
-            boolean isExist=planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithStartAndEndDateTT(unitId, startDate);
+            boolean isExist=planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithUnitIdAndDate(unitId, startDate);
             if(validateStartDateForPeriodCreation(startDate, planningPeriodDTO.getDurationType())){
                 // Add planning period
-
                     LocalDate calculateEndDate = DateUtils.addDurationInLocalDateExcludingLastDate(startDate, planningPeriodDTO.getDuration(),
                             planningPeriodDTO.getDurationType(),1);
                 if(!isExist){
-                    createPlanningPeriodOnMigration(startDate,calculateEndDate,unitId, planningPeriodDTO, phases, planningPeriods);
+                    createPlanningPeriodOnMigration(startDate,calculateEndDate,unitId, planningPeriodDTO, phases);
                 }
             }else{
                 endDate = getNextValidDateForPlanningPeriod(startDate, planningPeriodDTO.getDurationType()).minusDays(1);
                 if(!isExist){
-                    createPlanningPeriodOnMigration(startDate,endDate, unitId, planningPeriodDTO, phases, planningPeriods);
+                    createPlanningPeriodOnMigration(startDate,endDate, unitId, planningPeriodDTO, phases);
                 }
             }
         }
-
-
-        // TODO Add planning period for last days till monday or first day of month
     }
 
-    public void createPlanningPeriodOnMigration(LocalDate startDate,LocalDate endDate, Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> applicablePhases, List<PlanningPeriod> planningPeriods){
-
-        BigInteger currentPhaseId = null;
-        BigInteger nextPhaseId = null;
-        List<PeriodPhaseFlippingDate> tempPhaseFlippingDate = new ArrayList<>();
-        if(Optional.ofNullable(applicablePhases).isPresent()){
-
-            LocalDate tempFlippingDate = startDate;
-            boolean scopeToFlipNextPhase =true;
-            BigInteger previousPhaseId = null;
-            int index = 0;
-
-
-            for(PhaseDTO phase : applicablePhases){
-                // Check if duration of period is enough to assign next flipping
-                tempFlippingDate = DateUtils.addDurationInLocalDate(tempFlippingDate, -phase.getDurationInDays(), DurationType.DAYS, 1);
-                // DateUtils.getDate().compareTo(tempFlippingDate) >= 0
-                if (applicablePhases.size() == index+1 || (scopeToFlipNextPhase && DateUtils.getLocalDateFromDate(DateUtils.getDate()).isAfter(tempFlippingDate)) ){
-                    if(scopeToFlipNextPhase){
-                        currentPhaseId = phase.getId();
-                        nextPhaseId = previousPhaseId;
-                    }
-                    scopeToFlipNextPhase = false;
-                }
-                previousPhaseId = phase.getId();
-                // Calculate flipping date by duration
-                PeriodPhaseFlippingDate periodPhaseFlippingDate = new PeriodPhaseFlippingDate(phase.getId(), scopeToFlipNextPhase ? tempFlippingDate : null);
-                tempPhaseFlippingDate.add(periodPhaseFlippingDate);
-                index +=1;
-            }
-        }
+    public void createPlanningPeriodOnMigration(LocalDate startDate,LocalDate endDate, Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> applicablePhases){
 
         // Set name of period dynamically
         String name = DateUtils.formatLocalDate(startDate, "dd.MMM.yyyy")+ "  " +DateUtils.formatLocalDate(endDate, "dd.MMM.yyyy");
@@ -260,33 +226,6 @@ public class PlanningPeriodService extends MongoBaseService {
                 planningPeriodDTO.getDurationType(),1);
         }else{
             endDate = getNextValidDateForPlanningPeriod(startDate, planningPeriodDTO.getDurationType()).minusDays(1);
-        }
-       BigInteger currentPhaseId = null;
-        BigInteger nextPhaseId = null;
-        List<PeriodPhaseFlippingDate> tempPhaseFlippingDate = new ArrayList<>();
-        if(Optional.ofNullable(applicablePhases).isPresent()){
-
-            LocalDate tempFlippingDate = startDate;
-            boolean scopeToFlipNextPhase =true;
-            BigInteger previousPhaseId = null;
-            int index = 0;
-            for(PhaseDTO phase : applicablePhases){
-                // Check if duration of period is enough to assign next flipping
-                tempFlippingDate = DateUtils.addDurationInLocalDate(tempFlippingDate, -phase.getDurationInDays(), DurationType.DAYS, 1);
-                // DateUtils.getDate().compareTo(tempFlippingDate) >= 0
-                if (applicablePhases.size() == index+1 || (scopeToFlipNextPhase && DateUtils.getLocalDateFromDate(DateUtils.getDate()).isAfter(tempFlippingDate)) ){
-                    if(scopeToFlipNextPhase){
-                        currentPhaseId = phase.getId();
-                        nextPhaseId = previousPhaseId;
-                    }
-                    scopeToFlipNextPhase = false;
-                }
-                previousPhaseId = phase.getId();
-                // Calculate flipping date by duration
-                PeriodPhaseFlippingDate periodPhaseFlippingDate = new PeriodPhaseFlippingDate(phase.getId(), scopeToFlipNextPhase ? tempFlippingDate : null);
-                tempPhaseFlippingDate.add(periodPhaseFlippingDate);
-                index +=1;
-            }
         }
         // Set name of period dynamically
         String name = DateUtils.formatLocalDate(startDate, "dd.MMM.yyyy")+ "  " +DateUtils.formatLocalDate(endDate, "dd.MMM.yyyy");
@@ -367,19 +306,11 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.organization.phases", unitId);
         }
 
-        //Set Start Date and End date in PlanningPeriodDTO according to recurringNumber
-//        LocalDate endDate = DateUtils.addDurationInLocalDate(planningPeriodDTO.getStartDate(),planningPeriodDTO.getDuration(),
-//                planningPeriodDTO.getDurationType(), planningPeriodDTO.getRecurringNumber());
-
         // period can't be created in past
         if(DateUtils.getLocalDateFromDate(DateUtils.getDate()).isAfter(planningPeriodDTO.getStartDate())){
             exceptionService.actionNotPermittedException("error.period.past.date.creation");
         }
 
-        // Check if any period already exist in the given period
-//        if(planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithStartAndEndDate(unitId, planningPeriodDTO.getStartDate(), endDate)){
-//            exceptionService.actionNotPermittedException("message.period.invalid.startDate.or.duration");
-//        }
 
         List<PlanningPeriod> planningPeriods = new ArrayList<PlanningPeriod>(planningPeriodDTO.getRecurringNumber());
         PlanningPeriod lastEndDate=planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
@@ -445,12 +376,6 @@ public class PlanningPeriodService extends MongoBaseService {
         if(!Optional.ofNullable(planningPeriod).isPresent()){
             exceptionService.dataNotFoundByIdException("message.period.organization.notfound", periodId);
         }
-
-        // If start date is equal to end date or end date is less than start date
-        if(planningPeriodDTO.getStartDate().compareTo(planningPeriodDTO.getEndDate()) >= 0 ){
-            exceptionService.actionNotPermittedException("message.period.invalid.duration");
-        }
-
         // Check if period is in request phase (Changes for start date and end date can be done in Request Phase
         // We are checking request phase by its name, can be done by sequence, need to ask
         // We know here that sequence of request phase is 0
@@ -465,61 +390,8 @@ public class PlanningPeriodService extends MongoBaseService {
             planningPeriod = updatePhaseFlippingDateOfPeriod(planningPeriod, planningPeriodDTO, unitId);
             planningPeriod.setName(planningPeriodDTO.getName());
             save(planningPeriod);
-            return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate());
         }
-
-        // We know here that sequence of request phase is 0
-        if(planningPeriodMongoRepository.checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(
-                unitId, planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),AppConstants.REQUEST_PHASE_SEQUENCE)){
-            exceptionService.actionNotPermittedException("message.period.phase.request.merge");
-        }
-
-        // Fetch previous and next planning periods
-        PlanningPeriod previousPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(unitId, planningPeriodDTO.getStartDate());
-        PlanningPeriod nextPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(unitId, planningPeriodDTO.getEndDate());
-
-        LocalDate startDateOfPeriodToBeDeleted = Optional.ofNullable(previousPeriod).isPresent() ? previousPeriod.getStartDate() : planningPeriod.getStartDate() ;
-        LocalDate endDateOfPeriodToBeDeleted = Optional.ofNullable(nextPeriod).isPresent() ? nextPeriod.getEndDate() : planningPeriodDTO.getEndDate();
-
-        // Delete Periods between dates startDateOfPeriodToBeDeleted and endDateOfPeriodToBeDeleted
-        planningPeriodMongoRepository.deletePlanningPeriodLiesBetweenDates(unitId, startDateOfPeriodToBeDeleted, endDateOfPeriodToBeDeleted);
-
-        List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);
-
-        List<PlanningPeriod> planningPeriodsToSave = new ArrayList<PlanningPeriod>(3);
-        HashMap<LocalDate,LocalDate> mapOfDatesForPlanningPeriods = new HashMap<>();
-
-        if(startDateOfPeriodToBeDeleted.compareTo(planningPeriodDTO.getStartDate()) != 0){
-            mapOfDatesForPlanningPeriods.put(startDateOfPeriodToBeDeleted, DateUtils.addDurationInLocalDate(planningPeriodDTO.getStartDate(), -1, DurationType.DAYS, 1));
-        }
-
-        mapOfDatesForPlanningPeriods.put(planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate());
-
-        if(endDateOfPeriodToBeDeleted.compareTo(planningPeriodDTO.getEndDate()) != 0){
-            mapOfDatesForPlanningPeriods.put(DateUtils.addDurationInLocalDate(planningPeriodDTO.getEndDate(), 1, DurationType.DAYS, 1), endDateOfPeriodToBeDeleted);
-        }
-
-        mapOfDatesForPlanningPeriods.forEach((startDate,endDate)->{
-            addPlanningPeriodOnUpdate(unitId, endDate, startDate,phases, planningPeriodsToSave );
-        });
-
-        save(planningPeriodsToSave);
-
-        // Fetch periods from start date and end date and return
-        return getPlanningPeriods(unitId, startDateOfPeriodToBeDeleted, endDateOfPeriodToBeDeleted);
-    }
-
-
-    public void addPlanningPeriodOnUpdate(Long unitId, LocalDate endDate, LocalDate startDate, List<PhaseDTO> phases, List<PlanningPeriod> planningPeriods){
-        if(endDate.compareTo(startDate) <= 0){
-            return;
-        }
-        int duration = DateUtils.getDurationBetweenTwoLocalDatesIncludingLastDate(endDate, startDate, DurationType.DAYS).intValue();//Period.between(startDate, endDate).getDays();//endDate.compareTo(startDate);
-
-        PlanningPeriodDTO tempPlanningPeriodDTO = new PlanningPeriodDTO(startDate,duration,
-                DurationType.DAYS, 1, endDate);
-
-        createPlanningPeriod(unitId, startDate, planningPeriods, phases, tempPlanningPeriodDTO, 1);
+        return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate());
     }
 
     // To delete planning period
@@ -569,20 +441,18 @@ public class PlanningPeriodService extends MongoBaseService {
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
-    public boolean createGapPlanningPeriod(Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> phases, List<PlanningPeriod> planningPeriods){
+    private void createPlanningPeriodForGap(Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> phases){
         List<PlanningPeriod>  requestPlanningPeriods=planningPeriodMongoRepository.findAllPeriodsOfUnitByRequestPhaseId(unitId,AppConstants.REQUEST_PHASE_NAME);
         for(int i=0;i<requestPlanningPeriods.size()-1;i++){
-           // int duration = DateUtils.getDurationBetweenTwoLocalDatesIncludingLastDate(requestPlanningPeriods.get(i).getEndDate(),requestPlanningPeriods.get(i+1).getStartDate(), DurationType.DAYS).intValue();//Period.between(startDate, endDate).getDays();//endDate.compareTo(startDate);
-            Long duration=ChronoUnit.DAYS.between(requestPlanningPeriods.get(i).getEndDate(), requestPlanningPeriods.get(i+1).getStartDate());
+            int duration = DateUtils.getDurationBetweenTwoLocalDatesIncludingLastDate(requestPlanningPeriods.get(i).getEndDate(),requestPlanningPeriods.get(i+1).getStartDate(), DurationType.DAYS).intValue();//Period.between(startDate, endDate).getDays();//endDate.compareTo(startDate);
                 if(duration>0){
                     LocalDate startDate=requestPlanningPeriods.get(i).getEndDate().plusDays(1);
                     LocalDate endDate=requestPlanningPeriods.get(i+1).getStartDate().minusDays(1);
-                    boolean isExist=planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithStartAndEndDateTT(unitId, startDate);
+                    boolean isExist=planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithUnitIdAndDate(unitId, startDate);
                     if(!isExist){
-                    createPlanningPeriodOnMigration( startDate,endDate,  unitId,planningPeriodDTO,  phases,  planningPeriods);
+                    createPlanningPeriodOnMigration( startDate,endDate,  unitId,planningPeriodDTO,  phases);
                 }}
         }
-        return true;
     }
 
         /*public Date addDaysInDate(Date date,  int duration, DurationType durationType, int recurringNumber, int millis){
@@ -1063,49 +933,7 @@ public class PlanningPeriodService extends MongoBaseService {
         save(planningPeriod);
     }*/
 
-    // not delete this code
-/*
-  public Boolean migratePlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO){
-        Phase requestPhase = phaseMongoRepository.findBySequenceAndOrganizationIdAndDeletedFalse(AppConstants.REQUEST_PHASE_SEQUENCE, unitId);
-        List<PlanningPeriod> requestPlanningPeriods = planningPeriodMongoRepository.findAllPeriodsOfUnitByCurrentPhaseId(unitId, requestPhase.getId());
-
-        if(requestPlanningPeriods.size() > 0 ){
-            Map<LocalDate,LocalDate> requestPlanningPeriodsDateRanges = new HashMap<>();
-            LocalDate endDate = null;
-            LocalDate startDate = null;
-            // Prepare Date Range for Planning Periods of Request Phase
-            for (PlanningPeriod planningPeriod : requestPlanningPeriods){
-
-                if(Duration.between(planningPeriod.getStartDate().atStartOfDay(),planningPeriod.getEndDate().atStartOfDay()).toDays()>1){
-                    //requestPlanningPeriodsDateRanges.put(startDate, endDate);
-                    endDate = planningPeriod.getEndDate();
-                    startDate = planningPeriod.getStartDate();
-                } else {
-                    startDate = planningPeriod.getStartDate();
-                }
-                requestPlanningPeriodsDateRanges.put(startDate, endDate);
-               // planningPeriod.setActive(false);
-            }
-            requestPlanningPeriodsDateRanges.put(startDate,endDate);
-
-            List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);;
-            if(!Optional.ofNullable(phases).isPresent()){
-                exceptionService.dataNotFoundByIdException("message.organization.phases", unitId);
-            }
-
-            List<PlanningPeriod> planningPeriods = new ArrayList<PlanningPeriod>();
-
-            // Create planning period of request phase after deletion of older one
-            requestPlanningPeriodsDateRanges.forEach((k,v)->{
-                createMigratedPlanningPeriodForTimeDuration(k,v, unitId, planningPeriodDTO, phases, planningPeriods);
-            });
-        }
-
-    return  true;
 
 
-    }
-
- */
 
 }

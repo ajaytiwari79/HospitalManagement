@@ -45,6 +45,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 and("startDate").gte(startDate).and("endDate").lte(endDate));
         Update update = new Update();
         update.set("deleted", true);
+        update.set("active", false);
         return mongoTemplate.updateMulti(query, update, PlanningPeriod.class);
     }
 

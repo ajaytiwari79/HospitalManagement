@@ -77,7 +77,7 @@ public class PlanningPeriodController {
     }
 
     @ApiOperation(value = "Migrate Planning Period")
-    @PostMapping(value="/migrate_period")
+    @PostMapping(value="/migrate_planning_period")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> migratePlanningPeriod(@PathVariable Long unitId,  @RequestBody @Valid PlanningPeriodDTO planningPeriodDTO) {
 
