@@ -11,6 +11,7 @@ import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.access_page.KPIAccessPageDTO;
+import com.kairos.util.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -69,8 +70,9 @@ public class CounterManagementService extends MongoBaseService{
 
     //vairous methods for accessing countertypes
     //to locate the counters in moduleWiseCounterMapping will be supplied to UI for ref.
-    public List getAllCounters(){
-        return counterRepository.getEntityItemList(Counter.class);
+    public List getAllKPIs(){
+        List<Counter> allKPIs = counterRepository.getEntityItemList(KPI.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(allKPIs, KPIDTO.class);
     }
 
     public Map getCounterTypeAndIdMapping(List<Counter> counters){
