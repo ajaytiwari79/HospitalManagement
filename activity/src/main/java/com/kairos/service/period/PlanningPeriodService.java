@@ -142,7 +142,7 @@ public class PlanningPeriodService extends MongoBaseService {
             requestPlanningPeriodsDateRanges.forEach((k,v)->{
                 createMigratedPlanningPeriodForTimeDuration(k,v, unitId, planningPeriodDTO, phases, planningPeriods);
             });
-            //createGapPlanningPeriod(unitId, planningPeriodDTO, phases, planningPeriods);
+            createGapPlanningPeriod(unitId, planningPeriodDTO, phases, planningPeriods);
         }
     return true;
     }
@@ -368,8 +368,8 @@ public class PlanningPeriodService extends MongoBaseService {
         }
 
         //Set Start Date and End date in PlanningPeriodDTO according to recurringNumber
-        LocalDate endDate = DateUtils.addDurationInLocalDate(planningPeriodDTO.getStartDate(),planningPeriodDTO.getDuration(),
-                planningPeriodDTO.getDurationType(), planningPeriodDTO.getRecurringNumber());
+//        LocalDate endDate = DateUtils.addDurationInLocalDate(planningPeriodDTO.getStartDate(),planningPeriodDTO.getDuration(),
+//                planningPeriodDTO.getDurationType(), planningPeriodDTO.getRecurringNumber());
 
         // period can't be created in past
         if(DateUtils.getLocalDateFromDate(DateUtils.getDate()).isAfter(planningPeriodDTO.getStartDate())){
@@ -377,9 +377,9 @@ public class PlanningPeriodService extends MongoBaseService {
         }
 
         // Check if any period already exist in the given period
-        if(planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithStartAndEndDate(unitId, planningPeriodDTO.getStartDate(), endDate)){
-            exceptionService.actionNotPermittedException("message.period.invalid.startDate.or.duration");
-        }
+//        if(planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithStartAndEndDate(unitId, planningPeriodDTO.getStartDate(), endDate)){
+//            exceptionService.actionNotPermittedException("message.period.invalid.startDate.or.duration");
+//        }
 
         List<PlanningPeriod> planningPeriods = new ArrayList<PlanningPeriod>(planningPeriodDTO.getRecurringNumber());
         PlanningPeriod lastEndDate=planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
@@ -574,7 +574,7 @@ public class PlanningPeriodService extends MongoBaseService {
         for(int i=0;i<requestPlanningPeriods.size()-1;i++){
            // int duration = DateUtils.getDurationBetweenTwoLocalDatesIncludingLastDate(requestPlanningPeriods.get(i).getEndDate(),requestPlanningPeriods.get(i+1).getStartDate(), DurationType.DAYS).intValue();//Period.between(startDate, endDate).getDays();//endDate.compareTo(startDate);
             Long duration=ChronoUnit.DAYS.between(requestPlanningPeriods.get(i).getEndDate(), requestPlanningPeriods.get(i+1).getStartDate());
-                if(duration<0){
+                if(duration>0){
                     LocalDate startDate=requestPlanningPeriods.get(i).getEndDate().plusDays(1);
                     LocalDate endDate=requestPlanningPeriods.get(i+1).getStartDate().minusDays(1);
                     boolean isExist=planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithStartAndEndDateTT(unitId, startDate);
