@@ -6,9 +6,9 @@ import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
-import static com.kairos.constants.AppConstants.HAS_LANGUAGE_SPECIFIC_DATA;
+import static com.kairos.constants.AppConstants.ACCESS_PAGE_HAS_LANGUAGE;
 
-@RelationshipEntity(type=HAS_LANGUAGE_SPECIFIC_DATA)
+@RelationshipEntity(type= ACCESS_PAGE_HAS_LANGUAGE)
 public class AccessPageLanguageRelationShip extends UserBaseEntity {
     @StartNode
     private AccessPage accessPage;
