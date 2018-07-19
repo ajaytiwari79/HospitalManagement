@@ -37,7 +37,7 @@ public class SystemLanguageService extends UserBaseService {
     public SystemLanguageDTO addSystemLanguage(SystemLanguageDTO systemLanguageDTO) {
 
         logger.info("featureDTO : "+systemLanguageDTO.getName());
-        if( systemLanguageGraphRepository.isSystemLanguageExistsWithSameName(systemLanguageDTO.getName()) ){
+        if( systemLanguageGraphRepository.isSystemLanguageExistsWithSameName(systemLanguageDTO.getName().trim()) ){
             exceptionService.duplicateDataException("message.system.language.name.alreadyExist",systemLanguageDTO.getName());
         }
 
