@@ -22,7 +22,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityTagDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds);
 
-    List<CompositeActivityDTO> getCompositeActivities(BigInteger activityIds);
+    List<CompositeActivityDTO> getCompositeActivities(BigInteger activityId);
 
     List<ActivityTagDTO> findAllActivityByCountry(long countryId);
 
