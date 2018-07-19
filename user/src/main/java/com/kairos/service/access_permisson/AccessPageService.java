@@ -419,7 +419,7 @@ public class AccessPageService extends UserBaseService {
         if(Optional.ofNullable(accessPageLanguageDTO.getId()).isPresent()){
             Optional<AccessPageLanguageRelationShip> accessPageLanguageRelationShip= accessPageLanguageRelationShipRepository.findById(accessPageLanguageDTO.getId());
             if(!accessPageLanguageRelationShip.isPresent()){
-                exceptionService.dataNotFoundByIdException("access_page.description.absent");
+                exceptionService.dataNotFoundByIdException("access_page.lang.description.absent",accessPageLanguageDTO.getLanguageId());
             }
             accessPageLanguageRelationShip.get().setDescription(accessPageLanguageDTO.getDescription());
             save(accessPageLanguageRelationShip.get());

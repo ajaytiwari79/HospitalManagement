@@ -375,8 +375,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "return id(org) as unitId, permissions as permission")
     List<UserPermissionQueryResult> fetchStaffPermission(Long userId);
 
-    @Query("Match (accessPage:AccessPage) where accessPage.isModule=true return accessPage")
-    List<AccessPage> getMainModulesList();
+
 
     @Query("MATCH (n:AccessPage) -[:SUB_PAGE *]->(subPages:AccessPage{active:true,kpiEnabled:true}) where n.moduleId={0} RETURN subPages")
     List<AccessPage> getKPITabsList(String moduleId);
