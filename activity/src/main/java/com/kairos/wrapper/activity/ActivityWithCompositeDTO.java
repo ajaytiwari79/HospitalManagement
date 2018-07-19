@@ -23,7 +23,7 @@ public class ActivityWithCompositeDTO {
     private String name;
     private GeneralActivityTab generalActivityTab;
     private TimeCalculationActivityDTO timeCalculationActivityTab;
-    private List<CompositeActivityDTO> compositeActivities;
+    private List<CompositeActivityDTO> compositeActivities= new ArrayList<>();
     private List<Long> expertises= new ArrayList<>();
     private List<Long> employmentTypes= new ArrayList<>();
     private RulesActivityTab rulesActivityTab;

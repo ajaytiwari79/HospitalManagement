@@ -9,7 +9,7 @@ import java.math.BigInteger;
 /**
  * Created by pavan on 8/2/18.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompositeActivityDTO {
     private BigInteger id;
