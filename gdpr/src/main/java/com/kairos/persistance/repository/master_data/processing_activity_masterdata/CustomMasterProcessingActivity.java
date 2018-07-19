@@ -20,9 +20,9 @@ public interface CustomMasterProcessingActivity {
 
    List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId,Long organizationId);
 
-   List<MasterProcessingActivity> getMasterProcessingActivityWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
+   List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
 
-   Criteria buildQuery(FilterSelection filterSelection, FilterType filterType, Query query);
+   Criteria buildQuery(FilterSelection filterSelection, FilterType filterType);
 
 
 
