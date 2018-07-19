@@ -9,6 +9,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccessPageLanguageRelationShipRepository extends Neo4jBaseRepository<AccessPageLanguageRelationShip,Long> {
 
-
-    AccessPageLanguageRelationShip findByIdAndDeletedFalse(Long id);
 }
