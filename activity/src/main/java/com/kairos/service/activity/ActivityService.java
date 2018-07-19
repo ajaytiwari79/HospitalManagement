@@ -414,7 +414,7 @@ public class ActivityService extends MongoBaseService {
         }
         Set<BigInteger> compositeShiftIds = new HashSet<>();
         compositeShiftIds.addAll(compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet()));
-        Integer activityMatchedCount = activityMongoRepository.findAllActivityByIds(compositeShiftIds);
+        Integer activityMatchedCount = activityMongoRepository.countActivityByIds(compositeShiftIds);
         if (activityMatchedCount != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
