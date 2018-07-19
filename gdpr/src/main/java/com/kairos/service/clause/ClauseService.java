@@ -78,13 +78,12 @@ public class ClauseService extends MongoBaseService {
             exceptionService.invalidRequestException("message.invalid.request", "Select account Type");
         }
         List<ClauseTag> tagList = new ArrayList<>();
-        // templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
+        //templateTypeService.getTemplateByIdsList(templateTypesIds, countryId);
         Clause newClause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), countryId, clauseDto.getOrganizationTypes(), clauseDto.getOrganizationSubTypes()
                 , clauseDto.getOrganizationServices(), clauseDto.getOrganizationSubServices());
         newClause.setOrganizationId(organizationId);
         newClause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
-        //newClause.setOrganizationList(clauseDto.getOrganizationList());
-        // newClause.setTemplateType(clauseDto.getTemplateType());
+        newClause.setTemplateTypes(clauseDto.getTemplateTypes());
 
         try {
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
@@ -101,14 +100,6 @@ public class ClauseService extends MongoBaseService {
             throw new RuntimeException(e.getMessage());
         }
 
-    }
-
-    public Clause getClause(Long countryId, Long organizationId, BigInteger id) {
-        Clause clause = clauseMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
-        if (!Optional.ofNullable(clause).isPresent()) {
-            throw new DataNotFoundByIdException("message.clause.data.not.found.for " + id);
-        } else
-            return clause;
     }
 
 
@@ -133,7 +124,8 @@ public class ClauseService extends MongoBaseService {
         }
         List<ClauseTag> tagList = new ArrayList<>();
         exists.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
-        // templateTypeService.getTemplateByById(clauseDto.getTemplateType(), countryId);
+        List<BigInteger> templateTypesIds=clauseDto.getTemplateTypes();
+        //templateTypeService.getTemplateByIdsList(templateTypesIds, countryId);
         try {
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
             exists.setOrganizationTypes(clauseDto.getOrganizationTypes());
@@ -143,7 +135,7 @@ public class ClauseService extends MongoBaseService {
             exists.setTitle(clauseDto.getTitle());
             exists.setDescription(clauseDto.getDescription());
             exists.setTags(tagList);
-            //exists.setTemplateType(clauseDto.getTemplateType());
+            exists.setTemplateTypes(clauseDto.getTemplateTypes());
             // exists.setOrganizationList(clauseDto.getOrganizationList());
             exists = clauseMongoRepository.save(sequenceGenerator(exists));
         } catch (Exception e) {
@@ -188,7 +180,10 @@ public class ClauseService extends MongoBaseService {
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
             Clause clause = new Clause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), countryId, policyAgreementTemplate.getOrganizationTypes(), policyAgreementTemplate.getOrganizationSubTypes()
                     , policyAgreementTemplate.getOrganizationServices(), policyAgreementTemplate.getOrganizationSubServices());
-            clause.setTemplateType(policyAgreementTemplate.getTemplateType());
+
+            List<BigInteger> templateTypes=new ArrayList<>();
+            templateTypes.add(policyAgreementTemplate.getTemplateType());
+            clause.setTemplateTypes(templateTypes);
             clause.setOrganizationId(organizationId);
             clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
             newCLauseList.add(clause);
@@ -205,8 +200,19 @@ public class ClauseService extends MongoBaseService {
      * @description
      */
     public List<ClauseResponseDTO> getAllClauses(Long countryId, Long organizationId) {
-        return clauseMongoRepository.findAllClause(countryId, organizationId);
+        return clauseMongoRepository.findAllClauseWithTemplateType(countryId, organizationId);
     }
+
+
+    public ClauseResponseDTO getClauseById(Long countryId, Long organizationId, BigInteger id) {
+        ClauseResponseDTO clause = clauseMongoRepository.findClauseWithTemplateTypeById(countryId, organizationId, id);
+        if (!Optional.ofNullable(clause).isPresent()) {
+            throw new DataNotFoundByIdException("message.clause.data.not.found.for " + id);
+        }
+        return clause;
+    }
+
+
 
 
     /**

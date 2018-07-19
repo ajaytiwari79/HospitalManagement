@@ -1,6 +1,6 @@
 package com.kairos.persistance.repository.master_data.asset_management;
 
-import com.kairos.persistance.model.master_data.asset_management.AssetType;
+import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.master_data.AssetTypeResponseDto;

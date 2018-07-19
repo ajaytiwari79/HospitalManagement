@@ -203,7 +203,7 @@ public class PhaseService extends MongoBaseService {
         long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
 
         Collections.sort(phases, (Phase p1, Phase p2) -> {
-            if (p1.getSequence() < p2.getSequence())
+            if (p1.getSequence() > p2.getSequence())
                 return 1;
             else
                 return -1;
@@ -232,7 +232,7 @@ public class PhaseService extends MongoBaseService {
             phase = phases.get(phases.size() - 1);
             return phase;
         }
-        //logger.info(phase.getName());
+        logger.info(phase.getName());
         return phase;
     }
 

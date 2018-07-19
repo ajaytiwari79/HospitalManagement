@@ -8,8 +8,8 @@ import com.kairos.dto.master_data.ModuleIdDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
-import com.kairos.persistance.model.master_data.asset_management.MasterAsset;
-import com.kairos.persistance.model.master_data.processing_activity_masterdata.MasterProcessingActivity;
+import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
+import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.filter.FilterMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.MasterAssetMongoRepository;
@@ -147,10 +147,10 @@ public class FilterService {
                 assetFilterData.setData(masterAssetResponseDTOs);
                 return assetFilterData;
             case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
-                List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, organizationId, filterSelectionDto);
-                List<MasterProcessingActivityResponseDTO> processingActivityResponseDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivities, MasterProcessingActivityResponseDTO.class);
+                List<MasterProcessingActivityResponseDTO> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, organizationId, filterSelectionDto);
+                //List<MasterProcessingActivityResponseDTO> processingActivityResponseDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivities, MasterProcessingActivityResponseDTO.class);
                 FilterResponseWithData<List<MasterProcessingActivityResponseDTO>> processingActivityFilterData = new FilterResponseWithData<>();
-                processingActivityFilterData.setData(processingActivityResponseDTOs);
+                processingActivityFilterData.setData(processingActivities);
                 return processingActivityFilterData;
             default:
                 throw new DataNotFoundByIdException("data not found by moduleName " + moduleName);

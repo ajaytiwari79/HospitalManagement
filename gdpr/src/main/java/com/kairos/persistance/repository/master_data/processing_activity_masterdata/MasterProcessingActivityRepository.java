@@ -1,6 +1,6 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
 
-import com.kairos.persistance.model.master_data.processing_activity_masterdata.MasterProcessingActivity;
+import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -28,7 +28,7 @@ public interface MasterProcessingActivityRepository extends MongoRepository<Mast
     @Query("{deleted:false,countryId:?0,organizationId:?1,name:?2}")
     MasterProcessingActivity findByNameAndCountryId(Long countryId,Long organizationId,String name);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2},isSubProcess:false}")
+    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2},isSubProcess:true}")
     List<MasterProcessingActivity> getAllMasterSubProcessingActivityByIds(Long countryId,Long organizationId,List<BigInteger> subProcessingActivityIds);
 
 }

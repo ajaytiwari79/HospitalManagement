@@ -60,7 +60,8 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
     }
 
     private void updatePlannedTime(Task task, LocalDateTime plannedDateTime, ScoreDirector scoreDirector){
-        if(Objects.equals(task.getPlannedStartTime(),plannedDateTime)) return;
+        //TODO we cant bypass here as 540 + 60 or 60+540 will lead or no change... Moreover 540+60 and 60+550 will also lead to same as we round off minutes
+       // if(Objects.equals(task.getPlannedStartTime(),plannedDateTime)) return;
         scoreDirector.beforeVariableChanged(task,"plannedStartTime");
         task.setPlannedStartTime(plannedDateTime);
         scoreDirector.afterVariableChanged(task,"plannedStartTime");

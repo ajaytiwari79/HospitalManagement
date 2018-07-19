@@ -5,7 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.persistance.model.master_data.processing_activity_masterdata.ProcessingLegalBasis;
+import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.ProcessingLegalBasisMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
