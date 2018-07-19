@@ -25,6 +25,7 @@ import static com.kairos.constants.AppConstant.ID;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -33,6 +34,10 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
     @Inject
     private MongoTemplate mongoTemplate;
+
+
+    Document projectionOperation = Document.parse(CustomAggregationQuery.processingActivityWithSubProcessingNonDeletedData());
+
 
 
     @Override
@@ -49,7 +54,6 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     @Override
     public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId,Long organizationId,BigInteger id) {
 
-        Document projectionOperation = Document.parse(CustomAggregationQuery.processingActivityWithSubProcessingNonDeletedData());
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId)),
                 lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
@@ -61,7 +65,6 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
     @Override
     public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId,Long organizationId) {
-        Document projectionOperation = Document.parse(CustomAggregationQuery.processingActivityWithSubProcessingNonDeletedData());
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId)),
@@ -74,21 +77,31 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     }
 
     @Override
-    public List<MasterProcessingActivity> getMasterProcessingActivityWithFilterSelection(Long countryId,Long organizationId, FilterSelectionDTO filterSelectionDto) {
-        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId));
+    public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityWithFilterSelection(Long countryId,Long organizationId, FilterSelectionDTO filterSelectionDto) {
+
+
+        Criteria criteria=Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId);
+        List<Criteria> processingActivityCriterias = new ArrayList<>(filterSelectionDto.getFiltersData().size());
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
             if (filterSelection.getValue().size() != 0) {
-              query.addCriteria(buildQuery(filterSelection, filterSelection.getName(), query));
-
-
+                processingActivityCriterias.add(buildQuery(filterSelection, filterSelection.getName()));
             }
         });
-       return mongoTemplate.find(query, MasterProcessingActivity.class);
+        criteria = criteria.andOperator(processingActivityCriterias.toArray(new Criteria[processingActivityCriterias.size()]));
+        Aggregation aggregation = Aggregation.newAggregation(
+
+                match(criteria),
+                lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
+                , new CustomAggregationOperation(projectionOperation)
+        );
+        AggregationResults<MasterProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDTO.class);
+        return result.getMappedResults();
+
 
     }
 
     @Override
-    public Criteria buildQuery(FilterSelection filterSelection, FilterType filterType, Query query) {
+    public Criteria buildQuery(FilterSelection filterSelection, FilterType filterType) {
         switch (filterType) {
             case ACCOUNT_TYPES:
                 return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
