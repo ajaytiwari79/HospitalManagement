@@ -408,8 +408,8 @@ public class ActivityService extends MongoBaseService {
     }
 
     public List<CompositeShiftActivityDTO> assignCompositeActivitiesInActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
+        Optional<Activity> activity = activityMongoRepository.findById(activityId);
+        if (!activity.isPresent()) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         Set<BigInteger> compositeShiftIds = new HashSet<>();
@@ -423,8 +423,8 @@ public class ActivityService extends MongoBaseService {
             compositeActivities.add(new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter()));
         });
 
-        activity.setCompositeActivities(compositeActivities);
-        save(activity);
+        activity.get().setCompositeActivities(compositeActivities);
+        save(activity.get());
         return compositeShiftActivityDTOs;
 
     }
@@ -439,12 +439,12 @@ public class ActivityService extends MongoBaseService {
     }
 
     public List<CompositeActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
+        Optional<Activity> activity = activityMongoRepository.findById(activityId);
+        if (!activity.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
         List<CompositeActivityDTO> compositeActivities= new ArrayList<>();
-        if (Optional.ofNullable(activity.getCompositeActivities()).isPresent() && !activity.getCompositeActivities().isEmpty()){
+        if (Optional.ofNullable(activity.get().getCompositeActivities()).isPresent() && !activity.get().getCompositeActivities().isEmpty()){
              compositeActivities = activityMongoRepository.getCompositeActivities(activityId);
         }
         return compositeActivities;
