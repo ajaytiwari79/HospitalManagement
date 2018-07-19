@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.OrganizationCategory;
-import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessPage;
-import com.kairos.persistence.model.access_permission.AccessPageDTO;
-import com.kairos.persistence.model.access_permission.Tab;
+import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.organization.Organization;
@@ -17,11 +14,10 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
-import com.kairos.persistence.repository.user.access_permission.AccessPageCustomIdRepository;
-import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
-import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
+import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
+import com.kairos.persistence.repository.user.access_permission.*;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepository;
@@ -30,9 +26,9 @@ import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tree_structure.TreeStructureService;
+import com.kairos.persistence.model.access_permission.AccessPageLanguageDTO;
 import com.kairos.user.access_page.KPIAccessPageDTO;
 import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
-import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.user.staff.permission.StaffPermissionDTO;
 import com.kairos.user.staff.permission.StaffTabPermission;
 import com.kairos.util.ObjectMapperUtils;
@@ -78,8 +74,10 @@ public class AccessPageService extends UserBaseService {
     UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Inject
     UserGraphRepository userGraphRepository;
+    @Inject private SystemLanguageGraphRepository systemLanguageGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private AccessPageLanguageRelationShipRepository accessPageLanguageRelationShipRepository;
 
     public synchronized AccessPage createAccessPage(AccessPageDTO accessPageDTO){
         AccessPage accessPage = new AccessPage(accessPageDTO.getName(),accessPageDTO.isModule(),
@@ -404,9 +402,6 @@ public class AccessPageService extends UserBaseService {
         return false;
     }
 
-    public List<OrganizationCategoryDTO> getListOfOrganizaionCategories(){
-        return OrganizationCategory.getListOfOrganizationCategory();
-    }
 
     // For Test Cases
     public AccessPage getOneMainModule(){
@@ -418,5 +413,35 @@ public class AccessPageService extends UserBaseService {
         if(accessPages==null) return new ArrayList<>();
         List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
         return kpiTabs;
+    }
+
+    public AccessPageLanguageDTO assignLanguageToAccessPage(String moduleId, AccessPageLanguageDTO accessPageLanguageDTO){
+        if(Optional.ofNullable(accessPageLanguageDTO.getId()).isPresent()){
+            Optional<AccessPageLanguageRelationShip> accessPageLanguageRelationShip= accessPageLanguageRelationShipRepository.findById(accessPageLanguageDTO.getId());
+            if(!accessPageLanguageRelationShip.isPresent()){
+                exceptionService.dataNotFoundByIdException("access_page.description.absent");
+            }
+            accessPageLanguageRelationShip.get().setDescription(accessPageLanguageDTO.getDescription());
+            save(accessPageLanguageRelationShip.get());
+            return accessPageLanguageDTO;
+        }
+        AccessPage accessPage=accessPageRepository.findByModuleId(moduleId);
+        if(!Optional.ofNullable(accessPage).isPresent()){
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","Access Page",moduleId);
+        }
+        SystemLanguage systemLanguage=systemLanguageGraphRepository.findSystemLanguageById(accessPageLanguageDTO.getLanguageId());
+        if(!Optional.ofNullable(systemLanguage).isPresent()){
+            exceptionService.dataNotFoundByIdException("message.dataNotFound","SystemLanguage", accessPageLanguageDTO.getLanguageId());
+        }
+
+        AccessPageLanguageRelationShip accessPageLanguageRelationShip=new AccessPageLanguageRelationShip(accessPageLanguageDTO.getId(),accessPage,systemLanguage, accessPageLanguageDTO.getDescription());
+        save(accessPageLanguageRelationShip);
+        accessPageLanguageDTO.setId(accessPageLanguageRelationShip.getId());
+        return accessPageLanguageDTO;
+
+    }
+
+    public AccessPageLanguageDTO getLanguageDataByModuleId(String moduleId, Long languageId){
+        return accessPageRepository.findLanguageSpecificDataByModuleIdAndLanguageId(moduleId,languageId);
     }
 }

@@ -7,7 +7,7 @@ import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import com.kairos.user.access_page.KPIAccessPageDTO;
+import com.kairos.persistence.model.access_permission.AccessPageLanguageDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.AppConstants.HAS_ACCESS_OF_TABS;
+import static com.kairos.constants.AppConstants.HAS_LANGUAGE_SPECIFIC_DATA;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -379,6 +380,9 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("MATCH (n:AccessPage) -[:SUB_PAGE *]->(subPages:AccessPage{active:true,kpiEnabled:true}) where n.moduleId={0} RETURN subPages")
     List<AccessPage> getKPITabsList(String moduleId);
+
+    @Query("Match(accessPage:AccessPage)-[rel:"+HAS_LANGUAGE_SPECIFIC_DATA+"]-(language:SystemLanguage{deleted:false}) WHERE accessPage.moduleId={0} AND id(language)={1} RETURN rel.description as description, id(rel) as id, rel.languageId as languageId, rel.moduleId as moduleId limit 1")
+    AccessPageLanguageDTO findLanguageSpecificDataByModuleIdAndLanguageId(String moduleId, Long languageId);
 }
 
 
