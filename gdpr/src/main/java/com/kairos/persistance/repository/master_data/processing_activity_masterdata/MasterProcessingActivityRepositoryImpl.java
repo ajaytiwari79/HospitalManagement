@@ -87,7 +87,12 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
                 processingActivityCriterias.add(buildQuery(filterSelection, filterSelection.getName()));
             }
         });
-        criteria = criteria.andOperator(processingActivityCriterias.toArray(new Criteria[processingActivityCriterias.size()]));
+
+        if (!processingActivityCriterias.isEmpty())
+        {
+            criteria = criteria.andOperator(processingActivityCriterias.toArray(new Criteria[processingActivityCriterias.size()]));
+
+        }
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(criteria),
