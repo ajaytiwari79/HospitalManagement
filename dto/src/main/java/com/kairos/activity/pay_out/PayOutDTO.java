@@ -39,13 +39,6 @@ public class PayOutDTO {
     //Distributed min on the basis of Interval;
     private List<PayOutIntervalDTO> timeIntervals = new ArrayList<>();
     private List<PayOutCTADistributionDTO> payOutDistributions = new ArrayList<>();
-    private ScheduleTimeByTimeTypeDTO workingTimeType;
-    private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
-    private UnitPositionWithCtaDetailsDTO costTimeAgreement;
-
-    private List<PayOutIntervalDTO> weeklyIntervalsPayOut;
-    private List<PayOutIntervalDTO> monthlyIntervalsPayOut;
-
     public PayOutDTO(Long unitPositionId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
      {
         this.unitPositionId = unitPositionId;
@@ -86,21 +79,6 @@ public class PayOutDTO {
         this.totalPayOutMaxLimit = totalPayOutMaxLimit;
     }
 
-    public List<PayOutIntervalDTO> getWeeklyIntervalsPayOut() {
-        return weeklyIntervalsPayOut;
-    }
-
-    public void setWeeklyIntervalsPayOut(List<PayOutIntervalDTO> weeklyIntervalsPayOut) {
-        this.weeklyIntervalsPayOut = weeklyIntervalsPayOut;
-    }
-
-    public List<PayOutIntervalDTO> getMonthlyIntervalsPayOut() {
-        return monthlyIntervalsPayOut;
-    }
-
-    public void setMonthlyIntervalsPayOut(List<PayOutIntervalDTO> monthlyIntervalsPayOut) {
-        this.monthlyIntervalsPayOut = monthlyIntervalsPayOut;
-    }
 
     public String getQuery() {
         return query;
@@ -110,13 +88,7 @@ public class PayOutDTO {
         this.query = query;
     }
 
-    public UnitPositionWithCtaDetailsDTO getCostTimeAgreement() {
-        return costTimeAgreement;
-    }
 
-    public void setCostTimeAgreement(UnitPositionWithCtaDetailsDTO costTimeAgreement) {
-        this.costTimeAgreement = costTimeAgreement;
-    }
 
     public List<PayOutCTADistributionDTO> getPayOutDistributions() {
         return payOutDistributions;
@@ -129,21 +101,6 @@ public class PayOutDTO {
     public PayOutDTO() {
     }
 
-    public ScheduleTimeByTimeTypeDTO getWorkingTimeType() {
-        return workingTimeType;
-    }
-
-    public void setWorkingTimeType(ScheduleTimeByTimeTypeDTO workingTimeType) {
-        this.workingTimeType = workingTimeType;
-    }
-
-    public ScheduleTimeByTimeTypeDTO getNonWorkingTimeType() {
-        return nonWorkingTimeType;
-    }
-
-    public void setNonWorkingTimeType(ScheduleTimeByTimeTypeDTO nonWorkingTimeType) {
-        this.nonWorkingTimeType = nonWorkingTimeType;
-    }
 
     public int getTotalPayOutAfterCtaMin() {
         return totalPayOutAfterCtaMin;

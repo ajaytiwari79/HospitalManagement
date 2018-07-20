@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.pay_out;
 
+import com.kairos.enums.payout.PayOutStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -23,6 +24,8 @@ public class PayOut extends MongoBaseEntity{
     private int payOutMinWithoutCta;
     private int payOutMinWithCta;
     private LocalDate date;
+    private PayOutStatus payOutStatus;
+    private boolean paidout;
     private List<PayOutCTADistribution> payOutCTADistributionList;
 
 
@@ -31,6 +34,23 @@ public class PayOut extends MongoBaseEntity{
         this.unitPositionId = unitPositionId;
         this.staffId = staffId;
         this.date = date;
+        this.payOutStatus = PayOutStatus.APPROVED;
+    }
+
+    public boolean isPaidout() {
+        return paidout;
+    }
+
+    public void setPaidout(boolean paidout) {
+        this.paidout = paidout;
+    }
+
+    public PayOutStatus getPayOutStatus() {
+        return payOutStatus;
+    }
+
+    public void setPayOutStatus(PayOutStatus payOutStatus) {
+        this.payOutStatus = payOutStatus;
     }
 
     public BigInteger getShiftId() {

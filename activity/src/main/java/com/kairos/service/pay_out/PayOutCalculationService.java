@@ -23,14 +23,12 @@ import static com.kairos.constants.AppConstants.*;
 
 
 /*
-* Created By Mohit Shakya
+* Created By Pradeep singh
 *
 * */
 
 @Service
 public class PayOutCalculationService {
-
-
 
 
     public PayOut calculateAndUpdatePayOut(DateTimeInterval interval, StaffUnitPositionDetails unitPositionDetails, Shift shift, Activity activity, PayOut payOut) {

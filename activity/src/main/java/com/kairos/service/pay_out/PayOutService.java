@@ -2,7 +2,9 @@ package com.kairos.service.pay_out;
 
 
 import com.kairos.activity.shift.StaffUnitPositionDetails;
+import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.pay_out.PayOutRestClient;
 import com.kairos.persistence.model.activity.Shift;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -53,6 +56,7 @@ public class PayOutService extends MongoBaseService {
     private OrganizationRestClient organizationRestClient;
     @Inject
     private TimeTypeService timeTypeService;
+    @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
 
     public void savePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Activity activity) {
         ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
@@ -88,6 +92,13 @@ public class PayOutService extends MongoBaseService {
         }
     }
 
+    private boolean approvePayOutRequest(BigInteger payOutTransactionId){
+        PayOutTransaction payOutTransaction = payOutTransactionMongoRepository.findOne(payOutTransactionId);
+        PayOutTransaction approvedPayOutTransaction = new PayOutTransaction(payOutTransaction.getStaffId(),payOutTransaction.getUnitPositionId(), PayOutTrasactionStatus.APPROVED,payOutTransaction.getMinutes(), LocalDate.now());
+        save(approvedPayOutTransaction);
+        return true;
+    }
+
     private void updatePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Activity activity) {
         ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
@@ -116,6 +127,7 @@ public class PayOutService extends MongoBaseService {
             save(payOuts);
         }
     }
+
 
 
     public Map<Long, List<ShiftWithActivityDTO>> getShiftsMapByUEPs(List<Long> unitPositionIds, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {

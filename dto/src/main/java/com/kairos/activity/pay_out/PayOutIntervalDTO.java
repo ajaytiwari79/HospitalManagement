@@ -16,9 +16,7 @@ public class PayOutIntervalDTO {
     //In minutes
     private int totalPayOutAfterCtaMin;
     private int totalPayOutBeforeCtaMin;
-    private int totalScheduledMin;
     private int totalPayOutMin;
-    private int totalContractualMin;
     private int totalPayOutDiff;
     private String title;
     private List<PayOutCTADistributionDTO> payOutDistributions = new ArrayList<>();
@@ -121,14 +119,6 @@ public class PayOutIntervalDTO {
         this.totalPayOutBeforeCtaMin = totalPayOutBeforeCtaMin;
     }
 
-    public int getTotalScheduledMin() {
-        return totalScheduledMin;
-    }
-
-    public void setTotalScheduledMin(int totalScheduledMin) {
-        this.totalScheduledMin = totalScheduledMin;
-    }
-
     public int getTotalPayOutMin() {
         return totalPayOutMin;
     }
@@ -137,11 +127,4 @@ public class PayOutIntervalDTO {
         this.totalPayOutMin = totalPayOutMin;
     }
 
-    public int getTotalContractualMin() {
-        return totalContractualMin;
-    }
-
-    public void setTotalContractualMin(int totalContractualMin) {
-        this.totalContractualMin = totalContractualMin;
-    }
 }
