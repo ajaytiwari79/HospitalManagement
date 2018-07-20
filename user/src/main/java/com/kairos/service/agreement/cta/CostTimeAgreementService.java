@@ -825,7 +825,7 @@ public class CostTimeAgreementService extends UserBaseService {
             collectiveTimeAgreementDTO.setOrganizationSubType(organizationSubTypeId);
             return countryCTAService.createCostTimeAgreementInCountry(countryId, collectiveTimeAgreementDTO);
         } else {
-            Optional<CostTimeAgreement> cta = collectiveTimeAgreementGraphRepository.findById(ctaId);
+            Optional<CostTimeAgreement> cta = collectiveTimeAgreementGraphRepository.findById(ctaId,0);
             if (!cta.isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.cta.id.notFound", ctaId);
 
