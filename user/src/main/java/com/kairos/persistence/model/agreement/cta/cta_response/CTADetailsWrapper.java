@@ -7,7 +7,6 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 
 import java.util.List;
-import java.util.Map;
 
 public class CTADetailsWrapper {
     private Boolean all;
@@ -15,8 +14,8 @@ public class CTADetailsWrapper {
     private Expertise expertise;
     private OrganizationType organizationType;
     private OrganizationType organizationSubType;
-    private Map<Long,EmploymentType> employmentTypeIdMap;
-    private Map<Long,RuleTemplateCategory> ruleTemplateCategoryIdMap;
+    private List<EmploymentType> employmentTypes;
+    private List<RuleTemplateCategory> ruleTemplateCategories;
 
     public Boolean getAll() {
         return all;
@@ -58,19 +57,19 @@ public class CTADetailsWrapper {
         this.organizationSubType = organizationSubType;
     }
 
-    public Map<Long, EmploymentType> getEmploymentTypeIdMap() {
-        return employmentTypeIdMap;
+    public List<EmploymentType> getEmploymentTypes() {
+        return employmentTypes;
     }
 
-    public void setEmploymentTypeIdMap(Map<Long, EmploymentType> employmentTypeIdMap) {
-        this.employmentTypeIdMap = employmentTypeIdMap;
+    public void setEmploymentTypes(List<EmploymentType> employmentTypes) {
+        this.employmentTypes = employmentTypes;
     }
 
-    public Map<Long, RuleTemplateCategory> getRuleTemplateCategoryIdMap() {
-        return ruleTemplateCategoryIdMap;
+    public List<RuleTemplateCategory> getRuleTemplateCategories() {
+        return ruleTemplateCategories;
     }
 
-    public void setRuleTemplateCategoryIdMap(Map<Long, RuleTemplateCategory> ruleTemplateCategoryIdMap) {
-        this.ruleTemplateCategoryIdMap = ruleTemplateCategoryIdMap;
+    public void setRuleTemplateCategories(List<RuleTemplateCategory> ruleTemplateCategories) {
+        this.ruleTemplateCategories = ruleTemplateCategories;
     }
 }

@@ -102,7 +102,7 @@ public class CountryCTAService extends UserBaseService {
 
         costTimeAgreement.setId(null);
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CountryCTAService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, true);
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper,true);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
@@ -160,28 +160,24 @@ public class CountryCTAService extends UserBaseService {
         }
         //
         Set<Long> ruleTemplateCategoryIds = collectiveTimeAgreementDTO.getRuleTemplates().stream().map(CTARuleTemplateDTO::getRuleTemplateCategory).collect(Collectors.toSet());
+        Set<Long> employmentTypeIds = collectiveTimeAgreementDTO.getRuleTemplates()
+                .stream().flatMap(ctaRuleTemplateDTO ->
+                        ctaRuleTemplateDTO.getEmploymentTypes().stream().map(e -> e.longValue()))
+                .collect(Collectors.toSet());
 
         Callable<List<RuleTemplateCategory>> callableRuleTemplateCategory = () -> {
             List<RuleTemplateCategory> ruleTemplateCategories = ruleTemplateCategoryGraphRepository.findRuleTemplatesByIds(ruleTemplateCategoryIds);
             return ruleTemplateCategories;
         };
         Future<List<RuleTemplateCategory>> futureRules = asynchronousService.executeAsynchronously(callableRuleTemplateCategory);
-        Map<Long, RuleTemplateCategory> ruleTemplateCategoryMap = futureRules.get().stream().collect(Collectors.toMap(RuleTemplateCategory::getId, v -> v));
-        ctaDetailsWrapper.setRuleTemplateCategoryIdMap(ruleTemplateCategoryMap);
-
-        Set<Long> employmentTypeIds = collectiveTimeAgreementDTO.getRuleTemplates()
-                .stream().flatMap(ctaRuleTemplateDTO ->
-                        ctaRuleTemplateDTO.getEmploymentTypes().stream().map(e -> e.longValue()))
-                .collect(Collectors.toSet());
+        ctaDetailsWrapper.setRuleTemplateCategories(futureRules.get());
 
         Callable<List<EmploymentType>> callableEmploymentTypes = () -> {
             List<EmploymentType> employmentTypes = employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds);
             return employmentTypes;
         };
         Future<List<EmploymentType>> futureEmploymentTypes = asynchronousService.executeAsynchronously(callableEmploymentTypes);
-        Map<Long, EmploymentType> employmentTypeMap = futureEmploymentTypes.get().stream().collect(Collectors.toMap(EmploymentType::getId, v -> v));
-        ctaDetailsWrapper.setEmploymentTypeIdMap(employmentTypeMap);
-
+        ctaDetailsWrapper.setEmploymentTypes(futureEmploymentTypes.get());
 
         ctaDetailsWrapper.setAll(true);
         return CompletableFuture.completedFuture(true);
@@ -189,7 +185,7 @@ public class CountryCTAService extends UserBaseService {
     }
 
     @Async
-    public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, CTADetailsWrapper ctaDetailsWrapper, boolean creatingFromCountry)
+    public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, CTADetailsWrapper ctaDetailsWrapper,boolean creatingFromCountry)
             throws InterruptedException, ExecutionException {
         // Get Rule Templates
         Callable<List<RuleTemplate>> ctaRuleTemplatesCallable = () -> {
@@ -199,7 +195,7 @@ public class CountryCTAService extends UserBaseService {
                 BeanUtils.copyProperties(ctaRuleTemplateDTO, ctaRuleTemplate);
                 ctaRuleTemplate.cloneCTARuleTemplate();
                 CTARuleTemplate.setActivityBasesCostCalculationSettings(ctaRuleTemplate);
-                ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, ctaDetailsWrapper);
+                ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
                 ruleTemplates.add(ctaRuleTemplate);
             }
             return ruleTemplates;
@@ -267,7 +263,7 @@ public class CountryCTAService extends UserBaseService {
         }
 
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CountryCTAService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, false);
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper,false);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
@@ -276,18 +272,19 @@ public class CountryCTAService extends UserBaseService {
         return costTimeAgreement;
     }
 
-    public CTARuleTemplate saveEmbeddedEntitiesOfCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO, CTADetailsWrapper ctaDetailsWrapper) {
+    public CTARuleTemplate saveEmbeddedEntitiesOfCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO) {
         if (ctaRuleTemplate.getId() != null) {
             ctaRuleTemplateGraphRepository.detachAllTimeTypesFromCTARuleTemplate(ctaRuleTemplate.getId());
         }
-        if (!ctaRuleTemplateDTO.getEmploymentTypes().isEmpty()) {
-            ctaRuleTemplateDTO.getEmploymentTypes().forEach(c -> {
-                ctaRuleTemplate.getEmploymentTypes().add(ctaDetailsWrapper.getEmploymentTypeIdMap().get(c));
-            });
 
-        }
-        if (ctaRuleTemplateDTO.getRuleTemplateCategory() != null) {
-            ctaRuleTemplate.setRuleTemplateCategory(ctaDetailsWrapper.getRuleTemplateCategoryIdMap().get(ctaRuleTemplateDTO.getRuleTemplateCategory()));
+        // Fetch Employment Type
+        List<Long> employmentTypeIds = ctaRuleTemplateDTO.getEmploymentTypes();
+        ctaRuleTemplate.setEmploymentTypes(employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds, false));
+
+
+        Long ruleTemplateId = ctaRuleTemplateDTO.getRuleTemplateCategory();
+        if (ruleTemplateId != null) {
+            ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategoryGraphRepository.findOne(ruleTemplateId));
         }
 
         return ctaRuleTemplate;
