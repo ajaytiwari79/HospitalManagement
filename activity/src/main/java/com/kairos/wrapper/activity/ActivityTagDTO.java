@@ -4,16 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
-import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
-import com.kairos.persistence.model.activity.tabs.PermissionsActivityTab;
-import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
+import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.user.country.tag.TagDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by prerna on 16/12/17.
@@ -35,21 +33,21 @@ public class ActivityTagDTO {
     private PermissionsActivityTab permissionsActivityTab;
     private LocalDate startDate;
     private LocalDate endDate;
+    private TimeCalculationActivityTab timeCalculationActivityTab;
+
+    private Long parentId;
+    private ActivityStateEnum state;
+
+    public ActivityTagDTO() {
+        //default constructor
+    }
+
     public TimeCalculationActivityTab getTimeCalculationActivityTab() {
         return timeCalculationActivityTab;
     }
 
     public void setTimeCalculationActivityTab(TimeCalculationActivityTab timeCalculationActivityTab) {
         this.timeCalculationActivityTab = timeCalculationActivityTab;
-    }
-
-    private TimeCalculationActivityTab timeCalculationActivityTab;
-    private List<ActivityTagDTO> compositeActivities = new ArrayList<ActivityTagDTO>();
-    private Long parentId;
-    private ActivityStateEnum state;
-
-    public ActivityTagDTO() {
-        //default constructor
     }
 
     public LocalDate getStartDate() {
@@ -148,13 +146,6 @@ public class ActivityTagDTO {
         this.generalActivityTab = generalActivityTab;
     }
 
-    public List<ActivityTagDTO> getCompositeActivities() {
-        return compositeActivities;
-    }
-
-    public void setCompositeActivities(List<ActivityTagDTO> compositeActivities) {
-        this.compositeActivities = compositeActivities;
-    }
 
     public Long getParentId() {
         return parentId;
@@ -180,6 +171,16 @@ public class ActivityTagDTO {
         this.permissionsActivityTab = permissionsActivityTab;
     }
 
+    public BalanceSettingsActivityTab getBalanceSettingsActivityTab() {
+        return balanceSettingsActivityTab;
+    }
+
+    public void setBalanceSettingsActivityTab(BalanceSettingsActivityTab balanceSettingsActivityTab) {
+        this.balanceSettingsActivityTab = balanceSettingsActivityTab;
+    }
+
+
+
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
         this.id = activity.getId();
         this.name = activity.getName();
@@ -187,7 +188,7 @@ public class ActivityTagDTO {
         this.isParentActivity = activity.isParentActivity();
         this.unitId = activity.getUnitId();
         this.tags = tags;
-        this.state=activity.getState();
+        this.state = activity.getState();
 
         return this;
     }
