@@ -388,16 +388,5 @@ public class CTARuleTemplate extends RuleTemplate {
                 .toString();
 
     }
-    public static void setActivityBasesCostCalculationSettings(CTARuleTemplate ctaRuleTemplate) {
 
-        switch (ctaRuleTemplate.getActivityTypeForCostCalculation()) {
-            case TIME_TYPE_ACTIVITY:
-                ctaRuleTemplate.setActivityIds(new ArrayList<>());
-                break;
-            default:
-                ctaRuleTemplate.setPlannedTimeIds(null);
-                ctaRuleTemplate.setTimeTypeIds(null);
-                break;
-        }
-    }
 }

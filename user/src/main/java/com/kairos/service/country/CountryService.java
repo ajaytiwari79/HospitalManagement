@@ -494,7 +494,7 @@ public class CountryService extends UserBaseService {
         List<ActivityCategoryDTO> activityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId);
 
          List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
-         List<EmploymentType> employmentTypes=countryGraphRepository.getEmploymentTypeByCountry(countryId,false);
+         List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
          TimeTypeDTO timeType= timeTypeRestClient.getAllTimeTypes(countryId).stream().filter(t->t.getTimeTypes().equals(TimeTypes.WORKING_TYPE.toValue())).findFirst().get();
          List<TimeTypeDTO> timeTypes = Arrays.asList(timeType);
          List<PresenceTypeDTO> plannedTime= plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
