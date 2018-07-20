@@ -9,7 +9,6 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -52,10 +51,8 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
             "create (rc)-[:" + HAS_RULE_TEMPLATES + "]->(w)")
     void setRuleTemplateCategoryWithRuleTemplate(Long templateCategoryId, Long ruleTemplateId);
 
-
-    @Query("MATCH (n:RuleTemplateCategory{deleted:false,ruleTemplateCategoryType:'CTA'}) where  Id(n) IN {0} return n")
-
-    List<RuleTemplateCategory> findRuleTemplatesByIds(Set<Long> ruleTemplates);
+    @Query("MATCH (n:RuleTemplateCategory{deleted:false})-[:" + HAS_RULE_TEMPLATES + "]->(w:WTABaseRuleTemplateDTO)<-[:" + HAS_RULE_TEMPLATE + "]-(c:Country) where n.name={0} AND Id(c)={1} return Id(w)")
+    List<Long> findAllExistingRuleTemplateAddedToThiscategory(String ruleTemplateCategoryName, long countryId);
 
     @Query("MATCH (allRTC:RuleTemplateCategory{deleted:false})\n" +
             "match(newRTC:RuleTemplateCategory) where newRTC.name={1} \n" +
