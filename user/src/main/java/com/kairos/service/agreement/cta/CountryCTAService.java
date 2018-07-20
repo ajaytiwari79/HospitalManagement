@@ -91,7 +91,7 @@ public class CountryCTAService extends UserBaseService {
         }
         CTADetailsWrapper ctaDetailsWrapper = new CTADetailsWrapper();
         CompletableFuture<Boolean> allBasicDetails = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CountryCTAService.class)
-                .getPreRequisiteForCTA(countryId, collectiveTimeAgreementDTO, ctaDetailsWrapper);
+                .getPreRequisiteForCTA(countryId, collectiveTimeAgreementDTO, ctaDetailsWrapper, false);
         CompletableFuture.allOf(allBasicDetails).join();
 
         CostTimeAgreement costTimeAgreement = new CostTimeAgreement();
@@ -102,7 +102,7 @@ public class CountryCTAService extends UserBaseService {
 
         costTimeAgreement.setId(null);
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CountryCTAService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, true);
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, false,true);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
@@ -121,35 +121,35 @@ public class CountryCTAService extends UserBaseService {
     }
 
     @Async
-    public CompletableFuture<Boolean> getPreRequisiteForCTA(Long countryId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, CTADetailsWrapper ctaDetailsWrapper) throws InterruptedException, ExecutionException {
+    public CompletableFuture<Boolean> getPreRequisiteForCTA(Long countryId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, CTADetailsWrapper ctaDetailsWrapper, boolean doUpdate) throws InterruptedException, ExecutionException {
+        if (!doUpdate) {
+            Callable<Optional<Country>> callableCountry = () -> {
+                Optional<Country> country = countryGraphRepository.findById(countryId, 0);
+                return country;
+            };
+            Future<Optional<Country>> futureCountry = asynchronousService.executeAsynchronously(callableCountry);
+            if (futureCountry.get().isPresent())
+                ctaDetailsWrapper.setCountry(futureCountry.get().get());
 
-        Callable<Optional<Country>> callableCountry = () -> {
-            Optional<Country> country = countryGraphRepository.findById(countryId, 0);
-            return country;
-        };
-        Future<Optional<Country>> futureCountry = asynchronousService.executeAsynchronously(callableCountry);
-        if (futureCountry.get().isPresent())
-            ctaDetailsWrapper.setCountry(futureCountry.get().get());
+            // Get Organization Type
+            Callable<Optional<OrganizationType>> OrganizationTypesListCallable = () -> {
+                Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationType(), 0);
+                return organizationType;
+            };
 
-        // Get Organization Type
-        Callable<Optional<OrganizationType>> OrganizationTypesListCallable = () -> {
-            Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationType(), 0);
-            return organizationType;
-        };
+            Future<Optional<OrganizationType>> organizationTypesFuture = asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
+            if (organizationTypesFuture.get().isPresent())
+                ctaDetailsWrapper.setOrganizationType(organizationTypesFuture.get().get());
 
-        Future<Optional<OrganizationType>> organizationTypesFuture = asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
-        if (organizationTypesFuture.get().isPresent())
-            ctaDetailsWrapper.setOrganizationType(organizationTypesFuture.get().get());
-
-        // Get Organization Sub Type
-        Callable<Optional<OrganizationType>> OrganizationSubTypesListCallable = () -> {
-            Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationSubType(), 0);
-            return organizationType;
-        };
-        Future<Optional<OrganizationType>> organizationSubTypesFuture = asynchronousService.executeAsynchronously(OrganizationSubTypesListCallable);
-        if (organizationSubTypesFuture.get().isPresent())
-            ctaDetailsWrapper.setOrganizationSubType(organizationSubTypesFuture.get().get());
-
+            // Get Organization Sub Type
+            Callable<Optional<OrganizationType>> OrganizationSubTypesListCallable = () -> {
+                Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationSubType(), 0);
+                return organizationType;
+            };
+            Future<Optional<OrganizationType>> organizationSubTypesFuture = asynchronousService.executeAsynchronously(OrganizationSubTypesListCallable);
+            if (organizationSubTypesFuture.get().isPresent())
+                ctaDetailsWrapper.setOrganizationSubType(organizationSubTypesFuture.get().get());
+        }
         Callable<Optional<Expertise>> callableExpertise = () -> {
             Optional<Expertise> expertise = expertiseGraphRepository.findById(collectiveTimeAgreementDTO.getExpertise(), 0);
             return expertise;
@@ -189,7 +189,7 @@ public class CountryCTAService extends UserBaseService {
     }
 
     @Async
-    public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, CTADetailsWrapper ctaDetailsWrapper, boolean creatingFromCountry)
+    public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, CTADetailsWrapper ctaDetailsWrapper,boolean doUpdate, boolean creatingFromCountry)
             throws InterruptedException, ExecutionException {
         // Get Rule Templates
         Callable<List<RuleTemplate>> ctaRuleTemplatesCallable = () -> {
@@ -207,7 +207,7 @@ public class CountryCTAService extends UserBaseService {
         Future<List<RuleTemplate>> ctaRuleTemplatesFuture = asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
 
         costTimeAgreement.setExpertise(ctaDetailsWrapper.getExpertise());
-        if (creatingFromCountry) {
+        if (creatingFromCountry && !doUpdate) {
             costTimeAgreement.setOrganizationType(ctaDetailsWrapper.getOrganizationType());
             costTimeAgreement.setOrganizationSubType(ctaDetailsWrapper.getOrganizationSubType());
         }
@@ -267,13 +267,46 @@ public class CountryCTAService extends UserBaseService {
         }
 
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CountryCTAService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, false);
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, false,false);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
 
         this.save(costTimeAgreement);
         return costTimeAgreement;
+    }
+
+    public CollectiveTimeAgreementDTO updateCostTimeAgreement(Long countryId, Long unitId, Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+
+        if (countryId != null && collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName(), ctaId)) {
+            exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
+        } else if (unitId != null && collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName(), ctaId)) {
+            exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
+        }
+        CostTimeAgreement costTimeAgreement = collectiveTimeAgreementGraphRepository.findOne(ctaId, 2);
+
+
+        CTADetailsWrapper ctaDetailsWrapper = new CTADetailsWrapper();
+        CompletableFuture<Boolean> allBasicDetails = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CountryCTAService.class)
+                .getPreRequisiteForCTA(countryId, collectiveTimeAgreementDTO, ctaDetailsWrapper, true);
+        CompletableFuture.allOf(allBasicDetails).join();
+
+
+        List<Long> previousRuleTemplateIds = new ArrayList<>();
+        logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplates().size());
+        for (RuleTemplate ruleTemplate : costTimeAgreement.getRuleTemplates()) {
+            previousRuleTemplateIds.add(ruleTemplate.getId());
+        }
+
+        BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
+        costTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
+        costTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
+        CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CountryCTAService.class)
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper,true, countryId != null);
+        CompletableFuture.allOf(hasUpdated).join();
+
+        this.save(costTimeAgreement);
+        return collectiveTimeAgreementDTO;
     }
 
     public CTARuleTemplate saveEmbeddedEntitiesOfCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO, CTADetailsWrapper ctaDetailsWrapper) {
