@@ -348,7 +348,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("id").is(activityId).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
                         "timeType"),
-                project().and("name").as("activity.name").and("description").as("activity.description")
+                project().and("id").as("activity._id").and("name").as("activity.name").and("description").as("activity.description")
                         .and("countryId").as("activity.countryId").and("expertises").as("activity.expertises")
                       .and("organizationTypes").as("activity.organizationTypes").and("organizationSubTypes").as("activity.organizationSubTypes")
                         .and("regions").as("activity.regions").and("levels").as("activity.levels")
