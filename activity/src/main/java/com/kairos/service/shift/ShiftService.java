@@ -606,7 +606,7 @@ public class ShiftService extends MongoBaseService {
                 .and(shiftTimeLessThan);
 
 
-        activitySpecification.isSatisfied(shift);
+        //activitySpecification.isSatisfied(shift);
         // updateWTACounter(ruleTemplateSpecificInfo, staffAdditionalInfoDTO);
         //.and(wtaRulesSpecification);
         List<String> messages = activitySpecification.isSatisfiedString(shift);
