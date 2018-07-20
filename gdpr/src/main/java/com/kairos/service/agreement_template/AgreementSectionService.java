@@ -65,7 +65,7 @@ public class AgreementSectionService extends MongoBaseService {
         }
         List<BigInteger> agreementSectionIdList;
         if (flag) {
-            agreementSectionIdList = updateAggrementSectionsAndClausesAndAddToAgreementTemplate(countryId, organizationId, agreementSectionDTOs, policyAgreementTemplate);
+            agreementSectionIdList = updateAgrrementSectionSubSectionAndClausesAndAddToAgreementTemplate(countryId, organizationId, agreementSectionDTOs, policyAgreementTemplate);
             policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         } else {
             agreementSectionIdList = createAggrementSectionsAndClausesAndAddtoAgreementTemplate(countryId, organizationId, agreementSectionDTOs, policyAgreementTemplate);
@@ -308,7 +308,9 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    /**
+
+
+       /**
      * @param countryId
      * @param organizationId
      * @param agreementSectionDTOS    -agreementSectionDTOS contain List of Agreement section Dto Which were already present and also contain new  Agreement Section
@@ -316,7 +318,7 @@ public class AgreementSectionService extends MongoBaseService {
      * @param policyAgreementTemplate - new clauses which we need to create inherit it properties from policyAgreementTemplate .
      * @return
      */
-    public List<BigInteger> updateAggrementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
+    public List<BigInteger> updateAgrrementSectionSubSectionAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
         checkForDuplicacyInTitleOfAgreementSectionAndSubSection(agreementSectionDTOS);
         List<AgreementSectionDTO> exisitingAgreementSectionDtoList = new ArrayList<>();
@@ -333,25 +335,23 @@ public class AgreementSectionService extends MongoBaseService {
             agreementSectionIdList.addAll(createAggrementSectionsAndClausesAndAddtoAgreementTemplate(countryId, organizationId, newAgreementSectionDTOList, policyAgreementTemplate));
 
         }
-        agreementSectionIdList.addAll(updateAggrementSectionsAndClauses(countryId, organizationId, exisitingAgreementSectionDtoList, policyAgreementTemplate));
+        agreementSectionIdList.addAll(updateAggrementSectionsSubSectionsAndClauses(countryId, organizationId, exisitingAgreementSectionDtoList, policyAgreementTemplate));
         return agreementSectionIdList;
     }
 
 
-    /**
-     * @param countryId
-     * @param organizationId
-     * @param policyAgreementTemplate - new clauses which we need to create inherit it properties from policyAgreementTemplate .
-     * @return - list of Agreement Section ids
-     * @description - AgreementSectionClauseWrapper class  conatain list of clauses for new creation of clause and Clause which needs to be update.
-     * this method update exisiting Sections with  list of clauses( changed or updated ,unchanged and new clause )
-     * update  exisiting Agreement sections and clauses if exist. or create new clause in exisiting agreement sections
-     */
-    public List<BigInteger> updateAggrementSectionsAndClauses(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOSList, PolicyAgreementTemplate policyAgreementTemplate) {
+
+
+
+
+
+
+    //todo working on it update below method for sub sections
+    public List<BigInteger> updateAggrementSectionsSubSectionsAndClauses(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOList, PolicyAgreementTemplate policyAgreementTemplate) {
 
 
         List<BigInteger> agreementSectionIdList = new ArrayList<>();
-        for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOSList) {
+        for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOList) {
             agreementSectionIdList.add(agreementSectionDTO.getId());
         }
         List<AgreementSection> agreementSectionList = agreementSectionMongoRepository.findAgreementSectionByIds(countryId, organizationId, agreementSectionIdList);
@@ -365,10 +365,10 @@ public class AgreementSectionService extends MongoBaseService {
         List<BigInteger> changedClauseIdsList = new ArrayList<>();
         agreementSectionList.clear();
         Map<String, AgreementSectionClauseWrapper> agreementSectionClauseAndClauseDtoHashMap = new HashMap<>();
-        for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOSList) {
+        for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOList) {
             AgreementSection agreementSection = agreementSectiosnMap.get(agreementSectionDTO.getId());
             AgreementSectionClauseWrapper sectionClauseAndClauseDtoWrapper = new AgreementSectionClauseWrapper();
-            if (Optional.ofNullable(agreementSectionDTO.getClauses()).isPresent() && !agreementSectionDTO.getClauses().isEmpty()) {
+            if (!agreementSectionDTO.getClauses().isEmpty()) {
                 List<BigInteger> unchangedClauseidList = new ArrayList<>();
                 List<ClauseBasicDTO> changedClauseBelongToSection = new ArrayList<>();
                 List<ClauseBasicDTO> newClauseBelongToSection = new ArrayList<>();
@@ -416,13 +416,23 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    /**
-     * @param countryId
-     * @param orgId
-     * @param templateId - Policy Agreement template id
-     * @param id         -agreement section id
-     * @return -true on successfull deletion of section
-     */
+    public List<BigInteger> updateAggrementSubSectionsAndClauses(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOList, PolicyAgreementTemplate policyAgreementTemplate) {
+
+
+        return null;
+        }
+
+
+
+
+
+        /**
+         * @param countryId
+         * @param orgId
+         * @param templateId - Policy Agreement template id
+         * @param id         -agreement section id
+         * @return -true on successfull deletion of section
+         */
     public Boolean deleteAgreementSection(Long countryId, Long orgId, BigInteger templateId, BigInteger id) {
 
         AgreementSection exist = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, id);
