@@ -14,6 +14,7 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
     private LocalTime endTime;
     private boolean mainShift;
     private Set<BigInteger> subShiftIds;
+    private int durationMinutes;
 
     public IndividualShiftTemplate() {
         //Default Constructor
