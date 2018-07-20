@@ -102,7 +102,7 @@ public class CountryCTAService extends UserBaseService {
 
         costTimeAgreement.setId(null);
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CountryCTAService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, false,true);
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, false, true);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
@@ -189,7 +189,7 @@ public class CountryCTAService extends UserBaseService {
     }
 
     @Async
-    public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, CTADetailsWrapper ctaDetailsWrapper,boolean doUpdate, boolean creatingFromCountry)
+    public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, CTADetailsWrapper ctaDetailsWrapper, boolean doUpdate, boolean creatingFromCountry)
             throws InterruptedException, ExecutionException {
         // Get Rule Templates
         Callable<List<RuleTemplate>> ctaRuleTemplatesCallable = () -> {
@@ -197,7 +197,9 @@ public class CountryCTAService extends UserBaseService {
             for (CTARuleTemplateDTO ctaRuleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()) {
                 CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate();
                 BeanUtils.copyProperties(ctaRuleTemplateDTO, ctaRuleTemplate);
-                ctaRuleTemplate.cloneCTARuleTemplate();
+                if (!doUpdate || (doUpdate && !ctaDetailsWrapper.getSelectedRuleTemplateIds().contains(ctaRuleTemplate.getId()))) {
+                    ctaRuleTemplate.cloneCTARuleTemplate();
+                }
                 CTARuleTemplate.setActivityBasesCostCalculationSettings(ctaRuleTemplate);
                 ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, ctaDetailsWrapper);
                 ruleTemplates.add(ctaRuleTemplate);
@@ -207,6 +209,7 @@ public class CountryCTAService extends UserBaseService {
         Future<List<RuleTemplate>> ctaRuleTemplatesFuture = asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
 
         costTimeAgreement.setExpertise(ctaDetailsWrapper.getExpertise());
+        // if creating fro country and we are not updating then only.
         if (creatingFromCountry && !doUpdate) {
             costTimeAgreement.setOrganizationType(ctaDetailsWrapper.getOrganizationType());
             costTimeAgreement.setOrganizationSubType(ctaDetailsWrapper.getOrganizationSubType());
@@ -267,7 +270,7 @@ public class CountryCTAService extends UserBaseService {
         }
 
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CountryCTAService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, false,false);
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, false, false);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
@@ -297,12 +300,12 @@ public class CountryCTAService extends UserBaseService {
         for (RuleTemplate ruleTemplate : costTimeAgreement.getRuleTemplates()) {
             previousRuleTemplateIds.add(ruleTemplate.getId());
         }
-
+        ctaDetailsWrapper.setSelectedRuleTemplateIds(previousRuleTemplateIds);
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
         costTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         costTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CountryCTAService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper,true, countryId != null);
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, true, countryId != null);
         CompletableFuture.allOf(hasUpdated).join();
 
         this.save(costTimeAgreement);
