@@ -99,7 +99,10 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                 clauseCriteria.add(buildQuery(filterSelection, filterSelection.getName()));
             }
         });
-        criteria = criteria.andOperator(clauseCriteria.toArray(new Criteria[clauseCriteria.size()]));
+        if (!clauseCriteria.isEmpty())
+        {
+            criteria = criteria.andOperator(clauseCriteria.toArray(new Criteria[clauseCriteria.size()]));
+        }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("template_type","templateTypes","_id","templateTypes"),
