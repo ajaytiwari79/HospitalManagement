@@ -1,25 +1,30 @@
-package com.kairos.activity.activity.activity_tabs;
+package com.kairos.persistence.model.activity.tabs;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
  * Created by vipul on 23/8/17.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class CompositeShiftActivityDTO {
+
+public class CompositeActivity implements Serializable {
 
     private BigInteger activityId;
     private boolean allowedBefore;
     private boolean allowedAfter;
 
-    public CompositeShiftActivityDTO() {
+    public CompositeActivity() {
         // DC
     }
 
+    public CompositeActivity(BigInteger activityId, boolean allowedBefore, boolean allowedAfter) {
+        this.activityId = activityId;
+        this.allowedBefore = allowedBefore;
+        this.allowedAfter = allowedAfter;
+    }
+
     public BigInteger getActivityId() {
-        return this.activityId;
+        return activityId;
     }
 
     public void setActivityId(BigInteger activityId) {
