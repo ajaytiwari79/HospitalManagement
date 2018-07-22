@@ -1,7 +1,7 @@
 package com.kairos.service.counter;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.enums.CounterType;
+import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.ModuleCounter;
 import com.kairos.persistence.model.counter.UnitRoleCounter;

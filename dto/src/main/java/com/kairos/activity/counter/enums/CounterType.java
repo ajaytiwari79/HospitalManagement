@@ -1,4 +1,4 @@
-package com.kairos.enums;
+package com.kairos.activity.counter.enums;
 
 import com.kairos.activity.counter.CounterTypeDefDTO;
 

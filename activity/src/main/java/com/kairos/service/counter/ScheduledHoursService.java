@@ -1,6 +1,6 @@
 package com.kairos.service.counter;
 
-import com.kairos.enums.CounterType;
+import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.repository.counter.CounterRepository;

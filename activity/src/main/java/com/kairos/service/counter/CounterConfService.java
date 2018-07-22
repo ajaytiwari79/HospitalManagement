@@ -2,9 +2,11 @@ package com.kairos.service.counter;
 
 import com.kairos.activity.counter.FilterCriteria;
 import com.kairos.activity.counter.KPICategoryUpdationDTO;
-import com.kairos.enums.CounterType;
+import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.counter.KPIAssignmentConf;
 import com.kairos.persistence.model.counter.KPICategory;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.service.MongoBaseService;
@@ -52,7 +54,8 @@ public class CounterConfService extends MongoBaseService {
         save(counter);
     }
 
-    private void verifyForCategoryAvailability(List<String> categoryNames){
+    private void verifyForCategoryAvailability(List<String> categoryNames, Long refId){
+        // confLevel, name
         List<String> formattedNames = new ArrayList<>();
         categoryNames.forEach(category -> {
             formattedNames.add(category.trim().toLowerCase());
@@ -76,9 +79,9 @@ public class CounterConfService extends MongoBaseService {
         return categoriesNames;
     }
 
-    public List<KPICategory> addCategories(List<KPICategory> categories){
+    public List<KPICategory> addCategories(List<KPICategory> categories, ConfLevel level, Long ownerId){
         List<String > names = getTrimmedNames(categories);
-        verifyForCategoryAvailability(names);
+        verifyForCategoryAvailability(names, ownerId);
         return save(categories);
     }
 
@@ -99,7 +102,7 @@ public class CounterConfService extends MongoBaseService {
         return save(updatableCategories);
     }
 
-    public void addEntries(){
+    public void addEntries(Long countryId){
         List<KPI> kpis = new ArrayList<>();
         /// String title, BaseChart chart, CounterSize size, CounterType type, boolean treatAsCounter, BigInteger primaryCounter
         //verification for availability
@@ -110,6 +113,8 @@ public class CounterConfService extends MongoBaseService {
         addableCounters.forEach(counterType -> {
             kpis.add(new KPI(counterType.getName(), null, null, counterType, false, null));
         });
-        save(kpis);
+        List<KPI> savedKPIs = save(kpis);
+        List<KPIAssignmentConf> kpiAssignment = savedKPIs.parallelStream().map(kpi -> new KPIAssignmentConf(kpi.getId(), countryId, null, null, ConfLevel.COUNTRY)).collect(Collectors.toList());
+        save(kpiAssignment);
     }
 }
