@@ -17,7 +17,7 @@ public interface CustomFilterMongoRepository {
 
     AggregationOperation buildAggregationQuery(FilterType filterType);
 
-    Aggregation createAggregationQueryForMasterAsset(Map<String, AggregationOperation> aggregationOperations);
+    Aggregation createAggregationQueryForFilterCategory(Map<String, AggregationOperation> aggregationOperations);
 
     AggregationResults<FilterQueryResult> getFilterAggregationResult(Aggregation aggregation,FilterGroup filterGroup, String moduleId);
 

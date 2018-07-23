@@ -81,7 +81,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     }
 
     @Override
-    public Aggregation createAggregationQueryForMasterAsset(Map<String, AggregationOperation> aggregationOperations) {
+    public Aggregation createAggregationQueryForFilterCategory(Map<String, AggregationOperation> aggregationOperations) {
         GroupOperation groupOperation = group();
         List<AggregationOperation> operations = new ArrayList<>();
         operations.add(aggregationOperations.get("match"));

@@ -67,7 +67,7 @@ public class FilterService {
         if (Optional.ofNullable(filterGroup).isPresent()) {
             List<FilterType> filterTypes = filterGroup.getFilterTypes();
             filterCriteria = filterMongoRepository.getFilterCriteria(countryId, organizationId, filterTypes,filterGroup);
-            Aggregation aggregation = filterMongoRepository.createAggregationQueryForMasterAsset(filterCriteria);
+            Aggregation aggregation = filterMongoRepository.createAggregationQueryForFilterCategory(filterCriteria);
             AggregationResults<FilterQueryResult> result = filterMongoRepository.getFilterAggregationResult(aggregation, filterGroup, moduleId);
             FilterQueryResult filterQueryResult = result.getUniqueMappedResult();
 
