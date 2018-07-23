@@ -1,0 +1,11 @@
+// To drop old db entries
+db.staffActivitySetting.drop();
+
+// Unique constraints on staffId and activityId
+db.staffActivitySetting.createIndex( { staffId:1,activityId:1 }, { unique: true } )
+
+// To set default values in existing activities
+
+db.activities.updateMany({},{$set:{
+"rulesActivityTab.plannedTimeInAdvance": {"type":"HOURS","value":0}
+      }})
