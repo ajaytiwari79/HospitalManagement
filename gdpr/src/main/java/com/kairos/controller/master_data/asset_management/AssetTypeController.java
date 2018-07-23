@@ -105,7 +105,7 @@ public class AssetTypeController {
         if ((Boolean) result.get("isSuccess")){
             return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
         }
-        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST,false,result);
+        return ResponseHandler.generateResponse(HttpStatus.OK,false,result);
 
     }
 
