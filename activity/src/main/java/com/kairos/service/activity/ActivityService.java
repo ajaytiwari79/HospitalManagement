@@ -2,6 +2,7 @@ package com.kairos.service.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
+import com.kairos.activity.activity.CompositeActivityDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
 import com.kairos.activity.activity.activity_tabs.*;
 import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
@@ -128,8 +129,10 @@ public class ActivityService extends MongoBaseService {
     @Inject
     private OpenShiftIntervalRepository openShiftIntervalRepository;
 
-    @Inject private ShiftTemplateService shiftTemplateService;
-    @Inject private GenericIntegrationService genericIntegrationService;
+    @Inject
+    private ShiftTemplateService shiftTemplateService;
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -297,7 +300,7 @@ public class ActivityService extends MongoBaseService {
         save(activity);
 
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(new BigInteger(String.valueOf(countryId)));
-     //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        //   generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityCategories);
 
         return activityTabsWrapper;
@@ -345,7 +348,7 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", balanceDTO.getActivityId());
         }
-        TimeType timeType=timeTypeMongoRepository.findOneById(balanceDTO.getTimeTypeId());
+        TimeType timeType = timeTypeMongoRepository.findOneById(balanceDTO.getTimeTypeId());
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.timetype.notfound");
         }
@@ -402,24 +405,25 @@ public class ActivityService extends MongoBaseService {
 
     }
 
-    public ActivityTabsWrapper updateCompositeShiftTabOfActivity(CompositeShiftActivityDTO compositeShiftActivityDTO) {
-
-
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(compositeShiftActivityDTO.getActivityId())));
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", compositeShiftActivityDTO.getActivityId());
+    public List<CompositeShiftActivityDTO> assignCompositeActivitiesInActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {
+        Optional<Activity> activity = activityMongoRepository.findById(activityId);
+        if (!activity.isPresent()) {
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
-        Set<BigInteger> activityIds = compositeShiftActivityDTO.getActivityList();
-        Integer activityMatchedCount = activityMongoRepository.findAllActivityByIds(activityIds);
-
-        if (activityMatchedCount != activityIds.size()) {
-            exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftActivityDTO.getActivityId());
+        Set<BigInteger> compositeShiftIds = new HashSet<>();
+        compositeShiftIds.addAll(compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet()));
+        Integer activityMatchedCount = activityMongoRepository.countActivityByIds(compositeShiftIds);
+        if (activityMatchedCount != compositeShiftIds.size()) {
+            exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
+        List<CompositeActivity> compositeActivities = new ArrayList<>();
+        compositeShiftActivityDTOs.forEach(compositeShiftActivityDTO -> {
+            compositeActivities.add(new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter()));
+        });
 
-        activity.setCompositeActivities(compositeShiftActivityDTO.getActivityList());
-        save(activity);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(compositeShiftActivityDTO.getActivityList());
-        return activityTabsWrapper;
+        activity.get().setCompositeActivities(compositeActivities);
+        save(activity.get());
+        return compositeShiftActivityDTOs;
 
     }
 
@@ -432,19 +436,16 @@ public class ActivityService extends MongoBaseService {
         return activityTabsWrapper;
     }
 
-    public List<ActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (activity == null) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
+    public List<CompositeActivityDTO> getCompositeShiftTabOfActivity(BigInteger activityId) {
+        Optional<Activity> activity = activityMongoRepository.findById(activityId);
+        if (!activity.isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        Set<BigInteger> compositeShiftIds = new HashSet<>();
-        if (activity.getCompositeActivities() != null) {
-            compositeShiftIds = Optional.ofNullable(activity.getCompositeActivities()).orElse(Collections.EMPTY_SET);
+        List<CompositeActivityDTO> compositeActivities= new ArrayList<>();
+        if (Optional.ofNullable(activity.get().getCompositeActivities()).isPresent() && !activity.get().getCompositeActivities().isEmpty()){
+             compositeActivities = activityMongoRepository.getCompositeActivities(activityId);
         }
-        List<ActivityDTO> activityDTOS = activityMongoRepository.findAllActivitiesWithDataByIds(compositeShiftIds);
-        return activityDTOS;
-
-
+        return compositeActivities;
     }
 
     public ActivityTabsWrapper updateIndividualPointsTab(IndividualPointsActivityTabDTO individualPointsDTO) {
@@ -558,7 +559,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id", bonusActivityDTO.getActivityId());
         }
         BonusActivityTab bonusActivityTab = new BonusActivityTab(bonusActivityDTO.getBonusHoursType(), bonusActivityDTO.isOverRuleCtaWta());
-                activity.setBonusActivityTab(bonusActivityTab);
+        activity.setBonusActivityTab(bonusActivityTab);
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(bonusActivityTab);
         return activityTabsWrapper;
@@ -738,7 +739,7 @@ public class ActivityService extends MongoBaseService {
 
         // Set access Role of staff
 
-        UserAccessRoleDTO userAccessRoleDTO= staffRestClient.getAccessOfCurrentLoggedInStaff();
+        UserAccessRoleDTO userAccessRoleDTO = staffRestClient.getAccessOfCurrentLoggedInStaff();
         ArrayList<PhaseWeeklyDTO> phaseWeeklyDTOS = new ArrayList<PhaseWeeklyDTO>();
         for (PhaseDTO phaseObj : phaseDTOs) {
             if (phaseObj.getDurationType().equals(DurationType.WEEKS)) {
@@ -776,10 +777,10 @@ public class ActivityService extends MongoBaseService {
             }
         }
 
-        List<ActivityWithCompositeDTO> activities=activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
+        List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
 
-        List<ShiftTemplateDTO> shiftTemplates =shiftTemplateService.getAllShiftTemplates(unitId);
-        PhaseActivityDTO phaseActivityDTO = new PhaseActivityDTO(activities,phaseWeeklyDTOS,dayTypes,userAccessRoleDTO,shiftTemplates,phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId));
+        List<ShiftTemplateDTO> shiftTemplates = shiftTemplateService.getAllShiftTemplates(unitId);
+        PhaseActivityDTO phaseActivityDTO = new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, userAccessRoleDTO, shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId));
         return phaseActivityDTO;
     }
 
@@ -1087,8 +1088,8 @@ public class ActivityService extends MongoBaseService {
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
-        PermissionsActivityTabDTO permissionsActivityTabDTO=new PermissionsActivityTabDTO();
-        BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(),permissionsActivityTabDTO);
+        PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
+        BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
         activityDTO.setPermissionsActivityTab(permissionsActivityTabDTO);
         return activityDTO;
     }

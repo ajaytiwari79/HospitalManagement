@@ -66,8 +66,8 @@ public class FilterService {
         FilterAndFavouriteFilterDTO filterAndFavouriteFilterDto = new FilterAndFavouriteFilterDTO();
         if (Optional.ofNullable(filterGroup).isPresent()) {
             List<FilterType> filterTypes = filterGroup.getFilterTypes();
-            filterCriteria = filterMongoRepository.getFilterCriteria(countryId, organizationId, filterTypes);
-            Aggregation aggregation = filterMongoRepository.createAggregationQueryForMasterAsset(filterCriteria);
+            filterCriteria = filterMongoRepository.getFilterCriteria(countryId, organizationId, filterTypes,filterGroup);
+            Aggregation aggregation = filterMongoRepository.createAggregationQueryForFilterCategory(filterCriteria);
             AggregationResults<FilterQueryResult> result = filterMongoRepository.getFilterAggregationResult(aggregation, filterGroup, moduleId);
             FilterQueryResult filterQueryResult = result.getUniqueMappedResult();
 
@@ -130,15 +130,13 @@ public class FilterService {
     }
 
 
-    //Wrap filter data response on the basic and module id and filter selection
     public FilterResponseWithData getFilterDataByModuleName(Long countryId, Long organizationId, String moduleName, FilterSelectionDTO filterSelectionDto) {
 
         switch (moduleName) {
             case CLAUSE_MODULE_NAME:
-                List<Clause> clauses = clauseMongoRepository.getClauseDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
-                List<ClauseResponseDTO> clauseResponseDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDTO.class);
+                List<ClauseResponseDTO> clauses = clauseMongoRepository.getClauseDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
                 FilterResponseWithData<List<ClauseResponseDTO>> clauseFilterData = new FilterResponseWithData<>();
-                clauseFilterData.setData(clauseResponseDTOs);
+                clauseFilterData.setData(clauses);
                 return clauseFilterData;
             case ASSET_MODULE_NAME:
                 List<MasterAsset> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
@@ -147,10 +145,9 @@ public class FilterService {
                 assetFilterData.setData(masterAssetResponseDTOs);
                 return assetFilterData;
             case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
-                List<MasterProcessingActivity> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, organizationId, filterSelectionDto);
-                List<MasterProcessingActivityResponseDTO> processingActivityResponseDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivities, MasterProcessingActivityResponseDTO.class);
+                List<MasterProcessingActivityResponseDTO> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, organizationId, filterSelectionDto);
                 FilterResponseWithData<List<MasterProcessingActivityResponseDTO>> processingActivityFilterData = new FilterResponseWithData<>();
-                processingActivityFilterData.setData(processingActivityResponseDTOs);
+                processingActivityFilterData.setData(processingActivities);
                 return processingActivityFilterData;
             default:
                 throw new DataNotFoundByIdException("data not found by moduleName " + moduleName);
