@@ -90,22 +90,33 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public List<Clause> getClauseDataWithFilterSelection(Long countryId, Long organizationId, FilterSelectionDTO filterSelectionDto) {
-        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId));
-        filterSelectionDto.getFiltersData().forEach(filterSelection -> {
+    public List<ClauseResponseDTO> getClauseDataWithFilterSelection(Long countryId, Long organizationId, FilterSelectionDTO filterSelectionDto) {
 
+        Criteria criteria=Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId);
+        List<Criteria> clauseCriteria = new ArrayList<>(filterSelectionDto.getFiltersData().size());
+        filterSelectionDto.getFiltersData().forEach(filterSelection -> {
             if (filterSelection.getValue().size() != 0) {
-                query.addCriteria(buildQuery(filterSelection, filterSelection.getName(), query));
+                clauseCriteria.add(buildQuery(filterSelection, filterSelection.getName()));
             }
         });
+        if (!clauseCriteria.isEmpty())
+        {
+            criteria = criteria.andOperator(clauseCriteria.toArray(new Criteria[clauseCriteria.size()]));
+        }
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("template_type","templateTypes","_id","templateTypes"),
+                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
 
-        return mongoTemplate.find(query, Clause.class);
+        );
 
+        AggregationResults<ClauseResponseDTO> result=mongoTemplate.aggregate(aggregation,Clause.class,ClauseResponseDTO.class);
+        return result.getMappedResults();
     }
 
 
     @Override
-    public Criteria buildQuery(FilterSelection filterSelection, FilterType filterType, Query query) {
+    public Criteria buildQuery(FilterSelection filterSelection, FilterType filterType) {
 
         switch (filterType) {
             case ACCOUNT_TYPES:

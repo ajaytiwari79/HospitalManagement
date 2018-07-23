@@ -16,9 +16,9 @@ public interface CustomClauseRepository {
 
     Clause findByTitle(Long countryId,Long organizationId,String title);
 
-    List<Clause> getClauseDataWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
+    List<ClauseResponseDTO> getClauseDataWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
 
-    Criteria buildQuery(FilterSelection filterSelection, FilterType filterType, Query query);
+    Criteria buildQuery(FilterSelection filterSelection, FilterType filterType);
 
     List<Clause> findClausesByTitle(Long countryId,Long orgId,List<String> clauseTitles);
 

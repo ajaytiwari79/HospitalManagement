@@ -28,14 +28,14 @@ public class GeneralActivityTabDTO {
     private String ultraShortName;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String originalIconName;
+    private String modifiedIconName;
+    private List<BigInteger> tags = new ArrayList<>();
 
-    public String getUltraShortName() {
-        return ultraShortName;
+    public GeneralActivityTabDTO() {
+        // dc
     }
 
-    public void setUltraShortName(String ultraShortName) {
-        this.ultraShortName = ultraShortName;
-    }
 
     @Override
     public String toString() {
@@ -58,9 +58,14 @@ public class GeneralActivityTabDTO {
                 '}';
     }
 
-    private String originalIconName;
-    private String modifiedIconName;
-    private List<BigInteger> tags = new ArrayList<>();
+    public String getUltraShortName() {
+        return ultraShortName;
+    }
+
+    public void setUltraShortName(String ultraShortName) {
+        this.ultraShortName = ultraShortName;
+    }
+
     public List<BigInteger> getTags() {
         return tags;
     }
