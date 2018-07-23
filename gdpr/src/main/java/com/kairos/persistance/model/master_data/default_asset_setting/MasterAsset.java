@@ -10,6 +10,7 @@ import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.List;
 
 @Document(collection = "master_asset")
@@ -33,6 +34,17 @@ public class MasterAsset extends MongoBaseEntity {
     private List <SubServiceCategoryDTO> organizationSubServices;
 
     private Long countryId;
+
+    @NotNull(message = "Asset type can't be null")
+    private BigInteger assetTypeId;
+
+    public BigInteger getAssetTypeId() {
+        return assetTypeId;
+    }
+
+    public void setAssetTypeId(BigInteger assetTypeId) {
+        this.assetTypeId = assetTypeId;
+    }
 
     public Long getCountryId() {
         return countryId;

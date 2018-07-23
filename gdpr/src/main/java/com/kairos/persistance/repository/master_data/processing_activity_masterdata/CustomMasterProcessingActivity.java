@@ -22,7 +22,7 @@ public interface CustomMasterProcessingActivity {
 
    List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
 
-   Criteria buildQuery(FilterSelection filterSelection, FilterType filterType);
+   Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType);
 
 
 

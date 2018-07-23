@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -45,6 +46,16 @@ public class MasterAssetDTO {
     @Valid
     private List<SubServiceCategoryDTO> organizationSubServices;
 
+   // @NotNull(message = "Asset Type Can't be empty")
+    private BigInteger assetTypeId;
+
+    public BigInteger getAssetTypeId() {
+        return assetTypeId;
+    }
+
+    public void setAssetTypeId(BigInteger assetTypeId) {
+        this.assetTypeId = assetTypeId;
+    }
 
     public String getName() {
         return name;
