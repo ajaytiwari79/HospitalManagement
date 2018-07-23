@@ -56,7 +56,7 @@ public class MasterAssetService extends MongoBaseService {
         ,masterAssetDto.getOrganizationServices(),masterAssetDto.getOrganizationSubServices());
         newAsset.setCountryId(countryId);
         newAsset.setOrganizationId(organizationId);
-        newAsset.setAssetTypeId(masterAssetDto.getAssetTypeId());
+        newAsset.setAssetType(masterAssetDto.getAssetTypeId());
         return masterAssetMongoRepository.save(sequenceGenerator(newAsset));
     }
 
@@ -99,7 +99,7 @@ public class MasterAssetService extends MongoBaseService {
         exists.setOrganizationServices(masterAssetDto.getOrganizationServices());
         exists.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
         exists.setName(masterAssetDto.getName());
-        exists.setAssetTypeId(masterAssetDto.getAssetTypeId());
+        exists.setAssetType(masterAssetDto.getAssetTypeId());
         exists.setDescription(masterAssetDto.getDescription());
         masterAssetMongoRepository.save(sequenceGenerator(exists));
         return exists;
