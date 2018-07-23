@@ -161,9 +161,6 @@ public class PlanningPeriodService extends MongoBaseService {
         LocalDate endDate;
         for (LocalDate startDate : startDateList) {
             boolean isExist = planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithUnitIdAndDate(unitId, startDate);
-            if(isExist){
-                exceptionService.actionNotPermittedException("message.period.date.alreadyexists");
-            }
             if (validateStartDateForPeriodCreation(startDate, planningPeriodDTO.getDurationType())) {
                 // Add planning period
                  endDate = DateUtils.addDurationInLocalDateExcludingLastDate(startDate, planningPeriodDTO.getDuration(),
@@ -171,13 +168,14 @@ public class PlanningPeriodService extends MongoBaseService {
                  if(endDate.isAfter(oldEndDate)){
                      endDate=oldEndDate;
                  }
-                    createPlanningPeriodOnMigration(startDate, endDate, unitId, planningPeriodDTO, phases);
             } else {
                 endDate = getNextValidDateForPlanningPeriod(startDate, planningPeriodDTO.getDurationType()).minusDays(1);
                 if(endDate.isAfter(oldEndDate)){
                     endDate=oldEndDate;
                 }
-                    createPlanningPeriodOnMigration(startDate, endDate, unitId, planningPeriodDTO, phases);
+            }
+            if(!isExist) {
+                createPlanningPeriodOnMigration(startDate, endDate, unitId, planningPeriodDTO, phases);
             }
         }
     }
