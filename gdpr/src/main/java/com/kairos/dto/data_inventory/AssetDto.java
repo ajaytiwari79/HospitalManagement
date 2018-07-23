@@ -1,27 +1,26 @@
-package com.kairos.persistance.model.data_inventory.asset;
+package com.kairos.dto.data_inventory;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.List;
 
-@Document(collection = "asset")
-public class Asset extends MongoBaseEntity {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class AssetDto {
 
 
-    @NotNullOrEmpty(message = "Name can 't be empty")
+    @NotNullOrEmpty(message = "name can't be empty ")
+    @Pattern(message = "Numbers and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNullOrEmpty(message = "description can't be empty")
+    @NotNullOrEmpty(message = "description  can't be  Empty ")
     private String description;
-
-    private Long countryId;
 
     private List<BigInteger> storageFormats;
 
@@ -35,10 +34,11 @@ public class Asset extends MongoBaseEntity {
 
     private BigInteger hostingType;
 
-    @NotNull(message = "Asset Type can't be empty")
+    @NotNull(message = "Asset  Types can't be empty")
     private BigInteger assetType;
 
-    @NotEmpty(message = "Sub Asset Type can't be empty")
+    @NotNull(message = "Asset Sub Types can't be empty")
+    @NotEmpty(message = "Asset Sub Types can't be empty")
     private List<BigInteger> assetSubTypes;
 
     private Integer dataRetentionPeriod;
@@ -49,29 +49,13 @@ public class Asset extends MongoBaseEntity {
 
     private RiskSeverity risk;
 
-    private Boolean isActive=false;
-
-    public Boolean getActive() { return isActive; }
-
-    public void setActive(Boolean active) { isActive = active; }
-
     public String getName() { return name; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setName(String name) { this.name = name; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getDescription() { return description; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Long getCountryId() { return countryId; }
-
-    public void setCountryId(Long countryId) { this.countryId = countryId; }
+    public void setDescription(String description) { this.description = description; }
 
     public List<BigInteger> getStorageFormats() { return storageFormats; }
 
@@ -117,21 +101,7 @@ public class Asset extends MongoBaseEntity {
 
     public void setProcessingActivity(BigInteger processingActivity) { this.processingActivity = processingActivity; }
 
-
-    public Asset() {
-    }
-
     public List<BigInteger> getAssetSubTypes() { return assetSubTypes; }
 
     public void setAssetSubTypes(List<BigInteger> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
-
-    public Asset(String name, String description, Long countryId, BigInteger assetType,List<BigInteger> assetSubTypes) {
-        this.name = name;
-        this.description = description;
-        this.countryId = countryId;
-        this.assetType = assetType;
-        this.assetSubTypes=assetSubTypes;
-    }
 }
-
-
