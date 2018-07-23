@@ -1,6 +1,8 @@
 package com.kairos.controller.activity;
 
 import com.kairos.activity.shift.ShiftDTO;
+import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.phase.ShiftAndPhaseStatusDTO;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.activity.shift.CopyShiftDTO;
@@ -20,6 +22,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -149,4 +152,17 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> createShiftUsingTemplate(@PathVariable Long unitId, @RequestBody ShiftDTO shiftDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShiftUsingTemplate(unitId,shiftDTO));
     }
+
+    @ApiOperation("Add statuses in  Shifts")
+    @PutMapping(value = "/add_status")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addStatusesInShift(@PathVariable Long unitId, @RequestBody @Valid ShiftAndPhaseStatusDTO shiftAndPhaseStatusDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addStatusesInShift(unitId,shiftAndPhaseStatusDTO));
+    }
+
+
+
+
+
+
 }

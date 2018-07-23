@@ -301,92 +301,56 @@ public class PhaseService extends MongoBaseService {
                 .map(Enum::name)
                 .collect(Collectors.toList());
     }
-    /*private ArrayList getDefaultPhases(long unitId) {
-        ArrayList<Phase> phases = new ArrayList();
-        return phases;
-    }*/
-
-    /*public void createDefaultPhases() {
-
-        logger.info("<<<<<< createDefaultPhases executes >>>>>>>");
-        List<Long> organizationIdList = organizationRestClient.getAllOrganizationIds();
-        logger.info("Organization whose phases need to create " + organizationIdList.size());
-        if (!organizationIdList.isEmpty()) {
-            for (Long organizationId : organizationIdList) {
-                createDefaultPhase(organizationId);
-            }
-            logger.info("<<<<<< createDefaultPhases completed >>>>>>>");
-            organizationRestClient.updateOrganizationWithoutPhases(organizationIdList);
-        } else {
-            logger.info("<<<<<< All organization's have already Phases created >>>>>>>");
-        }
-
-    }*/
-
-    /*public Phase createPhasesByUnitId(Long unitId, PhaseDTO phaseDTO) {
-
-        if (phaseDTO.getDuration() <= 0) {
-            throw new ActionNotPermittedException("Invalid Phase Duration : " + phaseDTO.getDuration());
-        }
-
-        OrganizationDTO unitOrganization = organizationRestClient.getOrganization(unitId);
-        if (unitOrganization == null) {
-            throw new DataNotFoundByIdException("Invalid unitId : " + unitId);
-        }
-        Phase phase = phaseMongoRepository.findByNameAndDisabled(unitId, phaseDTO.getName(), false);
-
-        if (phase != null) {
-            throw new ActionNotPermittedException("Phase with name : " + phaseDTO.getName() + " already exists.");
-        }
-
-        phase = preparePhase(phaseDTO, unitOrganization);
-        save(phase);
-
-        return phase;
-    }*/
-
-    // called once when  new country is registered
-    /*public void createDefaultPhasesInCountry(Long countryId) {
-//        boolean exists = countryRestClient.isCountryExists(countryId);
-//        if (!exists) {
-//            throw new DataNotFoundByIdException("Invalid unitId : " + countryId);
-//        }
-        ArrayList<Phase> phases = getDefaultPhasesForCountry(countryId);
-        save(phases);
-    }*/
-
-    /*private ArrayList getDefaultPhasesForCountry(Long countryId) {
-        Phase realTimePhase = new Phase(REALTIME_PHASE_NAME, REALTIME_PHASE_DESCRIPTION, 24, DurationType.HOURS, 1, countryId, false, null, null);
-        Phase tentativePhase = new Phase(TENTATIVE_PHASE_NAME, TENTATIVE_PHASE_DESCRIPTION, 7, DurationType.DAYS, 2, countryId, false, null, null);
-        Phase draftPhase = new Phase(DRAFT_PHASE_NAME, DRAFT_PHASE_DESCRIPTION, 4, DurationType.WEEKS, 3, countryId, false, null, null);
-        Phase constructionPhase = new Phase(CONSTRUCTION_PHASE_NAME, CONSTRUCTION_PHASE_DESCRIPTION, 1, DurationType.WEEKS, 4, countryId, false, null, null);
-        Phase puzzlePhase = new Phase(PUZZLE_PHASE_NAME, PUZZLE_PHASE_DESCRIPTION, 1, DurationType.WEEKS, 5, countryId, false, null, null);
-        Phase requestPhase = new Phase(REQUEST_PHASE_NAME, REQUEST_PHASE_DESCRIPTION, 1, DurationType.WEEKS, 6, countryId, false, null, null);
-        ArrayList<Phase> phases = new ArrayList();
-        phases.add(realTimePhase);
-        phases.add(tentativePhase);
-        phases.add(draftPhase);
-        phases.add(constructionPhase);
-        phases.add(puzzlePhase);
-        phases.add(requestPhase);
-        return phases;
-    }*/
-
-    /*private Phase preparePhase(PhaseDTO phaseDTO, OrganizationDTO unitOrganization) {
-        Phase phase = new Phase();
-        phase.setName(phaseDTO.getName());
-        phase.setDuration(phaseDTO.getDuration());
-        phase.setSequence(phaseDTO.getSequence());
-        phase.setDescription(phaseDTO.getDescription());
-//        phase.setConstructionPhaseStartsAtDay(phaseDTO.getConstructionPhaseStartsAtDay());
-//        phase.setActivityAccess(phaseDTO.getActivityAccess());
-        phase.setOrganizationId(unitOrganization.getId());
-        return phase;
-    }*/
 
     public List<Phase> getAllPhasesOfUnit(Long unitId) {
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalseAndDurationGreaterThan(unitId, PhaseType.PLANNING.toString(), 0L);
         return phases;
+    }
+
+    public List<Phase> getCurrentPhaseListByDate(Long unitId, List<Date> dates) {
+        List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalseAndDurationGreaterThan(unitId, PhaseType.PLANNING.toString(), 0L);
+        List<Phase> phaseList=new ArrayList<>();
+        LocalDate currentDate = LocalDate.now();
+        Collections.sort(phases, (Phase p1, Phase p2) -> {
+            if (p1.getSequence() > p2.getSequence())
+                return 1;
+            else
+                return -1;
+        });
+        for (Date date : dates) {
+            Phase phase = null;
+            LocalDate proposedDate = DateUtils.getLocalDateFromDate(date);
+            long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
+
+            if (weekDifference < 0) {
+                Optional<Phase> phaseOptional = phases.stream().findFirst();
+                phase = phaseOptional.get();
+                phaseList.add(phase);
+            }
+            int weekCount = 1;
+            outerLoop:
+            for (Phase phaseObject : phases) {
+                if (phaseObject.getDurationType().equals(DurationType.WEEKS) && phaseObject.getDuration() > 0) {    // Only considering Week based phases
+                    for (int i = 0; i < phaseObject.getDuration(); i++) {
+                        //logger.info(phaseObject.getName());
+                        if (weekDifference == weekCount) {
+                            phase = phaseObject;
+                            phaseList.add(phase);
+                            break outerLoop;
+                        }
+                        weekCount++;
+                    }
+                }
+            }
+
+
+            if (!Optional.ofNullable(phase).isPresent()) {
+                phase = phases.get(phases.size() - 1);
+                phaseList.add(phase);
+            }
+        }
+
+        return phaseList;
     }
 
 }

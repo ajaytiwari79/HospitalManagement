@@ -18,6 +18,7 @@ import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.phase.ShiftAndPhaseStatusDTO;
 import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
@@ -1241,5 +1242,31 @@ public class ShiftService extends MongoBaseService {
                 });
             }
         });
+    }
+
+
+
+    public Map<String, List<BigInteger>>  addStatusesInShift(Long unitId,ShiftAndPhaseStatusDTO shiftAndPhaseStatusDTO){
+        List<BigInteger> success = new ArrayList<>();
+        List<BigInteger> error = new ArrayList<>();
+        Map<String, List<BigInteger>> response = new HashMap<>();
+        response.put("success", success);
+        response.put("error", error);
+
+        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftAndPhaseStatusDTO.getShiftIds());
+        List<Date> dates=shifts.stream().map(Shift::getStartDate).collect(Collectors.toList());
+        List<Phase> phases=phaseService.getCurrentPhaseListByDate(unitId,dates);
+        for(int i=0;i<shifts.size();i++){
+            List<Phase.PhaseStatus> phaseStatuses=phases.get(i).getStatus();
+            if(phaseStatuses.containsAll(shiftAndPhaseStatusDTO.getPhaseStatuses())){
+                shifts.get(i).setPhaseStatuses(shiftAndPhaseStatusDTO.getPhaseStatuses());
+                success.add(shifts.get(i).getId());
+            }
+            else {
+                error.add(shifts.get(i).getId());
+            }
+        }
+        save(shifts);
+        return response;
     }
 }

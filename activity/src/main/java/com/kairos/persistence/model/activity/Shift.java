@@ -60,6 +60,8 @@ public class Shift extends MongoBaseEntity {
     private BigInteger copiedFromShiftId;
     private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
 
+    private List<Phase.PhaseStatus> phaseStatuses;
+
     public Shift() {
         //dc
     }
@@ -404,5 +406,11 @@ public class Shift extends MongoBaseEntity {
         return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
     }
 
+    public List<Phase.PhaseStatus> getPhaseStatuses() {
+        return phaseStatuses;
+    }
 
+    public void setPhaseStatuses(List<Phase.PhaseStatus> phaseStatuses) {
+        this.phaseStatuses = phaseStatuses;
+    }
 }
