@@ -39,13 +39,13 @@ public class MasterAssetResponseDTO {
 
     private List <SubServiceCategoryDTO> organizationSubServices;
 
-    private AssetTypeResponseDto assetType;
+    private AssetTypeResponseDTO assetType;
 
-    public AssetTypeResponseDto getAssetType() {
+    public AssetTypeResponseDTO getAssetType() {
         return assetType;
     }
 
-    public void setAssetType(AssetTypeResponseDto assetType) {
+    public void setAssetType(AssetTypeResponseDTO assetType) {
         this.assetType = assetType;
     }
 
