@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.facet;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static com.kairos.constants.AppConstant.CLAUSE_MODULE_NAME;
@@ -31,6 +32,7 @@ import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 import static com.kairos.constants.AppConstant.DELETED;
 import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
+import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_ID;
 
 
 public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
@@ -40,9 +42,14 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Map<String, AggregationOperation> getFilterCriteria(Long countryId,Long organizationId,List<FilterType> filterTypes) {
+    public Map<String, AggregationOperation> getFilterCriteria(Long countryId, Long organizationId, List<FilterType> filterTypes, FilterGroup filterGroup) {
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
-        aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
+        if (filterGroup.getAccessModule().get(0).getModuleId().equals(MASTER_PROCESSING_ACTIVITY_MODULE_ID)) {
+            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId).and("isSubProcess").is(false)));
+
+        } else {
+            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
+        }
         filterTypes.forEach(filterType -> {
                     aggregationOperations.put(filterType.value, buildAggregationQuery(filterType));
                 }

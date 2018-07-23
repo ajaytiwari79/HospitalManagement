@@ -13,7 +13,7 @@ import java.util.Map;
 public interface CustomFilterMongoRepository {
 
 
-    Map<String, AggregationOperation> getFilterCriteria(Long countryId,Long organizationId,List<FilterType> filterTypes);
+    Map<String, AggregationOperation> getFilterCriteria(Long countryId,Long organizationId,List<FilterType> filterTypes,FilterGroup  filterGroup);
 
     AggregationOperation buildAggregationQuery(FilterType filterType);
 
