@@ -32,7 +32,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @EnableSwagger2
 @ComponentScan("com.kairos.controller")
 @Configuration
-@Profile({"local","development","release","production"})
+@Profile({"local","development","qa","production"})
 public class SwaggerConfig {
 
     /**
