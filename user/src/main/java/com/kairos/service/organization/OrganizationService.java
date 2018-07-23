@@ -298,7 +298,6 @@ public class OrganizationService extends UserBaseService {
      * @return Organization
      */
     public Organization createOrganization(Organization organization, Long id, boolean baseOrganization) {
-        logger.info("baseOrganization: " + baseOrganization);
         Organization parent = (id == null) ? null : getOrganizationById(id);
         logger.info("Received Parent ID: " + id);
         if (parent != null) {
@@ -307,16 +306,16 @@ public class OrganizationService extends UserBaseService {
             logger.info("Parent Organization: " + o.getName());
         } else {
             organization = save(organization);
-            /*if (!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)){
+            if (!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)){
                 int count = organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
-            }*/
+            }
         }
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
-        /*if(!baseOrganization){
+        if(!baseOrganization){
             accessGroupService.createDefaultAccessGroups(organization);
             organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
-        }*/
+        }
         return organization;
     }
 
