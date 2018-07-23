@@ -151,34 +151,33 @@ public class PlanningPeriodService extends MongoBaseService {
         return getPlanningPeriods(unitId,null,null);
     }
 
-    public void createMigratedPlanningPeriodForTimeDuration(LocalDate oldStartDate, LocalDate oldeEndDate, Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> phases) {
+    public void createMigratedPlanningPeriodForTimeDuration(LocalDate oldStartDate, LocalDate oldEndDate, Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> phases) {
         //delete planning periods between given dates done in  migratePlanningPeriods and set active property false
         //  create new periods with the update planning period type
         //done Check if start date id correct date ( either monday or 1st day of month)
         // done Add planning period for earlier days from monday or first day of month
         // Add planning period for last days till monday or first day of month
-        List<LocalDate> startDateList = getListOfStartDateInWeek(oldStartDate, oldeEndDate, planningPeriodDTO);
+        List<LocalDate> startDateList = getListOfStartDateInWeekOrMonths(oldStartDate, oldEndDate, planningPeriodDTO);
         LocalDate endDate;
         for (LocalDate startDate : startDateList) {
             boolean isExist = planningPeriodMongoRepository.checkIfPeriodsExistsOrOverlapWithUnitIdAndDate(unitId, startDate);
+            if(isExist){
+                exceptionService.actionNotPermittedException("message.period.date.alreadyexists");
+            }
             if (validateStartDateForPeriodCreation(startDate, planningPeriodDTO.getDurationType())) {
                 // Add planning period
                  endDate = DateUtils.addDurationInLocalDateExcludingLastDate(startDate, planningPeriodDTO.getDuration(),
                         planningPeriodDTO.getDurationType(), 1);
-                 if(endDate.isAfter(oldeEndDate)){
-                     endDate=oldeEndDate;
+                 if(endDate.isAfter(oldEndDate)){
+                     endDate=oldEndDate;
                  }
-                if (!isExist) {
                     createPlanningPeriodOnMigration(startDate, endDate, unitId, planningPeriodDTO, phases);
-                }
             } else {
                 endDate = getNextValidDateForPlanningPeriod(startDate, planningPeriodDTO.getDurationType()).minusDays(1);
-                if(endDate.isAfter(oldeEndDate)){
-                    endDate=oldeEndDate;
+                if(endDate.isAfter(oldEndDate)){
+                    endDate=oldEndDate;
                 }
-                if (!isExist) {
                     createPlanningPeriodOnMigration(startDate, endDate, unitId, planningPeriodDTO, phases);
-                }
             }
         }
     }
@@ -258,7 +257,7 @@ public class PlanningPeriodService extends MongoBaseService {
         }
     }
 
-    public List<LocalDate> getListOfStartDateInWeek(LocalDate startDate, LocalDate endDate, PlanningPeriodDTO planningPeriodDTO) {
+    public List<LocalDate> getListOfStartDateInWeekOrMonths(LocalDate startDate, LocalDate endDate, PlanningPeriodDTO planningPeriodDTO) {
         List<LocalDate> startDateList = new ArrayList<>();
         if (planningPeriodDTO.getDurationType().equals(DurationType.WEEKS)) {
             if (!startDate.getDayOfWeek().equals(DayOfWeek.MONDAY)) {

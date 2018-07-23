@@ -87,12 +87,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return result.getMappedResults();
     }
 
-//    public List<PlanningPeriod> findAllPeriodsOfUnitByCurrentPhaseId(Long unitId, BigInteger currentPhaseId) {
-//        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).and("currentPhaseId").is(currentPhaseId));
-//        query.with(Sort.by(Sort.Direction.ASC, "startDate"));
-//        return mongoTemplate.find(query, PlanningPeriod.class);
-//    }
-
 
     /*public  List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, Date startDate, Date endDate) {
 
