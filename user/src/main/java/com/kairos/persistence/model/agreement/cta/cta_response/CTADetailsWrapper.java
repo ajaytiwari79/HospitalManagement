@@ -6,6 +6,7 @@ import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ public class CTADetailsWrapper {
     private OrganizationType organizationSubType;
     private Map<Long,EmploymentType> employmentTypeIdMap;
     private Map<Long,RuleTemplateCategory> ruleTemplateCategoryIdMap;
+    private List<Long> selectedRuleTemplateIds= new ArrayList<>();
 
     public Boolean getAll() {
         return all;
@@ -72,5 +74,13 @@ public class CTADetailsWrapper {
 
     public void setRuleTemplateCategoryIdMap(Map<Long, RuleTemplateCategory> ruleTemplateCategoryIdMap) {
         this.ruleTemplateCategoryIdMap = ruleTemplateCategoryIdMap;
+    }
+
+    public List<Long> getSelectedRuleTemplateIds() {
+        return selectedRuleTemplateIds;
+    }
+
+    public void setSelectedRuleTemplateIds(List<Long> selectedRuleTemplateIds) {
+        this.selectedRuleTemplateIds = selectedRuleTemplateIds;
     }
 }
