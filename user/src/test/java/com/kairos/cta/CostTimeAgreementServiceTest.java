@@ -269,7 +269,7 @@ public class CostTimeAgreementServiceTest {
         if (createdCtaId == null) {
             // GET CTA with name  "New Test CTA"
             try {
-                collectiveTimeAgreementDTO = costTimeAgreementService.createCostTimeAgreement(countryId, collectiveTimeAgreementDTO);
+              //  collectiveTimeAgreementDTO = costTimeAgreementService.createCostTimeAgreement(countryId, collectiveTimeAgreementDTO);
             } catch (Exception e) {
                 logger.info("Exception occured");
             }

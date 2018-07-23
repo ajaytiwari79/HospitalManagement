@@ -184,9 +184,11 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             " MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]->(os) return toString(id(expertise)) as id, expertise.name as value ORDER BY value")
     List<FilterSelectionQueryResult> getExpertiseByCountryIdForFilters(Long unitId, Long countryId);
 
-    @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0}  AND expertise.startDateMillis<={2} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis > {2}) \n" +
-            "match(expertise)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]-(orgSubType:OrganizationType) where id(orgSubType) = {1} \n" +
-            "return id(expertise) as id, expertise.name as name order by expertise.creationDate")
+
+    @Query("match(organizationType:OrganizationType) where id(organizationType)={1}\n" +
+            "match(organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService)\n" +
+            " match(os)<-[:SUPPORTS_SERVICES]-(expertise:Expertise) where expertise.published AND expertise.startDateMillis<={2} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis > {2})\n" +
+            "return distinct id(expertise) as id,expertise.name as name")
     List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId, Long selectedDateMillis);
 
     @Query("MATCH (country:Country) where id(country)={0}  " +
