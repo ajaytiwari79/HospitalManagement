@@ -14,6 +14,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.activity.tabs.CompositeActivity;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.period.PlanningPeriod;
@@ -89,6 +90,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
@@ -719,7 +721,7 @@ public class ShiftService extends MongoBaseService {
     }
 
     public ShiftQueryResult addSubShift(Long unitId, ShiftDTO shiftDTO, String type) {
-        Shift shift = null;
+        Shift shift;
         if (shiftDTO.getId() != null) {
             shift = shiftMongoRepository.findOne(shiftDTO.getId());
             if (!Optional.ofNullable(shift).isPresent()) {
@@ -746,10 +748,11 @@ public class ShiftService extends MongoBaseService {
         shiftWithActivityDTO.setActivity(activity);
         shiftWithActivityDTO.setUnitId(unitId);
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
-        //validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
+        validateShiftWithActivity(wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         ShiftQueryResult shiftQueryResult;
         if (shiftDTO.getSubShifts().size() == 0) {
             shift = buildShift(shiftDTO);
+            shift.setUnitId(unitId);
             shift.setMainShift(true);
             save(shift);
             shiftQueryResult = shift.getShiftQueryResult();
@@ -774,23 +777,35 @@ public class ShiftService extends MongoBaseService {
     /**
      * This method is used to check the timings overlap of sub shifts
      */
-    protected void validateTimingOfShifts(ShiftDTO shiftDTO) {
+    protected void validateTimingOfShifts(ShiftDTO shiftDTO, Activity activity) {
         Date parentShiftStartDateTime = shiftDTO.getStartDate();
         Date parentShiftEndDateTime = shiftDTO.getEndDate();
+        Map<BigInteger, CompositeActivity> compositeActivityMap = activity.getCompositeActivities().stream().collect(Collectors.toMap(CompositeActivity::getActivityId, Function.identity()));
         logger.info(shiftDTO.getSubShifts().size() + "");
+
         for (int i = 0; i < shiftDTO.getSubShifts().size(); i++) {
             ShiftDTO subShifts = shiftDTO.getSubShifts().get(i);
+            CompositeActivity compositeActivity= compositeActivityMap.get(subShifts.getActivityId());
             if (i == 0) {
                 if ((!parentShiftStartDateTime.equals(subShifts.getStartDate())) || (parentShiftEndDateTime.before(subShifts.getEndDate()))) {
                     logger.info("start " + parentShiftStartDateTime + "-" + subShifts.getStartDate()
                             + "end " + parentShiftEndDateTime + "-" + subShifts.getEndDate() + "shift data");
                     exceptionService.invalidRequestException("message.shift.date.startandend.incorrect", (i - 1));
                 }
+
+                if(compositeActivity!=null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedBefore()) {
+                    exceptionService.invalidRequestException("message.shift.notAllowedBefore",subShifts.getName(),activity.getName());
+                }
+
+
             } else {
                 if ((!parentShiftEndDateTime.equals(subShifts.getStartDate())) || (shiftDTO.getEndDate().before(subShifts.getEndDate()))) {
                     logger.info("start " + (parentShiftStartDateTime) + "-" + subShifts.getStartDate()
                             + "end " + (parentShiftEndDateTime) + "-" + subShifts.getEndDate() + "shift data");
                     exceptionService.invalidRequestException("message.shift.date.startandend.incorrect", (i - 1));
+                }
+                if(compositeActivity!=null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedAfter()) {
+                    exceptionService.invalidRequestException("message.shift.notAllowedAfter",subShifts.getName(),activity.getName());
                 }
             }
             // making the calculating the previous  object as parent
@@ -798,21 +813,25 @@ public class ShiftService extends MongoBaseService {
         }
     }
 
+
     private List<Shift> verifyCompositeShifts(ShiftDTO shiftDTO, BigInteger shiftId, Activity activity) {
         if (shiftDTO.getSubShifts().size() == 0) {
             exceptionService.invalidRequestException("message.sub-shift.create");
         }
-
         if (!Optional.ofNullable(activity.getCompositeActivities()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.sub-shift.activity.create");
         }
-        validateTimingOfShifts(shiftDTO);
+        validateTimingOfShifts(shiftDTO, activity);
         List<ShiftDTO> subShiftDTOS = shiftDTO.getSubShifts();
 
-        Set<BigInteger> activityIds = subShiftDTOS.parallelStream().map(ShiftDTO::getActivityId).collect(Collectors.toSet());
+        Set<BigInteger> activityIds = subShiftDTOS.parallelStream()
+                .filter(act->!(act.getName().equalsIgnoreCase(PAID_BREAK) || act.getName().equalsIgnoreCase(UNPAID_BREAK)))
+                .map(act->act.getActivityId())
+                .collect(Collectors.toSet());
 
-        activity.getCompositeActivities().add(shiftDTO.getActivityId());
-        if (!activity.getCompositeActivities().containsAll(activityIds)) {
+        Set<BigInteger> allowedActivities = activity.getCompositeActivities().stream().map(CompositeActivity::getActivityId).collect(Collectors.toSet());
+        allowedActivities.add(shiftDTO.getActivityId());
+        if (!allowedActivities.containsAll(activityIds)) {
             exceptionService.invalidRequestException("message.activity.multishift");
         }
 

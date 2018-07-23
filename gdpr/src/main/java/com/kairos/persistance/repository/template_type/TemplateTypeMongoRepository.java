@@ -36,8 +36,8 @@ public interface TemplateTypeMongoRepository extends MongoRepository<TemplateTyp
     TemplateType findByIdAndNonDeleted(BigInteger id,Long countryId);
 
 
-    @Query("{name:{$in:?0},deleted:false}")
-    List<TemplateType> findByNameList(Set<String> templateName);
+    @Query("{_id:{$in:?1},countryId:?0,deleted:false}")
+    List<TemplateType> findTemplateTypeByIdsList(Long countryId,List<BigInteger> templateIds);
 
 
     @Query("{deleted:false,countryId:?0}")

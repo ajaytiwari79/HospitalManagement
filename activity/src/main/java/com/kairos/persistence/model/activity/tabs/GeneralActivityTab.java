@@ -21,7 +21,6 @@ import java.util.List;
         private BigInteger categoryId;
         private Boolean colorPresent;
         private String backgroundColor;
-        private String textColor;
         private String description;
         private boolean isActive =true;
         private  String shortName;
@@ -43,26 +42,24 @@ import java.util.List;
             this.ultraShortName=ultraShortName;
         }
 
-        public GeneralActivityTab(String name, String code, String printoutSymbol, BigInteger categoryId, Boolean colorPresent, String backgroundColor, String textColor, String description) {
+        public GeneralActivityTab(String name, String code, String printoutSymbol, BigInteger categoryId, Boolean colorPresent, String backgroundColor, String description) {
             this.name = name;
             this.code = code;
             this.printoutSymbol = printoutSymbol;
             this.categoryId = categoryId;
             this.colorPresent = colorPresent;
             this.backgroundColor = backgroundColor;
-            this.textColor = textColor;
             this.description = description;
         }
 
         public GeneralActivityTab(String name, String code, String printoutSymbol, BigInteger categoryId, Boolean colorPresent, String backgroundColor,
-                                  String textColor, String description, boolean isActive, String shortName, boolean eligibleForUse) {
+                                  String description, boolean isActive, String shortName, boolean eligibleForUse) {
             this.name = name;
             this.code = code;
             this.printoutSymbol = printoutSymbol;
             this.categoryId = categoryId;
             this.colorPresent = colorPresent;
             this.backgroundColor = backgroundColor;
-            this.textColor = textColor;
             this.description = description;
             this.isActive = isActive;
             this.shortName = shortName;
@@ -70,7 +67,7 @@ import java.util.List;
         }
 
 
-        public GeneralActivityTab(String name, String code, String printoutSymbol, BigInteger categoryId, Boolean colorPresent, String backgroundColor, String textColor, String description,
+        public GeneralActivityTab(String name, String code, String printoutSymbol, BigInteger categoryId, Boolean colorPresent, String backgroundColor, String description,
                                   boolean isActive, String shortName, boolean eligibleForUse, String originalIconName, String modifiedIconName,String ultraShortName, LocalDate startDate,LocalDate endDate) {
             this.name = name;
             this.code = code;
@@ -78,7 +75,6 @@ import java.util.List;
             this.categoryId = categoryId;
             this.colorPresent = colorPresent;
             this.backgroundColor = backgroundColor;
-            this.textColor = textColor;
             this.description = description;
             this.isActive = isActive;
             this.shortName = shortName;
@@ -104,14 +100,6 @@ import java.util.List;
 
         public void setBackgroundColor(String backgroundColor) {
             this.backgroundColor = backgroundColor;
-        }
-
-        public String getTextColor() {
-            return textColor;
-        }
-
-        public void setTextColor(String textColor) {
-            this.textColor = textColor;
         }
 
         public BigInteger getCategoryId() {

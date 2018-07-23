@@ -30,7 +30,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
     Document addNonDeletedAgreementSectionOperation = Document.parse(CustomAggregationQuery.addNonDeletedAgreementSectionToAgreementTemplate());
     Document projectionForTemplateTypeElementAtIndexZeroOperation = Document.parse(CustomAggregationQuery.agreementTemplateProjectionBeforeGroupOperationForTemplateTypeAtIndexZero());
     Document agreementTemplateGroupOperation = Document.parse(CustomAggregationQuery.agreementTemplateGroupOperation());
-    Document addNonDeletedTemplateTypeOperation = Document.parse(CustomAggregationQuery.addNonDeletedTemplateTypeToAgreementTemplate());
+    Document addNonDeletedTemplateTypeOperation = Document.parse(CustomAggregationQuery.addNonDeletedTemplateTyeField());
 
     @Override
     public PolicyAgreementTemplateResponseDTO getPolicyAgreementWithSectionsAndClausesById(Long countryId, Long orgId, BigInteger id) {

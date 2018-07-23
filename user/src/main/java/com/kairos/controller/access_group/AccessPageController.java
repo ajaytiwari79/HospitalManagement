@@ -3,6 +3,7 @@ package com.kairos.controller.access_group;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.access_permission.Tab;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.persistence.model.access_permission.AccessPageLanguageDTO;
 import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.user.access_permission.AccessPageStatusDTO;
 import com.kairos.util.response.ResponseHandler;
@@ -79,5 +80,15 @@ public class AccessPageController {
     @GetMapping(value = "/country/{countryId}/module/{moduleId}/kpi_details")
     public ResponseEntity<Map<String, Object>> getKPITabsDataForCountry(@PathVariable String moduleId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getKPIAccessPageList(moduleId));
+    }
+
+    @PutMapping(value = "/country/{countryId}/module/{moduleId}/language")
+    public ResponseEntity<Map<String, Object>> addLanguageSpecificData(@PathVariable String moduleId, @RequestBody AccessPageLanguageDTO accessPageLanguageDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.assignLanguageToAccessPage(moduleId, accessPageLanguageDTO));
+    }
+
+    @GetMapping(value = "/country/{countryId}/module/{moduleId}/language/{languageId}")
+    public ResponseEntity<Map<String, Object>> getLanguageSpecificData(@PathVariable String moduleId, @PathVariable Long languageId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getLanguageDataByModuleId(moduleId,languageId));
     }
 }
