@@ -20,10 +20,10 @@ import java.util.List;
 public class MasterAssetDTO {
 
     @NotNullOrEmpty(message = "Name  can't be Empty")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title can not contain number or special character")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "title can not contain number or special character")
     private String name;
 
-    @NotNullOrEmpty(message = "Description cannot be Empty")
+    @NotNullOrEmpty(message = "Description can't be Empty")
     private String description;
 
     @Valid
@@ -46,7 +46,7 @@ public class MasterAssetDTO {
     @Valid
     private List<SubServiceCategoryDTO> organizationSubServices;
 
-   // @NotNull(message = "Asset Type Can't be empty")
+    @NotNull(message = "Asset Type Can't be empty")
     private BigInteger assetTypeId;
 
     public BigInteger getAssetTypeId() {
