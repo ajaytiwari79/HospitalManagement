@@ -5,15 +5,21 @@ import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
+import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
+import com.kairos.persistance.repository.common.CustomAggregationQuery;
+import com.kairos.response.dto.clause.ClauseResponseDTO;
+import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
@@ -26,6 +32,9 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
     @Inject
     private MongoTemplate mongoTemplate;
+
+
+    Document addNonDeletedTemplateTypeOperation = Document.parse(CustomAggregationQuery.addNonDeletedTemplateTyeField());
 
 
     @Override
@@ -48,23 +57,66 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
         return mongoTemplate.find(query, Clause.class);
     }
 
-    @Override
-    public List<Clause> getClauseDataWithFilterSelection(Long countryId, Long organizationId, FilterSelectionDTO filterSelectionDto) {
-        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId));
-        filterSelectionDto.getFiltersData().forEach(filterSelection -> {
 
+    @Override
+    public List<ClauseResponseDTO> findAllClauseWithTemplateType(Long countryId, Long organizationId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
+                lookup("template_type","templateTypes","_id","templateTypes"),
+                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
+
+        );
+
+
+        AggregationResults<ClauseResponseDTO> result=mongoTemplate.aggregate(aggregation,Clause.class,ClauseResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, Long organizationId, BigInteger id) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
+                lookup("template_type","templateTypes","_id","templateTypes"),
+                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
+
+
+        );
+        AggregationResults<ClauseResponseDTO> result=mongoTemplate.aggregate(aggregation,Clause.class,ClauseResponseDTO.class);
+        return result.getUniqueMappedResult();
+    }
+
+
+
+
+
+    @Override
+    public List<ClauseResponseDTO> getClauseDataWithFilterSelection(Long countryId, Long organizationId, FilterSelectionDTO filterSelectionDto) {
+
+        Criteria criteria=Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId);
+        List<Criteria> clauseCriteria = new ArrayList<>(filterSelectionDto.getFiltersData().size());
+        filterSelectionDto.getFiltersData().forEach(filterSelection -> {
             if (filterSelection.getValue().size() != 0) {
-                query.addCriteria(buildQuery(filterSelection, filterSelection.getName(), query));
+                clauseCriteria.add(buildQuery(filterSelection, filterSelection.getName()));
             }
         });
+        if (!clauseCriteria.isEmpty())
+        {
+            criteria = criteria.andOperator(clauseCriteria.toArray(new Criteria[clauseCriteria.size()]));
+        }
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("template_type","templateTypes","_id","templateTypes"),
+                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
 
-        return mongoTemplate.find(query, Clause.class);
+        );
 
+        AggregationResults<ClauseResponseDTO> result=mongoTemplate.aggregate(aggregation,Clause.class,ClauseResponseDTO.class);
+        return result.getMappedResults();
     }
 
 
     @Override
-    public Criteria buildQuery(FilterSelection filterSelection, FilterType filterType, Query query) {
+    public Criteria buildQuery(FilterSelection filterSelection, FilterType filterType) {
 
         switch (filterType) {
             case ACCOUNT_TYPES:

@@ -243,7 +243,7 @@ public class StaffFilterService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.staff.filter.setting.notfound");
 
         }
-        Organization organization = organizationService.fetchParentOrganization(unitId);
+        Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentWrapper staffEmploymentWrapper = new StaffEmploymentWrapper();
         staffEmploymentWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));

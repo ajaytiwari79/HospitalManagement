@@ -1,4 +1,4 @@
-package com.kairos.persistance.model.master_data.processing_activity_masterdata;
+package com.kairos.persistance.model.master_data.default_proc_activity_setting;
 
 
 import com.kairos.dto.OrganizationSubTypeDTO;

@@ -3,7 +3,7 @@ package com.kairos.persistance.repository.master_data.asset_management;
 import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDTO;
 import com.kairos.enums.FilterType;
-import com.kairos.persistance.model.master_data.asset_management.MasterAsset;
+import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;

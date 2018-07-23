@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
-import com.kairos.persistance.model.master_data.asset_management.HostingType;
+import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
 import com.kairos.service.master_data.asset_management.HostingTypeService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.validate_list.ValidateListOfRequestBody;

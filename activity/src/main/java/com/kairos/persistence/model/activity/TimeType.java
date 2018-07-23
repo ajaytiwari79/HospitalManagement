@@ -20,7 +20,6 @@ public class TimeType extends MongoBaseEntity{
     private String description;
     private List<BigInteger> childTimeTypeIds = new ArrayList<>();
     private String backgroundColor;
-    private String textColor;
 
     public TimeType(BigInteger upperLevelTimeTypeId, String label, String description) {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
@@ -38,10 +37,11 @@ public class TimeType extends MongoBaseEntity{
 
     public TimeType() {}
 
-    public TimeType(TimeTypes timeTypes, String label, String description) {
+    public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor) {
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
+        this.backgroundColor=backgroundColor;
         this.leafNode = true;
     }
 
@@ -100,13 +100,5 @@ public class TimeType extends MongoBaseEntity{
 
     public void setBackgroundColor(String backgroundColor) {
         this.backgroundColor = backgroundColor;
-    }
-
-    public String getTextColor() {
-        return textColor;
-    }
-
-    public void setTextColor(String textColor) {
-        this.textColor = textColor;
     }
 }
