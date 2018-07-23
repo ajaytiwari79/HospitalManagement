@@ -6,7 +6,7 @@ import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.counter.KPIAssignmentConf;
+import com.kairos.persistence.model.counter.KPIAssignment;
 import com.kairos.persistence.model.counter.KPICategory;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.service.MongoBaseService;
@@ -114,7 +114,7 @@ public class CounterConfService extends MongoBaseService {
             kpis.add(new KPI(counterType.getName(), null, null, counterType, false, null));
         });
         List<KPI> savedKPIs = save(kpis);
-        List<KPIAssignmentConf> kpiAssignment = savedKPIs.parallelStream().map(kpi -> new KPIAssignmentConf(kpi.getId(), countryId, null, null, ConfLevel.COUNTRY)).collect(Collectors.toList());
+        List<KPIAssignment> kpiAssignment = savedKPIs.parallelStream().map(kpi -> new KPIAssignment(kpi.getId(), countryId, null, null, ConfLevel.COUNTRY)).collect(Collectors.toList());
         save(kpiAssignment);
     }
 }

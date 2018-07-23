@@ -8,6 +8,8 @@ import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
+import com.kairos.util.ObjectMapperUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -91,6 +93,22 @@ public class CounterRepository {
     }
 
     //categoryKPI crud
+    public List<KPICategory> getKPICategory(ConfLevel level, Long refId){
+        String queryField = (ConfLevel.COUNTRY.equals(level))? "countryId":"unitId";
+        String categoryListField = "categoryList";
+        Aggregation ag = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where(queryField).is(refId).and("level").is(level).and("deleted").is(false))
+                , Aggregation.lookup("kPICategory", "categoryId", "id", "category")
+                , Aggregation.sort(Sort.Direction.ASC, "categoryId")
+                , Aggregation.group(queryField).push("category").as(categoryListField)
+                , Aggregation.project(categoryListField)
+        );
+        AggregationResults<Map> results = mongoTemplate.aggregate(ag, CategoryAssignment.class, Map.class);
+        if(!results.getMappedResults().isEmpty() && results.getMappedResults().get(0).get(categoryListField)!=null) {
+            return ObjectMapperUtils.copyPropertiesOfListByMapper((List) results.getMappedResults().get(0).get(categoryListField), KPICategoryDTO.class);
+        }
+        return new ArrayList<>();
+    }
 
     public List<KPI> getKPIsByCategory(List<BigInteger> categoryId){
         Query query = new Query(Criteria.where("categoryId").in(categoryId).and("deleted").is(false));
@@ -105,8 +123,8 @@ public class CounterRepository {
     }
 
     public void removeTabKPIConfiguration(TabKPIEntry entry){
-            Query query = new Query(Criteria.where("tabId").is(entry.getTabId()).and("kpiId").is(entry.getKpiId()));
-            mongoTemplate.remove(query, TabKPIEntry.class);
+        Query query = new Query(Criteria.where("tabId").is(entry.getTabId()).and("kpiId").is(entry.getKpiId()));
+        mongoTemplate.remove(query, TabKPIEntry.class);
     }
 
     //accessGroupKPI distribution crud

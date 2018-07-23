@@ -2,6 +2,7 @@ package com.kairos.service.counter;
 
 
 import com.kairos.activity.counter.*;
+import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
@@ -45,12 +46,12 @@ public class CounterManagementService extends MongoBaseService{
         return counterRepository.getRoleAndModuleCounterIdMapping(unitId);
     }
 
-    public List<KPI> getKPIsList(){
+    public List<KPI> getKPIsList(Long refId, ConfLevel confLevel){
         return counterRepository.getEntityItemList(KPI.class);
     }
 
-    public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(){
-        List<KPI> kpisList = getKPIsList();
+    public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(Long refId, ConfLevel level){
+        List<KPI> kpisList = getKPIsList(refId, level);
         List<KPICategory> categories = counterRepository.getEntityItemList(KPICategory.class);
         Map<BigInteger, List<BigInteger>> categoryKPIsMap = new HashMap<>();
         categories.forEach(category -> {

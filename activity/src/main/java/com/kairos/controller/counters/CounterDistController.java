@@ -4,6 +4,7 @@ import com.kairos.activity.counter.AccessGroupKPIConfDTO;
 import com.kairos.activity.counter.CategoryKPIsDTO;
 import com.kairos.activity.counter.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.TabKPIEntryConfDTO;
+import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.service.counter.CounterManagementService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.ws.rs.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -35,18 +37,34 @@ public class CounterDistController {
 
     private final static Logger logger = LoggerFactory.getLogger(CounterDistController.class);
 
-    @GetMapping("/counters")
-    public ResponseEntity<Map<String, Object>> getAvailableCountersList(){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList());
+    @GetMapping("/counters/country/{countryId}")
+    public ResponseEntity<Map<String, Object>> getAvailableKPIsListForCountry(@PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList(countryId, ConfLevel.COUNTRY));
     }
 
-    @GetMapping("/category")
-    public ResponseEntity<Map<String, Object>> getInitialCategoryKPIDistributionData(){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistData());
+    @GetMapping("/counters/unit/{unitId}")
+    public ResponseEntity<Map<String, Object>> getAvailableKPIsListForUnit(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList(unitId, ConfLevel.UNIT));
     }
 
-    @PostMapping("/category")
-    public ResponseEntity<Map<String, Object>> saveCategoryKPIDistribution(@RequestBody CategoryKPIsDTO categorieKPIsDetails){
+    @GetMapping("/category/country/{countryId}")
+    public ResponseEntity<Map<String, Object>> getInitialCategoryKPIDistributionDataForCountry(@PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistData(countryId, ConfLevel.COUNTRY));
+    }
+
+    @GetMapping("/category/unit/{unitId}")
+    public ResponseEntity<Map<String, Object>> getInitialCategoryKPIDistributionDataForUnit(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistData(unitId, ConfLevel.UNIT));
+    }
+
+    @PostMapping("/category/country/{countryId}")
+    public ResponseEntity<Map<String, Object>> saveCategoryKPIDistributionForCountry(@RequestBody CategoryKPIsDTO categorieKPIsDetails){
+        counterManagementService.updateCategoryKPIsDistribution(categorieKPIsDetails);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PostMapping("/category/unit/{unitId}")
+    public ResponseEntity<Map<String, Object>> saveCategoryKPIDistributionUnit(@RequestBody CategoryKPIsDTO categorieKPIsDetails){
         counterManagementService.updateCategoryKPIsDistribution(categorieKPIsDetails);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }

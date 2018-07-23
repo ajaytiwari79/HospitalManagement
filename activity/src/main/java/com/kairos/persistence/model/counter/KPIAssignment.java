@@ -5,18 +5,18 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 
-public class KPIAssignmentConf extends MongoBaseEntity {
+public class KPIAssignment extends MongoBaseEntity {
     private BigInteger kpiId;
     private Long countryId;
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
 
-    public KPIAssignmentConf() {
+    public KPIAssignment() {
 
     }
 
-    public KPIAssignmentConf(BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level){
+    public KPIAssignment(BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level){
         this.countryId = countryId;
         this.unitId = unitId;
         this.staffId = staffId;
