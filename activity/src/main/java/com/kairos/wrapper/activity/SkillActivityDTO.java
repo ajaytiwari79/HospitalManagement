@@ -15,6 +15,10 @@ public class SkillActivityDTO {
     private BigInteger activityId;
     private List<ActivitySkill> activitySkills;
 
+    public SkillActivityDTO() {
+        // dc
+    }
+
     public BigInteger getActivityId() {
         return activityId;
     }
