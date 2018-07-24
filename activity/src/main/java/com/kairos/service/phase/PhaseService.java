@@ -19,8 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,7 +65,7 @@ public class PhaseService extends MongoBaseService {
     public List<PhaseDTO> getPlanningPhasesByUnit(Long unitId) {
         OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
         }
         List<PhaseDTO> phases = phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.DESC);
         return phases;
@@ -81,7 +84,7 @@ public class PhaseService extends MongoBaseService {
     public Map<String, List<PhaseDTO>> getCategorisedPhasesByUnit(Long unitId) {
         OrganizationDTO unitOrganization = organizationRestClient.getOrganizationWithoutAuth(unitId);
         if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException("message.unit.id",unitId);
+            exceptionService.dataNotFoundByIdException("message.unit.id", unitId);
         }
         List<PhaseDTO> phases = getPhasesByUnit(unitId);
         Map<String, List<PhaseDTO>> phasesData = new HashMap<>(2);
@@ -100,7 +103,6 @@ public class PhaseService extends MongoBaseService {
 
         return true;
     }
-
 
 
     public PhaseDTO getUnitPhaseByDate(Long unitId, Date date) {
@@ -198,12 +200,19 @@ public class PhaseService extends MongoBaseService {
 
     public Phase getCurrentPhaseInUnitByDate(List<Phase> phases, Date date) {
         Phase phase = null;
-        LocalDate currentDate = LocalDate.now();
+        LocalDate upcomingMondayDate = DateUtils.getDateForUpcomingDay(LocalDate.now(), DayOfWeek.MONDAY);
         LocalDate proposedDate = DateUtils.getLocalDateFromDate(date);
-        long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
 
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+
+        int startWeekNumber = upcomingMondayDate.get(weekFields.weekOfWeekBasedYear());
+        int proposedWeekNumber = proposedDate.get(weekFields.weekOfWeekBasedYear());
+
+        int weekDifference = proposedWeekNumber-startWeekNumber;
+
+        weekDifference++; // 34-30  its 4 bit actually we need 5 including curreny
         Collections.sort(phases, (Phase p1, Phase p2) -> {
-            if (p1.getSequence() > p2.getSequence())
+            if (p1.getSequence() < p2.getSequence())
                 return 1;
             else
                 return -1;
@@ -254,7 +263,7 @@ public class PhaseService extends MongoBaseService {
         /*phase.setName(phaseDTO.getName());
         phase.setSequence(phaseDTO.getSequence());*/
 
-        if(phase.getPhaseType().equals(PhaseType.PLANNING)){
+        if (phase.getPhaseType().equals(PhaseType.PLANNING)) {
             phase.setDescription(phaseDTO.getDescription());
             phase.setDurationType(phaseDTO.getDurationType());
             phase.setDuration(phaseDTO.getDuration());
@@ -289,14 +298,14 @@ public class PhaseService extends MongoBaseService {
         if (phase != null && !oldPhase.getName().equals(phaseDTO.getName())) {
             exceptionService.actionNotPermittedException("message.phase.name.alreadyexists", phaseDTO.getName());
         }
-        if(oldPhase.getPhaseType().equals(PhaseType.PLANNING)){
+        if (oldPhase.getPhaseType().equals(PhaseType.PLANNING)) {
             preparePhase(oldPhase, phaseDTO);
             save(oldPhase);
         }
         return phaseDTO;
     }
 
-    public List<String> getAllApplicablePhaseStatus(){
+    public List<String> getAllApplicablePhaseStatus() {
         return Stream.of(Phase.PhaseStatus.values())
                 .map(Enum::name)
                 .collect(Collectors.toList());
