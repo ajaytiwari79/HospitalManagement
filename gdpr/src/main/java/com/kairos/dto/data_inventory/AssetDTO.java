@@ -2,9 +2,13 @@ package com.kairos.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.RiskSeverity;
+import com.kairos.persistance.model.data_inventory.asset.Organization;
+import com.kairos.persistance.model.data_inventory.asset.Staff;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -12,7 +16,8 @@ import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AssetDto {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class AssetDTO {
 
 
     @NotNullOrEmpty(message = "name can't be empty ")
@@ -21,6 +26,16 @@ public class AssetDto {
 
     @NotNullOrEmpty(message = "description  can't be  Empty ")
     private String description;
+
+    private String hostingLocation;
+
+    @NotNull(message = "Managing department can't be empty")
+    @Valid
+    private Organization managingDepartment;
+
+    @NotNull(message = "Asset Owner can't be Empty")
+    @Valid
+    private Staff assetOwner;
 
     private List<BigInteger> storageFormats;
 
@@ -40,6 +55,9 @@ public class AssetDto {
     @NotNull(message = "Asset Sub Types can't be empty")
     @NotEmpty(message = "Asset Sub Types can't be empty")
     private List<BigInteger> assetSubTypes;
+
+    @NotNull
+    private Boolean isActive;
 
     private Integer dataRetentionPeriod;
 
@@ -104,4 +122,24 @@ public class AssetDto {
     public List<BigInteger> getAssetSubTypes() { return assetSubTypes; }
 
     public void setAssetSubTypes(List<BigInteger> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
+
+    public String getHostingLocation() { return hostingLocation; }
+
+    public void setHostingLocation(String hostingLocation) { this.hostingLocation = hostingLocation; }
+
+    public Organization getManagingDepartment() { return managingDepartment; }
+
+    public void setManagingDepartment(Organization managingDepartment) { this.managingDepartment = managingDepartment; }
+
+    public Staff getAssetOwner() { return assetOwner; }
+
+    public void setAssetOwner(Staff assetOwner) { this.assetOwner = assetOwner; }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
 }

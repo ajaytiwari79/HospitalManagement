@@ -24,7 +24,7 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
 
     @Override
     public Asset findByName(Long countryid, Long organizationId, String name) {
-        Query query=new Query(Criteria.where(COUNTRY_ID).is(countryid).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false));
+        Query query=new Query(Criteria.where(COUNTRY_ID).is(countryid).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("name").is(name));
         query.collation(Collation.of("en").strength(Collation.ComparisonLevel.secondary()));
         return  mongoTemplate.findOne(query,Asset.class);
 

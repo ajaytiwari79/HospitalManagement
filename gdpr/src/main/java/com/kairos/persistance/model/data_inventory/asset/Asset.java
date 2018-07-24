@@ -23,6 +23,14 @@ public class Asset extends MongoBaseEntity {
 
     private Long countryId;
 
+    private String hostingLocation;
+
+    @NotNull(message = "Managing department can't be empty")
+    private Organization managingDepartment;
+
+    @NotNull(message = "Asset Owner can't be Empty")
+    private Staff assetOwner;
+
     private List<BigInteger> storageFormats;
 
     private List<BigInteger> orgSecurityMeasures;
@@ -118,6 +126,17 @@ public class Asset extends MongoBaseEntity {
     public void setProcessingActivity(BigInteger processingActivity) { this.processingActivity = processingActivity; }
 
 
+    public String getHostingLocation() { return hostingLocation; }
+
+    public void setHostingLocation(String hostingLocation) { this.hostingLocation = hostingLocation; }
+    public Organization getManagingDepartment() { return managingDepartment; }
+
+    public void setManagingDepartment(Organization managingDepartment) { this.managingDepartment = managingDepartment; }
+
+    public Staff getAssetOwner() { return assetOwner; }
+
+    public void setAssetOwner(Staff assetOwner) { this.assetOwner = assetOwner; }
+
     public Asset() {
     }
 
@@ -125,12 +144,14 @@ public class Asset extends MongoBaseEntity {
 
     public void setAssetSubTypes(List<BigInteger> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
 
-    public Asset(String name, String description, Long countryId, BigInteger assetType,List<BigInteger> assetSubTypes) {
+    public Asset(String name, String description, Long countryId, BigInteger assetType,List<BigInteger> assetSubTypes,Organization managingDepartment,Staff assetOwner) {
         this.name = name;
         this.description = description;
         this.countryId = countryId;
         this.assetType = assetType;
         this.assetSubTypes=assetSubTypes;
+        this.assetOwner=assetOwner;
+        this.managingDepartment=managingDepartment;
     }
 }
 
