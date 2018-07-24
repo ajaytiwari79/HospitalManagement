@@ -33,16 +33,20 @@ public class NotificationEventListener {
 
          staffingLevelService.updateStaffingLevelAvailableStaffCount(shiftNotificationEvent);
     }
-    @Async
+    //@Async
     @EventListener
     public void shiftNotificationEvent(PriorityGroupRuleDataDTO priorityGroupRuleDataDTO) throws UnsupportedEncodingException {
         logger.info("shift created details {send Emails}");
 
+        int i = 0;
         Map<BigInteger,List<StaffUnitPositionQueryResult>> openShiftStaffMap = priorityGroupRuleDataDTO.getOpenShiftStaffMap();
         for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry:openShiftStaffMap.entrySet()) {
 
+            i=0;
             for(StaffUnitPositionQueryResult staffUnitPositionQueryResult:entry.getValue()) {
-                mailService.sendPlainMail(staffUnitPositionQueryResult.getStaffEmail(), AppConstants.OPENSHIFT_EMAIL_BODY,AppConstants.OPENSHIFT_SUBJECT);
+
+                mailService.sendPlainMail(staffUnitPositionQueryResult.getStaffEmail(), String.format(AppConstants.OPENSHIFT_EMAIL_BODY,i++),AppConstants.OPENSHIFT_SUBJECT);
+
             }
         }
     }
