@@ -15,7 +15,5 @@ public interface PlanningPeriodMongoRepository extends MongoBaseRepository<Plann
     @Query(value = "{ id:?0 ,unitId:?1 }")
     PlanningPeriod findByIdAndUnitId(BigInteger id, Long unitId);
 
-    @Query(value = "{active:true,unitId:?0,startDate:{$lte:?1},endDate:{$gte:?1}}",exists = true)
-   boolean checkIfPeriodsExistsOrOverlapWithUnitIdAndDate(Long unitId, LocalDate startDate);
 
 }

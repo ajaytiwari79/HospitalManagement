@@ -13,21 +13,14 @@ import java.util.List;
  */
 public interface CustomPlanningPeriodMongoRepository {
 
-//    Boolean checkUnitPeriodExistsBetweenDates(Date startDate, Date endDate, Long unitId);
     List<PlanningPeriodDTO> findAllPeriodsOfUnit(Long unitId);
-//    List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, Date startDate, Date endDate);
     List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate);
     PlanningPeriod getPlanningPeriodContainsDate(Long unitId, LocalDate dateLiesInPeriod);
-//    PlanningPeriod getPlanningPeriodContainsDate(Long unitId, Date dateLiesInPeriod);
-//    UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, Date startDate, Date endDate);
     UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, LocalDate startDate, LocalDate endDate);
     PlanningPeriod getFirstPlanningPeriod(Long unitId);
     PlanningPeriod getLastPlanningPeriod(Long unitId);
-//    boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, Date startDate, Date endDate, int sequence);
     boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, LocalDate startDate, LocalDate endDate, int sequence);
     boolean checkIfPeriodsExistsOrOverlapWithStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate);
-   // List<PlanningPeriod> findAllPeriodsOfUnitByCurrentPhaseId(Long unitId, BigInteger currentPhaseId);
-
     PlanningPeriod findLastPlaningPeriodEndDate(Long unitId);
     List<PlanningPeriod> findAllPeriodsOfUnitByRequestPhaseId(Long unitId, String requestPhaseName);
 }
