@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -150,10 +151,10 @@ public class OrganizationActivityController {
 
 
     @ApiOperation("Update compositeShifts Tab of Activity")
-    @PutMapping(value = "/activity/compositeShifts")
+    @PutMapping(value = "/activity/{activityId}/compositeShifts")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateCompositeShiftTabOfActivity(@RequestBody CompositeShiftActivityDTO compositeShiftActivityDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateCompositeShiftTabOfActivity(compositeShiftActivityDTO));
+    ResponseEntity<Map<String, Object>> assignCompositeActivitiesInActivity(@PathVariable BigInteger activityId,@RequestBody List<CompositeShiftActivityDTO> compositeShiftActivityDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignCompositeActivitiesInActivity(activityId,compositeShiftActivityDTO));
     }
 
     @ApiOperation("get compositeShifts Tab of Activity")

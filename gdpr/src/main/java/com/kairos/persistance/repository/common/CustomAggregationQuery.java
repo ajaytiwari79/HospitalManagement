@@ -160,14 +160,35 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String addNonDeletedTemplateTypeToAgreementTemplate() {
+    public static String addNonDeletedTemplateTyeField() {
         return  " {  '$addFields':" +
-                "                {'templateType':" +
+                "                {'templateTypes':" +
                 "                {'$filter' : { " +
-                "                'input': '$templateType'," +
+                "                'input': '$templateTypes'," +
                 "                'as': 'templateType', " +
                 "                'cond': {'$eq': ['$$templateType.deleted', false ]}" +
                 "                }}}}" ;
 
     }
+
+
+
+
+    public static String masterAssetProjectionWithAssetType() {
+        return " {" +
+                "'$project':{" +
+                "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "         'name':1," +
+                "       'description':1," +
+                "       'organizationSubTypes':1," +
+                "       'organizationTypes':1," +
+                "       'organizationServices':1," +
+                "       'organizationSubServices':1," +
+
+                "            }}";
+    }
+
+  
+
+
 }

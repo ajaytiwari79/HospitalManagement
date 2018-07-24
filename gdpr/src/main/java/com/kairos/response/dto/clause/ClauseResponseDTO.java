@@ -8,6 +8,7 @@ import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.response.dto.master_data.AccountTypeResponseDTO;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
+import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -27,13 +28,7 @@ public class ClauseResponseDTO {
     @NotNullOrEmpty
     private String description;
 
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
+    private List<TemplateTypeResponseDTO> templateTypes;
 
     private List<OrganizationTypeDTO> organizationTypes;
 
@@ -53,9 +48,26 @@ public class ClauseResponseDTO {
         this.accountTypes = accountTypes;
     }
 
+    public List<TemplateTypeResponseDTO> getTemplateTypes() {
+        return templateTypes;
+    }
+
+    public void setTemplateTypes(List<TemplateTypeResponseDTO> templateTypes) {
+        this.templateTypes = templateTypes;
+    }
+
     public String getTitle() {
         return title;
     }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
+
 
     public void setTitle(String title) {
         this.title = title;

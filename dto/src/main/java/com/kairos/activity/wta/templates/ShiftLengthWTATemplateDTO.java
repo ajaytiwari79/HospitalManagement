@@ -26,7 +26,6 @@ public class ShiftLengthWTATemplateDTO extends WTABaseRuleTemplateDTO {
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     private MinMaxSetting minMaxSetting;
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
 
 
@@ -90,13 +89,6 @@ public class ShiftLengthWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;;
     }
 
-    public List<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;

@@ -318,6 +318,7 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());
         unitPosition.setHourlyWages(unitPositionDTO.getHourlyWages());
         unitPosition.setSalary(unitPositionDTO.getSalary());
+        unitPosition.setStartDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate()));
     }
 
     private boolean calculativeValueChanged(UnitPosition oldUnitPosition, UnitPositionDTO unitPositionDTO, UnitPositionEmploymentTypeRelationShip oldUnitPositionEmploymentTypeRelationShip) {
@@ -330,6 +331,16 @@ public class UnitPositionService extends UserBaseService {
             return true;
         }
         return false;
+    }
+
+    private void linkUnitPositionWithEmploymentType(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO) {
+        EmploymentType employmentType = employmentTypeGraphRepository.findOne(unitPositionDTO.getEmploymentTypeId());
+        if (!Optional.ofNullable(employmentType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.position.employmenttype.notexist", unitPositionDTO.getEmploymentTypeId());
+        }
+
+        UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
+        unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
     }
 
     public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO, Long unitId, String type, Boolean saveAsDraft) {
@@ -365,6 +376,7 @@ public class UnitPositionService extends UserBaseService {
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             oldUnitPosition.setEndDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate().minusDays(1L)));
             save(unitPosition);
+            linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         }
         // calculative value is not changed but still user still wants to save as draft.
@@ -372,6 +384,7 @@ public class UnitPositionService extends UserBaseService {
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             save(unitPosition);
+            linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         }
         // calculative value is not changed but still user is publishing it it means olny end date is updated.
@@ -386,6 +399,7 @@ public class UnitPositionService extends UserBaseService {
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             save(unitPosition);
+            linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         } else {
             // update in current copy

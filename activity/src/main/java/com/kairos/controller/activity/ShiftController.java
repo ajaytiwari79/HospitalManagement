@@ -107,13 +107,6 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShifts(unitId, shiftDTOS, type));
     }
 
-   /* @ApiOperation("get Average Of Shifts By Activity")
-    @GetMapping(value = "/{staffId}/getAverageOfShiftsByActivity")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAverageOfShiftByActivity(@RequestParam("type") String type, @PathVariable long unitId, @PathVariable Long staffId , @RequestParam String activityId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date fromDate,@RequestParam Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAverageOfShiftByActivity( unitId,staffId,activityId,fromDate,type,unitPositionId));
-    }*/
-
     @ApiOperation("publish Shifts")
     @PutMapping(value = "/publish_shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
