@@ -41,7 +41,7 @@ public class AssetController {
 
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/asset/{assetId}/history")
-    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger assetId) {
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger assetId)  throws ClassNotFoundException {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Country id can't be Null");
         }

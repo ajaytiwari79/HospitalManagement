@@ -6,6 +6,7 @@ import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsse
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.javers.JaversCommonService;
 import org.apache.commons.lang3.StringUtils;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -32,6 +33,9 @@ public class AssetService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private JaversCommonService javersCommonService;
+
 
     public Asset addBasicAssetDetail(Long countryId, Long organizationId, AssetDTO assetDto) {
 
@@ -54,17 +58,14 @@ public class AssetService extends MongoBaseService {
 
 
 
-    public  List<CdoSnapshot>  getAssetActivities(Long countryId, Long organizationId, BigInteger assetId)
-    {
+    public  List<Map<String,Object>>   getAssetActivities(Long countryId, Long organizationId, BigInteger assetId)  throws ClassNotFoundException {
 
         QueryBuilder jqlQuery1 = QueryBuilder.byInstanceId(assetId, Asset.class);
 
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(BigInteger.valueOf(8), MasterAsset.class);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(BigInteger.valueOf(11), MasterAsset.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
-
-
-      return changes;
+      return javersCommonService.getHistoryMap(changes,BigInteger.valueOf(11),MasterAsset.class);
     }
 
 }
