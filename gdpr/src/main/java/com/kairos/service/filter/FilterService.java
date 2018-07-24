@@ -66,8 +66,8 @@ public class FilterService {
         FilterAndFavouriteFilterDTO filterAndFavouriteFilterDto = new FilterAndFavouriteFilterDTO();
         if (Optional.ofNullable(filterGroup).isPresent()) {
             List<FilterType> filterTypes = filterGroup.getFilterTypes();
-            filterCriteria = filterMongoRepository.getFilterCriteria(countryId, organizationId, filterTypes);
-            Aggregation aggregation = filterMongoRepository.createAggregationQueryForMasterAsset(filterCriteria);
+            filterCriteria = filterMongoRepository.getFilterCriteria(countryId, organizationId, filterTypes,filterGroup);
+            Aggregation aggregation = filterMongoRepository.createAggregationQueryForFilterCategory(filterCriteria);
             AggregationResults<FilterQueryResult> result = filterMongoRepository.getFilterAggregationResult(aggregation, filterGroup, moduleId);
             FilterQueryResult filterQueryResult = result.getUniqueMappedResult();
 
@@ -139,10 +139,9 @@ public class FilterService {
                 clauseFilterData.setData(clauses);
                 return clauseFilterData;
             case ASSET_MODULE_NAME:
-                List<MasterAsset> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
-                List<MasterAssetResponseDTO> masterAssetResponseDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssets, MasterAssetResponseDTO.class);
+                List<MasterAssetResponseDTO> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
                 FilterResponseWithData<List<MasterAssetResponseDTO>> assetFilterData = new FilterResponseWithData<>();
-                assetFilterData.setData(masterAssetResponseDTOs);
+                assetFilterData.setData(masterAssets);
                 return assetFilterData;
             case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
                 List<MasterProcessingActivityResponseDTO> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, organizationId, filterSelectionDto);

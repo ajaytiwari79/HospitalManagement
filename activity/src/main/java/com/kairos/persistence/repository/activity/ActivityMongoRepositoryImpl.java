@@ -367,6 +367,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public ActivityWrapper findActivityAndTimeTypeByActivityId(BigInteger activityId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("id").is(activityId).and("deleted").is(false)),
+
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id","timeType"),
                 project().and("name").as("activity.name").and("description").as("activity.description")
                         .and("countryId").as("activity.countryId").and("expertises").as("activity.expertises")

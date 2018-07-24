@@ -220,7 +220,7 @@ public class ShiftService extends MongoBaseService {
         Shift mainShift = buildShift(shiftWithActivityDTO);
         mainShift.setMainShift(true);
         mainShift.setPlannedTimeId(shiftWithActivityDTO.getPlannedTypeId());
-
+        validateStaffingLevel(mainShift, activity, true, staffAdditionalInfoDTO);
         // Break Settings
         shiftQueryResults.addAll(addBreakInShifts(activity, mainShift, staffAdditionalInfoDTO));
         List<Integer> activityDayTypes = new ArrayList<>();
@@ -608,14 +608,14 @@ public class ShiftService extends MongoBaseService {
                 .and(shiftTimeLessThan);
 
 
-        activitySpecification.isSatisfied(shift);
+        //activitySpecification.isSatisfied(shift);
         // updateWTACounter(ruleTemplateSpecificInfo, staffAdditionalInfoDTO);
         //.and(wtaRulesSpecification);
         List<String> messages = activitySpecification.isSatisfiedString(shift);
         if (!messages.isEmpty()) {
             List<String> errors = new ArrayList<>();
             messages.forEach(responseMessage -> {
-                errors.add(localeService.getMessage(responseMessage));
+                errors.add(responseMessage);
             });
             exceptionService.actionNotPermittedException(errors.get(0));
         }
@@ -674,7 +674,6 @@ public class ShiftService extends MongoBaseService {
                     exceptionService.actionNotPermittedException("message.staffingLevel.absent");
                 }
                 List<Shift> shifts = shiftMongoRepository.findShiftBetweenDuration(shift.getStartDate(), shift.getEndDate(), shift.getUnitId());
-                boolean isUpdated = !checkOverStaffing ? shifts.removeIf(s -> s.getId().equals(shift.getId())) : shifts.add(shift);
                 for (StaffingLevel staffingLevel : staffingLevels) {
                     List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
                             activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
@@ -697,14 +696,14 @@ public class ShiftService extends MongoBaseService {
                             int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
                             boolean checkForStaff = staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff();
                             boolean checkForManagement = staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
-                            if ((checkOverStaffing && totalCount > 0)) {
+                            if ((checkOverStaffing && totalCount >= 0)) {
                                 if ((checkForStaff && checkForManagement) && (!phaseSettings.isManagementEligibleForOverStaffing() && !phaseSettings.isStaffEligibleForOverStaffing())) {
                                     exceptionService.actionNotPermittedException("message.shift.overStaffing");
                                 } else if (checkForStaff ? !phaseSettings.isStaffEligibleForOverStaffing() : !phaseSettings.isManagementEligibleForOverStaffing()) {
                                     exceptionService.actionNotPermittedException("message.shift.overStaffing");
                                 }
                             }
-                            if (!checkOverStaffing && checkForUnderStaffing && totalCount < 0) {
+                            if (!checkOverStaffing && checkForUnderStaffing && totalCount <= 0) {
                                 if ((checkForStaff && checkForManagement) && (!phaseSettings.isStaffEligibleForUnderStaffing() && !phaseSettings.isManagementEligibleForUnderStaffing())) {
                                     exceptionService.actionNotPermittedException("message.shift.underStaffing");
                                 } else if (checkForStaff ? !phaseSettings.isStaffEligibleForUnderStaffing() : !phaseSettings.isManagementEligibleForUnderStaffing()) {
