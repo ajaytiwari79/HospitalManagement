@@ -16,9 +16,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.COUNTER_CONF_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com

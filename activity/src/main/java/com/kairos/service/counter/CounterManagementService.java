@@ -51,17 +51,8 @@ public class CounterManagementService extends MongoBaseService{
     }
 
     public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(Long refId, ConfLevel level){
-        List<KPI> kpisList = getKPIsList(refId, level);
-        List<KPICategory> categories = counterRepository.getEntityItemList(KPICategory.class);
-        Map<BigInteger, List<BigInteger>> categoryKPIsMap = new HashMap<>();
-        categories.forEach(category -> {
-            categoryKPIsMap.put(category.getId(), new ArrayList<>());
-        });
-        kpisList.forEach(kpi -> {
-            if(kpi.getCategoryId() != null){
-                categoryKPIsMap.get(kpi.getCategoryId()).add(kpi.getId());
-            }
-        });
+        //List<KPI> kpisList = getKPIsList(refId, level);
+        List<KPICategoryDTO> categories = counterRepository.getKPICategory(level, refId);
 
         return new InitialKPICategoryDistDataDTO(categories, categoryKPIsMap);
     }

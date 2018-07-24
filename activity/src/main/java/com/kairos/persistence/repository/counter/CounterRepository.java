@@ -1,9 +1,6 @@
 package com.kairos.persistence.repository.counter;
 
-import com.kairos.activity.counter.CounterOrderDTO;
-import com.kairos.activity.counter.KPICategoryDTO;
-import com.kairos.activity.counter.ModuleCounterGroupingDTO;
-import com.kairos.activity.counter.RoleCounterDTO;
+import com.kairos.activity.counter.*;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.activity.Activity;
@@ -92,12 +89,14 @@ public class CounterRepository {
         return mongoTemplate.find(query, claz);
     }
 
+    //category CRUD
+
     //categoryKPI crud
-    public List<KPICategory> getKPICategory(ConfLevel level, Long refId){
+    public List<KPICategoryDTO> getKPICategory(ConfLevel level, Long refId){
         String queryField = (ConfLevel.COUNTRY.equals(level))? "countryId":"unitId";
         String categoryListField = "categoryList";
         Aggregation ag = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where(queryField).is(refId).and("level").is(level).and("deleted").is(false))
+                Aggregation.match(Criteria.where(queryField).is(refId).and("deleted").is(false))
                 , Aggregation.lookup("kPICategory", "categoryId", "id", "category")
                 , Aggregation.sort(Sort.Direction.ASC, "categoryId")
                 , Aggregation.group(queryField).push("category").as(categoryListField)
@@ -110,10 +109,20 @@ public class CounterRepository {
         return new ArrayList<>();
     }
 
-    public List<KPI> getKPIsByCategory(List<BigInteger> categoryId){
-        Query query = new Query(Criteria.where("categoryId").in(categoryId).and("deleted").is(false));
-        return mongoTemplate.find(query, KPI.class);
+    public List<CategoryAssignmentDTO> getCategoryAssignments(List<BigInteger> categoryIds, ConfLevel level, Long refId){
+        String queryField = (ConfLevel.COUNTRY.equals(level))? "countryId":"unitId";
+        Aggregation ag = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where(queryField).is(refId).and("categoryId").in(categoryIds))
+                , Aggregation.lookup("kPICategory", "categoryId", "id", "category")
+        );
+
+        AggregationResults<CategoryAssignmentDTO> results = mongoTemplate.aggregate(ag, CategoryAssignment.class, CategoryAssignmentDTO.class);
+        return results.getMappedResults();
     }
+
+    public List
+
+
 
     //tabKPI distribution crud
 

@@ -5,21 +5,24 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 
-public class CategoryAssignment extends MongoBaseEntity {
+public class CategoryKPIConf extends MongoBaseEntity {
+    private BigInteger kpiId;
     private BigInteger categoryId;
     private Long countryId;
     private Long unitId;
     private ConfLevel level;
 
-    public CategoryAssignment() {
-
+    public CategoryKPIConf(BigInteger kpiId, BigInteger categoryId, Long countryId, Long unitId, ConfLevel level){
+        this.categoryId = categoryId;
+        this.
     }
 
-    public CategoryAssignment(BigInteger categoryId, Long countryId, Long unitId, ConfLevel level){
-        this.categoryId = categoryId;
-        this.countryId = countryId;
-        this.unitId = unitId;
-        this.level = level;
+    public BigInteger getKpiId() {
+        return kpiId;
+    }
+
+    public void setKpiId(BigInteger kpiId) {
+        this.kpiId = kpiId;
     }
 
     public BigInteger getCategoryId() {
