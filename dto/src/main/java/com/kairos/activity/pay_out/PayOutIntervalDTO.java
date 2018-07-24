@@ -2,7 +2,9 @@ package com.kairos.activity.pay_out;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.payout.PayOutTrasactionStatus;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,77 +16,34 @@ public class PayOutIntervalDTO {
     private Date startDate;
     private Date endDate;
     //In minutes
-    private int totalPayOutAfterCtaMin;
-    private int totalPayOutBeforeCtaMin;
-    private int totalPayOutMin;
-    private int totalPayOutDiff;
-    private String title;
-    private List<PayOutCTADistributionDTO> payOutDistributions = new ArrayList<>();
-    private ScheduleTimeByTimeTypeDTO workingTimeType;
-    private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
-    private int minutesFromCta;
+    private long totalPayOutAfterCtaMin;
+    private long totalPayOutBeforeCtaMin;
+    private long payoutChange;
+    private PayOutCTADistributionDTO payOutDistribution;
+    private DayOfWeek dayOfWeek;
 
 
-    public PayOutIntervalDTO(String title) {
-        this.title = title;
-    }
 
 
-    public int getTotalPayOutDiff() {
-        return totalPayOutDiff;
-    }
-
-    public void setTotalPayOutDiff(int totalPayOutDiff) {
-        this.totalPayOutDiff = totalPayOutDiff;
-    }
-
-    public List<PayOutCTADistributionDTO> getPayOutDistributions() {
-        return payOutDistributions;
-    }
-
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public ScheduleTimeByTimeTypeDTO getWorkingTimeType() {
-        return workingTimeType;
-    }
-
-    public void setWorkingTimeType(ScheduleTimeByTimeTypeDTO workingTimeType) {
-        this.workingTimeType = workingTimeType;
-    }
-
-    public int getMinutesFromCta() {
-        return minutesFromCta;
-    }
-
-    public void setMinutesFromCta(int minutesFromCta) {
-        this.minutesFromCta = minutesFromCta;
-    }
-
-    public ScheduleTimeByTimeTypeDTO getNonWorkingTimeType() {
-        return nonWorkingTimeType;
-    }
-
-    public void setNonWorkingTimeType(ScheduleTimeByTimeTypeDTO nonWorkingTimeType) {
-        this.nonWorkingTimeType = nonWorkingTimeType;
-    }
-
-    public void setPayOutDistributions(List<PayOutCTADistributionDTO> payOutDistributions) {
-        this.payOutDistributions = payOutDistributions;
+    public PayOutIntervalDTO(Date startDate, Date endDate, long totalPayOutAfterCtaMin, long totalPayOutBeforeCtaMin, long payoutChange, PayOutCTADistributionDTO payOutDistribution,DayOfWeek dayOfWeek) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.totalPayOutAfterCtaMin = totalPayOutAfterCtaMin;
+        this.totalPayOutBeforeCtaMin = totalPayOutBeforeCtaMin;
+        this.payOutDistribution = payOutDistribution;
+        this.payoutChange = payoutChange;
+        this.dayOfWeek = dayOfWeek;
     }
 
     public PayOutIntervalDTO() {
     }
 
-    public PayOutIntervalDTO(Date startDate, Date endDate) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public void setDayOfWeek(DayOfWeek dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
     }
 
     public Date getStartDate() {
@@ -103,28 +62,37 @@ public class PayOutIntervalDTO {
         this.endDate = endDate;
     }
 
-    public int getTotalPayOutAfterCtaMin() {
+    public long getTotalPayOutAfterCtaMin() {
         return totalPayOutAfterCtaMin;
     }
 
-    public void setTotalPayOutAfterCtaMin(int totalPayOutAfterCtaMin) {
+    public void setTotalPayOutAfterCtaMin(long totalPayOutAfterCtaMin) {
         this.totalPayOutAfterCtaMin = totalPayOutAfterCtaMin;
     }
 
-    public int getTotalPayOutBeforeCtaMin() {
+    public long getTotalPayOutBeforeCtaMin() {
         return totalPayOutBeforeCtaMin;
     }
 
-    public void setTotalPayOutBeforeCtaMin(int totalPayOutBeforeCtaMin) {
+    public void setTotalPayOutBeforeCtaMin(long totalPayOutBeforeCtaMin) {
         this.totalPayOutBeforeCtaMin = totalPayOutBeforeCtaMin;
     }
 
-    public int getTotalPayOutMin() {
-        return totalPayOutMin;
+
+    public long getPayoutChange() {
+        return payoutChange;
     }
 
-    public void setTotalPayOutMin(int totalPayOutMin) {
-        this.totalPayOutMin = totalPayOutMin;
+    public void setPayoutChange(long payoutChange) {
+        this.payoutChange = payoutChange;
+    }
+
+    public PayOutCTADistributionDTO getPayOutDistribution() {
+        return payOutDistribution;
+    }
+
+    public void setPayOutDistribution(PayOutCTADistributionDTO payOutDistribution) {
+        this.payOutDistribution = payOutDistribution;
     }
 
 }

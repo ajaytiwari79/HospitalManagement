@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.Map;
 
@@ -26,27 +27,9 @@ public class PayOutController {
     @Autowired
     private PayOutService payOutService;
 
-    @GetMapping(value = "/unit_position/{unitEmploymentId}/")
-    public ResponseEntity<Map<String, Object>> getPayOutForAdvanceView(@PathVariable Long unitId, @PathVariable Long unitEmploymentId, @RequestParam(value = "query") String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payOutService.getAdvanceViewPayOut
-                (unitId,unitEmploymentId,query,startDate,endDate));
-    }
-
-    @GetMapping(value = "overview/unit_position/{unitEmploymentId}/")
-    public ResponseEntity<Map<String, Object>> getPayOutForOverview(@PathVariable Long unitId, @PathVariable Long unitEmploymentId, @RequestParam Integer year) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payOutService.getOverviewPayOut
-                (unitEmploymentId,year));
-    }
-
-
-    @RequestMapping(value = "/savePayOut", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getPayOutIncludedTimeTypes() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payOutService.savePayOut());
-    }
-
-    @PutMapping(value = "/updateBlankPayOut")
-    public ResponseEntity<Map<String,Object>> updateBlankPayOut(@RequestBody UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payOutService.updateBlankPayOut(unitPositionWithCtaDetailsDTO));
+    @GetMapping(value = "/{payoutTrasactionId}")
+    public ResponseEntity<Map<String, Object>> getPayOutForAdvanceView(@PathVariable BigInteger payoutTrasactionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payOutService.approvePayOutRequest(payoutTrasactionId));
     }
 
 

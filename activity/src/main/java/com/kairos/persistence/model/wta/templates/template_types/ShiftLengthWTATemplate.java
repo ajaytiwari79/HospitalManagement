@@ -7,6 +7,7 @@ import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.PartOfDay;
 import com.kairos.enums.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.util.TimeInterval;
 
@@ -28,7 +29,6 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;
     private List<Long> dayTypeIds = new ArrayList<>();
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.NIGHT);
     private float recommendedValue;
@@ -87,13 +87,6 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 
-    public List<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
@@ -105,29 +98,34 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        String exception = "";
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
             if (timeInterval != null) {
-                if (isValidForDay(dayTypeIds, infoWrapper)) {
-                    Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
-                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0] * 60, infoWrapper.getShift().getMinutes());
-                    if (!isValid) {
-                        if (limitAndCounter[1] != null) {
-                            int counterValue = limitAndCounter[1] - 1;
-                            if (counterValue < 0) {
-                                throw new InvalidRequestException(getName() + " is Broken");
+                List<ShiftWithActivityDTO> shiftWithActivityDTOS = filterShifts(Arrays.asList(infoWrapper.getShift()),timeTypeIds,null,null);
+                if(!shiftWithActivityDTOS.isEmpty()){
+                    ShiftWithActivityDTO shift = shiftWithActivityDTOS.get(0);
+                    if (isValidForDay(dayTypeIds, infoWrapper)) {
+                        Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
+                        boolean isValid = isValid(minMaxSetting, limitAndCounter[0] * 60, shift.getMinutes());
+                        if (!isValid) {
+                            if (limitAndCounter[1] != null) {
+                                int counterValue = limitAndCounter[1] - 1;
+                                if (counterValue < 0) {
+                                    exception = getName() + " is Broken";
+                                } else {
+                                    infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                                    shift.getBrokenRuleTemplateIds().add(getId());
+                                }
                             } else {
-                                infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
-                                infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                                exception = getName() + " is Broken";
                             }
-                        } else {
-                            throw new InvalidRequestException(getName() + " is Broken");
                         }
                     }
                 }
             }
         }
-        return "";
+        return exception;
     }
 
     public ShiftLengthWTATemplate(String name, String description, long timeLimit) {

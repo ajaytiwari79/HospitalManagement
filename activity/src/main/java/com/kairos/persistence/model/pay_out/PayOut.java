@@ -17,28 +17,48 @@ public class PayOut extends MongoBaseEntity{
     private Long unitPositionId;
     private Long staffId;
     private BigInteger shiftId;
+    private Long unitId;
     //In minutes
-    private int totalPayOutMin;
-    private int contractualMin;
-    private int scheduledMin;
-    private int payOutMinWithoutCta;
-    private int payOutMinWithCta;
+    private long totalPayOutMin;
+    private long contractualMin;
+    private long scheduledMin;
+    private long payOutMinWithoutCta;
+    private long payOutMinWithCta;
+    private long payoutBeforeThisDate;
     private LocalDate date;
     private PayOutStatus payOutStatus;
     private boolean paidout;
-    private List<PayOutCTADistribution> payOutCTADistributionList;
+    private List<PayOutCTADistribution> payOutCTADistributions;
 
 
-    public PayOut(BigInteger shiftId,Long unitPositionId, Long staffId, LocalDate date) {
+    public PayOut(BigInteger shiftId,Long unitPositionId, Long staffId, LocalDate date,Long unitId) {
         this.shiftId = shiftId;
         this.unitPositionId = unitPositionId;
         this.staffId = staffId;
         this.date = date;
         this.payOutStatus = PayOutStatus.APPROVED;
+        this.unitId = unitId;
+    }
+
+    public long getPayoutBeforeThisDate() {
+        return payoutBeforeThisDate;
+    }
+
+    public void setPayoutBeforeThisDate(long payoutBeforeThisDate) {
+        this.payoutBeforeThisDate = payoutBeforeThisDate;
     }
 
     public boolean isPaidout() {
         return paidout;
+    }
+
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 
     public void setPaidout(boolean paidout) {
@@ -61,16 +81,24 @@ public class PayOut extends MongoBaseEntity{
         this.shiftId = shiftId;
     }
 
-    public List<PayOutCTADistribution> getPayOutCTADistributionList() {
-        return payOutCTADistributionList;
+    public List<PayOutCTADistribution> getPayOutCTADistributions() {
+        return payOutCTADistributions;
     }
 
-    public void setPayOutCTADistributionList(List<PayOutCTADistribution> payOutCTADistributionList) {
-        this.payOutCTADistributionList = payOutCTADistributionList;
+    public void setPayOutCTADistributions(List<PayOutCTADistribution> payOutCTADistributions) {
+        this.payOutCTADistributions = payOutCTADistributions;
     }
 
 
     public PayOut() {
+    }
+
+    public PayOut(Long unitPositionId, Long staffId, long totalPayOutMin, LocalDate date, PayOutStatus payOutStatus) {
+        this.unitPositionId = unitPositionId;
+        this.staffId = staffId;
+        this.totalPayOutMin = totalPayOutMin;
+        this.date = date;
+        this.payOutStatus = payOutStatus;
     }
 
     public LocalDate getDate() {
@@ -81,27 +109,27 @@ public class PayOut extends MongoBaseEntity{
         this.date = date;
     }
 
-    public int getScheduledMin() {
+    public long getScheduledMin() {
         return scheduledMin;
     }
 
-    public void setScheduledMin(int scheduledMin) {
+    public void setScheduledMin(long scheduledMin) {
         this.scheduledMin = scheduledMin;
     }
 
-    public int getPayOutMinWithoutCta() {
+    public long getPayOutMinWithoutCta() {
         return payOutMinWithoutCta;
     }
 
-    public void setPayOutMinWithoutCta(int payOutMinWithoutCta) {
+    public void setPayOutMinWithoutCta(long payOutMinWithoutCta) {
         this.payOutMinWithoutCta = payOutMinWithoutCta;
     }
 
-    public int getPayOutMinWithCta() {
+    public long getPayOutMinWithCta() {
         return payOutMinWithCta;
     }
 
-    public void setPayOutMinWithCta(int payOutMinWithCta) {
+    public void setPayOutMinWithCta(long payOutMinWithCta) {
         this.payOutMinWithCta = payOutMinWithCta;
     }
 
@@ -121,19 +149,19 @@ public class PayOut extends MongoBaseEntity{
         this.staffId = staffId;
     }
 
-    public int getTotalPayOutMin() {
+    public long getTotalPayOutMin() {
         return totalPayOutMin;
     }
 
-    public void setTotalPayOutMin(int totalPayOutMin) {
+    public void setTotalPayOutMin(long totalPayOutMin) {
         this.totalPayOutMin = totalPayOutMin;
     }
 
-    public int getContractualMin() {
+    public long getContractualMin() {
         return contractualMin;
     }
 
-    public void setContractualMin(int contractualMin) {
+    public void setContractualMin(long contractualMin) {
         this.contractualMin = contractualMin;
     }
 
