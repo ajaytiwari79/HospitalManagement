@@ -81,10 +81,5 @@ public class ControlPanelController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, controlPanelService.getControlPanelData(controlPanelId));
     }
 
-    @RequestMapping(value = "/push_to_queue", method = RequestMethod.PUT)
-    @ApiOperation("Push to queue ")
-    public ResponseEntity<Map<String, Object>> pushToQueue() {
-        controlPanelService.pushToQueue();
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
-    }
+
 }

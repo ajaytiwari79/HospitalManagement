@@ -1,11 +1,7 @@
 package com.kairos.service.control_panel;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.kairos.client.dto.ControlPanelDTO;
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.dto.KairosScheduleJobDTO;
-import com.kairos.dto.QueueDTO;
-import com.kairos.enums.scheduler.Result;
 import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
@@ -22,10 +18,6 @@ import com.kairos.util.timeCareShift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.IntegerDeserializer;
-import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -298,16 +290,6 @@ public class ControlPanelService extends UserBaseService {
         controlPanelDTO.setJobId(jobId);
         controlPanelDTO.setUnitId(unitId);
         return controlPanelDTO;
-    }
-
-    public void pushToQueue() {
-
-        ControlPanel panel = controlPanelGraphRepository.findOne(14491L);
-        KairosScheduleJobDTO job = new KairosScheduleJobDTO();
-        ObjectMapperUtils.copyProperties(panel,job);
-       //  kafkaProducer.pushToQueue(job);
-
-
     }
 
 

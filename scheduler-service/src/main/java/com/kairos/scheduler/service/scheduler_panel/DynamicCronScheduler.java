@@ -95,7 +95,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
     public void stopCronJob(String scheduler){
         try {
- sta            logger.info("Check scheduler --> "+scheduler);
+             logger.info("Check scheduler --> "+scheduler);
 
 
             ThreadPoolTaskScheduler scheduler2 = BeanFactoryUtil.getDefaultListableBeanFactory()

@@ -1,27 +1,13 @@
 package com.kairos.scheduler.kafka.producer;
 
 
-import com.kairos.dto.KairosScheduleJobDTO;
 import com.kairos.dto.KairosSchedulerExecutorDTO;
-import com.kairos.dto.QueueDTO;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.IntegerDeserializer;
-import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.listener.KafkaMessageListenerContainer;
-import org.springframework.kafka.listener.config.ContainerProperties;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC;
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_TO_USER_QUEUE_TOPIC;
