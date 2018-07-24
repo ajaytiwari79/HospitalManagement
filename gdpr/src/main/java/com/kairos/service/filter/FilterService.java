@@ -139,10 +139,9 @@ public class FilterService {
                 clauseFilterData.setData(clauses);
                 return clauseFilterData;
             case ASSET_MODULE_NAME:
-                List<MasterAsset> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
-                List<MasterAssetResponseDTO> masterAssetResponseDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssets, MasterAssetResponseDTO.class);
+                List<MasterAssetResponseDTO> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
                 FilterResponseWithData<List<MasterAssetResponseDTO>> assetFilterData = new FilterResponseWithData<>();
-                assetFilterData.setData(masterAssetResponseDTOs);
+                assetFilterData.setData(masterAssets);
                 return assetFilterData;
             case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
                 List<MasterProcessingActivityResponseDTO> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, organizationId, filterSelectionDto);
