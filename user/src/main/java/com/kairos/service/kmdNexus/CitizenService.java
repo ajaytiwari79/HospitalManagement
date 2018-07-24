@@ -388,7 +388,7 @@ public class CitizenService {
                  //organizationService.createOrganization(supplier, null);
             } else if (citizenSupplier.getType().equals("organization")) {
                 if (organizationService.checkDuplicationOrganizationRelation(organization.getId(), supplier.getId()) == 0)
-                   supplier = organizationService.createOrganization(supplier, organization.getId());
+                   supplier = organizationService.createOrganization(supplier, organization.getId(), false);
             }
 
             if (supplierOptional.isPresent()) grantObject.put("supplierId",supplier.getId());
