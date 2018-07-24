@@ -11,7 +11,7 @@ public class CurrentUserDetails {
     private  int age;
     private Long countryId;
     private boolean hubMember;
-    private String language;
+    private Long languageId;
 
     public CurrentUserDetails(){
     //default constructor
@@ -108,11 +108,11 @@ public class CurrentUserDetails {
         this.hubMember = hubMember;
     }
 
-    public String getLanguage() {
-        return language;
+    public Long getLanguageId() {
+        return languageId;
     }
 
-    public void setLanguage(String language) {
-        this.language = language;
+    public void setLanguageId(Long languageId) {
+        this.languageId = languageId;
     }
 }
