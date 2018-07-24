@@ -13,13 +13,12 @@ import java.math.BigInteger;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.kairos.scheduler.constants.ApiConstants.API_INTEGRATIONCONFIGURATION_URL;
+import static com.kairos.scheduler.constants.ApiConstants.API_V1;
 
 @RestController
-@RequestMapping(API_INTEGRATIONCONFIGURATION_URL)
-@Api(API_INTEGRATIONCONFIGURATION_URL)
-public class IntegrationConfigurationController {
+@RequestMapping(API_V1)
+@Api(API_V1)
+public class IntegrationSettingsController {
 
     @Inject
     private IntegrationConfigurationService integrationConfigurationService;
@@ -35,11 +34,11 @@ public class IntegrationConfigurationController {
     @RequestMapping(value = "/integration_service", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addIntegrationService(@Validated @RequestBody IntegrationSettings objectToSave) {
-        HashMap<String, Object> integrationConfiguration = integrationConfigurationService.addIntegrationConfiguration(objectToSave);
-        if (integrationConfiguration == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, integrationConfiguration);
+        HashMap<String, Object> integrationSettings = integrationConfigurationService.addIntegrationConfiguration(objectToSave);
+        if (integrationSettings == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, integrationSettings);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationConfiguration);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationSettings);
     }
 
     @ApiOperation(value = "Update integration service")

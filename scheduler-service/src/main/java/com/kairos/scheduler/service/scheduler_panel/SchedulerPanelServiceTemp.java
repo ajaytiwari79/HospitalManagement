@@ -27,7 +27,7 @@ public class SchedulerPanelServiceTemp extends MongoBaseService {
         job.setJobType(JobType.FUNCTIONAL);
 
        // ObjectMapperUtils.copyProperties(panel,job);
-        kafkaProducer.pushToQueue(job);
+        //kafkaProducer.pushToQueue(job);
 
 
     }

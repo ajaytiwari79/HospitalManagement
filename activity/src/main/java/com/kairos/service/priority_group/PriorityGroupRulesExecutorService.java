@@ -12,10 +12,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class PriorityGroupRulesImplementation {
+public class PriorityGroupRulesExecutorService {
 
 
-    public PriorityGroupRulesImplementation() {
+    public PriorityGroupRulesExecutorService() {
 
     }
 // TODO refactor this method to createRulesList

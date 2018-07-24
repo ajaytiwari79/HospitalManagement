@@ -1,5 +1,6 @@
 package com.kairos.scheduler.controller;
 
+import com.kairos.dto.SchedulerPanelDTO;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
 import com.kairos.scheduler.utils.ResponseHandler;
@@ -44,14 +45,14 @@ public class SchedulerPanelController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     @ApiOperation("Create Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@RequestParam(value = "integrationConfigurationId", required = true) BigInteger integrationConfigurationId, @PathVariable  long unitId, @RequestBody SchedulerPanel schedulerPanel) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanel, integrationConfigurationId));
+    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@RequestParam(value = "integrationConfigurationId", required = false) BigInteger integrationConfigurationId, @PathVariable  long unitId, @RequestBody SchedulerPanelDTO schedulerPanelDTO) throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTO, integrationConfigurationId));
     }
 
-    @RequestMapping(value = "", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{schedulerPanelId}", method = RequestMethod.PUT)
     @ApiOperation("Update Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> updateSchedulerPanel(@RequestBody SchedulerPanel schedulerPanel) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanel(schedulerPanel));
+    public ResponseEntity<Map<String, Object>> updateSchedulerPanel(@RequestBody SchedulerPanelDTO schedulerPanelDTO,@PathVariable BigInteger schedulerPanelId) throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanel(schedulerPanelDTO,schedulerPanelId));
     }
 
     @RequestMapping(value = "/jobDetails/{schedulerPanelId}", method = RequestMethod.GET)
@@ -79,15 +80,5 @@ public class SchedulerPanelController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getControlPanelData(schedulerPanelId));
     }
 */
-
-
-
-
-    @RequestMapping(value = "/push_to_queue", method = RequestMethod.PUT)
-    @ApiOperation("Push to queue ")
-    public ResponseEntity<Map<String, Object>> pushToQueue() {
-        schedulerPanelService.pushToQueue();
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
-    }
 
 }

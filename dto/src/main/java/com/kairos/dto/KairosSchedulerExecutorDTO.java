@@ -5,6 +5,7 @@ import com.kairos.enums.scheduler.JobType;
 import com.kairos.enums.scheduler.OperationType;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 
 public class KairosSchedulerExecutorDTO {
 
@@ -16,12 +17,13 @@ public class KairosSchedulerExecutorDTO {
     private String filterId;
     private OperationType operationType;
     private IntegrationConfigurationDTO integrationConfigurationDTO;
+    private Long oneTimeTriggerDateMillis;
 
     public KairosSchedulerExecutorDTO() {
 
     }
     public KairosSchedulerExecutorDTO(BigInteger id,Long unitId,JobType jobType,JobSubType jobSubType, BigInteger entityId, OperationType operationType,
-                                      IntegrationConfigurationDTO integrationConfigurationDTO) {
+                                      IntegrationConfigurationDTO integrationConfigurationDTO,Long oneTimeTriggerDateMillis ) {
 
         this.id = id;
         this.unitId = unitId;
@@ -30,6 +32,7 @@ public class KairosSchedulerExecutorDTO {
         this.entityId = entityId;
         this.operationType = operationType;
         this.integrationConfigurationDTO = integrationConfigurationDTO;
+        this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
 
     }
 
@@ -95,6 +98,15 @@ public class KairosSchedulerExecutorDTO {
     public void setOperationType(OperationType operationType) {
         this.operationType = operationType;
     }
+
+    public Long getOneTimeTriggerDateMillis() {
+        return oneTimeTriggerDateMillis;
+    }
+
+    public void setOneTimeTriggerDateMillis(Long oneTimeTriggerDateMillis) {
+        this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
+    }
+
 
 
 

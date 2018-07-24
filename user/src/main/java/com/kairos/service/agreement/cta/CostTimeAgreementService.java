@@ -535,6 +535,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
 
     @Async
+    //Todo refactor
     public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, Boolean doUpdate, List<Long> ruleTemplateIds)
             throws InterruptedException, ExecutionException {
 

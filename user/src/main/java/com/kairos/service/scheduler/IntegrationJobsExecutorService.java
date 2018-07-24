@@ -8,6 +8,7 @@ import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.util.DateUtil;
+import com.kairos.util.DateUtils;
 import com.kairos.util.timeCareShift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -100,11 +101,10 @@ public class IntegrationJobsExecutorService {
                             IOUtils.closeQuietly(zi);
                         }
 
-        /*String result = "Success";
-        if(transstatus.getResult().getNr_errors() > 0) result = "Error";*/
 
 
-                        KairosSchedulerLogsDTO logs = new KairosSchedulerLogsDTO(Result.SUCCESS,unzipped,job.getId(),job.getUnitId(),started,stopped,job.getJobSubType());
+
+                        KairosSchedulerLogsDTO logs = new KairosSchedulerLogsDTO(Result.SUCCESS,unzipped,job.getId(),job.getUnitId(),DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),job.getJobSubType());
                         if(transstatus.getResult().getNr_errors() > 0) {
                             logs.setResult(Result.ERROR);
                         }

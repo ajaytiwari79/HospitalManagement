@@ -244,10 +244,6 @@ public class ControlPanelService extends UserBaseService {
     public Boolean deleteJob(long controlPanelId){
         try {
             ControlPanel panel = controlPanelGraphRepository.findOne(controlPanelId);
-           /* List<JobDetails> jobDetailsList = jobDetailsRepository.findByControlPanelId(controlPanelId);
-            for (JobDetails jobDetails : jobDetailsList) {
-                jobDetailsRepository.delete(jobDetails);
-            }*/
             dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
             panel.setActive(false);
             controlPanelGraphRepository.save(panel);

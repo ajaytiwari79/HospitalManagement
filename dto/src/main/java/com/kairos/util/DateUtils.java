@@ -605,4 +605,7 @@ public class DateUtils {
     public static LocalDateTime getLocalDatetimeFromLong(Long millis) {
         return Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
+    public static Long getMillisFromLocalDateTime(LocalDateTime date) {
+        return  date==null?null:date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() ;  }
+
 }

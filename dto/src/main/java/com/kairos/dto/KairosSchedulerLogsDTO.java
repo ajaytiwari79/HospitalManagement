@@ -3,7 +3,6 @@ package com.kairos.dto;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 
 public class KairosSchedulerLogsDTO {
 
@@ -12,21 +11,39 @@ public class KairosSchedulerLogsDTO {
     private String log;
     private BigInteger schedulerPanelId;
     private Long unitId;
-    private LocalDateTime started;
-    private LocalDateTime stopped;
+
+
+
+    private Long startedDate;
+    private Long stoppedDate;
     private JobSubType jobSubType;
 
     public KairosSchedulerLogsDTO() {
 
     }
-    public KairosSchedulerLogsDTO(Result result,String log,BigInteger schedulerPanelId,Long unitId,LocalDateTime started, LocalDateTime stopped,JobSubType jobSubType) {
+    public KairosSchedulerLogsDTO(Result result, String log, BigInteger schedulerPanelId, Long unitId, Long startedDate, Long stoppedDate, JobSubType jobSubType) {
         this.result = result;
         this.log = log;
         this.schedulerPanelId = schedulerPanelId;
         this.unitId = unitId;
-        this.started = started;
-        this.stopped = stopped;
+        this.startedDate = startedDate;
+        this.stoppedDate = stoppedDate;
         this.jobSubType = jobSubType;
+    }
+    public Long getStartedDate() {
+        return startedDate;
+    }
+
+    public void setStartedDate(Long startedDate) {
+        this.startedDate = startedDate;
+    }
+
+    public Long getStoppedDate() {
+        return stoppedDate;
+    }
+
+    public void setStoppedDate(Long stoppedDate) {
+        this.stoppedDate = stoppedDate;
     }
     public BigInteger getSchedulerPanelId() {
         return schedulerPanelId;
@@ -44,21 +61,7 @@ public class KairosSchedulerLogsDTO {
         this.jobSubType = jobSubType;
     }
 
-    public LocalDateTime getStarted() {
-        return started;
-    }
 
-    public void setStarted(LocalDateTime started) {
-        this.started = started;
-    }
-
-    public LocalDateTime getStopped() {
-        return stopped;
-    }
-
-    public void setStopped(LocalDateTime stopped) {
-        this.stopped = stopped;
-    }
     public Result getResult() {
         return result;
     }

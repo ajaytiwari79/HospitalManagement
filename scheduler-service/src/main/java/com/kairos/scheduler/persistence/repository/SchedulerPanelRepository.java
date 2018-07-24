@@ -15,6 +15,7 @@ public interface SchedulerPanelRepository extends MongoRepository<SchedulerPanel
     List<SchedulerPanel> findByUnitId(long unitId);
     List<SchedulerPanel> findByActive(boolean active);
 
+    List<SchedulerPanel> findAllByDeletedFalse();
     SchedulerPanel findByJobSubTypeAndEntityIdAndUnitId(JobSubType jobSubType, BigInteger entityId, Long unitId);
 
 }

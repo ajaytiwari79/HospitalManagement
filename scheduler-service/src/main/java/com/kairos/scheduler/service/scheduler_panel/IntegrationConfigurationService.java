@@ -1,6 +1,6 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
-import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationConfiguration;
+import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.repository.IntegrationConfigurationRepository;
 import com.kairos.scheduler.service.MongoBaseService;
 import org.springframework.stereotype.Service;
@@ -20,19 +20,19 @@ public class IntegrationConfigurationService extends MongoBaseService {
     @Inject
     IntegrationConfigurationRepository integrationConfigurationRepository;
 
-    public HashMap<String, Object> addIntegrationConfiguration(IntegrationConfiguration integrationConfiguration){
-        save(integrationConfiguration);
-        return filterIntegrationServiceData(integrationConfiguration);
+    public HashMap<String, Object> addIntegrationConfiguration(IntegrationSettings integrationSettings){
+        save(integrationSettings);
+        return filterIntegrationServiceData(integrationSettings);
     }
 
-    public List<IntegrationConfiguration> getAllIntegrationServices(){
+    public List<IntegrationSettings> getAllIntegrationServices(){
         List<Map<String,Object>> integrationService = new ArrayList<>();
 
         return integrationConfigurationRepository.findAllAndIsEnabledTrue();
     }
 
     public boolean deleteIntegrationService(BigInteger integrationServiceId){
-        Optional<IntegrationConfiguration> objectToDelete =integrationConfigurationRepository.findById(integrationServiceId);
+        Optional<IntegrationSettings> objectToDelete =integrationConfigurationRepository.findById(integrationServiceId);
 
         if(!objectToDelete.isPresent()){
             return false;
@@ -42,24 +42,24 @@ public class IntegrationConfigurationService extends MongoBaseService {
         return true;
     }
 
-    public HashMap<String, Object> updateIntegrationService(BigInteger integrationServiceId,IntegrationConfiguration integrationConfiguration){
-        Optional<IntegrationConfiguration> objectToUpdateOptional = integrationConfigurationRepository.findById(integrationServiceId);
+    public HashMap<String, Object> updateIntegrationService(BigInteger integrationServiceId,IntegrationSettings integrationSettings){
+        Optional<IntegrationSettings> objectToUpdateOptional = integrationConfigurationRepository.findById(integrationServiceId);
         if(!objectToUpdateOptional.isPresent()){
             return null;
         }
-        IntegrationConfiguration objectToUpdate = objectToUpdateOptional.get();
-        objectToUpdate.setDescription(integrationConfiguration.getDescription());
-        objectToUpdate.setName(integrationConfiguration.getName());
-        objectToUpdate.setUniqueKey(integrationConfiguration.getUniqueKey());
+        IntegrationSettings objectToUpdate = objectToUpdateOptional.get();
+        objectToUpdate.setDescription(integrationSettings.getDescription());
+        objectToUpdate.setName(integrationSettings.getName());
+        objectToUpdate.setUniqueKey(integrationSettings.getUniqueKey());
         save(objectToUpdate);
         return filterIntegrationServiceData(objectToUpdate);
     }
 
-    private HashMap<String,Object> filterIntegrationServiceData(IntegrationConfiguration integrationConfiguration){
+    private HashMap<String,Object> filterIntegrationServiceData(IntegrationSettings integrationSettings){
         HashMap<String,Object> map = new HashMap<>(2);
-        map.put("id",integrationConfiguration.getId());
-        map.put("description",integrationConfiguration.getDescription());
-        map.put("uniqueKey",integrationConfiguration.getUniqueKey());
+        map.put("id", integrationSettings.getId());
+        map.put("description", integrationSettings.getDescription());
+        map.put("uniqueKey", integrationSettings.getUniqueKey());
         return map;
     }
 

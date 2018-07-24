@@ -48,6 +48,20 @@ public class EnvConfig {
     @Value("${tomtom.key}")
     private String tomtomKey;
 
+    @Value("${scheduler.authorization}")
+    private String authorizationForScheduler;
+
+    public String getAuthorizationForScheduler() {
+        return authorizationForScheduler;
+    }
+
+    public void setAuthorizationForScheduler(String authorizationForScheduler) {
+        this.authorizationForScheduler = authorizationForScheduler;
+    }
+
+
+
+
     public String getGoogleCalendarAPIV3Url(String vCardId){
 
         return googleCalendarAPIV3Url.replace("{countryVCard}" ,vCardId);

@@ -2,48 +2,31 @@ package com.kairos.scheduler.service.scheduler_panel;
 
 import com.kairos.dto.IntegrationConfigurationDTO;
 import com.kairos.dto.KairosSchedulerExecutorDTO;
-import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
 import com.kairos.enums.scheduler.OperationType;
-//import com.kairos.persistence.model.organization.Organization;
-//import com.kairos.persistence.model.user.control_panel.ControlPanel;
-//import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.scheduler.kafka.producer.KafkaProducer;
-import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationConfiguration;
+import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.persistence.repository.IntegrationConfigurationRepository;
 import com.kairos.scheduler.utils.BeanFactoryUtil;
-//import com.kairos.service.control_panel.ControlPanelService;
-//import com.kairos.util.BeanFactoryUtil;
-//import com.kairos.util.DateUtil;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
-//import com.kairos.util.timeCareShift.Transstatus;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.poi.ss.usermodel.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.http.*;
 import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import rx.Scheduler;
 
 import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
 
-//import static com.kairos.constants.AppConstants.*;
-import static com.kairos.scheduler.constants.AppConstants.*;
+import static com.kairos.scheduler.constants.AppConstants.activitySubTypes;
+import static com.kairos.scheduler.constants.AppConstants.userSubTypes;
+
+
 
 /**
  * Created by oodles on 11/1/17.
@@ -68,11 +51,11 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicCronScheduler.class);
 
-    public String setCronScheduling(SchedulerPanel schedulerPanel){
+    public String setCronScheduling(SchedulerPanel schedulerPanel, String timezone) {
         logger.debug("cron----> " + schedulerPanel.getCronExpression());
         CronTrigger trigger = null;
         if(!schedulerPanel.isOneTimeTrigger()) {
-            trigger = new CronTrigger(schedulerPanel.getCronExpression(), TimeZone.getTimeZone("Asia/Kolkata"));
+            trigger = new CronTrigger(schedulerPanel.getCronExpression(), TimeZone.getTimeZone(timezone));
         }
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
         //threadPoolTaskScheduler.setThreadNamePrefix(schedulerPanel.getIntegrationConfigurationId().toString());
@@ -80,7 +63,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
         threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
         threadPoolTaskScheduler.initialize();
-        Runnable runnable = getTask(schedulerPanel, trigger, TimeZone.getTimeZone("Asia/Kolkata"));
+        Runnable runnable = getTask(schedulerPanel, trigger, TimeZone.getTimeZone(timezone));
 
         if(!schedulerPanel.isOneTimeTrigger()) {
             threadPoolTaskScheduler.schedule(runnable, trigger);
@@ -91,11 +74,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
         logger.info("Name of cron job is --> " + "scheduler" + schedulerPanel.getId());
         BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), threadPoolTaskScheduler);
-        //   context.getBeanFactory().registerSingleton("scheduler" + controlPanel.getId(), threadPoolTaskScheduler);
-        //    context.register(ThreadPoolTaskScheduler.class);
-        //      context.refresh();
         logger.info("Name of cron job is --> " + "scheduler" + schedulerPanel.getId());
-        //  context.close();
 
         return "scheduler" + schedulerPanel.getId();
 
@@ -116,7 +95,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
     public void stopCronJob(String scheduler){
         try {
-            logger.info("Check scheduler --> "+scheduler);
+ sta            logger.info("Check scheduler --> "+scheduler);
 
 
             ThreadPoolTaskScheduler scheduler2 = BeanFactoryUtil.getDefaultListableBeanFactory()
@@ -131,15 +110,15 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
     }
 
-    public void startCronJob(SchedulerPanel schedulerPanel){
+    public void startCronJob(SchedulerPanel schedulerPanel, String timezone){
         try {
             String scheduler = "scheduler"+schedulerPanel.getId();
             logger.info("Start scheduler from BootStrap--> "+scheduler);
             CronTrigger trigger = null;
             if(!schedulerPanel.isOneTimeTrigger()) {
-                trigger = new CronTrigger(schedulerPanel.getCronExpression(),  TimeZone.getTimeZone("Asia/Kolkata"));
+                trigger = new CronTrigger(schedulerPanel.getCronExpression(),  TimeZone.getTimeZone(timezone));
             }
-            Runnable task = getTask(schedulerPanel,  trigger, TimeZone.getTimeZone("Asia/Kolkata"));
+            Runnable task = getTask(schedulerPanel,  trigger, TimeZone.getTimeZone(timezone));
 
             ThreadPoolTaskScheduler scheduler2 = BeanFactoryUtil.getDefaultListableBeanFactory()
                     .getBean(scheduler, ThreadPoolTaskScheduler.class);
@@ -175,98 +154,19 @@ public class DynamicCronScheduler implements  DisposableBean  {
                 IntegrationConfigurationDTO integrationConfigurationDTO = null;
                 if(Optional.ofNullable(schedulerPanel.getIntegrationConfigurationId()).isPresent()) {
                     integrationConfigurationDTO = new IntegrationConfigurationDTO();
-                    Optional<IntegrationConfiguration> integrationConfiguration = integrationConfigurationRepository.findById(schedulerPanel.getIntegrationConfigurationId());
+                    Optional<IntegrationSettings> integrationConfiguration = integrationConfigurationRepository.findById(schedulerPanel.getIntegrationConfigurationId());
                     ObjectMapperUtils.copyProperties(integrationConfiguration.get(),integrationConfigurationDTO);
                 }
 
                 KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getId(),schedulerPanel.getUnitId(),schedulerPanel.getJobType(), schedulerPanel.getJobSubType(),schedulerPanel.getEntityId(),OperationType.EXECUTE,
-                        integrationConfigurationDTO);
+                        integrationConfigurationDTO,DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
 
-                kafkaProducer.pushToQueue(jobToExecute);
-
-
-
-
-             /*   String plainClientCredentials = "cluster:cluster";
-                String base64ClientCredentials = new String(Base64.encodeBase64(plainClientCredentials.getBytes()));
-
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
-                headers.add("Authorization", "Basic " + base64ClientCredentials);
-                HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-                String importShiftStatusXMLURI = envConfig.getCarteServerHost()+KETTLE_TRANS_STATUS;
-                //   String startDate = DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy-MM-dd");
-                //     String endDate = DateFormatUtils.format(DateUtil.addWeeksInDate(DateUtil.getCurrentDate(), 5), "yyyy-MM-dd");
-                //  String startDate = DateFormatUtils.format(controlPanel.getStartDateMillis(), "yyyy-MM-dd");
-                //  String endDate = DateFormatUtils.format(controlPanel.getEndDateMillis(), "yyyy-MM-dd");
-                Long workplaceId = Long.valueOf(String.valueOf("15"));
-                if(schedulerPanel.getUnitId() != null){
-                    Organization organization = organizationGraphRepository.findOne(schedulerPanel.getUnitId());
-                    if(organization.getExternalId() != null) workplaceId = Long.valueOf(organization.getExternalId());
+                if(userSubTypes.contains(jobToExecute.getJobSubType())) {
+                    kafkaProducer.pushToUserQueue(jobToExecute);
                 }
-                String importShiftURI = "";
-                int weeks = 35;
-                String uniqueKey = schedulerPanel.getIntegrationConfiguration().getUniqueKey();
-                logger.info("uniqueKey----> "+uniqueKey);
-                RestTemplate restTemplate = new RestTemplate();
-                switch(uniqueKey){
-                    case IMPORT_TIMECARE_SHIFTS:
-                        logger.info("!!===============Hit to carte server from Kairos==============!!");
-                        importShiftURI = envConfig.getCarteServerHost()+KETTLE_EXECUTE_TRANS+IMPORT_TIMECARE_SHIFTS_PATH+"&intWorkPlaceId="+workplaceId+"&weeks="+weeks+"&jobId="+schedulerPanel.getId();
-                        logger.info("importShiftURI----> "+importShiftURI);
-                        Date started = DateUtil.getCurrentDate();
-                        ResponseEntity<String> importResult = restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                        if (importResult.getStatusCodeValue() == 200) {
-                            ResponseEntity<String> resultStatusXml = restTemplate.exchange(importShiftStatusXMLURI, HttpMethod.GET, entity, String.class);
-                            Date stopped = DateUtil.getCurrentDate();
-                            try {
-                                JAXBContext jaxbContext = JAXBContext.newInstance(Transstatus.class);
-                                Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-                                StringReader reader = new StringReader(resultStatusXml.getBody());
-                                Transstatus transstatus = (Transstatus) jaxbUnmarshaller.unmarshal(reader);
-                                logger.info("trans status---> " + transstatus.getId());
-
-                                controlPanelService.createJobScheduleDetails(schedulerPanel, transstatus, started, stopped);
-                            } catch (JAXBException exception) {
-                                logger.info("trans status---exception > " + exception);
-                            }
-                            catch(IOException exception){
-                                logger.info("exception while logging job details-- > " + exception);
-                            }
-
-                        }
-                        break;
-                    case IMPORT_KMD_CITIZEN:
-                        importShiftURI = envConfig.getServerHost()+KMD_CARE_CITIZEN_URL+schedulerPanel.getUnitId();
-                        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                        break;
-                    case IMPORT_KMD_CITIZEN_NEXT_TO_KIN:
-                        importShiftURI = envConfig.getServerHost()+API_KMD_CARE_CITIZEN_RELATIVE_DATA;
-                        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                        break;
-                    case IMPORT_KMD_CITIZEN_GRANTS:
-                        importShiftURI = envConfig.getServerHost()+API_KMD_CARE_CITIZEN_GRANTS;
-                        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                        break;
-                    case IMPORT_KMD_STAFF_AND_WORKING_HOURS:
-                        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+schedulerPanel.getUnitId()+"/getShifts/"+schedulerPanel.getFilterId();
-                        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                        break;
-                    case IMPORT_KMD_TASKS:
-                        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+schedulerPanel.getUnitId()+"/getTasks/"+schedulerPanel.getFilterId();
-                        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                        break;
-                    case IMPORT_KMD_TIME_SLOTS:
-                        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+schedulerPanel.getUnitId()+"/getTimeSlots";
-                        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
-                        break;
-
-                }*/
-
-
-
-
+                else if(activitySubTypes.contains(jobToExecute.getJobSubType())) {
+                    kafkaProducer.pushToActivityQueue(jobToExecute);
+                }
             }
         };
 

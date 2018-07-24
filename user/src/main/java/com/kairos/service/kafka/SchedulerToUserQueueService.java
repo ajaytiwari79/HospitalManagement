@@ -4,6 +4,10 @@ import java.util.List;
 import com.kairos.dto.KairosSchedulerExecutorDTO;
 import com.kairos.service.scheduler.IntegrationJobsExecutorService;
 import com.kairos.service.staff.EmploymentService;
+import com.kairos.util.DateUtil;
+import com.kairos.util.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -16,6 +20,8 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
     private EmploymentService employmentService;
     @Inject
     private IntegrationJobsExecutorService integrationJobService;
+
+    private static Logger logger = LoggerFactory.getLogger(SchedulerToUserQueueService.class);
     
     public void execute(KairosSchedulerExecutorDTO job) {
 
@@ -24,12 +30,10 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
                 integrationJobService.runJob(job);
                 break;
             case EMPLOYMENT_END:
-                List<Long> employmentIds = new ArrayList<Long>();
-                employmentIds.add(job.getEntityId().longValue());
-                employmentService.moveToReadOnlyAccessGroup(employmentIds);
+                employmentService.endEmploymentProcess(job.getId(),job.getUnitId(),job.getEntityId().longValue(),DateUtils.getLocalDatetimeFromLong(job.getOneTimeTriggerDateMillis()));
                 break;
-
-
+            case QUESTIONAIRE_NIGHTWORKER:
+                logger.info("Questionaire nightworker----------------->"+job.getId());
         }
 
     }

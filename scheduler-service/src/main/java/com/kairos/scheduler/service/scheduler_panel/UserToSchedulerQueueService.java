@@ -1,6 +1,7 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
 import com.kairos.dto.KairosScheduleJobDTO;
+import com.kairos.dto.SchedulerPanelDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.kafka.JobQueueExecutor;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
@@ -18,20 +19,22 @@ public class UserToSchedulerQueueService implements JobQueueHandler {
 
     public void handleJob(KairosScheduleJobDTO scheduleJobDTO) {
 
-        SchedulerPanel schedulerPanel = new SchedulerPanel();
-        ObjectMapperUtils.copyProperties(scheduleJobDTO,schedulerPanel);
-        if(schedulerPanel.isOneTimeTrigger()) {
-            schedulerPanel.setOneTimeTriggerDate(DateUtils.getLocalDatetimeFromLong(scheduleJobDTO.getOneTimeTriggerDateMillis()));
+        SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO();
+        ObjectMapperUtils.copyProperties(scheduleJobDTO,schedulerPanelDTO);
+        if(schedulerPanelDTO.isOneTimeTrigger()) {
+            schedulerPanelDTO.setOneTimeTriggerDate(DateUtils.getLocalDatetimeFromLong(scheduleJobDTO.getOneTimeTriggerDateMillis()));
         }
 
         switch (scheduleJobDTO.getIntegrationOperation()) {
             case CREATE:
-                schedulerPanelService.createSchedulerPanel(scheduleJobDTO.getUnitId(), schedulerPanel, null);
+                schedulerPanelService.createSchedulerPanel(scheduleJobDTO.getUnitId(), schedulerPanelDTO, null);
                 break;
             case UPDATE:
-                schedulerPanelService.updateSchedulerPanelByJobSubTypeAndEntityId(schedulerPanel);
+                schedulerPanelService.updateSchedulerPanelByJobSubTypeAndEntityId(schedulerPanelDTO);
+                break;
             case DELETE:
-                schedulerPanelService.deleteJobBySubTypeAndEntityId(schedulerPanel);
+                schedulerPanelService.deleteJobBySubTypeAndEntityId(schedulerPanelDTO);
+                break;
 
         }
     }

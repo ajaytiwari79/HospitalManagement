@@ -23,6 +23,9 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.constants.AppConstants.USER_TO_SCHEDULER_JOB_QUEUE_TOPIC;
+import static com.kairos.constants.AppConstants.USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC;
+
 @Component
 public class KafkaProducer {
 
@@ -34,15 +37,15 @@ public class KafkaProducer {
 
     public void pushToJobQueue(KairosScheduleJobDTO job) {
 
-      kafkaTemplateJobQueue.send("UserToSchedulerJobQueue",job);
+      kafkaTemplateJobQueue.send(USER_TO_SCHEDULER_JOB_QUEUE_TOPIC,job);
     }
 
     public void pushToSchedulerLogsQueue(KairosSchedulerLogsDTO logs) {
 
-        kafkaTemplateLogsQueue.send("UserToSchedulerLogsQueue",logs);
+        kafkaTemplateLogsQueue.send(USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC,logs);
     }
 
-    public KafkaMessageListenerContainer<Integer, QueueDTO> kafkaContainer() {
+   /* public KafkaMessageListenerContainer<Integer, QueueDTO> kafkaContainer() {
         ContainerProperties containerProps = new ContainerProperties("userSchedulerQueue");
         containerProps.setMessageListener( new DefaultKafkaMessageListener());
 
@@ -76,5 +79,5 @@ public class KafkaProducer {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         return props;
-    }
+    }*/
 }

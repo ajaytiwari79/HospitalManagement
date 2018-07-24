@@ -10,7 +10,7 @@ import com.kairos.rest_client.pay_out.PayOutRestClient;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.pay_out.DailyPayOutEntry;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.activity.ShiftMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.pay_out.PayOutMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;

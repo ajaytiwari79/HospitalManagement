@@ -26,7 +26,6 @@ public class ShcedulerToUserQueueListener {
             KairosSchedulerExecutorDTO job = objectMapper.readValue(message,KairosSchedulerExecutorDTO.class);
             logger.info("received content = '{}'", job.toString());
             schedulerToUserQueueService.execute(job);
-            //storage.put(content);
         }
         catch(Exception e) {
             logger.error(e.getMessage(),e);

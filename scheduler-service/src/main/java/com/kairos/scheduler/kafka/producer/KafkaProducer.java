@@ -8,6 +8,8 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.apache.kafka.common.serialization.IntegerSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -21,6 +23,9 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC;
+import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_TO_USER_QUEUE_TOPIC;
+
 @Component
 public class KafkaProducer {
 
@@ -28,11 +33,16 @@ public class KafkaProducer {
     @Inject
     private KafkaTemplate<Integer,KairosSchedulerExecutorDTO> kafkaTemplate;
 
-    public void pushToQueue(KairosSchedulerExecutorDTO job) {
-
-      kafkaTemplate.send("SchedulerToUserQueue",job);
+    private static Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
+    public void pushToUserQueue(KairosSchedulerExecutorDTO job) {
+        logger.info("Pushing to ScheduleTOUserQueue----------->"+job.getId());
+      kafkaTemplate.send(SCHEDULER_TO_USER_QUEUE_TOPIC,job);
     }
 
+    public void pushToActivityQueue(KairosSchedulerExecutorDTO job) {
+        logger.info("Pushing to ScheduleTOUserQueue----------->"+job.getId());
+        kafkaTemplate.send(SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC,job);
+    }
    /* public KafkaMessageListenerContainer<Integer, QueueDTO> kafkaContainer() {
         ContainerProperties containerProps = new ContainerProperties("userSchedulerQueue");
         containerProps.setMessageListener( new DefaultKafkaMessageListener());

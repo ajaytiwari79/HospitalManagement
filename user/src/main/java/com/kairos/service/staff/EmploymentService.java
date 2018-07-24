@@ -3,11 +3,13 @@ package com.kairos.service.staff;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.KairosScheduleJobDTO;
+import com.kairos.dto.KairosSchedulerLogsDTO;
 import com.kairos.enums.EmploymentStatus;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
+import com.kairos.enums.scheduler.Result;
 import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
@@ -36,6 +38,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.scheduler.IntegrationJobsExecutorService;
 import com.kairos.service.tree_structure.TreeStructureService;
@@ -110,6 +113,9 @@ public class EmploymentService extends UserBaseService {
     private UserGraphRepository userGraphRepository;
     @Inject
     private KafkaProducer kafkaProducer;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
+
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
@@ -802,6 +808,7 @@ public class EmploymentService extends UserBaseService {
                 employment.getUnitPermissions().add(unitPermission);
                 currentElement++;
             }
+            employment.setEmploymentStatus(EmploymentStatus.FORMER);
             employments.add(employment);
         }
         if(expiredEmploymentsQueryResults.size()>0) {
@@ -902,5 +909,30 @@ public class EmploymentService extends UserBaseService {
 
         return employment;
 
+    }
+
+    public void endEmploymentProcess(BigInteger schedulerPanelId,Long unitId, Long employmentId,LocalDateTime employmentEndDate) {
+       LocalDateTime started = LocalDateTime.now();
+        KairosSchedulerLogsDTO schedulerLogsDTO;
+        LocalDateTime stopped ;
+        String log = null;
+        Result result = Result.SUCCESS;
+
+
+        try{
+            List<Long> employmentIds = Stream.of(employmentId).collect(Collectors.toList());
+
+            moveToReadOnlyAccessGroup(employmentIds);
+            Long staffId = employmentGraphRepository.findStaffByEmployment(employmentId);
+            activityIntegrationService.deleteShiftsAndOpenShift(unitId,staffId,employmentEndDate);
+        }
+        catch(Exception ex) {
+            log = ex.getMessage();
+            result = Result.ERROR;
+        }
+        stopped = LocalDateTime.now();
+        schedulerLogsDTO = new KairosSchedulerLogsDTO(result,log,schedulerPanelId,unitId,DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),JobSubType.EMPLOYMENT_END);
+
+        kafkaProducer.pushToSchedulerLogsQueue(schedulerLogsDTO);
     }
 }

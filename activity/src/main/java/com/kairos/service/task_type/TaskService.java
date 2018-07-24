@@ -21,7 +21,7 @@ import com.kairos.persistence.model.task_type.AddressCode;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.model.task_type.TaskTypeDefination;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.activity.ShiftMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepositoryImpl;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
