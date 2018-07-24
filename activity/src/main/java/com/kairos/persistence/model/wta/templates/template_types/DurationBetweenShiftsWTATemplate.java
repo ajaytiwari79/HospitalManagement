@@ -94,11 +94,9 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
 
     }
     public DurationBetweenShiftsWTATemplate() {
-        wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
     }
 
     @Override

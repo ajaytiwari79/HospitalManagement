@@ -127,6 +127,9 @@ public class CopyShiftDTO {
         if (!Optional.ofNullable(this.startDate).isPresent() || !Optional.ofNullable(this.endDate).isPresent()) {
             return false;
         }
+        if (startDate.isEqual(endDate)) {
+            return true;
+        }
         return startDate.isBefore(endDate);
 
     }

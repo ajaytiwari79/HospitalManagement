@@ -2,6 +2,7 @@ package com.kairos.controller.master_data.asset_management;
 
 
 import com.kairos.dto.master_data.AssetTypeDTO;
+import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Map;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstant.UNIT_URL;
@@ -99,17 +101,11 @@ public class AssetTypeController {
     @ApiOperation("delete AssetType  by id")
     @DeleteMapping("/asset_type/delete/{id}")
     public ResponseEntity<Object> deleteAssetTypeById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        Map<String,Object> result=assetTypeService.deleteAssetType(countryId, organizationId, id);
+        if ((Boolean) result.get("isSuccess")){
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
         }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.deleteAssetType(countryId, organizationId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK,false,result);
 
     }
 
