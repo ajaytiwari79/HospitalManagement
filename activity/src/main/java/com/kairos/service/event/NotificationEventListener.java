@@ -33,7 +33,7 @@ public class NotificationEventListener {
 
          staffingLevelService.updateStaffingLevelAvailableStaffCount(shiftNotificationEvent);
     }
-    //@Async
+    @Async
     @EventListener
     public void shiftNotificationEvent(PriorityGroupRuleDataDTO priorityGroupRuleDataDTO) throws UnsupportedEncodingException {
         logger.info("shift created details {send Emails}");
