@@ -75,9 +75,9 @@ public class ProcessingActivityController {
 
 
 
-    @ApiOperation(value = "Get All Asset With meta data ")
+    @ApiOperation(value = "Get All Processing activity With meta data ")
     @GetMapping("/processing_activity/all")
-    public ResponseEntity<Object> getAllProcessingActivityWithMetaData(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable BigInteger assetId) {
+    public ResponseEntity<Object> getAllProcessingActivityWithMetaData(@PathVariable Long countryId, @PathVariable Long organizationId) {
 
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Country id can't be Null");
