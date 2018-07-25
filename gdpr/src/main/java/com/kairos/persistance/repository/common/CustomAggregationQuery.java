@@ -174,7 +174,53 @@ public class CustomAggregationQuery {
 
 
 
-  
+    public static String masterAssetProjectionWithAssetType() {
+        return " {" +
+                "'$project':{" +
+                "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "         'name':1," +
+                "       'description':1," +
+                "       'organizationSubTypes':1," +
+                "       'organizationTypes':1," +
+                "       'organizationServices':1," +
+                "       'organizationSubServices':1," +
+
+                "            }}";
+    }
+
+
+
+
+
+    public static String assetProjectionWithMetaData() {
+        return " {" +
+                "'$project':{" +
+                "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "'hostingType':{$arrayElemAt:['$hostingType',0]}," +
+                "'dataDisposal':{$arrayElemAt:['$dataDisposal',0]}," +
+                "'hostingProvider':{$arrayElemAt:['$hostingProvider',0]}," +
+                "  'name':1," +
+                "  'description':1," +
+                "  'hostingLocation':1," +
+                "  'managingDepartment':1," +
+                "  'assetOwner':1," +
+                "  'storageFormats':1," +
+                "  'orgSecurityMeasures':1," +
+                "  'technicalSecurityMeasures':1," +
+                "  'dataRetentionPeriod':1," +
+                "  'minDataSubjectVolume':1," +
+                "  'maxDataSubjectVolume':1," +
+                "  'isActive':1," +
+
+                "            }}";
+    }
+
+
+
+
+
+
+
 
 
 }

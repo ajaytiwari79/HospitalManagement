@@ -297,8 +297,7 @@ public class OrganizationService extends UserBaseService {
      * @param organization
      * @return Organization
      */
-    public Organization createOrganization(Organization organization, Long id) {
-
+    public Organization createOrganization(Organization organization, Long id, boolean baseOrganization) {
         Organization parent = (id == null) ? null : getOrganizationById(id);
         logger.info("Received Parent ID: " + id);
         if (parent != null) {
@@ -307,13 +306,16 @@ public class OrganizationService extends UserBaseService {
             logger.info("Parent Organization: " + o.getName());
         } else {
             organization = save(organization);
-            int count = organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
-            logger.info("Linked with region level " + count);
+            if (!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)){
+                int count = organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
+            }
         }
-        accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
-        organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+        if(!baseOrganization){
+            accessGroupService.createDefaultAccessGroups(organization);
+            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+        }
         return organization;
     }
 
@@ -1281,13 +1283,13 @@ public class OrganizationService extends UserBaseService {
                     organization.setExternalId(String.valueOf(workPlace.getId()));
                     if (workPlace.getIsParent()) {
                         logger.info("Creating parent organization " + workPlace.getName());
-                        createOrganization(organization, null);
+                        createOrganization(organization, null, false);
                     } else {
                         logger.info("Creating child organization " + workPlace.getName());
                         logger.info("Sending Parent ID: " + workPlace.getParentWorkPlaceID());
                         Organization parentOrganization = getOrganizationByExternalId(workPlace.getParentWorkPlaceID().toString());
                         logger.info("parentOrganization  ID: " + parentOrganization.getId());
-                        createOrganization(organization, parentOrganization.getId());
+                        createOrganization(organization, parentOrganization.getId(),false);
                     }
                 }
             }

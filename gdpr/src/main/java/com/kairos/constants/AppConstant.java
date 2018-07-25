@@ -35,5 +35,14 @@ public class AppConstant {
     public static final String ASSET_TYPES_LIST = "asset_types";
 
 
+    //metaData refrence key for asset and processing activity
+    public static final String ASSET_TYPE = "assetType";
+    public static final String ASSET_SUB_TYPE = "assetSubTypes";
+    public static final String STORAGE_FORMAT = "storageFormats";
+    public static final String ORG_SECURITY_MEASURE = "orgSecurityMeasures";
+    public static final String TECHNICAL_SECURITY_MEASURE = "technicalSecurityMeasures";
+    public static final String HOSTING_PROVIDER = "hostingProvider";
+    public static final String HOSTING_TYPE = "hostingType";
+    public static final String DATA_DISPOSAL = "dataDisposal";
 
 }

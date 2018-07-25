@@ -82,12 +82,12 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getKPIAccessPageList(moduleId));
     }
 
-    @PutMapping(value = "/country/{countryId}/module/{moduleId}/language")
+    @PutMapping(value = "/module/{moduleId}/language")
     public ResponseEntity<Map<String, Object>> addLanguageSpecificData(@PathVariable String moduleId, @RequestBody AccessPageLanguageDTO accessPageLanguageDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.assignLanguageToAccessPage(moduleId, accessPageLanguageDTO));
     }
 
-    @GetMapping(value = "/country/{countryId}/module/{moduleId}/language/{languageId}")
+    @GetMapping(value = "/module/{moduleId}/language/{languageId}")
     public ResponseEntity<Map<String, Object>> getLanguageSpecificData(@PathVariable String moduleId, @PathVariable Long languageId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getLanguageDataByModuleId(moduleId,languageId));
     }
