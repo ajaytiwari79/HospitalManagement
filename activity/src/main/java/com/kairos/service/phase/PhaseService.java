@@ -49,8 +49,6 @@ public class PhaseService extends MongoBaseService {
 
     public List<Phase> createDefaultPhase(Long unitId, Long countryId) {
         List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
-        Map<String,PhaseDTO> phaseMap=countryPhases.stream().collect(Collectors.toMap(K->K.getName(),V->V));
-        List<Phase> alreadyExistPhasesInUnit=phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
             Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
@@ -321,7 +319,7 @@ public class PhaseService extends MongoBaseService {
     }
 
 
-    public Map<LocalDate,List<ShiftState>> addPhaseStatusesInShift(Long unitId, Set<LocalDate> dates) {
+    public Map<LocalDate,List<ShiftState>> getApplicableStatusesInShift(Long unitId, Set<LocalDate> dates) {
         Map<LocalDate,List<ShiftState>> localDatePhaseStatusMap=new HashMap<>();
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<String,List<ShiftState>> phaseMap=phases.stream().collect(Collectors.toMap(k->k.getName(), k->k.getStatus()));
@@ -349,6 +347,7 @@ public class PhaseService extends MongoBaseService {
                 localDatePhaseStatusMap.put(date,phaseMap.get(PAYROLL));
             }
             else {
+                //No Any Actual phase found so going to add Planning Phase
                 addPlanningPhase(planningPhases,date,localDatePhaseStatusMap,upcomingMondayDate);
             }
         }

@@ -60,8 +60,6 @@ public class Shift extends MongoBaseEntity {
     private BigInteger copiedFromShiftId;
     private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
 
-
-
     public Shift() {
         //dc
     }

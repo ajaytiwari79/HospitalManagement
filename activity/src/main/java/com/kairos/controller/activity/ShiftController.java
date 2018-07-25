@@ -107,8 +107,8 @@ public class ShiftController {
     @ApiOperation("publish Shifts")
     @PutMapping(value = "/publish_shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> publishShifts(@PathVariable Long unitId,@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addStatusesInShift(unitId,shiftPublishDTO));
+    public ResponseEntity<Map<String, Object>> addStatusesInShifts(@PathVariable Long unitId,@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addStatusesInShifts(unitId,shiftPublishDTO));
     }
 
 
@@ -142,17 +142,4 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> createShiftUsingTemplate(@PathVariable Long unitId, @RequestBody ShiftDTO shiftDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShiftUsingTemplate(unitId,shiftDTO));
     }
-
-//    @ApiOperation("Add statuses in  Shifts")
-//    @PutMapping(value = "/add_status")
-//    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-//    public ResponseEntity<Map<String, Object>> addStatusesInShift(@PathVariable Long unitId, @RequestBody @Valid ShiftAndPhaseStatusDTO shiftAndPhaseStatusDTO) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addStatusesInShift(unitId,shiftAndPhaseStatusDTO));
-//    }
-
-
-
-
-
-
 }

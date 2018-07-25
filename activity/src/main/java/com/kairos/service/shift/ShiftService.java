@@ -975,7 +975,7 @@ public class ShiftService extends MongoBaseService {
         return activityChangeStatus;
     }
 
-    public Map<String, List<ShiftResponse>> addStatusesInShift(Long unitId,ShiftPublishDTO shiftPublishDTO) {
+    public Map<String, List<ShiftResponse>> addStatusesInShifts(Long unitId,ShiftPublishDTO shiftPublishDTO) {
 
         List<ShiftResponse> success = new ArrayList<>();
         List<ShiftResponse> error = new ArrayList<>();
@@ -986,7 +986,7 @@ public class ShiftService extends MongoBaseService {
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftPublishDTO.getShiftIds());
         //todo check for empty shift list
         Set<LocalDate> dates=shifts.stream().map(s->DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
-        Map<LocalDate,List<ShiftState>> phaseListByDate=phaseService.addPhaseStatusesInShift(unitId,dates);
+        Map<LocalDate,List<ShiftState>> phaseListByDate=phaseService.getApplicableStatusesInShift(unitId,dates);
         for(Shift shift:shifts){
             List<ShiftState> phaseStatuses=phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
             if(phaseStatuses.containsAll(shiftPublishDTO.getShiftStates())){
@@ -1258,30 +1258,4 @@ public class ShiftService extends MongoBaseService {
             }
         });
     }
-
-
-
-//    public Map<String, List<BigInteger>>  addStatusesInShift(Long unitId,ShiftAndPhaseStatusDTO shiftAndPhaseStatusDTO){
-//        List<BigInteger> success = new ArrayList<>();
-//        List<BigInteger> error = new ArrayList<>();
-//        Map<String, List<BigInteger>> response = new HashMap<>();
-//        response.put("success", success);
-//        response.put("error", error);
-//
-//        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftAndPhaseStatusDTO.getShiftIds());
-//        Set<LocalDate> dates=shifts.stream().map(Shift::getStartDate).collect(Collectors.toSet());
-//        List<Phase> phases=phaseService.getCurrentPhaseListByDate(unitId,dates);
-//        for(int i=0;i<shifts.size();i++){
-//            List<Phase.PhaseStatus> phaseStatuses=phases.get(i).getStatus();
-//            if(phaseStatuses.containsAll(shiftAndPhaseStatusDTO.getPhaseStatuses())){
-//                shifts.get(i).setPhaseStatuses(shiftAndPhaseStatusDTO.getPhaseStatuses());
-//                success.add(shifts.get(i).getId());
-//            }
-//            else {
-//                error.add(shifts.get(i).getId());
-//            }
-//        }
-//        save(shifts);
-//        return response;
-//    }
 }
