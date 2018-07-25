@@ -36,6 +36,8 @@ public class ProcessingActivityDTO {
 
     private List<BigInteger> sourceTransferMethods;
 
+    private List<BigInteger> destinationTransferMethods;
+
     private Integer controllerContactInfo;
 
     private Integer dpoContactInfo;
@@ -104,4 +106,12 @@ public class ProcessingActivityDTO {
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
 
     public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }
+
+    public List<BigInteger> getDestinationTransferMethods() {
+        return destinationTransferMethods;
+    }
+
+    public void setDestinationTransferMethods(List<BigInteger> destinationTransferMethods) {
+        this.destinationTransferMethods = destinationTransferMethods;
+    }
 }

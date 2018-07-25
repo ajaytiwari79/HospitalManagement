@@ -32,7 +32,7 @@ public class ProcessingActivityController {
 
 
     @ApiOperation(value = "create Processing activity ")
-    @PostMapping("/processing_activity")
+    @PostMapping("/processing_activity/add")
     public ResponseEntity<Object> createProcessingActivity(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
 
         if (countryId == null) {
@@ -45,16 +45,49 @@ public class ProcessingActivityController {
 
 
     @ApiOperation(value = "delete  asset by Id")
-    @DeleteMapping("/processing_activity/{id}")
+    @DeleteMapping("/processing_activity/delete/{id}")
     public ResponseEntity<Object> deleteAssetById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
 
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Country id can't be Null");
         } else if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "ManagingOrganization id can't be Null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization  id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.deleteProcessingActivity(countryId, organizationId, id));
     }
+
+
+
+
+
+    @ApiOperation(value = "Get Processing Activity with meta data by Id")
+    @GetMapping("/processing_activity/{id}")
+    public ResponseEntity<Object> getProcessingActivityWithMetaDatabyId(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable BigInteger id) {
+
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Country id can't be Null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityWithMetaDataById(countryId, organizationId,id));
+    }
+
+
+
+
+    @ApiOperation(value = "Get All Asset With meta data ")
+    @GetMapping("/processing_activity/all")
+    public ResponseEntity<Object> getAllProcessingActivityWithMetaData(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable BigInteger assetId) {
+
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Country id can't be Null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityWithMetaData(countryId, organizationId));
+    }
+
+
 
 
 
@@ -65,7 +98,7 @@ public class ProcessingActivityController {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Country id can't be Null");
         } else if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "ManagingOrganization id can't be Null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.updateProcessingActivity(countryId, organizationId,id, processingActivityDTO));
     }

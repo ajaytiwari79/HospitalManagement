@@ -35,6 +35,9 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private List<BigInteger> sourceTransferMethods;
 
+    private List<BigInteger> destinationTransferMethods;
+
+
     private Integer controllerContactInfo;
 
     private Integer dpoContactInfo;
@@ -111,7 +114,21 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setAccessorParties(List<BigInteger> accessorParties) { this.accessorParties = accessorParties; }
 
-    public ProcessingActivity( String name, String description,Long countryId, ManagingOrganization managingDepartment,  Staff processOwner) {
+    public Long getCountryId() { return countryId;
+    }
+
+    public void setCountryId(Long countryId) { this.countryId = countryId;
+    }
+
+    public List<BigInteger> getDestinationTransferMethods() {
+        return destinationTransferMethods;
+    }
+
+    public void setDestinationTransferMethods(List<BigInteger> destinationTransferMethods) {
+        this.destinationTransferMethods = destinationTransferMethods;
+    }
+
+    public ProcessingActivity(String name, String description, Long countryId, ManagingOrganization managingDepartment, Staff processOwner) {
         this.name = name;
         this.description = description;
         this.managingDepartment = managingDepartment;
