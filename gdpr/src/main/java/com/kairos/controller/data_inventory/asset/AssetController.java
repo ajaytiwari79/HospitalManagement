@@ -35,8 +35,68 @@ public class AssetController {
         } else if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.addBasicAssetDetail(countryId, organizationId, assetDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.createAsseWithBasictDetail(countryId, organizationId, assetDto));
     }
+
+
+    @ApiOperation(value = "delete  asset by Id")
+    @DeleteMapping("/asset/{assetId}")
+    public ResponseEntity<Object> deleteAssetById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger assetId) {
+
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Country id can't be Null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.deleteAssetById(countryId, organizationId, assetId));
+    }
+
+
+
+    @ApiOperation(value = "update asset basic detail")
+    @PutMapping("/asset/update/{assetId}")
+    public ResponseEntity<Object> updateAssetData(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable BigInteger assetId, @Valid @RequestBody AssetDTO assetDto) {
+
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Country id can't be Null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.updateAssetData(countryId, organizationId,assetId, assetDto));
+    }
+
+
+
+
+
+    @ApiOperation(value = "Get Asset With meta data by Id")
+    @GetMapping("/asset/{assetId}")
+    public ResponseEntity<Object> getAssetWithMetaDatabyId(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable BigInteger assetId) {
+
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Country id can't be Null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetWithMetadataById(countryId, organizationId,assetId));
+    }
+
+
+
+
+    @ApiOperation(value = "Get All Asset With meta data ")
+    @GetMapping("/asset")
+    public ResponseEntity<Object> getAllAssetWithMetaData(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable BigInteger assetId) {
+
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Country id can't be Null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllAssetWithMetadata(countryId, organizationId));
+    }
+
+
 
 
     @ApiOperation(value = "get history of asset or changes done in Asset")
