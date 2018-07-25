@@ -1,16 +1,19 @@
 package com.kairos.persistance.model.data_inventory.asset;
 
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
+import org.javers.core.metamodel.annotation.ValueObject;
 
 import javax.validation.constraints.NotNull;
 
-public class Organization {
+
+@ValueObject
+public class ManagingOrganization {
 
 
     @NotNull
     private Long id;
 
-    @NotNullOrEmpty(message = "Organization name can't be empty")
+    @NotNullOrEmpty(message = "ManagingOrganization name can't be empty")
     private String name;
 
     @NotNullOrEmpty(message = "email can't be empty")
@@ -28,12 +31,12 @@ public class Organization {
 
     public void setEmail(String email) { this.email = email; }
 
-    public Organization(Long id, String name, String email) {
+    public ManagingOrganization(Long id, String name, String email) {
         this.id = id;
         this.name = name;
         this.email = email;
     }
 
-    public Organization() {
+    public ManagingOrganization() {
     }
 }

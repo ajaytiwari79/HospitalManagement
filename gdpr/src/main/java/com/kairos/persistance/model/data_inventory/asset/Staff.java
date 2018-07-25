@@ -3,12 +3,14 @@ package com.kairos.persistance.model.data_inventory.asset;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
+import org.javers.core.metamodel.annotation.ValueObject;
 
 import javax.validation.constraints.NotNull;
 
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Staff
-{
+@ValueObject
+public class Staff {
 
     @NotNull
     private Long id;

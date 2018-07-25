@@ -7,6 +7,7 @@ import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
+import org.javers.core.metamodel.annotation.ValueObject;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;

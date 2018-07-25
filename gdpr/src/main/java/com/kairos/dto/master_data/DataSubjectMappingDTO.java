@@ -26,13 +26,13 @@ public class DataSubjectMappingDTO {
     @NotNullOrEmpty(message = "description  can't be empty")
     private String description;
 
-    @NotNull(message = "Organization  Type  can't be  null")
-    @NotEmpty(message = "Organization Type  can't be  empty")
+    @NotNull(message = "ManagingOrganization  Type  can't be  null")
+    @NotEmpty(message = "ManagingOrganization Type  can't be  empty")
     @Valid
     private List<OrganizationTypeDTO> organizationTypes;
 
-    @NotNull(message = "Organization Sub Type  can't be  null")
-    @NotEmpty(message = "Organization Sub Type   can't be  empty")
+    @NotNull(message = "ManagingOrganization Sub Type  can't be  null")
+    @NotEmpty(message = "ManagingOrganization Sub Type   can't be  empty")
     @Valid
     private List<OrganizationSubTypeDTO> organizationSubTypes;
 

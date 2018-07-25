@@ -26,13 +26,13 @@ public class MasterProcessingActivityDTO {
     @NotNullOrEmpty(message = "Description  can't be  Empty")
     private String description;
 
-    @NotEmpty(message = "Organization Type  can't be  Empty")
-    @NotNull(message = "Organization  Type  can't be  null")
+    @NotEmpty(message = "ManagingOrganization Type  can't be  Empty")
+    @NotNull(message = "ManagingOrganization  Type  can't be  null")
     @Valid
     private List<OrganizationTypeDTO> organizationTypes;
 
-    @NotNull(message = "Organization Sub Type  can't be  null")
-    @NotEmpty(message = "Organization Sub Type  can't be Empty")
+    @NotNull(message = "ManagingOrganization Sub Type  can't be  null")
+    @NotEmpty(message = "ManagingOrganization Sub Type  can't be Empty")
     @Valid
     private List<OrganizationSubTypeDTO> organizationSubTypes;
 
