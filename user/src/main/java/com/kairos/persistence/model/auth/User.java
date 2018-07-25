@@ -79,7 +79,7 @@ public class User extends UserBaseEntity {
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private UserPersonalizedSettings userPersonalizedSettings;
 
-    @Relationship(type= USER_LANGUAGE)
+    @Relationship(type= SELECTED_LANGUAGE)
     private SystemLanguage userLanguage;
 
     public int getOtp() {
