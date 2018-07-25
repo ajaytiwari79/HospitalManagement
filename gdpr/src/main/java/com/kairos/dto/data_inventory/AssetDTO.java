@@ -60,9 +60,6 @@ public class AssetDTO {
     @NotEmpty(message = "Asset Sub Types can't be empty")
     private List<BigInteger> assetSubTypes;
 
-    @NotNull
-    private Boolean isActive;
-
     private Integer dataRetentionPeriod;
 
     private Long minDataSubjectVolume;

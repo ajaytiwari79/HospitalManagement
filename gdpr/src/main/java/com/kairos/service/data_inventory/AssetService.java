@@ -4,6 +4,7 @@ import com.kairos.dto.data_inventory.AssetDTO;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import jdk.nashorn.internal.runtime.options.Option;
@@ -27,9 +28,9 @@ public class AssetService extends MongoBaseService {
     @Inject
     private AssetMongoRepository assetMongoRepository;
 
-
     @Inject
     private Javers javers;
+
     @Inject
     private ExceptionService exceptionService;
 
@@ -50,6 +51,9 @@ public class AssetService extends MongoBaseService {
         asset.setTechnicalSecurityMeasures(assetDto.getTechnicalSecurityMeasures());
         asset.setStorageFormats(assetDto.getStorageFormats());
         asset.setDataDisposal(assetDto.getDataDisposal());
+        asset.setDataRetentionPeriod(assetDto.getDataRetentionPeriod());
+        asset.setMaxDataSubjectVolume(assetDto.getMaxDataSubjectVolume());
+        asset.setMinDataSubjectVolume(assetDto.getMinDataSubjectVolume());
         assetMongoRepository.save(sequenceGenerator(asset));
         return asset;
     }
@@ -63,6 +67,23 @@ public class AssetService extends MongoBaseService {
         delete(asset);
         return true;
     }
+
+
+
+    public AssetResponseDTO getAssetWithMetadataById(Long countryId, Long organizationId, BigInteger id) {
+        AssetResponseDTO asset = assetMongoRepository.findAssetWithMetaDataById(countryId, organizationId, id);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
+        }
+        return asset;
+    }
+
+    public List<AssetResponseDTO> getAllAssetWithMetadata(Long countryId, Long organizationId) {
+        return assetMongoRepository.findAllAssetWithMetaData(countryId,organizationId);
+    }
+
+
+
 
 
     public Asset updateAssetData(Long countryId, Long organizationId, BigInteger assetId, AssetDTO assetDto) {
@@ -88,6 +109,9 @@ public class AssetService extends MongoBaseService {
         existAsset.setTechnicalSecurityMeasures(assetDto.getTechnicalSecurityMeasures());
         existAsset.setStorageFormats(assetDto.getStorageFormats());
         existAsset.setDataDisposal(assetDto.getDataDisposal());
+        existAsset.setDataRetentionPeriod(assetDto.getDataRetentionPeriod());
+        existAsset.setMaxDataSubjectVolume(assetDto.getMaxDataSubjectVolume());
+        existAsset.setMinDataSubjectVolume(assetDto.getMinDataSubjectVolume());
         assetMongoRepository.save(sequenceGenerator(existAsset));
         return existAsset;
     }
