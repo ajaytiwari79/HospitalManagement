@@ -5,7 +5,6 @@ import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.user.country.agreement.cta.cta_response.PhaseResponseDTO;
-import com.kairos.user.organization.OrganizationPhaseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -19,7 +18,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 
 /**
@@ -69,13 +67,6 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
         query.with(new Sort(Sort.Direction.ASC, "sequence"));
         query.limit(1);
         return mongoTemplate.find(query, PhaseDTO.class, "phases");
-
-    }
-
-    public List<OrganizationPhaseDTO> getPhasesGroupByOrganization() {
-        Aggregation aggregation = Aggregation.newAggregation(group("$organizationId").push("$$ROOT").as("phases"));
-        AggregationResults<OrganizationPhaseDTO> result = mongoTemplate.aggregate(aggregation, Phase.class, OrganizationPhaseDTO.class);
-        return result.getMappedResults();
 
     }
 

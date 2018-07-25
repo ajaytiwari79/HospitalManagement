@@ -11,6 +11,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.util.TimeInterval;
 
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +28,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;
     private List<Long> dayTypeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.NIGHT);
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
@@ -82,6 +84,15 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     public ShiftLengthWTATemplate() {
         wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
+    }
+
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
     }
 
     @Override

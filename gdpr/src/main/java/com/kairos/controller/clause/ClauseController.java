@@ -63,7 +63,7 @@ public class ClauseController {
         if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClause(countryId, organizationId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseById(countryId, organizationId, id));
 
 
     }

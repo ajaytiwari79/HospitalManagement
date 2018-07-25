@@ -5,7 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.persistance.model.master_data.processing_activity_masterdata.DataSource;
+import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.DataSourceMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
@@ -13,10 +13,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
+import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
+
 
 @Service
 public class DataSourceService extends MongoBaseService {
@@ -67,8 +69,8 @@ public class DataSourceService extends MongoBaseService {
 
                 newDataSources = dataSourceMongoRepository.saveAll(sequenceGenerator(newDataSources));
             }
-            result.put("existing", existing);
-            result.put("new", newDataSources);
+            result.put(EXISTING_DATA_LIST, existing);
+            result.put(NEW_DATA_LIST, newDataSources);
             return result;
         } else
             throw new InvalidRequestException("list cannot be empty");

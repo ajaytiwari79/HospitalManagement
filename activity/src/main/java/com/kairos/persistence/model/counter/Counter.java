@@ -32,6 +32,10 @@ public class Counter extends MongoBaseEntity {
         this.title = title;
     }
 
+    public Counter(CounterType restingHoursPerPresenceDay, List<FilterCriteria> criteriaList) {
+        super();
+    }
+
     public CounterType getType() {
         return type;
     }

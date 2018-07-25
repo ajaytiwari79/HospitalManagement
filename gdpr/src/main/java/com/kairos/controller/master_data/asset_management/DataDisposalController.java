@@ -1,6 +1,6 @@
 package com.kairos.controller.master_data.asset_management;
 
-import com.kairos.persistance.model.master_data.asset_management.DataDisposal;
+import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.service.master_data.asset_management.DataDisposalService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.validate_list.ValidateListOfRequestBody;

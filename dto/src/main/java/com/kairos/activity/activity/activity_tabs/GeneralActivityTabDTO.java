@@ -21,7 +21,6 @@ public class GeneralActivityTabDTO {
     private BigInteger categoryId;
     private Boolean colorPresent;
     private String backgroundColor;
-    private String textColor;
     private String description;
     private boolean isActive=true;
     private  String shortName;
@@ -29,14 +28,14 @@ public class GeneralActivityTabDTO {
     private String ultraShortName;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String originalIconName;
+    private String modifiedIconName;
+    private List<BigInteger> tags = new ArrayList<>();
 
-    public String getUltraShortName() {
-        return ultraShortName;
+    public GeneralActivityTabDTO() {
+        // dc
     }
 
-    public void setUltraShortName(String ultraShortName) {
-        this.ultraShortName = ultraShortName;
-    }
 
     @Override
     public String toString() {
@@ -49,7 +48,6 @@ public class GeneralActivityTabDTO {
                 ", categoryId=" + categoryId +
                 ", colorPresent=" + colorPresent +
                 ", backgroundColor='" + backgroundColor + '\'' +
-                ", textColor='" + textColor + '\'' +
                 ", description='" + description + '\'' +
                 ", isActive=" + isActive +
                 ", shortName='" + shortName + '\'' +
@@ -60,9 +58,14 @@ public class GeneralActivityTabDTO {
                 '}';
     }
 
-    private String originalIconName;
-    private String modifiedIconName;
-    private List<BigInteger> tags = new ArrayList<>();
+    public String getUltraShortName() {
+        return ultraShortName;
+    }
+
+    public void setUltraShortName(String ultraShortName) {
+        this.ultraShortName = ultraShortName;
+    }
+
     public List<BigInteger> getTags() {
         return tags;
     }
@@ -114,15 +117,7 @@ public class GeneralActivityTabDTO {
         this.backgroundColor = backgroundColor;
     }
 
-    public String getTextColor() {
-        return textColor;
-    }
-
-    public void setTextColor(String textColor) {
-        this.textColor = textColor;
-    }
-
-     public String getDescription() {
+    public String getDescription() {
         return description;
     }
 

@@ -7,6 +7,7 @@ import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.PartOfDay;
 import com.kairos.enums.WTATemplateType;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class ShiftLengthWTATemplateDTO extends WTABaseRuleTemplateDTO {
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     private MinMaxSetting minMaxSetting;
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
 
 
     public MinMaxSetting getMinMaxSetting() {
@@ -85,6 +87,15 @@ public class ShiftLengthWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     public ShiftLengthWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;;
+    }
+
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
     }
 
     public ShiftLengthWTATemplateDTO(String name, boolean minimum, String description, long timeLimit, boolean checkAgainstTimeRules) {

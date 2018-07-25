@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by pavan on 8/2/18.
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityWithCompositeDTO {
 
@@ -23,7 +23,7 @@ public class ActivityWithCompositeDTO {
     private String name;
     private GeneralActivityTab generalActivityTab;
     private TimeCalculationActivityDTO timeCalculationActivityTab;
-    private List<CompositeActivityDTO> compositeActivities;
+    private List<CompositeActivityDTO> compositeActivities= new ArrayList<>();
     private List<Long> expertises= new ArrayList<>();
     private List<Long> employmentTypes= new ArrayList<>();
     private RulesActivityTab rulesActivityTab;
@@ -68,6 +68,7 @@ public class ActivityWithCompositeDTO {
         this.compositeActivities = compositeActivities;
     }
 
+
     public GeneralActivityTab getGeneralActivityTab() {
         return generalActivityTab;
     }
@@ -107,4 +108,5 @@ public class ActivityWithCompositeDTO {
     public void setSkillActivityTab(SkillActivityTab skillActivityTab) {
         this.skillActivityTab = skillActivityTab;
     }
+
 }

@@ -20,7 +20,7 @@ public class LocaleServiceImpl implements LocaleService{
     @Autowired
     private MessageSource messageSource;
 
-    /*@Override
+    @Override
     public String getMessage(String code) {
         Locale locale = LocaleContextHolder.getLocale();
         return this.messageSource.getMessage(code, null, locale);
@@ -29,8 +29,8 @@ public class LocaleServiceImpl implements LocaleService{
     public String getMessage(String code, Object[] args) {
         Locale locale = LocaleContextHolder.getLocale();
         return this.messageSource.getMessage(code, args, locale);
-    }*/
-    @Override
+    }
+    /*@Override
     public String getMessage(String code) {
         Locale locale = new Locale(Optional.ofNullable(UserContext.getUserDetails().getLanguage()).orElse(""));
         return this.messageSource.getMessage(code, null, locale);
@@ -40,6 +40,6 @@ public class LocaleServiceImpl implements LocaleService{
     public String getMessage(String code, Object[] args) {
         Locale locale = new Locale(Optional.ofNullable(UserContext.getUserDetails().getLanguage()).orElse(""));
         return this.messageSource.getMessage(code, args, locale);
-    }
+    }*/
 
 }

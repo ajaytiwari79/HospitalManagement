@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class AccountTypeService extends MongoBaseService {
@@ -40,7 +37,7 @@ public class AccountTypeService extends MongoBaseService {
         AccountType newAccount = new AccountType();
         newAccount.setName(accountType.getName());
         newAccount.setCountryId(countryId);
-        return accountTypeRepository.save( sequenceGenerator(newAccount));
+        return accountTypeRepository.save(sequenceGenerator(newAccount));
 
     }
 
@@ -91,7 +88,7 @@ public class AccountTypeService extends MongoBaseService {
         }
         exists = accountTypeRepository.findByIdAndNonDeleted(countryId, id);
         exists.setName(accountType.getName());
-        return  accountTypeRepository.save(sequenceGenerator(exists));
+        return accountTypeRepository.save(sequenceGenerator(exists));
 
     }
 

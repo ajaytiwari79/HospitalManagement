@@ -4,9 +4,11 @@ import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
+import com.kairos.response.dto.clause.ClauseResponseDTO;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public interface CustomClauseRepository {
@@ -14,8 +16,14 @@ public interface CustomClauseRepository {
 
     Clause findByTitle(Long countryId,Long organizationId,String title);
 
-    List<Clause> getClauseDataWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
+    List<ClauseResponseDTO> getClauseDataWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
 
-    Criteria buildQuery(FilterSelection filterSelection, FilterType filterType, Query query);
+    Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType);
+
+    List<Clause> findClausesByTitle(Long countryId,Long orgId,List<String> clauseTitles);
+
+    List<ClauseResponseDTO> findAllClauseWithTemplateType(Long countryId,Long organizationId);
+
+    ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, Long organizationId, BigInteger id);
 
 }

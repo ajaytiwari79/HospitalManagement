@@ -14,7 +14,6 @@ import java.util.Map;
 
 public class WTAVersionDTO {
 
-
     private Date startDate;
     private Date endDate;
     // TODO fix need to make constant fields for date

@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.country;
 
 
-import com.kairos.persistence.model.enums.ReasonCodeType;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;

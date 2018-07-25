@@ -1382,7 +1382,7 @@ public class TaskService extends MongoBaseService {
      * This method is use in citizen controller
      */
 
-    public void createTaskFromKMD(Long staffId, KMDShift shift, Long unitId) {
+    public void createTaskFromKMD(Long staffId, ImportShiftDTO shift, Long unitId) {
         try {
             TaskType taskType = taskTypeService.findByExternalId("6123");
             Map<String, Object> taskMetaData = new HashMap<>();
@@ -1439,7 +1439,7 @@ public class TaskService extends MongoBaseService {
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject objects = jsonArray.getJSONObject(i);
-            KMDTask kmdTask = JsonUtils.toObject(objects.toString(), KMDTask.class);
+            ImportTaskDTO kmdTask = JsonUtils.toObject(objects.toString(), ImportTaskDTO.class);
             Integer grantCount = 0;
             TaskDemand taskDemand = null;
             Client citizen = null;
@@ -1485,7 +1485,7 @@ public class TaskService extends MongoBaseService {
     }
 
 
-    public Task createKMDPlannedTask(KMDTask kmdTask, TaskType taskType, TaskDemand taskDemand,
+    public Task createKMDPlannedTask(ImportTaskDTO kmdTask, TaskType taskType, TaskDemand taskDemand,
                                      TaskAddress taskAddress, List<Long> staffIds) {
         //Single task
 
@@ -1520,7 +1520,7 @@ public class TaskService extends MongoBaseService {
 
     }
 
-    private TaskAddress createTaskAddress(KMDTask kmdTask) {
+    private TaskAddress createTaskAddress(ImportTaskDTO kmdTask) {
         TaskAddress taskAddress = new TaskAddress();
         CurrentAddress currentAddress = kmdTask.getPatientResourceList().get(0).getCurrentAddress();
         String addressLine1 = currentAddress.getAddressLine1();

@@ -7,6 +7,10 @@ import com.kairos.enums.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
@@ -16,6 +20,9 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     private int restingTime;
     private PartOfDay sequenceShiftFrom;
     private PartOfDay sequenceShiftTo;
+
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
 
    /* public int getNightShiftSequence() {
         return sequence;
@@ -68,6 +75,22 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
         wtaTemplateType=WTATemplateType.NO_OF_SEQUENCE_SHIFT;
     }
 
+    public List<BigInteger> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
         return "";
@@ -77,6 +100,7 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
         this.name = name;
         this.disabled = disabled;
         this.description = description;
+        this.wtaTemplateType = WTATemplateType.NO_OF_SEQUENCE_SHIFT;
         //this.sequence=sequence;
         this.sequenceShiftTo = sequenceShiftTo;
         this.sequenceShiftFrom = sequenceShiftFrom;
