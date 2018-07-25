@@ -89,7 +89,7 @@ public class MasterAssetService extends MongoBaseService {
         if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         }
-        exists = masterAssetMongoRepository.findByid(id);
+        exists = masterAssetMongoRepository.findByIdANdNonDeleted(countryId,organizationId,id);
         if (!Optional.of(exists).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "master.asset", id);
         }
