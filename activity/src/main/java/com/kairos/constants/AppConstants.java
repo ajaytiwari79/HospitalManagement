@@ -256,7 +256,7 @@ public class AppConstants {
     public static final String NO_CONFLICTS = "NO CONFLICTS";
     public static final String BREAK = "BREAK";
     public static final String SHIFT = "SHIFT";
-    public static final String OPENSHIFT_EMAIL_BODY = "Hi, You have been picked for openshift.";
+    public static final String OPENSHIFT_EMAIL_BODY = "Hi, You have been picked for openshift. fibonacii order- %s";
     public static final String OPENSHIFT_SUBJECT = "Open Shift";
     public static final String NOTIFY="NOTIFY";
     public static final String ASSIGN="ASSIGN";

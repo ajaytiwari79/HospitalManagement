@@ -104,22 +104,6 @@ public class ShiftTemplateService extends MongoBaseService {
             activityIds.add(shift.getActivityId());
             activityIds.addAll(shift.getSubShifts().stream().map(s->s.getActivityId()).collect(Collectors.toSet()));
         });
-
-
-
-
-        //==============================   OLD ==============================
-
-//        Map<BigInteger, IndividualShiftTemplateDTO> individualShiftTemplateDTOMap = individualShiftTemplateDTOS.stream().collect(Collectors.toMap(IndividualShiftTemplateDTO::getId, Function.identity()));
-//        shiftTemplateDTOS.forEach(shiftTemplateDTO -> {
-//            shiftTemplateDTO.getIndividualShiftTemplateIds().forEach(individualShiftTemplateId->{
-//                shiftTemplateDTO.getShiftList().add(individualShiftTemplateDTOMap.get(individualShiftTemplateId));
-//            });
-//        });
-
-
-        //===============================  NEW ==================================
-
         Map<BigInteger,String> timeTypeMap = activityMongoRepository.findAllTimeTypeByActivityIds(activityIds).stream().collect(Collectors.toMap(k->k.getActivityId(),v->v.getTimeType()));
         Map<BigInteger, IndividualShiftTemplateDTO> individualShiftTemplateDTOMap = individualShiftTemplateDTOS.stream().collect(Collectors.toMap(IndividualShiftTemplateDTO::getId, Function.identity()));
         shiftTemplateDTOS.forEach(shiftTemplateDTO -> {
