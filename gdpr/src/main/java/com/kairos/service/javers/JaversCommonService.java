@@ -1,20 +1,14 @@
 package com.kairos.service.javers;
 
 
-import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
-import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
 import com.kairos.persistance.repository.master_data.asset_management.*;
 import com.kairos.service.exception.ExceptionService;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
-import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -58,7 +52,7 @@ public class JaversCommonService {
 
     public List<Map<String, Object>> getHistoryMap(List<CdoSnapshot> auditHistoryList, BigInteger ownerId, Class clazz) throws ClassNotFoundException {
         List<Map<String, Object>> auditHistoryListData = new ArrayList<>();
-        int currPosition = 0;
+        int currPosition = auditHistoryList.size();
         for (CdoSnapshot snapShot : auditHistoryList) {
             Map<String, Object> historyMap = new HashMap<>();
             historyMap.put("commitMetaData", snapShot.getCommitMetadata());
@@ -66,12 +60,12 @@ public class JaversCommonService {
             historyMap.put("values", getFieldsValue(snapShot, snapShot.getChanged(), ownerId, clazz));
             historyMap.put("oldValues", getOldFieldsValues(snapShot.getChanged(), auditHistoryList, currPosition, (int) snapShot.getVersion(), ownerId, clazz));
             historyMap.put("version", (int) snapShot.getVersion());
-            if (currPosition == 0) {
+            if (currPosition==auditHistoryList.size()) {
                 historyMap.put("isCreated", true);
             } else
                 historyMap.put("isCreated", false);
             auditHistoryListData.add(historyMap);
-            currPosition++;
+            currPosition--;
         }
         Collections.reverse(auditHistoryListData);
         return auditHistoryListData;
@@ -81,11 +75,11 @@ public class JaversCommonService {
         List<Object> oldValues = new ArrayList<Object>();
         for (String field : fields) {
             if (version >= 2) {
-                if (auditHistoryList.get(index - 1).getState().getPropertyValue(field) instanceof InstanceId) {
+                if (auditHistoryList.get(index-1).getState().getPropertyValue(field) != null && auditHistoryList.get(index - 1).getState().getPropertyValue(field) instanceof ValueObjectId) {
                     ValueObjectId valueObject = (ValueObjectId) auditHistoryList.get(index - 1).getState().getPropertyValue(field);
                     List<CdoSnapshot> valueObjectCdoSnapshots = javers.findSnapshots(QueryBuilder.byValueObjectId(ownerId, ownerClass, valueObject.getFragment()).build());
                     addChangedOrAuditvalueObject(valueObjectCdoSnapshots.get(0));
-                } else if ( auditHistoryList.get(index - 1).getState().getPropertyValue(field) instanceof ArrayList) {
+                } else if ( auditHistoryList.get(index-1).getState().getPropertyValue(field) != null && auditHistoryList.get(index - 1).getState().getPropertyValue(field) instanceof ArrayList) {
                     ArrayList valueObjectList = (ArrayList) auditHistoryList.get(index - 1).getState().getPropertyValue(field);
                     if (valueObjectList.get(0) instanceof ValueObjectId) {
                         ValueObjectId valueObject = (ValueObjectId) valueObjectList.get(0);
@@ -106,12 +100,12 @@ public class JaversCommonService {
     private List<Object> getFieldsValue(CdoSnapshot historyMap, List<String> fields, BigInteger ownerId, Class ownerClass) {
         List<Object> fieldValues = new ArrayList<Object>();
         for (String field : fields) {
-            if ( historyMap.getState().getPropertyValue(field) instanceof ValueObjectId) {
+            if ( historyMap.getState().getPropertyValue(field) != null  && historyMap.getState().getPropertyValue(field) instanceof ValueObjectId) {
                 ValueObjectId valueObject = (ValueObjectId) historyMap.getState().getPropertyValue(field);
                 List<CdoSnapshot> valueObjectCdoSnapshots = javers.findSnapshots(QueryBuilder.byValueObjectId(ownerId, ownerClass, valueObject.getFragment()).build());
                 addChangedOrAuditvalueObject(valueObjectCdoSnapshots.get(0));
 
-            } else if (historyMap.getState().getPropertyValue(field) instanceof ArrayList) {
+            } else if (historyMap.getState().getPropertyValue(field) != null  && historyMap.getState().getPropertyValue(field) instanceof ArrayList) {
                 ArrayList valueObjectList = (ArrayList) historyMap.getState().getPropertyValue(field);
                 if (valueObjectList.get(0) instanceof ValueObjectId) {
                     ValueObjectId valueObject = (ValueObjectId) valueObjectList.get(0);
