@@ -69,7 +69,12 @@ public class AssetService extends MongoBaseService {
     }
 
 
-
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param id
+     * @return method return Asset with Meta Data (storgae format ,data Disposal, hosting type and etc)
+     */
     public AssetResponseDTO getAssetWithMetadataById(Long countryId, Long organizationId, BigInteger id) {
         AssetResponseDTO asset = assetMongoRepository.findAssetWithMetaDataById(countryId, organizationId, id);
         if (!Optional.ofNullable(asset).isPresent()) {
@@ -78,14 +83,25 @@ public class AssetService extends MongoBaseService {
         return asset;
     }
 
+
+    /**
+     * @param countryId
+     * @param organizationId
+     * @return return list Of Asset With Meta Data
+     */
     public List<AssetResponseDTO> getAllAssetWithMetadata(Long countryId, Long organizationId) {
         return assetMongoRepository.findAllAssetWithMetaData(countryId,organizationId);
     }
 
 
-
-
-
+    /**
+     *
+     * @param countryId
+     * @param organizationId
+     * @param assetId - asset id
+     * @param assetDto - asset dto contain meta data about asset
+     * @return - updated Asset
+     */
     public Asset updateAssetData(Long countryId, Long organizationId, BigInteger assetId, AssetDTO assetDto) {
 
         Asset existAsset = assetMongoRepository.findByName(countryId, organizationId, assetDto.getName());
