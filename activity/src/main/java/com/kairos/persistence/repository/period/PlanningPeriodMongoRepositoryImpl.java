@@ -33,7 +33,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     public PlanningPeriod getPlanningPeriodContainsDate(Long unitId, LocalDate localDateLiesInPeriod) {
         Date dateLiesInPeriod = DateUtils.asDate(localDateLiesInPeriod);
-        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).
+        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).
                 and("startDate").lte(dateLiesInPeriod).and("endDate").gte(dateLiesInPeriod));
         return mongoTemplate.findOne(query, PlanningPeriod.class);
     }
@@ -41,7 +41,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     public UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
         Date startDate = DateUtils.asDate(startLocalDate);
         Date endDate = DateUtils.asDate(endLocalDate);
-        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).
+        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).
                 and("startDate").gte(startDate).and("endDate").lte(endDate));
         Update update = new Update();
         update.set("deleted", true);
@@ -50,14 +50,14 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     }
 
     public PlanningPeriod getFirstPlanningPeriod(Long unitId) {
-        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false));
+        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true));
         query.with(Sort.by(Sort.Direction.ASC, "startDate"));
         query.limit(1);
         return mongoTemplate.findOne(query, PlanningPeriod.class);
     }
 
     public PlanningPeriod getLastPlanningPeriod(Long unitId) {
-        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false));
+        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true));
         query.with(Sort.by(Sort.Direction.DESC, "startDate"));
         query.limit(1);
         return mongoTemplate.findOne(query, PlanningPeriod.class);
@@ -144,7 +144,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         Date startDate = DateUtils.asDate(startLocalDate);
         Date endDate = DateUtils.asDate(endLocalDate);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
+                match(Criteria.where("deleted").is(false).and("active").is(true).and("unitId").is(unitId)
                         .orOperator(
                                 Criteria.where("startDate").gte(startDate).lte(endDate),
                                 Criteria.where("endDate").gte(startDate).lte(endDate)
@@ -168,7 +168,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         Date startDate = DateUtils.asDate(startLocalDate);
         Date endDate = DateUtils.asDate(endLocalDate);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
+                match(Criteria.where("deleted").is(false).and("active").is(true).and("unitId").is(unitId)
                         .orOperator(
                                 Criteria.where("startDate").gte(startDate).lte(endDate),
                                 Criteria.where("endDate").gte(startDate).lte(endDate),
