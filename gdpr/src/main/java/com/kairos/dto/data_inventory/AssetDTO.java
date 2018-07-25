@@ -4,7 +4,7 @@ package com.kairos.dto.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.persistance.model.data_inventory.asset.Organization;
+import com.kairos.persistance.model.data_inventory.asset.ManagingOrganization;
 import com.kairos.persistance.model.data_inventory.asset.Staff;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
@@ -33,7 +33,7 @@ public class AssetDTO {
 
     @NotNull(message = "Managing department can't be empty")
     @Valid
-    private Organization managingDepartment;
+    private ManagingOrganization managingDepartment;
 
     @NotNull(message = "Asset Owner can't be Empty")
     @Valid
@@ -128,9 +128,9 @@ public class AssetDTO {
 
     public void setHostingLocation(String hostingLocation) { this.hostingLocation = hostingLocation; }
 
-    public Organization getManagingDepartment() { return managingDepartment; }
+    public ManagingOrganization getManagingDepartment() { return managingDepartment; }
 
-    public void setManagingDepartment(Organization managingDepartment) { this.managingDepartment = managingDepartment; }
+    public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
 
     public Staff getAssetOwner() { return assetOwner; }
 

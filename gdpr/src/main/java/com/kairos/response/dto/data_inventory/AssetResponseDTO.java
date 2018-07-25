@@ -2,9 +2,8 @@ package com.kairos.response.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.ProcessingActivityDTO;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.persistance.model.data_inventory.asset.Organization;
+import com.kairos.persistance.model.data_inventory.asset.ManagingOrganization;
 import com.kairos.persistance.model.data_inventory.asset.Staff;
 import com.kairos.response.dto.common.*;
 
@@ -23,7 +22,7 @@ public class AssetResponseDTO {
 
     private String hostingLocation;
 
-    private Organization managingDepartment;
+    private ManagingOrganization managingDepartment;
 
     private Staff assetOwner;
 
@@ -70,9 +69,9 @@ public class AssetResponseDTO {
 
     public void setHostingLocation(String hostingLocation) { this.hostingLocation = hostingLocation; }
 
-    public Organization getManagingDepartment() { return managingDepartment; }
+    public ManagingOrganization getManagingDepartment() { return managingDepartment; }
 
-    public void setManagingDepartment(Organization managingDepartment) { this.managingDepartment = managingDepartment; }
+    public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
 
     public Staff getAssetOwner() { return assetOwner; }
 
