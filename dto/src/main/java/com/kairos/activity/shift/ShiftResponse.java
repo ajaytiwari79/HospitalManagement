@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
+
 public class ShiftResponse {
     private BigInteger shiftId;
     private String shiftName;

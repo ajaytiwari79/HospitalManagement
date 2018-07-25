@@ -1,2 +1,2 @@
 db.shifts.updateMany({},{$unset:{"shiftState":1}});
-db.shifts.updateMany({},{$set:{"shiftStates":["PUBLISHED"]}});
+db.shifts.updateMany({},{$set:{"status":["PUBLISHED"]}});

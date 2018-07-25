@@ -1,6 +1,6 @@
 package com.kairos.service.phase;
 
-import com.kairos.enums.shift.ShiftState;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.user.organization.OrganizationDTO;
@@ -23,7 +23,6 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -270,7 +269,7 @@ public class PhaseService extends MongoBaseService {
             phase.setDurationType(phaseDTO.getDurationType());
             phase.setDuration(phaseDTO.getDuration());
         }
-        phase.setStatus(ShiftState.getListByValue(phaseDTO.getStatus()));
+        phase.setStatus(ShiftStatus.getListByValue(phaseDTO.getStatus()));
         save(phase);
         return phase;
     }
@@ -308,7 +307,7 @@ public class PhaseService extends MongoBaseService {
     }
 
     public List<String> getAllApplicablePhaseStatus() {
-        return Stream.of(ShiftState.values())
+        return Stream.of(ShiftStatus.values())
                 .map(Enum::name)
                 .collect(Collectors.toList());
     }
@@ -319,10 +318,10 @@ public class PhaseService extends MongoBaseService {
     }
 
 
-    public Map<LocalDate,List<ShiftState>> getApplicableStatusesInShift(Long unitId, Set<LocalDate> dates) {
-        Map<LocalDate,List<ShiftState>> localDatePhaseStatusMap=new HashMap<>();
+    public Map<LocalDate,List<ShiftStatus>> getApplicableStatusesInShift(Long unitId, Set<LocalDate> dates) {
+        Map<LocalDate,List<ShiftStatus>> localDatePhaseStatusMap=new HashMap<>();
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
-        Map<String,List<ShiftState>> phaseMap=phases.stream().collect(Collectors.toMap(k->k.getName(), k->k.getStatus()));
+        Map<String,List<ShiftStatus>> phaseMap=phases.stream().collect(Collectors.toMap(k->k.getName(), k->k.getStatus()));
         LocalDate currentDate=LocalDate.now();
         List<Phase> planningPhases=phases.stream().filter(phase -> phase.getPhaseType().equals(PhaseType.PLANNING) && phase.getDuration()>0).collect(Collectors.toList());
         Collections.sort(planningPhases, (Phase p1, Phase p2) -> {
@@ -358,7 +357,7 @@ public class PhaseService extends MongoBaseService {
 
     //==============================Method for adding Planning Phases===================================================
 
-    private void addPlanningPhase(List<Phase> phases, LocalDate proposedDate,Map<LocalDate,List<ShiftState>> localDatePhaseStatusMap,LocalDate upcomingMondayDate) {
+    private void addPlanningPhase(List<Phase> phases, LocalDate proposedDate, Map<LocalDate,List<ShiftStatus>> localDatePhaseStatusMap, LocalDate upcomingMondayDate) {
         Phase phase = null;
 
         WeekFields weekFields = WeekFields.of(Locale.getDefault());

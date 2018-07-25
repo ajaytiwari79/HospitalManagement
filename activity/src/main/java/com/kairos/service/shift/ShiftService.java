@@ -9,7 +9,7 @@ import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.shift.BreakPaymentSetting;
-import com.kairos.enums.shift.ShiftState;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.Shift;
@@ -450,8 +450,8 @@ public class ShiftService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getId());
         }
 
-        if (shift.getShiftStates().contains(ShiftState.FIXED) || shift.getShiftStates().contains(ShiftState.PUBLISHED) || shift.getShiftStates().contains(ShiftState.LOCKED)) {
-            exceptionService.actionNotPermittedException("message.shift.state.update", shift.getShiftStates());
+        if (shift.getStatus().contains(ShiftStatus.FIXED) || shift.getStatus().contains(ShiftStatus.PUBLISHED) || shift.getStatus().contains(ShiftStatus.LOCKED)) {
+            exceptionService.actionNotPermittedException("message.shift.state.update", shift.getStatus());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
         WTAQueryResultDTO wtaResponseDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
@@ -540,8 +540,8 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(shift).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftId);
         }
-        if (!shift.getShiftStates().contains(ShiftState.UNPUBLISHED)) {
-            exceptionService.actionNotPermittedException("message.shift.delete", shift.getShiftStates());
+        if (!shift.getStatus().contains(ShiftStatus.UNPUBLISHED)) {
+            exceptionService.actionNotPermittedException("message.shift.delete", shift.getStatus());
         }
         Activity activity = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId());
@@ -583,11 +583,11 @@ public class ShiftService extends MongoBaseService {
             throw new ActionNotPermittedException("WTA is Expired for unit employment.");
         }
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
-        RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(shift, wtaQueryResultDTO, staffAdditionalInfoDTO);
+        //RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(shift, wtaQueryResultDTO, staffAdditionalInfoDTO);
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills());
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
-        Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
+        //Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
         Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, shift.getActivity(), staffAdditionalInfoDTO);
         Specification<ShiftWithActivityDTO> shiftTimeLessThan = new ShiftStartTimeLessThan(staffAdditionalInfoDTO.getUnitTimeZone(), shift.getStartDate(), shift.getActivity().getRulesActivityTab().getPlannedTimeInAdvance());
 
@@ -601,7 +601,7 @@ public class ShiftService extends MongoBaseService {
         Specification<ShiftWithActivityDTO> activitySpecification = activityEmploymentTypeSpecification
                 .and(activityExpertiseSpecification)
                 .and(activitySkillSpec)
-                .and(wtaRulesSpecification)
+               // .and(wtaRulesSpecification)
                 .and(staffEmploymentSpecification)
                 .and(shiftTimeLessThan);
 
@@ -986,17 +986,17 @@ public class ShiftService extends MongoBaseService {
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftPublishDTO.getShiftIds());
         //todo check for empty shift list
         Set<LocalDate> dates=shifts.stream().map(s->DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
-        Map<LocalDate,List<ShiftState>> phaseListByDate=phaseService.getApplicableStatusesInShift(unitId,dates);
+        Map<LocalDate,List<ShiftStatus>> phaseListByDate=phaseService.getApplicableStatusesInShift(unitId,dates);
         for(Shift shift:shifts){
-            List<ShiftState> phaseStatuses=phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
-            if(phaseStatuses.containsAll(shiftPublishDTO.getShiftStates())){
-                shift.setShiftStates(shiftPublishDTO.getShiftStates());
+            List<ShiftStatus> phaseStatuses=phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
+            if(phaseStatuses.containsAll(shiftPublishDTO.getStatus())){
+                shift.setStatus(shiftPublishDTO.getStatus());
                 success.add(new ShiftResponse(shift.getId(),shift.getName(),Arrays.asList("Status added successfully"),true));
             }
             else {
                 error.add(new ShiftResponse(shift.getId(),shift.getName(),Arrays.asList("Status can't be added."+
                         "Available Status to be applied :"+phaseStatuses+
-                        "Statuses send to be applied :"+shiftPublishDTO.getShiftStates()),false));
+                        "Statuses send to be applied :"+shiftPublishDTO.getStatus()),false));
             }
         }
         save(shifts);
@@ -1023,10 +1023,10 @@ public class ShiftService extends MongoBaseService {
             openShiftResponseDTOS.add(openShiftResponseDTO);
         });
         List<AccessGroupRole> roles = new ArrayList<>();
-        if (userAccessRoleDTO.getManagement()) {
+        if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getManagement()) {
             roles.add(AccessGroupRole.MANAGEMENT);
         }
-        if (userAccessRoleDTO.getStaff()) {
+        if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
             roles.add(AccessGroupRole.STAFF);
         }
         StaffAccessRoleDTO staffAccessRoleDTO = new StaffAccessRoleDTO(userAccessRoleDTO.getStaffId(), roles);
@@ -1119,7 +1119,7 @@ public class ShiftService extends MongoBaseService {
 
             Shift copiedShift = new Shift(sourceShift.getName(), DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(sourceShift.getStartDate())), DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(sourceShift.getEndDate())),
                     sourceShift.getRemarks(), sourceShift.getActivityId(), staffUnitPosition.getStaff().getId(), sourceShift.getPhase(), sourceShift.getUnitId(),
-                    sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.isMainShift(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getShiftStates(), sourceShift.getParentOpenShiftId(), sourceShift.getAllowedBreakDurationInMinute(), sourceShift.getId());
+                    sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.isMainShift(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getStatus(), sourceShift.getParentOpenShiftId(), sourceShift.getAllowedBreakDurationInMinute(), sourceShift.getId());
             if (activity.getRulesActivityTab().isBreakAllowed()) {
 
                 List<ShiftQueryResult> shiftQueryResults = addBreakInShifts(copiedShift, breakActivity, breakSettings, shiftDurationInMinute);
@@ -1152,7 +1152,7 @@ public class ShiftService extends MongoBaseService {
     private Shift getShiftObject(Shift shift, String name, BigInteger activityId, Date startDate, Date endDate, Long allowedBreakDurationInMinute) {
         Shift childShift = new Shift(null, name, startDate, endDate, shift.getBid(), shift.getpId(), shift.getBonusTimeBank()
                 , shift.getAmount(), shift.getProbability(), shift.getAccumulatedTimeBankInMinutes(), shift.getRemarks(), activityId, shift.getStaffId(), shift.getUnitId(), shift.getUnitPositionId());
-        childShift.setShiftStates(Arrays.asList(ShiftState.UNPUBLISHED));
+        childShift.setStatus(Arrays.asList(ShiftStatus.UNPUBLISHED));
         childShift.setMainShift(false);
         childShift.setAllowedBreakDurationInMinute(allowedBreakDurationInMinute);
         return childShift;
@@ -1215,7 +1215,7 @@ public class ShiftService extends MongoBaseService {
                 shiftDTO.getProbability(), shiftDTO.getAccumulatedTimeBankInMinutes(), shiftDTO.getRemarks(), shiftDTO.getActivityId(), shiftDTO.getStaffId(), shiftDTO.getUnitId(), shiftDTO.getUnitPositionId());
         shift.setDurationMinutes(shiftDTO.getDurationMinutes());
         shift.setScheduledMinutes(shiftDTO.getScheduledMinutes());
-        shift.setShiftStates(Arrays.asList(ShiftState.UNPUBLISHED));
+        shift.setStatus(Arrays.asList(ShiftStatus.UNPUBLISHED));
         shift.setAllowedBreakDurationInMinute(shiftDTO.getAllowedBreakDurationInMinute());
         return shift;
     }
@@ -1226,7 +1226,7 @@ public class ShiftService extends MongoBaseService {
                 shiftDTO.getProbability(), shiftDTO.getAccumulatedTimeBankInMinutes(), shiftDTO.getRemarks(), shiftDTO.getActivityId(), shiftDTO.getStaffId(), shiftDTO.getUnitPositionId(), shiftDTO.getUnitId(), activity);
         shiftWithActivityDTO.setDurationMinutes(shiftDTO.getDurationMinutes());
         shiftWithActivityDTO.setScheduledMinutes(shiftDTO.getScheduledMinutes());
-        shiftWithActivityDTO.setShiftState(ShiftState.UNPUBLISHED);
+        shiftWithActivityDTO.setStatus(Arrays.asList(ShiftStatus.UNPUBLISHED));
         return shiftWithActivityDTO;
     }
 

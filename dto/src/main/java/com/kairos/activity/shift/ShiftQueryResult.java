@@ -1,7 +1,7 @@
 package com.kairos.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.shift.ShiftState;
+import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -41,7 +41,7 @@ public class ShiftQueryResult {
     private Long unitPositionId;
     private int scheduledMinutes;
     private int durationMinutes;
-    private List<ShiftState> shiftStates;
+    private List<ShiftStatus> status;
     private Long allowedBreakDurationInMinute;
     private Long expertiseId;
     private String timeType;
@@ -234,12 +234,12 @@ public class ShiftQueryResult {
         this.unitPositionId = unitPositionId;
     }
 
-    public List<ShiftState> getShiftStates() {
-        return shiftStates;
+    public List<ShiftStatus> getStatus() {
+        return status;
     }
 
-    public void setShiftStates(List<ShiftState> shiftStates) {
-        this.shiftStates = shiftStates;
+    public void setStatus(List<ShiftStatus> status) {
+        this.status = status;
     }
 
     public Long getAllowedBreakDurationInMinute() {

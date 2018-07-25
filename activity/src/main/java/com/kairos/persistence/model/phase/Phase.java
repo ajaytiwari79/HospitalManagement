@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.shift.ShiftState;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseType;
@@ -13,8 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Created by vipul on 25/9/17.
@@ -33,7 +31,7 @@ public class Phase extends MongoBaseEntity {
     private Long countryId;
     private BigInteger parentCountryPhaseId;
     private PhaseType phaseType;
-    private List<ShiftState> status;
+    private List<ShiftStatus> status;
 
     public Phase() {
         //default constructor
@@ -111,11 +109,11 @@ public class Phase extends MongoBaseEntity {
         this.phaseType = phaseType;
     }
 
-    public List<ShiftState> getStatus() {
+    public List<ShiftStatus> getStatus() {
         return status;
     }
 
-    public void setStatus(List<ShiftState> status) {
+    public void setStatus(List<ShiftStatus> status) {
         this.status = status;
     }
 
@@ -129,7 +127,7 @@ public class Phase extends MongoBaseEntity {
         this.organizationId = organizationId;
         this.parentCountryPhaseId = parentCountryPhaseId;
         this.phaseType = phaseType;
-        this.status = ShiftState.getListByValue(status);
+        this.status = ShiftStatus.getListByValue(status);
     }
 
     @Override

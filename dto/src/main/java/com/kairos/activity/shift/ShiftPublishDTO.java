@@ -1,18 +1,16 @@
 package com.kairos.activity.shift;
 
-import com.kairos.enums.shift.ShiftState;
+import com.kairos.enums.shift.ShiftStatus;
 
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by vipul on 9/5/18.
  */
 public class ShiftPublishDTO {
     List<BigInteger> shiftIds;
-    List<ShiftState> shiftStates;
+    List<ShiftStatus> status;
 
 
     public ShiftPublishDTO() {
@@ -29,11 +27,11 @@ public class ShiftPublishDTO {
         this.shiftIds = shiftIds;
     }
 
-    public List<ShiftState> getShiftStates() {
-        return shiftStates;
+    public List<ShiftStatus> getStatus() {
+        return status;
     }
 
-    public void setShiftStates(List<ShiftState> shiftStates) {
-        this.shiftStates = shiftStates;
+    public void setStatus(List<ShiftStatus> status) {
+        this.status = status;
     }
 }
