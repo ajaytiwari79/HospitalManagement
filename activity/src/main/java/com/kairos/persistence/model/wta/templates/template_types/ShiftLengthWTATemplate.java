@@ -28,7 +28,6 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;
     private List<Long> dayTypeIds = new ArrayList<>();
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.NIGHT);
     private float recommendedValue;
@@ -87,13 +86,6 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 
-    public List<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;

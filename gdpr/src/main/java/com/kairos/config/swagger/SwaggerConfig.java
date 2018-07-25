@@ -5,6 +5,7 @@ import com.google.common.base.Predicate;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -26,6 +27,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @EnableSwagger2
 @Configuration
 @EnableAutoConfiguration
+@Profile({"local","development","qa","production"})
 public class SwaggerConfig {
 
     @Bean
