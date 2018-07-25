@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -43,10 +44,10 @@ public class RuleTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.getRuleTemplate(countryId));
     }
 
-    @RequestMapping(value = COUNTRY_URL + "/rule_templates/{templateType}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @RequestBody WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO) {
+    @RequestMapping(value = COUNTRY_URL + "/rule_templates/{ruleTemplateId}", method = RequestMethod.PUT)
+    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable BigInteger ruleTemplateId, @RequestBody WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO) {
         // WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO = WTABuilderService.copyRuleTemplateMapToDTO(template);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.updateRuleTemplate(countryId, wtaBaseRuleTemplateDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.updateRuleTemplate(countryId, ruleTemplateId,wtaBaseRuleTemplateDTO));
     }
 
 

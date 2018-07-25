@@ -31,7 +31,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     Activity findByNameExcludingCurrentInCountry(String name, BigInteger activityId, Long countryId);
 
     @CountQuery("{_id:{$in:?0}, deleted:false}")
-    Integer findAllActivityByIds(Set<BigInteger> activityIds);
+    Integer countActivityByIds(Set<BigInteger> activityIds);
 
     @Query("{'deleted' : false,'_id':?0}")
     Activity findActivityByIdAndEnabled(BigInteger id);

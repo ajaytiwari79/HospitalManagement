@@ -39,7 +39,6 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     Document projectionOperation = Document.parse(CustomAggregationQuery.processingActivityWithSubProcessingNonDeletedData());
 
 
-
     @Override
     public MasterProcessingActivity findByName(Long countryId, Long organizationId, String name) {
         Query query = new Query();
@@ -52,7 +51,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     }
 
     @Override
-    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId,Long organizationId,BigInteger id) {
+    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId, Long organizationId, BigInteger id) {
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId)),
@@ -64,7 +63,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     }
 
     @Override
-    public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId,Long organizationId) {
+    public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId, Long organizationId) {
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId)),
@@ -77,17 +76,21 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     }
 
     @Override
-    public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityWithFilterSelection(Long countryId,Long organizationId, FilterSelectionDTO filterSelectionDto) {
+    public List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityWithFilterSelection(Long countryId, Long organizationId, FilterSelectionDTO filterSelectionDto) {
 
 
-        Criteria criteria=Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId);
+        Criteria criteria = Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId);
         List<Criteria> processingActivityCriterias = new ArrayList<>(filterSelectionDto.getFiltersData().size());
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
             if (filterSelection.getValue().size() != 0) {
-                processingActivityCriterias.add(buildQuery(filterSelection, filterSelection.getName()));
+                processingActivityCriterias.add(buildMatchCriteria(filterSelection, filterSelection.getName()));
             }
         });
-        criteria = criteria.andOperator(processingActivityCriterias.toArray(new Criteria[processingActivityCriterias.size()]));
+
+        if (!processingActivityCriterias.isEmpty()) {
+            criteria = criteria.andOperator(processingActivityCriterias.toArray(new Criteria[processingActivityCriterias.size()]));
+
+        }
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(criteria),
@@ -101,7 +104,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     }
 
     @Override
-    public Criteria buildQuery(FilterSelection filterSelection, FilterType filterType) {
+    public Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType) {
         switch (filterType) {
             case ACCOUNT_TYPES:
                 return Criteria.where(filterType.value + ID).in(filterSelection.getValue());

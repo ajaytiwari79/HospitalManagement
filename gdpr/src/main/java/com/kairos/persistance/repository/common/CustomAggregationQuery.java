@@ -174,6 +174,20 @@ public class CustomAggregationQuery {
 
 
 
+    public static String masterAssetProjectionWithAssetType() {
+        return " {" +
+                "'$project':{" +
+                "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "         'name':1," +
+                "       'description':1," +
+                "       'organizationSubTypes':1," +
+                "       'organizationTypes':1," +
+                "       'organizationServices':1," +
+                "       'organizationSubServices':1," +
+
+                "            }}";
+    }
+
   
 
 
