@@ -108,7 +108,7 @@ public class ShiftController {
     @PutMapping(value = "/publish_shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addStatusesInShifts(@PathVariable Long unitId,@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addStatusesInShifts(unitId,shiftPublishDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateStatusOfShift(unitId,shiftPublishDTO));
     }
 
 

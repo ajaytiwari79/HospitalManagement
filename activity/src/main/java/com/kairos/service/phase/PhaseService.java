@@ -318,7 +318,7 @@ public class PhaseService extends MongoBaseService {
     }
 
 
-    public Map<LocalDate,List<ShiftStatus>> getApplicableStatusesInShift(Long unitId, Set<LocalDate> dates) {
+    public Map<LocalDate,List<ShiftStatus>> getStatusByDates(Long unitId, Set<LocalDate> dates) {
         Map<LocalDate,List<ShiftStatus>> localDatePhaseStatusMap=new HashMap<>();
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<String,List<ShiftStatus>> phaseMap=phases.stream().collect(Collectors.toMap(k->k.getName(), k->k.getStatus()));

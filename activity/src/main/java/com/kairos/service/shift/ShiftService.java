@@ -975,7 +975,7 @@ public class ShiftService extends MongoBaseService {
         return activityChangeStatus;
     }
 
-    public Map<String, List<ShiftResponse>> addStatusesInShifts(Long unitId,ShiftPublishDTO shiftPublishDTO) {
+    public Map<String, List<ShiftResponse>> updateStatusOfShift(Long unitId,ShiftPublishDTO shiftPublishDTO) {
 
         List<ShiftResponse> success = new ArrayList<>();
         List<ShiftResponse> error = new ArrayList<>();
@@ -986,7 +986,7 @@ public class ShiftService extends MongoBaseService {
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftPublishDTO.getShiftIds());
         //todo check for empty shift list
         Set<LocalDate> dates=shifts.stream().map(s->DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
-        Map<LocalDate,List<ShiftStatus>> phaseListByDate=phaseService.getApplicableStatusesInShift(unitId,dates);
+        Map<LocalDate,List<ShiftStatus>> phaseListByDate=phaseService.getStatusByDates(unitId,dates);
         for(Shift shift:shifts){
             List<ShiftStatus> phaseStatuses=phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
             if(phaseStatuses.containsAll(shiftPublishDTO.getStatus())){
