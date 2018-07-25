@@ -1,6 +1,6 @@
 package com.kairos.activity.shift;
 
-import com.kairos.persistence.model.user.country.Day;
+import com.kairos.enums.Day;
 
 import javax.validation.constraints.AssertTrue;
 import java.math.BigInteger;
@@ -126,6 +126,9 @@ public class CopyShiftDTO {
     public boolean isValid() {
         if (!Optional.ofNullable(this.startDate).isPresent() || !Optional.ofNullable(this.endDate).isPresent()) {
             return false;
+        }
+        if (startDate.isEqual(endDate)) {
+            return true;
         }
         return startDate.isBefore(endDate);
 

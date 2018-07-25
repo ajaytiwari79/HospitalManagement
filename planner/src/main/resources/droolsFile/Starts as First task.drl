@@ -1,0 +1,17 @@
+package drl;
+    dialect "java"
+import com.kairos.planner.vrp.taskplanning.model.*;
+import com.kairos.planner.vrp.taskplanning.*;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+
+global HardMediumSoftLongScoreHolder scoreHolder;
+
+rule "Longest Task"
+salience 20
+    when
+        $shift:Shift(nextTask!=null);
+        //$task:$shift.getLongestTask();
+        $order: Integer(intValue>0) from ($shift.getLongestTask().getOrder())
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-1);
+end

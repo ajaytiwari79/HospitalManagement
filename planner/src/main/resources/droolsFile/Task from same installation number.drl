@@ -1,0 +1,16 @@
+package drl;
+    dialect "java"
+import com.kairos.planner.vrp.taskplanning.model.*;
+import com.kairos.planner.vrp.taskplanning.*;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+
+global HardMediumSoftLongScoreHolder scoreHolder;
+
+rule "Consecutive tasks"
+salience 22
+    when
+        $t1:Task(prevTaskOrShift!=null && !shiftBreak)
+        $t2:Task(prevTaskOrShift!=null && !shiftBreak && hasSameChain($t1) && hasSameLocation($t1)  && !isConsecutive($t1))
+    then
+        scoreHolder.addMediumConstraintMatch(kcontext,-1);
+end

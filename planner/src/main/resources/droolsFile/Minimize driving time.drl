@@ -1,0 +1,16 @@
+package drl;
+    dialect "java"
+import com.kairos.planner.vrp.taskplanning.model.*;
+import com.kairos.planner.vrp.taskplanning.*;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+
+global HardMediumSoftLongScoreHolder scoreHolder;
+
+
+rule "Driving Time"
+salience 22
+    when
+        Task(prevTaskOrShift!=null ,$minutes:drivingTimeSeconds, $minutes>0)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,-$minutes);
+end

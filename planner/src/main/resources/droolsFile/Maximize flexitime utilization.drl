@@ -1,0 +1,38 @@
+package drl;
+    dialect "java"
+import com.kairos.planner.vrp.taskplanning.model.*;
+import com.kairos.planner.vrp.taskplanning.*;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+
+global HardMediumSoftLongScoreHolder scoreHolder;
+
+rule "Shift out of boundary"
+salience 21
+
+    when
+        Shift( $minutes:totalPlannedMinutes,$min:totalTime)//isHalfWorkDay() &&
+        $ot: Integer(intValue>0) from ($minutes-$min)
+    then
+        if($ot>60){
+            scoreHolder.addHardConstraintMatch(kcontext,-($ot-60));
+        }
+        else{
+            scoreHolder.addSoftConstraintMatch(kcontext,-10);
+        }
+end
+
+/*
+rule "Shift out of boundary full day"
+salience 22
+    when
+        Shift(isFullWorkDay() && $minutes:totalPlannedMinutes)
+        $ot: Integer(intValue>0) from ($minutes-540)
+    then
+        if($ot>60){
+            scoreHolder.addHardConstraintMatch(kcontext,-($ot-60));
+        }
+        else{
+            scoreHolder.addSoftConstraintMatch(kcontext,-10);
+        }
+end
+*/
