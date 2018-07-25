@@ -27,6 +27,8 @@ public class AssetDTO {
     @NotNullOrEmpty(message = "description  can't be  Empty ")
     private String description;
 
+
+    @NotNullOrEmpty(message = "Hosting Location can't be Empty")
     private String hostingLocation;
 
     @NotNull(message = "Managing department can't be empty")
@@ -48,6 +50,8 @@ public class AssetDTO {
     private BigInteger hostingProvider;
 
     private BigInteger hostingType;
+
+    private BigInteger dataDisposal;
 
     @NotNull(message = "Asset  Types can't be empty")
     private BigInteger assetType;
@@ -135,11 +139,10 @@ public class AssetDTO {
 
     public void setAssetOwner(Staff assetOwner) { this.assetOwner = assetOwner; }
 
-    public Boolean getActive() {
-        return isActive;
-    }
+    public BigInteger getDataDisposal() { return dataDisposal; }
 
-    public void setActive(Boolean active) {
-        isActive = active;
+    public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
+
+    public AssetDTO() {
     }
 }

@@ -6,6 +6,7 @@ import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -23,6 +24,7 @@ public class Asset extends MongoBaseEntity {
 
     private Long countryId;
 
+    @NotBlank(message = "Hosting Loction can't be empty")
     private String hostingLocation;
 
     @NotNull(message = "Managing department can't be empty")
@@ -42,6 +44,8 @@ public class Asset extends MongoBaseEntity {
     private BigInteger hostingProvider;
 
     private BigInteger hostingType;
+
+    private BigInteger dataDisposal;
 
     @NotNull(message = "Asset Type can't be empty")
     private BigInteger assetType;
@@ -144,9 +148,14 @@ public class Asset extends MongoBaseEntity {
 
     public void setAssetSubTypes(List<BigInteger> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
 
-    public Asset(String name, String description, Long countryId, BigInteger assetType,List<BigInteger> assetSubTypes,Organization managingDepartment,Staff assetOwner) {
+    public BigInteger getDataDisposal() { return dataDisposal; }
+
+    public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
+
+    public Asset(String name, String description, String hostingLocation, Long countryId,BigInteger assetType, List<BigInteger> assetSubTypes, Organization managingDepartment, Staff assetOwner) {
         this.name = name;
         this.description = description;
+        this.hostingLocation=hostingLocation;
         this.countryId = countryId;
         this.assetType = assetType;
         this.assetSubTypes=assetSubTypes;
