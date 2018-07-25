@@ -120,10 +120,6 @@ public class CounterRepository {
         return results.getMappedResults();
     }
 
-    public List
-
-
-
     //tabKPI distribution crud
 
     public List<TabKPIEntry> getTabKPIConfgiurationByTabId(List<String> tabIds){

@@ -68,8 +68,15 @@ public class CounterConfController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.addCategories(categories, ConfLevel.UNIT, unitId));
     }
 
-    @PutMapping(value = "/category")
-    public ResponseEntity<Map<String, Object>> updateCategories(@RequestBody KPICategoryUpdationDTO categories){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.updateCategories(categories));
+    @PutMapping(value = "/category"+COUNTRY_URL)
+    public ResponseEntity<Map<String, Object>> updateCategoriesForCountry(@RequestBody KPICategoryUpdationDTO categories, @PathVariable Long countryId){
+        counterConfService.updateCategories(categories, ConfLevel.COUNTRY, countryId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping(value = "/category"+UNIT_URL)
+    public ResponseEntity<Map<String, Object>> updateCategoriesForUnit(@RequestBody KPICategoryUpdationDTO categories, @PathVariable Long unitId){
+        counterConfService.updateCategories(categories, ConfLevel.UNIT, unitId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 }
