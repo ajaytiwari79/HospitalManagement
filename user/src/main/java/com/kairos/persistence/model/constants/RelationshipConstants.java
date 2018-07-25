@@ -259,7 +259,7 @@ public abstract class RelationshipConstants {
 // System Langugae
 
     public final static String HAS_SYSTEM_LANGUAGE="HAS_SYSTEM_LANGUAGE";
-    public final static String USER_LANGUAGE="USER_LANGUAGE";
+    public final static String SELECTED_LANGUAGE ="SELECTED_LANGUAGE";
 
 
     /**
