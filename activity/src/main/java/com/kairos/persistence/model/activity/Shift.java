@@ -50,7 +50,7 @@ public class Shift extends MongoBaseEntity {
     private String externalId;
 
     private Long unitPositionId;
-    private ShiftState shiftState;
+    private List<ShiftState> shiftStates;
     private List<BigInteger> brokenRuleTemplateIds;
 
     private BigInteger parentOpenShiftId;
@@ -60,7 +60,7 @@ public class Shift extends MongoBaseEntity {
     private BigInteger copiedFromShiftId;
     private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
 
-    private List<Phase.PhaseStatus> phaseStatuses;
+
 
     public Shift() {
         //dc
@@ -262,7 +262,7 @@ public class Shift extends MongoBaseEntity {
                 ", phase=" + phase +
                 ", weekCount=" + weekCount +
                 ", unitId=" + unitId +
-                ", state=" + shiftState +
+                ", states=" + shiftStates +
                 '}';
     }
 
@@ -318,7 +318,7 @@ public class Shift extends MongoBaseEntity {
                 this.activityId, this.staffId, this.unitId, this.unitPositionId);
         shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
         shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
-        shiftQueryResult.setShiftState(this.getShiftState());
+        shiftQueryResult.setShiftStates(this.getShiftStates());
         shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
         shiftQueryResult.setPlannedTimeId(this.plannedTimeId);
         return shiftQueryResult;
@@ -342,12 +342,12 @@ public class Shift extends MongoBaseEntity {
         this.unitPositionId = unitPositionId;
     }
 
-    public ShiftState getShiftState() {
-        return shiftState;
+    public List<ShiftState> getShiftStates() {
+        return shiftStates;
     }
 
-    public void setShiftState(ShiftState shiftState) {
-        this.shiftState = shiftState;
+    public void setShiftStates(List<ShiftState> shiftStates) {
+        this.shiftStates = shiftStates;
     }
 
     public BigInteger getParentOpenShiftId() {
@@ -382,7 +382,7 @@ public class Shift extends MongoBaseEntity {
         this.plannedTimeId = plannedTimeId;
     }
 
-    public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, ShiftState shiftState, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
+    public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, List<ShiftState> shiftStates, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -396,7 +396,7 @@ public class Shift extends MongoBaseEntity {
         this.isMainShift = isMainShift;
         this.externalId = externalId;
         this.unitPositionId = unitPositionId;
-        this.shiftState = shiftState;
+        this.shiftStates = shiftStates;
         this.parentOpenShiftId = parentOpenShiftId;
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
         this.copiedFromShiftId = copiedFromShiftId;
@@ -406,11 +406,4 @@ public class Shift extends MongoBaseEntity {
         return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
     }
 
-    public List<Phase.PhaseStatus> getPhaseStatuses() {
-        return phaseStatuses;
-    }
-
-    public void setPhaseStatuses(List<Phase.PhaseStatus> phaseStatuses) {
-        this.phaseStatuses = phaseStatuses;
-    }
 }

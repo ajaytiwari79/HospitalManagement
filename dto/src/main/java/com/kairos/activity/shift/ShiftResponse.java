@@ -13,7 +13,11 @@ public class ShiftResponse {
 
 
     public ShiftResponse() {
-        //
+        //Default Constructor
+    }
+
+    public ShiftResponse(BigInteger shiftId) {
+        this.shiftId = shiftId;
     }
 
     public BigInteger getShiftId() {
@@ -62,6 +66,13 @@ public class ShiftResponse {
         this.messages = messages;
         this.success = success;
         this.shiftCreationDate = shiftCreationDate;
+    }
+
+    public ShiftResponse(BigInteger shiftId, String shiftName, List<String> messages, boolean success) {
+        this.shiftId = shiftId;
+        this.shiftName = shiftName;
+        this.messages = messages;
+        this.success = success;
     }
 
     @Override

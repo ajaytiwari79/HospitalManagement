@@ -1,12 +1,10 @@
 package com.kairos.controller.activity;
 
+import com.kairos.activity.shift.CopyShiftDTO;
 import com.kairos.activity.shift.ShiftDTO;
-import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.phase.ShiftAndPhaseStatusDTO;
+import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.activity.shift.CopyShiftDTO;
-import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,7 +20,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -110,8 +107,8 @@ public class ShiftController {
     @ApiOperation("publish Shifts")
     @PutMapping(value = "/publish_shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> publishShifts(@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.publishShifts(shiftPublishDTO));
+    public ResponseEntity<Map<String, Object>> publishShifts(@PathVariable Long unitId,@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addStatusesInShift(unitId,shiftPublishDTO));
     }
 
 
@@ -146,12 +143,12 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShiftUsingTemplate(unitId,shiftDTO));
     }
 
-    @ApiOperation("Add statuses in  Shifts")
-    @PutMapping(value = "/add_status")
-    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addStatusesInShift(@PathVariable Long unitId, @RequestBody @Valid ShiftAndPhaseStatusDTO shiftAndPhaseStatusDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addStatusesInShift(unitId,shiftAndPhaseStatusDTO));
-    }
+//    @ApiOperation("Add statuses in  Shifts")
+//    @PutMapping(value = "/add_status")
+//    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> addStatusesInShift(@PathVariable Long unitId, @RequestBody @Valid ShiftAndPhaseStatusDTO shiftAndPhaseStatusDTO) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addStatusesInShift(unitId,shiftAndPhaseStatusDTO));
+//    }
 
 
 

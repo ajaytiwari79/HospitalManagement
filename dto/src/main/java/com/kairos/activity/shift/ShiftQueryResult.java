@@ -41,7 +41,7 @@ public class ShiftQueryResult {
     private Long unitPositionId;
     private int scheduledMinutes;
     private int durationMinutes;
-    private ShiftState shiftState;
+    private List<ShiftState> shiftStates;
     private Long allowedBreakDurationInMinute;
     private Long expertiseId;
     private String timeType;
@@ -234,12 +234,12 @@ public class ShiftQueryResult {
         this.unitPositionId = unitPositionId;
     }
 
-    public ShiftState getShiftState() {
-        return shiftState;
+    public List<ShiftState> getShiftStates() {
+        return shiftStates;
     }
 
-    public void setShiftState(ShiftState shiftState) {
-        this.shiftState = shiftState;
+    public void setShiftStates(List<ShiftState> shiftStates) {
+        this.shiftStates = shiftStates;
     }
 
     public Long getAllowedBreakDurationInMinute() {

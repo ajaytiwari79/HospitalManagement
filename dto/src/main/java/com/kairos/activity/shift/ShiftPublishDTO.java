@@ -12,19 +12,14 @@ import java.util.Set;
  */
 public class ShiftPublishDTO {
     List<BigInteger> shiftIds;
-    @NotNull
-    ShiftState shiftState;
-    Set<ShiftState> shiftStates;
+    List<ShiftState> shiftStates;
 
 
     public ShiftPublishDTO() {
         //default
     }
 
-    public ShiftPublishDTO(List<BigInteger> shiftIds, @NotNull ShiftState shiftState) {
-        this.shiftIds = shiftIds;
-        this.shiftState = shiftState;
-    }
+
 
     public List<BigInteger> getShiftIds() {
         return shiftIds;
@@ -34,19 +29,11 @@ public class ShiftPublishDTO {
         this.shiftIds = shiftIds;
     }
 
-    public ShiftState getShiftState() {
-        return shiftState;
-    }
-
-    public void setShiftState(ShiftState shiftState) {
-        this.shiftState = shiftState;
-    }
-
-    public Set<ShiftState> getShiftStates() {
+    public List<ShiftState> getShiftStates() {
         return shiftStates;
     }
 
-    public void setShiftStates(Set<ShiftState> shiftStates) {
+    public void setShiftStates(List<ShiftState> shiftStates) {
         this.shiftStates = shiftStates;
     }
 }
