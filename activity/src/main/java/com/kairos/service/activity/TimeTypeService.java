@@ -38,12 +38,12 @@ public class TimeTypeService extends MongoBaseService {
         }
         timeTypeDTOs.forEach(timeTypeDTO -> {
             TimeType timeType;
-            if (timeTypeDTO.getTimeTypes() != null) {
+            if (timeTypeDTO.getTimeTypes() != null && timeTypeDTO.getUpperLevelTimeTypeId()!=null) {
                 timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(),timeTypeDTO.getBackgroundColor());
                     timeType.setCountryId(countryId);
-                    if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
+                    //if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                         timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
-                    }
+                    //}
                     timeType = save(timeType);
                     if(timeTypeDTO.getUpperLevelTimeTypeId() != null){
                         TimeType parentTimeType = timeTypeMongoRepository.findOne(timeTypeDTO.getUpperLevelTimeTypeId());

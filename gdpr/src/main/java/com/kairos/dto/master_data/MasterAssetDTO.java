@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -19,10 +20,10 @@ import java.util.List;
 public class MasterAssetDTO {
 
     @NotNullOrEmpty(message = "Name  can't be Empty")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$",message = "title can not contain number or special character")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "title can not contain number or special character")
     private String name;
 
-    @NotNullOrEmpty(message = "Description cannot be Empty")
+    @NotNullOrEmpty(message = "Description can't be Empty")
     private String description;
 
     @Valid
@@ -45,6 +46,16 @@ public class MasterAssetDTO {
     @Valid
     private List<SubServiceCategoryDTO> organizationSubServices;
 
+    @NotNull(message = "Asset Type Can't be empty")
+    private BigInteger assetTypeId;
+
+    public BigInteger getAssetTypeId() {
+        return assetTypeId;
+    }
+
+    public void setAssetTypeId(BigInteger assetTypeId) {
+        this.assetTypeId = assetTypeId;
+    }
 
     public String getName() {
         return name;

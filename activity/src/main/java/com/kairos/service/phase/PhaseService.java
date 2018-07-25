@@ -209,6 +209,7 @@ public class PhaseService extends MongoBaseService {
         int proposedWeekNumber = proposedDate.get(weekFields.weekOfWeekBasedYear());
 
         int weekDifference = proposedWeekNumber-startWeekNumber;
+
         weekDifference++; // 34-30  its 4 bit actually we need 5 including curreny
         Collections.sort(phases, (Phase p1, Phase p2) -> {
             if (p1.getSequence() < p2.getSequence())

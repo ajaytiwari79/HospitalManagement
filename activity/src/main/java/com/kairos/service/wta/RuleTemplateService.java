@@ -23,6 +23,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
 import com.kairos.user.country.basic_details.CountryDTO;
 import com.kairos.user.organization.OrganizationDTO;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.userContext.CurrentUserDetails;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -156,12 +158,13 @@ public class RuleTemplateService extends MongoBaseService {
         dailyRestingTimeWTATemplate.setCountryId(countryDTO.getId());
         dailyRestingTimeWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         dailyRestingTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
-        dailyRestingTimeWTATemplate.setWtaTemplateType(WTATemplateType.DAILY_RESTING_TIME);
+        dailyRestingTimeWTATemplate.setWtaTemplateType(WTATemplateType.DURATION_BETWEEN_SHIFTS);
         wtaBaseRuleTemplates1.add(dailyRestingTimeWTATemplate);
 
         DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate = new DurationBetweenShiftsWTATemplate("Minimum duration between shifts",false,"Minimum duration between shifts");
         durationBetweenShiftsWTATemplate.setCountryId(countryDTO.getId());
         durationBetweenShiftsWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+        durationBetweenShiftsWTATemplate.setWtaTemplateType(WTATemplateType.DURATION_BETWEEN_SHIFTS);
         durationBetweenShiftsWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(durationBetweenShiftsWTATemplate);
 
@@ -250,7 +253,7 @@ public class RuleTemplateService extends MongoBaseService {
         }
 
         //
-        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = WTABuilderService.copyRuleTemplatesToDTO(templateList);
+        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(templateList, WTABaseRuleTemplateDTO.class);
         assignCategoryToRuleTemplate(categoryList,wtaBaseRuleTemplateDTOS);
         RuleTemplateWrapper wrapper = new RuleTemplateWrapper();
         wrapper.setCategoryList(categoryList);
@@ -266,7 +269,7 @@ public class RuleTemplateService extends MongoBaseService {
         //List<WTAResponseDTO> wtaResponseDTOS = workingTimeAgreementMongoRepository.getWtaByOrganization(organization.getId());
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.getRuleTemplateCategoryByUnitId(unitId);
         List<WTABaseRuleTemplate> templateList = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(organization.getCountryId());
-        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = WTABuilderService.copyRuleTemplatesToDTO(templateList);
+        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(templateList, WTABaseRuleTemplateDTO.class);
         RuleTemplateWrapper ruleTemplateWrapper = new RuleTemplateWrapper();
         assignCategoryToRuleTemplate(categoryList,wtaBaseRuleTemplateDTOS);
         ruleTemplateWrapper.setCategoryList(categoryList);
@@ -289,12 +292,12 @@ public class RuleTemplateService extends MongoBaseService {
     }
 
 
-    public WTABaseRuleTemplateDTO updateRuleTemplate(long countryId, WTABaseRuleTemplateDTO templateDTO) {
+    public WTABaseRuleTemplateDTO updateRuleTemplate(long countryId, BigInteger ruleTemplateId, WTABaseRuleTemplateDTO templateDTO) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id",countryId);
         }
-        WTABaseRuleTemplate oldTemplate = wtaBaseRuleTemplateMongoRepository.findOne(templateDTO.getId());
+        WTABaseRuleTemplate oldTemplate = wtaBaseRuleTemplateMongoRepository.findOne(ruleTemplateId);
         if (!Optional.ofNullable(oldTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.wta-base-rule-template.id",templateDTO.getId());
         }
@@ -306,6 +309,8 @@ public class RuleTemplateService extends MongoBaseService {
         save(oldTemplate);
         return templateDTO;
     }
+
+
     public WTABaseRuleTemplateDTO copyRuleTemplate(Long countryId, WTABaseRuleTemplateDTO wtaRuleTemplateDTO) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
