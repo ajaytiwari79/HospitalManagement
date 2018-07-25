@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.COUNTER_COUNTRY_DIST_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -52,26 +54,31 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistData(countryId, ConfLevel.COUNTRY));
     }
 
+    @PostMapping("/category/country/{countryId}")
+    public ResponseEntity<Map<String, Object>> saveCategoryKPIDistributionForCountry(@RequestBody CategoryKPIsDTO categorieKPIsDetails, @PathVariable Long countryId){
+        counterManagementService.updateCategoryKPIsDistribution(categorieKPIsDetails, ConfLevel.COUNTRY, countryId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
     @GetMapping("/category/unit/{unitId}")
     public ResponseEntity<Map<String, Object>> getInitialCategoryKPIDistributionDataForUnit(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistData(unitId, ConfLevel.UNIT));
     }
 
-    @PostMapping("/category/country/{countryId}")
-    public ResponseEntity<Map<String, Object>> saveCategoryKPIDistributionForCountry(@RequestBody CategoryKPIsDTO categorieKPIsDetails){
-        counterManagementService.updateCategoryKPIsDistribution(categorieKPIsDetails);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
-    }
-
     @PostMapping("/category/unit/{unitId}")
-    public ResponseEntity<Map<String, Object>> saveCategoryKPIDistributionUnit(@RequestBody CategoryKPIsDTO categorieKPIsDetails){
-        counterManagementService.updateCategoryKPIsDistribution(categorieKPIsDetails);
+    public ResponseEntity<Map<String, Object>> saveCategoryKPIDistributionUnit(@RequestBody CategoryKPIsDTO categorieKPIsDetails, @PathVariable Long unitId){
+        counterManagementService.updateCategoryKPIsDistribution(categorieKPIsDetails, ConfLevel.UNIT, unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @GetMapping("/module/{moduleId}/initials")
-    public ResponseEntity<Map<String, Object>> getInitialDataForTabKPIConfiguration(@PathVariable Long countryId, @PathVariable String moduleId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(moduleId, countryId));
+    @GetMapping("/module/{moduleId}"+COUNTRY_URL)
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForCountry(@PathVariable Long countryId, @PathVariable String moduleId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(moduleId, countryId, ConfLevel.COUNTRY));
+    }
+
+    @GetMapping("/module/{moduleId}"+UNIT_URL)
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForUnit(@PathVariable Long unitId, @PathVariable String moduleId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(moduleId, unitId, ConfLevel.UNIT));
     }
 
     @PostMapping("/module/{moduleId}/create_dist_entry")

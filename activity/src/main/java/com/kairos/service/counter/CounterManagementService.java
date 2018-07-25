@@ -51,33 +51,28 @@ public class CounterManagementService extends MongoBaseService{
     }
 
     public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(Long refId, ConfLevel level){
-        //List<KPI> kpisList = getKPIsList(refId, level);
-        List<KPICategoryDTO> categories = counterRepository.getKPICategory(level, refId);
-
-        return new InitialKPICategoryDistDataDTO(categories, categoryKPIsMap);
+        List<CategoryAssignmentDTO> categories = counterRepository.getCategoryAssignments(null, level, refId);
+        List<BigInteger> categoryAssignmentIds = categories.parallelStream().map(categoryAssignment -> categoryAssignment.getId()).collect(toList());
+        CategoryKPIMappingDTO categoryKPIMapping = counterRepository.getKPIsMappingForCategories(categoryAssignmentIds);
+        return new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
     }
 
-    public void updateCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails){
-        List<KPI> kpis = getKPIsList();
-        Map<BigInteger, List<KPI>> categoryKPIMap = kpis.stream().collect(Collectors.groupingBy(kpi-> (kpi.getCategoryId()!=null)?kpi.getCategoryId():BigInteger.valueOf(-1), Collectors.toList()));
-        Map<BigInteger, Counter> kpisIdMap = new HashMap<>();
-        kpis.parallelStream().forEach(kpi -> {
-            kpisIdMap.put(kpi.getId(), kpi);
-        });
-
-        categoryKPIsDetails.getKpiIds().forEach(kpiId ->{
-            if(categoryKPIsDetails.getCategoryId().equals(kpisIdMap.get(kpiId).getCategoryId()))
-                exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
-            kpisIdMap.get(kpiId).setCategoryId(categoryKPIsDetails.getCategoryId());
-        });
-
-        save(kpis);
+    public void updateCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId){
+        CategoryAssignment categoryAssignment = counterRepository.getCategoryAssignment(categoryKPIsDetails.getCategoryId(), level, refId);
+        List<KPIAssignment> kpiAssignments = counterRepository.getKPIAssignments(categoryKPIsDetails.getKpiIds(), level, refId);
+        List<CategoryKPIConf> categoryKPIConfs = counterRepository.getCategoryKPIConfs(categoryAssignment.getId());
+        List<BigInteger> kpiAssignmentIds = categoryKPIConfs.stream().map(categoryKPIConf -> categoryKPIConf.getKpiAssignmentId()).collect(toList());
+        kpiAssignments = kpiAssignments.parallelStream().filter(kpiAssignment -> kpiAssignmentIds.contains(kpiAssignment.getId())).collect(toList());
+        if(kpiAssignments.isEmpty()) exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
+        List<CategoryKPIConf> newCategoryKPIConfs = new ArrayList<>();
+        kpiAssignments.parallelStream().forEach(kpiAssignment -> newCategoryKPIConfs.add(new CategoryKPIConf(kpiAssignment.getKpiId(), categoryAssignment.getId())));
+        save(newCategoryKPIConfs);
     }
 
     //settings for KPI-Module configuration
 
-    public InitialKPITabDistDataDTO getInitialTabKPIDataConf(String moduleId, Long countryId){
-        List<KPIAccessPageDTO> kpiTabs= genericIntegrationService.getKPIEnabledTabsForModule(moduleId, countryId);
+    public InitialKPITabDistDataDTO getInitialTabKPIDataConf(String moduleId, Long refId, ConfLevel level){
+        List<KPIAccessPageDTO> kpiTabs= genericIntegrationService.getKPIEnabledTabsForModule(moduleId, refId);
         Map<String, List<BigInteger>> tabKPIsMap = new HashMap<>();
         if(kpiTabs != null && kpiTabs.isEmpty()){
             exceptionService.dataNotFoundByIdException("error.dist.module_kpi_tabs.not_available");
@@ -86,7 +81,7 @@ public class CounterManagementService extends MongoBaseService{
             tabKPIsMap.put(tabKPI.getModuleId(), new ArrayList<>());
         });
 
-        List<TabKPIEntry> tabKPIEntries = counterRepository.getTabKPIConfgiurationByTabId(kpiTabs.stream().map(kpiTab -> kpiTab.getModuleId()).collect(toList()));
+        List<TabKPIEntryConfDTO> tabKPIEntries = counterRepository.getTabKPIConfgiurationByTabId(kpiTabs.stream().map(kpiTab -> kpiTab.getModuleId()).collect(toList()));
         tabKPIEntries.forEach(tabKPI -> {
             tabKPIsMap.get(tabKPI.getTabId()).add(tabKPI.getKpiId());
         });

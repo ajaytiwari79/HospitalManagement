@@ -8,10 +8,12 @@ import java.util.Map;
  * @dated: JUL/05/2018
  */
 public class InitialKPICategoryDistDataDTO {
-    private List categories;
-    private Map categoryKPIsmap;
+    private List<KPICategoryDTO> categories;
+    private CategoryKPIMappingDTO categoryKPIsmap;
 
-    public InitialKPICategoryDistDataDTO(List categories, Map categoryKPIsMap){
+    public InitialKPICategoryDistDataDTO(){}
+
+    public InitialKPICategoryDistDataDTO(List categories, CategoryKPIMappingDTO categoryKPIsMap){
         this.categories = categories;
         this.categoryKPIsmap = categoryKPIsMap;
     }
@@ -24,11 +26,11 @@ public class InitialKPICategoryDistDataDTO {
         this.categories = categories;
     }
 
-    public Map getCategoryKPIsmap() {
+    public CategoryKPIMappingDTO getCategoryKPIsmap() {
         return categoryKPIsmap;
     }
 
-    public void setCategoryKPIsmap(Map categoryKPIsmap) {
+    public void setCategoryKPIsmap(CategoryKPIMappingDTO categoryKPIsmap) {
         this.categoryKPIsmap = categoryKPIsmap;
     }
 }

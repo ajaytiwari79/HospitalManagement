@@ -89,15 +89,38 @@ public class CounterRepository {
         return mongoTemplate.find(query, claz);
     }
 
+    public String getRefQueryField(ConfLevel level){
+        switch(level){
+            case COUNTRY: return "countryId";
+            case UNIT: return "unitId";
+            case STAFF: return "staffId";
+            case DEFAULT: return "countryId";
+        }
+        return null;
+    }
+
+    //KPI assignment CRUD
+    public List<KPIAssignment> getKPIAssignments(List<BigInteger> kpiIds, ConfLevel level, Long refId){
+        String refQueryField = getRefQueryField(level);
+        Criteria matchCriteria;
+        if(kpiIds!=null){
+            matchCriteria = Criteria.where("kpiId").in(kpiIds).and(refQueryField).is(refId);
+        }else{
+            matchCriteria = Criteria.where(refQueryField).is(refId);
+        }
+        Query query = new Query(matchCriteria);
+        return mongoTemplate.find(query, KPIAssignment.class);
+    }
+
     //category CRUD
 
-    //categoryKPI crud
     public List<KPICategoryDTO> getKPICategory(ConfLevel level, Long refId){
         String queryField = (ConfLevel.COUNTRY.equals(level))? "countryId":"unitId";
         String categoryListField = "categoryList";
         Aggregation ag = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where(queryField).is(refId).and("deleted").is(false))
                 , Aggregation.lookup("kPICategory", "categoryId", "id", "category")
+                , Aggregation.project("categoryId").and("category").arrayElementAt(0).as("category")
                 , Aggregation.sort(Sort.Direction.ASC, "categoryId")
                 , Aggregation.group(queryField).push("category").as(categoryListField)
                 , Aggregation.project(categoryListField)
@@ -111,13 +134,46 @@ public class CounterRepository {
 
     public List<CategoryAssignmentDTO> getCategoryAssignments(List<BigInteger> categoryIds, ConfLevel level, Long refId){
         String queryField = (ConfLevel.COUNTRY.equals(level))? "countryId":"unitId";
-        Aggregation ag = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where(queryField).is(refId).and("categoryId").in(categoryIds))
-                , Aggregation.lookup("kPICategory", "categoryId", "id", "category")
-        );
+        List<AggregationOperation> operations = new ArrayList<>();
+        Criteria matchCriteria;
+        if(categoryIds == null){
+            matchCriteria = Criteria.where(queryField).is(refId);
+        }else{
+            matchCriteria = Criteria.where(queryField).is(refId).and("categoryId").in(categoryIds);
+        }
+        operations.add(Aggregation.match(matchCriteria));
+        operations.add(Aggregation.lookup("kPICategory", "categoryId", "id", "category"));
+        operations.add(Aggregation.project("countryId").andInclude("unitId").andInclude("level").and("category").arrayElementAt(0).as("category"));
+        Aggregation ag = Aggregation.newAggregation(operations);
 
         AggregationResults<CategoryAssignmentDTO> results = mongoTemplate.aggregate(ag, CategoryAssignment.class, CategoryAssignmentDTO.class);
         return results.getMappedResults();
+    }
+
+    public CategoryAssignment getCategoryAssignment(BigInteger categoryId, ConfLevel level, Long refId){
+        String queryField = (ConfLevel.COUNTRY.equals(level))? "countryId":"unitId";
+        Query query = new Query(Criteria.where(queryField).is(refId).and("categoryId").is(refId));
+        return mongoTemplate.findOne(query, CategoryAssignment.class);
+    }
+
+    //CategoryKPI distribution
+
+    public List<CategoryKPIConf> getCategoryKPIConfs(BigInteger categoryAssignmentId){
+        Query query = new Query(Criteria.where("categoryAssignmentId").is(categoryAssignmentId));
+        return mongoTemplate.find(query, CategoryKPIConf.class);
+    }
+
+    public CategoryKPIMappingDTO getKPIsMappingForCategories(List<BigInteger> categoryAssignmentIds){
+        Aggregation ag = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("categoryAssignmentId").in(categoryAssignmentIds))
+                , Aggregation.lookup("categoryAssignment", "categoryAssignmentId", "id", "categoryAssignment")
+                , Aggregation.lookup("kpiAssignment", "kpiAssignmentId", "id", "kpiAssignment")
+                , Aggregation.project().and("kpiAssignment").arrayElementAt(0).as("kpiAssignment").and("categoryAssignment").arrayElementAt(0).as("categoryAssignment")
+                , Aggregation.group("categoryAssignment.categoryId").push("kpiAssignment.kpiId").as("kpiIds")
+                , Aggregation.project().and("id").as("categoryId").and("kpiIds")
+        );
+        AggregationResults<CategoryKPIMappingDTO> results = mongoTemplate.aggregate(ag, CategoryKPIConf.class, CategoryKPIMappingDTO.class);
+        return (!results.getMappedResults().isEmpty())?results.getMappedResults().get(0):null;
     }
 
     //tabKPI distribution crud
