@@ -19,11 +19,15 @@ public class AppConstant {
 
     public static final String EXISTING_DATA_LIST= "existing";
     public static final String NEW_DATA_LIST = "new";
+    public static final String AGREEMENT_SECTION = "agreement_section";
+    public static final String AGREEMENT_SECTION_WRAPPER= "agreement_section_wrapper";
+    public static final String AGREEMENT_SUB_SECTION_MAP_CONTAINING_CLAUSE = "agreement_sub_section_map_with_clauses";
+
+
+
 
     //rollback
     public static final String QUESTION_LIST = "question_list";
-    public static final String AGREEMENT_SECTION_LIST = "agreement_sections";
-
     public static final String QUESTIONNAIRE_SECTIONS = "questionnaire_sectionList";
     public static final String PROCESSING_ACTIVITIES = "processing_activities";
     public static final String IDS_LIST = "ids";
