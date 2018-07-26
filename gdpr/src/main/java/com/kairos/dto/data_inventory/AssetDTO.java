@@ -4,8 +4,8 @@ package com.kairos.dto.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.persistance.model.data_inventory.asset.ManagingOrganization;
-import com.kairos.persistance.model.data_inventory.asset.Staff;
+import com.kairos.persistance.model.data_inventory.ManagingOrganization;
+import com.kairos.persistance.model.data_inventory.Staff;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
@@ -21,7 +21,7 @@ public class AssetDTO {
 
 
     @NotNullOrEmpty(message = "name can't be empty ")
-    @Pattern(message = "Numbers and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "Number and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     @NotNullOrEmpty(message = "description  can't be  Empty ")

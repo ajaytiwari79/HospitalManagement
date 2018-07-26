@@ -1,4 +1,4 @@
-package com.kairos.persistance.model.data_inventory.asset;
+package com.kairos.persistance.model.data_inventory;
 
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.javers.core.metamodel.annotation.ValueObject;
