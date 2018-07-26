@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.kairos.enums.RuleTemplateCategoryType;
-import com.kairos.user.country.tag.MongoTagDTO;
+import com.kairos.activity.tags.TagDTO;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -35,7 +35,7 @@ public class RuleTemplateCategoryDTO {
     private boolean deleted;
     private List<BigInteger> ruleTemplateIds;
 
-    private List<MongoTagDTO> tags = new ArrayList<>();
+    private List<TagDTO> tags = new ArrayList<>();
 
 
     public RuleTemplateCategoryDTO(String name, String description, boolean deleted) {
@@ -141,11 +141,11 @@ public class RuleTemplateCategoryDTO {
         this.country = country;
     }
 
-    public List<MongoTagDTO> getTags() {
+    public List<TagDTO> getTags() {
         return tags;
     }
 
-    public void setTags(List<MongoTagDTO> tags) {
+    public void setTags(List<TagDTO> tags) {
         this.tags = tags;
     }
 }
