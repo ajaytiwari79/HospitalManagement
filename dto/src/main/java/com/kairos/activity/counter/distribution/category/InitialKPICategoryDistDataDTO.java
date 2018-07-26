@@ -1,7 +1,8 @@
-package com.kairos.activity.counter;
+package com.kairos.activity.counter.distribution.category;
+
+import com.kairos.activity.counter.KPICategoryDTO;
 
 import java.util.List;
-import java.util.Map;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -9,11 +10,11 @@ import java.util.Map;
  */
 public class InitialKPICategoryDistDataDTO {
     private List<KPICategoryDTO> categories;
-    private CategoryKPIMappingDTO categoryKPIsmap;
+    private List<CategoryKPIMappingDTO> categoryKPIsmap;
 
     public InitialKPICategoryDistDataDTO(){}
 
-    public InitialKPICategoryDistDataDTO(List categories, CategoryKPIMappingDTO categoryKPIsMap){
+    public InitialKPICategoryDistDataDTO(List categories, List<CategoryKPIMappingDTO> categoryKPIsMap){
         this.categories = categories;
         this.categoryKPIsmap = categoryKPIsMap;
     }
@@ -26,11 +27,11 @@ public class InitialKPICategoryDistDataDTO {
         this.categories = categories;
     }
 
-    public CategoryKPIMappingDTO getCategoryKPIsmap() {
+    public List<CategoryKPIMappingDTO> getCategoryKPIsmap() {
         return categoryKPIsmap;
     }
 
-    public void setCategoryKPIsmap(CategoryKPIMappingDTO categoryKPIsmap) {
+    public void setCategoryKPIsmap(List<CategoryKPIMappingDTO> categoryKPIsmap) {
         this.categoryKPIsmap = categoryKPIsmap;
     }
 }
