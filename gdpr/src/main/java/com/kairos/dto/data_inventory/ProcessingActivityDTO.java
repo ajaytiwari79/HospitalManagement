@@ -25,7 +25,7 @@ public class ProcessingActivityDTO {
     @NotNull(message = "Mangaing department can't be null")
     private ManagingOrganization managingDepartment;
 
-    @NotNull(message = "Process Owner can't be null")
+    //@NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
 
     private List<BigInteger> processingPurposes;
