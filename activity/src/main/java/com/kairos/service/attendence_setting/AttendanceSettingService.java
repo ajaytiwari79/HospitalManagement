@@ -69,7 +69,7 @@ public class AttendanceSettingService extends MongoBaseService {
         AttendanceSetting attendanceSetting = null;
         StaffResultDTO staffAndOrganizationId;
         if (Optional.ofNullable(unitId).isPresent()&&!Optional.ofNullable(reasonCodeId).isPresent()) {
-            exceptionService.actionNotPermittedException("message.unitid.reasoncodeid.notnull");
+            exceptionService.actionNotPermittedException("message.unitid.reasoncodeid.notnull","");
         }else if(Optional.ofNullable(unitId).isPresent()&&Optional.ofNullable(reasonCodeId).isPresent()){
             staffAndOrganizationId = staffAndOrganizationIds.stream().filter(e -> e.getUnitId().equals(unitId)).findAny().get();
             if (!Optional.ofNullable(staffAndOrganizationId).isPresent()) {

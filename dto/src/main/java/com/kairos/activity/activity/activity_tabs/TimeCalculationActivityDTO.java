@@ -32,6 +32,10 @@ public class TimeCalculationActivityDTO {
     private int historyDuration;
     private LocalTime defaultStartTime;
 
+    public TimeCalculationActivityDTO() {
+        //dc
+    }
+
     public DayOfWeek getFullWeekStart() {
         return fullWeekStart;
     }

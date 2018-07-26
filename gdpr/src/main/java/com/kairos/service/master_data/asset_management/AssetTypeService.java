@@ -7,13 +7,16 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
-import com.kairos.response.dto.master_data.AssetTypeResponseDto;
+import com.kairos.persistance.repository.master_data.asset_management.MasterAssetMongoRepository;
+import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
+import com.kairos.response.dto.master_data.MasterAssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -34,14 +37,17 @@ public class AssetTypeService extends MongoBaseService {
     @Inject
     private AssetTypeMongoRepository assetTypeMongoRepository;
 
+    @Inject
+    private MasterAssetMongoRepository masterAssetMongoRepository;
+
 
     /**
-     * @description method create Asset type if sub Asset Types if present then create and add sub Asset Types to Asset type.
      * @param countryId
      * @param organizationId
-     * @param assetTypeDto contain asset data ,and list of sub asset types
+     * @param assetTypeDto   contain asset data ,and list of sub asset types
      * @return asset type object
-     * @exception DuplicateDataException if asset type is already present with same name
+     * @throws DuplicateDataException if asset type is already present with same name
+     * @description method create Asset type if sub Asset Types if present then create and add sub Asset Types to Asset type.
      */
     public AssetType createAssetTypeAndAddSubAssetTypes(Long countryId, Long organizationId, AssetTypeDTO assetTypeDto) {
 
@@ -104,11 +110,11 @@ public class AssetTypeService extends MongoBaseService {
     }
 
 
-    /**@description  this method update existing Sub asset Types and return list of Sub Asset Types and  ids list
+    /**
      * @param countryId
      * @param subAssetTypesDto contain list of Existing Sub Asset type which need to we update
      * @return map of Sub asset Types List and Ids (List for rollback)
-     *
+     * @description this method update existing Sub asset Types and return list of Sub Asset Types and  ids list
      */
     public Map<String, Object> updateSubAssetTypes(Long countryId, Long organizationId, List<AssetTypeDTO> subAssetTypesDto) {
 
@@ -140,50 +146,64 @@ public class AssetTypeService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param organizationId
      * @return return list of Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
-    public List<AssetTypeResponseDto> getAllAssetType(Long countryId, Long organizationId) {
+    public List<AssetTypeResponseDTO> getAllAssetType(Long countryId, Long organizationId) {
         return assetTypeMongoRepository.getAllAssetTypesWithSubAssetTypes(countryId, organizationId);
     }
 
 
     /**
-     *
      * @param countryId
      * @param organizationId
      * @return return Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
-    public AssetTypeResponseDto getAssetTypeById(Long countryId, Long organizationId, BigInteger id) {
-        return assetTypeMongoRepository.getAssetTypesWithSubAssetTypes(countryId, organizationId, id);
+    public AssetTypeResponseDTO getAssetTypeById(Long countryId, Long organizationId, BigInteger id) {
+        AssetTypeResponseDTO assetType = assetTypeMongoRepository.getAssetTypesWithSubAssetTypes(countryId, organizationId, id);
+        if (!Optional.ofNullable(assetType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", id);
+        }
+        return assetType;
 
     }
 
 
-    public Boolean deleteAssetType(Long countryId, Long organizationId, BigInteger id) {
+    public Map<String, Object> deleteAssetType(Long countryId, Long organizationId, BigInteger id) {
         AssetType exist = assetTypeMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         }
-        if (Optional.ofNullable(exist.getSubAssetTypes()).isPresent()) {
+        List<MasterAssetBasicResponseDTO> masterAssetLinkWithAssetType = masterAssetMongoRepository.findAllMasterAssetbyAssetType(countryId, organizationId, id);
+        Map<String, Object> result = new HashMap<>();
+        if (!masterAssetLinkWithAssetType.isEmpty()) {
+            result.put("isSuccess", false);
+            result.put("MasterAssets", masterAssetLinkWithAssetType);
+            result.put("message", "Asset Type is linked with Master Assets");
+
+        } else {
             List<AssetType> subAssetTypes = assetTypeMongoRepository.findAllAssetTypebyIds(countryId, organizationId, exist.getSubAssetTypes());
-            assetTypeMongoRepository.deleteAll(subAssetTypes);
+            if (!subAssetTypes.isEmpty()) {
+                subAssetTypes.forEach(subAssetType -> subAssetType.setDeleted(true));
+                assetTypeMongoRepository.saveAll(sequenceGenerator(subAssetTypes));
+            }
+            delete(exist);
+            result.put("isSuccess", true);
         }
-        delete(exist);
-        return true;
+        return result;
+
     }
 
 
     /**
-     * @description method simply (update already exit Sub asset types if id is present)and (add create new sub asset types if id is not present in sub asset types)
      * @param countryId
      * @param organizationId
-     * @param id          id of Asset Type to which Sub Asset Types Link.
-     * @param assetTypeDto     asset type Dto contain list of Existing sub Asset typeswhich need to be update and New SubAsset Types  which we need to create and add to asset afterward.
+     * @param id             id of Asset Type to which Sub Asset Types Link.
+     * @param assetTypeDto   asset type Dto contain list of Existing sub Asset typeswhich need to be update and New SubAsset Types  which we need to create and add to asset afterward.
      * @return Asset Type with updated Sub Asset and new Sub Asset Types
-     * @exception DuplicateDataException if Asset type is already present with same name .
+     * @throws DuplicateDataException if Asset type is already present with same name .
+     * @description method simply (update already exit Sub asset types if id is present)and (add create new sub asset types if id is not present in sub asset types)
      */
     public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, Long organizationId, BigInteger id, AssetTypeDTO assetTypeDto) {
         AssetType exist = assetTypeMongoRepository.findByName(countryId, organizationId, assetTypeDto.getName());
@@ -191,7 +211,7 @@ public class AssetTypeService extends MongoBaseService {
             throw new DuplicateDataException("data  exist for  " + assetTypeDto.getName());
         }
 
-        exist = assetTypeMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        exist = assetTypeMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         exist.setName(assetTypeDto.getName());
         List<AssetTypeDTO> newSubAssetTypesList = new ArrayList<>();
         List<AssetTypeDTO> updateExistingSubAssetTypes = new ArrayList<>();
@@ -230,11 +250,11 @@ public class AssetTypeService extends MongoBaseService {
     }
 
     /**
-     * @throws DataNotExists if Asset type not found for given name
      * @param countryId
      * @param organizationId
-     * @param name name of asset types
+     * @param name           name of asset types
      * @return return basic object of asset type
+     * @throws DataNotExists if Asset type not found for given name
      */
     public AssetType getAssetTypeByName(Long countryId, Long organizationId, String name) {
         if (!StringUtils.isBlank(name)) {

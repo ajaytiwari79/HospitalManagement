@@ -13,15 +13,18 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompositeActivityDTO {
     private BigInteger id;
+    // TODO CHECK HOW TO UPDATE ID DYNAMICALLY
+    private BigInteger compositeId;
     private String name;
     private String description;
     private Long countryId;
     private BigInteger categoryId;
     private String categoryName;
-    private Long unitId = -1L;
-    private boolean isParentActivity = true;
+    private Long unitId ;
     private GeneralActivityTabDTO generalActivityTab;
     private Long countryActivityId;
+    private Boolean allowedBefore;
+    private Boolean allowedAfter;
 
     public CompositeActivityDTO() {
         //default Constructor
@@ -83,13 +86,6 @@ public class CompositeActivityDTO {
         this.unitId = unitId;
     }
 
-    public boolean isParentActivity() {
-        return isParentActivity;
-    }
-
-    public void setParentActivity(boolean parentActivity) {
-        isParentActivity = parentActivity;
-    }
 
     public GeneralActivityTabDTO getGeneralActivityTab() {
         return generalActivityTab;
@@ -105,5 +101,29 @@ public class CompositeActivityDTO {
 
     public void setCountryActivityId(Long countryActivityId) {
         this.countryActivityId = countryActivityId;
+    }
+
+    public Boolean getAllowedBefore() {
+        return allowedBefore;
+    }
+
+    public void setAllowedBefore(Boolean allowedBefore) {
+        this.allowedBefore = allowedBefore;
+    }
+
+    public Boolean getAllowedAfter() {
+        return allowedAfter;
+    }
+
+    public void setAllowedAfter(Boolean allowedAfter) {
+        this.allowedAfter = allowedAfter;
+    }
+
+    public BigInteger getCompositeId() {
+        return compositeId;
+    }
+
+    public void setCompositeId(BigInteger compositeId) {
+        this.compositeId = compositeId;
     }
 }
