@@ -47,7 +47,7 @@ public class PayGroupAreaService extends UserBaseService {
 
         // PatGroup Area id not present so checking name in level
         if (!Optional.ofNullable(payGroupAreaDTO.getPayGroupAreaId()).isPresent() && payGroupAreaGraphRepository.isPayGroupAreaExistWithNameInLevel(payGroupAreaDTO.getLevelId(), payGroupAreaDTO.getName().trim())) {
-            exceptionService.duplicateDataException("payGroupArea.exists", payGroupAreaDTO.getName());
+            exceptionService.duplicateDataException("message.payGroupArea.exists", payGroupAreaDTO.getName());
         }
         Level level = countryGraphRepository.getLevel(countryId, payGroupAreaDTO.getLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
