@@ -1,8 +1,7 @@
 package com.kairos.activity.wta.rule_template_category;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.user.country.tag.MongoTagDTO;
-import com.kairos.user.country.tag.TagDTO;
+import com.kairos.activity.tags.TagDTO;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ public class RuleTemplateCategoryTagDTO {
     private BigInteger id;
     private String name;
     private String description;
-    private List<MongoTagDTO> tags = new ArrayList<>();
+    private List<TagDTO> tags = new ArrayList<>();
     private List<BigInteger> ruleTemplateIds;
 
     public BigInteger getId() {
@@ -52,11 +51,11 @@ public class RuleTemplateCategoryTagDTO {
         this.description = description;
     }
 
-    public List<MongoTagDTO> getTags() {
+    public List<TagDTO> getTags() {
         return tags;
     }
 
-    public void setTags(List<MongoTagDTO> tags) {
+    public void setTags(List<TagDTO> tags) {
         this.tags = tags;
     }
 }
