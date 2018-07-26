@@ -18,6 +18,12 @@ public class AgreementSectionDTO {
 
     private List<ClauseBasicDTO> clauses;
 
+    private List<AgreementSectionDTO> subAgreementSections;
+
+    public List<AgreementSectionDTO> getSubAgreementSections() { return subAgreementSections; }
+
+    public void setSubAgreementSections(List<AgreementSectionDTO> subAgreementSections) { this.subAgreementSections = subAgreementSections; }
+
     public BigInteger getId() {
         return id;
     }

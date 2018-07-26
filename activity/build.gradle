@@ -51,8 +51,6 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-aop') //c
     compile('org.springframework.boot:spring-boot-starter-cache') //c
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
-    // Added for hot deploy,ent
-    compile("org.springframework.boot:spring-boot-devtools")
 
     compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client') //c
     compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')//c

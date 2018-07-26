@@ -106,7 +106,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 		registry.addInterceptor(new ExtractOrganizationAndUnitInfoInterceptor());
 	}
 
-	@Profile({"!local"})
+	@Profile({"development","qa","production"})
 	@LoadBalanced
 	@Primary
 	@Bean
@@ -118,7 +118,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 		return template;
 	}
 
-	@Profile({"!local"})
+	@Profile({"development","qa","production"})
 	@LoadBalanced
 	@Bean(name ="schedulerRestTemplate")
 	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
