@@ -6,7 +6,6 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
-import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
