@@ -1,27 +1,32 @@
-package com.kairos.persistence.model.tag;
+package com.kairos.user.country.tag;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.MasterDataTypeEnum;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-/**
- * Created by prerna on 20/11/17.
- */
-@Document
+import java.math.BigInteger;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Tag extends MongoBaseEntity {
-
+public class MongoTagDTO {
+    private BigInteger id;
     private String name;
-    @Indexed
     private MasterDataTypeEnum masterDataType;
-
     private boolean countryTag;
-
     private long countryId;
-
     private long organizationId;
+
+    public MongoTagDTO() {
+        //dv
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -62,20 +67,4 @@ public class Tag extends MongoBaseEntity {
     public void setOrganizationId(long organizationId) {
         this.organizationId = organizationId;
     }
-
-    public Tag(){
-
-    }
-
-    public Tag(String name, MasterDataTypeEnum masterDataType, boolean countryTag, Long countryOrOrgId){
-        this.name = name;
-        this.masterDataType = masterDataType;
-        this.countryTag = countryTag;
-        if(countryTag){
-            this.countryId = countryOrOrgId;
-        } else {
-            this.organizationId = countryOrOrgId;
-        }
-    }
-
 }
