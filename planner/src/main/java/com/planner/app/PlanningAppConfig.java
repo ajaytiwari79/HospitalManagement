@@ -59,7 +59,7 @@ public class PlanningAppConfig {
         System.setProperty("user.timezone", "UTC");
     }
 
-    @Profile({"!local"})
+    @Profile({"development","qa","production"})
     @LoadBalanced
     @Primary
     @Bean

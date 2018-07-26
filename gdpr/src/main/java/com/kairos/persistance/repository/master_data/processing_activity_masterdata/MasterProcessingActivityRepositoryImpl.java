@@ -3,6 +3,7 @@ package com.kairos.persistance.repository.master_data.processing_activity_master
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDTO;
+import com.kairos.dto.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
@@ -123,5 +124,19 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
 
         }
+    }
+
+
+    @Override
+    public List<MasterProcessingActivity> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long countryId, Long organizationId, OrganizationMetaDataDTO organizationMetaDataDTO) {
+        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
+                .and(ORGANIZATION_ID).is(organizationId)
+                .and(DELETED).is(false));
+        query.addCriteria(Criteria.where("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationService().getId()));
+        query.addCriteria(Criteria.where("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubType().getId()));
+        query.addCriteria(Criteria.where("organizationServices._id").in(organizationMetaDataDTO.getOrganizationService().getId()));
+        query.addCriteria(Criteria.where("organizationSubServices._id").in(organizationMetaDataDTO.getOrganizationSubService().getId()));
+        return mongoTemplate.find(query, MasterProcessingActivity.class);
+
     }
 }

@@ -268,7 +268,7 @@ public class RuleTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.organization.id");
         }
         //List<WTAResponseDTO> wtaResponseDTOS = workingTimeAgreementMongoRepository.getWtaByOrganization(organization.getId());
-        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.getRuleTemplateCategoryByUnitId(unitId);
+        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(organization.getCountryId());
         List<WTABaseRuleTemplate> templateList = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(organization.getCountryId());
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(templateList, WTABaseRuleTemplateDTO.class);
         RuleTemplateWrapper ruleTemplateWrapper = new RuleTemplateWrapper();
