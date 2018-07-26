@@ -15,7 +15,7 @@ import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryMongoRepository;
+import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.CountryRestClient;
@@ -56,7 +56,7 @@ public class WTAService extends MongoBaseService {
     @Inject
     private CountryRestClient countryRestClient;
     @Inject
-    private RuleTemplateCategoryMongoRepository ruleTemplateCategoryRepository;
+    private RuleTemplateCategoryRepository ruleTemplateCategoryRepository;
     @Inject
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateGraphRepository;
     @Inject

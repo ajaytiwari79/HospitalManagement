@@ -16,7 +16,7 @@ import java.util.List;
  * Created by vipul on 2/8/17.
  */
 @Repository
-public interface RuleTemplateCategoryMongoRepository extends MongoBaseRepository<RuleTemplateCategory, BigInteger> ,CustomRuleTemplateMongoRepository {
+public interface RuleTemplateCategoryRepository extends MongoBaseRepository<RuleTemplateCategory, BigInteger> ,CustomRuleTemplateCategoryRepository {
     @Query("{}")
     List<RuleTemplateCategory> getRuleTemplateCategoryByCountry(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType);
 

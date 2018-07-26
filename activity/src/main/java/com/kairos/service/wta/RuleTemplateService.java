@@ -14,7 +14,7 @@ import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.model.wta.templates.template_types.*;
-import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryMongoRepository;
+import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
@@ -52,7 +52,7 @@ public class RuleTemplateService extends MongoBaseService {
     @Inject
     private CountryRestClient countryRestClient;
     @Autowired
-    private RuleTemplateCategoryMongoRepository ruleTemplateCategoryMongoRepository;
+    private RuleTemplateCategoryRepository ruleTemplateCategoryMongoRepository;
     @Inject
     private TagService tagService;
     @Inject
@@ -237,12 +237,12 @@ public class RuleTemplateService extends MongoBaseService {
     }
 
     public RuleTemplateWrapper getRuleTemplate(long countryId) {
-        CountryDTO country = countryRestClient.getCountryById(countryId);
-        if (country == null) {
-            exceptionService.dataNotFoundByIdException("message.country.id", countryId);
-        }
+//        CountryDTO country = countryRestClient.getCountryById(countryId);
+//        if (country == null) {
+//            exceptionService.dataNotFoundByIdException("message.country.id", countryId);
+//        }
 
-        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllByCountryId(countryId);
+        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(countryId);
 
         if (categoryList == null) {
             exceptionService.dataNotFoundByIdException("message.category.null-list");

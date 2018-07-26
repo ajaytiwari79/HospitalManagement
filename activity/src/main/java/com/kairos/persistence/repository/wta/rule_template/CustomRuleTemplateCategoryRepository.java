@@ -4,7 +4,7 @@ import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO
 
 import java.util.List;
 
-public interface CustomRuleTemplateMongoRepository {
+public interface CustomRuleTemplateCategoryRepository {
 
-        List<RuleTemplateCategoryTagDTO> findAllByCountryId(Long countryId);
+        List<RuleTemplateCategoryTagDTO> findAllUsingCountryId(Long countryId);
 }
