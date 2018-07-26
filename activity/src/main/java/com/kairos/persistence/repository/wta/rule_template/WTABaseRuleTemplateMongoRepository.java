@@ -1,4 +1,4 @@
-package com.kairos.persistence.repository.wta;
+package com.kairos.persistence.repository.wta.rule_template;
 
 
 import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
