@@ -50,7 +50,7 @@ public class Shift extends MongoBaseEntity {
     private String externalId;
 
     private Long unitPositionId;
-    private List<ShiftStatus> status;
+    private Set<ShiftStatus> status;
     private List<BigInteger> brokenRuleTemplateIds;
 
     private BigInteger parentOpenShiftId;
@@ -340,11 +340,11 @@ public class Shift extends MongoBaseEntity {
         this.unitPositionId = unitPositionId;
     }
 
-    public List<ShiftStatus> getStatus() {
+    public Set<ShiftStatus> getStatus() {
         return status;
     }
 
-    public void setStatus(List<ShiftStatus> status) {
+    public void setStatus(Set<ShiftStatus> status) {
         this.status = status;
     }
 
@@ -380,7 +380,7 @@ public class Shift extends MongoBaseEntity {
         this.plannedTimeId = plannedTimeId;
     }
 
-    public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, List<ShiftStatus> status, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
+    public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, Set<ShiftStatus> status, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;

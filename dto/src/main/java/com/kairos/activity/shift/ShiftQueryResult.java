@@ -8,10 +8,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.IsoFields;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by vipul on 31/8/17.
@@ -41,7 +38,7 @@ public class ShiftQueryResult {
     private Long unitPositionId;
     private int scheduledMinutes;
     private int durationMinutes;
-    private List<ShiftStatus> status;
+    private Set<ShiftStatus> status;
     private Long allowedBreakDurationInMinute;
     private Long expertiseId;
     private String timeType;
@@ -234,11 +231,11 @@ public class ShiftQueryResult {
         this.unitPositionId = unitPositionId;
     }
 
-    public List<ShiftStatus> getStatus() {
-        return status;
+    public Set<ShiftStatus> getStatus() {
+        return status=Optional.ofNullable(status).orElse(new HashSet<>());
     }
 
-    public void setStatus(List<ShiftStatus> status) {
+    public void setStatus(Set<ShiftStatus> status) {
         this.status = status;
     }
 

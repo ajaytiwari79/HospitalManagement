@@ -367,7 +367,7 @@ public class PhaseService extends MongoBaseService {
 
         int weekDifference = proposedWeekNumber-startWeekNumber;
 
-        weekDifference++; // 34-30  its 4 bit actually we need 5 including curreny
+        weekDifference++; // 34-30  its 4 but actually we need 5 including currently
         if (weekDifference < 0) {
             Optional<Phase> phaseOptional = phases.stream().findFirst();
             phase = phaseOptional.get();
