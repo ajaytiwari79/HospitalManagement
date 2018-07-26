@@ -306,17 +306,14 @@ public class PlanningPeriodService extends MongoBaseService {
         boolean updateCurrentAndNextPhases = false;
         BigInteger nextPhaseId = null;
         for (PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()) {
-
-            if (planningPeriod.getNextPhaseId().equals(phaseFlippingDate.getPhaseId())) {
-                if (phaseFlippingDate.getFlippingDate().compareTo(date) <= 0) {
-                    updateCurrentAndNextPhases = true;
-                }
+            if (phaseFlippingDate.getFlippingDate().isEqual(date)) {
+                planningPeriod.setCurrentPhaseId(phaseFlippingDate.getPhaseId());
+                updateCurrentAndNextPhases = true;
                 break;
             }
             nextPhaseId = phaseFlippingDate.getPhaseId();
         }
         if (updateCurrentAndNextPhases) {
-            planningPeriod.setCurrentPhaseId(planningPeriod.getNextPhaseId());
             planningPeriod.setNextPhaseId(nextPhaseId);
             save(planningPeriod);
         }
@@ -419,5 +416,31 @@ public class PlanningPeriodService extends MongoBaseService {
 
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
+
+/*  not delete this code harish
+* public boolean updateFlippingDate(BigInteger periodId, Long unitId, LocalDate date){
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
+        boolean updateCurrentAndNextPhases = false;
+        BigInteger nextPhaseId = null;
+        for(PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()){
+
+            if(planningPeriod.getNextPhaseId().equals(phaseFlippingDate.getPhaseId()) ){
+                if(phaseFlippingDate.getFlippingDate().compareTo(date) <= 0){
+                    updateCurrentAndNextPhases = true;
+                }
+                break;
+            }
+            nextPhaseId = phaseFlippingDate.getPhaseId();
+        }
+        if(updateCurrentAndNextPhases){
+            planningPeriod.setCurrentPhaseId(planningPeriod.getNextPhaseId());
+            planningPeriod.setNextPhaseId(nextPhaseId);
+            save(planningPeriod);
+        }
+        return true;
+    }
+* */
+
+
 
 }

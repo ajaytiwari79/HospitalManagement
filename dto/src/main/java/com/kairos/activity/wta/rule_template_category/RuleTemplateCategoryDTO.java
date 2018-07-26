@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.kairos.enums.RuleTemplateCategoryType;
+import com.kairos.activity.tags.TagDTO;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -20,10 +21,10 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RuleTemplateCategoryDTO{
+public class RuleTemplateCategoryDTO {
 
     @NotNull(message = "error.RuleTemplateCategory.name.notnull")
-   // @JsonProperty(value = "categoryName")
+    // @JsonProperty(value = "categoryName")
     private String name;
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
@@ -31,8 +32,12 @@ public class RuleTemplateCategoryDTO{
     private BigInteger id;
     private Date createdAt;
     private Date updatedAt;
-    private boolean deleted ;
+    private boolean deleted;
     private List<BigInteger> ruleTemplateIds;
+
+    private List<TagDTO> tags = new ArrayList<>();
+
+
     public RuleTemplateCategoryDTO(String name, String description, boolean deleted) {
         this.name = name;
         this.description = description;
@@ -87,9 +92,6 @@ public class RuleTemplateCategoryDTO{
         this.name = name;
     }
 
-    private List<Long> tags = new ArrayList<>();
-
-
 
     public String getName() {
         return name;
@@ -97,7 +99,7 @@ public class RuleTemplateCategoryDTO{
 
     @JsonSetter("categoryName")
     public void setCategoryategoryName(String name) {
-        if(this.name==null) {
+        if (this.name == null) {
             this.name = name;
         }
     }
@@ -110,6 +112,7 @@ public class RuleTemplateCategoryDTO{
     public String getDescription() {
         return description;
     }
+
     public boolean isDeleted() {
         return deleted;
     }
@@ -117,6 +120,7 @@ public class RuleTemplateCategoryDTO{
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -136,13 +140,13 @@ public class RuleTemplateCategoryDTO{
     public void setCountry(Long country) {
         this.country = country;
     }
-    public List<Long> getTags() {
+
+    public List<TagDTO> getTags() {
         return tags;
     }
 
-    public void setTags(List<Long> tags) {
+    public void setTags(List<TagDTO> tags) {
         this.tags = tags;
     }
-
 }
 

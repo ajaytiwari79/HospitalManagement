@@ -3,6 +3,8 @@ package com.kairos.persistance.model.data_inventory.asset;
 
 import com.kairos.enums.RiskSeverity;
 import com.kairos.persistance.model.common.MongoBaseEntity;
+import com.kairos.persistance.model.data_inventory.ManagingOrganization;
+import com.kairos.persistance.model.data_inventory.Staff;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -28,7 +30,7 @@ public class Asset extends MongoBaseEntity {
     private String hostingLocation;
 
     @NotNull(message = "Managing department can't be empty")
-    private Organization managingDepartment;
+    private ManagingOrganization managingDepartment;
 
     @NotNull(message = "Asset Owner can't be Empty")
     private Staff assetOwner;
@@ -61,7 +63,8 @@ public class Asset extends MongoBaseEntity {
 
     private RiskSeverity risk;
 
-    private Boolean isActive=false;
+    @NotNull(message = "Status can't be empty")
+    private Boolean isActive;
 
     public Boolean getActive() { return isActive; }
 
@@ -133,9 +136,9 @@ public class Asset extends MongoBaseEntity {
     public String getHostingLocation() { return hostingLocation; }
 
     public void setHostingLocation(String hostingLocation) { this.hostingLocation = hostingLocation; }
-    public Organization getManagingDepartment() { return managingDepartment; }
+    public ManagingOrganization getManagingDepartment() { return managingDepartment; }
 
-    public void setManagingDepartment(Organization managingDepartment) { this.managingDepartment = managingDepartment; }
+    public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
 
     public Staff getAssetOwner() { return assetOwner; }
 
@@ -152,7 +155,7 @@ public class Asset extends MongoBaseEntity {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public Asset(String name, String description, String hostingLocation, Long countryId,BigInteger assetType, List<BigInteger> assetSubTypes, Organization managingDepartment, Staff assetOwner) {
+    public Asset(String name, String description, String hostingLocation, Long countryId, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner,Boolean isActive) {
         this.name = name;
         this.description = description;
         this.hostingLocation=hostingLocation;
@@ -161,6 +164,15 @@ public class Asset extends MongoBaseEntity {
         this.assetSubTypes=assetSubTypes;
         this.assetOwner=assetOwner;
         this.managingDepartment=managingDepartment;
+        this.isActive=isActive;
+    }
+
+
+    public Asset(String name, String description, Long countryId, Boolean isActive) {
+        this.name = name;
+        this.description = description;
+        this.countryId = countryId;
+        this.isActive = isActive;
     }
 }
 

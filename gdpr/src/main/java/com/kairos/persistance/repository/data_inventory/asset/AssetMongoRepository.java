@@ -17,5 +17,6 @@ public interface AssetMongoRepository extends MongoRepository<Asset,BigInteger>,
     Asset findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
 
+    Asset findByid(BigInteger id);
 
 }

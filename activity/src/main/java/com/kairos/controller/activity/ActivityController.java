@@ -64,8 +64,8 @@ public class ActivityController {
     @ApiOperation("Get all activity categories based on countryId ")
     @GetMapping(value = "/activity/activity_categories")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivityCategoriesForDefaultData(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityCategoriesByCountry(countryId));
+    public ResponseEntity<Map<String, Object>> getActivityCategoriesForDefaultData(@PathVariable long countryId,@RequestParam List<BigInteger> activityCategoriesIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityCategoriesByCountry(countryId, activityCategoriesIds));
     }
 
     @ApiOperation("Get all activity Ids of units by parentIds")

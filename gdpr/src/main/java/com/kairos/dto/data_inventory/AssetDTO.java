@@ -4,8 +4,8 @@ package com.kairos.dto.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.persistance.model.data_inventory.asset.Organization;
-import com.kairos.persistance.model.data_inventory.asset.Staff;
+import com.kairos.persistance.model.data_inventory.ManagingOrganization;
+import com.kairos.persistance.model.data_inventory.Staff;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
@@ -21,7 +21,7 @@ public class AssetDTO {
 
 
     @NotNullOrEmpty(message = "name can't be empty ")
-    @Pattern(message = "Numbers and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "Number and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     @NotNullOrEmpty(message = "description  can't be  Empty ")
@@ -33,10 +33,10 @@ public class AssetDTO {
 
     @NotNull(message = "Managing department can't be empty")
     @Valid
-    private Organization managingDepartment;
+    private ManagingOrganization managingDepartment;
 
-    @NotNull(message = "Asset Owner can't be Empty")
-    @Valid
+   // @NotNull(message = "Asset Owner can't be Empty")
+    //@Valid
     private Staff assetOwner;
 
     private List<BigInteger> storageFormats;
@@ -67,6 +67,8 @@ public class AssetDTO {
     private Long maxDataSubjectVolume;
 
     private RiskSeverity risk;
+
+    private Boolean isActive;
 
     public String getName() { return name; }
 
@@ -128,9 +130,9 @@ public class AssetDTO {
 
     public void setHostingLocation(String hostingLocation) { this.hostingLocation = hostingLocation; }
 
-    public Organization getManagingDepartment() { return managingDepartment; }
+    public ManagingOrganization getManagingDepartment() { return managingDepartment; }
 
-    public void setManagingDepartment(Organization managingDepartment) { this.managingDepartment = managingDepartment; }
+    public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
 
     public Staff getAssetOwner() { return assetOwner; }
 
@@ -140,6 +142,9 @@ public class AssetDTO {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public AssetDTO() {
-    }
+ public Boolean getActive() { return isActive; }
+
+ public void setActive(Boolean active) { isActive = active; }
+
+ public AssetDTO() { }
 }
