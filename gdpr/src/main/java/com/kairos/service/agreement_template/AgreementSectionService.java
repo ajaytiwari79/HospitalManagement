@@ -408,7 +408,6 @@ public class AgreementSectionService extends MongoBaseService {
     public List<AgreementSection> updateSubSectionAndClausesList(List<ClauseBasicDTO> newClauseBasicDTOList, List<ClauseBasicDTO> changedClausesDTOList, List<BigInteger> changedClauseIdsList,
                                                                  AgreementSectionDTO agreementSectionDTO, Map<String, AgreementSectionClauseWrapper> agreementSubSectionClauseAndClauseDtoHashMap) {
 
-
         List<BigInteger> subSectionIdList = new ArrayList<>();
 
         agreementSectionDTO.getSubAgreementSections().forEach(agreementSubSectionDTO -> {
@@ -452,7 +451,6 @@ public class AgreementSectionService extends MongoBaseService {
         return agreementSubSectionList;
     }
 
-
     /**
      * @param countryId
      * @param orgId
@@ -470,7 +468,7 @@ public class AgreementSectionService extends MongoBaseService {
         List<BigInteger> agreementSectionIdList = policyAgreementTemplate.getAgreementSections();
         agreementSectionIdList.remove(id);
         policyAgreementTemplateRepository.save(sequenceGenerator(policyAgreementTemplate));
-        delete(exist);
+        agreementSectionMongoRepository.delete(exist);
         return true;
     }
 
