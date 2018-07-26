@@ -382,7 +382,7 @@ public class ShiftService extends MongoBaseService {
             }
         }
         // Sometimes the break is
-        if (shiftDurationInMinute > 0 && shiftDurationInMinute <= breakAllowedAfterMinute && Objects.equals(lastItemAdded, SHIFT)) {
+        if (shiftDurationInMinute > 0 && shiftDurationInMinute <= breakAllowedAfterMinute && SHIFT.equals(lastItemAdded)) {
             // handle later
             startDateMillis = endDateMillis;
             endDateMillis = endDateMillis + (shiftDurationInMinute * ONE_MINUTE);
@@ -390,7 +390,7 @@ public class ShiftService extends MongoBaseService {
             shifts.add(getShiftObject(mainShift, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
 
 
-        } else if (shiftDurationInMinute > 0 && shiftDurationInMinute <= breakAllowedAfterMinute && Objects.equals(lastItemAdded, BREAK)) {
+        } else if (shiftDurationInMinute > 0 && shiftDurationInMinute <= breakAllowedAfterMinute && BREAK.equals(lastItemAdded )) {
             startDateMillis = endDateMillis;
             endDateMillis = startDateMillis + (shiftDurationInMinute * ONE_MINUTE);
             shifts.add(getShiftObject(mainShift, mainShift.getName(), mainShift.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
