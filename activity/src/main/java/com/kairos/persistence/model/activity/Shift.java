@@ -11,9 +11,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by vipul on 30/8/17.
@@ -341,7 +339,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public Set<ShiftStatus> getStatus() {
-        return status;
+        return status=Optional.ofNullable(status).orElse(new HashSet<>());
     }
 
     public void setStatus(Set<ShiftStatus> status) {

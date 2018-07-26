@@ -390,7 +390,7 @@ public class ShiftService extends MongoBaseService {
             shifts.add(getShiftObject(mainShift, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
 
 
-        } else if (shiftDurationInMinute > 0 && shiftDurationInMinute <= breakAllowedAfterMinute && BREAK.equals(lastItemAdded )) {
+        } else if (shiftDurationInMinute > 0 && shiftDurationInMinute <= breakAllowedAfterMinute && BREAK.equals(lastItemAdded)) {
             startDateMillis = endDateMillis;
             endDateMillis = startDateMillis + (shiftDurationInMinute * ONE_MINUTE);
             shifts.add(getShiftObject(mainShift, mainShift.getName(), mainShift.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
@@ -599,7 +599,7 @@ public class ShiftService extends MongoBaseService {
         Specification<ShiftWithActivityDTO> activitySpecification = activityEmploymentTypeSpecification
                 .and(activityExpertiseSpecification)
                 .and(activitySkillSpec)
-               // .and(wtaRulesSpecification)
+                // .and(wtaRulesSpecification)
                 .and(staffEmploymentSpecification)
                 .and(shiftTimeLessThan);
 
@@ -778,7 +778,7 @@ public class ShiftService extends MongoBaseService {
 
         for (int i = 0; i < shiftDTO.getSubShifts().size(); i++) {
             ShiftDTO subShifts = shiftDTO.getSubShifts().get(i);
-            CompositeActivity compositeActivity= compositeActivityMap.get(subShifts.getActivityId());
+            CompositeActivity compositeActivity = compositeActivityMap.get(subShifts.getActivityId());
             if (i == 0) {
                 if ((!parentShiftStartDateTime.equals(subShifts.getStartDate())) || (parentShiftEndDateTime.before(subShifts.getEndDate()))) {
                     logger.info("start " + parentShiftStartDateTime + "-" + subShifts.getStartDate()
@@ -786,8 +786,8 @@ public class ShiftService extends MongoBaseService {
                     exceptionService.invalidRequestException("message.shift.date.startandend.incorrect", (i - 1));
                 }
 
-                if(compositeActivity!=null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedBefore()) {
-                    exceptionService.invalidRequestException("message.shift.notAllowedBefore",subShifts.getName(),activity.getName());
+                if (compositeActivity != null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedBefore()) {
+                    exceptionService.invalidRequestException("message.shift.notAllowedBefore", subShifts.getName(), activity.getName());
                 }
 
 
@@ -797,8 +797,8 @@ public class ShiftService extends MongoBaseService {
                             + "end " + (parentShiftEndDateTime) + "-" + subShifts.getEndDate() + "shift data");
                     exceptionService.invalidRequestException("message.shift.date.startandend.incorrect", (i - 1));
                 }
-                if(compositeActivity!=null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedAfter()) {
-                    exceptionService.invalidRequestException("message.shift.notAllowedAfter",subShifts.getName(),activity.getName());
+                if (compositeActivity != null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedAfter()) {
+                    exceptionService.invalidRequestException("message.shift.notAllowedAfter", subShifts.getName(), activity.getName());
                 }
             }
             // making the calculating the previous  object as parent
@@ -818,8 +818,8 @@ public class ShiftService extends MongoBaseService {
         List<ShiftDTO> subShiftDTOS = shiftDTO.getSubShifts();
 
         Set<BigInteger> activityIds = subShiftDTOS.parallelStream()
-                .filter(act->!(act.getName().equalsIgnoreCase(PAID_BREAK) || act.getName().equalsIgnoreCase(UNPAID_BREAK)))
-                .map(act->act.getActivityId())
+                .filter(act -> !(act.getName().equalsIgnoreCase(PAID_BREAK) || act.getName().equalsIgnoreCase(UNPAID_BREAK)))
+                .map(act -> act.getActivityId())
                 .collect(Collectors.toSet());
 
         Set<BigInteger> allowedActivities = activity.getCompositeActivities().stream().map(CompositeActivity::getActivityId).collect(Collectors.toSet());
@@ -969,7 +969,7 @@ public class ShiftService extends MongoBaseService {
         return activityChangeStatus;
     }
 
-    public Map<String, List<ShiftResponse>> updateStatusOfShift(Long unitId,ShiftPublishDTO shiftPublishDTO) {
+    public Map<String, List<ShiftResponse>> updateStatusOfShift(Long unitId, ShiftPublishDTO shiftPublishDTO) {
 
         List<ShiftResponse> success = new ArrayList<>();
         List<ShiftResponse> error = new ArrayList<>();
@@ -978,21 +978,22 @@ public class ShiftService extends MongoBaseService {
         response.put("error", error);
 
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftPublishDTO.getShiftIds());
-        if(shifts.isEmpty()){
+        if (shifts.isEmpty()) {
             return response;
         }
-        Set<LocalDate> dates=shifts.stream().map(s->DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
-        Map<LocalDate,List<ShiftStatus>> phaseListByDate=phaseService.getStatusByDates(unitId,dates);
-        for(Shift shift:shifts){
-            List<ShiftStatus> phaseStatuses=phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
-            if(phaseStatuses.containsAll(shiftPublishDTO.getStatus())){
+        Set<LocalDate> dates = shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
+        Map<LocalDate, List<ShiftStatus>> phaseListByDate = phaseService.getStatusByDates(unitId, dates);
+        for (Shift shift : shifts) {
+            List<ShiftStatus> phaseStatuses = phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
+            if (phaseStatuses.containsAll(shiftPublishDTO.getStatus())) {
                 shift.getStatus().addAll(shiftPublishDTO.getStatus());
-                success.add(new ShiftResponse(shift.getId(),shift.getName(),Arrays.asList("Status added successfully"),true));
-            }
-            else {
-                error.add(new ShiftResponse(shift.getId(),shift.getName(),Arrays.asList("Status can't be added."+
-                        "Available Status to be applied :"+phaseStatuses+
-                        "Statuses send to be applied :"+shiftPublishDTO.getStatus()),false));
+                success.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("message.shift.status.added")), true));
+            } else {
+
+                List<Object> ls = new ArrayList<>();
+                ls.addAll(shiftPublishDTO.getStatus());
+                ls.addAll(phaseStatuses);
+                error.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("error.shift.status", ls.toArray())), false));
             }
         }
         save(shifts);
