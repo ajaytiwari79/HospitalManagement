@@ -28,7 +28,7 @@ public class Asset extends MongoBaseEntity {
     private String hostingLocation;
 
     @NotNull(message = "Managing department can't be empty")
-    private Organization managingDepartment;
+    private ManagingOrganization managingDepartment;
 
     @NotNull(message = "Asset Owner can't be Empty")
     private Staff assetOwner;
@@ -133,9 +133,9 @@ public class Asset extends MongoBaseEntity {
     public String getHostingLocation() { return hostingLocation; }
 
     public void setHostingLocation(String hostingLocation) { this.hostingLocation = hostingLocation; }
-    public Organization getManagingDepartment() { return managingDepartment; }
+    public ManagingOrganization getManagingDepartment() { return managingDepartment; }
 
-    public void setManagingDepartment(Organization managingDepartment) { this.managingDepartment = managingDepartment; }
+    public void setManagingDepartment(ManagingOrganization managingDepartment) { this.managingDepartment = managingDepartment; }
 
     public Staff getAssetOwner() { return assetOwner; }
 
@@ -152,7 +152,7 @@ public class Asset extends MongoBaseEntity {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public Asset(String name, String description, String hostingLocation, Long countryId,BigInteger assetType, List<BigInteger> assetSubTypes, Organization managingDepartment, Staff assetOwner) {
+    public Asset(String name, String description, String hostingLocation, Long countryId, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner) {
         this.name = name;
         this.description = description;
         this.hostingLocation=hostingLocation;

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,15 +58,17 @@ public class ActivityTypesRestClient {
 
     }
 
-    public List<ActivityCategoryDTO> getActivityCategoriesForCountry (Long countryId){
+    public List<ActivityCategoryDTO> getActivityCategoriesForCountry (Long countryId, List<BigInteger> activityCategoriesIds){
 
         final String baseUrl=getBaseUrl(false);
+        final String activityCategoriesIdsQueryString = activityCategoriesIds.stream().map(Object::toString)
+                .collect(Collectors.joining(", "));
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>> typeReference =
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/country/{countryId}/activity/activity_categories",
+                            baseUrl + "/country/{countryId}/activity/activity_categories?activityCategoriesIds="+activityCategoriesIdsQueryString,
                             HttpMethod.GET,
                             null, typeReference,countryId);
 
