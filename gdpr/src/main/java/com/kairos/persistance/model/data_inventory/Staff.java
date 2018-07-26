@@ -1,4 +1,4 @@
-package com.kairos.persistance.model.data_inventory.asset;
+package com.kairos.persistance.model.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
