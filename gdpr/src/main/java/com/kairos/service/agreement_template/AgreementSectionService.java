@@ -309,6 +309,7 @@ public class AgreementSectionService extends MongoBaseService {
      * @param policyAgreementTemplate - new clauses which we need to create inherit it properties from policyAgreementTemplate .
      * @return
      */
+       //Todo add update Sub section api and complete the method for update Agreement  section
     public List<BigInteger> updateAgreementSectionSubSectionAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
         checkForDuplicacyInTitleOfAgreementSectionAndSubSection(agreementSectionDTOS);
@@ -383,7 +384,7 @@ public class AgreementSectionService extends MongoBaseService {
 
     }
 
-
+    //Todo :  working on it
     public List<BigInteger> updateExistingSectionAndClausesList(List<ClauseBasicDTO> newClauseBasicDTOList, List<ClauseBasicDTO> changedClausesDTOList, List<BigInteger> changedClauseIdsList,
                                                                 AgreementSectionDTO agreementSectionDTO, Map<String, AgreementSectionClauseWrapper> agreementSubSectionClauseAndClauseDtoHashMap){
 
