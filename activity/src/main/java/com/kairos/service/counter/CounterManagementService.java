@@ -81,10 +81,10 @@ public class CounterManagementService extends MongoBaseService{
             tabKPIsMap.put(tabKPI.getModuleId(), new ArrayList<>());
         });
 
-        List<TabKPIEntryConfDTO> tabKPIEntries = counterRepository.getTabKPIConfgiurationByTabId(kpiTabs.stream().map(kpiTab -> kpiTab.getModuleId()).collect(toList()));
-        tabKPIEntries.forEach(tabKPI -> {
-            tabKPIsMap.get(tabKPI.getTabId()).add(tabKPI.getKpiId());
-        });
+//        List<TabKPIEntryConfDTO> tabKPIEntries = counterRepository.getTabKPIConfgiurationByTabId(kpiTabs.stream().map(kpiTab -> kpiTab.getModuleId()).collect(toList()));
+//        tabKPIEntries.forEach(tabKPI -> {
+//            tabKPIsMap.get(tabKPI.getTabId()).add(tabKPI.getKpiId());
+//        });
         return new InitialKPITabDistDataDTO(kpiTabs, tabKPIsMap);
     }
 
