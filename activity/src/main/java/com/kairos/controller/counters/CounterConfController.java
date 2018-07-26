@@ -58,23 +58,23 @@ public class CounterConfController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PostMapping(value="/category"+COUNTRY_URL)
+    @PostMapping(value=COUNTRY_URL+"/category")
     public ResponseEntity<Map<String, Object>> addCategoriesAtCountryLevel(@PathVariable Long countryId, @RequestBody List<KPICategory> categories){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.addCategories(categories, ConfLevel.COUNTRY, countryId));
     }
 
-    @PostMapping(value="/category"+UNIT_URL)
+    @PostMapping(value=UNIT_URL+"/category")
     public ResponseEntity<Map<String, Object>> addCategoriesAtUnitLevel(@PathVariable Long unitId, @RequestBody List<KPICategory> categories){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.addCategories(categories, ConfLevel.UNIT, unitId));
     }
 
-    @PutMapping(value = "/category"+COUNTRY_URL)
+    @PutMapping(value = COUNTRY_URL+"/category")
     public ResponseEntity<Map<String, Object>> updateCategoriesForCountry(@RequestBody KPICategoryUpdationDTO categories, @PathVariable Long countryId){
         counterConfService.updateCategories(categories, ConfLevel.COUNTRY, countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(value = "/category"+UNIT_URL)
+    @PutMapping(value =UNIT_URL+"/category")
     public ResponseEntity<Map<String, Object>> updateCategoriesForUnit(@RequestBody KPICategoryUpdationDTO categories, @PathVariable Long unitId){
         counterConfService.updateCategories(categories, ConfLevel.UNIT, unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);

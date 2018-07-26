@@ -42,7 +42,7 @@ public class CounterConfIntegrationTest {
         criteriaList.add(filter);
         filter = new FilterCriteria(FilterType.PLANNED_TIME_TYPE, new ArrayList<>());
         filter.getValues().add(null);
-        Counter myCounter = new Counter(CounterType.RESTING_HOURS_PER_PRESENCE_DAY, criteriaList);
+        Counter myCounter = new Counter(CounterType.RESTING_HOURS_PER_PRESENCE_DAY);
         HttpEntity<Counter> requestEntity = new HttpEntity<>(myCounter);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {};
         ResponseEntity<RestTemplateResponseEnvelope<Object>> response = testRestTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity, typeReference);
