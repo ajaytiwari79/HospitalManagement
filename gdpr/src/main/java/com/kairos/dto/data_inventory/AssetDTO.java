@@ -35,8 +35,8 @@ public class AssetDTO {
     @Valid
     private ManagingOrganization managingDepartment;
 
-    @NotNull(message = "Asset Owner can't be Empty")
-    @Valid
+   // @NotNull(message = "Asset Owner can't be Empty")
+    //@Valid
     private Staff assetOwner;
 
     private List<BigInteger> storageFormats;

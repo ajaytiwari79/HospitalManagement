@@ -162,6 +162,14 @@ public class Asset extends MongoBaseEntity {
         this.assetOwner=assetOwner;
         this.managingDepartment=managingDepartment;
     }
+
+
+    public Asset(String name, String description, Long countryId, Boolean isActive) {
+        this.name = name;
+        this.description = description;
+        this.countryId = countryId;
+        this.isActive = isActive;
+    }
 }
 
 
