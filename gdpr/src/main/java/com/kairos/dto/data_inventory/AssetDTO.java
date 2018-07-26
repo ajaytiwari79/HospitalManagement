@@ -68,6 +68,8 @@ public class AssetDTO {
 
     private RiskSeverity risk;
 
+    private Boolean isActive;
+
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
@@ -140,6 +142,9 @@ public class AssetDTO {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public AssetDTO() {
-    }
+ public Boolean getActive() { return isActive; }
+
+ public void setActive(Boolean active) { isActive = active; }
+
+ public AssetDTO() { }
 }

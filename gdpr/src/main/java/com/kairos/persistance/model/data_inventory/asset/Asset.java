@@ -63,7 +63,8 @@ public class Asset extends MongoBaseEntity {
 
     private RiskSeverity risk;
 
-    private Boolean isActive=false;
+    @NotNull(message = "Status can't be empty")
+    private Boolean isActive;
 
     public Boolean getActive() { return isActive; }
 
@@ -154,7 +155,7 @@ public class Asset extends MongoBaseEntity {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public Asset(String name, String description, String hostingLocation, Long countryId, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner) {
+    public Asset(String name, String description, String hostingLocation, Long countryId, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner,Boolean isActive) {
         this.name = name;
         this.description = description;
         this.hostingLocation=hostingLocation;
@@ -163,6 +164,7 @@ public class Asset extends MongoBaseEntity {
         this.assetSubTypes=assetSubTypes;
         this.assetOwner=assetOwner;
         this.managingDepartment=managingDepartment;
+        this.isActive=isActive;
     }
 
 

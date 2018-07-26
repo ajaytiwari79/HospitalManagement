@@ -23,6 +23,15 @@ public class DataInheritOrganizationLevelController {
     private DataInheritOrganizationLevelService dataInheritOrganizationLevelService;
 
 
+    /**
+     *
+     * @param countryId
+     * @param organizationId - id of parent organization from which unit inherit data
+     * @param unitId - id of the organization which inherit data from from
+     * @param organizationMetaDataDTO - contain meta data about child organization, on the basis of meta data (org type ,sub type ,service category and sub service) unit
+     *                             inherit data from parent
+     * @return
+     */
     @ApiOperation(value = "inherit Data from Parent organization on the basis of Org Type, sub Type,Category and Sub Category")
     @PostMapping(UNIT_URL + "/inherit")
     public ResponseEntity<Object> inheritDataFromParentOrganization(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable Long unitId, @Valid @RequestBody OrganizationMetaDataDTO organizationMetaDataDTO) {

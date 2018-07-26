@@ -101,17 +101,12 @@ public class AssetController {
 
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/asset/{assetId}/history")
-    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger assetId)  throws ClassNotFoundException {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Country id can't be Null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "ManagingOrganization id can't be Null");
-        }
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset( @PathVariable BigInteger assetId)  throws ClassNotFoundException {
+
         if (assetId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Asset  id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetActivities(countryId, organizationId, assetId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetActivities( assetId));
     }
 
 

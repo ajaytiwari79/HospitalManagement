@@ -54,6 +54,8 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private Long countryId;
 
+    private Boolean isActive;
+
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
@@ -128,11 +130,21 @@ public class ProcessingActivity extends MongoBaseEntity {
         this.destinationTransferMethods = destinationTransferMethods;
     }
 
+    public Boolean getActive() { return isActive; }
+
+    public void setActive(Boolean active) { isActive = active; }
     public ProcessingActivity(String name, String description, Long countryId, ManagingOrganization managingDepartment, Staff processOwner) {
         this.name = name;
         this.description = description;
         this.managingDepartment = managingDepartment;
         this.processOwner = processOwner;
         this.countryId=countryId;
+    }
+
+    public ProcessingActivity(String name,  String description, Long countryId, Boolean isActive) {
+        this.name = name;
+        this.description = description;
+        this.countryId = countryId;
+        this.isActive = isActive;
     }
 }
