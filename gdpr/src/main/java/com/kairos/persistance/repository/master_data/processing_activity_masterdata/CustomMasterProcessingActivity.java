@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data.processing_activity_master
 
 import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDTO;
+import com.kairos.dto.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
@@ -24,6 +25,7 @@ public interface CustomMasterProcessingActivity {
 
    Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType);
 
+   List<MasterProcessingActivity> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId, Long organizationId, OrganizationMetaDataDTO organizationMetaDataDTO);
 
 
 }

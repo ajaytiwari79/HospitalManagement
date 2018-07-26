@@ -35,8 +35,8 @@ public class AssetDTO {
     @Valid
     private ManagingOrganization managingDepartment;
 
-    @NotNull(message = "Asset Owner can't be Empty")
-    @Valid
+   // @NotNull(message = "Asset Owner can't be Empty")
+    //@Valid
     private Staff assetOwner;
 
     private List<BigInteger> storageFormats;
@@ -67,6 +67,8 @@ public class AssetDTO {
     private Long maxDataSubjectVolume;
 
     private RiskSeverity risk;
+
+    private Boolean isActive;
 
     public String getName() { return name; }
 
@@ -140,6 +142,9 @@ public class AssetDTO {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public AssetDTO() {
-    }
+ public Boolean getActive() { return isActive; }
+
+ public void setActive(Boolean active) { isActive = active; }
+
+ public AssetDTO() { }
 }
