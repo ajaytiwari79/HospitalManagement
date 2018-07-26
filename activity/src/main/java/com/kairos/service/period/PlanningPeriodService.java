@@ -56,15 +56,10 @@ public class PlanningPeriodService extends MongoBaseService {
     public List<PhaseDTO> getPhasesWithDurationInDays(Long unitId) {
         List<PhaseDTO> phases = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
         phases.forEach(phase -> {
-            switch (phase.getDurationType()) {
-                case DAYS: {
-                    phase.setDurationInDays(phase.getDuration());
-                    break;
-                }
-                case WEEKS: {
-                    phase.setDurationInDays(phase.getDuration() * 7);
-                    break;
-                }
+            if(phase.getDurationType().equals(DurationType.DAYS)){
+                phase.setDurationInDays(phase.getDuration());
+            }else{
+                phase.setDurationInDays(phase.getDuration() * 7);
             }
         });
         return phases;
