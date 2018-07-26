@@ -26,12 +26,12 @@ public class PolicyAgreementTemplateDTO {
     @NotNullOrEmpty(message = "error.agreement.name.cannot.be.empty.or.null")
     private String description;
 
-    @NotNull(message = "Organization Type cannot be null")
-    @NotEmpty(message = "Organization Type cannot be empty")
+    @NotNull(message = "ManagingOrganization Type cannot be null")
+    @NotEmpty(message = "ManagingOrganization Type cannot be empty")
     private List<OrganizationTypeDTO>  organizationTypes;
 
-    @NotNull(message = "Organization Sub Type cannot be null")
-    @NotEmpty(message = "Organization Sub Type cannot be empty")
+    @NotNull(message = "ManagingOrganization Sub Type cannot be null")
+    @NotEmpty(message = "ManagingOrganization Sub Type cannot be empty")
     private List<OrganizationSubTypeDTO>  organizationSubTypes;
 
     @NotNull(message = "Service Type cannot be null")

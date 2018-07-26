@@ -227,8 +227,8 @@ public class ActivityService extends MongoBaseService {
         return activityMongoRepository.findAllActivityWithCtaWtaSettingByCountry(countryId);
     }
 
-    public List<ActivityCategory> findAllActivityCategoriesByCountry(long countryId) {
-        return activityCategoryRepository.findByCountryId(countryId);
+    public List<ActivityCategory> findAllActivityCategoriesByCountry(long countryId,List<BigInteger>  activityCategoriesIds) {
+        return activityCategoryRepository.findAllByIdsIn(activityCategoriesIds);
     }
 
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByUnit(long unitId) {

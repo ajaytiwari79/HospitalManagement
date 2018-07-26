@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
+import com.kairos.response.dto.common.HostingTypeResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -19,6 +20,9 @@ public interface HostingTypeMongoRepository extends MongoRepository<HostingType,
     HostingType findByName(Long countryId,Long organizationId,String name);
 
     HostingType findByid(BigInteger id);
+
+    @Query("{deleted:false,_id:?0}")
+    HostingTypeResponseDTO findHostingTypeById(BigInteger id);
 
     @Query("{countryId:?0,organizationId:?1,deleted:false}")
     List<HostingType> findAllHostingTypes(Long countryId,Long organizationId);

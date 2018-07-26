@@ -197,22 +197,19 @@ public class PlanningPeriodService extends MongoBaseService {
         return getPlanningPeriods(unitId, planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate());
     }
 
-    public boolean updateFlippingDate(BigInteger periodId, Long unitId, LocalDate date){
+    public boolean updateFlippingDate(BigInteger periodId, Long unitId, LocalDate date) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
         boolean updateCurrentAndNextPhases = false;
         BigInteger nextPhaseId = null;
-        for(PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()){
-
-            if(planningPeriod.getNextPhaseId().equals(phaseFlippingDate.getPhaseId()) ){
-                if(phaseFlippingDate.getFlippingDate().compareTo(date) <= 0){
-                    updateCurrentAndNextPhases = true;
-                }
+        for (PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()) {
+            if (phaseFlippingDate.getFlippingDate().isEqual(date)) {
+                planningPeriod.setCurrentPhaseId(phaseFlippingDate.getPhaseId());
+                updateCurrentAndNextPhases = true;
                 break;
             }
             nextPhaseId = phaseFlippingDate.getPhaseId();
         }
-        if(updateCurrentAndNextPhases){
-            planningPeriod.setCurrentPhaseId(planningPeriod.getNextPhaseId());
+        if (updateCurrentAndNextPhases) {
             planningPeriod.setNextPhaseId(nextPhaseId);
             save(planningPeriod);
         }
@@ -375,7 +372,29 @@ public class PlanningPeriodService extends MongoBaseService {
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
+/*  not delete this code harish
+* public boolean updateFlippingDate(BigInteger periodId, Long unitId, LocalDate date){
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
+        boolean updateCurrentAndNextPhases = false;
+        BigInteger nextPhaseId = null;
+        for(PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()){
 
+            if(planningPeriod.getNextPhaseId().equals(phaseFlippingDate.getPhaseId()) ){
+                if(phaseFlippingDate.getFlippingDate().compareTo(date) <= 0){
+                    updateCurrentAndNextPhases = true;
+                }
+                break;
+            }
+            nextPhaseId = phaseFlippingDate.getPhaseId();
+        }
+        if(updateCurrentAndNextPhases){
+            planningPeriod.setCurrentPhaseId(planningPeriod.getNextPhaseId());
+            planningPeriod.setNextPhaseId(nextPhaseId);
+            save(planningPeriod);
+        }
+        return true;
+    }
+* */
 
         /*public Date addDaysInDate(Date date,  int duration, DurationType durationType, int recurringNumber, int millis){
         Calendar cal = Calendar.getInstance();
