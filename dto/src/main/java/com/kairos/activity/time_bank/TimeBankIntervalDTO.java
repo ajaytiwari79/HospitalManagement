@@ -28,7 +28,7 @@ public class TimeBankIntervalDTO {
     private TimeBankCTADistributionDTO timeBankDistribution;
     private ScheduleTimeByTimeTypeDTO workingTimeType;
     private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
-    private DayOfWeek dayOfWeek;
+    private String headerName;
 
 
     public TimeBankCTADistributionDTO getTimeBankDistribution() {
@@ -85,12 +85,12 @@ public class TimeBankIntervalDTO {
         this.workingTimeType = workingTimeType;
     }
 
-    public DayOfWeek getDayOfWeek() {
-        return dayOfWeek;
+    public String getHeaderName() {
+        return headerName;
     }
 
-    public void setDayOfWeek(DayOfWeek dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
+    public void setHeaderName(String headerName) {
+        this.headerName = headerName;
     }
 
     public long getPaidoutChange() {

@@ -3,19 +3,16 @@ package com.kairos.controller.pay_out;
 
 import com.kairos.constants.ApiConstants;
 import com.kairos.controller.task.TaskController;
-import com.kairos.activity.pay_out.UnitPositionWithCtaDetailsDTO;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.util.response.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.Map;
 
 @RestController
@@ -27,9 +24,9 @@ public class PayOutController {
     @Autowired
     private PayOutService payOutService;
 
-    @GetMapping(value = "/{payoutTrasactionId}")
-    public ResponseEntity<Map<String, Object>> getPayOutForAdvanceView(@PathVariable BigInteger payoutTrasactionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payOutService.approvePayOutRequest(payoutTrasactionId));
+    @GetMapping(value = "/{payoutTransactionId}")
+    public ResponseEntity<Map<String, Object>> getPayOutForAdvanceView(@PathVariable BigInteger payoutTransactionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payOutService.approvePayOutRequest(payoutTransactionId));
     }
 
 

@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.pay_out;
 
-import com.kairos.enums.payout.PayOutStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -26,8 +25,7 @@ public class PayOut extends MongoBaseEntity{
     private long payOutMinWithCta;
     private long payoutBeforeThisDate;
     private LocalDate date;
-    private PayOutStatus payOutStatus;
-    private boolean paidout;
+    private boolean paidOut;
     private List<PayOutCTADistribution> payOutCTADistributions;
 
 
@@ -36,7 +34,6 @@ public class PayOut extends MongoBaseEntity{
         this.unitPositionId = unitPositionId;
         this.staffId = staffId;
         this.date = date;
-        this.payOutStatus = PayOutStatus.APPROVED;
         this.unitId = unitId;
     }
 
@@ -48,8 +45,8 @@ public class PayOut extends MongoBaseEntity{
         this.payoutBeforeThisDate = payoutBeforeThisDate;
     }
 
-    public boolean isPaidout() {
-        return paidout;
+    public boolean isPaidOut() {
+        return paidOut;
     }
 
 
@@ -61,17 +58,11 @@ public class PayOut extends MongoBaseEntity{
         this.unitId = unitId;
     }
 
-    public void setPaidout(boolean paidout) {
-        this.paidout = paidout;
+    public void setPaidOut(boolean paidOut) {
+        this.paidOut = paidOut;
     }
 
-    public PayOutStatus getPayOutStatus() {
-        return payOutStatus;
-    }
 
-    public void setPayOutStatus(PayOutStatus payOutStatus) {
-        this.payOutStatus = payOutStatus;
-    }
 
     public BigInteger getShiftId() {
         return shiftId;
@@ -93,12 +84,11 @@ public class PayOut extends MongoBaseEntity{
     public PayOut() {
     }
 
-    public PayOut(Long unitPositionId, Long staffId, long totalPayOutMin, LocalDate date, PayOutStatus payOutStatus) {
+    public PayOut(Long unitPositionId, Long staffId, long totalPayOutMin, LocalDate date) {
         this.unitPositionId = unitPositionId;
         this.staffId = staffId;
         this.totalPayOutMin = totalPayOutMin;
         this.date = date;
-        this.payOutStatus = payOutStatus;
     }
 
     public LocalDate getDate() {

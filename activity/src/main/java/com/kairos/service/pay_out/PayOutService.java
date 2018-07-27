@@ -1,7 +1,6 @@
 package com.kairos.service.pay_out;
 
 
-import com.kairos.enums.payout.PayOutStatus;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
@@ -122,7 +121,7 @@ public class PayOutService extends MongoBaseService {
         PayOutTransaction payOutTransaction = payOutTransactionMongoRepository.findOne(payOutTransactionId);
         PayOutTransaction approvedPayOutTransaction = new PayOutTransaction(payOutTransaction.getStaffId(),payOutTransaction.getUnitPositionId(), PayOutTrasactionStatus.APPROVED,payOutTransaction.getMinutes(), LocalDate.now());
         save(approvedPayOutTransaction);
-        PayOut payOut = new PayOut(payOutTransaction.getUnitPositionId(),payOutTransaction.getStaffId(),payOutTransaction.getMinutes(),payOutTransaction.getDate(), PayOutStatus.APPROVED);
+        PayOut payOut = new PayOut(payOutTransaction.getUnitPositionId(),payOutTransaction.getStaffId(),payOutTransaction.getMinutes(),payOutTransaction.getDate());
         payOutMongoRepository.findLastPayoutByUnitPositionId(payOutTransaction.getUnitPositionId());
         payOut.setPayoutBeforeThisDate(payOut.getPayoutBeforeThisDate()+payOut.getTotalPayOutMin());
         save(payOut);
@@ -142,10 +141,10 @@ public class PayOutService extends MongoBaseService {
         while (startDate.isBefore(endDate)) {
             DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
             Optional<PayOut> payOut = payOuts.stream().filter(p -> p.getDate().equals(interval.getStartLocalDate())).findFirst();
-            if(payOut.isPresent()){
-                PayOut updatedPayOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activity, payOut.get());
+            payOut.ifPresent(payOut1 -> {
+                PayOut updatedPayOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activity, payOut1);
                 payOuts.add(updatedPayOut);
-            }
+            });
             startDate = startDate.plusDays(1);
         }
         if(!payOuts.isEmpty()){
@@ -189,7 +188,7 @@ public class PayOutService extends MongoBaseService {
      * @param shiftQueryResultWithActivities
      * @return List<ShiftWithActivityDTO>
      */
-    public List<ShiftWithActivityDTO> getShiftsByUEP(Long unitPositionId, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
+    private List<ShiftWithActivityDTO> getShiftsByUEP(Long unitPositionId, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
         List<ShiftWithActivityDTO> shifts = new ArrayList<>();
         shiftQueryResultWithActivities.forEach(s -> {
             if (s.getUnitPositionId().equals(unitPositionId)) {

@@ -108,7 +108,7 @@ public class PayOutCalculationService {
      * @param startDate
      * @return DateTimeInterval
      */
-    public DateTimeInterval getCTAInterval(com.kairos.activity.time_bank.CTAIntervalDTO ctaIntervalDTO, ZonedDateTime startDate) {
+    private DateTimeInterval getCTAInterval(com.kairos.activity.time_bank.CTAIntervalDTO ctaIntervalDTO, ZonedDateTime startDate) {
         int ctaStart = ctaIntervalDTO.getStartTime();
         //totalMin in a day
         int totalMinInADay = 1440;
@@ -118,13 +118,13 @@ public class PayOutCalculationService {
 
     /**
      *
-     * @param ctaRuleTemplateCalulatedTimeBankDTOS
+     * @param ctaRuleTemplateCalculatedTimeBankDTOS
      * @param ctaTimeBankMinMap
      * @return List<PayOutCTADistribution>s
      */
-    private List<PayOutCTADistribution> getCTADistribution(List<CTARuleTemplateDTO> ctaRuleTemplateCalulatedTimeBankDTOS, Map<Long, Integer> ctaTimeBankMinMap) {
-        List<PayOutCTADistribution> timeBankCTADistributions = new ArrayList<>(ctaRuleTemplateCalulatedTimeBankDTOS.size());
-        for (CTARuleTemplateDTO ruleTemplate : ctaRuleTemplateCalulatedTimeBankDTOS) {
+    private List<PayOutCTADistribution> getCTADistribution(List<CTARuleTemplateDTO> ctaRuleTemplateCalculatedTimeBankDTOS, Map<Long, Integer> ctaTimeBankMinMap) {
+        List<PayOutCTADistribution> timeBankCTADistributions = new ArrayList<>(ctaRuleTemplateCalculatedTimeBankDTOS.size());
+        for (CTARuleTemplateDTO ruleTemplate : ctaRuleTemplateCalculatedTimeBankDTOS) {
             if (!ruleTemplate.isCalculateScheduledHours()) {
                 timeBankCTADistributions.add(new PayOutCTADistribution(ruleTemplate.getName(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(),0), ruleTemplate.getId()));
             }
@@ -152,8 +152,7 @@ public class PayOutCalculationService {
         long payoutAfter = payoutCalculatedValue[2];
         long payoutFromCTA = payoutCalculatedValue[3];
         PayOutCTADistributionDTO payOutCTADistributionDTO = new PayOutCTADistributionDTO(payoutFromCTA,ctaDistributionDTOS);
-        PayOutDTO payOutDTO = new PayOutDTO(intervals.get(0).getStart().toDate(),intervals.get(intervals.size()-1).getEnd().toDate(),payoutAfter,payoutBefore,payoutChange,payoutIntervalDTOS,payOutCTADistributionDTO);
-        return payOutDTO;
+        return new PayOutDTO(intervals.get(0).getStart().toDate(),intervals.get(intervals.size()-1).getEnd().toDate(),payoutAfter,payoutBefore,payoutChange,payoutIntervalDTOS,payOutCTADistributionDTO);
     }
 
     /**
@@ -164,9 +163,7 @@ public class PayOutCalculationService {
      */
     private Map<Interval, List<PayOut>> getPayoutIntervalsMap(List<Interval> intervals, List<PayOut> payOuts) {
         Map<Interval, List<PayOut>> timeBanksIntervalMap = new HashMap<>(intervals.size());
-        intervals.forEach(i -> {
-            timeBanksIntervalMap.put(i, getPayoutsByInterval(i, payOuts));
-        });
+        intervals.forEach(i -> timeBanksIntervalMap.put(i, getPayoutsByInterval(i, payOuts)));
         return timeBanksIntervalMap;
     }
 
@@ -218,7 +215,7 @@ public class PayOutCalculationService {
         return payOutIntervalDTOS;
     }
 
-    public String getTitle(String query, Interval interval) {
+    private String getTitle(String query, Interval interval) {
         switch (query) {
             case DAILY:
                 return interval.getStart().toLocalDate().toString();
@@ -241,7 +238,7 @@ public class PayOutCalculationService {
      * @param unitPositionWithCtaDetailsDTO
      * @return List<CTADistributionDTO>
      */
-    public List<CTADistributionDTO> getDistributionOfPayout(Map<Long, Long> ctaDistributionMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
+    private List<CTADistributionDTO> getDistributionOfPayout(Map<Long, Long> ctaDistributionMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<CTADistributionDTO> distributionDTOS = new ArrayList<>();
         unitPositionWithCtaDetailsDTO.getCtaRuleTemplates().forEach(cta -> {
             if (!cta.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && cta.getAccountType().equals(PAIDOUT_ACCOUNT)) {
