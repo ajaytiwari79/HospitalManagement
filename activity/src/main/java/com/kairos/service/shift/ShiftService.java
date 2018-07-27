@@ -969,7 +969,7 @@ public class ShiftService extends MongoBaseService {
         return activityChangeStatus;
     }
 
-    public Map<String, List<ShiftResponse>> updateStatusOfShift(Long unitId, ShiftPublishDTO shiftPublishDTO) {
+    public Map<String, List<ShiftResponse>> updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
 
         List<ShiftResponse> success = new ArrayList<>();
         List<ShiftResponse> error = new ArrayList<>();
@@ -978,25 +978,24 @@ public class ShiftService extends MongoBaseService {
         response.put("error", error);
 
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftPublishDTO.getShiftIds());
-        if (shifts.isEmpty()) {
-            return response;
-        }
-        Set<LocalDate> dates = shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
-        Map<LocalDate, List<ShiftStatus>> phaseListByDate = phaseService.getStatusByDates(unitId, dates);
-        for (Shift shift : shifts) {
-            List<ShiftStatus> phaseStatuses = phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
-            if (phaseStatuses.containsAll(shiftPublishDTO.getStatus())) {
-                shift.getStatus().addAll(shiftPublishDTO.getStatus());
-                success.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("message.shift.status.added")), true));
-            } else {
+        if (!shifts.isEmpty()) {
+            Set<LocalDate> dates = shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
+            Map<LocalDate, List<ShiftStatus>> phaseListByDate = phaseService.getStatusByDates(unitId, dates);
+            for (Shift shift : shifts) {
+                List<ShiftStatus> phaseStatuses = phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
+                if (phaseStatuses.containsAll(shiftPublishDTO.getStatus())) {
+                    shift.getStatus().addAll(shiftPublishDTO.getStatus());
+                    success.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("message.shift.status.added")), true));
+                } else {
 
-                List<Object> ls = new ArrayList<>();
-                ls.addAll(shiftPublishDTO.getStatus());
-                ls.addAll(phaseStatuses);
-                error.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("error.shift.status", ls.toArray())), false));
+                    List<Object> errorMessages = new ArrayList<>();
+                    errorMessages.addAll(shiftPublishDTO.getStatus());
+                    errorMessages.addAll(phaseStatuses);
+                    error.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("error.shift.status", errorMessages.toArray())), false));
+                }
             }
+            save(shifts);
         }
-        save(shifts);
         return response;
     }
 

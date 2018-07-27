@@ -30,9 +30,6 @@ public class LocaleServiceImpl implements LocaleService{
         return this.messageSource.getMessage(code, args, locale);
     }
 
-
-
-
     /*@Override
     public String getMessage(String code) {
        // Locale locale = new Locale(Optional.ofNullable(UserContext.getUserDetails().getLanguage()).orElse(""));

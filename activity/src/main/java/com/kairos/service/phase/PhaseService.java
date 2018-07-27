@@ -333,17 +333,18 @@ public class PhaseService extends MongoBaseService {
         LocalDate upcomingMondayDate = DateUtils.getDateForUpcomingDay(LocalDate.now(), DayOfWeek.MONDAY);
         LocalDate previousMonday=DateUtils.getDateForPreviousDay(LocalDate.now(),DayOfWeek.MONDAY);
         for(LocalDate date:dates){
-            if((date).isEqual(currentDate)){
-                localDatePhaseStatusMap.put(date,phaseMap.get(REALTIME));
+            if(date.isBefore(previousMonday)){
+                localDatePhaseStatusMap.put(date,phaseMap.get(PAYROLL));
             }
-            else if((date).isEqual(previousMonday)){
+            else if(date.isBefore(currentDate) && date.isAfter(previousMonday.minusDays(1))){
                 localDatePhaseStatusMap.put(date,phaseMap.get(TIME_AND_ATTENDANCE));
             }
+            else if((date).isEqual(currentDate)){
+                localDatePhaseStatusMap.put(date,phaseMap.get(REALTIME));
+            }
+
             else if((date).isBefore(upcomingMondayDate.plusDays(1)) && date.isAfter(currentDate)){
                 localDatePhaseStatusMap.put(date,phaseMap.get(TENTATIVE));
-            }
-            else if(date.isBefore(previousMonday)){
-                localDatePhaseStatusMap.put(date,phaseMap.get(PAYROLL));
             }
             else {
                 //No Any Actual phase found so going to add Planning Phase
@@ -376,9 +377,8 @@ public class PhaseService extends MongoBaseService {
         int weekCount = 1;
         outerLoop:
         for (Phase phaseObject : phases) {
-            if (phaseObject.getDurationType().equals(DurationType.WEEKS) && phaseObject.getDuration() > 0) {    // Only considering Week based phases
+            if (DurationType.WEEKS .equals(phaseObject.getDurationType()) && phaseObject.getDuration() > 0) {    // Only considering Week based phases
                 for (int i = 0; i < phaseObject.getDuration(); i++) {
-
                     if (weekDifference == weekCount) {
                         localDatePhaseStatusMap.put(proposedDate,phaseObject.getStatus());
                         break outerLoop;

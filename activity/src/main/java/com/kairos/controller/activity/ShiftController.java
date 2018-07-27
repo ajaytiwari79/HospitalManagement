@@ -105,10 +105,10 @@ public class ShiftController {
     }
 
     @ApiOperation("update status of shifts")
-    @PutMapping(value = "/publish_shifts")
+    @PutMapping(value = "shift/update_status")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addStatusesInShifts(@PathVariable Long unitId,@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateStatusOfShift(unitId,shiftPublishDTO));
+    public ResponseEntity<Map<String, Object>> updateStatusOfShifts(@PathVariable Long unitId,@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateStatusOfShifts(unitId,shiftPublishDTO));
     }
 
 
