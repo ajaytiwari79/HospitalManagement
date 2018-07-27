@@ -34,6 +34,10 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
                 break;
             case QUESTIONAIRE_NIGHTWORKER:
                 logger.info("Questionaire nightworker----------------->"+job.getId());
+                break;
+            default:
+                logger.error("No exceution route found for jobsubtype");
+                break;
         }
 
     }

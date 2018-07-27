@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -102,6 +103,16 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
         mappingJackson2HttpMessageConverter.setObjectMapper(serializingObjectMapper());
         mappingJackson2HttpMessageConverter.setPrettyPrint(true);
         return mappingJackson2HttpMessageConverter;
+    }
+
+    @Bean
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler(){
+        ThreadPoolTaskScheduler threadPoolTaskScheduler
+                = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setPoolSize(5);
+        threadPoolTaskScheduler.setThreadNamePrefix(
+                "ThreadPoolTaskScheduler");
+        return threadPoolTaskScheduler;
     }
 
 }
