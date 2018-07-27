@@ -16,7 +16,7 @@ import java.util.List;
 * */
 
 @Repository
-public interface PayOutMongoRepository extends MongoBaseRepository<PayOut,BigInteger>,CustomPayoutMongoRepository {
+public interface PayOutRepository extends MongoBaseRepository<PayOut,BigInteger>,CustomPayOutRepository {
 
     @Query("{unitPositionId:{$in:?0},date:{$gte:?1 , $lte:?2},deleted:false}")
     List<PayOut> findAllByUnitPositionsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);

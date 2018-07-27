@@ -9,7 +9,7 @@ import java.util.Date;
  * @date - 24/7/18
  */
 
-public interface CustomPayoutMongoRepository {
+public interface CustomPayOutRepository {
 
     PayOut findLastPayoutByUnitPositionId(Long unitPositionId, Date date);
 

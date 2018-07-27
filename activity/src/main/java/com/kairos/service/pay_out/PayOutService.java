@@ -10,7 +10,7 @@ import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.ShiftMongoRepository;
-import com.kairos.persistence.repository.pay_out.PayOutMongoRepository;
+import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
@@ -41,7 +41,7 @@ public class PayOutService extends MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(PayOutService.class);
 
     @Inject
-    private PayOutMongoRepository payOutMongoRepository;
+    private PayOutRepository payOutRepository;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
@@ -70,7 +70,7 @@ public class PayOutService extends MongoBaseService {
         while (startDate.isBefore(endDate)) {
             DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
             PayOut payOut = new PayOut(shift.getId(), shift.getUnitPositionId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId());
-            payOutMongoRepository.findLastPayoutByUnitPositionId(shift.getUnitPositionId(),DateUtils.getDateByZoneDateTime(startDate));
+            payOutRepository.findLastPayoutByUnitPositionId(shift.getUnitPositionId(),DateUtils.getDateByZoneDateTime(startDate));
             payOut.setPayoutBeforeThisDate(payOut.getPayoutBeforeThisDate()+payOut.getTotalPayOutMin());
             payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activity, payOut);
             if(payOut.getTotalPayOutMin()>0) {
@@ -122,7 +122,7 @@ public class PayOutService extends MongoBaseService {
         PayOutTransaction approvedPayOutTransaction = new PayOutTransaction(payOutTransaction.getStaffId(),payOutTransaction.getUnitPositionId(), PayOutTrasactionStatus.APPROVED,payOutTransaction.getMinutes(), LocalDate.now());
         save(approvedPayOutTransaction);
         PayOut payOut = new PayOut(payOutTransaction.getUnitPositionId(),payOutTransaction.getStaffId(),payOutTransaction.getMinutes(),payOutTransaction.getDate());
-        payOutMongoRepository.findLastPayoutByUnitPositionId(payOutTransaction.getUnitPositionId(),DateUtils.asDate(payOutTransaction.getDate()));
+        payOutRepository.findLastPayoutByUnitPositionId(payOutTransaction.getUnitPositionId(),DateUtils.asDate(payOutTransaction.getDate()));
         payOut.setPayoutBeforeThisDate(payOut.getPayoutBeforeThisDate()+payOut.getTotalPayOutMin());
         save(payOut);
         return true;
@@ -137,7 +137,7 @@ public class PayOutService extends MongoBaseService {
     public void updatePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Activity activity) {
         ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
-        List<PayOut> payOuts = payOutMongoRepository.findAllByShiftId(shift.getId());
+        List<PayOut> payOuts = payOutRepository.findAllByShiftId(shift.getId());
         while (startDate.isBefore(endDate)) {
             DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
             Optional<PayOut> payOut = payOuts.stream().filter(p -> p.getDate().equals(interval.getStartLocalDate())).findFirst();
@@ -158,7 +158,7 @@ public class PayOutService extends MongoBaseService {
      * @param shiftId
      */
     public void deletePayOut(BigInteger shiftId){
-        List<PayOut> payOuts = payOutMongoRepository.findAllByShiftId(shiftId);
+        List<PayOut> payOuts = payOutRepository.findAllByShiftId(shiftId);
         if(!payOuts.isEmpty()) {
             payOuts.forEach(p -> {
                 p.setDeleted(true);

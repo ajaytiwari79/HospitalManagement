@@ -35,7 +35,7 @@ import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
-import com.kairos.persistence.repository.time_bank.TimeBankMongoRepository;
+import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
@@ -121,7 +121,7 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private TimeBankService timeBankService;
     @Inject
-    private TimeBankMongoRepository timeBankMongoRepository;
+    private TimeBankRepository timeBankRepository;
     @Inject
     private PayOutService payOutService;
     @Inject
@@ -635,7 +635,7 @@ public class ShiftService extends MongoBaseService {
         List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()), phase.getName());
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates());
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.getDateByZonedDateTime(intervalByRuleTemplates.getStart()), DateUtils.getDateByZonedDateTime(intervalByRuleTemplates.getEnd()));
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankMongoRepository.findAllByUnitPositionAndBeforeDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndBeforeDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(sc -> sc.getRuleTemplateId(), sc -> sc.getCount()));
         Interval interval = new Interval(staffAdditionalInfoDTO.getUnitPosition().getStartDateMillis(), staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis() == null ? shift.getEndDate().getTime() : staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis());
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes(), staffAdditionalInfoDTO.getUnitPosition().getWorkingDaysInWeek(), DateUtils.asLocalDate(new Date(staffAdditionalInfoDTO.getUnitPosition().getStartDateMillis())), staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis() != null ? DateUtils.asLocalDate(new Date(staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis())) : null);

@@ -15,7 +15,7 @@ import java.util.Date;
  * @date - 27/7/18
  */
 
-public class TimeBankMongoRepositoryImpl implements CustomTimeBankRepository{
+public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
 
     @Inject private MongoTemplate mongoTemplate;
 
