@@ -131,12 +131,11 @@ public class SchedulerPanelService extends MongoBaseService {
     public SchedulerPanelDTO updateSchedulerPanel(SchedulerPanelDTO schedulerPanelDTO,BigInteger schedulerPanelId)  {
         logger.info("schedulerPanel.getId()-------------> "+schedulerPanelId);
         Optional<SchedulerPanel> panelOpt = schedulerPanelRepository.findById(schedulerPanelId);
-        SchedulerPanel panel;
+
         if(!panelOpt.isPresent()){
             exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
         }
-        panel = panelOpt.get();
-
+        SchedulerPanel panel = panelOpt.get();
         String interval;
         String cronExpression;
 
@@ -148,10 +147,8 @@ public class SchedulerPanelService extends MongoBaseService {
             } else
                 cronExpression = cronExpressionRunOnceBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRunOnce());
             panel.setCronExpression(cronExpression);
-            panel.setCronExpression(cronExpression);
             panel.setDays(schedulerPanelDTO.getDays());
             panel.setSelectedHours(schedulerPanelDTO.getSelectedHours());
-            panel.setWeeks(schedulerPanelDTO.getWeeks());
 
         }
         else {
@@ -188,7 +185,6 @@ public class SchedulerPanelService extends MongoBaseService {
                schedulerPanelDB.setCronExpression(cronExpression);
                schedulerPanelDB.setDays(schedulerPanelDTO.getDays());
                schedulerPanelDB.setSelectedHours(schedulerPanelDTO.getSelectedHours());
-               schedulerPanelDB.setWeeks(schedulerPanelDTO.getWeeks());
 
            }
            else {
@@ -311,11 +307,6 @@ public class SchedulerPanelService extends MongoBaseService {
                 exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
             }
             SchedulerPanel panel = panelOptional.get();
-
-           /* List<JobDetails> jobDetailsList = jobDetailsRepository.findAll();
-            for (JobDetails jobDetails : jobDetailsList) {
-                jobDetailsRepository.delete(jobDetails);
-            }*/
             dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
             panel.setActive(false);
             schedulerPanelRepository.save(panel);

@@ -20,16 +20,13 @@ public class SchedulerPanelDTO {
     private String interval; // to show the content selected e.g. Monday,Tuesday,Wednesday,Thursday,Friday. Every 60 minute
     private Date lastRunTime;
     private Date nextRunTime;
-    private boolean isAlarmed;
     private Integer startMinute;
     private Integer repeat;
     private List<DayOfWeek> days;
-
     private LocalTime runOnce;
-    private List<String> selectedHours;
+    private List<LocalTime> selectedHours;
     private Date startDate;
     private Date endDate;
-    private Integer weeks;
     private Long unitId;
     private String filterId;
     private BigInteger integrationConfigurationId;
@@ -89,13 +86,7 @@ public class SchedulerPanelDTO {
     }
 
 
-    public List<String> getSelectedHours() {
-        return selectedHours;
-    }
 
-    public void setSelectedHours(List<String> selectedHours) {
-        this.selectedHours = selectedHours;
-    }
 
    /* public String getRunOnce() {
         return runOnce;
@@ -114,6 +105,13 @@ public class SchedulerPanelDTO {
     }
 */
 
+    public List<LocalTime> getSelectedHours() {
+        return selectedHours;
+    }
+
+    public void setSelectedHours(List<LocalTime> selectedHours) {
+        this.selectedHours = selectedHours;
+    }
     public String getName() {
         return name;
     }
@@ -189,13 +187,7 @@ public class SchedulerPanelDTO {
         this.endDate = endDate;
     }
 
-    public boolean isAlarmed() {
-        return isAlarmed;
-    }
 
-    public void setAlarmed(boolean alarmed) {
-        isAlarmed = alarmed;
-    }
 
     public Integer getStartMinute() {
         return startMinute;
@@ -211,14 +203,6 @@ public class SchedulerPanelDTO {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
-    }
-
-    public Integer getWeeks() {
-        return weeks;
-    }
-
-    public void setWeeks(Integer weeks) {
-        this.weeks = weeks;
     }
 
     public String getFilterId() {

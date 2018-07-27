@@ -10,6 +10,7 @@ import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
@@ -25,9 +26,9 @@ public class KairosScheduleJobDTO {
     private boolean isAlarmed;
     private Integer startMinute;
     private Integer repeat;
-    private List<String> days;
+    private List<DayOfWeek> days;
     private LocalTime runOnce;
-    private List<String> selectedHours;
+    private List<LocalTime> selectedHours;
     private Date startDate;
     private Date endDate;
     private Integer weeks;
@@ -71,9 +72,6 @@ public class KairosScheduleJobDTO {
         this.oneTimeTrigger = oneTimeTrigger;
     }
 
-
-
-
     public BigInteger getEntityId() {
         return entityId;
     }
@@ -82,8 +80,13 @@ public class KairosScheduleJobDTO {
         this.entityId = entityId;
     }
 
+    public List<DayOfWeek> getDays() {
+        return days;
+    }
 
-
+    public void setDays(List<DayOfWeek> days) {
+        this.days = days;
+    }
 
     public JobType getJobType() {
         return jobType;
@@ -101,8 +104,13 @@ public class KairosScheduleJobDTO {
         this.jobSubType = jobSubType;
     }
 
+    public List<LocalTime> getSelectedHours() {
+        return selectedHours;
+    }
 
-
+    public void setSelectedHours(List<LocalTime> selectedHours) {
+        this.selectedHours = selectedHours;
+    }
     public String getName() {
         return name;
     }
@@ -183,13 +191,6 @@ public class KairosScheduleJobDTO {
         this.repeat = repeat;
     }*/
 
-    public List<String> getDays() {
-        return days;
-    }
-
-    public void setDays(List<String> days) {
-        this.days = days;
-    }
 
     /*public String getRunOnce() {
         return runOnce;
@@ -199,13 +200,7 @@ public class KairosScheduleJobDTO {
         this.runOnce = runOnce;
     }*/
 
-    public List<String> getSelectedHours() {
-        return selectedHours;
-    }
 
-    public void setSelectedHours(List<String> selectedHours) {
-        this.selectedHours = selectedHours;
-    }
 
     public Date getStartDate() {
         return startDate;

@@ -65,15 +65,11 @@ dependencies {
     compile group: 'org.springframework.ws', name: 'spring-ws-core', version: '3.0.0.RELEASE'//c
 
     compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'//c
-    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.10-FINAL'//c
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion//c
     compile group: 'org.json', name: 'json', version: '20160810'//c
     compile "io.springfox:springfox-swagger2:${swaggerVersion}"//c
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggerVersion//c
-    compile 'com.google.api-client:google-api-client:1.22.0'//c
-    compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'//c
-    compile 'com.google.apis:google-api-services-calendar:v3-rev239-1.22.0'//c
-    compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'//c
+       compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'//c
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
     compile 'org.springframework.kafka:spring-kafka:2.1.7.RELEASE'
