@@ -1,12 +1,12 @@
 package com.kairos.service.counter;
 
-import com.google.inject.Inject;
+
+import com.google.api.client.util.Value;
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.controller.counters.CounterDistController;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,7 +14,6 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
@@ -24,45 +23,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class CounterConfServiceTest {
-    private Logger logger = LoggerFactory.getLogger(CounterConfService.class);
-    @Autowired
-    ExceptionService exceptionService;
-    @Autowired
-    CounterConfService counterConfService;
-    @Autowired
-    @Value("${server.host.http.url}")
+public class CounterDistIntegrationTest {
+    private Logger logger = LoggerFactory.getLogger(CounterManagementService.class);
+   @Autowired
+   ExceptionService exceptionService;
+    @org.springframework.beans.factory.annotation.Value("${server.host.http.url}")
     private String url;
-    @Autowired
-    TestRestTemplate restTemplate;
+   @Autowired
+   TestRestTemplate testRestTemplate;
 
-//    @Test
-//    public void case1_addEntries() {
-//        counterConfService.addEntries(4l);
-//    }
-
-    @Test
-    public void case2_addCounter(){
-        Counter counter=new Counter("test", CounterType.WORKING_HOUR_PER_SHIFT,false,BigInteger.valueOf(5));
-        String baseUrl = getBaseUrl(2567l, 4l);
-        HttpEntity<Counter> requestBodyData = new HttpEntity<>(counter);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<Counter>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Counter>>() {
-                };
-    ResponseEntity<RestTemplateResponseEnvelope<Counter>> response = restTemplate.exchange(
-            baseUrl + "/counters/conf/counter",
-            HttpMethod.POST, requestBodyData, typeReference);
-        logger.info("Status Code : " + response.getStatusCode());
-        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
-}
+   @Test
+    public void case1_getAvailableKPIsListForCountry(){
+       String baseUrl = getBaseUrl(2567l, null);
+       ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPI>>> typeReference=new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPI>>>() {
+       };
+       ResponseEntity<RestTemplateResponseEnvelope<List<KPI>>> response=testRestTemplate.exchange(baseUrl+"/counter/dist/counters/country/4", HttpMethod.GET,null,typeReference);
+       logger.info("Status Code : " + response.getStatusCode());
+       Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+   }
 
 
     public final String getBaseUrl(Long organizationId, Long countryId) {
@@ -79,5 +61,6 @@ public class CounterConfServiceTest {
         }
         return null;
     }
+
 
 }
