@@ -118,16 +118,17 @@ public class CounterConfIntegrationTest {
     @Test
     public void updateCategoriesForCountry() throws Exception{
         List<KPICategory> kpiCategories=new ArrayList<>();
+        List<KPICategory> kpiCategories1=new ArrayList<>();
         KPICategory kpiCategory1=new KPICategory("Working Time for Country after update ", 3l);
         KPICategory kpiCategory2=new KPICategory("Resting Time for Country after update", 4l);
-        //KPICategory kpiCategory3=new KPICategory("Resting1 Time for Country after update", 4l);
-        kpiCategory1.setId(BigInteger.valueOf(18));
-        kpiCategory2.setId(BigInteger.valueOf(19));
-       // kpiCategory3.setId(BigInteger.valueOf(20));
+        kpiCategory1.setId(BigInteger.valueOf(20));
+        kpiCategory2.setId(BigInteger.valueOf(21));
         kpiCategories.add(kpiCategory1);
         kpiCategories.add(kpiCategory2);
-    //    kpiCategories.add(kpiCategory3);
-        KPICategoryUpdationDTO kpiCategoryUpdationDTO=new KPICategoryUpdationDTO(new ArrayList(),kpiCategories);
+        KPICategory kpiCategory3=new KPICategory("Working Time for Country after update ", 3l);
+        kpiCategory3.setId(BigInteger.valueOf(14));
+        kpiCategories1.add(kpiCategory3);
+        KPICategoryUpdationDTO kpiCategoryUpdationDTO=new KPICategoryUpdationDTO(kpiCategories,kpiCategories1);
         String baseUrl=getBaseUrl(2567l,null);
         HttpEntity<KPICategoryUpdationDTO> requestBodyDate=new HttpEntity<>(kpiCategoryUpdationDTO);
         ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> typeReference=new ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>>() {
