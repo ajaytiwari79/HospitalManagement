@@ -57,6 +57,13 @@ public class TimeBankCalculationService {
 
     private static final Logger log = LoggerFactory.getLogger(TimeBankCalculationService.class);
 
+    /**
+     *
+     * @param ctaDto
+     * @param shifts
+     * @param days
+     * @return List<CalculatedTimeBankByDateDTO>
+     */
     /*
     * It is for SelfRostering Tab It calculate timebank for UpcomingDays
     * on the basis of currentCta
@@ -73,6 +80,13 @@ public class TimeBankCalculationService {
         return calculatedTimeBankByDateDTOS;
     }
 
+    /**
+     *
+     * @param ctaDto
+     * @param interval
+     * @param shifts
+     * @return DailyTimeBankEntry
+     */
     public DailyTimeBankEntry getTimeBankByInterval(StaffUnitPositionDetails ctaDto, Interval interval, List<ShiftWithActivityDTO> shifts) {
         DailyTimeBankEntry dailyTimeBank = null;
         if (shifts != null && !shifts.isEmpty()) {
@@ -83,6 +97,11 @@ public class TimeBankCalculationService {
         return dailyTimeBank;
     }
 
+    /**
+     *
+     * @param shifts
+     * @return List<ShiftWithActivityDTO>
+     */
     public List<ShiftWithActivityDTO> filterSubshifts(List<ShiftWithActivityDTO> shifts) {
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>(shifts.size());
         for (ShiftWithActivityDTO shift : shifts) {
@@ -96,7 +115,12 @@ public class TimeBankCalculationService {
         return shiftQueryResultWithActivities;
     }
 
-
+    /**
+     *
+     * @param shift
+     * @param activity
+     * @param unitPosition
+     */
     public void calculateScheduleAndDurationHour(Shift shift, Activity activity, StaffUnitPositionDetails unitPosition) {
         int scheduledMinutes = 0;
         int duration = 0;
@@ -135,13 +159,22 @@ public class TimeBankCalculationService {
         shift.setScheduledMinutes(scheduledMinutes);
     }
 
+    /**
+     *
+     * @param shift
+     * @param activity
+     */
     private void calculateEnteredManually(Shift shift, Activity activity) {
         int duration = (int) new Interval(shift.getStartDate().getTime(), shift.getEndDate().getTime()).toDuration().getStandardMinutes();
         shift.setDurationMinutes(duration);
         shift.setScheduledMinutes(new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue());
     }
 
-
+    /**
+     *
+     * @param ctaDto
+     * @return List<TimeBankCTADistribution>
+     */
     public List<TimeBankCTADistribution> getDistribution(UnitPositionWithCtaDetailsDTO ctaDto) {
         List<TimeBankCTADistribution> timeBankCTADistributions = new ArrayList<>(ctaDto.getCtaRuleTemplates().size());
         ctaDto.getCtaRuleTemplates().forEach(rt -> {
@@ -150,6 +183,14 @@ public class TimeBankCalculationService {
         return timeBankCTADistributions;
     }
 
+    /**
+     *
+     * @param interval
+     * @param ctaDto
+     * @param shifts
+     * @param dailyTimeBankEntry
+     * @return DailyTimeBankEntry
+     */
     //TODO complete review by Sachin and need Test cases
     public DailyTimeBankEntry calculateDailyTimebank(Interval interval, StaffUnitPositionDetails ctaDto, List<ShiftWithActivityDTO> shifts, DailyTimeBankEntry dailyTimeBankEntry) {
         int totalDailyTimebank = 0;
@@ -213,12 +254,24 @@ public class TimeBankCalculationService {
         return dailyTimeBankEntry;
     }
 
+    /**
+     *
+     * @param ctaIntervalDTO
+     * @param startDate
+     * @return Interval
+     */
     public Interval getCTAInterval(CTAIntervalDTO ctaIntervalDTO, DateTime startDate) {
         int ctaStart = ctaIntervalDTO.getStartTime();
         int ctaEnd = ctaIntervalDTO.getStartTime() >= ctaIntervalDTO.getEndTime() ? 1440 + ctaIntervalDTO.getEndTime() : ctaIntervalDTO.getEndTime();
         return new Interval(startDate.withTimeAtStartOfDay().plusMinutes(ctaStart), startDate.plusMinutes(ctaEnd));
     }
 
+    /**
+     *
+     * @param ctaRuleTemplateCalulatedTimeBankDTOS
+     * @param ctaTimeBankMinMap
+     * @return List<TimeBankCTADistribution>
+     */
     private List<TimeBankCTADistribution> getBlankTimeBankDistribution(List<CTARuleTemplateDTO> ctaRuleTemplateCalulatedTimeBankDTOS, Map<Long, Integer> ctaTimeBankMinMap) {
         List<TimeBankCTADistribution> timeBankCTADistributions = new ArrayList<>(ctaRuleTemplateCalulatedTimeBankDTOS.size());
         for (CTARuleTemplateDTO ruleTemplate : ctaRuleTemplateCalulatedTimeBankDTOS) {
@@ -229,6 +282,12 @@ public class TimeBankCalculationService {
         return timeBankCTADistributions;
     }
 
+    /**
+     *
+     * @param shifts
+     * @param intervalValue
+     * @return Map<String, List<ShiftWithActivityDTO>>
+     */
     public Map<String, List<ShiftWithActivityDTO>> getMapOfShiftByInterval(List<ShiftWithActivityDTO> shifts, int intervalValue) {
         Map<String, List<ShiftWithActivityDTO>> shiftQueryResultMap = new HashMap<>();
         for (int i = 0; i < shifts.size() - 1; i++) {
@@ -240,6 +299,12 @@ public class TimeBankCalculationService {
     }
 
 
+    /**
+     *
+     * @param interval
+     * @param shifts
+     * @return List<ShiftWithActivityDTO>
+     */
     private List<ShiftWithActivityDTO> getShiftsByDate(Interval interval, List<ShiftWithActivityDTO> shifts) {
         List<ShiftWithActivityDTO> shifts1 = new ArrayList<>();
         shifts.forEach(s -> {
@@ -250,6 +315,10 @@ public class TimeBankCalculationService {
         return shifts1;
     }
 
+    /**
+     *
+     * @return List<ShiftWithActivityDTO>
+     */
     private List<ShiftWithActivityDTO> getFutureShifts() {
         List<ShiftWithActivityDTO> shifts = new ArrayList<>(30);
         IntStream.range(0, 29).forEachOrdered(i -> {
@@ -263,6 +332,20 @@ public class TimeBankCalculationService {
         return shifts;
     }
 
+    /**
+     *
+     * @param totalTimeBankBeforeStartDate
+     * @param startDate
+     * @param endDate
+     * @param query
+     * @param shifts
+     * @param dailyTimeBankEntries
+     * @param unitPositionWithCtaDetailsDTO
+     * @param timeTypeDTOS
+     * @param payOuts
+     * @param payOutTransactions
+     * @return TimeBankAndPayoutDTO
+     */
     public TimeBankAndPayoutDTO getAdvanceViewTimeBank(int totalTimeBankBeforeStartDate, Date startDate, Date endDate, String query, List<ShiftWithActivityDTO> shifts, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, List<TimeTypeDTO> timeTypeDTOS, List<PayOut> payOuts, List<PayOutTransaction> payOutTransactions) {
         TimeBankDTO timeBankDTO = new TimeBankDTO();
         timeBankDTO.setCostTimeAgreement(unitPositionWithCtaDetailsDTO);
@@ -292,7 +375,7 @@ public class TimeBankCalculationService {
         long totalTimeBank = payoutCalculatedValue[6];
         long requestPayOut = payoutCalculatedValue[7];
         long paidPayOut = payoutCalculatedValue[8];
-        long approvePayOut = payoutCalculatedValue[9];
+        long approvePayOut = 189;//payoutCalculatedValue[9];
         timeBankDTO.setApprovePayOut(approvePayOut);
         timeBankDTO.setPaidoutChange(paidPayOut);
         timeBankDTO.setRequestPayOut(requestPayOut);
@@ -304,11 +387,16 @@ public class TimeBankCalculationService {
         timeBankDTO.setTotalTimeBankBeforeCtaMin(totalTimeBankBeforeCtaMin);
         timeBankDTO.setTotalScheduledMin(totalScheduledMin);
         timeBankDTO.setTotalTimeBankDiff(totalTimeBankDiff);
-        PayOutDTO payOut = payOutCalculationService.getAdvanceViewPayout(intervals, payOuts, payoutTransactionIntervalMap,unitPositionWithCtaDetailsDTO);
+        PayOutDTO payOut = payOutCalculationService.getAdvanceViewPayout(intervals, payOuts, payoutTransactionIntervalMap,unitPositionWithCtaDetailsDTO,query);
         return new TimeBankAndPayoutDTO(timeBankDTO, payOut);
     }
 
-
+    /**
+     *
+     * @param intervals
+     * @param payOuts
+     * @return Map<Interval, List<PayOutTransaction>>
+     */
     private Map<Interval, List<PayOutTransaction>> getPayoutTrasactionIntervalsMap(List<Interval> intervals, List<PayOutTransaction> payOuts) {
         Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap = new HashMap<>(intervals.size());
         intervals.forEach(interval -> {
@@ -333,6 +421,11 @@ public class TimeBankCalculationService {
         return payOutTransactionList;
     }
 
+    /**
+     *
+     * @param timeBankIntervalDTOS
+     * @return long[]
+     */
     private long[] calculateTimebankValues(List<TimeBankIntervalDTO> timeBankIntervalDTOS){
         long totalContractedMin = 0l;
         long minutesFromCta = 0l;
@@ -345,7 +438,7 @@ public class TimeBankCalculationService {
         long requestPayOut = 0l;
         long paidPayOut = 0l;
         for (TimeBankIntervalDTO timeBankIntervalDTO : timeBankIntervalDTOS) {
-            totalContractedMin += timeBankIntervalDTO.getTotalContractualMin();
+            totalContractedMin += timeBankIntervalDTO.getTotalContractedMin();
             minutesFromCta += timeBankIntervalDTO.getTimeBankDistribution().getMinutes();
             totalScheduledMin += timeBankIntervalDTO.getTotalScheduledMin();
             totalTimeBankDiff += timeBankIntervalDTO.getTotalTimeBankDiff();
@@ -363,8 +456,15 @@ public class TimeBankCalculationService {
     }
 
 
-
-
+    /**
+     *
+     * @param unitEmployementPositionId
+     * @param startDate
+     * @param lastDateTimeOfYear
+     * @param dailyTimeBankEntries
+     * @param unitPositionWithCtaDetailsDTO
+     * @return TimeBankDTO
+     */
     public TimeBankDTO getOverviewTimeBank(Long unitEmployementPositionId, DateTime startDate, DateTime lastDateTimeOfYear, List<DailyTimeBankEntry> dailyTimeBankEntries, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<Interval> weeklyIntervals = getWeeklyIntervals(startDate, lastDateTimeOfYear);
         List<Interval> monthlyIntervals = getMonthlyIntervals(startDate, lastDateTimeOfYear);
@@ -382,6 +482,15 @@ public class TimeBankCalculationService {
         return timeBankDTO;
     }
 
+    /**
+     *
+     * @param interval
+     * @param unitPositionWithCtaDetailsDTO
+     * @param isByOverView
+     * @param dailyTimeBankEntries
+     * @param calculateContractual
+     * @return int
+     */
     public int calculateTimeBankForInterval(Interval interval, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, boolean isByOverView, List<DailyTimeBankEntry> dailyTimeBankEntries, boolean calculateContractual) {
         List<LocalDate> dailyTimeBanksDates = new ArrayList<>();
         if (!calculateContractual) {
@@ -417,6 +526,15 @@ public class TimeBankCalculationService {
         return contractualMinutes;
     }
 
+    /**
+     *
+     * @param interval
+     * @param unitPositionWithCtaDetailsDTO
+     * @param isByOverView
+     * @param dailyTimeBankEntries
+     * @param calculateContractual
+     * @return int
+     */
     public int calculateOnlyTimeBankForInterval(Interval interval, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, boolean isByOverView, List<DailyTimeBankEntry> dailyTimeBankEntries, boolean calculateContractual) {
         List<LocalDate> dailyTimeBanksDates = new ArrayList<>();
         if (!calculateContractual) {
@@ -453,6 +571,14 @@ public class TimeBankCalculationService {
     }
 
 
+    /**
+     *
+     * @param intervals
+     * @param timeBankIntervalMap
+     * @param basedUpon
+     * @param unitPositionWithCtaDetailsDTO
+     * @return List<TimeBankIntervalDTO>
+     */
     public List<TimeBankIntervalDTO> getTimeBankByIntervals(List<Interval> intervals, Map<Interval, List<DailyTimeBankEntry>> timeBankIntervalMap, String basedUpon, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<TimeBankIntervalDTO> timeBankIntervalDTOS = new ArrayList<>(intervals.size());
         for (Interval interval : intervals) {
@@ -478,7 +604,12 @@ public class TimeBankCalculationService {
         return timeBankIntervalDTOS;
     }
 
-
+    /**
+     *
+     * @param unitPositionWithCtaDetailsDTO
+     * @param interval
+     * @return Interval
+     */
     private Interval getIntervalByDateForOverview(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Interval interval) {
         DateTime startDate = interval.getStart();
         DateTime endDate = interval.getEnd();
@@ -505,6 +636,12 @@ public class TimeBankCalculationService {
         return updatedInterval;
     }
 
+    /**
+     *
+     * @param unitPositionWithCtaDetailsDTO
+     * @param interval
+     * @return Interval
+     */
     private Interval getIntervalByDateForAdvanceView(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Interval interval) {
         Interval updatedInterval = null;
         DateTime unitPositionStartTime = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate());
@@ -518,6 +655,11 @@ public class TimeBankCalculationService {
         return updatedInterval;
     }
 
+    /**
+     *
+     * @param interval
+     * @return int
+     */
     //This method because of weekOfTheWeek function depends how many day in current Week
     private int getWeekCount(Interval interval) {
         if (interval.getEnd().getWeekOfWeekyear() == 1 && interval.getEnd().getMonthOfYear() == 12) {
@@ -527,6 +669,12 @@ public class TimeBankCalculationService {
         }
     }
 
+    /**
+     *
+     * @param startDate
+     * @param lastDateTimeOfYear
+     * @return List<Interval>
+     */
     public List<Interval> getMonthlyIntervals(DateTime startDate, DateTime lastDateTimeOfYear) {
         List<Interval> intervals = new ArrayList<>(12);
         DateTime endDate = startDate.dayOfMonth().withMaximumValue();
@@ -543,6 +691,12 @@ public class TimeBankCalculationService {
     }
 
 
+    /**
+     *
+     * @param startDate
+     * @param lastDateTimeOfYear
+     * @return List<Interval>
+     */
     public List<Interval> getWeeklyIntervals(DateTime startDate, DateTime lastDateTimeOfYear) {
         List<Interval> intervals = new ArrayList<>(60);
         DateTime endDate = startDate.getDayOfWeek() == 7 ? startDate.plusWeeks(1) : startDate.withDayOfWeek(DateTimeConstants.SUNDAY);
@@ -562,6 +716,18 @@ public class TimeBankCalculationService {
     }
 
 
+    /**
+     *
+     * @param totalTimeBankBefore
+     * @param query
+     * @param intervals
+     * @param shiftsintervalMap
+     * @param timeBanksIntervalMap
+     * @param timeTypeDTOS
+     * @param unitPositionWithCtaDetailsDTO
+     * @param payoutTransactionIntervalMap
+     * @return List<TimeBankIntervalDTO>
+     */
     public List<TimeBankIntervalDTO> getTimeBankIntervals(int totalTimeBankBefore, String query, List<Interval> intervals, Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap, Map<Interval, List<DailyTimeBankEntry>> timeBanksIntervalMap, List<TimeTypeDTO> timeTypeDTOS, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO,Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap) {
         List<TimeBankIntervalDTO> timeBankIntervalDTOS = new ArrayList<>(intervals.size());
         for (Interval interval : intervals) {
@@ -571,11 +737,11 @@ public class TimeBankCalculationService {
             TimeBankIntervalDTO timeBankIntervalDTO = new TimeBankIntervalDTO(interval.getStart().toDate(), interval.getEnd().toDate());
             int timeBankOfInterval = calculateTimeBankForInterval(interval, unitPositionWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
             int contractualMin = calculateTimeBankForInterval(interval, unitPositionWithCtaDetailsDTO, false, dailyTimeBankEntries, true);
-            timeBankIntervalDTO.setTotalContractualMin(contractualMin);
+            timeBankIntervalDTO.setTotalContractedMin(contractualMin);
             Long approvePayOut = payOutTransactionList.stream().filter(p->p.getPayOutTrasactionStatus().equals(PayOutTrasactionStatus.APPROVED)).mapToLong(p->(long)p.getMinutes()).sum();
             Long requestPayOut = payOutTransactionList.stream().filter(p->p.getPayOutTrasactionStatus().equals(PayOutTrasactionStatus.REQUESTED)).mapToLong(p->(long)p.getMinutes()).sum();
             Long paidPayOut = payOutTransactionList.stream().filter(p->p.getPayOutTrasactionStatus().equals(PayOutTrasactionStatus.PAIDOUT)).mapToLong(p->(long)p.getMinutes()).sum();
-            timeBankIntervalDTO.setApprovePayOut(approvePayOut);
+            timeBankIntervalDTO.setApprovePayOut(189);
             timeBankIntervalDTO.setRequestPayOut(requestPayOut);
             timeBankIntervalDTO.setPaidoutChange(paidPayOut);
             timeBankIntervalDTO.setDayOfWeek(DayOfWeek.of(interval.getStart().getDayOfWeek()));
@@ -612,6 +778,12 @@ public class TimeBankCalculationService {
         return Lists.reverse(timeBankIntervalDTOS);
     }
 
+    /**
+     *
+     * @param ctaDistributionMap
+     * @param unitPositionWithCtaDetailsDTO
+     * @return List<CTADistributionDTO>
+     */
     public List<CTADistributionDTO> getDistributionOfTimeBank(Map<Long, Integer> ctaDistributionMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<CTADistributionDTO> distributionDTOS = new ArrayList<>();
         unitPositionWithCtaDetailsDTO.getCtaRuleTemplates().forEach(cta -> {
@@ -622,6 +794,12 @@ public class TimeBankCalculationService {
         return distributionDTOS;
     }
 
+    /**
+     *
+     * @param query
+     * @param interval
+     * @return String
+     */
     public String getTitle(String query, Interval interval) {
         switch (query) {
             case DAILY:
@@ -639,6 +817,13 @@ public class TimeBankCalculationService {
         return "";
     }
 
+    /**
+     *
+     * @param interval
+     * @param shifts
+     * @param timeTypeDTOS
+     * @return ScheduleTimeByTimeTypeDTO
+     */
     public ScheduleTimeByTimeTypeDTO getWorkingTimeType(Interval interval, List<ShiftWithActivityDTO> shifts, List<TimeTypeDTO> timeTypeDTOS) {
         ScheduleTimeByTimeTypeDTO scheduleTimeByTimeTypeDTO = new ScheduleTimeByTimeTypeDTO(0);
         List<ScheduleTimeByTimeTypeDTO> parentTimeTypes = new ArrayList<>();
@@ -670,6 +855,13 @@ public class TimeBankCalculationService {
         return scheduleTimeByTimeTypeDTO;
     }
 
+    /**
+     *
+     * @param interval
+     * @param shifts
+     * @param timeTypeDTOS
+     * @return ScheduleTimeByTimeTypeDTO
+     */
     public ScheduleTimeByTimeTypeDTO getNonWorkingTimeType(Interval interval, List<ShiftWithActivityDTO> shifts, List<TimeTypeDTO> timeTypeDTOS) {
         ScheduleTimeByTimeTypeDTO scheduleTimeByTimeTypeDTO = new ScheduleTimeByTimeTypeDTO(0);
         List<ScheduleTimeByTimeTypeDTO> parentTimeTypes = new ArrayList<>();
@@ -700,7 +892,14 @@ public class TimeBankCalculationService {
         return scheduleTimeByTimeTypeDTO;
     }
 
-
+    /**
+     *
+     * @param timeTypeId
+     * @param interval
+     * @param shifts
+     * @param timeTypeDTOS
+     * @return List<ScheduleTimeByTimeTypeDTO>
+     */
     public List<ScheduleTimeByTimeTypeDTO> getTimeTypeDTOS(BigInteger timeTypeId, Interval interval, List<ShiftWithActivityDTO> shifts, List<TimeTypeDTO> timeTypeDTOS) {
         List<ScheduleTimeByTimeTypeDTO> scheduleTimeByTimeTypeDTOS = new ArrayList<>();
         timeTypeDTOS.forEach(timeType -> {
@@ -730,6 +929,11 @@ public class TimeBankCalculationService {
     }
 
 
+    /**
+     *
+     * @param unitPositionWithCtaDetailsDTO
+     * @return List<CTADistributionDTO>
+     */
     private List<CTADistributionDTO> getBlankTimeBankDistribution(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<CTADistributionDTO> timeBankCTADistributionDTOS = new ArrayList<>();
         unitPositionWithCtaDetailsDTO.getCtaRuleTemplates().forEach(cta -> {
@@ -740,6 +944,12 @@ public class TimeBankCalculationService {
         return timeBankCTADistributionDTOS;
     }
 
+    /**
+     *
+     * @param intervals
+     * @param dailyTimeBankEntries
+     * @return Map<Interval, List<DailyTimeBankEntry>>
+     */
     private Map<Interval, List<DailyTimeBankEntry>> getTimebankIntervalsMap(List<Interval> intervals, List<DailyTimeBankEntry> dailyTimeBankEntries) {
         Map<Interval, List<DailyTimeBankEntry>> timeBanksIntervalMap = new HashMap<>(intervals.size());
         intervals.forEach(i -> {
@@ -748,6 +958,12 @@ public class TimeBankCalculationService {
         return timeBanksIntervalMap;
     }
 
+    /**
+     *
+     * @param interval
+     * @param dailyTimeBankEntries
+     * @return List<DailyTimeBankEntry>
+     */
     private List<DailyTimeBankEntry> getTimeBanksByInterval(Interval interval, List<DailyTimeBankEntry> dailyTimeBankEntries) {
         List<DailyTimeBankEntry> dailyTimeBanks1Entry = new ArrayList<>();
         dailyTimeBankEntries.forEach(tb -> {
@@ -758,12 +974,24 @@ public class TimeBankCalculationService {
         return dailyTimeBanks1Entry;
     }
 
+    /**
+     *
+     * @param interval
+     * @param dailyTimeBankEntries
+     * @return int
+     */
     private int getTotalTimeBanksByInterval(Interval interval, List<DailyTimeBankEntry> dailyTimeBankEntries) {
         int totalTimeBank = 0;
         totalTimeBank = dailyTimeBankEntries.stream().filter(dailyTimeBankEntry -> (interval.contains(DateUtils.asDate(dailyTimeBankEntry.getDate()).getTime()))).mapToInt(dailyTimeBankEntry -> dailyTimeBankEntry.getTotalTimeBankMin()).sum();
         return totalTimeBank;
     }
 
+    /**
+     *
+     * @param intervals
+     * @param shifts
+     * @return Map<Interval, List<ShiftWithActivityDTO>>
+     */
     private Map<Interval, List<ShiftWithActivityDTO>> getShiftsIntervalMap(List<Interval> intervals, List<ShiftWithActivityDTO> shifts) {
         Map<Interval, List<ShiftWithActivityDTO>> shiftsintervalMap = new HashMap<>(intervals.size());
         intervals.forEach(i -> {
@@ -773,6 +1001,13 @@ public class TimeBankCalculationService {
     }
 
 
+    /**
+     *
+     * @param startDate
+     * @param endDate
+     * @param field
+     * @return List<Interval>
+     */
     public List<Interval> getAllIntervalsBetweenDates(Date startDate, Date endDate, String field) {
         DateTime startDateTime = new DateTime(startDate);
         DateTime endDateTime = new DateTime(endDate);
@@ -806,6 +1041,11 @@ public class TimeBankCalculationService {
         return intervals;
     }
 
+    /**
+     *
+     * @param dateTime
+     * @return DateTime
+     */
     private DateTime getQuaterByDate(DateTime dateTime) {
         int quater = (int) Math.ceil((double) dateTime.getMonthOfYear() / 3);
         DateTime quaterDateTime = null;
@@ -826,7 +1066,10 @@ public class TimeBankCalculationService {
         return quaterDateTime;
     }
 
-
+    /**
+     *
+     * @return List<ShiftWithActivityDTO>
+     */
     private List<ShiftWithActivityDTO> getShifts() {
         List<ShiftWithActivityDTO> shifts = new ArrayList<>(3);
         ShiftWithActivityDTO shiftWithActivityDTO = new ShiftWithActivityDTO();
@@ -854,6 +1097,13 @@ public class TimeBankCalculationService {
 
     }
 
+    /**
+     *
+     * @param shift
+     * @param activity
+     * @param unitPositionWithCtaDetailsDTO
+     * @return int[]
+     */
     //Calculating Time Bank Against Open Shift
     public int[] calculateDailyTimeBankForOpenShift(OpenShift shift, Activity activity, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         int totalTimebank = 0;
@@ -901,6 +1151,13 @@ public class TimeBankCalculationService {
         return new int[]{plannedTimeMin, totalTimebank};
     }
 
+    /**
+     *
+     * @param openShift
+     * @param activity
+     * @param unitPosition
+     * @return int
+     */
     //Calculating schedule Minutes for Open Shift
     private int calculateScheduleAndDurationHourForOpenShift(OpenShift openShift, Activity activity, UnitPositionWithCtaDetailsDTO unitPosition) {
         int scheduledMinutes = 0;

@@ -17,11 +17,13 @@ public class TimeBankIntervalDTO {
     private long totalTimeBankBeforeCtaMin;
     private long totalScheduledMin;
     private long totalTimeBankMin;
-    private long totalContractualMin;
+    private long totalContractedMin;
     private long totalTimeBankDiff;
     private long paidoutChange;
     private long approvePayOut;
     private long requestPayOut;
+    private long totalDeltaBalanceConrection;
+    private String phaseName;
     private String title;
     private TimeBankCTADistributionDTO timeBankDistribution;
     private ScheduleTimeByTimeTypeDTO workingTimeType;
@@ -41,7 +43,25 @@ public class TimeBankIntervalDTO {
         this.title = title;
     }
 
+    public String getPhaseName() {
+        return phaseName;
+    }
 
+    public void setPhaseName(String phaseName) {
+        this.phaseName = phaseName;
+    }
+
+    public void setTotalContractedMin(long totalContractedMin) {
+        this.totalContractedMin = totalContractedMin;
+    }
+
+    public long getTotalDeltaBalanceConrection() {
+        return totalDeltaBalanceConrection;
+    }
+
+    public void setTotalDeltaBalanceConrection(long totalDeltaBalanceConrection) {
+        this.totalDeltaBalanceConrection = totalDeltaBalanceConrection;
+    }
 
     public void setTotalTimeBankDiff(int totalTimeBankDiff) {
         this.totalTimeBankDiff = totalTimeBankDiff;
@@ -108,11 +128,13 @@ public class TimeBankIntervalDTO {
 
 
     public TimeBankIntervalDTO() {
+        this.phaseName = "T & A Phase";
     }
 
     public TimeBankIntervalDTO(Date startDate, Date endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
+        this.phaseName = "T & A Phase";
     }
 
     public Date getStartDate() {
@@ -148,8 +170,8 @@ public class TimeBankIntervalDTO {
         this.totalTimeBankMin = totalTimeBankMin;
     }
 
-    public void setTotalContractualMin(int totalContractualMin) {
-        this.totalContractualMin = totalContractualMin;
+    public void setTotalContractedMin(int totalContractedMin) {
+        this.totalContractedMin = totalContractedMin;
     }
 
     public long getTotalTimeBankAfterCtaMin() {
@@ -184,12 +206,12 @@ public class TimeBankIntervalDTO {
         this.totalTimeBankMin = totalTimeBankMin;
     }
 
-    public long getTotalContractualMin() {
-        return totalContractualMin;
+    public long getTotalContractedMin() {
+        return totalContractedMin;
     }
 
     public void setTotalContractualMin(long totalContractualMin) {
-        this.totalContractualMin = totalContractualMin;
+        this.totalContractedMin = totalContractualMin;
     }
 
     public long getTotalTimeBankDiff() {

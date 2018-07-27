@@ -19,13 +19,14 @@ public class PayOutIntervalDTO {
     private long totalPayOutAfterCtaMin;
     private long totalPayOutBeforeCtaMin;
     private long payoutChange;
+    private String title;
     private PayOutCTADistributionDTO payOutDistribution;
     private DayOfWeek dayOfWeek;
 
 
 
 
-    public PayOutIntervalDTO(Date startDate, Date endDate, long totalPayOutAfterCtaMin, long totalPayOutBeforeCtaMin, long payoutChange, PayOutCTADistributionDTO payOutDistribution,DayOfWeek dayOfWeek) {
+    public PayOutIntervalDTO(Date startDate, Date endDate, long totalPayOutAfterCtaMin, long totalPayOutBeforeCtaMin, long payoutChange, PayOutCTADistributionDTO payOutDistribution,DayOfWeek dayOfWeek,String title) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.totalPayOutAfterCtaMin = totalPayOutAfterCtaMin;
@@ -33,6 +34,16 @@ public class PayOutIntervalDTO {
         this.payOutDistribution = payOutDistribution;
         this.payoutChange = payoutChange;
         this.dayOfWeek = dayOfWeek;
+        this.title = title;
+    }
+
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public PayOutIntervalDTO() {

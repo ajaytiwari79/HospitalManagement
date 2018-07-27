@@ -58,7 +58,12 @@ public class PayOutService extends MongoBaseService {
     @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
 
 
-
+    /**
+     *
+     * @param staffAdditionalInfoDTO
+     * @param shift
+     * @param activity
+     */
     public void savePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Activity activity) {
         ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
@@ -69,7 +74,9 @@ public class PayOutService extends MongoBaseService {
             payOutMongoRepository.findLastPayoutByUnitPositionId(shift.getUnitPositionId());
             payOut.setPayoutBeforeThisDate(payOut.getPayoutBeforeThisDate()+payOut.getTotalPayOutMin());
             payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activity, payOut);
-            payOuts.add(payOut);
+            if(payOut.getTotalPayOutMin()>0) {
+                payOuts.add(payOut);
+            }
             startDate = startDate.plusDays(1);
         }
         if (!payOuts.isEmpty()) {
@@ -77,6 +84,13 @@ public class PayOutService extends MongoBaseService {
         }
     }
 
+
+    /**
+     *
+     * @param staffAdditionalInfoDTO
+     * @param shifts
+     * @param activities
+     */
     public void savePayOuts(StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<Shift> shifts, List<Activity> activities) {
         List<PayOut> payOuts = new ArrayList<>();
         Map<BigInteger,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v));
@@ -88,7 +102,9 @@ public class PayOutService extends MongoBaseService {
                 PayOut payOut = new PayOut(shift.getId(), shift.getUnitPositionId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId());
                 Activity activity = activityMap.get(shift.getActivityId());
                 payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activity, payOut);
-                payOuts.add(payOut);
+                if(payOut.getTotalPayOutMin()>0) {
+                    payOuts.add(payOut);
+                }
                 startDate = startDate.plusDays(1);
             }
         }
@@ -97,6 +113,11 @@ public class PayOutService extends MongoBaseService {
         }
     }
 
+    /**
+     *
+     * @param payOutTransactionId
+     * @return boolean
+     */
     public boolean approvePayOutRequest(BigInteger payOutTransactionId){
         PayOutTransaction payOutTransaction = payOutTransactionMongoRepository.findOne(payOutTransactionId);
         PayOutTransaction approvedPayOutTransaction = new PayOutTransaction(payOutTransaction.getStaffId(),payOutTransaction.getUnitPositionId(), PayOutTrasactionStatus.APPROVED,payOutTransaction.getMinutes(), LocalDate.now());
@@ -108,6 +129,12 @@ public class PayOutService extends MongoBaseService {
         return true;
     }
 
+    /**
+     *
+     * @param staffAdditionalInfoDTO
+     * @param shift
+     * @param activity
+     */
     public void updatePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Activity activity) {
         ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
@@ -127,6 +154,10 @@ public class PayOutService extends MongoBaseService {
 
     }
 
+    /**
+     *
+     * @param shiftId
+     */
     public void deletePayOut(BigInteger shiftId){
         List<PayOut> payOuts = payOutMongoRepository.findAllByShiftId(shiftId);
         if(!payOuts.isEmpty()) {
@@ -138,7 +169,12 @@ public class PayOutService extends MongoBaseService {
     }
 
 
-
+    /**
+     *
+     * @param unitPositionIds
+     * @param shiftQueryResultWithActivities
+     * @return Map<Long, List<ShiftWithActivityDTO>>
+     */
     public Map<Long, List<ShiftWithActivityDTO>> getShiftsMapByUEPs(List<Long> unitPositionIds, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
         Map<Long, List<ShiftWithActivityDTO>> shiftsMap = new HashMap<>(unitPositionIds.size());
         unitPositionIds.forEach(uEPId -> {
@@ -147,7 +183,12 @@ public class PayOutService extends MongoBaseService {
         return shiftsMap;
     }
 
-
+    /**
+     *
+     * @param unitPositionId
+     * @param shiftQueryResultWithActivities
+     * @return List<ShiftWithActivityDTO>
+     */
     public List<ShiftWithActivityDTO> getShiftsByUEP(Long unitPositionId, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
         List<ShiftWithActivityDTO> shifts = new ArrayList<>();
         shiftQueryResultWithActivities.forEach(s -> {

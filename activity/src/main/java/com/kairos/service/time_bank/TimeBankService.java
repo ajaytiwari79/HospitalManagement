@@ -62,6 +62,12 @@ public class TimeBankService extends MongoBaseService {
     @Inject private PayOutMongoRepository payOutMongoRepository;
     @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
 
+
+    /**
+     *
+     * @param staffAdditionalInfoDTO
+     * @param shift
+     */
     public void saveTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift) {
         staffAdditionalInfoDTO.getUnitPosition().setStaffId(shift.getStaffId());
         List<DailyTimeBankEntry> dailyTimeBanks = renewDailyTimeBank(staffAdditionalInfoDTO.getUnitPosition(),shift);
@@ -70,6 +76,11 @@ public class TimeBankService extends MongoBaseService {
         }
     }
 
+    /**
+     *
+     * @param staffAdditionalInfoDTO
+     * @param shifts
+     */
     public void saveTimeBanks(StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<Shift> shifts) {
         staffAdditionalInfoDTO.getUnitPosition().setStaffId(shifts.get(0).getStaffId());
         List<DailyTimeBankEntry> updatedDailyTimeBankEntries = new ArrayList<>();
@@ -82,6 +93,12 @@ public class TimeBankService extends MongoBaseService {
         }
     }
 
+    /**
+     *
+     * @param unitPositionWithCtaDetailsDTO
+     * @param shift
+     * @return List<DailyTimeBankEntry>
+     */
     private List<DailyTimeBankEntry> renewDailyTimeBank(StaffUnitPositionDetails unitPositionWithCtaDetailsDTO, Shift shift){
         DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = new DateTime(shift.getEndDate()).plusDays(1).withTimeAtStartOfDay();
@@ -101,12 +118,12 @@ public class TimeBankService extends MongoBaseService {
     }
 
 
-
-
-
-
-
-
+    /**
+     *
+     * @param unitPositionIds
+     * @param shiftQueryResultWithActivities
+     * @return Map<Long, List<ShiftWithActivityDTO>>
+     */
     public Map<Long, List<ShiftWithActivityDTO>> getShiftsMapByUEPs(List<Long> unitPositionIds, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
         Map<Long, List<ShiftWithActivityDTO>> shiftsMap = new HashMap<>(unitPositionIds.size());
         unitPositionIds.forEach(uEPId -> {
@@ -115,7 +132,12 @@ public class TimeBankService extends MongoBaseService {
         return shiftsMap;
     }
 
-
+    /**
+     *
+     * @param unitPositionId
+     * @param shiftQueryResultWithActivities
+     * @return List<ShiftWithActivityDTO>
+     */
     public List<ShiftWithActivityDTO> getShiftsByUEP(Long unitPositionId, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
         List<ShiftWithActivityDTO> shifts = new ArrayList<>();
         shiftQueryResultWithActivities.forEach(s -> {
@@ -126,19 +148,36 @@ public class TimeBankService extends MongoBaseService {
         return shifts;
     }
 
-
+    /**
+     *
+     * @param unitPositonId
+     * @return List<CalculatedTimeBankByDateDTO>
+     */
     public List<CalculatedTimeBankByDateDTO> getTimeBankFromCurrentDateByUEP(Long unitPositonId) {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(145l);
         List<ShiftWithActivityDTO> shifts = null;//shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitEmploymentPositonId,new Date(),new Date());
         return timeBankCalculationService.getTimeBankByDates(unitPositionWithCtaDetailsDTO, shifts, 365);
     }
 
+    /**
+     *
+     * @param unitPositionId
+     * @return UnitPositionWithCtaDetailsDTO
+     */
     public UnitPositionWithCtaDetailsDTO getCostTimeAgreement(Long unitPositionId) {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
         return unitPositionWithCtaDetailsDTO;
     }
 
-
+    /**
+     *
+     * @param unitId
+     * @param unitPositionId
+     * @param query
+     * @param startDate
+     * @param endDate
+     * @return TimeBankAndPayoutDTO
+     */
     public TimeBankAndPayoutDTO getAdvanceViewTimeBank(Long unitId, Long unitPositionId, String query, Date startDate, Date endDate) {
         List<DailyTimeBankEntry> dailyTimeBanks = timeBankMongoRepository.findAllByUnitPositionAndDate(unitPositionId, startDate, endDate);//Arrays.asList(getMockTimeBank());
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionId, startDate, endDate);
@@ -164,7 +203,12 @@ public class TimeBankService extends MongoBaseService {
         return timeBankAndPayoutDTO;
     }
 
-
+    /**
+     *
+     * @param unitPositionId
+     * @param year
+     * @return TimeBankDTO
+     */
     public TimeBankDTO getOverviewTimeBank(Long unitPositionId, Integer year) {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(unitPositionId);
         Interval interval = getIntervalByDateForOverviewTimeBank(unitPositionWithCtaDetailsDTO, year);
@@ -175,6 +219,12 @@ public class TimeBankService extends MongoBaseService {
         return timeBankCalculationService.getOverviewTimeBank(unitPositionId, interval.getStart().dayOfYear().withMinimumValue(), interval.getEnd().dayOfYear().withMaximumValue(), dailyTimeBankEntries, unitPositionWithCtaDetailsDTO);
     }
 
+    /**
+     *
+     * @param unitPositionWithCtaDetailsDTO
+     * @param year
+     * @return Interval
+     */
     private Interval getIntervalByDateForOverviewTimeBank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Integer year) {
 
         DateTime startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
