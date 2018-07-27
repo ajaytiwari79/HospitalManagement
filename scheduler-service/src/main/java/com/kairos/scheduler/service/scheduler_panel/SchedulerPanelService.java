@@ -361,37 +361,10 @@ public class SchedulerPanelService extends MongoBaseService {
     }
 
 
-    /**
-     * data needs to move into neo4j
-     * @param controlPanelId
-     * @return
-     */
-    public String getRecentJobId(BigInteger controlPanelId){
-       /* Aggregation aggregation = Aggregation.newAggregation(
-                match(
-                        Criteria.where("controlPanelId").is(controlPanelId)
-                ),
-                sort(Sort.Direction.DESC, "createdAt"),
-                limit(1)
-        );
-        AggregationResults<Map> finalResult =
-                mongoTemplate.aggregate(aggregation, JobDetails.class, Map.class);
-        if(finalResult.getMappedResults().size() > 0) {
-            String jobDetailId = finalResult.getMappedResults().get(0).get("_id").toString();
-            return jobDetailId;
-        }else {
-            return null;
-        }*/
-
-       return "";
 
 
-    }
 
-    public Long getControlPanelUnitId(BigInteger schedulerPanelId){
-        Optional<SchedulerPanel> panel = schedulerPanelRepository.findById(schedulerPanelId);
-        return panel.get().getUnitId();
-    }
+
 //Dont remove
    /* public ControlPanelDTO getControlPanelData(BigInteger schedulerPanelId){
         String jobId = getRecentJobId(schedulerPanelId);

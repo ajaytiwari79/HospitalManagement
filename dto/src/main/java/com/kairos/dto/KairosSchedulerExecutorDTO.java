@@ -2,10 +2,8 @@ package com.kairos.dto;
 
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
-import com.kairos.enums.scheduler.OperationType;
 
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 
 public class KairosSchedulerExecutorDTO {
 
