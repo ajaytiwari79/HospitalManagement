@@ -83,6 +83,12 @@ public class CounterConfService extends MongoBaseService {
         return save(categories);
     }
 
+    private List<CategoryAssignmentDTO> getDeletableAssignments(List<KPICategoryDTO> deletedCategories, ConfLevel level, Long refId){
+        List<BigInteger> deletableCategories = deletedCategories.stream().map(categoryDTO -> categoryDTO.getId()).collect(Collectors.toList());
+        List<CategoryAssignmentDTO> assignmentDTOs = counterRepository.getCategoryAssignments(deletableCategories, level, refId);
+        return assignmentDTOs;
+    }
+
     private void deleteCategories(List<KPICategoryDTO> deletedCategories, ConfLevel level, Long refId){
         List<BigInteger> deletableCategories = deletedCategories.stream().map(categoryDTO -> categoryDTO.getId()).collect(Collectors.toList());
         List<CategoryAssignmentDTO> assignmentDTOs = counterRepository.getCategoryAssignments(deletableCategories, level, refId);
@@ -97,8 +103,10 @@ public class CounterConfService extends MongoBaseService {
     }
 
     private void modifyCategories(List<KPICategoryDTO> changedCategories, ConfLevel level, Long refId){
+        if(changedCategories.isEmpty()) return;
         List<BigInteger> categoryIds = changedCategories.stream().map(changedCategory -> changedCategory.getId()).collect(Collectors.toList());
         List<CategoryAssignmentDTO>  assignmentDTOs = counterRepository.getCategoryAssignments(categoryIds, level, refId);
+        if(assignmentDTOs.isEmpty()) exceptionService.dataNotFoundByIdException("error.kpi_category.availability");
         Map<BigInteger, CategoryAssignmentDTO> categoryDTOMapById = assignmentDTOs.parallelStream().collect(Collectors.toMap(assignmentDTO -> assignmentDTO.getCategory().getId(), assignmentDTO -> assignmentDTO));
         Map<String, BigInteger>  categoryNameAssignemtIdMap = new HashMap<>();
         List<KPICategory> updatableCategories = new ArrayList<>();
@@ -107,7 +115,7 @@ public class CounterConfService extends MongoBaseService {
             if(!assignmentDTO.getCategory().getName().equals(kpiCategoryDTO.getName())){
                 KPICategory category = new KPICategory(kpiCategoryDTO.getName(), refId);
                 if(assignmentDTO.getCategory().getLevelId().equals(refId) && !ConfLevel.COUNTRY.equals(level)){
-                    category.setId(assignmentDTO.getId());
+                    category.setId(assignmentDTO.getCategory().getId());
                 }
                 categoryNameAssignemtIdMap.put(category.getName(), assignmentDTO.getId());
                 updatableCategories.add(category);
@@ -133,8 +141,16 @@ public class CounterConfService extends MongoBaseService {
     public void updateCategories(KPICategoryUpdationDTO categories, ConfLevel level, Long refId){
         Set<String> categoriesNames = categories.getUpdatedCategories().stream().map(category -> category.getName().trim().toLowerCase()).collect(Collectors.toSet());
         if(categoriesNames.size() != categories.getUpdatedCategories().size())  exceptionService.duplicateDataException("error.kpi_category.duplicate");
-        deleteCategories(categories.getDeletedCategories(), level, refId);
+        List<CategoryAssignmentDTO> deletableAssignments = getDeletableAssignments(categories.getDeletedCategories(), level, refId);
+        List<BigInteger> deletableCategoryAssignmentIds = deletableAssignments.stream().map(assignmentDTO -> assignmentDTO.getId()).collect(Collectors.toList());
+        List<BigInteger> ownedDeletableCategoryIds  = new ArrayList<>();
+        if(ConfLevel.UNIT.equals(level)){
+            ownedDeletableCategoryIds = deletableAssignments.parallelStream().filter(assignmentDTO -> assignmentDTO.getCategory().getLevelId().equals(refId)).map(categoryAssignmentDTO -> categoryAssignmentDTO.getCategory().getId()).collect(Collectors.toList());
+        }
         modifyCategories(categories.getUpdatedCategories(), level, refId);
+        counterRepository.removeAll("categoryAssignmentId", deletableCategoryAssignmentIds, CategoryKPIConf.class);
+        counterRepository.removeAll("id", deletableCategoryAssignmentIds, CategoryAssignment.class);
+        counterRepository.removeAll("id", ownedDeletableCategoryIds, KPICategory.class);
     }
 
     public void addEntries(Long countryId){

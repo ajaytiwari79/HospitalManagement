@@ -82,7 +82,7 @@ public class CounterDistController {
 
     @PostMapping("/module/{moduleId}/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addTabKPIsEntry(@RequestBody TabKPIEntryConfDTO tabKPIEntry){
-        counterManagementService.addTabKPIEntries(tabKPIEntry);
+        //counterManagementService.addTabKPIEntries(tabKPIEntry);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 

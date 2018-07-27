@@ -124,7 +124,7 @@ public class CounterRepository {
         Aggregation ag = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where(queryField).is(refId).and("deleted").is(false))
                 , Aggregation.lookup("kPICategory", "categoryId", "id", "category")
-                , Aggregation.project("categoryId").and("category").arrayElementAt(0).as("category")
+                , Aggregation.project("categoryId").and("category").arrayElementAt(0).as("category").and(queryField)
                 , Aggregation.sort(Sort.Direction.ASC, "categoryId")
                 , Aggregation.group(queryField).push("category").as(categoryListField)
                 , Aggregation.project(categoryListField)
