@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.counter;
 
-import com.kairos.activity.counter.*;
+import com.kairos.activity.counter.KPICategoryDTO;
+import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
 import com.kairos.activity.counter.distribution.category.CategoryAssignmentDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
-import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.activity.counter.enums.CounterType;
