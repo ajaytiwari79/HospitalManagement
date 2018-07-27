@@ -78,10 +78,12 @@ public class CounterConfService extends MongoBaseService {
     }
 
     public List<KPICategory> addCategories(List<KPICategory> categories, ConfLevel level, Long ownerId){
+        Long countryId = ConfLevel.COUNTRY.equals(level)? ownerId: null;
+        Long unitId=ConfLevel.UNIT.equals(level)? ownerId: null;
         List<String > names = getTrimmedNames(categories);
         verifyForCategoryAvailability(names, ownerId, level);
         List<KPICategory> kpiCategories=save(categories);
-        List<CategoryAssignment> categoryAssignment = kpiCategories.parallelStream().map(category -> new CategoryAssignment(category.getId(),ownerId,null,  level)).collect(Collectors.toList());
+        List<CategoryAssignment> categoryAssignment = kpiCategories.parallelStream().map(category -> new CategoryAssignment(category.getId(),countryId,unitId,level)).collect(Collectors.toList());
         save(categoryAssignment);
         return kpiCategories;
     }
