@@ -24,14 +24,14 @@ public class IntegrationSettingsController {
     private IntegrationConfigurationService integrationConfigurationService;
 
     @ApiOperation(value = "Get integration services")
-    @RequestMapping(value = "/unit/{unitId}/integration_service", method = RequestMethod.GET)
+    @GetMapping("/unit/{unitId}/integration_service")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getIntegrationServices() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationConfigurationService.getAllIntegrationServices());
     }
 
     @ApiOperation(value = "Add integration service")
-    @RequestMapping(value = "/integration_service", method = RequestMethod.POST)
+    @PostMapping("/integration_service")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addIntegrationService(@Validated @RequestBody IntegrationSettings objectToSave) {
         HashMap<String, Object> integrationSettings = integrationConfigurationService.addIntegrationConfiguration(objectToSave);
@@ -42,7 +42,7 @@ public class IntegrationSettingsController {
     }
 
     @ApiOperation(value = "Update integration service")
-    @RequestMapping(value = "/integration_service/{integrationServiceId}", method = RequestMethod.PUT)
+    @PutMapping("/integration_service/{integrationServiceId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateIntegrationService(@Validated @RequestBody IntegrationSettings integrationSettings, @PathVariable BigInteger integrationServiceId) {
         HashMap<String, Object> updatedObject = integrationConfigurationService.updateIntegrationService(integrationServiceId, integrationSettings);
@@ -53,7 +53,7 @@ public class IntegrationSettingsController {
     }
 
     @ApiOperation(value = "Delete integration service")
-    @RequestMapping(value = "/integration_service/{integrationServiceId}", method = RequestMethod.DELETE)
+    @DeleteMapping("/integration_service/{integrationServiceId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteIntegrationService(@PathVariable BigInteger integrationServiceId) {
         boolean isDeleted = integrationConfigurationService.deleteIntegrationService(integrationServiceId);

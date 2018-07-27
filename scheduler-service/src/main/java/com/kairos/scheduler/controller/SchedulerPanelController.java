@@ -26,7 +26,7 @@ public class SchedulerPanelController {
     @Inject
     private SchedulerPanelService schedulerPanelService;
 
-    @RequestMapping(value = "/{schedulerPanelId}", method = RequestMethod.GET)
+    @GetMapping("/{schedulerPanelId}")
     @ApiOperation("Get Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> getSchedulerPanel(@PathVariable BigInteger controlPanelId) throws IOException {
 
@@ -34,7 +34,7 @@ public class SchedulerPanelController {
 
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @GetMapping("")
     @ApiOperation("Get Control Panel List ")
     public ResponseEntity<Map<String, Object>> getSchedulerPanelList(@PathVariable  long unitId) throws IOException {
 
@@ -43,25 +43,25 @@ public class SchedulerPanelController {
     }
 
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @PostMapping("")
     @ApiOperation("Create Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> addSchedulerPanel(@RequestParam(value = "integrationConfigurationId", required = false) BigInteger integrationConfigurationId, @PathVariable  long unitId, @RequestBody SchedulerPanelDTO schedulerPanelDTO) throws IOException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTO, integrationConfigurationId));
     }
 
-    @RequestMapping(value = "/{schedulerPanelId}", method = RequestMethod.PUT)
+    @PutMapping("/{schedulerPanelId}")
     @ApiOperation("Update Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> updateSchedulerPanel(@RequestBody SchedulerPanelDTO schedulerPanelDTO,@PathVariable BigInteger schedulerPanelId) throws IOException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanel(schedulerPanelDTO,schedulerPanelId));
     }
 
-    @RequestMapping(value = "/jobDetails/{schedulerPanelId}", method = RequestMethod.GET)
+    @GetMapping("/jobDetails/{schedulerPanelId}")
     @ApiOperation("Get job details ")
     public ResponseEntity<Map<String, Object>> getJobDetails(@PathVariable BigInteger schedulerPanelId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getJobDetails(schedulerPanelId));
     }
 
-    @RequestMapping(value = "/delete/{schedulerPanelId}", method = RequestMethod.DELETE)
+    @DeleteMapping("/delete/{schedulerPanelId}")
     @ApiOperation("Delete Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> deleteJob(@PathVariable BigInteger schedulerPanelId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelId));
