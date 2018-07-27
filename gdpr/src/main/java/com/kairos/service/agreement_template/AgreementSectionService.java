@@ -350,7 +350,7 @@ public class AgreementSectionService extends MongoBaseService {
             AgreementSection agreementSection = agreementSectionMap.get(agreementSectionDTO.getId());
             agreementSection.setName(agreementSectionDTO.getName());
             AgreementSectionClauseWrapper sectionClauseAndClauseDtoWrapper = new AgreementSectionClauseWrapper();
-            if (agreementSectionDTO.getClauses() !=null && !agreementSectionDTO.getClauses().isEmpty()) {
+            if (agreementSectionDTO.getClauses() != null && !agreementSectionDTO.getClauses().isEmpty()) {
                 List<BigInteger> unchangedClauseidList = new ArrayList<>();
                 List<ClauseBasicDTO> changedClauseBelongToSection = new ArrayList<>();
                 List<ClauseBasicDTO> newClauseBelongToSection = new ArrayList<>();
@@ -370,7 +370,7 @@ public class AgreementSectionService extends MongoBaseService {
                 sectionClauseAndClauseDtoWrapper.setNewClauses(newClauseBelongToSection);
                 agreementSection.setClauses(unchangedClauseidList);
             }
-            if (agreementSectionDTO.getSubAgreementSections() !=null && !agreementSectionDTO.getSubAgreementSections().isEmpty()) {
+            if (agreementSectionDTO.getSubAgreementSections() != null && !agreementSectionDTO.getSubAgreementSections().isEmpty()) {
                 List<AgreementSection> agreementSubSectionList = updateSubSectionAndClausesList(newClauseBasicDTOList, changedClausesDTOList, changedClauseIdsList, agreementSectionDTO, agreementSubSectionClauseAndClauseDtoHashMap);
                 sectionClauseAndClauseDtoWrapper.setAgreementSubSections(agreementSubSectionList);
             }
@@ -411,7 +411,7 @@ public class AgreementSectionService extends MongoBaseService {
         List<BigInteger> subSectionIdList = new ArrayList<>();
 
         agreementSectionDTO.getSubAgreementSections().forEach(agreementSubSectionDTO -> {
-            subSectionIdList.add(agreementSectionDTO.getId());
+            subSectionIdList.add(agreementSubSectionDTO.getId());
         });
         List<AgreementSection> agreementSubSectionList = agreementSectionMongoRepository.findAgreementSectionByIds(UserContext.getCountryId(), UserContext.getOrgId(), subSectionIdList);
         Map<BigInteger, AgreementSection> agreementSubSectionMap = new HashMap<>();
@@ -419,12 +419,13 @@ public class AgreementSectionService extends MongoBaseService {
         agreementSubSectionList.forEach(agreementSection -> {
             agreementSubSectionMap.put(agreementSection.getId(), agreementSection);
         });
+        agreementSubSectionList.clear();
         agreementSectionDTO.getSubAgreementSections().forEach(agreementSubSectionDTO -> {
 
             AgreementSectionClauseWrapper agreementSubsectionClauseAndClauseDtoWrapper = new AgreementSectionClauseWrapper();
-            AgreementSection agreementSubSection = agreementSubSectionMap.get(agreementSectionDTO.getId());
-
-            if (agreementSubSectionDTO.getClauses()!=null && !agreementSubSectionDTO.getClauses().isEmpty()) {
+            AgreementSection agreementSubSection = agreementSubSectionMap.get(agreementSubSectionDTO.getId());
+            agreementSubSection.setName(agreementSubSectionDTO.getName());
+            if (agreementSubSectionDTO.getClauses() != null && !agreementSubSectionDTO.getClauses().isEmpty()) {
                 List<BigInteger> unchangedClauseidList = new ArrayList<>();
                 List<ClauseBasicDTO> changedClauseBelongToSubSection = new ArrayList<>();
                 List<ClauseBasicDTO> newClauseBelongToSubSection = new ArrayList<>();
