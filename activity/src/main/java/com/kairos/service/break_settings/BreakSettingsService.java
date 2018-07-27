@@ -62,7 +62,6 @@ public class BreakSettingsService extends MongoBaseService {
         breakSettings.setBreakDurationInMinute(breakSettingsDTO.getBreakDurationInMinute());
         breakSettings.setNumberOfBreaks(breakSettingsDTO.getNumberOfBreaks());
         save(breakSettings);
-
         return breakSettingsDTO;
     }
 

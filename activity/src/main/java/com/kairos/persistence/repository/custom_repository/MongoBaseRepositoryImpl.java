@@ -23,4 +23,6 @@ extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
 
 		return mongoOperations.findById(id, entityInformation.getJavaType(), entityInformation.getCollectionName());
 	}
+
+
 }
