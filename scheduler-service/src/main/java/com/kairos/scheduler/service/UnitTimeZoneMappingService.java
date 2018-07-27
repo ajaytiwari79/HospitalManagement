@@ -4,10 +4,7 @@ import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.unit_settings.UnitTimeZoneMapping;
 import com.kairos.scheduler.persistence.repository.UnitTimeZoneMappingRepository;
 import org.springframework.stereotype.Service;
-import java.math.BigInteger;
-import java.time.ZoneId;
 import java.util.Optional;
-
 import javax.inject.Inject;
 
 @Service

@@ -2,9 +2,6 @@ package com.kairos.scheduler.service.scheduler_panel;
 
 import com.kairos.dto.KairosScheduleJobDTO;
 import com.kairos.dto.SchedulerPanelDTO;
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.kafka.JobQueueExecutor;
-import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;

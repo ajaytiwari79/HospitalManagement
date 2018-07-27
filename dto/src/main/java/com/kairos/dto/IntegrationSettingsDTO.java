@@ -5,7 +5,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 
-public class IntegrationConfigurationDTO {
+public class IntegrationSettingsDTO {
 
 
     @NotEmpty(message = "name can not be null") @NotNull(message = "name can not be null")

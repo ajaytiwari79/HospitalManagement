@@ -1,8 +1,11 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
+import com.kairos.dto.IntegrationSettingsDTO;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.repository.IntegrationConfigurationRepository;
 import com.kairos.scheduler.service.MongoBaseService;
+import com.kairos.scheduler.service.exception.ExceptionService;
+import com.kairos.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,17 +21,19 @@ import java.util.*;
 public class IntegrationConfigurationService extends MongoBaseService {
 
     @Inject
-    IntegrationConfigurationRepository integrationConfigurationRepository;
+    private IntegrationConfigurationRepository integrationConfigurationRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
-    public HashMap<String, Object> addIntegrationConfiguration(IntegrationSettings integrationSettings){
+
+    public IntegrationSettingsDTO addIntegrationConfiguration(IntegrationSettings integrationSettings){
         save(integrationSettings);
-        return filterIntegrationServiceData(integrationSettings);
+        return ObjectMapperUtils.copyPropertiesByMapper(integrationSettings,IntegrationSettingsDTO.class);
     }
 
-    public List<IntegrationSettings> getAllIntegrationServices(){
-        List<Map<String,Object>> integrationService = new ArrayList<>();
+    public List<IntegrationSettingsDTO> getAllIntegrationServices(){
 
-        return integrationConfigurationRepository.findAllAndIsEnabledTrue();
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(integrationConfigurationRepository.findAllAndIsEnabledTrue(),IntegrationSettingsDTO.class);
     }
 
     public boolean deleteIntegrationService(BigInteger integrationServiceId){
@@ -42,25 +47,20 @@ public class IntegrationConfigurationService extends MongoBaseService {
         return true;
     }
 
-    public HashMap<String, Object> updateIntegrationService(BigInteger integrationServiceId,IntegrationSettings integrationSettings){
+    public IntegrationSettingsDTO updateIntegrationService(BigInteger integrationServiceId,IntegrationSettings integrationSettings){
         Optional<IntegrationSettings> objectToUpdateOptional = integrationConfigurationRepository.findById(integrationServiceId);
         if(!objectToUpdateOptional.isPresent()){
-            return null;
+            exceptionService.dataNotFoundByIdException("message.integrationsettings.notfound",integrationServiceId);
         }
         IntegrationSettings objectToUpdate = objectToUpdateOptional.get();
         objectToUpdate.setDescription(integrationSettings.getDescription());
         objectToUpdate.setName(integrationSettings.getName());
         objectToUpdate.setUniqueKey(integrationSettings.getUniqueKey());
         save(objectToUpdate);
-        return filterIntegrationServiceData(objectToUpdate);
+
+        return ObjectMapperUtils.copyPropertiesByMapper(objectToUpdate,IntegrationSettingsDTO.class);
     }
 
-    private HashMap<String,Object> filterIntegrationServiceData(IntegrationSettings integrationSettings){
-        HashMap<String,Object> map = new HashMap<>(2);
-        map.put("id", integrationSettings.getId());
-        map.put("description", integrationSettings.getDescription());
-        map.put("uniqueKey", integrationSettings.getUniqueKey());
-        return map;
-    }
+
 
 }

@@ -1,6 +1,6 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
-import com.kairos.dto.IntegrationConfigurationDTO;
+import com.kairos.dto.IntegrationSettingsDTO;
 import com.kairos.dto.KairosSchedulerExecutorDTO;
 import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
@@ -57,7 +57,6 @@ public class DynamicCronScheduler implements  DisposableBean  {
             trigger = new CronTrigger(schedulerPanel.getCronExpression(), TimeZone.getTimeZone(timezone));
         }
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        //threadPoolTaskScheduler.setThreadNamePrefix(schedulerPanel.getIntegrationConfigurationId().toString());
         threadPoolTaskScheduler.setThreadNamePrefix(schedulerPanel.getJobSubType().toString());
 
         threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
@@ -80,7 +79,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
     }
 
-    public Date getNextExecutionTime(CronTrigger trigger, Date lastScheduledExecutionTime, TimeZone timeZone){
+    private Date getNextExecutionTime(CronTrigger trigger, Date lastScheduledExecutionTime, TimeZone timeZone){
         TriggerContext triggerContext = getTriggerContext(lastScheduledExecutionTime);
         triggerContext.lastActualExecutionTime();
         return trigger.nextExecutionTime(triggerContext);
@@ -137,7 +136,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
 
     }
 
-    public Runnable getTask(SchedulerPanel schedulerPanel,  CronTrigger trigger, TimeZone timeZone){
+    private Runnable getTask(SchedulerPanel schedulerPanel,  CronTrigger trigger, TimeZone timeZone){
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -150,15 +149,15 @@ public class DynamicCronScheduler implements  DisposableBean  {
                     schedulerPanel.setNextRunTime(DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate()));
                 }
                 schedulerPanelService.setScheduleLastRunTime(schedulerPanel);
-                IntegrationConfigurationDTO integrationConfigurationDTO = null;
+                IntegrationSettingsDTO integrationSettingsDTO = null;
                 if(Optional.ofNullable(schedulerPanel.getIntegrationConfigurationId()).isPresent()) {
-                    integrationConfigurationDTO = new IntegrationConfigurationDTO();
+                    integrationSettingsDTO = new IntegrationSettingsDTO();
                     Optional<IntegrationSettings> integrationConfiguration = integrationConfigurationRepository.findById(schedulerPanel.getIntegrationConfigurationId());
-                    ObjectMapperUtils.copyProperties(integrationConfiguration.get(),integrationConfigurationDTO);
+                    ObjectMapperUtils.copyProperties(integrationConfiguration.get(), integrationSettingsDTO);
                 }
 
                 KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getId(),schedulerPanel.getUnitId(),schedulerPanel.getJobType(), schedulerPanel.getJobSubType(),schedulerPanel.getEntityId(),
-                        integrationConfigurationDTO,DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
+                        integrationSettingsDTO,DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
 
                 if(userSubTypes.contains(jobToExecute.getJobSubType())) {
                     kafkaProducer.pushToUserQueue(jobToExecute);

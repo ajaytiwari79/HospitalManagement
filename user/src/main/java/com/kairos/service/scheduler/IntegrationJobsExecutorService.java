@@ -7,7 +7,6 @@ import com.kairos.enums.scheduler.Result;
 import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.util.DateUtil;
 import com.kairos.util.DateUtils;
 import com.kairos.util.timeCareShift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
@@ -28,7 +27,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
 import static com.kairos.constants.AppConstants.*;
@@ -69,7 +67,7 @@ public class IntegrationJobsExecutorService {
         }
         String importShiftURI = "";
         int weeks = 35;
-        String uniqueKey = job.getIntegrationConfigurationDTO().getUniqueKey();
+        String uniqueKey = job.getIntegrationSettingsDTO().getUniqueKey();
         logger.info("uniqueKey----> "+uniqueKey);
         RestTemplate restTemplate = new RestTemplate();
         switch(uniqueKey){

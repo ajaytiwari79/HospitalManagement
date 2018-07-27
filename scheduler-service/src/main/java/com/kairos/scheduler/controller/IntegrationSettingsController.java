@@ -1,5 +1,6 @@
 package com.kairos.scheduler.controller;
 
+import com.kairos.dto.IntegrationSettingsDTO;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.service.scheduler_panel.IntegrationConfigurationService;
 import com.kairos.scheduler.utils.ResponseHandler;
@@ -34,7 +35,7 @@ public class IntegrationSettingsController {
     @PostMapping("/integration_service")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addIntegrationService(@Validated @RequestBody IntegrationSettings objectToSave) {
-        HashMap<String, Object> integrationSettings = integrationConfigurationService.addIntegrationConfiguration(objectToSave);
+        IntegrationSettingsDTO integrationSettings = integrationConfigurationService.addIntegrationConfiguration(objectToSave);
         if (integrationSettings == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, integrationSettings);
         }
@@ -45,11 +46,11 @@ public class IntegrationSettingsController {
     @PutMapping("/integration_service/{integrationServiceId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateIntegrationService(@Validated @RequestBody IntegrationSettings integrationSettings, @PathVariable BigInteger integrationServiceId) {
-        HashMap<String, Object> updatedObject = integrationConfigurationService.updateIntegrationService(integrationServiceId, integrationSettings);
-        if (updatedObject == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, updatedObject);
+        IntegrationSettingsDTO integrationSettingsDTO = integrationConfigurationService.updateIntegrationService(integrationServiceId, integrationSettings);
+        if (integrationSettingsDTO == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, integrationSettingsDTO);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, updatedObject);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationSettingsDTO);
     }
 
     @ApiOperation(value = "Delete integration service")

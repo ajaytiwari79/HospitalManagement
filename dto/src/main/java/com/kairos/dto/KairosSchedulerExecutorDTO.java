@@ -13,21 +13,21 @@ public class KairosSchedulerExecutorDTO {
     private JobSubType jobSubType;
     private BigInteger entityId;
     private String filterId;
-    private IntegrationConfigurationDTO integrationConfigurationDTO;
+    private IntegrationSettingsDTO integrationSettingsDTO;
     private Long oneTimeTriggerDateMillis;
 
     public KairosSchedulerExecutorDTO() {
 
     }
-    public KairosSchedulerExecutorDTO(BigInteger id,Long unitId,JobType jobType,JobSubType jobSubType, BigInteger entityId,
-                                      IntegrationConfigurationDTO integrationConfigurationDTO,Long oneTimeTriggerDateMillis ) {
+    public KairosSchedulerExecutorDTO(BigInteger id, Long unitId, JobType jobType, JobSubType jobSubType, BigInteger entityId,
+                                      IntegrationSettingsDTO integrationSettingsDTO, Long oneTimeTriggerDateMillis ) {
 
         this.id = id;
         this.unitId = unitId;
         this.jobType = jobType;
         this.jobSubType = jobSubType;
         this.entityId = entityId;
-        this.integrationConfigurationDTO = integrationConfigurationDTO;
+        this.integrationSettingsDTO = integrationSettingsDTO;
         this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
 
     }
@@ -47,12 +47,12 @@ public class KairosSchedulerExecutorDTO {
     public void setFilterId(String filterId) {
         this.filterId = filterId;
     }
-    public IntegrationConfigurationDTO getIntegrationConfigurationDTO() {
-        return integrationConfigurationDTO;
+    public IntegrationSettingsDTO getIntegrationSettingsDTO() {
+        return integrationSettingsDTO;
     }
 
-    public void setIntegrationConfigurationDTO(IntegrationConfigurationDTO integrationConfigurationDTO) {
-        this.integrationConfigurationDTO = integrationConfigurationDTO;
+    public void setIntegrationSettingsDTO(IntegrationSettingsDTO integrationSettingsDTO) {
+        this.integrationSettingsDTO = integrationSettingsDTO;
     }
 
     public Long getUnitId() {
