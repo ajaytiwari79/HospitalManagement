@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.counter;
 
-import com.kairos.activity.counter.*;
+import com.kairos.activity.counter.KPICategoryDTO;
+import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
 import com.kairos.activity.counter.distribution.category.CategoryAssignmentDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
-import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.activity.counter.enums.CounterType;
@@ -93,14 +93,14 @@ public class CounterRepository {
         return mongoTemplate.find(query, claz);
     }
 
-    public String getRefQueryField(ConfLevel level){
+    private String getRefQueryField(ConfLevel level){
         switch(level){
             case COUNTRY: return "countryId";
             case UNIT: return "unitId";
             case STAFF: return "staffId";
             case DEFAULT: return "countryId";
+            default: return "countryId";
         }
-        return null;
     }
 
     //KPI assignment CRUD
@@ -190,11 +190,6 @@ public class CounterRepository {
         return results.getMappedResults();
     }
 
-    public List<TabKPIEntry> getTabKPIConfgiurationByTabId(List<String> tabIds, ConfLevel level, Long refId){
-        String refQueryField = getRefQueryField(level);
-        return mongoTemplate.find(null, TabKPIEntry.class);
-    }
-
     public void removeTabKPIConfiguration(TabKPIEntry entry){
         Query query = new Query(Criteria.where("tabId").is(entry.getTabId()).and("kpiId").is(entry.getKpiId()));
         mongoTemplate.remove(query, TabKPIEntry.class);
@@ -220,12 +215,5 @@ public class CounterRepository {
     public void removeOrgTypeKPIEntry(OrgTypeKPIEntry entry){
         Query query = new Query(Criteria.where("orgTypeId").is(entry.getOrgTypeId()).and("kpiId").is(entry.getKpiId()));
         mongoTemplate.remove(query, OrgTypeKPIEntry.class);
-    }
-
-    public List<KPICategoryDTO> getKPICategoriesByAssignee(Long assigneeId, ConfLevel level){
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("levelId").is(assigneeId).and("ownerLevel").is(level))
-        );
-        return null;
     }
 }
