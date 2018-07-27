@@ -116,7 +116,17 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    // updated for section creation and sub sectiomn creations
+    /**
+     * @description - method addd new clause  of section and sub sections to  newClauseBasicDTOList ,so that we can create all the new clause at single time for all section and sub sections
+     *                similarly changedClausesDTOList contain list of clauses whic are changed and we update the exisiting clauses single time.
+     * @param newClauseBasicDTOList   -list of new clause
+     * @param changedClausesDTOList  - list of clause which are changed and we need update those clause
+     * @param changedClauseIdsList -list of clause id which we need to updated
+     * @param agreementSectionDTO   ;-agreement section Dto contain list of clauses and  list of Sub section(sub section contain list of clauses )
+     * @param agreementSubSectionClauseAndClauseDtoHashMap - map contain list of clauses (new clause ,and clause which need to be update)
+     *                                                     corresponding to Agreement sub section name which is unique for every subsection.
+     * @return       method return Object of agreement and Wrapper class which contain  Clause and Subsections corresponding to section
+     */
     public Map<String, Object> buildAgreementSectionsList(List<ClauseBasicDTO> newClauseBasicDTOList, List<ClauseBasicDTO> changedClausesDTOList, List<BigInteger> changedClauseIdsList,
                                                           AgreementSectionDTO agreementSectionDTO, Map<String, AgreementSectionClauseWrapper> agreementSubSectionClauseAndClauseDtoHashMap) {
         Map<String, Object> result = new HashMap<>();
