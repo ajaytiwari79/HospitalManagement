@@ -99,8 +99,8 @@ public class CostTimeAgreementController {
 
     @ApiOperation(value = "Update Unit Position's CTA")
     @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta/{ctaId}")
-    public ResponseEntity<Map<String, Object>> updateUnitPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable Long ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.createCostTimeAgreementForUnitPosition(unitId, unitPositionId, ctaId, collectiveTimeAgreementDTO));
+    public ResponseEntity<Map<String, Object>> updateCostTimeAgreementForUnitPosition(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable Long ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO ctaDTO) throws ExecutionException, InterruptedException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.updateCostTimeAgreementForUnitPosition(unitId, unitPositionId, ctaId, ctaDTO));
     }
 
     @ApiOperation(value = "get unit_position's CTA")

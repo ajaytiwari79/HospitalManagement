@@ -827,10 +827,12 @@ public class ShiftService extends MongoBaseService {
         if (!allowedActivities.containsAll(activityIds)) {
             exceptionService.invalidRequestException("message.activity.multishift");
         }
-
+        List<Activity> activities=activityRepository.findAllActivitiesByIds(activityIds);
+        Map<BigInteger,String> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,Activity::getName));
         List<Shift> shifts = new ArrayList<>(shiftDTO.getSubShifts().size());
         for (int i = 0; i < shiftDTO.getSubShifts().size(); i++) {
             Shift subShifts = buildShift(shiftDTO.getSubShifts().get(i));
+            subShifts.setName(activityMap.get(shiftDTO.getSubShifts().get(i).getActivityId()));
             subShifts.setMainShift(false);
             shifts.add(subShifts);
         }

@@ -42,6 +42,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
+import static javax.management.timer.Timer.ONE_DAY;
 
 
 /**
@@ -541,9 +542,7 @@ public class WTAService extends MongoBaseService {
         newWta.setStartDate(new Date(wtadto.getStartDateMillis()));
         newWta.setEndDate(wtadto.getEndDateMillis() != null ? new Date(wtadto.getStartDateMillis()) : null);
         newWta.setRuleTemplateIds(null);
-        if (wtadto.getEndDateMillis() != null) {
-            oldWta.setEndDate(new Date(wtadto.getEndDateMillis()));
-        }
+        oldWta.setEndDate(new Date(wtadto.getStartDateMillis()-ONE_DAY));
         oldWta.setId(null);
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
         if (wtadto.getRuleTemplates().size() > 0) {
