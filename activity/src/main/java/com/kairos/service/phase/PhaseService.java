@@ -333,32 +333,29 @@ public class PhaseService extends MongoBaseService {
         for(LocalDate date:dates){
             if(date.isBefore(previousMonday)){
                 localDatePhaseStatusMap.put(date,phaseMap.get(PAYROLL));
-            }
-            else if(date.isBefore(currentDate) && date.isAfter(previousMonday.minusDays(1))){
+            } else if(date.isBefore(currentDate) && date.isAfter(previousMonday.minusDays(1))){
                 localDatePhaseStatusMap.put(date,phaseMap.get(TIME_AND_ATTENDANCE));
-            }
-            else if((date).isEqual(currentDate)){
+            } else if((date).isEqual(currentDate)){
                 localDatePhaseStatusMap.put(date,phaseMap.get(REALTIME));
-            }
-
-            else if((date).isBefore(upcomingMondayDate.plusDays(1)) && date.isAfter(currentDate)){
+            } else if((date).isBefore(upcomingMondayDate.plusDays(1)) && date.isAfter(currentDate)){
                 localDatePhaseStatusMap.put(date,phaseMap.get(TENTATIVE));
-            }
-            else {
+            } else {
                 //No Any Actual phase found so going to add Planning Phase
                 addPlanningPhase(planningPhases,date,localDatePhaseStatusMap,upcomingMondayDate);
             }
         }
-
         return localDatePhaseStatusMap;
-
     }
 
-    //==============================Method for adding Planning Phases===================================================
-
+    /**
+     *
+     * @param phases
+     * @param proposedDate
+     * @param localDatePhaseStatusMap
+     * @param upcomingMondayDate
+     */
     private void addPlanningPhase(List<Phase> phases, LocalDate proposedDate, Map<LocalDate,List<ShiftStatus>> localDatePhaseStatusMap, LocalDate upcomingMondayDate) {
         Phase phase = null;
-
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
 
         int startWeekNumber = upcomingMondayDate.get(weekFields.weekOfWeekBasedYear());
@@ -388,7 +385,6 @@ public class PhaseService extends MongoBaseService {
                 }
             }
         }
-
         if (!Optional.ofNullable(phase).isPresent()) {
             phase = phases.get(phases.size() - 1);
             localDatePhaseStatusMap.put(proposedDate,phase.getStatus());
