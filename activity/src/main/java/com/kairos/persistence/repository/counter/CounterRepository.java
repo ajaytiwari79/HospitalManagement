@@ -120,7 +120,7 @@ public class CounterRepository {
         Aggregation ag = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where(queryField).is(refId).and("deleted").is(false))
                 , Aggregation.lookup("kPICategory", "categoryId", "id", "category")
-                , Aggregation.project("categoryId").and("category").arrayElementAt(0).as("category")
+                , Aggregation.project("categoryId").and("category").arrayElementAt(0).as("category").and(queryField)
                 , Aggregation.sort(Sort.Direction.ASC, "categoryId")
                 , Aggregation.group(queryField).push("category").as(categoryListField)
                 , Aggregation.project(categoryListField)
@@ -133,18 +133,13 @@ public class CounterRepository {
     }
 
     public List<CategoryAssignmentDTO> getCategoryAssignments(List<BigInteger> categoryIds, ConfLevel level, Long refId){
-        String queryField = (ConfLevel.COUNTRY.equals(level))? "countryId":"unitId";
-        List<AggregationOperation> operations = new ArrayList<>();
-        Criteria matchCriteria;
-        if(categoryIds == null){
-            matchCriteria = Criteria.where(queryField).is(refId);
-        }else{
-            matchCriteria = Criteria.where(queryField).is(refId).and("categoryId").in(categoryIds);
-        }
-        operations.add(Aggregation.match(matchCriteria));
-        operations.add(Aggregation.lookup("kPICategory", "categoryId", "id", "category"));
-        operations.add(Aggregation.project("countryId").andInclude("unitId").andInclude("level").and("category").arrayElementAt(0).as("category"));
-        Aggregation ag = Aggregation.newAggregation(operations);
+        String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
+        Criteria matchCriteria = categoryIds == null ? Criteria.where(queryField).is(refId) : Criteria.where(queryField).is(refId).and("categoryId").in(categoryIds);
+        Aggregation ag = Aggregation.newAggregation(
+                Aggregation.match(matchCriteria),
+                Aggregation.lookup("kPICategory", "categoryId", "_id", "category"),
+                Aggregation.project("countryId", "level", "unitId").and("category").arrayElementAt(0).as("category")
+        );
 
         AggregationResults<CategoryAssignmentDTO> results = mongoTemplate.aggregate(ag, CategoryAssignment.class, CategoryAssignmentDTO.class);
         return results.getMappedResults();
