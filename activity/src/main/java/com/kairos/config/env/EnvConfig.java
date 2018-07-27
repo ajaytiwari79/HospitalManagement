@@ -37,10 +37,28 @@ public class EnvConfig {
     @Value("${webservice.googleCalendarApiUrl}")
     private String googleCalendarAPIV3Url;
 
-    public String getGoogleCalendarAPIV3Url(String vCardId) {
 
-        return googleCalendarAPIV3Url.replace("{countryVCard}", vCardId);
-    }
+    @Value("${spring.data.mongodb.database}")
+    private String dataBaseName;
+
+    @Value("${spring.data.mongodb.uri}")
+    private String mongoUri;
+
+    @Value("${spring.data.mongodb.port}")
+    private int mongoPort;
+
+    @Value("${spring.data.mongodb.host}")
+    private String mongoHost;
+
+    @Value("${spring.data.mongodb.username}")
+    private String mongoUserName;
+
+    @Value("${spring.data.mongodb.password}")
+    private  String mongoPassword;
+
+
+    public String getGoogleCalendarAPIV3Url(String vCardId) {
+        return googleCalendarAPIV3Url.replace("{countryVCard}", vCardId); }
 
 
     public String getWsUrl() {
@@ -80,4 +98,16 @@ public class EnvConfig {
     public void setFlsPackageName(String flsPackageName) {
         this.flsPackageName = flsPackageName;
     }
+
+    public String getDataBaseName() { return dataBaseName; }
+
+    public String getMongoUri() { return mongoUri; }
+
+    public int getMongoPort() { return mongoPort; }
+
+    public String getMongoHost() { return mongoHost; }
+
+    public String getMongoUserName() { return mongoUserName; }
+
+    public String getMongoPassword() { return mongoPassword; }
 }
