@@ -3,7 +3,7 @@ package com.kairos.service.activity;
 import com.kairos.KairosActivityApplication;
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.shift.ShiftPublishDTO;
-import com.kairos.enums.shift.ShiftState;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -147,7 +147,7 @@ public class ShiftIntegrationServiceTest {
         List<BigInteger> shifts = new ArrayList<>();
         shifts.add(new BigInteger("110"));
         shifts.add(new BigInteger("109"));
-        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, ShiftState.FIXED);
+        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, ShiftStatus.FIXED);
 
         HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
 
