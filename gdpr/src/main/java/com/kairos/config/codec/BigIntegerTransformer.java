@@ -1,4 +1,4 @@
-package com.kairos.util.codec;
+package com.kairos.config.codec;
 
 import org.bson.Transformer;
 
