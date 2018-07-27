@@ -70,7 +70,7 @@ public class PayOutService extends MongoBaseService {
         while (startDate.isBefore(endDate)) {
             DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
             PayOut payOut = new PayOut(shift.getId(), shift.getUnitPositionId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId());
-            payOutMongoRepository.findLastPayoutByUnitPositionId(shift.getUnitPositionId());
+            payOutMongoRepository.findLastPayoutByUnitPositionId(shift.getUnitPositionId(),DateUtils.getDateByZoneDateTime(startDate));
             payOut.setPayoutBeforeThisDate(payOut.getPayoutBeforeThisDate()+payOut.getTotalPayOutMin());
             payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activity, payOut);
             if(payOut.getTotalPayOutMin()>0) {
@@ -122,7 +122,7 @@ public class PayOutService extends MongoBaseService {
         PayOutTransaction approvedPayOutTransaction = new PayOutTransaction(payOutTransaction.getStaffId(),payOutTransaction.getUnitPositionId(), PayOutTrasactionStatus.APPROVED,payOutTransaction.getMinutes(), LocalDate.now());
         save(approvedPayOutTransaction);
         PayOut payOut = new PayOut(payOutTransaction.getUnitPositionId(),payOutTransaction.getStaffId(),payOutTransaction.getMinutes(),payOutTransaction.getDate());
-        payOutMongoRepository.findLastPayoutByUnitPositionId(payOutTransaction.getUnitPositionId());
+        payOutMongoRepository.findLastPayoutByUnitPositionId(payOutTransaction.getUnitPositionId(),DateUtils.asDate(payOutTransaction.getDate()));
         payOut.setPayoutBeforeThisDate(payOut.getPayoutBeforeThisDate()+payOut.getTotalPayOutMin());
         save(payOut);
         return true;

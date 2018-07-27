@@ -1,41 +1,37 @@
-package com.kairos.persistence.repository.pay_out;
+package com.kairos.persistence.repository.time_bank;
 
-import com.kairos.enums.payout.PayOutStatus;
-import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.util.Date;
 
 /**
  * @author pradeep
- * @date - 24/7/18
+ * @date - 27/7/18
  */
-public class PayoutMongoRepositoryImpl implements CustomPayoutMongoRepository{
 
+public class TimeBankMongoRepositoryImpl implements CustomTimeBankRepository{
 
-    @Inject
-    private MongoTemplate mongoTemplate;
-
+    @Inject private MongoTemplate mongoTemplate;
 
     @Override
-    public PayOut findLastPayoutByUnitPositionId(Long unitPositionId, Date date) {
+    public DailyTimeBankEntry findLastTimeBankByUnitPositionId(Long unitPositionId, Date date) {
         Query query = new Query(Criteria.where("unitPositionId").is(unitPositionId).and("date").lt(date).and("deleted").is(false));
         query.with(Sort.by(Sort.Direction.ASC,"date"));
-        return mongoTemplate.findOne(query,PayOut.class);
+        //query.limit(1);
+        return mongoTemplate.findOne(query,DailyTimeBankEntry.class);
     }
 
     @Override
-    public void updatePayOut(Long unitPositionId, int payOut) {
+    public void updateAccumulatedTimeBank(Long unitPositionId, int timeBank) {
         Query query = new Query(Criteria.where("unitPositionId").is(unitPositionId).and("deleted").is(false));
-        Update update = new Update().inc("payoutBeforeThisDate",payOut);
-        mongoTemplate.updateMulti(query,update,PayOut.class);
+        Update update = new Update().inc("accumultedTimeBankMin",timeBank);
+        mongoTemplate.updateMulti(query,update,DailyTimeBankEntry.class);
 
     }
 }
