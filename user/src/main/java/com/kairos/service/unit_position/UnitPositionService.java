@@ -276,6 +276,7 @@ public class UnitPositionService extends UserBaseService {
         oldUnitPosition.setHistory(true);
         oldUnitPosition.setEditable(false);
         Set<Long> olderFunctionsAddedInUnitPosition = oldUnitPosition.getFunctions() != null ? oldUnitPosition.getFunctions().stream().map(Function::getId).collect(Collectors.toSet()) : Collections.emptySet();
+        //TODO Vipul update equals method
         if (!olderFunctionsAddedInUnitPosition.equals(unitPositionDTO.getFunctionIds())) {
             List<Function> functions = new ArrayList<>();
             if (!unitPositionDTO.getFunctionIds().isEmpty()) {
@@ -320,6 +321,7 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setSalary(unitPositionDTO.getSalary());
         unitPosition.setStartDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate()));
     }
+
 
     private boolean calculativeValueChanged(UnitPosition oldUnitPosition, UnitPositionDTO unitPositionDTO, UnitPositionEmploymentTypeRelationShip oldUnitPositionEmploymentTypeRelationShip) {
         if (oldUnitPosition.getAvgDailyWorkingHours() != unitPositionDTO.getAvgDailyWorkingHours() ||

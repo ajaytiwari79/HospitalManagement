@@ -7,7 +7,9 @@ import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
@@ -28,9 +30,21 @@ public class SchedulerPanel extends MongoBaseEntity {
     private Date nextRunTime;
     private boolean isAlarmed;
     private Integer startMinute;
-    private String repeat;
-    private List<String> days;
-    private String runOnce;
+
+    public Integer getRepeat() {
+        return repeat;
+    }
+
+    public void setRepeat(Integer repeat) {
+        this.repeat = repeat;
+    }
+
+    private Integer repeat;
+    private List<DayOfWeek> days;
+
+
+
+    private LocalTime runOnce;
     private List<String> selectedHours;
     private Date startDate;
     private Date endDate;
@@ -102,21 +116,21 @@ public class SchedulerPanel extends MongoBaseEntity {
         this.selectedHours = selectedHours;
     }
 
-    public String getRunOnce() {
+   /* public String getRunOnce() {
         return runOnce;
     }
 
     public void setRunOnce(String runOnce) {
         this.runOnce = runOnce;
-    }
+    }*/
 
-    public List<String> getDays() {
-        return days;
-    }
-
-    public void setDays(List<String> days) {
-        this.days = days;
-    }
+//    public List<String> getDays() {
+//        return days;
+//    }
+//
+//    public void setDays(List<String> days) {
+//        this.days = days;
+//    }
 
 
     public String getName() {
@@ -143,13 +157,13 @@ public class SchedulerPanel extends MongoBaseEntity {
         this.interval = interval;
     }
 
-    public String getRepeat() {
+   /* public String getRepeat() {
         return repeat;
     }
 
     public void setRepeat(String repeat) {
         this.repeat = repeat;
-    }
+    }*/
 
     public boolean isActive() {
         return active;
@@ -238,5 +252,20 @@ public class SchedulerPanel extends MongoBaseEntity {
 
     public void setFilterId(String filterId) {
         this.filterId = filterId;
+    }
+    public List<DayOfWeek> getDays() {
+        return days;
+    }
+
+    public void setDays(List<DayOfWeek> days) {
+        this.days = days;
+    }
+
+    public LocalTime getRunOnce() {
+        return runOnce;
+    }
+
+    public void setRunOnce(LocalTime runOnce) {
+        this.runOnce = runOnce;
     }
 }

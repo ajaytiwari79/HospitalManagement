@@ -10,6 +10,7 @@ import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 
 import java.math.BigInteger;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
@@ -23,9 +24,9 @@ public class KairosScheduleJobDTO {
     private Date nextRunTime;
     private boolean isAlarmed;
     private Integer startMinute;
-    private String repeat;
+    private Integer repeat;
     private List<String> days;
-    private String runOnce;
+    private LocalTime runOnce;
     private List<String> selectedHours;
     private Date startDate;
     private Date endDate;
@@ -174,13 +175,13 @@ public class KairosScheduleJobDTO {
         this.startMinute = startMinute;
     }
 
-    public String getRepeat() {
+  /*  public String getRepeat() {
         return repeat;
     }
 
     public void setRepeat(String repeat) {
         this.repeat = repeat;
-    }
+    }*/
 
     public List<String> getDays() {
         return days;
@@ -190,13 +191,13 @@ public class KairosScheduleJobDTO {
         this.days = days;
     }
 
-    public String getRunOnce() {
+    /*public String getRunOnce() {
         return runOnce;
     }
 
     public void setRunOnce(String runOnce) {
         this.runOnce = runOnce;
-    }
+    }*/
 
     public List<String> getSelectedHours() {
         return selectedHours;
@@ -252,6 +253,21 @@ public class KairosScheduleJobDTO {
 
     public void setIntegrationOperation(IntegrationOperation integrationOperation) {
         this.integrationOperation = integrationOperation;
+    }
+
+    public Integer getRepeat() {
+        return repeat;
+    }
+
+    public void setRepeat(Integer repeat) {
+        this.repeat = repeat;
+    }
+    public LocalTime getRunOnce() {
+        return runOnce;
+    }
+
+    public void setRunOnce(LocalTime runOnce) {
+        this.runOnce = runOnce;
     }
 
 }

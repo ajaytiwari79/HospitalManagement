@@ -608,4 +608,11 @@ public class DateUtils {
     public static Long getMillisFromLocalDateTime(LocalDateTime date) {
         return  date==null?null:date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() ;  }
 
+    public static Long getOneDayBeforeMillis() {
+        return  LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    public static Long getCurrentMillis() {
+        return System.currentTimeMillis();
+    }
 }

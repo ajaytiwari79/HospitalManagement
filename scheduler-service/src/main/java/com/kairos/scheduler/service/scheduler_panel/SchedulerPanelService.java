@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -75,9 +76,11 @@ public class SchedulerPanelService extends MongoBaseService {
 
         for(SchedulerPanel schedulerPanel:schedulerPanels) {
 
-            if(!(schedulerPanel.isOneTimeTrigger()&&schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
+            /*if(!(schedulerPanel.isOneTimeTrigger()&&schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
                 dynamicCronScheduler.setCronScheduling(schedulerPanel,unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
-            }
+            }*/
+            dynamicCronScheduler.setCronScheduling(schedulerPanel,unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
+
         }
 
     }
@@ -237,7 +240,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
     }
 
-    public String intervalStringBuilder(List days, String repeat, String runOnce){
+    public String intervalStringBuilder(List days, Integer repeat, LocalTime runOnce){
         String regex = "\\[|\\]";
 
         String interval;
@@ -249,23 +252,27 @@ public class SchedulerPanelService extends MongoBaseService {
         return interval;
     }
 
-    public String cronExpressionSelectedHoursBuilder(List days, String repeat, Integer startTime, List selectedHours){
+    public String cronExpressionSelectedHoursBuilder(List days, Integer repeat, Integer startTime, List selectedHours){
         String cronExpressionSelectedHours = "0 {0}/{1} {2} ? * {3}"; // 	0 5/60 14-18 ? * MON-FRI
+        String cronExpressionSelectedHoursWithoutRepeat = "0 {0} {1} ? * {2}";
+        String cronExpressionSelectedHoursApplicable = Optional.ofNullable(repeat).isPresent()?cronExpressionSelectedHours:cronExpressionSelectedHoursWithoutRepeat;
         String regex = "\\[|\\]";
         String interval  = daysOfWeek(days);
 
         String selectedHoursString  = selectedHours.toString().replaceAll(" ", "").replaceAll("[-]\\d\\d","").replaceAll(regex, "").replaceAll("[:]\\d\\d", "");
         logger.info("selectedHoursString----> "+selectedHoursString);
-        String cronExpression = MessageFormat.format(cronExpressionSelectedHours, startTime.toString(), repeat, selectedHoursString, interval);
+        String cronExpression = Optional.ofNullable(repeat).isPresent()?MessageFormat.format(cronExpressionSelectedHours, startTime.toString(), repeat, selectedHoursString, interval):
+                MessageFormat.format(cronExpressionSelectedHoursWithoutRepeat, startTime.toString(), selectedHoursString, interval);
         logger.info("cronExpression-selectedHours-> "+cronExpression);
         return cronExpression;
     }
 
-    public String cronExpressionRunOnceBuilder(List days, String runOnce){
+    public String cronExpressionRunOnceBuilder(List days, LocalTime runOnce){
         String cronExpressionRunOnce = "0 {0} {1} ? * {2}";
         String interval  = daysOfWeek(days);
-        String hours = runOnce.substring(0,runOnce.indexOf(":"));
-        String minutes = runOnce.substring(runOnce.indexOf(":")+1);
+        //String hours = runOnce.substring(0,runOnce.indexOf(":"));
+        String hours = String.valueOf(runOnce.getHour());
+        String minutes = String.valueOf(runOnce.getMinute());
         logger.info("hours--> "+hours);
         logger.info("minutes--> "+minutes);
         String cronExpression = MessageFormat.format(cronExpressionRunOnce, minutes, hours, interval);

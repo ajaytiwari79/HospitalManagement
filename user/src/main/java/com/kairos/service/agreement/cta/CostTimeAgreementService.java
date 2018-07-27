@@ -467,7 +467,7 @@ public class CostTimeAgreementService extends UserBaseService {
         costTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         costTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, true, ruleTemplateIds);
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, true, ruleTemplateIds,null);
         CompletableFuture.allOf(hasUpdated).join();
 
 
