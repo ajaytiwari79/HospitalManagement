@@ -614,7 +614,7 @@ public class CostTimeAgreementService extends UserBaseService {
         return cta;
     }
 
-    public UnitPositionQueryResult updateCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) {
+    public UnitPositionQueryResult updateCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, Long ctaId, CollectiveTimeAgreementDTO ctaDTO) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent() || unitPosition.isDeleted() == true) {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
@@ -626,13 +626,13 @@ public class CostTimeAgreementService extends UserBaseService {
 
         if (unitPosition.isPublished()) {
             CostTimeAgreement costTimeAgreement = new CostTimeAgreement();
-            collectiveTimeAgreementDTO.setId(null);
-            BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
+            ctaDTO.setId(null);
+            BeanUtils.copyProperties(ctaDTO, costTimeAgreement);
             costTimeAgreement.setId(null);
-            copyRules(costTimeAgreement, collectiveTimeAgreementDTO, null);
+            copyRules(costTimeAgreement, ctaDTO, null);
             collectiveTimeAgreementGraphRepository.detachOldCTAFromUnitPosition(unitPositionId);
             oldCTA.setDisabled(true);
-            oldCTA.setEndDateMillis(collectiveTimeAgreementDTO.getStartDateMillis() - ONE_DAY);
+            oldCTA.setEndDateMillis(ctaDTO.getStartDateMillis() - ONE_DAY);
             costTimeAgreement.setDisabled(false);
             costTimeAgreement.setParent(oldCTA);
             costTimeAgreement.setExpertise(unitPosition.getExpertise());
@@ -646,7 +646,7 @@ public class CostTimeAgreementService extends UserBaseService {
                 ruleTemplateIds = new ArrayList<>();
                 oldCTA.getRuleTemplates().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
             }
-            copyRules(oldCTA, collectiveTimeAgreementDTO, ruleTemplateIds);
+            copyRules(oldCTA, ctaDTO, ruleTemplateIds);
             this.save(oldCTA);
             responseCTA = new CostTimeAgreement(oldCTA.getId(), oldCTA.getName(), oldCTA.getExpertise(), oldCTA.getRuleTemplates(), oldCTA.getStartDateMillis(), oldCTA.getEndDateMillis(), false);
 
