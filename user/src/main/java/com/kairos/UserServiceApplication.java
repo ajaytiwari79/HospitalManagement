@@ -108,7 +108,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 		converters.add(mappingJackson2XmlHttpMessageConverter());
 
 	}
-    @Profile("!local")
+	@Profile({"development","qa","production"})
     @LoadBalanced
 	@Primary
 	@Bean
@@ -119,7 +119,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 				.build();
 		return template;
 	}
-    @Profile("!local")
+	@Profile({"development","qa","production"})
 	@LoadBalanced
 	@Bean(name ="schedulerRestTemplate")
 	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {

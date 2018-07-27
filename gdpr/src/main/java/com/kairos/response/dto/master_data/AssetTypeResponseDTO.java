@@ -1,6 +1,5 @@
 package com.kairos.response.dto.master_data;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigInteger;
@@ -8,14 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AssetTypeResponseDto {
+public class AssetTypeResponseDTO {
 
 
     private BigInteger id;
 
     private String name;
 
-    private List<AssetTypeResponseDto> subAssetTypes=new ArrayList<>();
+    private List<AssetTypeResponseDTO> subAssetTypes=new ArrayList<>();
 
     private Boolean hasSubAsset;
 
@@ -35,11 +34,11 @@ public class AssetTypeResponseDto {
         this.name = name;
     }
 
-    public List<AssetTypeResponseDto> getSubAssetTypes() {
+    public List<AssetTypeResponseDTO> getSubAssetTypes() {
         return subAssetTypes;
     }
 
-    public void setSubAssetTypes(List<AssetTypeResponseDto> subAssetTypes) {
+    public void setSubAssetTypes(List<AssetTypeResponseDTO> subAssetTypes) {
         this.subAssetTypes = subAssetTypes;
     }
 

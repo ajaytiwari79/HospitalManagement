@@ -3,6 +3,7 @@ package com.kairos.controller.agreement.cta;
 import com.kairos.persistence.model.agreement.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
+import com.kairos.service.agreement.cta.CountryCTAService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -21,6 +23,7 @@ import static com.kairos.constants.ApiConstants.*;
 public class CostTimeAgreementController {
     @Autowired
   private  CostTimeAgreementService costTimeAgreementService;
+    @Inject private CountryCTAService countryCTAService;
 
     /**
      * @auther anil maurya
@@ -32,7 +35,7 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> createCTA(@PathVariable Long countryId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                costTimeAgreementService.createCostTimeAgreement(countryId,collectiveTimeAgreementDTO));
+                countryCTAService.createCostTimeAgreementInCountry(countryId,collectiveTimeAgreementDTO));
     }
 
     @RequestMapping(value = "/country/{countryId}/cta/{ctaId}", method = RequestMethod.PUT)
@@ -40,7 +43,7 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> updateCTA(@PathVariable Long countryId, @PathVariable Long ctaId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                costTimeAgreementService.updateCostTimeAgreement(countryId, null, ctaId, collectiveTimeAgreementDTO));
+                countryCTAService.updateCostTimeAgreement(countryId, null, ctaId, collectiveTimeAgreementDTO));
     }
 
     @RequestMapping(value = "/unit/{unitId}/cta/{ctaId}", method = RequestMethod.PUT)
@@ -48,7 +51,7 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> updateUnitCTA(@PathVariable Long unitId, @PathVariable Long ctaId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                costTimeAgreementService.updateCostTimeAgreement(null, unitId, ctaId, collectiveTimeAgreementDTO));
+                countryCTAService.updateCostTimeAgreement(null, unitId, ctaId, collectiveTimeAgreementDTO));
     }
 
     @RequestMapping(value = "/country/{countryId}/cta/{ctaId}", method = RequestMethod.DELETE)
@@ -120,7 +123,7 @@ public class CostTimeAgreementController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getAllCTAByOrganizationSubType(organizationSubTypeId));
     }
 
-    @ApiOperation(value = "link and unlink cta_response with org sub-type")
+    @ApiOperation(value = "link and unlink cta with org sub-type")
     @PutMapping(value = COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/cta/{ctaId}")
     public ResponseEntity<Map<String, Object>> setCTAWithOrganizationType(@PathVariable long countryId, @PathVariable long ctaId, @RequestBody CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, @PathVariable long organizationSubTypeId, @RequestParam(value = "checked") boolean checked) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.setCTAWithOrganizationType(countryId, ctaId,collectiveTimeAgreementDTO, organizationSubTypeId, checked));

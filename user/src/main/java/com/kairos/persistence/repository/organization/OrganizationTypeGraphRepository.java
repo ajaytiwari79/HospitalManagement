@@ -92,7 +92,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "return  case when skill is NULL then [] else collect({id:id(skill),name:skill.name}) END as  skillList  ,skillCategory.name as name ,id(skillCategory) as id,skillCategory.description as description")
     List<OrgTypeSkillQueryResult> getSkillsOfOrganizationType(long orgTypeId);
 
-    @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
+    @Query("Match (n:Organization{isEnable:true,union:false,boardingCompleted:true,isKairosHub:false,gdprUnit:false})-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) where id(organizationType)={0} return DISTINCT n")
     List<Organization> getOrganizationsByOrganizationType(long orgTypeId);
 
 

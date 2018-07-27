@@ -64,8 +64,8 @@ public class ActivityController {
     @ApiOperation("Get all activity categories based on countryId ")
     @GetMapping(value = "/activity/activity_categories")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivityCategoriesForDefaultData(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityCategoriesByCountry(countryId));
+    public ResponseEntity<Map<String, Object>> getActivityCategoriesForDefaultData(@PathVariable long countryId,@RequestParam List<BigInteger> activityCategoriesIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityCategoriesByCountry(countryId, activityCategoriesIds));
     }
 
     @ApiOperation("Get all activity Ids of units by parentIds")
@@ -178,10 +178,10 @@ public class ActivityController {
 
 
     @ApiOperation("Update compositeShifts Tab of Activity")
-    @PutMapping(value = "/activity/compositeShifts")
+    @PutMapping(value = "/activity/{activityId}/compositeShifts")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateCompositeShiftTabOfActivity(@RequestBody CompositeShiftActivityDTO compositeShiftActivityDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateCompositeShiftTabOfActivity(compositeShiftActivityDTO));
+    ResponseEntity<Map<String, Object>> assignCompositeActivitiesInActivity(@PathVariable BigInteger activityId,@RequestBody List<CompositeShiftActivityDTO> compositeShiftActivityDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignCompositeActivitiesInActivity(activityId,compositeShiftActivityDTO));
     }
 
     @ApiOperation("get compositeShifts Tab of Activity")

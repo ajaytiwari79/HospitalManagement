@@ -100,6 +100,7 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
         this.name = name;
         this.disabled = disabled;
         this.description = description;
+        this.wtaTemplateType = WTATemplateType.NO_OF_SEQUENCE_SHIFT;
         //this.sequence=sequence;
         this.sequenceShiftTo = sequenceShiftTo;
         this.sequenceShiftFrom = sequenceShiftFrom;
