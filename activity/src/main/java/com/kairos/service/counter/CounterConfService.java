@@ -80,7 +80,10 @@ public class CounterConfService extends MongoBaseService {
     public List<KPICategory> addCategories(List<KPICategory> categories, ConfLevel level, Long ownerId){
         List<String > names = getTrimmedNames(categories);
         verifyForCategoryAvailability(names, ownerId, level);
-        return save(categories);
+        List<KPICategory> kpiCategories=save(categories);
+        List<CategoryAssignment> categoryAssignment = kpiCategories.parallelStream().map(category -> new CategoryAssignment(category.getId(),ownerId,null,  level)).collect(Collectors.toList());
+        save(categoryAssignment);
+        return kpiCategories;
     }
 
     private void deleteCategories(List<KPICategoryDTO> deletedCategories, ConfLevel level, Long refId){
