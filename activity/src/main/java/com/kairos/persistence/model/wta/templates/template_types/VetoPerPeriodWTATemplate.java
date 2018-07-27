@@ -117,7 +117,7 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
             if (!isValid) {
-                exception = getName() + " is Broken";            }
+                exception = getName();            }
         }
         return exception;
     }

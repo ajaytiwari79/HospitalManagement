@@ -557,7 +557,7 @@ public class ShiftService extends MongoBaseService {
             messages.forEach(responseMessage -> {
                 errors.add(localeService.getMessage(responseMessage));
             });
-            exceptionService.actionNotPermittedException(errors.get(0));
+            exceptionService.actionNotPermittedException("message.ruleTemplate.broken",errors.get(0));
         }
         shift.setDeleted(true);
         save(shift);

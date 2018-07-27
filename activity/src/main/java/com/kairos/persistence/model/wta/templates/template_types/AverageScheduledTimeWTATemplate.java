@@ -146,13 +146,13 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                     if(limitAndCounter[1]!=null) {
                         int counterValue =  limitAndCounter[1] - 1;
                         if(counterValue<0){
-                            exception = getName() + " is Broken";
+                            exception = getName();
                         }else {
                             infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
                             infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                         }
                     }else {
-                        exception = getName() + " is Broken";
+                        exception = getName();
                     }
                 }
             }
