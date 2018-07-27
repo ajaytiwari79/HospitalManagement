@@ -1,7 +1,7 @@
 package com.kairos.controller.counters;
 
 import com.kairos.activity.counter.FilterCriteria;
-import com.kairos.activity.counter.KPICategoryUpdationDTO;
+import com.kairos.activity.counter.distribution.category.KPICategoryUpdationDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPICategory;

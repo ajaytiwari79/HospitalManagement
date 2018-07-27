@@ -1,7 +1,6 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
 
-import com.kairos.dto.data_inventory.AssetDTO;
 import com.kairos.dto.data_inventory.ProcessingActivityDTO;
 import com.kairos.service.data_inventory.ProcessingActivityService;
 import com.kairos.utils.ResponseHandler;

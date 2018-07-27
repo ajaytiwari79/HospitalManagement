@@ -2,7 +2,6 @@ package com.kairos.service.data_inventory;
 
 import com.kairos.dto.data_inventory.AssetDTO;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
-import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -44,9 +43,8 @@ public class AssetService extends MongoBaseService {
             exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDto.getName());
         }
         Asset asset = new Asset(assetDto.getName(), assetDto.getDescription(), assetDto.getHostingLocation(), countryId,
-                assetDto.getAssetType(), assetDto.getAssetSubTypes(), assetDto.getManagingDepartment(), assetDto.getAssetOwner());
+                assetDto.getAssetType(), assetDto.getAssetSubTypes(), assetDto.getManagingDepartment(), assetDto.getAssetOwner(),true);
         asset.setOrganizationId(organizationId);
-        asset.setActive(true);
         asset.setHostingProvider(assetDto.getHostingProvider());
         asset.setHostingType(assetDto.getHostingType());
         asset.setOrgSecurityMeasures(assetDto.getOrgSecurityMeasures());
@@ -99,12 +97,10 @@ public class AssetService extends MongoBaseService {
     /**
      * @description method return aduit history of asset , old Object list and latest version also.
      * return object contain  changed field with key feilds and values with key Values in return list of map
-     * @param countryId
-     * @param organizationId
      * @param assetId
      * @return
      */
-    public List<Map<String, Object>> getAssetActivities(Long countryId, Long organizationId, BigInteger assetId) throws ClassNotFoundException {
+    public List<Map<String, Object>> getAssetActivities( BigInteger assetId) throws ClassNotFoundException {
 
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
@@ -137,6 +133,7 @@ public class AssetService extends MongoBaseService {
         existAsset.setDescription(assetDto.getDescription());
         existAsset.setManagingDepartment(assetDto.getManagingDepartment());
         existAsset.setAssetOwner(assetDto.getAssetOwner());
+        existAsset.setActive(assetDto.getActive());
         existAsset.setAssetType(assetDto.getAssetType());
         existAsset.setAssetSubTypes(assetDto.getAssetSubTypes());
         existAsset.setHostingProvider(assetDto.getHostingProvider());

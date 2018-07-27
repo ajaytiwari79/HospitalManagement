@@ -6,7 +6,7 @@ import java.math.BigInteger;
 
 public class TabKPIConf {
     private String tabId;
-    private BigInteger kpiId;
+    private BigInteger kpiAssignmentId;
     private Long countryId;
     private Long unitId;
     private Long staffId;
@@ -24,12 +24,12 @@ public class TabKPIConf {
         this.tabId = tabId;
     }
 
-    public BigInteger getKpiId() {
-        return kpiId;
+    public BigInteger getKpiAssignmentId() {
+        return kpiAssignmentId;
     }
 
-    public void setKpiId(BigInteger kpiId) {
-        this.kpiId = kpiId;
+    public void setKpiAssignmentId(BigInteger kpiAssignmentId) {
+        this.kpiAssignmentId = kpiAssignmentId;
     }
 
     public Long getCountryId() {

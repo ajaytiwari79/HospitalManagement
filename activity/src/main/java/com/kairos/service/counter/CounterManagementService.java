@@ -1,9 +1,17 @@
 package com.kairos.service.counter;
 
 
-import com.kairos.activity.counter.*;
+import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
+import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
+import com.kairos.activity.counter.distribution.category.CategoryAssignmentDTO;
+import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
+import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
+import com.kairos.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
+import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
+import com.kairos.activity.counter.distribution.tab.InitialKPITabDistDataDTO;
+import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
+import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
-import com.kairos.counter.CounterServiceMapping;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -30,7 +38,6 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 public class CounterManagementService extends MongoBaseService{
-    @Inject private CounterServiceMapping counterServiceMapping;
     @Inject private CounterRepository counterRepository;
     @Inject private ExceptionService exceptionService;
     @Inject private GenericIntegrationService genericIntegrationService;
@@ -53,7 +60,7 @@ public class CounterManagementService extends MongoBaseService{
     public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(Long refId, ConfLevel level){
         List<CategoryAssignmentDTO> categories = counterRepository.getCategoryAssignments(null, level, refId);
         List<BigInteger> categoryAssignmentIds = categories.parallelStream().map(categoryAssignment -> categoryAssignment.getId()).collect(toList());
-        CategoryKPIMappingDTO categoryKPIMapping = counterRepository.getKPIsMappingForCategories(categoryAssignmentIds);
+        List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategories(categoryAssignmentIds);
         return new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
     }
 
@@ -77,27 +84,22 @@ public class CounterManagementService extends MongoBaseService{
         if(kpiTabs != null && kpiTabs.isEmpty()){
             exceptionService.dataNotFoundByIdException("error.dist.module_kpi_tabs.not_available");
         }
-        kpiTabs.forEach(tabKPI -> {
-            tabKPIsMap.put(tabKPI.getModuleId(), new ArrayList<>());
-        });
-
-//        List<TabKPIEntryConfDTO> tabKPIEntries = counterRepository.getTabKPIConfgiurationByTabId(kpiTabs.stream().map(kpiTab -> kpiTab.getModuleId()).collect(toList()));
-//        tabKPIEntries.forEach(tabKPI -> {
-//            tabKPIsMap.get(tabKPI.getTabId()).add(tabKPI.getKpiId());
-//        });
-        return new InitialKPITabDistDataDTO(kpiTabs, tabKPIsMap);
+        List<TabKPIMappingDTO> mappingDTO = counterRepository.getTabKPIConfigurationByTabIds(kpiTabs.stream().map(kpiTab -> kpiTab.getModuleId()).collect(toList()), level, refId);
+        return new InitialKPITabDistDataDTO(kpiTabs, mappingDTO);
     }
 
-    public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries){
-        List<TabKPIEntry> entries = counterRepository.getTabKPIConfgiurationByTabId(tabKPIEntries.getTabIds());
+    public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries, ConfLevel level, Long refId){
+        List<TabKPIMappingDTO> tabKPIMappingList= counterRepository.getTabKPIConfigurationByTabIds(tabKPIEntries.getTabIds(), level, refId);
         Map<String, Map<BigInteger, BigInteger>> tabKPIsMap = new HashMap<>();
         List<TabKPIEntry> entriesToSave = new ArrayList<>();
         tabKPIEntries.getTabIds().forEach(tabId -> {
             tabKPIsMap.put(tabId, new HashMap<BigInteger, BigInteger>());
         });
 
-        entries.parallelStream().forEach(tabKPIEntry -> {
-            tabKPIsMap.get(tabKPIEntry.getTabId()).put(tabKPIEntry.getKpiId(), tabKPIEntry.getKpiId());
+        tabKPIMappingList.parallelStream().forEach(tabKPIEntry -> {
+            HashMap<BigInteger, BigInteger> kpiMap = new HashMap<>();
+            tabKPIEntry.getKpiIds().parallelStream().forEach(kpiId -> kpiMap.put(kpiId, kpiId));
+            tabKPIsMap.put(tabKPIEntry.getTabId(), kpiMap);
         });
 
         tabKPIEntries.getTabIds().parallelStream().forEach(tabId ->{
@@ -107,6 +109,7 @@ public class CounterManagementService extends MongoBaseService{
                 }
             });
         });
+
         if(!entriesToSave.isEmpty())
             save(entriesToSave);
     }

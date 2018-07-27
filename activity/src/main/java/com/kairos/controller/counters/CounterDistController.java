@@ -1,9 +1,9 @@
 package com.kairos.controller.counters;
 
-import com.kairos.activity.counter.AccessGroupKPIConfDTO;
-import com.kairos.activity.counter.CategoryKPIsDTO;
-import com.kairos.activity.counter.OrgTypeKPIConfDTO;
-import com.kairos.activity.counter.TabKPIEntryConfDTO;
+import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
+import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
+import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
+import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.service.counter.CounterManagementService;
 import com.kairos.util.response.ResponseHandler;
@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.ws.rs.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -83,7 +82,7 @@ public class CounterDistController {
 
     @PostMapping("/module/{moduleId}/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addTabKPIsEntry(@RequestBody TabKPIEntryConfDTO tabKPIEntry){
-        counterManagementService.addTabKPIEntries(tabKPIEntry);
+        //counterManagementService.addTabKPIEntries(tabKPIEntry);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 

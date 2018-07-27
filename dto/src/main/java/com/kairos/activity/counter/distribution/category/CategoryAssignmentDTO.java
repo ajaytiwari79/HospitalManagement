@@ -1,5 +1,6 @@
-package com.kairos.activity.counter;
+package com.kairos.activity.counter.distribution.category;
 
+import com.kairos.activity.counter.KPICategoryDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 
 import java.math.BigInteger;

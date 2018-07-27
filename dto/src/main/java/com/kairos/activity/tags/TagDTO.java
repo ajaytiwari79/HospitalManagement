@@ -1,4 +1,4 @@
-package com.kairos.user.country.tag;
+package com.kairos.activity.tags;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -8,7 +8,7 @@ import java.math.BigInteger;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MongoTagDTO {
+public class TagDTO {
     private BigInteger id;
     private String name;
     private MasterDataTypeEnum masterDataType;
@@ -16,7 +16,7 @@ public class MongoTagDTO {
     private long countryId;
     private long organizationId;
 
-    public MongoTagDTO() {
+    public TagDTO() {
         //dv
     }
 

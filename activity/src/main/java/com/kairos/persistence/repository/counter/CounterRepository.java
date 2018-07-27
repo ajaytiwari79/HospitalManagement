@@ -1,6 +1,10 @@
 package com.kairos.persistence.repository.counter;
 
 import com.kairos.activity.counter.*;
+import com.kairos.activity.counter.distribution.category.CategoryAssignmentDTO;
+import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
+import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
+import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.activity.Activity;
@@ -158,7 +162,7 @@ public class CounterRepository {
         return mongoTemplate.find(query, CategoryKPIConf.class);
     }
 
-    public CategoryKPIMappingDTO getKPIsMappingForCategories(List<BigInteger> categoryAssignmentIds){
+    public List<CategoryKPIMappingDTO> getKPIsMappingForCategories(List<BigInteger> categoryAssignmentIds){
         Aggregation ag = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("categoryAssignmentId").in(categoryAssignmentIds))
                 , Aggregation.lookup("categoryAssignment", "categoryAssignmentId", "id", "categoryAssignment")
@@ -168,14 +172,27 @@ public class CounterRepository {
                 , Aggregation.project().and("id").as("categoryId").and("kpiIds")
         );
         AggregationResults<CategoryKPIMappingDTO> results = mongoTemplate.aggregate(ag, CategoryKPIConf.class, CategoryKPIMappingDTO.class);
-        return (!results.getMappedResults().isEmpty())?results.getMappedResults().get(0):null;
+        return results.getMappedResults();
     }
 
     //tabKPI distribution crud
 
-    public List<TabKPIEntry> getTabKPIConfgiurationByTabId(List<String> tabIds){
-        Query query = new Query(Criteria.where("tabId").in(tabIds));
-        return mongoTemplate.find(query, TabKPIEntry.class);
+    public List<TabKPIMappingDTO> getTabKPIConfigurationByTabIds(List<String> tabIds, ConfLevel level, Long refId){
+        String refQueryField = getRefQueryField(level);
+        Aggregation ag = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("tabId").in(tabIds).and(refQueryField).is(refId))
+                , Aggregation.lookup("kpiAssignment", "kpiAssignmentId", "id", "kpiAssignment")
+                , Aggregation.project("tabId").and("kpiAssignment").arrayElementAt(0).as("kpiAssignment")
+                , Aggregation.group("tabId").push("kpiAssignment.kpiId").as("kpiIds")
+                , Aggregation.project().and("id").as("tabId").and("kpiIds")
+        );
+        AggregationResults<TabKPIMappingDTO> results = mongoTemplate.aggregate(ag, TabKPIConf.class, TabKPIMappingDTO.class);
+        return results.getMappedResults();
+    }
+
+    public List<TabKPIEntry> getTabKPIConfgiurationByTabId(List<String> tabIds, ConfLevel level, Long refId){
+        String refQueryField = getRefQueryField(level);
+        return mongoTemplate.find(null, TabKPIEntry.class);
     }
 
     public void removeTabKPIConfiguration(TabKPIEntry entry){
