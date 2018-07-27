@@ -86,31 +86,18 @@ public class CounterConfService extends MongoBaseService {
         return kpiCategories;
     }
 
-    private List<CategoryAssignmentDTO> getDeletableAssignments(List<KPICategoryDTO> deletedCategories, ConfLevel level, Long refId){
+    private List<CategoryAssignmentDTO> getExistingAssignments(List<KPICategoryDTO> deletedCategories, ConfLevel level, Long refId){
+        if(deletedCategories.isEmpty()) return new ArrayList<>();
         List<BigInteger> deletableCategories = deletedCategories.stream().map(categoryDTO -> categoryDTO.getId()).collect(Collectors.toList());
         List<CategoryAssignmentDTO> assignmentDTOs = counterRepository.getCategoryAssignments(deletableCategories, level, refId);
+        if(deletedCategories.size() != assignmentDTOs.size()){
+            exceptionService.invalidOperationException("error.kpi.invalidData");
+        }
         return assignmentDTOs;
     }
 
-    private void deleteCategories(List<KPICategoryDTO> deletedCategories, ConfLevel level, Long refId){
-        List<BigInteger> deletableCategories = deletedCategories.stream().map(categoryDTO -> categoryDTO.getId()).collect(Collectors.toList());
-        List<CategoryAssignmentDTO> assignmentDTOs = counterRepository.getCategoryAssignments(deletableCategories, level, refId);
-        List<BigInteger> deletableCategoryAssignmentIds = assignmentDTOs.stream().map(assignmentDTO -> assignmentDTO.getId()).collect(Collectors.toList());
-        counterRepository.removeAll("categoryAssignmentId", deletableCategoryAssignmentIds, CategoryKPIConf.class);
-        counterRepository.removeAll("id", deletableCategoryAssignmentIds, CategoryAssignment.class);
-        List<BigInteger> ownedDeletableCategories = deletedCategories.parallelStream().filter(categoryDTO -> categoryDTO.getLevelId().equals(refId)).map(categoryDTO -> categoryDTO.getId()).collect(Collectors.toList());
-        assignmentDTOs = counterRepository.getCategoryAssignments(ownedDeletableCategories, level, refId);
-        Map<BigInteger, CategoryAssignmentDTO> assignmentDTOMap = assignmentDTOs.parallelStream().collect(Collectors.toMap(assignmentDTO -> assignmentDTO.getId(), assignmentDTO -> assignmentDTO));
-        List<BigInteger> finalDeletableCategories = ownedDeletableCategories.parallelStream().filter(categoryId -> assignmentDTOMap.get(categoryId)==null).collect(Collectors.toList());
-        counterRepository.removeAll("id", finalDeletableCategories, KPICategory.class);
-    }
-
-    private void modifyCategories(List<KPICategoryDTO> changedCategories, ConfLevel level, Long refId){
-        if(changedCategories.isEmpty()) return;
-        List<BigInteger> categoryIds = changedCategories.stream().map(changedCategory -> changedCategory.getId()).collect(Collectors.toList());
-        List<CategoryAssignmentDTO>  assignmentDTOs = counterRepository.getCategoryAssignments(categoryIds, level, refId);
-        if(assignmentDTOs.isEmpty()) exceptionService.dataNotFoundByIdException("error.kpi_category.availability");
-        Map<BigInteger, CategoryAssignmentDTO> categoryDTOMapById = assignmentDTOs.parallelStream().collect(Collectors.toMap(assignmentDTO -> assignmentDTO.getCategory().getId(), assignmentDTO -> assignmentDTO));
+    private void modifyCategories(List<KPICategoryDTO> changedCategories, List<CategoryAssignmentDTO> existingAssignmentDTOs, ConfLevel level, Long refId){
+        Map<BigInteger, CategoryAssignmentDTO> categoryDTOMapById = existingAssignmentDTOs.parallelStream().collect(Collectors.toMap(assignmentDTO -> assignmentDTO.getCategory().getId(), assignmentDTO -> assignmentDTO));
         Map<String, BigInteger>  categoryNameAssignemtIdMap = new HashMap<>();
         List<KPICategory> updatableCategories = new ArrayList<>();
         for( KPICategoryDTO kpiCategoryDTO: changedCategories){
@@ -144,13 +131,14 @@ public class CounterConfService extends MongoBaseService {
     public void updateCategories(KPICategoryUpdationDTO categories, ConfLevel level, Long refId){
         Set<String> categoriesNames = categories.getUpdatedCategories().stream().map(category -> category.getName().trim().toLowerCase()).collect(Collectors.toSet());
         if(categoriesNames.size() != categories.getUpdatedCategories().size())  exceptionService.duplicateDataException("error.kpi_category.duplicate");
-        List<CategoryAssignmentDTO> deletableAssignments = getDeletableAssignments(categories.getDeletedCategories(), level, refId);
+        List<CategoryAssignmentDTO> deletableAssignments = getExistingAssignments(categories.getDeletedCategories(), level, refId);
+        List<CategoryAssignmentDTO> existingAssignments = getExistingAssignments(categories.getUpdatedCategories(), level, refId);
+        modifyCategories(categories.getUpdatedCategories(), existingAssignments, level, refId);
         List<BigInteger> deletableCategoryAssignmentIds = deletableAssignments.stream().map(assignmentDTO -> assignmentDTO.getId()).collect(Collectors.toList());
         List<BigInteger> ownedDeletableCategoryIds  = new ArrayList<>();
         if(ConfLevel.UNIT.equals(level)){
             ownedDeletableCategoryIds = deletableAssignments.parallelStream().filter(assignmentDTO -> assignmentDTO.getCategory().getLevelId().equals(refId)).map(categoryAssignmentDTO -> categoryAssignmentDTO.getCategory().getId()).collect(Collectors.toList());
         }
-        modifyCategories(categories.getUpdatedCategories(), level, refId);
         counterRepository.removeAll("categoryAssignmentId", deletableCategoryAssignmentIds, CategoryKPIConf.class);
         counterRepository.removeAll("id", deletableCategoryAssignmentIds, CategoryAssignment.class);
         counterRepository.removeAll("id", ownedDeletableCategoryIds, KPICategory.class);
