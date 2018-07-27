@@ -8,7 +8,6 @@ import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.filter.FilterQueryResult;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
