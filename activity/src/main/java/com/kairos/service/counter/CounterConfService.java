@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class CounterConfService extends MongoBaseService {
 
     @Inject
-    ExceptionService exceptionService;
+    private ExceptionService exceptionService;
     @Inject
     private CounterRepository counterRepository;
 
@@ -37,7 +37,7 @@ public class CounterConfService extends MongoBaseService {
     }
 
     private void verifyForValidCounterType(CounterType type){
-        boolean validCounterType = Arrays.stream(CounterType.values()).filter(s -> s.equals(type)).findAny().isPresent();
+        boolean validCounterType = Arrays.stream(CounterType.values()).anyMatch(s -> s.equals(type));
         if(!validCounterType) exceptionService.invalidRequestException("error.counterType.invalid", type);
     }
 
@@ -55,9 +55,7 @@ public class CounterConfService extends MongoBaseService {
     private void verifyForCategoryAvailability(List<String> categoryNames, Long refId, ConfLevel level){
         // confLevel, name
         List<String> formattedNames = new ArrayList<>();
-        categoryNames.forEach(category -> {
-            formattedNames.add(category.trim().toLowerCase());
-        });
+        categoryNames.forEach(category -> formattedNames.add(category.trim().toLowerCase()));
         List<KPICategoryDTO> categories = counterRepository.getKPICategory(level, refId);
         List<KPICategoryDTO> duplicateEntries = new ArrayList<>();
         categories.forEach(category -> {
@@ -85,7 +83,7 @@ public class CounterConfService extends MongoBaseService {
 
     private List<CategoryAssignmentDTO> getExistingAssignments(List<KPICategoryDTO> deletedCategories, ConfLevel level, Long refId){
         if(deletedCategories.isEmpty()) return new ArrayList<>();
-        List<BigInteger> deletableCategories = deletedCategories.stream().map(categoryDTO -> categoryDTO.getId()).collect(Collectors.toList());
+        List<BigInteger> deletableCategories = deletedCategories.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
         List<CategoryAssignmentDTO> assignmentDTOs = counterRepository.getCategoryAssignments(deletableCategories, level, refId);
         if(deletedCategories.size() != assignmentDTOs.size()){
             exceptionService.invalidOperationException("error.kpi.invalidData");
@@ -131,7 +129,7 @@ public class CounterConfService extends MongoBaseService {
         List<CategoryAssignmentDTO> deletableAssignments = getExistingAssignments(categories.getDeletedCategories(), level, refId);
         List<CategoryAssignmentDTO> existingAssignments = getExistingAssignments(categories.getUpdatedCategories(), level, refId);
         modifyCategories(categories.getUpdatedCategories(), existingAssignments, level, refId);
-        List<BigInteger> deletableCategoryAssignmentIds = deletableAssignments.stream().map(assignmentDTO -> assignmentDTO.getId()).collect(Collectors.toList());
+        List<BigInteger> deletableCategoryAssignmentIds = deletableAssignments.stream().map(CategoryAssignmentDTO::getId).collect(Collectors.toList());
         List<BigInteger> ownedDeletableCategoryIds  = new ArrayList<>();
         if(ConfLevel.UNIT.equals(level)){
             ownedDeletableCategoryIds = deletableAssignments.parallelStream().filter(assignmentDTO -> assignmentDTO.getCategory().getLevelId().equals(refId)).map(categoryAssignmentDTO -> categoryAssignmentDTO.getCategory().getId()).collect(Collectors.toList());
@@ -147,11 +145,9 @@ public class CounterConfService extends MongoBaseService {
         //verification for availability
         List<Counter> availableCounters = counterRepository.getCounterByTypes(Arrays.asList(CounterType.values()));
         if(availableCounters.size() == CounterType.values().length) exceptionService.duplicateDataException("error.counterType.duplicate", "Duplicate Available");
-        List<CounterType> availableTypes = availableCounters.stream().map(counter -> counter.getType()).collect(Collectors.toList());
+        List<CounterType> availableTypes = availableCounters.stream().map(Counter::getType).collect(Collectors.toList());
         List<CounterType> addableCounters = Arrays.stream(CounterType.values()).filter(counterType -> !availableTypes.contains(counterType)).collect(Collectors.toList());
-        addableCounters.forEach(counterType -> {
-            kpis.add(new KPI(counterType.getName(), null, null, counterType, false, null));
-        });
+        addableCounters.forEach(counterType -> kpis.add(new KPI(counterType.getName(), null, null, counterType, false, null)));
         List<KPI> savedKPIs = save(kpis);
         List<KPIAssignment> kpiAssignment = savedKPIs.parallelStream().map(kpi -> new KPIAssignment(kpi.getId(), countryId, null, null, ConfLevel.COUNTRY)).collect(Collectors.toList());
         save(kpiAssignment);
