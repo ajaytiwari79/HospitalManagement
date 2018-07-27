@@ -152,12 +152,13 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    /**@description this method create is used in Agreement section Service for creating new Clauses on creation of sections in policy agreement tenplate.
+    /**
      * @param countryId
      * @param organizationId
-     * @param clauseBasicDTOS List od Clause Dto contain basic detail ,title and description of clause.
+     * @param clauseBasicDTOS         List od Clause Dto contain basic detail ,title and description of clause.
      * @param policyAgreementTemplate - policy agreement template contain list or organization types,Sub types,Service Catgeory and Sub Service Category and Account types.
      * @return
+     * @description this method create is used in Agreement section Service for creating new Clauses on creation of sections in policy agreement tenplate.
      */
     public List<Clause> createNewClauseUsingAgreementTemplateMetadata(Long countryId, Long organizationId, List<ClauseBasicDTO> clauseBasicDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
@@ -165,6 +166,9 @@ public class ClauseService extends MongoBaseService {
         List<String> clauseTitles = new ArrayList<>();
         clauseBasicDTOS.forEach(
                 clauseBasicDTO -> {
+                    if (clauseTitles.contains(clauseBasicDTO.getTitle())) {
+                        exceptionService.duplicateDataException("message.duplicate", "Caluse title ", clauseBasicDTO.getTitle());
+                    }
                     clauseTitles.add(clauseBasicDTO.getTitle());
                 }
         );

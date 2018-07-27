@@ -1,10 +1,10 @@
 package com.kairos.controller.activity;
 
+import com.kairos.activity.shift.CopyShiftDTO;
 import com.kairos.activity.shift.ShiftDTO;
+import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.activity.shift.CopyShiftDTO;
-import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -104,11 +104,11 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShifts(unitId, shiftDTOS, type));
     }
 
-    @ApiOperation("publish Shifts")
-    @PutMapping(value = "/publish_shifts")
+    @ApiOperation("update status of shifts")
+    @PutMapping(value = "/shift/update_status")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> publishShifts(@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.publishShifts(shiftPublishDTO));
+    public ResponseEntity<Map<String, Object>> updateStatusOfShifts(@PathVariable Long unitId,@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateStatusOfShifts(unitId,shiftPublishDTO));
     }
 
 

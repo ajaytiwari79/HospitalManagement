@@ -14,4 +14,4 @@ db.nightWorkerQuestion.insert({ "_id":"11","deleted":false,question:"If you have
 
 
 
-db.shifts.updateMany({},{$set:{shiftState:"UNPUBLISHED"}})
+db.shifts.updateMany({},{$set:{status:"UNPUBLISHED"}})

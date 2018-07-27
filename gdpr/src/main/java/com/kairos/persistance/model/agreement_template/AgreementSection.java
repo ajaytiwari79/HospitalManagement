@@ -18,11 +18,17 @@ public class AgreementSection extends MongoBaseEntity {
 
     private List<BigInteger> clauses;
 
+    private List<BigInteger> subAgreementSections;
+
     private Long countryId;
 
     public Long getCountryId() {
         return countryId;
     }
+
+    public List<BigInteger> getSubAgreementSections() { return subAgreementSections; }
+
+    public void setSubAgreementSections(List<BigInteger> subAgreementSections) { this.subAgreementSections = subAgreementSections; }
 
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
@@ -49,7 +55,7 @@ public class AgreementSection extends MongoBaseEntity {
         this.name=name;
         this.countryId=countryId;
     }
-public AgreementSection(){ }
+    public AgreementSection(){ }
 
 
 }
