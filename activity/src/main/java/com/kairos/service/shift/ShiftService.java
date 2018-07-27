@@ -557,7 +557,7 @@ public class ShiftService extends MongoBaseService {
             messages.forEach(responseMessage -> {
                 errors.add(localeService.getMessage(responseMessage));
             });
-            exceptionService.actionNotPermittedException("message.ruleTemplate.broken",errors.get(0));
+            exceptionService.actionNotPermittedException(errors.get(0));
         }
         shift.setDeleted(true);
         save(shift);
@@ -617,7 +617,7 @@ public class ShiftService extends MongoBaseService {
             messages.forEach(responseMessage -> {
                 errors.add(responseMessage);
             });
-            exceptionService.actionNotPermittedException(errors.get(0));
+            exceptionService.actionNotPermittedException(errors.get(0),errors.size()==2 ? errors.get(1) : "");
         }
         // updateWTACounter(ruleTemplateSpecificInfo, staffAdditionalInfoDTO);
         //TODO Pradeep will look into dayType
