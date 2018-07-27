@@ -16,19 +16,14 @@ import com.kairos.service.clause.ClauseService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.userContext.UserContext;
-import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
-import javax.swing.text.html.Option;
 import java.math.BigInteger;
 import java.util.*;
-
 import static com.kairos.constants.AppConstant.AGREEMENT_SECTION;
 import static com.kairos.constants.AppConstant.AGREEMENT_SECTION_WRAPPER;
-import static com.kairos.constants.AppConstant.AGREEMENT_SUB_SECTION_MAP_CONTAINING_CLAUSE;
 
 
 @Service
@@ -295,7 +290,6 @@ public class AgreementSectionService extends MongoBaseService {
      * @param policyAgreementTemplate - new clauses which we need to create inherit it properties from policyAgreementTemplate .
      * @return
      */
-    //Todo add update Sub section api and complete the method for update Agreement  section,on updating clause multiple subsectin id is stored in section
     public List<BigInteger> updateAgreementSectionSubSectionAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
         checkForDuplicacyInTitleOfAgreementSectionAndSubSection(agreementSectionDTOS);
