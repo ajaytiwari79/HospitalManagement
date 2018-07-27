@@ -10,7 +10,6 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Repository
-@JaversSpringDataAuditable
 public interface BreakSettingMongoRepository extends MongoBaseRepository<BreakSettings, BigInteger> {
 
     List<BreakSettingsDTO> findAllByDeletedFalseAndUnitIdOrderByCreatedAtAsc(Long unitId);
