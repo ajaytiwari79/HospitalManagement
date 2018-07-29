@@ -1185,4 +1185,26 @@ public class UnitPositionService extends UserBaseService {
     }
 
 
+    public void updateSeniorityLevelOnJobTrigger() {
+
+        List<UnitPositionSeniorityLevelQueryResult> unitPositionSeniorityLevelQueryResults = unitPositionGraphRepository.findUnitPositionSeniorityLeveltoUpdate();
+        List<Long> unitPositionIds = unitPositionSeniorityLevelQueryResults.stream().map(unitPositionQueryResult->unitPositionQueryResult.getUnitPosition().getId()).
+                collect(Collectors.toList());
+        unitPositionGraphRepository.deleteUnitPositionSeniorityLevelRelation(unitPositionIds);
+        List<UnitPosition> unitPositions = new ArrayList<>();
+        for(UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult :unitPositionSeniorityLevelQueryResults) {
+            UnitPosition unitPosition = new UnitPosition();
+            UnitPosition oldUnitPosition = unitPositionSeniorityLevelQueryResult.getUnitPosition();
+            ObjectMapperUtils.copyProperties(oldUnitPosition,unitPosition);
+            oldUnitPosition.setEndDateMillis(DateUtils.getOneDayBeforeMillis());
+            unitPosition.setStartDateMillis(DateUtils.getCurrentMillis());
+            unitPosition.setEndDateMillis(oldUnitPosition.getEndDateMillis());
+            unitPosition.setSeniorityLevel(unitPositionSeniorityLevelQueryResult.getSeniorityLevel());
+            unitPosition.setParentUnitPosition(oldUnitPosition);
+            unitPositions.add(unitPosition);
+        }
+
+        save(unitPositions);
+
+    }
 }

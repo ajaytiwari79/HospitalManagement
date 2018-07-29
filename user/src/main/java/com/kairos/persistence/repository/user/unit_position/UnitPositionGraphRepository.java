@@ -4,10 +4,7 @@ package com.kairos.persistence.repository.user.unit_position;
 import com.kairos.persistence.model.agreement.cta.CTAResponseDTO;
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQueryResult;
-import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
-import com.kairos.persistence.model.user.unit_position.UnitPosition;
-import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
-import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
+import com.kairos.persistence.model.user.unit_position.*;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -314,4 +311,15 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned, \n" +
             "employmentTypes:employmentTypes,phaseInfo:phaseInfo,plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType}}) END as ruleTemplates ORDER BY id DESC")
     List<CTAResponseDTO> getAllCtaByUserId(Long userId);
+
+    @Query("Match(staff:Staff{deleted:false})-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{deleted:false}) where up.endDateMillis is null or up.endDateMillis >= timestamp()  " +
+            "with staff,up match(staff)-[staff_expertise_relation:"+STAFF_HAS_EXPERTISE+"]->(exp:Expertise) where staff_expertise_relation.expertiseStartDate is not null" +
+            "and datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).month=datetime().month and " +
+            "datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).day=datetime().day and datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).year" +
+            "<>datetime().year with staff,exp, datetime().year-datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).year as currentYear " +
+            "match(up)-[:"+HAS_EXPERTISE_IN+"]-(exp)-[:"+FOR_SENIORITY_LEVEL+"]-(sl:SeniorityLevel) where sl.from <= currentYear and sl.to > currentYear return up,exp")
+    List<UnitPositionSeniorityLevelQueryResult> findUnitPositionSeniorityLeveltoUpdate();
+
+    @Query("Match(up:UnitPosition)-[r:HAS_SENIORITY_LEVEL]-(sl:SeniorityLevel) where id(up) in {0} delete r")
+    void deleteUnitPositionSeniorityLevelRelation(List<Long> unitPositionIds);
 }
