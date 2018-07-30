@@ -9,16 +9,16 @@ import java.math.BigInteger;
  * @dated: Jun/26/2018
  */
 
-public class UnitRoleCounter extends MongoBaseEntity{
+public class UnitRoleCounter extends MongoBaseEntity {
     private BigInteger unitId;
     private BigInteger roleId;
     private BigInteger refCounterId;
 
-    public UnitRoleCounter(){
+    public UnitRoleCounter() {
 
     }
 
-    public UnitRoleCounter(BigInteger unitId, BigInteger roleId, BigInteger refCounterId){
+    public UnitRoleCounter(BigInteger unitId, BigInteger roleId, BigInteger refCounterId) {
         this.refCounterId = refCounterId;
         this.roleId = roleId;
         this.unitId = unitId;

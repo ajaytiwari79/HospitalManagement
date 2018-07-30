@@ -1,4 +1,4 @@
-package com.kairos.enums;
+package com.kairos.activity.counter.enums;
 
 import com.kairos.activity.counter.CounterTypeDefDTO;
 
@@ -25,7 +25,8 @@ public enum CounterType {
     FLEXI_TIME_PERCENT("Flexi Time Percent"),
     FLEXI_TIME_TASK_PERCENT("Flex Time Task time"),
     TOTAL_KM_DRIVEN_PER_STAFF("Total Distance Driven Per Staff"),
-    TASK_EFFICIENCY("Task Efficiency")
+    TASK_EFFICIENCY("Task Efficiency"),
+    WORKING_HOUR_PER_SHIFT("working time")
     //COMPLETED
 
     ;
