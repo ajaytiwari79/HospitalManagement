@@ -2,7 +2,7 @@ package com.kairos.persistance.repository.master_data.asset_management;
 
 
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
-import com.kairos.response.dto.common.DataDisposalResponseDTO;
+import com.kairos.response.dto.metadata.DataDisposalResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

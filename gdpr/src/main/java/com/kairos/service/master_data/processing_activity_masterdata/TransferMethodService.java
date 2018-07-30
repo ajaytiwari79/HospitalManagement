@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.metadata.TransferMethodDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.TransferMethod;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.TransferMethodMongoRepository;
 import com.kairos.service.common.MongoBaseService;
@@ -60,9 +61,7 @@ public class TransferMethodService extends MongoBaseService {
             List<TransferMethod> newTransferMethods = new ArrayList<>();
             if (transferMethodNames.size() != 0) {
                 for (String name : transferMethodNames) {
-                    TransferMethod newTransferMethod = new TransferMethod();
-                    newTransferMethod.setName(name);
-                    newTransferMethod.setCountryId(countryId);
+                    TransferMethod newTransferMethod = new TransferMethod(name,countryId);
                     newTransferMethod.setOrganizationId(organizationId);
                     newTransferMethods.add(newTransferMethod);
                 }
@@ -159,6 +158,34 @@ public class TransferMethodService extends MongoBaseService {
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
+
+
+
+
+
+
+
+    public List<BigInteger> createTransferMethodForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
+
+        List<TransferMethod> newInheritTransferMethodFromParentOrg = new ArrayList<>();
+        List<BigInteger> transferMethodIds = new ArrayList<>();
+        for (TransferMethodDTO   transferMethodDTO: transferMethodDTOS) {
+            if (!transferMethodDTO.getOrganizationId().equals(organizationId)) {
+                TransferMethod transferMethod = new TransferMethod(transferMethodDTO.getName(), countryId);
+                transferMethod.setOrganizationId(organizationId);
+                newInheritTransferMethodFromParentOrg.add(transferMethod);
+            } else {
+                transferMethodIds.add(transferMethodDTO.getId());
+            }
+        }
+        newInheritTransferMethodFromParentOrg = transferMethodRepository.saveAll(sequenceGenerator(newInheritTransferMethodFromParentOrg));
+        newInheritTransferMethodFromParentOrg.forEach(dataSource -> {
+            transferMethodIds.add(dataSource.getId());
+        });
+        return transferMethodIds;
+    }
+
+
 
 
 }

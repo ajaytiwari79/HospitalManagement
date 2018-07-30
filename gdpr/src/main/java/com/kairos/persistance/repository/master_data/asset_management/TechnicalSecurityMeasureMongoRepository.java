@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
-import com.kairos.response.dto.common.TechnicalSecurityMeasureReponseDTO;
+import com.kairos.response.dto.metadata.TechnicalSecurityMeasureReponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

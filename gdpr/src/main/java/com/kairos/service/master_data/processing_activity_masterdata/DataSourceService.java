@@ -5,8 +5,11 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.data_inventory.ProcessingActivityDTO;
+import com.kairos.dto.metadata.DataSourceDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.DataSourceMongoRepository;
+import com.kairos.response.dto.metadata.DataSourceResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,9 +62,7 @@ public class DataSourceService extends MongoBaseService {
             if (dataSourceNames.size() != 0) {
                 for (String name : dataSourceNames) {
 
-                    DataSource newDataSource = new DataSource();
-                    newDataSource.setName(name);
-                    newDataSource.setCountryId(countryId);
+                    DataSource newDataSource = new DataSource(name,countryId);
                     newDataSource.setOrganizationId(organizationId);
                     newDataSources.add(newDataSource);
 
@@ -84,7 +85,7 @@ public class DataSourceService extends MongoBaseService {
      * @param organizationId
      * @return list of DataSource
      */
-    public List<DataSource> getAllDataSource(Long countryId, Long organizationId) {
+    public List<DataSourceResponseDTO> getAllDataSource(Long countryId, Long organizationId) {
         return dataSourceMongoRepository.findAllDataSources(countryId, organizationId);
     }
 
@@ -163,6 +164,59 @@ public class DataSourceService extends MongoBaseService {
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
+
+
+
+
+
+    public List<BigInteger> createDataSourceForOrganizationOnInheritingFromParentOrganization(Long countryId,Long organizationId,ProcessingActivityDTO processingActivityDTO)
+    {
+
+        List<DataSourceDTO>  dataSourceDTOS= processingActivityDTO.getDataSources();
+        List<DataSource> newInheritDataSourceFromCountry = new ArrayList<>();
+        List<BigInteger> dataSourceIds = new ArrayList<>();
+        for (DataSourceDTO dataSourceDTO : dataSourceDTOS) {
+            if (!dataSourceDTO.getOrganizationId().equals(organizationId)) {
+                DataSource dataSource = new DataSource(dataSourceDTO.getName(), countryId);
+                dataSource.setOrganizationId(organizationId);
+                newInheritDataSourceFromCountry.add(dataSource);
+            } else {
+                dataSourceIds.add(dataSourceDTO.getId());
+            }
+        }
+        newInheritDataSourceFromCountry = dataSourceMongoRepository.saveAll(sequenceGenerator(newInheritDataSourceFromCountry));
+        newInheritDataSourceFromCountry.forEach(dataSource -> {
+            dataSourceIds.add(dataSource.getId());
+        });
+        return dataSourceIds;
+    }
+
+
+    /**
+     *
+     * @param countryId
+     * @param organizationId - id of parent organization
+     * @param unitId  - id of unit organization
+     * @return method return list of organization Data Sources with Data Sources which were not inherited by organization  till now
+     */
+    public List<DataSourceResponseDTO> getAllInheritedFromParentAndOrganizationDataSource(Long countryId, Long organizationId, Long unitId) {
+
+        List<DataSourceResponseDTO> inheritingFromParentOrganizationDataSourceList = dataSourceMongoRepository.findAllDataSources(countryId, organizationId);
+        List<DataSourceResponseDTO> orgDataSourceList = dataSourceMongoRepository.findAllDataSources(countryId, unitId);
+        List<DataSourceResponseDTO> orgADataSourceWithNonInheritAccesorPartyFromParent = new ArrayList<>();
+        for (DataSourceResponseDTO dataSourceReponseDTO : inheritingFromParentOrganizationDataSourceList) {
+            if (!orgDataSourceList.contains(dataSourceReponseDTO)) {
+                orgADataSourceWithNonInheritAccesorPartyFromParent.add(dataSourceReponseDTO);
+            }
+        }
+        orgADataSourceWithNonInheritAccesorPartyFromParent.addAll(orgDataSourceList);
+        return orgADataSourceWithNonInheritAccesorPartyFromParent;
+
+    }
+
+
+
+
 
 
 }

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.persistance.model.data_inventory.ManagingOrganization;
 import com.kairos.persistance.model.data_inventory.Staff;
-import com.kairos.response.dto.common.*;
+import com.kairos.response.dto.metadata.*;
 
 import java.math.BigInteger;
 import java.util.List;

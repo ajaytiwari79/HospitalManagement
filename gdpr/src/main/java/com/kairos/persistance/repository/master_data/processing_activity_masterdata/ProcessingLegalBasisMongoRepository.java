@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
+import com.kairos.response.dto.metadata.ProcessingLegalBasisResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -25,7 +26,7 @@ public interface ProcessingLegalBasisMongoRepository extends MongoRepository<Pro
 
 
     @Query("{countryId:?0,organizationId:?1,deleted:false}")
-    List<ProcessingLegalBasis> findAllProcessingLegalBases(Long countryId,Long organizationId);
+    List<ProcessingLegalBasisResponseDTO> findAllProcessingLegalBases(Long countryId, Long organizationId);
 
     @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
     List<ProcessingLegalBasis>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);

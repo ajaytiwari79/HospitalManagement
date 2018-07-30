@@ -10,7 +10,7 @@ import java.math.BigInteger;
  */
 
 /*
-this Task TypeSetting common for Staff and Client
+this Task TypeSetting metadata for Staff and Client
 if staffId Exist so this is belongs to staff and
 if clientId so belongs to client, efficiency field only for staff and
 duration field only for client

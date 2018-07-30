@@ -5,8 +5,13 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.data_inventory.ProcessingActivityDTO;
+import com.kairos.dto.metadata.ProcessingLegalBasisDTO;
+import com.kairos.dto.metadata.ProcessingPurposeDTO;
+import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.ProcessingPurposeMongoRepository;
+import com.kairos.response.dto.metadata.ProcessingPurposeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
@@ -62,9 +67,7 @@ public class ProcessingPurposeService extends MongoBaseService {
             if (processingPurposesNames.size() != 0) {
                 for (String name : processingPurposesNames) {
 
-                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose();
-                    newProcessingPurpose.setName(name);
-                    newProcessingPurpose.setCountryId(countryId);
+                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name,countryId);
                     newProcessingPurpose.setOrganizationId(organizationId);
                     newProcessingPurposes.add(newProcessingPurpose);
 
@@ -87,7 +90,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @param organizationId
      * @return list of ProcessingPurpose
      */
-    public List<ProcessingPurpose> getAllProcessingPurpose(Long countryId,Long organizationId) {
+    public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long countryId,Long organizationId) {
         return processingPurposeMongoRepository.findAllProcessingPurposes(countryId,organizationId);
     }
 
@@ -172,6 +175,53 @@ public class ProcessingPurposeService extends MongoBaseService {
 
     public List<ProcessingPurpose> geProcessingPurposeList(Long countryId,Long organizationId,List<BigInteger> ids) {
         return processingPurposeMongoRepository.getProcessingPurposeList(countryId,organizationId,ids);
+    }
+
+
+
+
+    public List<BigInteger> createProcessingPurposeForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
+
+        List<ProcessingPurposeDTO> processingPurposeDTOs = processingActivityDTO.getProcessingPurposes();
+        List<ProcessingPurpose> newInheritProcessingPurposeFromCountry = new ArrayList<>();
+        List<BigInteger> processingPurposeIds = new ArrayList<>();
+        for (ProcessingPurposeDTO   processingPurposeDTO: processingPurposeDTOs) {
+            if (!processingPurposeDTO.getOrganizationId().equals(organizationId)) {
+                ProcessingPurpose processingPurpose = new ProcessingPurpose(processingPurposeDTO.getName(), countryId);
+                processingPurpose.setOrganizationId(organizationId);
+                newInheritProcessingPurposeFromCountry.add(processingPurpose);
+            } else {
+                processingPurposeIds.add(processingPurposeDTO.getId());
+            }
+        }
+        newInheritProcessingPurposeFromCountry = processingPurposeMongoRepository.saveAll(sequenceGenerator(newInheritProcessingPurposeFromCountry));
+        newInheritProcessingPurposeFromCountry.forEach(dataSource -> {
+            processingPurposeIds.add(dataSource.getId());
+        });
+        return processingPurposeIds;
+    }
+
+
+    /**
+     *
+     * @param countryId
+     * @param organizationId -id of parent organization
+     * @param unitId - id of cuurent organization
+     * @return method return list of processingPurposes (organzation processing purpose and processing purposes which were not inherited by organization from parent till now )
+     */
+    public List<ProcessingPurposeResponseDTO> getAllInheritedFromParentAndOrganizationProcessingPurpose(Long countryId, Long organizationId, Long unitId) {
+
+        List<ProcessingPurposeResponseDTO> inheritingFromParentOrganizationProcessingPurposeList = processingPurposeMongoRepository.findAllProcessingPurposes(countryId, organizationId);
+        List<ProcessingPurposeResponseDTO> orgProcessingPurposeList = processingPurposeMongoRepository.findAllProcessingPurposes(countryId, unitId);
+        List<ProcessingPurposeResponseDTO> orgProcessingPurposeWithNonInheritProcssingpurposeFromParent = new ArrayList<>();
+        for (ProcessingPurposeResponseDTO processingPurposeResponseDTO : inheritingFromParentOrganizationProcessingPurposeList) {
+            if (!orgProcessingPurposeList.contains(processingPurposeResponseDTO)) {
+                orgProcessingPurposeWithNonInheritProcssingpurposeFromParent.add(processingPurposeResponseDTO);
+            }
+        }
+        orgProcessingPurposeWithNonInheritProcssingpurposeFromParent.addAll(orgProcessingPurposeList);
+        return orgProcessingPurposeWithNonInheritProcssingpurposeFromParent;
+
     }
 
 

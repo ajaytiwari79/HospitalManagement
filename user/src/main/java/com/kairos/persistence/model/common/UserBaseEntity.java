@@ -7,7 +7,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import java.io.Serializable;
 
 /**
- * Contains common fields of an entity
+ * Contains metadata fields of an entity
  *
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)

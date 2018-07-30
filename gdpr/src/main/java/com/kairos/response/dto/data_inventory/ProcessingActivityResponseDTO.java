@@ -4,10 +4,10 @@ package com.kairos.response.dto.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistance.model.data_inventory.ManagingOrganization;
 import com.kairos.persistance.model.data_inventory.Staff;
-import com.kairos.response.dto.common.AccessorPartyReponseDTO;
-import com.kairos.response.dto.common.DataSourceReponseDTO;
-import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
-import com.kairos.response.dto.common.TransferMethodResponseDTO;
+import com.kairos.response.dto.metadata.AccessorPartyReponseDTO;
+import com.kairos.response.dto.metadata.DataSourceResponseDTO;
+import com.kairos.response.dto.metadata.ProcessingPurposeResponseDTO;
+import com.kairos.response.dto.metadata.TransferMethodResponseDTO;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -33,7 +33,7 @@ public class ProcessingActivityResponseDTO {
 
     private List<ProcessingPurposeResponseDTO> processingPurposes;
 
-    private List<DataSourceReponseDTO> dataSources;
+    private List<DataSourceResponseDTO> dataSources;
 
     private List<AccessorPartyReponseDTO> accessorParties;
 
@@ -101,11 +101,11 @@ public class ProcessingActivityResponseDTO {
         this.processingPurposes = processingPurposes;
     }
 
-    public List<DataSourceReponseDTO> getDataSources() {
+    public List<DataSourceResponseDTO> getDataSources() {
         return dataSources;
     }
 
-    public void setDataSources(List<DataSourceReponseDTO> dataSources) {
+    public void setDataSources(List<DataSourceResponseDTO> dataSources) {
         this.dataSources = dataSources;
     }
 

@@ -33,4 +33,12 @@ public class AccessorParty extends MongoBaseEntity {
         this.name = name;
     }
 
+
+    public AccessorParty(String name,Long countryId) {
+        this.name = name;
+        this.countryId=countryId;
+    }
+
+    public AccessorParty() {
+    }
 }

@@ -5,8 +5,12 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.data_inventory.ProcessingActivityDTO;
+import com.kairos.dto.metadata.ProcessingLegalBasisDTO;
+import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.ResponsibilityTypeMongoRepository;
+import com.kairos.response.dto.metadata.ResponsibilityTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,9 +66,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
             if (responsibilityTypeNames.size() != 0) {
                 for (String name : responsibilityTypeNames) {
 
-                    ResponsibilityType newResponsibilityType = new ResponsibilityType();
-                    newResponsibilityType.setName(name);
-                    newResponsibilityType.setCountryId(countryId);
+                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name,countryId);
                     newResponsibilityType.setOrganizationId(organizationId);
                     newResponsibilityTypes.add(newResponsibilityType);
 
@@ -88,7 +90,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
      * @param organizationId
      * @return list of ResponsibilityType
      */
-    public List<ResponsibilityType> getAllResponsibilityType(Long countryId,Long organizationId) {
+    public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long countryId,Long organizationId) {
         return responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId,organizationId);
     }
 
@@ -168,6 +170,32 @@ public class ResponsibilityTypeService extends MongoBaseService {
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
+
+
+
+    /**
+     *
+     * @param countryId
+     * @param organizationId -id of parent organization
+     * @param unitId - id of cuurent organization
+     * @return method return list of processingPurposes (organzation processing purpose and processing purposes which were not inherited by organization from parent till now )
+     */
+    public List<ResponsibilityTypeResponseDTO> getAllInheritedFromParentAndOrganizationResponsibilityTypes(Long countryId, Long organizationId, Long unitId) {
+
+        List<ResponsibilityTypeResponseDTO> inheritingFromParentOrganizationResponsibilityTypeList = responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId, organizationId);
+        List<ResponsibilityTypeResponseDTO> orgResponsibilityTypeList = responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId, unitId);
+        List<ResponsibilityTypeResponseDTO> orgResponsibilityTypesWithNonInheritResponsibilityTypesFromParentOrg = new ArrayList<>();
+        for (ResponsibilityTypeResponseDTO responsibilityTypeResponseDTO : inheritingFromParentOrganizationResponsibilityTypeList) {
+            if (!orgResponsibilityTypeList.contains(responsibilityTypeResponseDTO)) {
+                orgResponsibilityTypesWithNonInheritResponsibilityTypesFromParentOrg.add(responsibilityTypeResponseDTO);
+            }
+        }
+        orgResponsibilityTypesWithNonInheritResponsibilityTypesFromParentOrg.addAll(orgResponsibilityTypeList);
+        return orgResponsibilityTypesWithNonInheritResponsibilityTypesFromParentOrg;
+
+    }
+
+
 
 
 }

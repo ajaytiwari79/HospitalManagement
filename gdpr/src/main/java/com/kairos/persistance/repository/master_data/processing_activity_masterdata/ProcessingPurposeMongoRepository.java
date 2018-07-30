@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
+import com.kairos.response.dto.metadata.ProcessingPurposeResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -29,7 +30,7 @@ public interface ProcessingPurposeMongoRepository extends MongoRepository<Proces
 
 
     @Query("{countryId:?0,organizationId:?1,deleted:false}")
-    List<ProcessingPurpose> findAllProcessingPurposes(Long countryId,Long organizationId);
+    List<ProcessingPurposeResponseDTO> findAllProcessingPurposes(Long countryId, Long organizationId);
 
 
     @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")

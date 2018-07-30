@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data.processing_activity_master
 
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
+import com.kairos.response.dto.metadata.ResponsibilityTypeResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -27,7 +28,7 @@ public interface ResponsibilityTypeMongoRepository extends MongoRepository<Respo
 
 
     @Query("{countryId:?0,organizationId:?1,deleted:false}")
-    List<ResponsibilityType> findAllResponsibilityTypes(Long countryId,Long organizationId);
+    List<ResponsibilityTypeResponseDTO> findAllResponsibilityTypes(Long countryId, Long organizationId);
 
 
 

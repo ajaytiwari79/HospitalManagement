@@ -2,6 +2,7 @@ package com.kairos.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.metadata.*;
 import com.kairos.persistance.model.data_inventory.ManagingOrganization;
 import com.kairos.persistance.model.data_inventory.Staff;
 
@@ -28,15 +29,19 @@ public class ProcessingActivityDTO {
     //@NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
 
-    private List<BigInteger> processingPurposes;
+    private List<ProcessingPurposeDTO> processingPurposes;
 
-    private List<BigInteger> dataSources;
+    private List<DataSourceDTO> dataSources;
 
-    private List<BigInteger> dataDestinations;
+    private List<TransferMethodDTO> sourceTransferMethods;
 
-    private List<BigInteger> sourceTransferMethods;
+    private List<TransferMethodDTO> destinationTransferMethods;
 
-    private List<BigInteger> destinationTransferMethods;
+    private List<AccessorPartyDTO> accessorParties;
+
+    private List<ProcessingLegalBasisDTO> processingLegalBasis;
+
+    private ResponsibilityTypeDTO responsibilityType;
 
     private Integer controllerContactInfo;
 
@@ -67,21 +72,33 @@ public class ProcessingActivityDTO {
 
     public void setProcessOwner(Staff processOwner) { this.processOwner = processOwner; }
 
-    public List<BigInteger> getProcessingPurposes() { return processingPurposes; }
+    public List<ProcessingPurposeDTO> getProcessingPurposes() { return processingPurposes; }
 
-    public void setProcessingPurposes(List<BigInteger> processingPurposes) { this.processingPurposes = processingPurposes; }
+    public void setProcessingPurposes(List<ProcessingPurposeDTO> processingPurposes) { this.processingPurposes = processingPurposes; }
 
-    public List<BigInteger> getDataSources() { return dataSources; }
+    public List<DataSourceDTO> getDataSources() { return dataSources; }
 
-    public void setDataSources(List<BigInteger> dataSources) { this.dataSources = dataSources; }
+    public void setDataSources(List<DataSourceDTO> dataSources) { this.dataSources = dataSources; }
 
-    public List<BigInteger> getDataDestinations() { return dataDestinations; }
+    public List<TransferMethodDTO> getSourceTransferMethods() { return sourceTransferMethods; }
 
-    public void setDataDestinations(List<BigInteger> dataDestinations) { this.dataDestinations = dataDestinations; }
+    public void setSourceTransferMethods(List<TransferMethodDTO> sourceTransferMethods) { this.sourceTransferMethods = sourceTransferMethods; }
 
-    public List<BigInteger> getSourceTransferMethods() { return sourceTransferMethods; }
+    public List<TransferMethodDTO> getDestinationTransferMethods() { return destinationTransferMethods; }
 
-    public void setSourceTransferMethods(List<BigInteger> sourceTransferMethods) { this.sourceTransferMethods = sourceTransferMethods; }
+    public void setDestinationTransferMethods(List<TransferMethodDTO> destinationTransferMethods) { this.destinationTransferMethods = destinationTransferMethods; }
+
+    public List<AccessorPartyDTO> getAccessorParties() { return accessorParties; }
+
+    public void setAccessorParties(List<AccessorPartyDTO> accessorParties) { this.accessorParties = accessorParties; }
+
+    public List<ProcessingLegalBasisDTO> getProcessingLegalBasis() { return processingLegalBasis; }
+
+    public void setProcessingLegalBasis(List<ProcessingLegalBasisDTO> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
+
+    public ResponsibilityTypeDTO getResponsibilityType() { return responsibilityType; }
+
+    public void setResponsibilityType(ResponsibilityTypeDTO responsibilityType) { this.responsibilityType = responsibilityType; }
 
     public Integer getControllerContactInfo() { return controllerContactInfo; }
 
@@ -106,12 +123,4 @@ public class ProcessingActivityDTO {
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
 
     public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }
-
-    public List<BigInteger> getDestinationTransferMethods() {
-        return destinationTransferMethods;
-    }
-
-    public void setDestinationTransferMethods(List<BigInteger> destinationTransferMethods) {
-        this.destinationTransferMethods = destinationTransferMethods;
-    }
 }

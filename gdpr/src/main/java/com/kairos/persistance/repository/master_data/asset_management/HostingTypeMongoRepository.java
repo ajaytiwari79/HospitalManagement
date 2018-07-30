@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
-import com.kairos.response.dto.common.HostingTypeResponseDTO;
+import com.kairos.response.dto.metadata.HostingTypeResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

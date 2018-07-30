@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
+import com.kairos.response.dto.metadata.AccessorPartyReponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -31,7 +32,7 @@ public interface AccessorPartyMongoRepository extends MongoRepository<AccessorPa
     AccessorParty findByid(BigInteger id);
 
     @Query("{countryId:?0,organizationId:?1,deleted:false}")
-    List<AccessorParty> findAllAccessorParty(Long countryId,Long organizationId);
+    List<AccessorPartyReponseDTO> findAllAccessorParty(Long countryId, Long organizationId);
 
     @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
     List<AccessorParty>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);

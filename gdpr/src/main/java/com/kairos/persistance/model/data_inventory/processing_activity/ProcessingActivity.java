@@ -18,7 +18,7 @@ public class ProcessingActivity extends MongoBaseEntity {
     @NotBlank(message = "Name can't be empty")
     private String name;
 
-    @NotBlank(message = "Discription can't be empty")
+    @NotBlank(message = "Description can't be empty")
     private String description;
 
     @NotNull(message = "Mangaing department can't be null")
@@ -31,12 +31,15 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private List<BigInteger> dataSources;
 
-    private List<BigInteger> dataDestinations;
-
     private List<BigInteger> sourceTransferMethods;
 
     private List<BigInteger> destinationTransferMethods;
 
+    private List<BigInteger> accessorParties;
+
+    private List<BigInteger> processingLegalBasis;
+
+    private BigInteger responsibilityType;
 
     private Integer controllerContactInfo;
 
@@ -49,8 +52,6 @@ public class ProcessingActivity extends MongoBaseEntity {
     private Long maxDataSubjectVolume;
 
     private Integer dataRetentionPeriod;
-
-    private List<BigInteger> accessorParties;
 
     private Long countryId;
 
@@ -79,10 +80,6 @@ public class ProcessingActivity extends MongoBaseEntity {
     public List<BigInteger> getDataSources() { return dataSources; }
 
     public void setDataSources(List<BigInteger> dataSources) { this.dataSources = dataSources; }
-
-    public List<BigInteger> getDataDestinations() { return dataDestinations; }
-
-    public void setDataDestinations(List<BigInteger> dataDestinations) { this.dataDestinations = dataDestinations; }
 
     public List<BigInteger> getSourceTransferMethods() { return sourceTransferMethods; }
 
@@ -116,21 +113,25 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setAccessorParties(List<BigInteger> accessorParties) { this.accessorParties = accessorParties; }
 
-    public Long getCountryId() { return countryId;
-    }
+    public Long getCountryId() { return countryId; }
 
-    public void setCountryId(Long countryId) { this.countryId = countryId;
-    }
+    public void setCountryId(Long countryId) { this.countryId = countryId; }
 
     public List<BigInteger> getDestinationTransferMethods() {
         return destinationTransferMethods;
     }
 
-    public void setDestinationTransferMethods(List<BigInteger> destinationTransferMethods) {
-        this.destinationTransferMethods = destinationTransferMethods;
-    }
+    public void setDestinationTransferMethods(List<BigInteger> destinationTransferMethods) { this.destinationTransferMethods = destinationTransferMethods; }
+
+    public BigInteger getResponsibilityType() { return responsibilityType; }
+
+    public void setResponsibilityType(BigInteger responsibilityType) { this.responsibilityType = responsibilityType; }
 
     public Boolean getActive() { return isActive; }
+
+    public List<BigInteger> getProcessingLegalBasis() { return processingLegalBasis; }
+
+    public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
 
     public void setActive(Boolean active) { isActive = active; }
     public ProcessingActivity(String name, String description, Long countryId, ManagingOrganization managingDepartment, Staff processOwner) {

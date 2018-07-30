@@ -12,7 +12,7 @@ public class ProcessingLegalBasis extends MongoBaseEntity {
 
 
     @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
-    @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "Number and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     private Long countryId;
@@ -33,4 +33,11 @@ public class ProcessingLegalBasis extends MongoBaseEntity {
         this.name = name;
     }
 
+    public ProcessingLegalBasis() {
+    }
+
+    public ProcessingLegalBasis( String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
 }

@@ -33,4 +33,12 @@ public class TransferMethod extends MongoBaseEntity {
         this.name = name;
     }
 
+
+    public TransferMethod() {
+    }
+
+    public TransferMethod(String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
 }
