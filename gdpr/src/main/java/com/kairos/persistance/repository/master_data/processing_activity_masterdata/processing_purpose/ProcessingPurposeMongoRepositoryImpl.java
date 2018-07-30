@@ -33,7 +33,7 @@ public class ProcessingPurposeMongoRepositoryImpl implements CustomProcessingPur
             Document groupOPerationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
             Document projectionForFilteringDuplicateDataOfOrgAndParentOrg = Document.parse(CustomAggregationQuery.metaDataProjectionForRemovingDuplicateInheritedMetaData(organizationId));
             Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionforAddingFinalDataObject());
-            ReplaceRootOperation replaceRootOperation = new ReplaceRootOperation(Fields.field("data"));
+            Document replaceRootOperation = Document.parse(CustomAggregationQuery.metaDataReplaceRoot());
 
 
             List<Long> orgIdList = new ArrayList<>();
@@ -44,8 +44,7 @@ public class ProcessingPurposeMongoRepositoryImpl implements CustomProcessingPur
                     new CustomAggregationOperation(groupOPerationForDuplicateDataOnInheritingFromParentOrg),
                     new CustomAggregationOperation(projectionForFilteringDuplicateDataOfOrgAndParentOrg),
                     new CustomAggregationOperation(projectionOperation),
-                    replaceRootOperation
-
+                    new CustomAggregationOperation(replaceRootOperation)
             );
 
             AggregationResults<ProcessingPurposeResponseDTO> results = mongoTemplate.aggregate(aggregation, ProcessingPurpose.class, ProcessingPurposeResponseDTO.class);

@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 import static com.kairos.constants.AppConstant.DELETED;
@@ -22,8 +23,6 @@ import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 
 public class StorageFormatMongoRepositoryImpl implements CustomStorageFormatRepository {
-
-
 
 
     @Inject
@@ -34,19 +33,18 @@ public class StorageFormatMongoRepositoryImpl implements CustomStorageFormatRepo
         Document groupOPerationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
         Document projectionForFilteringDuplicateDataOfOrgAndParentOrg = Document.parse(CustomAggregationQuery.metaDataProjectionForRemovingDuplicateInheritedMetaData(organizationId));
         Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionforAddingFinalDataObject());
-        ReplaceRootOperation replaceRootOperation = new ReplaceRootOperation(Fields.field("data"));
-
+        Document replaceRootOperation = Document.parse(CustomAggregationQuery.metaDataReplaceRoot());
 
         List<Long> orgIdList = new ArrayList<>();
-        orgIdList.add(organizationId);orgIdList.add(parentOrganizationId);
+        orgIdList.add(organizationId);
+        orgIdList.add(parentOrganizationId);
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).in(orgIdList)),
                 new CustomAggregationOperation(groupOPerationForDuplicateDataOnInheritingFromParentOrg),
                 new CustomAggregationOperation(projectionForFilteringDuplicateDataOfOrgAndParentOrg),
-                new CustomAggregationOperation(projectionOperation),
-                replaceRootOperation
-
+                new CustomAggregationOperation(projectionOperation)
+               ,new CustomAggregationOperation(replaceRootOperation)
 
         );
 

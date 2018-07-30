@@ -246,6 +246,10 @@ public class CustomAggregationQuery {
     }
 
 
+    public static String metaDataReplaceRoot()
+    {
+        return "{ '$replaceRoot' : { 'newRoot' : '$data' } }";
+    }
 
 
 

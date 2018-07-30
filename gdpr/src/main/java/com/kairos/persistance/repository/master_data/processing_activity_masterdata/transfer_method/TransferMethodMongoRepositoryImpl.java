@@ -24,8 +24,6 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.matc
 public class TransferMethodMongoRepositoryImpl implements CustomTransferMethodRepository {
 
 
-
-
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -35,19 +33,19 @@ public class TransferMethodMongoRepositoryImpl implements CustomTransferMethodRe
         Document groupOPerationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
         Document projectionForFilteringDuplicateDataOfOrgAndParentOrg = Document.parse(CustomAggregationQuery.metaDataProjectionForRemovingDuplicateInheritedMetaData(organizationId));
         Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionforAddingFinalDataObject());
-        ReplaceRootOperation replaceRootOperation = new ReplaceRootOperation(Fields.field("data"));
+        Document replaceRootOperation = Document.parse(CustomAggregationQuery.metaDataReplaceRoot());
 
 
         List<Long> orgIdList = new ArrayList<>();
-        orgIdList.add(organizationId);orgIdList.add(parentOrganizationId);
+        orgIdList.add(organizationId);
+        orgIdList.add(parentOrganizationId);
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).in(orgIdList)),
                 new CustomAggregationOperation(groupOPerationForDuplicateDataOnInheritingFromParentOrg),
                 new CustomAggregationOperation(projectionForFilteringDuplicateDataOfOrgAndParentOrg),
                 new CustomAggregationOperation(projectionOperation),
-                replaceRootOperation
-
+                new CustomAggregationOperation(replaceRootOperation)
         );
 
         AggregationResults<TransferMethodResponseDTO> results = mongoTemplate.aggregate(aggregation, TransferMethod.class, TransferMethodResponseDTO.class);

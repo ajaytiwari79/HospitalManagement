@@ -36,7 +36,7 @@ public class ResponsibilityTypeMongoRepositoryImpl implements CustomResponsibili
         Document groupOPerationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
         Document projectionForFilteringDuplicateDataOfOrgAndParentOrg = Document.parse(CustomAggregationQuery.metaDataProjectionForRemovingDuplicateInheritedMetaData(organizationId));
         Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionforAddingFinalDataObject());
-        ReplaceRootOperation replaceRootOperation = new ReplaceRootOperation(Fields.field("data"));
+        Document replaceRootOperation = Document.parse(CustomAggregationQuery.metaDataReplaceRoot());
 
 
         List<Long> orgIdList = new ArrayList<>();
@@ -47,8 +47,7 @@ public class ResponsibilityTypeMongoRepositoryImpl implements CustomResponsibili
                 new CustomAggregationOperation(groupOPerationForDuplicateDataOnInheritingFromParentOrg),
                 new CustomAggregationOperation(projectionForFilteringDuplicateDataOfOrgAndParentOrg),
                 new CustomAggregationOperation(projectionOperation),
-                replaceRootOperation
-
+                new CustomAggregationOperation(replaceRootOperation)
         );
 
         AggregationResults<ResponsibilityTypeResponseDTO> results = mongoTemplate.aggregate(aggregation, ResponsibilityType.class, ResponsibilityTypeResponseDTO.class);

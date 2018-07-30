@@ -33,7 +33,7 @@ public class TechnicalSecurityMeasureMongoRepositoryImpl implements CustomTechni
         Document groupOPerationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
         Document projectionForFilteringDuplicateDataOfOrgAndParentOrg = Document.parse(CustomAggregationQuery.metaDataProjectionForRemovingDuplicateInheritedMetaData(organizationId));
         Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionforAddingFinalDataObject());
-        ReplaceRootOperation replaceRootOperation = new ReplaceRootOperation(Fields.field("data"));
+        Document replaceRootOperation = Document.parse(CustomAggregationQuery.metaDataReplaceRoot());
 
 
         List<Long> orgIdList = new ArrayList<>();
@@ -45,10 +45,10 @@ public class TechnicalSecurityMeasureMongoRepositoryImpl implements CustomTechni
                 new CustomAggregationOperation(groupOPerationForDuplicateDataOnInheritingFromParentOrg),
                 new CustomAggregationOperation(projectionForFilteringDuplicateDataOfOrgAndParentOrg),
                 new CustomAggregationOperation(projectionOperation),
-                replaceRootOperation
+                new CustomAggregationOperation(replaceRootOperation)
 
 
-        );
+                );
 
         AggregationResults<TechnicalSecurityMeasureReponseDTO> results = mongoTemplate.aggregate(aggregation, TechnicalSecurityMeasure.class, TechnicalSecurityMeasureReponseDTO.class);
         return results.getMappedResults();
