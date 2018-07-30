@@ -41,13 +41,8 @@ public class SchedulerPanel extends MongoBaseEntity {
 
     private Integer repeat;
     private List<DayOfWeek> days;
-
-
-
     private LocalTime runOnce;
-
-
-    private List<LocalTime> selectedHours;
+    private List<String> selectedHours;
     private Date startDate;
     private Date endDate;
     private Integer weeks;
@@ -110,13 +105,14 @@ public class SchedulerPanel extends MongoBaseEntity {
     }
 
 
-    public List<LocalTime> getSelectedHours() {
+    public List<String> getSelectedHours() {
         return selectedHours;
     }
 
-    public void setSelectedHours(List<LocalTime> selectedHours) {
+    public void setSelectedHours(List<String> selectedHours) {
         this.selectedHours = selectedHours;
     }
+
 
 
    /* public String getRunOnce() {

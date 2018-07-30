@@ -18,8 +18,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Created by vipul on 6/3/18.
@@ -32,10 +34,12 @@ public class EmploymentServiceIntegrationTest {
     @Value("${server.host.http.url}")
     private String url;
     @Autowired
-    TestRestTemplate restTemplate;
+    private TestRestTemplate restTemplate;
     static private Long createdId;
     static private String baseUrlWithUnit;
     static private Long staffId;
+    @Inject
+    private EmploymentService employmentService;
 
     @Before
     public void setUp() throws Exception {
@@ -68,6 +72,11 @@ public class EmploymentServiceIntegrationTest {
 
     }
 
+    /*@Test
+    public void moveToReadOnlyAccessGroup() {
+        employmentService.moveToReadOnlyAccessGroup(Stream.of(""));
+    }
+*/
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)

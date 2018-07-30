@@ -45,8 +45,11 @@ public class SchedulerPanelController {
 
     @PostMapping("")
     @ApiOperation("Create Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@RequestParam(value = "integrationConfigurationId", required = false) BigInteger integrationConfigurationId, @PathVariable  long unitId, @RequestBody SchedulerPanelDTO schedulerPanelDTO) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTO, integrationConfigurationId));
+    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@RequestParam(value = "integrationConfigurationId", required = false)
+                                                                             BigInteger integrationConfigurationId, @PathVariable  long unitId,
+                                                                 @RequestBody SchedulerPanelDTO schedulerPanelDTO) throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTO,
+                integrationConfigurationId));
     }
 
     @PutMapping("/{schedulerPanelId}")
@@ -61,7 +64,7 @@ public class SchedulerPanelController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getJobDetails(schedulerPanelId));
     }
 
-    @DeleteMapping("/delete/{schedulerPanelId}")
+    @DeleteMapping("/{schedulerPanelId}")
     @ApiOperation("Delete Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> deleteJob(@PathVariable BigInteger schedulerPanelId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelId));

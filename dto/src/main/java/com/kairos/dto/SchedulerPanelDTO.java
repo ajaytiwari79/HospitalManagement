@@ -12,7 +12,7 @@ import java.util.List;
 
 public class SchedulerPanelDTO {
 
-    private String _id;
+    private BigInteger id;
     private String name;
     private String processType;
     private boolean active;
@@ -24,7 +24,7 @@ public class SchedulerPanelDTO {
     private Integer repeat;
     private List<DayOfWeek> days;
     private LocalTime runOnce;
-    private List<LocalTime> selectedHours;
+    private List<String> selectedHours;
     private Date startDate;
     private Date endDate;
     private Long unitId;
@@ -36,6 +36,36 @@ public class SchedulerPanelDTO {
     private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
 
+
+    public SchedulerPanelDTO() {
+
+    }
+
+    public SchedulerPanelDTO(String name, boolean active, Integer startMinute, Integer repeat, List<DayOfWeek> days, LocalTime runOnce, List<String> selectedHours, Long unitId, BigInteger integrationConfigurationId, JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
+        this.name = name;
+        this.active = active;
+        this.startMinute = startMinute;
+        this.repeat = repeat;
+        this.days = days;
+        this.runOnce = runOnce;
+        this.selectedHours = selectedHours;
+        this.unitId = unitId;
+        this.integrationConfigurationId = integrationConfigurationId;
+        this.jobType = jobType;
+        this.jobSubType = jobSubType;
+        this.oneTimeTrigger = oneTimeTrigger;
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
+        this.entityId = entityId;
+    }
+
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
     public BigInteger getEntityId() {
         return entityId;
     }
@@ -105,13 +135,7 @@ public class SchedulerPanelDTO {
     }
 */
 
-    public List<LocalTime> getSelectedHours() {
-        return selectedHours;
-    }
 
-    public void setSelectedHours(List<LocalTime> selectedHours) {
-        this.selectedHours = selectedHours;
-    }
     public String getName() {
         return name;
     }
@@ -212,13 +236,7 @@ public class SchedulerPanelDTO {
     public void setFilterId(String filterId) {
         this.filterId = filterId;
     }
-    public String get_id() {
-        return _id;
-    }
 
-    public void set_id(String _id) {
-        this._id = _id;
-    }
     public List<DayOfWeek> getDays() {
         return days;
     }
@@ -242,5 +260,13 @@ public class SchedulerPanelDTO {
 
     public void setRunOnce(LocalTime runOnce) {
         this.runOnce = runOnce;
+    }
+
+    public List<String> getSelectedHours() {
+        return selectedHours;
+    }
+
+    public void setSelectedHours(List<String> selectedHours) {
+        this.selectedHours = selectedHours;
     }
 }

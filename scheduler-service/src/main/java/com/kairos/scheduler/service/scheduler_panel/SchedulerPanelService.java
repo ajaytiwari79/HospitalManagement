@@ -216,7 +216,8 @@ public class SchedulerPanelService extends MongoBaseService {
     public List<SchedulerPanelDTO> getSchedulerPanelByUnitId(long unitId) {
             //List<Map<String, Object>> controlPanels = schedulerPanelRepository.findByUnitId(unitId);
             List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitId(unitId);
-            return ObjectMapperUtils.copyPropertiesOfListByMapper(schedulerPanels,SchedulerPanel.class);
+            List<SchedulerPanelDTO> schedulerPanelDTOS =ObjectMapperUtils.copyProperties(schedulerPanels,SchedulerPanelDTO.class);
+            return schedulerPanelDTOS;
 
     }
 
