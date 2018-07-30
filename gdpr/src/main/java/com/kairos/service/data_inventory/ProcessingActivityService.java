@@ -6,7 +6,7 @@ import com.kairos.dto.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.*;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;

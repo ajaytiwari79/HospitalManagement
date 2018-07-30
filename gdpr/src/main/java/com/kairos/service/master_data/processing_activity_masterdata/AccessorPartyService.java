@@ -7,7 +7,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.metadata.AccessorPartyDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.AccessorPartyMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
 import com.kairos.response.dto.metadata.AccessorPartyReponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -194,19 +194,9 @@ public class AccessorPartyService extends MongoBaseService {
      * @param unitId - id of unit organization
      * @return     method return list of Organization Accessor party with non Inherited Accessor party from  parent
      */
-    public List<AccessorPartyReponseDTO> getAllInheritedFromParentAndOrganizationAccesorParty(Long countryId, Long organizationId, Long unitId) {
+    public List<AccessorPartyReponseDTO> getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(Long countryId, Long organizationId, Long unitId) {
 
-        List<AccessorPartyReponseDTO> inheritingFromParentOrganizationAccesorPartyList = accessorPartyMongoRepository.findAllAccessorParty(countryId, organizationId);
-        List<AccessorPartyReponseDTO> orgAccesorPartyList = accessorPartyMongoRepository.findAllAccessorParty(countryId, unitId);
-        List<AccessorPartyReponseDTO> orgAccesorPartyWithNonInheritAccesorPartyFromParent = new ArrayList<>();
-        for (AccessorPartyReponseDTO accessorPartyReponseDTO : inheritingFromParentOrganizationAccesorPartyList) {
-            if (!orgAccesorPartyList.contains(accessorPartyReponseDTO)) {
-                orgAccesorPartyWithNonInheritAccesorPartyFromParent.add(accessorPartyReponseDTO);
-            }
-        }
-        orgAccesorPartyWithNonInheritAccesorPartyFromParent.addAll(orgAccesorPartyList);
-        return orgAccesorPartyWithNonInheritAccesorPartyFromParent;
-
+      return accessorPartyMongoRepository.getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(countryId,organizationId,unitId);
     }
 
 

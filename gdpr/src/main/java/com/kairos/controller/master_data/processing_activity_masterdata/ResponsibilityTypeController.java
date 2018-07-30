@@ -108,6 +108,8 @@ public class ResponsibilityTypeController {
 
     }
 
+
+
     @ApiOperation("update ResponsibilityType  by id")
     @PutMapping("/responsibility_type/update/{id}")
     public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody ResponsibilityType responsibilityType) {
@@ -123,6 +125,14 @@ public class ResponsibilityTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(countryId, organizationId, id, responsibilityType));
 
     }
+
+
+    @ApiOperation("get All responsibility type of Current organization and Parent Oeg which were not inherited by Organization")
+    @GetMapping(UNIT_URL+"/inherit/responsibility_type")
+    public ResponseEntity<Object> getAllResponsibilityTypeOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getAllNotInheritedResponsibilityTypesFromParentOrgAndUnitResponsibilityType(countryId,organizationId,unitId));
+    }
+
 
 
     @ApiOperation("get ResponsibilityType of unit by id")

@@ -6,7 +6,8 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
-import com.kairos.persistance.repository.master_data.asset_management.TechnicalSecurityMeasureMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
+import com.kairos.response.dto.metadata.TechnicalSecurityMeasureReponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -162,6 +163,12 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+    public List<TechnicalSecurityMeasureReponseDTO> getAllNotInheritedTechnicalSecurityMeasureFromParentOrgAndUnitSecurityMeasure(Long countryId, Long parentOrganizationId, Long unitId){
+
+        return technicalSecurityMeasureMongoRepository.getAllNotInheritedTechnicalSecurityMeasureFromParentOrgAndUnitSecurityMeasure(countryId,parentOrganizationId,unitId);
     }
 
 

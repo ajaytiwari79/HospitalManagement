@@ -6,7 +6,8 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
-import com.kairos.persistance.repository.master_data.asset_management.DataDisposalMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
+import com.kairos.response.dto.metadata.DataDisposalResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -167,6 +168,17 @@ public class DataDisposalService extends MongoBaseService {
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
+
+
+
+
+    public List<DataDisposalResponseDTO> getAllNotInheritedDataDisposalFromParentOrgAndUnitDataDisposal(Long countryId,Long parentOrganizationId,Long unitId){
+
+        return dataDisposalMongoRepository.getAllNotInheritedDataDisposalFromParentOrgAndUnitDataDisposal(countryId,parentOrganizationId,unitId);
+    }
+
+
+
 
 
 }

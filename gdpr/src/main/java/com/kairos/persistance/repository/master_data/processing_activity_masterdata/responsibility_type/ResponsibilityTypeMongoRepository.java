@@ -1,4 +1,4 @@
-package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
+package com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type;
 
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface ResponsibilityTypeMongoRepository extends MongoRepository<ResponsibilityType,BigInteger> {
+public interface ResponsibilityTypeMongoRepository extends MongoRepository<ResponsibilityType,BigInteger>,CustomResponsibilityTypeRepository {
 
     @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
     ResponsibilityType findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);

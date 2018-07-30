@@ -6,7 +6,8 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
-import com.kairos.persistance.repository.master_data.asset_management.StorageFormatMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
+import com.kairos.response.dto.metadata.StorageFormatResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -164,6 +165,13 @@ public class StorageFormatService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+
+    public List<StorageFormatResponseDTO> getAllNotInheritedStorageFormatFromParentOrgAndUnitStorageFormat(Long countryId, Long parentOrganizationId, Long unitId){
+
+        return storageFormatMongoRepository.getAllNotInheritedStorageFormatFromParentOrgAndUnitStorageFormat(countryId,parentOrganizationId,unitId);
     }
 
 

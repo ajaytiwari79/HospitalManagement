@@ -7,7 +7,8 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.metadata.TransferMethodDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.TransferMethod;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.TransferMethodMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
+import com.kairos.response.dto.metadata.TransferMethodResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
@@ -160,11 +161,6 @@ public class TransferMethodService extends MongoBaseService {
     }
 
 
-
-
-
-
-
     public List<BigInteger> createTransferMethodForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
 
         List<TransferMethod> newInheritTransferMethodFromParentOrg = new ArrayList<>();
@@ -185,6 +181,12 @@ public class TransferMethodService extends MongoBaseService {
         return transferMethodIds;
     }
 
+
+    public List<TransferMethodResponseDTO> getAllNotInheritedTransferMethodFromParentOrgAndUnitTransferMethod(Long countryId,Long parentOrganizationId,Long unitId)
+    {
+        return transferMethodRepository.getAllNotInheritedTransferMethodFromParentOrgAndUnitTransferMethod(countryId,parentOrganizationId,unitId);
+
+    }
 
 
 

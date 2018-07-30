@@ -8,7 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.ProcessingLegalBasisMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
 import com.kairos.response.dto.metadata.ProcessingLegalBasisResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
@@ -192,19 +192,9 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     }
 
 
-    public List<ProcessingLegalBasisResponseDTO> getAllInheritingFromParentAndOrganizationProcessingLegalBasis(Long countryId, Long organizationId, Long unitId) {
+    public List<ProcessingLegalBasisResponseDTO> getAllNotInheritedLegalBasisFromParentOrgAndUnitProcessingLegalBasis(Long countryId, Long organizationId, Long unitId) {
 
-        List<ProcessingLegalBasisResponseDTO> inheritingFromParentOrganizationLegalBasisList = legalBasisMongoRepository.findAllProcessingLegalBases(countryId, organizationId);
-        List<ProcessingLegalBasisResponseDTO> orgProcessingLegalBasis = legalBasisMongoRepository.findAllProcessingLegalBases(countryId, unitId);
-        List<ProcessingLegalBasisResponseDTO> orgProcessingLegalBasisAndNonInheritedLegalBasisFromParent = new ArrayList<>();
-        for (ProcessingLegalBasisResponseDTO processingLegalBasisResponseDTO : inheritingFromParentOrganizationLegalBasisList) {
-            if (!orgProcessingLegalBasis.contains(processingLegalBasisResponseDTO)) {
-                orgProcessingLegalBasisAndNonInheritedLegalBasisFromParent.add(processingLegalBasisResponseDTO);
-            }
-        }
-        orgProcessingLegalBasisAndNonInheritedLegalBasisFromParent.addAll(orgProcessingLegalBasis);
-        return orgProcessingLegalBasisAndNonInheritedLegalBasisFromParent;
-
+       return legalBasisMongoRepository.getAllNotInheritedLegalBasisFromParentOrgAndUnitProcessingLegalBasis(countryId,organizationId,unitId);
     }
 
 

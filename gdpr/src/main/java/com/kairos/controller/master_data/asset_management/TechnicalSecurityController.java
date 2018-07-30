@@ -117,6 +117,15 @@ public class TechnicalSecurityController {
 
     }
 
+
+
+    @ApiOperation("get All technical security of Current organization and Parent Oeg which were not inherited by Organization")
+    @GetMapping(UNIT_URL+"/inherit/technical_security")
+    public ResponseEntity<Object> getAllTechnicalMeasurefOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getAllNotInheritedTechnicalSecurityMeasureFromParentOrgAndUnitSecurityMeasure(countryId,organizationId,unitId));
+    }
+
+
     @ApiOperation("get TechnicalSecurityMeasure of Unit by id")
     @GetMapping(UNIT_URL+"/technical_security/{id}")
     public ResponseEntity<Object> getTechnicalSecurityMeasureOfUnitById(@PathVariable Long countryId,@PathVariable Long unitId, @PathVariable BigInteger id) {

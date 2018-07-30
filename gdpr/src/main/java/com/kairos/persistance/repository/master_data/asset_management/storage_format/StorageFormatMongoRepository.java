@@ -1,4 +1,4 @@
-package com.kairos.persistance.repository.master_data.asset_management;
+package com.kairos.persistance.repository.master_data.asset_management.storage_format;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.response.dto.metadata.StorageFormatResponseDTO;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface StorageFormatMongoRepository extends MongoRepository<StorageFormat,BigInteger> {
+public interface StorageFormatMongoRepository extends MongoRepository<StorageFormat,BigInteger>,CustomStorageFormatRepository {
 
 
 

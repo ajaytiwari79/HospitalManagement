@@ -8,7 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.metadata.DataSourceDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.DataSourceMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
 import com.kairos.response.dto.metadata.DataSourceResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
@@ -16,9 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
@@ -62,7 +64,7 @@ public class DataSourceService extends MongoBaseService {
             if (dataSourceNames.size() != 0) {
                 for (String name : dataSourceNames) {
 
-                    DataSource newDataSource = new DataSource(name,countryId);
+                    DataSource newDataSource = new DataSource(name, countryId);
                     newDataSource.setOrganizationId(organizationId);
                     newDataSources.add(newDataSource);
 
@@ -80,7 +82,6 @@ public class DataSourceService extends MongoBaseService {
     }
 
     /**
-     *
      * @param countryId
      * @param organizationId
      * @return list of DataSource
@@ -90,11 +91,11 @@ public class DataSourceService extends MongoBaseService {
     }
 
     /**
-     * @throws DataNotFoundByIdException throw exception if DataSource not found for given id
      * @param countryId
      * @param organizationId
-     * @param id id of DataSource
+     * @param id             id of DataSource
      * @return DataSource object fetch by given id
+     * @throws DataNotFoundByIdException throw exception if DataSource not found for given id
      */
     public DataSource getDataSource(Long countryId, Long organizationId, BigInteger id) {
 
@@ -166,13 +167,9 @@ public class DataSourceService extends MongoBaseService {
     }
 
 
+    public List<BigInteger> createDataSourceForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
-
-
-    public List<BigInteger> createDataSourceForOrganizationOnInheritingFromParentOrganization(Long countryId,Long organizationId,ProcessingActivityDTO processingActivityDTO)
-    {
-
-        List<DataSourceDTO>  dataSourceDTOS= processingActivityDTO.getDataSources();
+        List<DataSourceDTO> dataSourceDTOS = processingActivityDTO.getDataSources();
         List<DataSource> newInheritDataSourceFromCountry = new ArrayList<>();
         List<BigInteger> dataSourceIds = new ArrayList<>();
         for (DataSourceDTO dataSourceDTO : dataSourceDTOS) {
@@ -193,30 +190,14 @@ public class DataSourceService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param organizationId - id of parent organization
-     * @param unitId  - id of unit organization
+     * @param unitId         - id of unit organization
      * @return method return list of organization Data Sources with Data Sources which were not inherited by organization  till now
      */
-    public List<DataSourceResponseDTO> getAllInheritedFromParentAndOrganizationDataSource(Long countryId, Long organizationId, Long unitId) {
-
-        List<DataSourceResponseDTO> inheritingFromParentOrganizationDataSourceList = dataSourceMongoRepository.findAllDataSources(countryId, organizationId);
-        List<DataSourceResponseDTO> orgDataSourceList = dataSourceMongoRepository.findAllDataSources(countryId, unitId);
-        List<DataSourceResponseDTO> orgADataSourceWithNonInheritAccesorPartyFromParent = new ArrayList<>();
-        for (DataSourceResponseDTO dataSourceReponseDTO : inheritingFromParentOrganizationDataSourceList) {
-            if (!orgDataSourceList.contains(dataSourceReponseDTO)) {
-                orgADataSourceWithNonInheritAccesorPartyFromParent.add(dataSourceReponseDTO);
-            }
-        }
-        orgADataSourceWithNonInheritAccesorPartyFromParent.addAll(orgDataSourceList);
-        return orgADataSourceWithNonInheritAccesorPartyFromParent;
-
+    public List<DataSourceResponseDTO> getAllNotInheritedDataSourceFromParentOrgAndUnitDataSource(Long countryId, Long organizationId, Long unitId) {
+        return dataSourceMongoRepository.getAllNotInheritedDataSourceFromParentOrgAndUnitDataSource(countryId, organizationId, unitId);
     }
-
-
-
-
 
 
 }

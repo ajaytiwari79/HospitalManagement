@@ -128,6 +128,12 @@ public class AccessorPartyController {
     }
 
 
+    @ApiOperation("get All AccessorParty of Current organization and Parent Oeg which were not inherited by Organization")
+    @GetMapping(UNIT_URL+"/inherit/accessor_party")
+    public ResponseEntity<Object> getAllAccessorPartyOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(countryId,organizationId,unitId));
+    }
+
 
     @ApiOperation("get AccessorParty by id")
     @GetMapping(UNIT_URL+"/accessor_party/{id}")

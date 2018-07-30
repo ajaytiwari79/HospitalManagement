@@ -125,6 +125,13 @@ public class ProcessingLegalBasisController {
     }
 
 
+    @ApiOperation("get All legal basis of Current organization and Parent Oeg which were not inherited by Organization")
+    @GetMapping(UNIT_URL+"/inherit/legal_basis")
+    public ResponseEntity<Object> getAllLegalBasisOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getAllNotInheritedLegalBasisFromParentOrgAndUnitProcessingLegalBasis(countryId,organizationId,unitId));
+    }
+
+
     @ApiOperation("get ProcessingLegalBasis of unit by id")
     @GetMapping(UNIT_URL+"/legal_basis/{id}")
     public ResponseEntity<Object> getProcessingLegalBasisOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {

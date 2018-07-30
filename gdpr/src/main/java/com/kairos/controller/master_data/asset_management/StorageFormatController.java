@@ -111,6 +111,13 @@ public class StorageFormatController {
     }
 
 
+    @ApiOperation("get All storage format  of Current organization and Parent Oeg which were not inherited by Organization")
+    @GetMapping(UNIT_URL+"/inherit/storage_format")
+    public ResponseEntity<Object> getAllStorageFormatMeasureOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getAllNotInheritedStorageFormatFromParentOrgAndUnitStorageFormat(countryId,organizationId,unitId));
+    }
+
+
     @ApiOperation("update StorageFormat by id")
     @PutMapping("/storage_format/update/{id}")
     public ResponseEntity<Object> updateStorageFormat(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody StorageFormat storageFormat) {
