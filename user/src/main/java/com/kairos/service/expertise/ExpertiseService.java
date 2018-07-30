@@ -49,7 +49,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -400,10 +399,16 @@ public class ExpertiseService extends UserBaseService {
 
 
         } else {
+
             // update in current expertise :)
+
             validateSeniorityLevel(currentExpertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), expertiseDTO.getSeniorityLevel().getId());
-            updateCurrentSeniorityLevel(expertiseDTO.getSeniorityLevel(), seniorityLevelToUpdate.get());
-            updateCurrentExpertise(countryId, currentExpertise, expertiseDTO);
+
+            boolean levelChanged = updateCurrentExpertise(countryId, currentExpertise, expertiseDTO);
+            updateCurrentSeniorityLevel(expertiseDTO.getSeniorityLevel(), seniorityLevelToUpdate.get(), levelChanged);
+            // organization Level is changed so need to set new
+
+
             save(currentExpertise);
             expertiseDTO.setId(currentExpertise.getId());
             expertiseDTO.setPublished(currentExpertise.isPublished());
@@ -416,18 +421,22 @@ public class ExpertiseService extends UserBaseService {
         return expertiseResponseDTO;
     }
 
-    private void updateCurrentSeniorityLevel(SeniorityLevelDTO seniorityLevelDTO, SeniorityLevel seniorityLevel) {
+    private void updateCurrentSeniorityLevel(SeniorityLevelDTO seniorityLevelDTO, SeniorityLevel seniorityLevel, boolean levelChanged) {
 
-        SeniorityLevelQueryResult functionAndSeniorityLevel = seniorityLevelGraphRepository.getPayGradeBySeniorityLevelId(seniorityLevel.getId());
+        PayGrade previousPayGrade = seniorityLevelGraphRepository.getPayGradeBySeniorityLevelId(seniorityLevel.getId());
         seniorityLevel.setFrom(seniorityLevelDTO.getFrom());
         seniorityLevel.setTo(seniorityLevelDTO.getTo());
         seniorityLevel.setPensionPercentage(seniorityLevelDTO.getPensionPercentage());
         seniorityLevel.setFreeChoicePercentage(seniorityLevelDTO.getFreeChoicePercentage());
         seniorityLevel.setFreeChoiceToPension(seniorityLevelDTO.getFreeChoiceToPension());
 
-        if (!seniorityLevelDTO.getPayGradeId().equals(functionAndSeniorityLevel.getPayGrade().getId())) {
-            seniorityLevelGraphRepository.removePreviousPayGradeFromSeniorityLevel(seniorityLevelDTO.getId());
-            PayGrade payGrade = payGradeGraphRepository.findOne(seniorityLevelDTO.getPayGradeId());
+        if (previousPayGrade == null || !seniorityLevelDTO.getPayGradeId().equals(previousPayGrade.getId())) {
+            if (!levelChanged) {
+                seniorityLevelGraphRepository.removePreviousPayGradeFromSeniorityLevel(seniorityLevelDTO.getId());
+            }
+
+            PayGrade payGrade = payGradeGraphRepository.findOne(seniorityLevelDTO.getPayGradeId(),0);
+
             if (!Optional.ofNullable(payGrade).isPresent() || payGrade.isDeleted()) {
                 exceptionService.dataNotFoundByIdException("message.expertise.payGradeId.notFound", seniorityLevelDTO.getPayGradeId());
             }
@@ -437,7 +446,8 @@ public class ExpertiseService extends UserBaseService {
 
     }
 
-    private void updateCurrentExpertise(Long countryId, Expertise expertise, ExpertiseUpdateDTO expertiseDTO) {
+    private boolean updateCurrentExpertise(Long countryId, Expertise expertise, ExpertiseUpdateDTO expertiseDTO) {
+        boolean levelChanged = false;
         expertise.setName(expertiseDTO.getName().trim());
         expertise.setDescription(expertiseDTO.getDescription());
         expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
@@ -450,10 +460,12 @@ public class ExpertiseService extends UserBaseService {
 
             }
             expertise.setOrganizationLevel(level);
+            seniorityLevelGraphRepository.unlinkAllPayGradesFromExpertise(expertise.getId());
+            levelChanged = true;
         }
 
-        Set<Long> previousOrganizationLevelIds = expertise.getOrganizationServices().stream().map(UserBaseEntity::getId).collect(Collectors.toSet());
-        if (!previousOrganizationLevelIds.equals(expertiseDTO.getOrganizationServiceIds())) {
+        Set<Long> previousOrganizationServicesIds = expertise.getOrganizationServices().stream().map(UserBaseEntity::getId).collect(Collectors.toSet());
+        if (!previousOrganizationServicesIds.equals(expertiseDTO.getOrganizationServiceIds())) {
             Set<OrganizationService> organizationService = organizationServiceRepository.findAllOrganizationServicesByIds(expertiseDTO.getOrganizationServiceIds());
             if (!Optional.ofNullable(organizationService).isPresent() || organizationService.size() != expertiseDTO.getOrganizationServiceIds().size()) {
                 exceptionService.dataNotFoundByIdException("message.expertise.serviceNotFound");
@@ -472,6 +484,7 @@ public class ExpertiseService extends UserBaseService {
         }
         expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
         expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
+        return levelChanged;
     }
 
     public ExpertiseQueryResult deleteExpertise(Long expertiseId) {
@@ -607,6 +620,7 @@ public class ExpertiseService extends UserBaseService {
     }
 
     /*This method is used to publish an expertise
+
      * */
     public ExpertiseQueryResult publishExpertise(Long expertiseId, Long publishedDateMillis) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
@@ -617,11 +631,19 @@ public class ExpertiseService extends UserBaseService {
         if (expertise.isPublished()) {
             exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
         }
-        expertise.setPublished(true);
-        expertise.setStartDateMillis(new Date(publishedDateMillis));
+        List<Long> seniorityLevelId = new ArrayList<>();
         for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel()) {
             seniorityLevel.setPublished(true);
+            seniorityLevelId.add(seniorityLevel.getId());
         }
+        boolean payGradesExistsForSeniorityLevels = seniorityLevelGraphRepository.checkPayGradesInSeniorityLevel(seniorityLevelId);
+        if (!payGradesExistsForSeniorityLevels) {
+            exceptionService.actionNotPermittedException("message.seniorityLevel.payGrade.missing");
+
+        }
+        expertise.setPublished(true);
+        expertise.setStartDateMillis(new Date(publishedDateMillis));
+
         save(expertise);
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if (Optional.ofNullable(parentExpertise).isPresent()) {
