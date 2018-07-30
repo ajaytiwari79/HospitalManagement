@@ -8,6 +8,7 @@ import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
+import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.activity.counter.distribution.tab.InitialKPITabDistDataDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
@@ -37,40 +38,44 @@ import static java.util.stream.Collectors.toList;
  */
 
 @Service
-public class CounterManagementService extends MongoBaseService{
-    @Inject private CounterRepository counterRepository;
-    @Inject private ExceptionService exceptionService;
-    @Inject private GenericIntegrationService genericIntegrationService;
+public class CounterManagementService extends MongoBaseService {
+    @Inject
+    private CounterRepository counterRepository;
+    @Inject
+    private ExceptionService exceptionService;
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
 
     private final static Logger logger = LoggerFactory.getLogger(CounterManagementService.class);
 
-    private void overrideOldObject(MongoBaseEntity newEntity, MongoBaseEntity oldEntity){
+    private void overrideOldObject(MongoBaseEntity newEntity, MongoBaseEntity oldEntity) {
         BeanUtils.copyProperties(oldEntity, newEntity);
     }
 
     //get role wise moduleCounterId mapping
-    public List<RoleCounterDTO> getRoleCounterMapping(BigInteger unitId){
+    public List<RoleCounterDTO> getRoleCounterMapping(BigInteger unitId) {
         return counterRepository.getRoleAndModuleCounterIdMapping(unitId);
     }
 
-    public List<KPI> getKPIsList(Long refId, ConfLevel confLevel){
+    public List<KPI> getKPIsList(Long refId, ConfLevel confLevel) {
         return counterRepository.getEntityItemList(KPI.class);
     }
 
-    public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(Long refId, ConfLevel level){
+    public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(Long refId, ConfLevel level) {
         List<CategoryAssignmentDTO> categories = counterRepository.getCategoryAssignments(null, level, refId);
         List<BigInteger> categoryAssignmentIds = categories.parallelStream().map(categoryAssignment -> categoryAssignment.getId()).collect(toList());
         List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategories(categoryAssignmentIds);
         return new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
     }
 
-    public void updateCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId){
+    public void updateCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {
         CategoryAssignment categoryAssignment = counterRepository.getCategoryAssignment(categoryKPIsDetails.getCategoryId(), level, refId);
         List<KPIAssignment> kpiAssignments = counterRepository.getKPIAssignments(categoryKPIsDetails.getKpiIds(), level, refId);
         List<CategoryKPIConf> categoryKPIConfs = counterRepository.getCategoryKPIConfs(categoryAssignment.getId());
         List<BigInteger> kpiAssignmentIds = categoryKPIConfs.stream().map(categoryKPIConf -> categoryKPIConf.getKpiAssignmentId()).collect(toList());
         kpiAssignments = kpiAssignments.parallelStream().filter(kpiAssignment -> kpiAssignmentIds.contains(kpiAssignment.getId())).collect(toList());
-        if(kpiAssignments.isEmpty()) exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
+        if (kpiAssignments.isEmpty())
+            exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
         List<CategoryKPIConf> newCategoryKPIConfs = new ArrayList<>();
         kpiAssignments.parallelStream().forEach(kpiAssignment -> newCategoryKPIConfs.add(new CategoryKPIConf(kpiAssignment.getKpiId(), categoryAssignment.getId())));
         save(newCategoryKPIConfs);
@@ -78,18 +83,18 @@ public class CounterManagementService extends MongoBaseService{
 
     //settings for KPI-Module configuration
 
-    public InitialKPITabDistDataDTO getInitialTabKPIDataConf(String moduleId, Long refId, ConfLevel level){
-        List<KPIAccessPageDTO> kpiTabs= genericIntegrationService.getKPIEnabledTabsForModule(moduleId, refId);
+    public InitialKPITabDistDataDTO getInitialTabKPIDataConf(String moduleId, Long refId, ConfLevel level) {
+        List<KPIAccessPageDTO> kpiTabs = genericIntegrationService.getKPIEnabledTabsForModule(moduleId, refId);
         Map<String, List<BigInteger>> tabKPIsMap = new HashMap<>();
-        if(kpiTabs != null && kpiTabs.isEmpty()){
+        if (kpiTabs != null && kpiTabs.isEmpty()) {
             exceptionService.dataNotFoundByIdException("error.dist.module_kpi_tabs.not_available");
         }
         List<TabKPIMappingDTO> mappingDTO = counterRepository.getTabKPIConfigurationByTabIds(kpiTabs.stream().map(kpiTab -> kpiTab.getModuleId()).collect(toList()), level, refId);
         return new InitialKPITabDistDataDTO(kpiTabs, mappingDTO);
     }
 
-    public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries, ConfLevel level, Long refId){
-        List<TabKPIMappingDTO> tabKPIMappingList= counterRepository.getTabKPIConfigurationByTabIds(tabKPIEntries.getTabIds(), level, refId);
+    public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries, ConfLevel level, Long refId) {
+        List<TabKPIMappingDTO> tabKPIMappingList = counterRepository.getTabKPIConfigurationByTabIds(tabKPIEntries.getTabIds(), level, refId);
         Map<String, Map<BigInteger, BigInteger>> tabKPIsMap = new HashMap<>();
         List<TabKPIEntry> entriesToSave = new ArrayList<>();
         tabKPIEntries.getTabIds().forEach(tabId -> {
@@ -102,19 +107,19 @@ public class CounterManagementService extends MongoBaseService{
             tabKPIsMap.put(tabKPIEntry.getTabId(), kpiMap);
         });
 
-        tabKPIEntries.getTabIds().parallelStream().forEach(tabId ->{
+        tabKPIEntries.getTabIds().parallelStream().forEach(tabId -> {
             tabKPIEntries.getKpiIds().forEach(kpiId -> {
-                if(tabKPIsMap.get(tabId).get(kpiId) == null){
+                if (tabKPIsMap.get(tabId).get(kpiId) == null) {
                     entriesToSave.add(new TabKPIEntry(tabId, kpiId));
                 }
             });
         });
 
-        if(!entriesToSave.isEmpty())
+        if (!entriesToSave.isEmpty())
             save(entriesToSave);
     }
 
-    public void removeTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries){
+    public void removeTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries) {
         //this is only for single document deletion but the document identification fields are combination of two list.
         tabKPIEntries.getTabIds().forEach(tabId -> {
             tabKPIEntries.getKpiIds().forEach(kpiId -> {
@@ -124,7 +129,7 @@ public class CounterManagementService extends MongoBaseService{
     }
 
     //setting accessGroup-KPI configuration
-    public Map<Long, List<BigInteger>> getInitialAccessGroupKPIDataConf(List<Long> accessGroupIds){
+    public Map<Long, List<BigInteger>> getInitialAccessGroupKPIDataConf(List<Long> accessGroupIds) {
         Map<Long, List<BigInteger>> accessGroupKPIMap = new HashMap<>();
         accessGroupIds.forEach(accessGroupId -> {
             accessGroupKPIMap.put(accessGroupId, new ArrayList<>());
@@ -137,7 +142,7 @@ public class CounterManagementService extends MongoBaseService{
         return accessGroupKPIMap;
     }
 
-    public void addAccessGroupKPIEntries(AccessGroupKPIConfDTO accessGroupKPIConf){
+    public void addAccessGroupKPIEntries(AccessGroupKPIConfDTO accessGroupKPIConf) {
         List<AccessGroupKPIEntry> entries = counterRepository.getAccessGroupKPIConfigurationByAccessGroupId(accessGroupKPIConf.getAccessGroupIds());
         Map<Long, Map<BigInteger, BigInteger>> tabKPIsMap = new HashMap<>();
         List<AccessGroupKPIEntry> entriesToSave = new ArrayList<>();
@@ -149,18 +154,18 @@ public class CounterManagementService extends MongoBaseService{
             tabKPIsMap.get(accessGroupKPIEntry.getAccessGroupId()).put(accessGroupKPIEntry.getKpiId(), accessGroupKPIEntry.getKpiId());
         });
 
-        accessGroupKPIConf.getAccessGroupIds().parallelStream().forEach(accessGroupId ->{
+        accessGroupKPIConf.getAccessGroupIds().parallelStream().forEach(accessGroupId -> {
             accessGroupKPIConf.getKpiIds().forEach(kpiId -> {
-                if(tabKPIsMap.get(accessGroupId).get(kpiId) == null){
+                if (tabKPIsMap.get(accessGroupId).get(kpiId) == null) {
                     entriesToSave.add(new AccessGroupKPIEntry(accessGroupId, kpiId));
                 }
             });
         });
-        if(!entriesToSave.isEmpty())
+        if (!entriesToSave.isEmpty())
             save(entriesToSave);
     }
 
-    public void removeOrgTypeKPIEntries(AccessGroupKPIConfDTO accessGroupKPIConf){
+    public void removeOrgTypeKPIEntries(AccessGroupKPIConfDTO accessGroupKPIConf) {
         accessGroupKPIConf.getAccessGroupIds().forEach(accessGroupId -> {
             accessGroupKPIConf.getKpiIds().forEach(kpiId -> {
                 counterRepository.removeAccessGroupKPIEntry(new AccessGroupKPIEntry(accessGroupId, kpiId));
@@ -169,32 +174,31 @@ public class CounterManagementService extends MongoBaseService{
     }
 
     //setting orgType-KPI configuration
-    public List<BigInteger> getInitialOrgTypeKPIDataConf(Long orgTypeId){
+    public List<BigInteger> getInitialOrgTypeKPIDataConf(Long orgTypeId) {
         Map<String, List<BigInteger>> accessGroupKPIsMap = new HashMap<>();
         List<OrgTypeKPIEntry> orgTypeKPIEntries = counterRepository.getOrgTypeKPIConfigurationByOrgTypeId(Arrays.asList(orgTypeId));
-        if(orgTypeKPIEntries==null || orgTypeKPIEntries.isEmpty()) return new ArrayList<>();
-        return orgTypeKPIEntries.parallelStream().map(entry -> entry.getKpiId()).collect(Collectors.toList());
+        if (orgTypeKPIEntries == null || orgTypeKPIEntries.isEmpty()) return new ArrayList<>();
+        return orgTypeKPIEntries.parallelStream().map(entry -> entry.getKpiAssignmentId()).collect(Collectors.toList());
     }
 
-    public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf,Long countryId){
-        List<OrgTypeKPIEntry> entries = counterRepository.getOrgTypeKPIConfigurationByOrgTypeId(orgTypeKPIConf.getOrgTypeIds());
-        List<KPIAssignment> kpiAssignments=counterRepository.getKPIAssignmentsByKPIId(orgTypeKPIConf.getKpiIds(),countryId);
-        Map<Long, Map<BigInteger, BigInteger>> orgTypeKPIMap = new HashMap<>();
+    public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf, Long countryId) {
         List<OrgTypeKPIEntry> entriesToSave = new ArrayList<>();
+        List<KPIAssignment> kpiAssignments = counterRepository.getKPIAssignmentsByKPIId(orgTypeKPIConf.getKpiIds(), countryId);
+//        if (orgTypeKPIConf.getKpiIds().size() != kpiAssignments.size()) {
+//            exceptionService.actionNotPermittedException("KPi id not valid");
+//        }
+        List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryWithAssignmanetId(orgTypeKPIConf.getOrgTypeIds(), countryId);
+        Map<Long, Map<BigInteger, BigInteger>> orgTypeKPIMap = new HashMap<>();
         orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId -> {
             orgTypeKPIMap.put(orgTypeId, new HashMap<BigInteger, BigInteger>());
         });
-
-        entries.parallelStream().forEach(orgTypeKPIEntry -> {
-            orgTypeKPIMap.get(orgTypeKPIEntry.getOrgTypeId()).put(orgTypeKPIEntry.getKpiId(), orgTypeKPIEntry.getKpiId());
+        orgTypeMappingDTOS.forEach(orgTypeMappingDTO -> {
+            orgTypeKPIMap.get(orgTypeMappingDTO.getOrgTypeId()).put(orgTypeMappingDTO.getKpiAssignmentId(), orgTypeMappingDTO.getKpiAssignmentId());
         });
-
-        orgTypeKPIConf.getOrgTypeIds().parallelStream().forEach(orgTypeId ->{
-            orgTypeKPIConf.getKpiIds().forEach(kpiId -> {
-                if(orgTypeKPIMap.get(orgTypeId).get(kpiId) == null){
-                    entriesToSave.add(new OrgTypeKPIEntry(orgTypeId, kpiId));
-                }
-            });
+        kpiAssignments.forEach(kpiAssignment -> {orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId->{
+            if(orgTypeKPIMap.get(orgTypeId).get(kpiAssignment.getId()) == null){
+                entriesToSave.add(new OrgTypeKPIEntry(orgTypeId, kpiAssignment.getId()));
+            } });
         });
         if(!entriesToSave.isEmpty())
             save(entriesToSave);
@@ -209,3 +213,31 @@ public class CounterManagementService extends MongoBaseService{
     }
 
 }
+
+
+/*
+ public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf,Long countryId){
+        List<OrgTypeKPIEntry> entries = counterRepository.getOrgTypeKPIConfigurationByOrgTypeId(orgTypeKPIConf.getOrgTypeIds());
+        List<OrgTypeMappingDTO> orgTypeMappingDTOS=counterRepository.getOrgTypeKPIEntryWithAssignmanetId(orgTypeKPIConf.getOrgTypeIds(),countryId);
+        Map<Long, Map<BigInteger, BigInteger>> orgTypeKPIMap = new HashMap<>();
+        List<OrgTypeKPIEntry> entriesToSave = new ArrayList<>();
+        orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId -> {
+            orgTypeKPIMap.put(orgTypeId, new HashMap<BigInteger, BigInteger>());
+        });
+
+        entries.parallelStream().forEach(orgTypeKPIEntry -> {
+            orgTypeKPIMap.get(orgTypeKPIEntry.getOrgTypeId()).put(orgTypeKPIEntry.getKpiAssignmentId(), orgTypeKPIEntry.getKpiAssignmentId());
+        });
+
+        orgTypeKPIConf.getOrgTypeIds().parallelStream().forEach(orgTypeId ->{
+            orgTypeKPIConf.getKpiIds().forEach(kpiId -> {
+                if(orgTypeKPIMap.get(orgTypeId).get(kpiId) == null){
+                   entriesToSave.add(new OrgTypeKPIEntry(orgTypeId, kpiId));
+                }
+            });
+        });
+        if(!entriesToSave.isEmpty())
+            save(entriesToSave);
+    }
+
+ */

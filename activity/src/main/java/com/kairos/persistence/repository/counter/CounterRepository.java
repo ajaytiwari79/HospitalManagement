@@ -4,6 +4,7 @@ import com.kairos.activity.counter.KPICategoryDTO;
 import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
 import com.kairos.activity.counter.distribution.category.CategoryAssignmentDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
+import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.activity.counter.enums.CounterType;
@@ -213,12 +214,23 @@ public class CounterRepository {
     }
 
     public void removeOrgTypeKPIEntry(OrgTypeKPIEntry entry){
-        Query query = new Query(Criteria.where("orgTypeId").is(entry.getOrgTypeId()).and("kpiId").is(entry.getKpiId()));
+        Query query = new Query(Criteria.where("orgTypeId").is(entry.getOrgTypeId()).and("kpiId").is(entry.getKpiAssignmentId()));
         mongoTemplate.remove(query, OrgTypeKPIEntry.class);
     }
 
     public List<KPIAssignment> getKPIAssignmentsByKPIId(List<BigInteger> kpiIds ,Long countryId){
-        Query query=new Query(Criteria.where("kpiId").in(kpiIds).and("countryId").in());
+        Query query=new Query(Criteria.where("kpiId").in(kpiIds));
         return mongoTemplate.find(query,KPIAssignment.class);
+    }
+
+    public List<OrgTypeMappingDTO> getOrgTypeKPIEntryWithAssignmanetId(List<Long> orgTypeIds ,Long countryId){
+        Aggregation aggregation =Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("orgTypeId").in(orgTypeIds)),
+                Aggregation.lookup("kPIAssignment", "kpiAssignmentId", "_id", "kpiAssignment"),
+                Aggregation.project("kpiAssignmentId","orgTypeId").and("kpiAssignment").arrayElementAt(0).as("kpiAssignment"),
+                Aggregation.project("kpiAssignmentId","orgTypeId").and("kpiAssignment.kpiId").as("kpiId")
+        );
+        AggregationResults<OrgTypeMappingDTO> results = mongoTemplate.aggregate(aggregation, OrgTypeKPIEntry.class, OrgTypeMappingDTO.class);
+        return results.getMappedResults();
     }
 }
