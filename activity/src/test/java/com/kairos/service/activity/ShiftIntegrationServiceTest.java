@@ -35,9 +35,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -147,7 +145,7 @@ public class ShiftIntegrationServiceTest {
         List<BigInteger> shifts = new ArrayList<>();
         shifts.add(new BigInteger("110"));
         shifts.add(new BigInteger("109"));
-        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, ShiftStatus.FIXED);
+        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, Collections.singleton( ShiftStatus.FIXED));
 
         HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
 
