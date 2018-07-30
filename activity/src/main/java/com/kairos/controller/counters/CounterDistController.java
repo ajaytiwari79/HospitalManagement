@@ -113,13 +113,13 @@ public class CounterDistController {
     }
 
     @GetMapping(COUNTRY_URL+"/org_type/{orgTypeId}")
-    public ResponseEntity<Map<String, Object>> getInitialDataForOrgTypeKPIConf(@PathVariable Long orgTypeId){
+    public ResponseEntity<Map<String, Object>> getInitialDataForOrgTypeKPIConf(@PathVariable Long countryId,@PathVariable Long orgTypeId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialOrgTypeKPIDataConf(orgTypeId));
     }
 
     @PostMapping(COUNTRY_URL+"/org_type/create_dist_entry")
-    public ResponseEntity<Map<String, Object>> addOrgTypeKPIEntry(@RequestBody OrgTypeKPIConfDTO orgTypeKPIConf){
-        counterManagementService.addOrgTypeKPIEntries(orgTypeKPIConf);
+    public ResponseEntity<Map<String, Object>> addOrgTypeKPIEntry(@PathVariable Long countryId,@RequestBody OrgTypeKPIConfDTO orgTypeKPIConf){
+        counterManagementService.addOrgTypeKPIEntries(orgTypeKPIConf,countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 

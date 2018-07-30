@@ -216,4 +216,9 @@ public class CounterRepository {
         Query query = new Query(Criteria.where("orgTypeId").is(entry.getOrgTypeId()).and("kpiId").is(entry.getKpiId()));
         mongoTemplate.remove(query, OrgTypeKPIEntry.class);
     }
+
+    public List<KPIAssignment> getKPIAssignmentsByKPIId(List<BigInteger> kpiIds ,Long countryId){
+        Query query=new Query(Criteria.where("kpiId").in(kpiIds).and("countryId").in());
+        return mongoTemplate.find(query,KPIAssignment.class);
+    }
 }

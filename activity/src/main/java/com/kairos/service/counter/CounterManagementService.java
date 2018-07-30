@@ -176,8 +176,9 @@ public class CounterManagementService extends MongoBaseService{
         return orgTypeKPIEntries.parallelStream().map(entry -> entry.getKpiId()).collect(Collectors.toList());
     }
 
-    public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf){
+    public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf,Long countryId){
         List<OrgTypeKPIEntry> entries = counterRepository.getOrgTypeKPIConfigurationByOrgTypeId(orgTypeKPIConf.getOrgTypeIds());
+        List<KPIAssignment> kpiAssignments=counterRepository.getKPIAssignmentsByKPIId(orgTypeKPIConf.getKpiIds(),countryId);
         Map<Long, Map<BigInteger, BigInteger>> orgTypeKPIMap = new HashMap<>();
         List<OrgTypeKPIEntry> entriesToSave = new ArrayList<>();
         orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId -> {
