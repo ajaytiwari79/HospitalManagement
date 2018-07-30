@@ -21,9 +21,9 @@ import java.util.Date;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DailyPayOutEntryServiceTest {
+public class PayOutServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(DailyPayOutEntryServiceTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(PayOutServiceTest.class);
 
     @Inject
     PayOutCalculationService payOutCalculationService;

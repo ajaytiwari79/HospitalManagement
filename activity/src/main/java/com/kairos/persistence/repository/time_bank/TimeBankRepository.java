@@ -16,7 +16,7 @@ import java.util.List;
 * */
 
 @Repository
-public interface TimeBankMongoRepository extends MongoBaseRepository<DailyTimeBankEntry,BigInteger> {
+public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEntry,BigInteger> ,CustomTimeBankRepository{
 
     @Query("{unitPositionId:{$in:?0},date:{$gte:?1 , $lte:?2}}")
     List<DailyTimeBankEntry> findAllByUnitPositionsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);

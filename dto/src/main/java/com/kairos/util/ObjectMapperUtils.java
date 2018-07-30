@@ -1,8 +1,12 @@
 package com.kairos.util;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
@@ -16,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter.serializeAllExcept;
 import static java.time.format.DateTimeFormatter.ofPattern;
 
 /**
@@ -93,16 +98,20 @@ public class ObjectMapperUtils {
 
 
 
-    public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object,Class<T> valueType){
+    public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object,Class<T> valueType,String... fields){
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         JavaTimeModule javaTimeModule = new JavaTimeModule();
+        SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept(fields);
+        FilterProvider filters = new SimpleFilterProvider().addFilter("PropertyFilterMixIn", theFilter);
         javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
         objectMapper.registerModule(javaTimeModule);
         //objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         try {
-            return objectMapper.readValue(objectMapper.writeValueAsString(object), valueType);
+            //writer(filters).
+            String json = objectMapper.writeValueAsString(object);
+            return objectMapper.readValue(json, valueType);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -160,4 +169,8 @@ public class ObjectMapperUtils {
      public static void copyPropertiesUsingBeanUtils(Object source,Object destination,String ...ignoreProperties) {
               BeanUtils.copyProperties(source,destination,ignoreProperties);
         }
+
+
+    @JsonFilter("JSON_FILTER")
+    class PropertyFilterMixIn {}
 }

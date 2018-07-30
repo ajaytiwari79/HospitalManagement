@@ -17,172 +17,29 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PayOutDTO {
 
-    private Long unitPositionId;
-    private Long staffId;
-    private int workingDaysInWeek;
-    private int totalWeeklyMin;
     private Date startDate;
     private Date endDate;
-    private Long unitId;
-    private String query;
-
-    private int totalPayOutAfterCtaMin;
-    private int totalPayOutBeforeCtaMin;
-    private int totalScheduledMin;
-    private int totalPayOutMin;
-    private int totalContractedMin;
-    private int totalPayOutMinLimit;
-    private int totalPayOutMaxLimit;
-    private int totalPayOutInPercent = 10;
-    private int totalPayOutDiff;
+    //In minutes
+    private long totalPayOutAfterCtaMin;
+    private long totalPayOutBeforeCtaMin;
+    private long payOutChange;
 
     //Distributed min on the basis of Interval;
     private List<PayOutIntervalDTO> timeIntervals = new ArrayList<>();
-    private List<PayOutCTADistributionDTO> payOutDistributions = new ArrayList<>();
-    private ScheduleTimeByTimeTypeDTO workingTimeType;
-    private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
-    private UnitPositionWithCtaDetailsDTO costTimeAgreement;
+    private PayOutCTADistributionDTO payOutDistribution;
 
-    private List<PayOutIntervalDTO> weeklyIntervalsPayOut;
-    private List<PayOutIntervalDTO> monthlyIntervalsPayOut;
-
-    public PayOutDTO(Long unitPositionId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
-     {
-        this.unitPositionId = unitPositionId;
-        this.staffId = staffId;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.totalWeeklyMin = totalWeeklyMins;
-    }
-
-    public int getTotalPayOutDiff() {
-        return totalPayOutDiff;
-    }
-
-    public void setTotalPayOutDiff(int totalPayOutDiff) {
-        this.totalPayOutDiff = totalPayOutDiff;
-    }
-
-    public int getTotalPayOutInPercent() {
-        return totalPayOutInPercent;
-    }
-
-    public void setTotalPayOutInPercent(int totalPayOutInPercent) {
-        this.totalPayOutInPercent = totalPayOutInPercent;
-    }
-
-    public int getTotalPayOutMinLimit() {
-        return totalPayOutMinLimit;
-    }
-
-    public void setTotalPayOutMinLimit(int totalPayOutMinLimit) {
-        this.totalPayOutMinLimit = totalPayOutMinLimit;
-    }
-
-    public int getTotalPayOutMaxLimit() {
-        return totalPayOutMaxLimit;
-    }
-
-    public void setTotalPayOutMaxLimit(int totalPayOutMaxLimit) {
-        this.totalPayOutMaxLimit = totalPayOutMaxLimit;
-    }
-
-    public List<PayOutIntervalDTO> getWeeklyIntervalsPayOut() {
-        return weeklyIntervalsPayOut;
-    }
-
-    public void setWeeklyIntervalsPayOut(List<PayOutIntervalDTO> weeklyIntervalsPayOut) {
-        this.weeklyIntervalsPayOut = weeklyIntervalsPayOut;
-    }
-
-    public List<PayOutIntervalDTO> getMonthlyIntervalsPayOut() {
-        return monthlyIntervalsPayOut;
-    }
-
-    public void setMonthlyIntervalsPayOut(List<PayOutIntervalDTO> monthlyIntervalsPayOut) {
-        this.monthlyIntervalsPayOut = monthlyIntervalsPayOut;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
-    }
-
-    public UnitPositionWithCtaDetailsDTO getCostTimeAgreement() {
-        return costTimeAgreement;
-    }
-
-    public void setCostTimeAgreement(UnitPositionWithCtaDetailsDTO costTimeAgreement) {
-        this.costTimeAgreement = costTimeAgreement;
-    }
-
-    public List<PayOutCTADistributionDTO> getPayOutDistributions() {
-        return payOutDistributions;
-    }
-
-    public void setPayOutDistributions(List<PayOutCTADistributionDTO> payOutDistributions) {
-        this.payOutDistributions = payOutDistributions;
-    }
 
     public PayOutDTO() {
     }
 
-    public ScheduleTimeByTimeTypeDTO getWorkingTimeType() {
-        return workingTimeType;
-    }
-
-    public void setWorkingTimeType(ScheduleTimeByTimeTypeDTO workingTimeType) {
-        this.workingTimeType = workingTimeType;
-    }
-
-    public ScheduleTimeByTimeTypeDTO getNonWorkingTimeType() {
-        return nonWorkingTimeType;
-    }
-
-    public void setNonWorkingTimeType(ScheduleTimeByTimeTypeDTO nonWorkingTimeType) {
-        this.nonWorkingTimeType = nonWorkingTimeType;
-    }
-
-    public int getTotalPayOutAfterCtaMin() {
-        return totalPayOutAfterCtaMin;
-    }
-
-    public void setTotalPayOutAfterCtaMin(int totalPayOutAfterCtaMin) {
+    public PayOutDTO(Date startDate, Date endDate, long totalPayOutAfterCtaMin, long totalPayOutBeforeCtaMin,long payOutChange, List<PayOutIntervalDTO> timeIntervals, PayOutCTADistributionDTO payOutDistribution) {
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.totalPayOutAfterCtaMin = totalPayOutAfterCtaMin;
-    }
-
-    public int getTotalPayOutBeforeCtaMin() {
-        return totalPayOutBeforeCtaMin;
-    }
-
-    public void setTotalPayOutBeforeCtaMin(int totalPayOutBeforeCtaMin) {
         this.totalPayOutBeforeCtaMin = totalPayOutBeforeCtaMin;
-    }
-
-    public int getTotalScheduledMin() {
-        return totalScheduledMin;
-    }
-
-    public void setTotalScheduledMin(int totalScheduledMin) {
-        this.totalScheduledMin = totalScheduledMin;
-    }
-
-    public int getTotalPayOutMin() {
-        return totalPayOutMin;
-    }
-
-    public void setTotalPayOutMin(int totalPayOutMin) {
-        this.totalPayOutMin = totalPayOutMin;
-    }
-
-    public int getTotalContractedMin() {
-        return totalContractedMin;
-    }
-
-    public void setTotalContractedMin(int totalContractedMin) {
-        this.totalContractedMin = totalContractedMin;
+        this.payOutChange = payOutChange;
+        this.timeIntervals = timeIntervals;
+        this.payOutDistribution = payOutDistribution;
     }
 
     public Date getStartDate() {
@@ -201,13 +58,30 @@ public class PayOutDTO {
         this.endDate = endDate;
     }
 
-    public Long getUnitId() {
-        return unitId;
+    public long getTotalPayOutAfterCtaMin() {
+        return totalPayOutAfterCtaMin;
     }
 
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
+    public void setTotalPayOutAfterCtaMin(long totalPayOutAfterCtaMin) {
+        this.totalPayOutAfterCtaMin = totalPayOutAfterCtaMin;
     }
+
+    public long getTotalPayOutBeforeCtaMin() {
+        return totalPayOutBeforeCtaMin;
+    }
+
+    public void setTotalPayOutBeforeCtaMin(long totalPayOutBeforeCtaMin) {
+        this.totalPayOutBeforeCtaMin = totalPayOutBeforeCtaMin;
+    }
+
+    public long getPayOutChange() {
+        return payOutChange;
+    }
+
+    public void setPayOutChange(long payOutChange) {
+        this.payOutChange = payOutChange;
+    }
+
 
     public List<PayOutIntervalDTO> getTimeIntervals() {
         return timeIntervals;
@@ -217,37 +91,11 @@ public class PayOutDTO {
         this.timeIntervals = timeIntervals;
     }
 
-    public int getWorkingDaysInWeek() {
-        return workingDaysInWeek;
+    public PayOutCTADistributionDTO getPayOutDistribution() {
+        return payOutDistribution;
     }
 
-    public void setWorkingDaysInWeek(int workingDaysInWeek) {
-        this.workingDaysInWeek = workingDaysInWeek;
-    }
-
-
-    public int getTotalWeeklyMin() {
-        return totalWeeklyMin;
-    }
-
-    public void setTotalWeeklyMin(int totalWeeklyMin) {
-        this.totalWeeklyMin = totalWeeklyMin;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-
-    public Long getUnitPositionId() {
-        return unitPositionId;
-    }
-
-    public void setUnitPositionId(Long unitPositionId) {
-        this.unitPositionId = unitPositionId;
+    public void setPayOutDistribution(PayOutCTADistributionDTO payOutDistribution) {
+        this.payOutDistribution = payOutDistribution;
     }
 }
