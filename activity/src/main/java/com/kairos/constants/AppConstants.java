@@ -268,6 +268,8 @@ public class AppConstants {
     public static final String EXTRA_TIME="Extra Time";
     public static final String OVER_TIME="Overtime";
 
+    //for Planning period name
+    public static final String DATE_FORMET_STRING="dd.MMM.yyyy";
     //Phases
     public static final String REALTIME="REALTIME";
     public static final String TIME_AND_ATTENDANCE="TIME & ATTENDANCE";
