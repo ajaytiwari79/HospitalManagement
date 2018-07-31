@@ -18,10 +18,6 @@ public class ShiftPublishDTO {
         //default
     }
 
-    public <T> ShiftPublishDTO(List<BigInteger> shifts, Set<T> singleton) {
-    }
-
-
     public List<BigInteger> getShiftIds() {
         return shiftIds;
     }

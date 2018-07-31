@@ -728,6 +728,9 @@ public class ExpertiseService extends UserBaseService {
 
     public List<ExpertisePlannedTimeQueryResult> getPlannedTimeInExpertise(Long expertiseId) {
         Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
+        if (!expertise.isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
+        }
         return expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
     }
 
