@@ -121,7 +121,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 				.build();
 		return template;
 	}
-    @Profile("local")
+    @Profile({"local", "test"})
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
@@ -131,7 +131,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
                 .build();
         return template;
     }
-    @Profile("local")
+    @Profile({"local", "test"})
     @Bean(name ="schedulerRestTemplate")
     public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder

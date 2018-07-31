@@ -310,6 +310,7 @@ public class SchedulerPanelService extends MongoBaseService {
             SchedulerPanel panel = panelOptional.get();
             dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
             panel.setActive(false);
+            panel.setDeleted(true);
             schedulerPanelRepository.save(panel);
             return true;
         }catch (Exception exception){

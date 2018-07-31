@@ -773,7 +773,7 @@ public class EmploymentService extends UserBaseService {
     }
 
     
-    public void moveToReadOnlyAccessGroup(List<Long> employmentIds) {
+    public boolean moveToReadOnlyAccessGroup(List<Long> employmentIds) {
         Long curDateMillisStart = DateUtil.getStartOfDay(DateUtil.getCurrentDate()).getTime();
         Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
         List<UnitPermission> unitPermissions;
@@ -814,6 +814,7 @@ public class EmploymentService extends UserBaseService {
         if(expiredEmploymentsQueryResults.size()>0) {
             employmentGraphRepository.saveAll(employments);
         }
+        return true;
     }
 
     public Employment updateEmploymentEndDate(Organization unit, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) {

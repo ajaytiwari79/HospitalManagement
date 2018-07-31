@@ -503,7 +503,7 @@ public class DateUtils {
         switch (durationType) {
             // Add case for Month, Year etc
             case DAYS: {
-                return ChronoUnit.DAYS.between(endDate, startDate);
+                return ChronoUnit.DAYS.between(startDate,endDate);
             }
             default:
                 return null;

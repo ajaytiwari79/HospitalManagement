@@ -9,7 +9,7 @@ import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.shift.BreakPaymentSetting;
-import com.kairos.enums.shift.ShiftState;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.Shift;
@@ -27,7 +27,7 @@ import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.activity.ShiftMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
@@ -35,7 +35,7 @@ import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
-import com.kairos.persistence.repository.time_bank.TimeBankMongoRepository;
+import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
@@ -82,10 +82,7 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
@@ -121,7 +118,7 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private TimeBankService timeBankService;
     @Inject
-    private TimeBankMongoRepository timeBankMongoRepository;
+    private TimeBankRepository timeBankRepository;
     @Inject
     private PayOutService payOutService;
     @Inject
@@ -231,13 +228,13 @@ public class ShiftService extends MongoBaseService {
         ShiftQueryResult shiftQueryResult = mainShift.getShiftQueryResult();
         shiftQueryResult.setSubShifts(shiftQueryResults);
         timeBankService.saveTimeBank(staffAdditionalInfoDTO, mainShift);
-        payOutService.savePayOut(mainShift.getUnitPositionId(), mainShift);
+        payOutService.savePayOut(staffAdditionalInfoDTO, mainShift,activity);
 
         shiftQueryResult.setTimeType(timeType);
         //anil m2 notify event for updating staffing level
-        boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
+        boolean isShiftForPresence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
         if (timeType.equals(TimeTypes.WORKING_TYPE.toString())) {
-            applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, mainShift, false, null, isShiftForPreence));
+            applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, mainShift, false, null, isShiftForPresence));
         }
         return shiftQueryResult;
     }
@@ -390,7 +387,7 @@ public class ShiftService extends MongoBaseService {
             shifts.add(getShiftObject(mainShift, breakActivity.getName(), breakActivity.getId(), new Date(startDateMillis), new Date(endDateMillis), allowedBreakDurationInMinute));
 
 
-        } else if (shiftDurationInMinute > 0 && shiftDurationInMinute <= breakAllowedAfterMinute && BREAK.equals(lastItemAdded )) {
+        } else if (shiftDurationInMinute > 0 && shiftDurationInMinute <= breakAllowedAfterMinute && BREAK.equals(lastItemAdded)) {
             startDateMillis = endDateMillis;
             endDateMillis = startDateMillis + (shiftDurationInMinute * ONE_MINUTE);
             shifts.add(getShiftObject(mainShift, mainShift.getName(), mainShift.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
@@ -435,7 +432,7 @@ public class ShiftService extends MongoBaseService {
         }
         save(shifts);
         timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shifts);
-        payOutService.savePayOuts(staffAdditionalInfoDTO.getUnitPosition().getId(), shifts);
+        payOutService.savePayOuts(staffAdditionalInfoDTO, shifts,Arrays.asList(activity));
         shifts.stream().forEach(s -> shiftQueryResults.add(s.getShiftQueryResult()));
         return shiftQueryResults;
     }
@@ -448,8 +445,8 @@ public class ShiftService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getId());
         }
 
-        if (shift.getShiftState().equals(ShiftState.FIXED) || shift.getShiftState().equals(ShiftState.PUBLISHED) || shift.getShiftState().equals(ShiftState.LOCKED)) {
-            exceptionService.actionNotPermittedException("message.shift.state.update", shift.getShiftState());
+        if (shift.getStatus().contains(ShiftStatus.FIXED) || shift.getStatus().contains(ShiftStatus.PUBLISHED) || shift.getStatus().contains(ShiftStatus.LOCKED)) {
+            exceptionService.actionNotPermittedException("message.shift.state.update", shift.getStatus());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
         WTAQueryResultDTO wtaResponseDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
@@ -477,7 +474,7 @@ public class ShiftService extends MongoBaseService {
         timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
         save(shift);
         timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
-        payOutService.savePayOut(shift.getUnitPositionId(), shift);
+        payOutService.updatePayOut(staffAdditionalInfoDTO, shift,activity);
         Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
         //anil m2 notify event for updating staffing level
         boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
@@ -538,8 +535,8 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(shift).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftId);
         }
-        if (!shift.getShiftState().equals(ShiftState.UNPUBLISHED)) {
-            exceptionService.actionNotPermittedException("message.shift.delete", shift.getShiftState());
+        if (!shift.getStatus().contains(ShiftStatus.UNPUBLISHED)) {
+            exceptionService.actionNotPermittedException("message.shift.delete", shift.getStatus());
         }
         Activity activity = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId());
@@ -558,7 +555,7 @@ public class ShiftService extends MongoBaseService {
         shift.setDeleted(true);
         save(shift);
         timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
-        payOutService.savePayOut(shift.getUnitPositionId(), shift);
+        payOutService.deletePayOut(shift.getId());
 
         boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
         applicationContext.publishEvent(new ShiftNotificationEvent(shift.getUnitId(), DateUtils.onlyDate(shift.getStartDate()), shift,
@@ -609,7 +606,11 @@ public class ShiftService extends MongoBaseService {
         //.and(wtaRulesSpecification);
         List<String> messages = activitySpecification.isSatisfiedString(shift);
         if (!messages.isEmpty()) {
-            exceptionService.actionNotPermittedException(messages.get(0));
+            List<String> errors = new ArrayList<>();
+            messages.forEach(responseMessage -> {
+                errors.add(responseMessage);
+            });
+            exceptionService.actionNotPermittedException(errors.get(0),errors.size()==2 ? errors.get(1) : "");
         }
         // updateWTACounter(ruleTemplateSpecificInfo, staffAdditionalInfoDTO);
         //TODO Pradeep will look into dayType
@@ -625,10 +626,13 @@ public class ShiftService extends MongoBaseService {
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
         logger.info("Current phase is " + phase.getName() + " for date " + new DateTime(shift.getStartDate()));
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), DateUtils.asLocalDate(shift.getStartDate()));
+        if(planningPeriod==null){
+            exceptionService.actionNotPermittedException("message.shift.planning.period.exit",shift.getStartDate());
+        }
         List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()), phase.getName());
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates());
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.getDateByZonedDateTime(intervalByRuleTemplates.getStart()), DateUtils.getDateByZonedDateTime(intervalByRuleTemplates.getEnd()));
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankMongoRepository.findAllByUnitPositionAndBeforeDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndBeforeDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(sc -> sc.getRuleTemplateId(), sc -> sc.getCount()));
         Interval interval = new Interval(staffAdditionalInfoDTO.getUnitPosition().getStartDateMillis(), staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis() == null ? shift.getEndDate().getTime() : staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis());
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes(), staffAdditionalInfoDTO.getUnitPosition().getWorkingDaysInWeek(), DateUtils.asLocalDate(new Date(staffAdditionalInfoDTO.getUnitPosition().getStartDateMillis())), staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis() != null ? DateUtils.asLocalDate(new Date(staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis())) : null);
@@ -650,8 +654,6 @@ public class ShiftService extends MongoBaseService {
     }
 
     private void validateStaffingLevel(Shift shift, Activity activity, boolean checkOverStaffing, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-
-
         if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
             Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
             PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
@@ -762,7 +764,7 @@ public class ShiftService extends MongoBaseService {
             shiftQueryResult = geSubShiftResponse(shift, shifts);
         }
         timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
-        payOutService.savePayOut(shift.getUnitPositionId(), shift);
+        payOutService.savePayOut(staffAdditionalInfoDTO, shift,activity);
         shiftQueryResult.setTimeType(activityWrapper.getTimeType());
         return shiftQueryResult;
     }
@@ -778,7 +780,7 @@ public class ShiftService extends MongoBaseService {
 
         for (int i = 0; i < shiftDTO.getSubShifts().size(); i++) {
             ShiftDTO subShifts = shiftDTO.getSubShifts().get(i);
-            CompositeActivity compositeActivity= compositeActivityMap.get(subShifts.getActivityId());
+            CompositeActivity compositeActivity = compositeActivityMap.get(subShifts.getActivityId());
             if (i == 0) {
                 if ((!parentShiftStartDateTime.equals(subShifts.getStartDate())) || (parentShiftEndDateTime.before(subShifts.getEndDate()))) {
                     logger.info("start " + parentShiftStartDateTime + "-" + subShifts.getStartDate()
@@ -786,8 +788,8 @@ public class ShiftService extends MongoBaseService {
                     exceptionService.invalidRequestException("message.shift.date.startandend.incorrect", (i - 1));
                 }
 
-                if(compositeActivity!=null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedBefore()) {
-                    exceptionService.invalidRequestException("message.shift.notAllowedBefore",subShifts.getName(),activity.getName());
+                if (compositeActivity != null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedBefore()) {
+                    exceptionService.invalidRequestException("message.shift.notAllowedBefore", subShifts.getName(), activity.getName());
                 }
 
 
@@ -797,8 +799,8 @@ public class ShiftService extends MongoBaseService {
                             + "end " + (parentShiftEndDateTime) + "-" + subShifts.getEndDate() + "shift data");
                     exceptionService.invalidRequestException("message.shift.date.startandend.incorrect", (i - 1));
                 }
-                if(compositeActivity!=null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedAfter()) {
-                    exceptionService.invalidRequestException("message.shift.notAllowedAfter",subShifts.getName(),activity.getName());
+                if (compositeActivity != null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedAfter()) {
+                    exceptionService.invalidRequestException("message.shift.notAllowedAfter", subShifts.getName(), activity.getName());
                 }
             }
             // making the calculating the previous  object as parent
@@ -818,8 +820,8 @@ public class ShiftService extends MongoBaseService {
         List<ShiftDTO> subShiftDTOS = shiftDTO.getSubShifts();
 
         Set<BigInteger> activityIds = subShiftDTOS.parallelStream()
-                .filter(act->!(act.getName().equalsIgnoreCase(PAID_BREAK) || act.getName().equalsIgnoreCase(UNPAID_BREAK)))
-                .map(act->act.getActivityId())
+                .filter(act -> !(act.getName().equalsIgnoreCase(PAID_BREAK) || act.getName().equalsIgnoreCase(UNPAID_BREAK)))
+                .map(act -> act.getActivityId())
                 .collect(Collectors.toSet());
 
         Set<BigInteger> allowedActivities = activity.getCompositeActivities().stream().map(CompositeActivity::getActivityId).collect(Collectors.toSet());
@@ -827,10 +829,12 @@ public class ShiftService extends MongoBaseService {
         if (!allowedActivities.containsAll(activityIds)) {
             exceptionService.invalidRequestException("message.activity.multishift");
         }
-
+        List<Activity> activities=activityRepository.findAllActivitiesByIds(activityIds);
+        Map<BigInteger,String> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,Activity::getName));
         List<Shift> shifts = new ArrayList<>(shiftDTO.getSubShifts().size());
         for (int i = 0; i < shiftDTO.getSubShifts().size(); i++) {
             Shift subShifts = buildShift(shiftDTO.getSubShifts().get(i));
+            subShifts.setName(activityMap.get(shiftDTO.getSubShifts().get(i).getActivityId()));
             subShifts.setMainShift(false);
             shifts.add(subShifts);
         }
@@ -969,27 +973,33 @@ public class ShiftService extends MongoBaseService {
         return activityChangeStatus;
     }
 
-    public Map<String, List<BigInteger>> publishShifts(ShiftPublishDTO shiftPublishDTO) {
-        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftPublishDTO.getShiftIds());
+    public Map<String, List<ShiftResponse>> updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
 
-        List<BigInteger> success = new ArrayList<>();
-        List<BigInteger> error = new ArrayList<>();
-        Map<String, List<BigInteger>> response = new HashMap<>();
+        List<ShiftResponse> success = new ArrayList<>();
+        List<ShiftResponse> error = new ArrayList<>();
+        Map<String, List<ShiftResponse>> response = new HashMap<>();
         response.put("success", success);
         response.put("error", error);
-        if (!shifts.isEmpty()) {
-            shifts.forEach(shift -> {
-                if (!shift.isDeleted()) {
-                    shift.setShiftState(shiftPublishDTO.getShiftState());
-                    success.add(shift.getId());
-                } else {
-                    error.add(shift.getId());
 
+        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftPublishDTO.getShiftIds());
+        if (!shifts.isEmpty()) {
+            Set<LocalDate> dates = shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
+            Map<LocalDate, List<ShiftStatus>> phaseListByDate = phaseService.getStatusByDates(unitId, dates);
+            for (Shift shift : shifts) {
+                List<ShiftStatus> phaseStatuses = phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
+                if (phaseStatuses.containsAll(shiftPublishDTO.getStatus())) {
+                    shift.getStatus().addAll(shiftPublishDTO.getStatus());
+                    success.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("message.shift.status.added")), true));
+                } else {
+
+                    List<Object> errorMessages = new ArrayList<>();
+                    errorMessages.addAll(shiftPublishDTO.getStatus());
+                    errorMessages.addAll(phaseStatuses);
+                    error.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("error.shift.status", errorMessages.toArray())), false));
                 }
-            });
+            }
             save(shifts);
         }
-
         return response;
     }
 
@@ -1013,10 +1023,10 @@ public class ShiftService extends MongoBaseService {
             openShiftResponseDTOS.add(openShiftResponseDTO);
         });
         List<AccessGroupRole> roles = new ArrayList<>();
-        if (userAccessRoleDTO.getManagement()) {
+        if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getManagement()) {
             roles.add(AccessGroupRole.MANAGEMENT);
         }
-        if (userAccessRoleDTO.getStaff()) {
+        if (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff()) {
             roles.add(AccessGroupRole.STAFF);
         }
         StaffAccessRoleDTO staffAccessRoleDTO = new StaffAccessRoleDTO(userAccessRoleDTO.getStaffId(), roles);
@@ -1109,7 +1119,7 @@ public class ShiftService extends MongoBaseService {
 
             Shift copiedShift = new Shift(sourceShift.getName(), DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(sourceShift.getStartDate())), DateUtils.getDateByLocalDateAndLocalTime(shiftCreationFirstDate, DateUtils.asLocalTime(sourceShift.getEndDate())),
                     sourceShift.getRemarks(), sourceShift.getActivityId(), staffUnitPosition.getStaff().getId(), sourceShift.getPhase(), sourceShift.getUnitId(),
-                    sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.isMainShift(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getShiftState(), sourceShift.getParentOpenShiftId(), sourceShift.getAllowedBreakDurationInMinute(), sourceShift.getId());
+                    sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.isMainShift(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getStatus(), sourceShift.getParentOpenShiftId(), sourceShift.getAllowedBreakDurationInMinute(), sourceShift.getId());
             if (activity.getRulesActivityTab().isBreakAllowed()) {
 
                 List<ShiftQueryResult> shiftQueryResults = addBreakInShifts(copiedShift, breakActivity, breakSettings, shiftDurationInMinute);
@@ -1142,7 +1152,7 @@ public class ShiftService extends MongoBaseService {
     private Shift getShiftObject(Shift shift, String name, BigInteger activityId, Date startDate, Date endDate, Long allowedBreakDurationInMinute) {
         Shift childShift = new Shift(null, name, startDate, endDate, shift.getBid(), shift.getpId(), shift.getBonusTimeBank()
                 , shift.getAmount(), shift.getProbability(), shift.getAccumulatedTimeBankInMinutes(), shift.getRemarks(), activityId, shift.getStaffId(), shift.getUnitId(), shift.getUnitPositionId());
-        childShift.setShiftState(ShiftState.UNPUBLISHED);
+        childShift.setStatus(Collections.singleton(ShiftStatus.UNPUBLISHED));
         childShift.setMainShift(false);
         childShift.setAllowedBreakDurationInMinute(allowedBreakDurationInMinute);
         return childShift;
@@ -1205,7 +1215,7 @@ public class ShiftService extends MongoBaseService {
                 shiftDTO.getProbability(), shiftDTO.getAccumulatedTimeBankInMinutes(), shiftDTO.getRemarks(), shiftDTO.getActivityId(), shiftDTO.getStaffId(), shiftDTO.getUnitId(), shiftDTO.getUnitPositionId());
         shift.setDurationMinutes(shiftDTO.getDurationMinutes());
         shift.setScheduledMinutes(shiftDTO.getScheduledMinutes());
-        shift.setShiftState(ShiftState.UNPUBLISHED);
+        shift.setStatus(Collections.singleton(ShiftStatus.UNPUBLISHED));
         shift.setAllowedBreakDurationInMinute(shiftDTO.getAllowedBreakDurationInMinute());
         return shift;
     }
@@ -1216,7 +1226,7 @@ public class ShiftService extends MongoBaseService {
                 shiftDTO.getProbability(), shiftDTO.getAccumulatedTimeBankInMinutes(), shiftDTO.getRemarks(), shiftDTO.getActivityId(), shiftDTO.getStaffId(), shiftDTO.getUnitPositionId(), shiftDTO.getUnitId(), activity);
         shiftWithActivityDTO.setDurationMinutes(shiftDTO.getDurationMinutes());
         shiftWithActivityDTO.setScheduledMinutes(shiftDTO.getScheduledMinutes());
-        shiftWithActivityDTO.setShiftState(ShiftState.UNPUBLISHED);
+        shiftWithActivityDTO.setStatus(Arrays.asList(ShiftStatus.UNPUBLISHED));
         return shiftWithActivityDTO;
     }
 
@@ -1249,7 +1259,7 @@ public class ShiftService extends MongoBaseService {
         });
     }
 
-    public void deleteShiftsAndOpenShiftsOnEmploymentEnd(Long staffId, LocalDateTime employmentEndDate,Long unitId) {
+    public void deleteShiftsAndOpenShiftsOnEmploymentEnd(Long staffId, LocalDateTime employmentEndDate, Long unitId) {
 
         shiftMongoRepository.deleteShiftsAfterDate(staffId,employmentEndDate);
         List<OpenShift> openShifts = openShiftMongoRepository.findAllOpenShiftsByInterestedStaff(staffId,employmentEndDate);
