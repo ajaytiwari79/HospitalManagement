@@ -101,6 +101,7 @@ public class MasterAssetService extends MongoBaseService {
         exists.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
         exists.setName(masterAssetDto.getName());
         exists.setAssetType(masterAssetDto.getAssetTypeId());
+        exists.setAssetSubTypes(masterAssetDto.getAssetSubTypes());
         exists.setDescription(masterAssetDto.getDescription());
         masterAssetMongoRepository.save(sequenceGenerator(exists));
         return exists;

@@ -190,9 +190,6 @@ public class CustomAggregationQuery {
     }
 
 
-
-
-
     public static String assetProjectionWithMetaData() {
         return " {" +
                 "'$project':{" +
