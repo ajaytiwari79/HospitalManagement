@@ -1,0 +1,86 @@
+buildscript {
+    ext {
+        springBootVersion = '2.0.2.RELEASE'
+        swaggerVersion = '2.5.0'
+        jacksonVersion = '2.9.2'
+        projectVersion = "0.0.1"
+        version = "0.0.1"
+    }
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://repo.spring.io/milestone" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+//group 'scheduler-microservice'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'application'
+
+version = "$projectVersion-SNAPSHOT"
+
+
+sourceCompatibility = 1.8
+mainClassName = 'com.kairos.scheduler.config.app.SchedulerAppConfig'
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+
+task wrapper(type: Wrapper) { gradleVersion = '4.1' }
+
+ext {
+    springCloudVersion = 'Finchley.M8'
+}
+
+dependencies {
+    compile project(':dto')
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-starter-aop') //c
+    compile('org.springframework.boot:spring-boot-starter-cache') //c
+    compile group: 'javax.inject', name: 'javax.inject', version: '1'
+
+    compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+    compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
+
+
+    compile('org.slf4j:slf4j-api:1.7.7')
+    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+
+    compile('org.springframework.cloud:spring-cloud-starter-oauth2')//c
+    compile('org.springframework.cloud:spring-cloud-starter-security')//c
+    compile group: 'org.springframework.ws', name: 'spring-ws-core', version: '3.0.0.RELEASE'//c
+
+    compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'//c
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion//c
+    compile group: 'org.json', name: 'json', version: '20160810'//c
+    compile "io.springfox:springfox-swagger2:${swaggerVersion}"//c
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggerVersion//c
+       compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'//c
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
+    compile 'org.springframework.kafka:spring-kafka:2.1.7.RELEASE'
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')//c
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}

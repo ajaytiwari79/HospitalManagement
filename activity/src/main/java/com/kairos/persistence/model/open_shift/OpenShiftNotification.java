@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.open_shift;
 
+import com.kairos.enums.open_shift.OpenShiftResponseStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -7,7 +8,7 @@ import java.math.BigInteger;
 public class OpenShiftNotification extends MongoBaseEntity {
     private BigInteger openShiftId;
     private Long staffId;
-    private boolean response;
+    private OpenShiftResponseStatus responseStatus;
 
     public OpenShiftNotification() {
         //Default Constructor
@@ -33,12 +34,13 @@ public class OpenShiftNotification extends MongoBaseEntity {
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
-
-    public boolean isResponse() {
-        return response;
+    public OpenShiftResponseStatus getResponseStatus() {
+        return responseStatus;
     }
 
-    public void setResponse(boolean response) {
-        this.response = response;
+    public void setResponseStatus(OpenShiftResponseStatus responseStatus) {
+        this.responseStatus = responseStatus;
     }
+
+
 }

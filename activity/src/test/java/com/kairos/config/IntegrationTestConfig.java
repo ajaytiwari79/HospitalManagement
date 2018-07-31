@@ -27,7 +27,6 @@ public class IntegrationTestConfig {
     @Value("${spring.test.authorization}")
     private String authorization ;
 
-    @Profile({"test"})
     @Bean
     @Primary
     public TestRestTemplate getTestRestTemplate(RestTemplateBuilder restTemplateBuilder) {

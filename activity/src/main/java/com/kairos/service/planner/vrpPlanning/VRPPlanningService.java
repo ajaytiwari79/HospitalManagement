@@ -7,7 +7,7 @@ import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.enums.solver_config.SolverConfigStatus;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.solver_config.SolverConfig;
-import com.kairos.persistence.repository.activity.ShiftMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.solver_config.ConstraintRepository;
 import com.kairos.persistence.repository.solver_config.SolverConfigRepository;

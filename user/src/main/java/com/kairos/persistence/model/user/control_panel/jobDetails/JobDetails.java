@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.user.control_panel.jobDetails;
+import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.common.UserBaseEntity;
+
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import java.util.Date;
@@ -13,11 +15,17 @@ public class JobDetails extends UserBaseEntity {
     private Long controlPanelId;
     private Date started;
     private Date stopped;
-    private String result;
+    private Result result;
     private String processName;
     private String name;
     private String log;
 
+    public Result getResult() {
+        return result;
+    }
+    public void setResult(Result result) {
+        this.result = result;
+    }
     public Long getControlPanelId() {
         return controlPanelId;
     }
@@ -59,13 +67,6 @@ public class JobDetails extends UserBaseEntity {
         this.stopped = stopped;
     }
 
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
 
     public String getLog() {
         return log;

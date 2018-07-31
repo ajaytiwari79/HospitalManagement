@@ -17,7 +17,10 @@ public class ShiftPublishDTO {
         //default
     }
 
-
+    public ShiftPublishDTO(List<BigInteger> shiftIds, List<ShiftStatus> status) {
+        this.shiftIds = shiftIds;
+        this.status = status;
+    }
 
     public List<BigInteger> getShiftIds() {
         return shiftIds;
