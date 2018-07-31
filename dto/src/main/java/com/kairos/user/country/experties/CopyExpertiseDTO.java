@@ -1,11 +1,13 @@
 package com.kairos.user.country.experties;
 
 import com.kairos.enums.shift.BreakPaymentSetting;
+import com.kairos.user.country.pay_table.FutureDate;
 import com.kairos.util.date_validator.FutureLocalDate;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +40,10 @@ public class CopyExpertiseDTO {
     @NotNull(message = "Please select payment type")
     private BreakPaymentSetting breakPaymentSetting;
     private Long parentId;
+    // TODO REMOVE FOR FE compactibility
+    private Long startDateMillis;
+    private Long endDateMillis;
+
     public CopyExpertiseDTO() {
         // DC
     }
@@ -152,6 +158,22 @@ public class CopyExpertiseDTO {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public Long getStartDateMillis() {
+        return startDateMillis;
+    }
+
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
+    }
+
+    public Long getEndDateMillis() {
+        return endDateMillis;
+    }
+
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public CopyExpertiseDTO(@NotBlank(message = "Expertise name is required") String name, LocalDate startDate, LocalDate endDate, String description, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Set<Long> organizationServiceIds, @NotNull(message = "union can not be null") Long unionId, Integer fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, List<SeniorityLevelDTO> seniorityLevels, @NotNull(message = "Please select payment type") BreakPaymentSetting breakPaymentSetting) {
