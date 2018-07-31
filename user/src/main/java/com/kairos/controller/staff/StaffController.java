@@ -39,10 +39,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.QueryParam;
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -685,6 +682,15 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getStaffByUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByUnit(unitId));
     }
+
+    @PostMapping(value = "/default_data_for_activity_setting")
+    @ApiOperation("get staff by unit")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForActivitySettings(@PathVariable Long unitId,@RequestBody Set<Long> staffIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getDefaultDataForActivitySettings(unitId,staffIds));
+    }
+
+
 
 
 

@@ -85,10 +85,7 @@ import com.kairos.user.employment.employment_dto.EmploymentOverlapDTO;
 import com.kairos.user.employment.employment_dto.MainEmploymentResultDTO;
 import com.kairos.user.staff.StaffWithSkillDTO;
 import com.kairos.user.staff.client.ClientStaffInfoDTO;
-import com.kairos.user.staff.staff.StaffChatDetails;
-import com.kairos.user.staff.staff.StaffCreationDTO;
-import com.kairos.user.staff.staff.StaffDTO;
-import com.kairos.user.staff.staff.StaffPreferencesDTO;
+import com.kairos.user.staff.staff.*;
 import com.kairos.user.user.password.PasswordUpdateDTO;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.util.*;
@@ -2159,5 +2156,12 @@ public class StaffService extends UserBaseService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
 
     }
+
+    public List<StaffExpertiseWrapper> getDefaultDataForActivitySettings(Long unitId,Set<Long> staffIds) {
+        List<StaffExpertiseWrapperQueryResult> expertiseWrapperQueryResults=staffExpertiseRelationShipGraphRepository.getAllExpertiseIdsByStaffIds(staffIds,System.currentTimeMillis());
+        return ObjectMapperUtils.copyProperties(expertiseWrapperQueryResults,StaffExpertiseWrapper.class);
+
+    }
+
 
 }

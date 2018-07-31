@@ -120,7 +120,7 @@ public class AgreementSectionService extends MongoBaseService {
 
 
     // updated for section creation and sub sectiomn creations
-    public Map<String, Object> buildAgreementSectionsList(List<ClauseBasicDTO> newClauseBasicDTOList, List<ClauseBasicDTO> changedClausesDTOList, List<BigInteger> changedClauseIdsList,
+    private Map<String, Object> buildAgreementSectionsList(List<ClauseBasicDTO> newClauseBasicDTOList, List<ClauseBasicDTO> changedClausesDTOList, List<BigInteger> changedClauseIdsList,
                                                           AgreementSectionDTO agreementSectionDTO, Map<String, AgreementSectionClauseWrapper> agreementSubSectionClauseAndClauseDtoHashMap) {
         Map<String, Object> result = new HashMap<>();
         AgreementSection agreementSection = new AgreementSection(UserContext.getCountryId(), agreementSectionDTO.getName());

@@ -9,6 +9,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.access_page.KPIAccessPageDTO;
 import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.user.staff.staff.StaffExpertiseWrapper;
 import com.kairos.util.ObjectMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -83,4 +85,10 @@ public class GenericIntegrationService {
     public List<KPIAccessPageDTO> getKPIEnabledTabsForModule(String moduleId, Long countryId){
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/"+countryId+"/module/"+moduleId+"/kpi_details", null), KPIAccessPageDTO.class);
     }
+
+    public List<StaffExpertiseWrapper> getStaffExpertiseByIds(Long unitId, Set<Long> staffIds){
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(staffIds, unitId, true, IntegrationOperation.CREATE, "/staff/default_data_for_activity_setting", null), StaffExpertiseWrapper.class);
+    }
+
+
 }
