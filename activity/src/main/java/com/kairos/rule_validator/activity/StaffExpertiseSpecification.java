@@ -2,18 +2,13 @@ package com.kairos.rule_validator.activity;
 
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.service.locale.LocaleService;
-import com.kairos.service.locale.LocaleServiceImpl;
-import com.kairos.user.staff.staff.StaffExpertiseWrapper;
+import com.kairos.user.staff.StaffDTO;
 import org.springframework.util.CollectionUtils;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-public class StaffExpertiseSpecification extends AbstractSpecification<StaffExpertiseWrapper> {
+public class StaffExpertiseSpecification extends AbstractSpecification<StaffDTO> {
     private Activity activity;
     List<String> errorMessages = new ArrayList<>();
 
@@ -22,13 +17,13 @@ public class StaffExpertiseSpecification extends AbstractSpecification<StaffExpe
     }
 
     @Override
-    public boolean isSatisfied(StaffExpertiseWrapper staffExpertiseSpecification) {
+    public boolean isSatisfied(StaffDTO staffExpertiseSpecification) {
         return false;
     }
 
     @Override
-    public List<String> isSatisfiedString(StaffExpertiseWrapper staffExpertiseSpecification) {
-        if (!CollectionUtils.containsAny(activity.getExpertises(), staffExpertiseSpecification.getExpertiseIds())) {
+    public List<String> isSatisfiedString(StaffDTO staffDTO) {
+        if (!CollectionUtils.containsAny(activity.getExpertises(), staffDTO.getExpertiseIds())) {
             errorMessages.add("expertise.absent.activity");
         }
         return errorMessages;

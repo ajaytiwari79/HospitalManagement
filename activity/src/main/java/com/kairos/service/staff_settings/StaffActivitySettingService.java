@@ -12,7 +12,7 @@ import com.kairos.rule_validator.activity.StaffExpertiseSpecification;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.locale.LocaleService;
-import com.kairos.user.staff.staff.StaffExpertiseWrapper;
+import com.kairos.user.staff.StaffDTO;
 import com.kairos.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.user.staff.staff_settings.StaffAndActivitySettingWrapper;
 import com.kairos.util.ObjectMapperUtils;
@@ -74,8 +74,8 @@ public class StaffActivitySettingService extends MongoBaseService {
         Set<BigInteger> activityIds=staffAndActivitySettingWrapper.getStaffActivitySettings().stream().map(StaffActivitySettingDTO::getActivityId).collect(Collectors.toSet());
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger,Activity> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,v->v));
-        List<StaffExpertiseWrapper> staffExpertiseWrappers= genericIntegrationService.getStaffExpertiseByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
-        Map<Long,StaffExpertiseWrapper> staffExpertiseWrapperMap=staffExpertiseWrappers.stream().collect(Collectors.toMap(StaffExpertiseWrapper::getStaffId,v->v));
+        List<StaffDTO> staffExpertiseWrappers= genericIntegrationService.getStaffExpertiseByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
+        Map<Long,StaffDTO> staffExpertiseWrapperMap=staffExpertiseWrappers.stream().collect(Collectors.toMap(StaffDTO::getStaffId,v->v));
         Map<String,List<StaffActivityResponse>> responseMap=new HashMap<>();
         for(Long currentStaffId:staffAndActivitySettingWrapper.getStaffIds()){
             responseMap=assignActivitySettingsForCurrentStaff(responseMap,activityMap,staffExpertiseWrapperMap,currentStaffId,staffAndActivitySettingWrapper.getStaffActivitySettings(),unitId);
@@ -105,15 +105,15 @@ public class StaffActivitySettingService extends MongoBaseService {
    }
 
 
-    private  String validateActivitySettingsForCurrentStaff(StaffExpertiseWrapper staffExpertiseWrapper,Activity activity){
-        Specification<StaffExpertiseWrapper> staffExpertiseWrapperSpecification=new StaffExpertiseSpecification(activity);
-        Specification<StaffExpertiseWrapper> staffEmploymentTypeSpecification=new StaffEmploymentTypeSpecification(activity);
-        Specification<StaffExpertiseWrapper> expertiseWrapperSpecification=staffExpertiseWrapperSpecification.and(staffEmploymentTypeSpecification);
-        List<String> messages = expertiseWrapperSpecification.isSatisfiedString(staffExpertiseWrapper);
+    private  String validateActivitySettingsForCurrentStaff(StaffDTO staffDTO,Activity activity){
+        Specification<StaffDTO> staffDTOSpecification=new StaffExpertiseSpecification(activity);
+        Specification<StaffDTO> staffEmploymentTypeSpecification=new StaffEmploymentTypeSpecification(activity);
+        Specification<StaffDTO> expertiseWrapperSpecification=staffDTOSpecification.and(staffEmploymentTypeSpecification);
+        List<String> messages = expertiseWrapperSpecification.isSatisfiedString(staffDTO);
         return (!messages.isEmpty())?localeService.getMessage(messages.get(0)):null;
     }
 
-   private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap,Map<BigInteger,Activity> activityMap,Map<Long,StaffExpertiseWrapper> longStaffExpertiseWrapperMap,Long staffId,List<StaffActivitySettingDTO> staffActivitySettingDTOS,Long unitId){
+   private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap,Map<BigInteger,Activity> activityMap,Map<Long,StaffDTO> longStaffExpertiseWrapperMap,Long staffId,List<StaffActivitySettingDTO> staffActivitySettingDTOS,Long unitId){
        List<StaffActivityResponse> success=(responseMap.get("success")==null)?new ArrayList<>():responseMap.get("success");
        List<StaffActivityResponse> error=(responseMap.get("error")==null)?new ArrayList<>():responseMap.get("error");
        List<StaffActivitySetting> staffActivitySettings=new ArrayList<>();

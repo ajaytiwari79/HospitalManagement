@@ -2,16 +2,12 @@ package com.kairos.rule_validator.activity;
 
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.service.locale.LocaleService;
-import com.kairos.user.staff.staff.StaffExpertiseWrapper;
-import org.springframework.util.CollectionUtils;
+import com.kairos.user.staff.StaffDTO;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class StaffEmploymentTypeSpecification extends AbstractSpecification<StaffExpertiseWrapper> {
+public class StaffEmploymentTypeSpecification extends AbstractSpecification<StaffDTO> {
     private Activity activity;
     List<String> errorMessages = new ArrayList<>();
 
@@ -20,13 +16,13 @@ public class StaffEmploymentTypeSpecification extends AbstractSpecification<Staf
     }
 
     @Override
-    public boolean isSatisfied(StaffExpertiseWrapper staffEmploymentTypeSpecification) {
+    public boolean isSatisfied(StaffDTO staffDTO) {
         return false;
     }
 
     @Override
-    public List<String> isSatisfiedString(StaffExpertiseWrapper staffEmploymentTypeSpecification) {
-        if (!activity.getEmploymentTypes().contains(staffEmploymentTypeSpecification.getEmploymentTypeId())) {
+    public List<String> isSatisfiedString(StaffDTO staffDTO) {
+        if (!activity.getEmploymentTypes().contains(staffDTO.getEmploymentTypeId())) {
             errorMessages.add("employment_type.absent.activity");
         }
         return errorMessages;

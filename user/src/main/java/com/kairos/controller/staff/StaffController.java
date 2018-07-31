@@ -683,7 +683,7 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByUnit(unitId));
     }
 
-    @PostMapping(value = "/default_data_for_activity_setting")
+    @PostMapping(value = "/details")
     @ApiOperation("get staff by unit")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDefaultDataForActivitySettings(@PathVariable Long unitId,@RequestBody Set<Long> staffIds) {
