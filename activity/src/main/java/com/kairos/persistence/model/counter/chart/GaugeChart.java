@@ -19,7 +19,7 @@ public class GaugeChart extends BaseChart {
     private RepresentationUnit unit;
     private String unitName;
 
-    public GaugeChart(double minValue, double maxValue, double value, List<Double> bandInitValues, List<String> bandColors, RepresentationUnit unit, String unitName){
+    public GaugeChart(double minValue, double maxValue, double value, List<Double> bandInitValues, List<String> bandColors, RepresentationUnit unit, String unitName) {
         super(ChartType.GAUGE);
         this.minValue = minValue;
         this.maxValue = maxValue;
