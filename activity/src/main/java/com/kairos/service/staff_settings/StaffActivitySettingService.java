@@ -74,7 +74,7 @@ public class StaffActivitySettingService extends MongoBaseService {
         Set<BigInteger> activityIds=staffAndActivitySettingWrapper.getStaffActivitySettings().stream().map(StaffActivitySettingDTO::getActivityId).collect(Collectors.toSet());
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger,Activity> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,v->v));
-        List<StaffDTO> staffExpertiseWrappers= genericIntegrationService.getStaffExpertiseByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
+        List<StaffDTO> staffExpertiseWrappers= genericIntegrationService.getStaffDetailByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
         Map<Long,StaffDTO> staffExpertiseWrapperMap=staffExpertiseWrappers.stream().collect(Collectors.toMap(StaffDTO::getStaffId,v->v));
         Map<String,List<StaffActivityResponse>> responseMap=new HashMap<>();
         for(Long currentStaffId:staffAndActivitySettingWrapper.getStaffIds()){

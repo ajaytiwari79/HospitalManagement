@@ -86,7 +86,7 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/"+countryId+"/module/"+moduleId+"/kpi_details", null), KPIAccessPageDTO.class);
     }
 
-    public List<StaffDTO> getStaffExpertiseByIds(Long unitId, Set<Long> staffIds){
+    public List<StaffDTO> getStaffDetailByIds(Long unitId, Set<Long> staffIds){
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(staffIds, unitId, true, IntegrationOperation.CREATE, "/staff/details", null), StaffDTO.class);
     }
 

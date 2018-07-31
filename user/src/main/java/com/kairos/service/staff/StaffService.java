@@ -2157,9 +2157,8 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public List<StaffExpertiseWrapperQueryResult> getDefaultDataForActivitySettings(Long unitId,Set<Long> staffIds) {
-        return staffExpertiseRelationShipGraphRepository.getAllExpertiseIdsByStaffIds(staffIds,System.currentTimeMillis());
-
+    public List<StaffExpertiseWrapperQueryResult> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
+        return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds,System.currentTimeMillis());
 
     }
 
