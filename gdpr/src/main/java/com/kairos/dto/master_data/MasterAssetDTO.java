@@ -110,4 +110,5 @@ public class MasterAssetDTO {
     public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
+
 }
