@@ -34,5 +34,5 @@ public interface PayGradeGraphRepository extends Neo4jBaseRepository<PayGrade, L
 
     @Query("MATCH (payGrade:PayGrade{deleted:false}) where id(payGrade) IN {0}\n" +
             "return payGrade")
-    List<PayGrade> getAllPayGradesById(Set<Long> payGradeId);
+    List<PayGrade> getAllPayGradesById(Set<Long> payGradeIds);
 }

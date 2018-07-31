@@ -283,14 +283,6 @@ public class DateUtil {
         return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     }
 
-    public static Date getDateFromLocalDate(LocalDate localDate) {
-        Date date = null;
-        if (localDate != null)
-            date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        return date;
-
-    }
-
     public static LocalDate getTimezonedCurrentDate(String timezone) {
         return Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of(timezone)).toLocalDate();
     }

@@ -42,7 +42,9 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.user.country.experties.*;
 import com.kairos.user.country.time_slot.TimeSlot;
+
 import com.kairos.util.DateUtil;
+import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -435,7 +437,7 @@ public class ExpertiseService extends UserBaseService {
                 seniorityLevelGraphRepository.removePreviousPayGradeFromSeniorityLevel(seniorityLevelDTO.getId());
             }
 
-            PayGrade payGrade = payGradeGraphRepository.findOne(seniorityLevelDTO.getPayGradeId(),0);
+            PayGrade payGrade = payGradeGraphRepository.findOne(seniorityLevelDTO.getPayGradeId(), 0);
 
             if (!Optional.ofNullable(payGrade).isPresent() || payGrade.isDeleted()) {
                 exceptionService.dataNotFoundByIdException("message.expertise.payGradeId.notFound", seniorityLevelDTO.getPayGradeId());
@@ -775,85 +777,85 @@ public class ExpertiseService extends UserBaseService {
             exceptionService.duplicateDataException("message.duplicate", "expertise");
         }
 
-        Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
-        if (!expertise.isPresent() || expertise.get().isDeleted()) {
+        Optional<Expertise> sourceExpertise = expertiseGraphRepository.findById(expertiseId);
+        if (!sourceExpertise.isPresent() || sourceExpertise.get().isDeleted()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", expertiseId);
         }
 
-        Expertise copiedExpertise = new Expertise(copyExpertiseDTO.getName(), copyExpertiseDTO.getDescription(), expertise.get().getCountry(), DateUtil.getDateFromLocalDate(copyExpertiseDTO.getStartDate()), DateUtil.getDateFromLocalDate(copyExpertiseDTO.getEndDate()),
+        Expertise targetExpertise = new Expertise(copyExpertiseDTO.getName(), copyExpertiseDTO.getDescription(), sourceExpertise.get().getCountry(), DateUtils.getDateFromLocalDate(copyExpertiseDTO.getStartDate()), DateUtils.getDateFromLocalDate(copyExpertiseDTO.getEndDate()),
                 copyExpertiseDTO.getFullTimeWeeklyMinutes() != null ? copyExpertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
                 copyExpertiseDTO.getNumberOfWorkingDaysInWeek() != null ? copyExpertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, copyExpertiseDTO.getBreakPaymentSetting(), false, false, false);
 
-        prepareExpertiseWhileCopy(copiedExpertise, copyExpertiseDTO, expertise.get());
+        prepareExpertiseWhileCopy(targetExpertise, copyExpertiseDTO, sourceExpertise.get());
 
         return copyExpertiseDTO;
     }
 
-    private void prepareExpertiseWhileCopy(Expertise expertise, CopyExpertiseDTO expertiseDTO, Expertise parentExpertise) {
-        if (!expertiseDTO.getOrganizationLevelId().equals(parentExpertise.getOrganizationLevel().getId())) {
-            Level level = countryGraphRepository.getLevel(parentExpertise.getCountry().getId(), expertiseDTO.getOrganizationLevelId());
+    private void prepareExpertiseWhileCopy(Expertise targetExpertise, CopyExpertiseDTO expertiseDTO, Expertise sourceExpertise) {
+        if (!expertiseDTO.getOrganizationLevelId().equals(sourceExpertise.getOrganizationLevel().getId())) {
+            Level level = countryGraphRepository.getLevel(sourceExpertise.getCountry().getId(), expertiseDTO.getOrganizationLevelId());
             if (!Optional.ofNullable(level).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "level", expertiseDTO.getOrganizationLevelId());
             }
-            expertise.setOrganizationLevel(level);
+            targetExpertise.setOrganizationLevel(level);
         } else {
-            expertise.setOrganizationLevel(parentExpertise.getOrganizationLevel());
+            targetExpertise.setOrganizationLevel(sourceExpertise.getOrganizationLevel());
         }
 
-        addSeniorityLevelsInExpertise(expertise, expertiseDTO, parentExpertise);
+        addSeniorityLevelsInExpertise(targetExpertise, expertiseDTO, sourceExpertise);
         Set<OrganizationService> organizationService = organizationServiceRepository.findAllOrganizationServicesByIds(expertiseDTO.getOrganizationServiceIds());
         if (!Optional.ofNullable(organizationService).isPresent() || organizationService.size() != expertiseDTO.getOrganizationServiceIds().size()) {
             exceptionService.dataNotFoundByIdException("message.multipleDataNotFound", "services");
         }
-        expertise.setOrganizationServices(organizationService);
+        targetExpertise.setOrganizationServices(organizationService);
         Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(expertiseDTO.getUnionId());
         if (!Optional.ofNullable(union).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "union", expertiseDTO.getUnionId());
         }
-        expertise.setUnion(union);
-        save(expertise);
-        createDefaultSettings(expertise, parentExpertise);
-        expertiseDTO.setId(expertise.getId());
+        targetExpertise.setUnion(union);
+        save(targetExpertise);
+        createDefaultSettings(targetExpertise, sourceExpertise);
+        expertiseDTO.setId(targetExpertise.getId());
         // small object so not creating map
-        expertiseDTO.getSeniorityLevels().forEach(seniorityLevelDTO -> expertise.getSeniorityLevel().forEach(current -> {
+        expertiseDTO.getSeniorityLevels().forEach(seniorityLevelDTO -> targetExpertise.getSeniorityLevel().forEach(current -> {
             if (current.getFrom().equals(seniorityLevelDTO.getFrom())) {
                 seniorityLevelDTO.setId(current.getId());
             }
         }));
     }
 
-    private void addSeniorityLevelsInExpertise(Expertise expertise, CopyExpertiseDTO expertiseDTO, Expertise parentExpertise) {
+    private void addSeniorityLevelsInExpertise(Expertise targetExpertise, CopyExpertiseDTO expertiseDTO, Expertise sourceExpertise) {
         Set<Long> payGradeIds = expertiseDTO.getSeniorityLevels().stream().map(SeniorityLevelDTO::getPayGradeId).collect(Collectors.toSet());
         List<PayGrade> payGrades = payGradeGraphRepository.getAllPayGradesById(payGradeIds);
         Map<Long, PayGrade> payGradeMap = payGrades.stream().collect(Collectors.toMap(PayGrade::getId, v -> v));
         expertiseDTO.getSeniorityLevels().forEach(seniorityLevelDTO -> {
             SeniorityLevel seniorityLevel = new SeniorityLevel(seniorityLevelDTO.getFrom(), seniorityLevelDTO.getTo(), payGradeMap.get(seniorityLevelDTO.getPayGradeId()), seniorityLevelDTO.getPensionPercentage(), seniorityLevelDTO.getFreeChoicePercentage(),
                     seniorityLevelDTO.getFreeChoiceToPension(), false);
-            expertise.addSeniorityLevel(seniorityLevel);
+            targetExpertise.addSeniorityLevel(seniorityLevel);
         });
-        parentExpertise.getChildCareDays().forEach(careDays -> expertise.addChildCareDay(new CareDays(careDays.getFrom(), careDays.getTo(), careDays.getLeavesAllowed())));
+        sourceExpertise.getChildCareDays().forEach(careDays -> targetExpertise.addChildCareDay(new CareDays(careDays.getFrom(), careDays.getTo(), careDays.getLeavesAllowed())));
 
-        parentExpertise.getSeniorDays().forEach(careDays -> expertise.addSeniorDay(new CareDays(careDays.getFrom(), careDays.getTo(), careDays.getLeavesAllowed())));
+        sourceExpertise.getSeniorDays().forEach(careDays -> targetExpertise.addSeniorDay(new CareDays(careDays.getFrom(), careDays.getTo(), careDays.getLeavesAllowed())));
     }
 
-    private void createDefaultSettings(Expertise expertise, Expertise parentExpertise) {
+    private void createDefaultSettings(Expertise targetExpertise, Expertise sourceExpertise) {
         List<ExpertiseEmploymentTypeRelationship> expertiseEmploymentList = new ArrayList();
-        ExpertisePlannedTimeQueryResult expertiseEmploymentTypeRelationships = expertiseEmploymentTypeRelationshipGraphRepository.getPlannedTimeConfigurationByExpertise(parentExpertise.getId());
+        ExpertisePlannedTimeQueryResult expertiseEmploymentTypeRelationships = expertiseEmploymentTypeRelationshipGraphRepository.getPlannedTimeConfigurationByExpertise(sourceExpertise.getId());
         if (Optional.ofNullable(expertiseEmploymentTypeRelationships).isPresent()) {
             expertiseEmploymentTypeRelationships.employmentTypes.forEach(employmentType -> {
-                ExpertiseEmploymentTypeRelationship expertiseEmploymentTypeRelationship = new ExpertiseEmploymentTypeRelationship(expertise,
+                ExpertiseEmploymentTypeRelationship expertiseEmploymentTypeRelationship = new ExpertiseEmploymentTypeRelationship(targetExpertise,
                         employmentType, expertiseEmploymentTypeRelationships.getIncludedPlannedTime(), expertiseEmploymentTypeRelationships.getExcludedPlannedTime());
                 expertiseEmploymentList.add(expertiseEmploymentTypeRelationship);
             });
             expertiseEmploymentTypeRelationshipGraphRepository.saveAll(expertiseEmploymentList);
         }
-        functionalPaymentGraphRepository.linkFunctionalPaymentInExpertise(parentExpertise.getId(), expertise.getId());
+        functionalPaymentGraphRepository.linkFunctionalPaymentInExpertise(sourceExpertise.getId(), targetExpertise.getId());
 
         TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
-                null, null, null, null, expertise.getCountry().getId(), expertise.getId());
-        genericRestClient.publish(expertiseNightWorkerSettingDTO, expertise.getCountry().getId(), false, IntegrationOperation.CREATE,
-                "/expertise/" + expertise.getId() + "/night_worker_setting", null);
+                null, null, null, null, targetExpertise.getCountry().getId(), targetExpertise.getId());
+        genericRestClient.publish(expertiseNightWorkerSettingDTO, targetExpertise.getCountry().getId(), false, IntegrationOperation.CREATE,
+                "/expertise/" + targetExpertise.getId() + "/night_worker_setting", null);
 
     }
 }

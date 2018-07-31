@@ -121,7 +121,7 @@ public class FunctionalPaymentService extends UserBaseService {
     private FunctionalPaymentMatrix addMatrixInFunctionalPayment(FunctionalPaymentMatrixDTO functionalPaymentMatrixDTO, List<SeniorityLevel> seniorityLevels, List<Function> functions) {
         FunctionalPaymentMatrix functionalPaymentMatrix = new FunctionalPaymentMatrix();
         if (Optional.ofNullable(functionalPaymentMatrixDTO.getPayGroupAreasIds()).isPresent() && !functionalPaymentMatrixDTO.getPayGroupAreasIds().isEmpty()) {
-            List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(functionalPaymentMatrixDTO.getPayGroupAreasIds());
+            List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(functionalPaymentMatrixDTO.getPayGroupAreasIds());
             if (payGroupAreas.size() != functionalPaymentMatrixDTO.getPayGroupAreasIds().size())
                 exceptionService.actionNotPermittedException("message.multipleDataNotFound", "payGroup-areas");
             functionalPaymentMatrix.setPayGroupAreas(new HashSet<>(payGroupAreas));
@@ -226,7 +226,7 @@ public class FunctionalPaymentService extends UserBaseService {
                     if (!payGroupAreaIds.equals(functionalPaymentMatrixDTO.getPayGroupAreasIds())) {
                         // user has updated the payGroupAreas   // remove all payGroup areas and add the new one
                         functionalPaymentGraphRepository.removeAllPayGroupAreas(functionalPaymentMatrix.getId());
-                        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(functionalPaymentMatrixDTO.getPayGroupAreasIds());
+                        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(functionalPaymentMatrixDTO.getPayGroupAreasIds());
                         functionalPaymentMatrix.setPayGroupAreas(new HashSet<>(payGroupAreas));
                     }
 
