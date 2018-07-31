@@ -689,9 +689,4 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getDefaultDataForActivitySettings(@PathVariable Long unitId,@RequestBody Set<Long> staffIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getDefaultDataForActivitySettings(unitId,staffIds));
     }
-
-
-
-
-
 }

@@ -2157,9 +2157,9 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public List<StaffExpertiseWrapper> getDefaultDataForActivitySettings(Long unitId,Set<Long> staffIds) {
-        List<StaffExpertiseWrapperQueryResult> expertiseWrapperQueryResults=staffExpertiseRelationShipGraphRepository.getAllExpertiseIdsByStaffIds(staffIds,System.currentTimeMillis());
-        return ObjectMapperUtils.copyProperties(expertiseWrapperQueryResults,StaffExpertiseWrapper.class);
+    public List<StaffExpertiseWrapperQueryResult> getDefaultDataForActivitySettings(Long unitId,Set<Long> staffIds) {
+        return staffExpertiseRelationShipGraphRepository.getAllExpertiseIdsByStaffIds(staffIds,System.currentTimeMillis());
+
 
     }
 
