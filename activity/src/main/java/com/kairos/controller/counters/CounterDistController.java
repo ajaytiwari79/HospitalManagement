@@ -5,6 +5,7 @@ import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.persistence.model.counter.OrgTypeKPIEntry;
 import com.kairos.service.counter.CounterManagementService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -84,38 +85,81 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(moduleId, unitId, ConfLevel.UNIT));
     }
 
-    @PostMapping(COUNTRY_URL+"/module/{moduleId}/create_dist_entry")
-    public ResponseEntity<Map<String, Object>> addTabKPIsEntry(@RequestBody TabKPIEntryConfDTO tabKPIEntry){
-        //counterManagementService.addTabKPIEntries(tabKPIEntry);
+    @GetMapping(UNIT_URL+"/staff/{staffId}/module/{moduleId}")
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long staffId, @PathVariable String moduleId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(moduleId, staffId, ConfLevel.STAFF));
+    }
+
+    @PostMapping(COUNTRY_URL+"/module/create_dist_entry")
+    public ResponseEntity<Map<String, Object>> addTabKPIsEntryForCounty(@RequestBody TabKPIEntryConfDTO tabKPIEntry,@PathVariable Long countryId){
+        counterManagementService.addTabKPIEntries(tabKPIEntry,ConfLevel.COUNTRY,countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(COUNTRY_URL+"/module/{moduleId}/remove_dist_entry")
-    public ResponseEntity<Map<String, Object>> removeTabKPIEntry(@RequestBody TabKPIEntryConfDTO tabKPIEntryConfDTO){
-        counterManagementService.removeTabKPIEntries(tabKPIEntryConfDTO);
+    @PostMapping(UNIT_URL+"/module/create_dist_entry")
+    public ResponseEntity<Map<String, Object>> addTabKPIsEntryForUnit(@RequestBody TabKPIEntryConfDTO tabKPIEntry,@PathVariable Long unitId){
+        counterManagementService.addTabKPIEntries(tabKPIEntry,ConfLevel.UNIT,unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PostMapping(COUNTRY_URL+"/access_group")
-    public ResponseEntity<Map<String, Object>> getInitialDataForAccessGroupKPIConf(@RequestBody List<Long> accessGroupIds){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialAccessGroupKPIDataConf(accessGroupIds));
+    @PostMapping(UNIT_URL+"staff/{staffId}/module/create_dist_entry")
+    public ResponseEntity<Map<String, Object>> addTabKPIsEntryForStaff(@RequestBody TabKPIEntryConfDTO tabKPIEntry,@PathVariable Long staffId){
+        counterManagementService.addTabKPIEntries(tabKPIEntry,ConfLevel.STAFF,staffId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping(COUNTRY_URL+"/module/remove_dist_entry/{moduleKpiId}")
+    public ResponseEntity<Map<String, Object>> removeTabKPIEntryForCountry(@PathVariable Long moduleKpiId){
+        counterManagementService.removeTabKPIEntries(moduleKpiId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping(UNIT_URL+"/module/remove_dist_entry/{moduleKpiId}")
+    public ResponseEntity<Map<String, Object>> removeTabKPIEntryForUnit(@PathVariable Long moduleKpiId){
+        counterManagementService.removeTabKPIEntries(moduleKpiId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping(UNIT_URL+"/staff/{staffId}/module/remove_dist_entry/{moduleKpiId}")
+    public ResponseEntity<Map<String, Object>> removeTabKPIEntryForStaff(@PathVariable Long moduleKpiId){
+        counterManagementService.removeTabKPIEntries(moduleKpiId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
     @PostMapping(COUNTRY_URL+"/access_group/create_dist_entry")
-    public ResponseEntity<Map<String, Object>> addAccessGroupKPIEntry(@RequestBody AccessGroupKPIConfDTO accessGroupKPIConf){
-        counterManagementService.addAccessGroupKPIEntries(accessGroupKPIConf);
+    public ResponseEntity<Map<String, Object>> addAccessGroupKPIEntryForCountry(@PathVariable Long countryId ,@RequestBody AccessGroupKPIConfDTO accessGroupKPIConf){
+        counterManagementService.addAccessGroupKPIEntries(accessGroupKPIConf,countryId,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(COUNTRY_URL+"/access_group/remove_dist_entry")
-    public ResponseEntity<Map<String, Object>> removeAccessGroupKPIEntry(@RequestBody AccessGroupKPIConfDTO accessGroupKPIConf){
-        counterManagementService.removeOrgTypeKPIEntries(accessGroupKPIConf);
+    @PostMapping(UNIT_URL+"/access_group/create_dist_entry")
+    public ResponseEntity<Map<String, Object>> addAccessGroupKPIEntryForUnit(@PathVariable Long unitId,@RequestBody AccessGroupKPIConfDTO accessGroupKPIConf){
+        counterManagementService.addAccessGroupKPIEntries(accessGroupKPIConf,unitId,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping(COUNTRY_URL+"/access_group/remove_dist_entry/{accessGroupKpiId}")
+    public ResponseEntity<Map<String, Object>> removeAccessGroupKPIEntryByCounty(@PathVariable Long accessGroupKpiId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,  counterManagementService.removeAccessGroupKPIEntries(accessGroupKpiId));
+    }
+    @PutMapping(UNIT_URL+"/access_group/remove_dist_entry/{accessGroupKpiId}")
+    public ResponseEntity<Map<String, Object>> removeAccessGroupKPIEntryByUnit(@PathVariable Long accessGroupKpiId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,  counterManagementService.removeAccessGroupKPIEntries(accessGroupKpiId));
+    }
+
+    @GetMapping(COUNTRY_URL+"/access_group/{accessGroupId}")
+    public ResponseEntity<Map<String, Object>> getInitialDataForAccessGroupKPIConfOfCountry(@PathVariable Long countryId,@PathVariable Long accessGroupId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialAccessGroupKPIDataConf(accessGroupId,countryId,ConfLevel.COUNTRY));
+    }
+
+    @GetMapping(UNIT_URL+"/access_group/{accessGroupId}")
+    public ResponseEntity<Map<String, Object>> getInitialDataForAccessgroupKPIConfOfUnit(@PathVariable Long unitId,@PathVariable Long accessGroupId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialAccessGroupKPIDataConf(accessGroupId,unitId,ConfLevel.UNIT));
     }
 
     @GetMapping(COUNTRY_URL+"/org_type/{orgTypeId}")
     public ResponseEntity<Map<String, Object>> getInitialDataForOrgTypeKPIConf(@PathVariable Long countryId,@PathVariable Long orgTypeId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialOrgTypeKPIDataConf(orgTypeId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialOrgTypeKPIDataConf(orgTypeId,countryId));
     }
 
     @PostMapping(COUNTRY_URL+"/org_type/create_dist_entry")
@@ -124,9 +168,8 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(COUNTRY_URL+"/org_type/remove_dist_entry")
-    public ResponseEntity<Map<String, Object>> removeOrgTypeKPIEntry(@RequestBody OrgTypeKPIConfDTO orgTypeKPIConf){
-        counterManagementService.removeOrgTypeKPIEntries(orgTypeKPIConf);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    @PutMapping(COUNTRY_URL+"/org_type/{orgTypeId}/remove_dist_entry")
+    public ResponseEntity<Map<String, Object>> removeOrgTypeKPIEntry(@PathVariable Long orgTypeId, @PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,   counterManagementService.removeOrgTypeKPIEntries(orgTypeId,countryId));
     }
 }

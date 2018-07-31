@@ -1,19 +1,18 @@
-package com.kairos.activity.counter.distribution.tab;
+package com.kairos.activity.counter.distribution.access_group;
 
 import java.math.BigInteger;
-import java.util.List;
 
-public class TabKPIMappingDTO {
-    private String tabId;
+public class AccessGroupMappingDTO {
+    private Long accessGroupId;
     private BigInteger kpiId;
     private BigInteger kpiAssignmentId;
 
-    public String getTabId() {
-        return tabId;
+    public Long getAccessGroupId() {
+        return accessGroupId;
     }
 
-    public void setTabId(String tabId) {
-        this.tabId = tabId;
+    public void setAccessGroupId(Long accessGroupId) {
+        this.accessGroupId = accessGroupId;
     }
 
     public BigInteger getKpiId() {

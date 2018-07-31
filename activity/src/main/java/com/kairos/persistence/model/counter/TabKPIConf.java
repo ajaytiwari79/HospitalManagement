@@ -1,10 +1,11 @@
 package com.kairos.persistence.model.counter;
 
 import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 
-public class TabKPIConf {
+public class TabKPIConf extends MongoBaseEntity {
     private String tabId;
     private BigInteger kpiAssignmentId;
     private Long countryId;
@@ -14,6 +15,15 @@ public class TabKPIConf {
 
     public TabKPIConf() {
 
+    }
+
+    public TabKPIConf(String tabId, BigInteger kpiAssignmentId, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+        this.tabId = tabId;
+        this.kpiAssignmentId = kpiAssignmentId;
+        this.countryId = countryId;
+        this.unitId = unitId;
+        this.staffId = staffId;
+        this.level = level;
     }
 
     public String getTabId() {
