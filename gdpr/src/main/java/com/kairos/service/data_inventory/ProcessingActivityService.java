@@ -110,7 +110,6 @@ public class ProcessingActivityService extends MongoBaseService {
         exist.setDescription(processingActivityDTO.getDescription());
         exist.setManagingDepartment(processingActivityDTO.getManagingDepartment());
         exist.setProcessOwner(processingActivityDTO.getProcessOwner());
-        exist.setOrganizationId(organizationId);
         exist.setControllerContactInfo(processingActivityDTO.getControllerContactInfo());
         exist.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
         exist.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
@@ -122,31 +121,24 @@ public class ProcessingActivityService extends MongoBaseService {
 
     private void buildProcessingActivityWithMetaDataAndUpdate(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO, ProcessingActivity processingActivity) {
 
-
         if (Optional.ofNullable(processingActivityDTO.getAccessorParties()).isPresent() && !processingActivityDTO.getAccessorParties().isEmpty()) {
-
             List<BigInteger> accessorPartyIds = accessorPartyService.createAccessorPartyForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO);
             processingActivity.setAccessorParties(accessorPartyIds);
         } else if (Optional.ofNullable(processingActivityDTO.getDataSources()).isPresent() && !processingActivityDTO.getDataSources().isEmpty()) {
-
             List<BigInteger> dataSourceIds = dataSourceService.createDataSourceForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO);
             processingActivity.setDataSources(dataSourceIds);
         } else if (Optional.ofNullable(processingActivityDTO.getProcessingLegalBasis()).isPresent() && !processingActivityDTO.getProcessingLegalBasis().isEmpty()) {
-
             List<BigInteger> processingLegalBasisIds = processingLegalBasisService.createProcessingLegaBasisForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO);
             processingActivity.setProcessingLegalBasis(processingLegalBasisIds);
         } else if (Optional.ofNullable(processingActivityDTO.getProcessingPurposes()).isPresent() && !processingActivityDTO.getProcessingPurposes().isEmpty()) {
-
             List<BigInteger> processingPurposeIds = processingPurposeService.createProcessingPurposeForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO);
             processingActivity.setProcessingPurposes(processingPurposeIds);
 
         } else if (Optional.ofNullable(processingActivityDTO.getSourceTransferMethods()).isPresent() && !processingActivityDTO.getSourceTransferMethods().isEmpty()) {
 
-
             List<BigInteger> sourceTransferMethodIds = transferMethodService.createTransferMethodForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO.getSourceTransferMethods());
             processingActivity.setSourceTransferMethods(sourceTransferMethodIds);
         } else if (Optional.ofNullable(processingActivityDTO.getDestinationTransferMethods()).isPresent() && !processingActivityDTO.getDestinationTransferMethods().isEmpty()) {
-
 
             List<BigInteger> destinationTransferMethodIds = transferMethodService.createTransferMethodForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO.getDestinationTransferMethods());
             processingActivity.setSourceTransferMethods(destinationTransferMethodIds);
@@ -160,13 +152,17 @@ public class ProcessingActivityService extends MongoBaseService {
                 processingActivity.setResponsibilityType(responsibilityType.getId());
             } else {
                 processingActivity.setResponsibilityType(responsibilityTypeDTO.getId());
-
             }
-
         }
-
-
     }
+
+
+
+
+
+
+
+
 
 
 }

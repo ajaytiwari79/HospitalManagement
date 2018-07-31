@@ -15,9 +15,6 @@ public class Staff {
     @NotNull
     private Long id;
 
-    @NotNullOrEmpty(message = "Staff Email can't be empty")
-    private String email;
-
     private String userName;
 
     @NotNullOrEmpty(message = "Staff Name can't be empty ")
@@ -27,9 +24,6 @@ public class Staff {
 
     public void setId(Long id) { this.id = id; }
 
-    public String getEmail() { return email; }
-
-    public void setEmail(String email) { this.email = email; }
 
     public String getUserName() { return userName; }
 
@@ -41,7 +35,6 @@ public class Staff {
 
     public Staff(Long id, String email, String userName, String firstName) {
         this.id = id;
-        this.email = email;
         this.userName = userName;
         this.firstName = firstName;
     }
