@@ -108,6 +108,7 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        String exception = "";
         if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues) && activityIds.contains(infoWrapper.getShift().getActivity().getId())) {
             DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift(), numberOfWeeks, validationStartDate);
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(interval, infoWrapper.getShifts(), null);
@@ -116,10 +117,9 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
             if (!isValid) {
-                throw new InvalidRequestException(getName() + " is Broken");
-            }
+                exception = getName();            }
         }
-        return "";
+        return exception;
     }
 
 }

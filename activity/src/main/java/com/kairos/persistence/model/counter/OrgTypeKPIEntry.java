@@ -8,9 +8,10 @@ public class OrgTypeKPIEntry extends MongoBaseEntity {
     private Long orgTypeId;
     private BigInteger kpiId;
 
-    public OrgTypeKPIEntry(){}
+    public OrgTypeKPIEntry() {
+    }
 
-    public OrgTypeKPIEntry(Long orgTypeId, BigInteger kpiId){
+    public OrgTypeKPIEntry(Long orgTypeId, BigInteger kpiId) {
         this.orgTypeId = orgTypeId;
         this.kpiId = kpiId;
     }

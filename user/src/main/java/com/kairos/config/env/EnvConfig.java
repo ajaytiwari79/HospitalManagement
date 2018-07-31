@@ -48,6 +48,7 @@ public class EnvConfig {
     @Value("${tomtom.key}")
     private String tomtomKey;
 
+
     public String getGoogleCalendarAPIV3Url(String vCardId){
 
         return googleCalendarAPIV3Url.replace("{countryVCard}" ,vCardId);
@@ -57,8 +58,6 @@ public class EnvConfig {
     public String getWsUrl() {
         return wsUrl;
     }
-
-
 
     public String getFlsPackageName() {
         return flsPackageName;

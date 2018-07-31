@@ -54,6 +54,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        String exception = "";
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], infoWrapper.getTotalTimeBank()/60);
@@ -61,17 +62,15 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
                 if (limitAndCounter[1] != null) {
                     int counterValue = limitAndCounter[1] - 1;
                     if (counterValue < 0) {
-                        throw new InvalidRequestException(getName() + " is Broken");
-                    } else {
+                        exception = getName();                    } else {
                         infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
                         infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                     }
                 } else {
-                    throw new InvalidRequestException(getName() + " is Broken");
-                }
+                    exception = getName();                }
             }
         }
-        return "";
+        return exception;
     }
 
     public TimeBankWTATemplate(String name, boolean disabled, String description) {

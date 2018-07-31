@@ -15,7 +15,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
@@ -58,11 +60,10 @@ public class ActivityTypesRestClient {
 
     }
 
-    public List<ActivityCategoryDTO> getActivityCategoriesForCountry (Long countryId, List<BigInteger> activityCategoriesIds){
+    public List<ActivityCategoryDTO> getActivityCategoriesForCountry (Long countryId,Set<BigInteger> activityCategoriesIds){
 
         final String baseUrl=getBaseUrl(false);
-        final String activityCategoriesIdsQueryString = activityCategoriesIds.stream().map(Object::toString)
-                .collect(Collectors.joining(", "));
+        final String activityCategoriesIdsQueryString = activityCategoriesIds.toString().replace("[","").replace("]","");
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>> typeReference =
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>>() {};

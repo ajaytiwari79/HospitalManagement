@@ -7,6 +7,7 @@ import com.kairos.activity.open_shift.OpenShiftDTO;
 import com.kairos.activity.open_shift.OpenShiftResponseDTO;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +30,8 @@ public interface OpenShiftMongoRepository extends MongoBaseRepository<OpenShift,
     List<OpenShift> getOpenShiftsByUnitIdAndOrderId(Long unitId, BigInteger orderId);
 
     @Query("{'deleted':false,  'activityId':?0, '$or':[{'startDate':{$gte:?1,$lte:?2}},{'endDate':{$gte:?1,$lte:?2}}]}")
-    List<OpenShift> findAllOpenShiftsByActivityIdAndBetweenDuration(BigInteger activityId, Date startDate, Date endDat);
+    List<OpenShift> findAllOpenShiftsByActivityIdAndBetweenDuration(BigInteger activityId, Date startDate, Date endDate);
 
+    @Query("{'deleted':false, interestedStaff:?0, 'startDate':{$gt:?1}}")
+    List<OpenShift> findAllOpenShiftsByInterestedStaff(Long staffId, LocalDateTime employmentEnd);
 }

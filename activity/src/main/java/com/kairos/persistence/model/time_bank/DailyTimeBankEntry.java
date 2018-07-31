@@ -22,6 +22,7 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private int scheduledMin;
     private int timeBankMinWithoutCta;
     private int timeBankMinWithCta;
+    private long accumultedTimeBankMin;
     private LocalDate date;
     private List<TimeBankCTADistribution> timeBankCTADistributionList;
 
@@ -42,6 +43,14 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
 
 
     public DailyTimeBankEntry() {
+    }
+
+    public long getAccumultedTimeBankMin() {
+        return accumultedTimeBankMin;
+    }
+
+    public void setAccumultedTimeBankMin(long accumultedTimeBankMin) {
+        this.accumultedTimeBankMin = accumultedTimeBankMin;
     }
 
     public LocalDate getDate() {

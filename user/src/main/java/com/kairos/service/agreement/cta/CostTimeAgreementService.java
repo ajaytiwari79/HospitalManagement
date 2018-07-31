@@ -535,7 +535,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, newCostTimeAgreement);
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, true, null, null);
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, true, null,null);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
@@ -685,10 +685,10 @@ public class CostTimeAgreementService extends UserBaseService {
         CostTimeAgreement costTimeAgreement = new CostTimeAgreement();
         collectiveTimeAgreementDTO.setId(null);
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
-        Optional<Expertise> expertise = expertiseGraphRepository.findById(collectiveTimeAgreementDTO.getExpertise(), 0);
+        Optional<Expertise> expertise= expertiseGraphRepository.findById(collectiveTimeAgreementDTO.getExpertise(),0);
 
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, false, null, expertise.get());
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, false, null,expertise.get());
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
