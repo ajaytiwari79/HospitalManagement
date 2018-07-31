@@ -57,6 +57,7 @@ public class MasterAssetService extends MongoBaseService {
         newAsset.setCountryId(countryId);
         newAsset.setOrganizationId(organizationId);
         newAsset.setAssetType(masterAssetDto.getAssetTypeId());
+        newAsset.setAssetSubTypes(masterAssetDto.getAssetSubTypes());
         return masterAssetMongoRepository.save(sequenceGenerator(newAsset));
     }
 
