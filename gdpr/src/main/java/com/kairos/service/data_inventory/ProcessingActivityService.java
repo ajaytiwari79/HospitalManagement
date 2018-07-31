@@ -134,14 +134,9 @@ public class ProcessingActivityService extends MongoBaseService {
             List<BigInteger> processingPurposeIds = processingPurposeService.createProcessingPurposeForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO);
             processingActivity.setProcessingPurposes(processingPurposeIds);
 
-        } else if (Optional.ofNullable(processingActivityDTO.getSourceTransferMethods()).isPresent() && !processingActivityDTO.getSourceTransferMethods().isEmpty()) {
-
-            List<BigInteger> sourceTransferMethodIds = transferMethodService.createTransferMethodForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO.getSourceTransferMethods());
-            processingActivity.setSourceTransferMethods(sourceTransferMethodIds);
-        } else if (Optional.ofNullable(processingActivityDTO.getDestinationTransferMethods()).isPresent() && !processingActivityDTO.getDestinationTransferMethods().isEmpty()) {
-
-            List<BigInteger> destinationTransferMethodIds = transferMethodService.createTransferMethodForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO.getDestinationTransferMethods());
-            processingActivity.setSourceTransferMethods(destinationTransferMethodIds);
+        } else if (Optional.ofNullable(processingActivityDTO.getTransferMethods()).isPresent() && !processingActivityDTO.getTransferMethods().isEmpty()) {
+            List<BigInteger> transferMethodIds = transferMethodService.createTransferMethodForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO.getTransferMethods());
+            processingActivity.setTransferMethods(transferMethodIds);
         } else if (Optional.ofNullable(processingActivityDTO.getResponsibilityType()).isPresent()) {
 
             ResponsibilityTypeDTO responsibilityTypeDTO = processingActivityDTO.getResponsibilityType();
@@ -155,14 +150,6 @@ public class ProcessingActivityService extends MongoBaseService {
             }
         }
     }
-
-
-
-
-
-
-
-
 
 
 }

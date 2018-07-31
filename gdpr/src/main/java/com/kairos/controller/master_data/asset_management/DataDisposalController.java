@@ -126,9 +126,9 @@ public class DataDisposalController {
     }
 
     @ApiOperation("get All data  disposal  of Current organization and Parent Oeg which were not inherited by Organization")
-    @GetMapping(UNIT_URL+"/inherit/data_disposal")
-    public ResponseEntity<Object> getAllDataDisposalOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getAllNotInheritedDataDisposalFromParentOrgAndUnitDataDisposal(countryId,organizationId,unitId));
+    @GetMapping("/data_disposal")
+    public ResponseEntity<Object> getAllDataDisposalOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getAllNotInheritedDataDisposalFromParentOrgAndUnitDataDisposal(countryId,parentOrgId,organizationId));
     }
 
 

@@ -121,9 +121,9 @@ public class DataSourceController {
 
 
     @ApiOperation("get All Data source of Current organization and Parent Oeg which were not inherited by Organization")
-    @GetMapping(UNIT_URL+"/inherit/data_source")
-    public ResponseEntity<Object> getAllDataSourceOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getAllNotInheritedDataSourceFromParentOrgAndUnitDataSource(countryId,organizationId,unitId));
+    @GetMapping("/data_source")
+    public ResponseEntity<Object> getAllDataSourceOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getAllNotInheritedDataSourceFromParentOrgAndUnitDataSource(countryId,parentOrgId,organizationId));
     }
 
 

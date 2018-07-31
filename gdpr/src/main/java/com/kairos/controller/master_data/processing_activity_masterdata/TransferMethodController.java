@@ -112,9 +112,9 @@ public class TransferMethodController {
 
 
     @ApiOperation("get All transfer method of Current organization and Parent Oeg which were not inherited by Organization")
-    @GetMapping(UNIT_URL+"/inherit/transfer_method")
-    public ResponseEntity<Object> getAllTransferMethodOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getAllNotInheritedTransferMethodFromParentOrgAndUnitTransferMethod(countryId,organizationId,unitId));
+    @GetMapping("/transfer_method")
+    public ResponseEntity<Object> getAllTransferMethodOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getAllNotInheritedTransferMethodFromParentOrgAndUnitTransferMethod(countryId,parentOrgId,parentOrgId));
     }
 
 
