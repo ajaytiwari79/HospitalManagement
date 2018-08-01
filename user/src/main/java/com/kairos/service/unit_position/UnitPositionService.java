@@ -1234,10 +1234,12 @@ public class UnitPositionService extends UserBaseService {
         List<UnitPositionSeniorityLevelQueryResult> unitPositionSeniorityLevelQueryResults = unitPositionGraphRepository.findUnitPositionSeniorityLeveltoUpdate();
         List<Long> unitPositionIds = unitPositionSeniorityLevelQueryResults.stream().map(unitPositionQueryResult->unitPositionQueryResult.getUnitPosition().getId()).
                 collect(Collectors.toList());
+        List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips = new ArrayList<>();
         unitPositionGraphRepository.deleteUnitPositionSeniorityLevelRelation(unitPositionIds);
         List<UnitPosition> unitPositions = new ArrayList<>();
         for(UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult :unitPositionSeniorityLevelQueryResults) {
             UnitPosition unitPosition = new UnitPosition();
+            UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip;
             UnitPosition oldUnitPosition = unitPositionSeniorityLevelQueryResult.getUnitPosition();
             ObjectMapperUtils.copyProperties(oldUnitPosition,unitPosition);
             oldUnitPosition.setEndDateMillis(DateUtils.getOneDayBeforeMillis());
@@ -1245,10 +1247,15 @@ public class UnitPositionService extends UserBaseService {
             unitPosition.setEndDateMillis(oldUnitPosition.getEndDateMillis());
             unitPosition.setSeniorityLevel(unitPositionSeniorityLevelQueryResult.getSeniorityLevel());
             unitPosition.setParentUnitPosition(oldUnitPosition);
+            unitPositionEmploymentTypeRelationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition,unitPositionSeniorityLevelQueryResult.getEmploymentType(),
+                    unitPositionSeniorityLevelQueryResult.getUnitPositionEmploymentTypeRelationShip().getEmploymentTypeCategory() );
+            unitPositionEmploymentTypeRelationShips.add( unitPositionEmploymentTypeRelationShip);
             unitPositions.add(unitPosition);
         }
 
         save(unitPositions);
+        save(unitPositionEmploymentTypeRelationShips);
+
 
     }
 }
