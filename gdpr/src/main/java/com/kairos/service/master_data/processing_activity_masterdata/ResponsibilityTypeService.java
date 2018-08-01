@@ -69,7 +69,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
                 }
 
-                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(sequenceGenerator(newResponsibilityTypes));
+                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(getNextSequence(newResponsibilityTypes));
 
             }
             result.put(EXISTING_DATA_LIST, existing);
@@ -141,7 +141,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
         } else {
             exist = responsibilityTypeMongoRepository.findByid(id);
             exist.setName(responsibilityType.getName());
-            return responsibilityTypeMongoRepository.save(sequenceGenerator(exist));
+            return responsibilityTypeMongoRepository.save(getNextSequence(exist));
 
         }
     }

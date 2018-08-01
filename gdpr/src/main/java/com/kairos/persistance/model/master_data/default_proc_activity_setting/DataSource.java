@@ -36,5 +36,6 @@ public class DataSource extends  MongoBaseEntity {
         this.countryId = countryId;
     }
 
-
+    public DataSource() {
+    }
 }

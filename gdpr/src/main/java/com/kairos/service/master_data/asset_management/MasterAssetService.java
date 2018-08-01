@@ -4,7 +4,6 @@ package com.kairos.service.master_data.asset_management;
 import com.kairos.custom_exception.*;
 import com.kairos.dto.master_data.MasterAssetDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
-import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -57,7 +56,7 @@ public class MasterAssetService extends MongoBaseService {
         newAsset.setCountryId(countryId);
         newAsset.setOrganizationId(organizationId);
         newAsset.setAssetType(masterAssetDto.getAssetTypeId());
-        return masterAssetMongoRepository.save(sequenceGenerator(newAsset));
+        return masterAssetMongoRepository.save(getNextSequence(newAsset));
     }
 
 
@@ -101,7 +100,7 @@ public class MasterAssetService extends MongoBaseService {
         exists.setName(masterAssetDto.getName());
         exists.setAssetType(masterAssetDto.getAssetTypeId());
         exists.setDescription(masterAssetDto.getDescription());
-        masterAssetMongoRepository.save(sequenceGenerator(exists));
+        masterAssetMongoRepository.save(getNextSequence(exists));
         return exists;
     }
 

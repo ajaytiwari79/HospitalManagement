@@ -71,7 +71,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
                 }
 
-                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(sequenceGenerator(newProcessingLegalBasisList));
+                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(getNextSequence(newProcessingLegalBasisList));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingLegalBasisList);
@@ -143,7 +143,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
         } else {
             exist = legalBasisMongoRepository.findByid(id);
             exist.setName(legalBasis.getName());
-            return legalBasisMongoRepository.save(sequenceGenerator(exist));
+            return legalBasisMongoRepository.save(getNextSequence(exist));
 
         }
     }
@@ -184,7 +184,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
                 legalBasisIds.add(processingLegalBasisDTO.getId());
             }
         }
-        newInheritProcessingLegalBasisFromCountry = legalBasisMongoRepository.saveAll(sequenceGenerator(newInheritProcessingLegalBasisFromCountry));
+        newInheritProcessingLegalBasisFromCountry = legalBasisMongoRepository.saveAll(getNextSequence(newInheritProcessingLegalBasisFromCountry));
         newInheritProcessingLegalBasisFromCountry.forEach(dataSource -> {
             legalBasisIds.add(dataSource.getId());
         });

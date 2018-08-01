@@ -72,7 +72,7 @@ public class AccessorPartyService extends MongoBaseService {
                     newAccessorParty.setOrganizationId(organizationId);
                     newAccessorPartyList.add(newAccessorParty);
                 }
-                newAccessorPartyList = accessorPartyMongoRepository.saveAll(sequenceGenerator(newAccessorPartyList));
+                newAccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(newAccessorPartyList));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newAccessorPartyList);
@@ -137,7 +137,7 @@ public class AccessorPartyService extends MongoBaseService {
         } else {
             exist = accessorPartyMongoRepository.findByid(id);
             exist.setName(accessorParty.getName());
-            return accessorPartyMongoRepository.save(sequenceGenerator(exist));
+            return accessorPartyMongoRepository.save(getNextSequence(exist));
 
         }
     }
@@ -179,7 +179,7 @@ public class AccessorPartyService extends MongoBaseService {
                 accessorPartyIds.add(accessorPartyDTO.getId());
             }
         }
-        newInheritAccessorPartiesFromCountry = accessorPartyMongoRepository.saveAll(sequenceGenerator(newInheritAccessorPartiesFromCountry));
+        newInheritAccessorPartiesFromCountry = accessorPartyMongoRepository.saveAll(getNextSequence(newInheritAccessorPartiesFromCountry));
         newInheritAccessorPartiesFromCountry.forEach(accessorParty -> {
             accessorPartyIds.add(accessorParty.getId());
         });

@@ -68,7 +68,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
                     newOrgSecurityMeasures.add(newOrganizationalSecurityMeasure);
 
                 }
-                newOrgSecurityMeasures = organizationalSecurityMeasureMongoRepository.saveAll(sequenceGenerator(newOrgSecurityMeasures));
+                newOrgSecurityMeasures = organizationalSecurityMeasureMongoRepository.saveAll(getNextSequence(newOrgSecurityMeasures));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newOrgSecurityMeasures);
@@ -140,7 +140,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
         } else {
             exist = organizationalSecurityMeasureMongoRepository.findByid(id);
             exist.setName(orgSecurityMeasure.getName());
-            return organizationalSecurityMeasureMongoRepository.save(sequenceGenerator(exist));
+            return organizationalSecurityMeasureMongoRepository.save(getNextSequence(exist));
 
         }
     }

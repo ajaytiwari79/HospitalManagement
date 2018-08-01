@@ -70,7 +70,7 @@ public class DataSourceService extends MongoBaseService {
 
                 }
 
-                newDataSources = dataSourceMongoRepository.saveAll(sequenceGenerator(newDataSources));
+                newDataSources = dataSourceMongoRepository.saveAll(getNextSequence(newDataSources));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newDataSources);
@@ -140,7 +140,7 @@ public class DataSourceService extends MongoBaseService {
         } else {
             exist = dataSourceMongoRepository.findByid(id);
             exist.setName(dataSource.getName());
-            return dataSourceMongoRepository.save(sequenceGenerator(exist));
+            return dataSourceMongoRepository.save(getNextSequence(exist));
 
         }
     }
@@ -181,7 +181,7 @@ public class DataSourceService extends MongoBaseService {
                 dataSourceIds.add(dataSourceDTO.getId());
             }
         }
-        newInheritDataSourceFromCountry = dataSourceMongoRepository.saveAll(sequenceGenerator(newInheritDataSourceFromCountry));
+        newInheritDataSourceFromCountry = dataSourceMongoRepository.saveAll(getNextSequence(newInheritDataSourceFromCountry));
         newInheritDataSourceFromCountry.forEach(dataSource -> {
             dataSourceIds.add(dataSource.getId());
         });

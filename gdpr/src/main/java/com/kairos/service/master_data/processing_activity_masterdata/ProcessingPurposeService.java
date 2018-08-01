@@ -70,7 +70,7 @@ public class ProcessingPurposeService extends MongoBaseService {
                     newProcessingPurposes.add(newProcessingPurpose);
 
                 }
-                newProcessingPurposes = processingPurposeMongoRepository.saveAll(sequenceGenerator(newProcessingPurposes));
+                newProcessingPurposes = processingPurposeMongoRepository.saveAll(getNextSequence(newProcessingPurposes));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingPurposes);
@@ -143,7 +143,7 @@ public class ProcessingPurposeService extends MongoBaseService {
         } else {
             exist=processingPurposeMongoRepository.findByid(id);
             exist.setName(processingPurpose.getName());
-            return processingPurposeMongoRepository.save(sequenceGenerator(exist));
+            return processingPurposeMongoRepository.save(getNextSequence(exist));
 
         }
     }
@@ -192,7 +192,7 @@ public class ProcessingPurposeService extends MongoBaseService {
                 processingPurposeIds.add(processingPurposeDTO.getId());
             }
         }
-        newInheritProcessingPurposeFromCountry = processingPurposeMongoRepository.saveAll(sequenceGenerator(newInheritProcessingPurposeFromCountry));
+        newInheritProcessingPurposeFromCountry = processingPurposeMongoRepository.saveAll(getNextSequence(newInheritProcessingPurposeFromCountry));
         newInheritProcessingPurposeFromCountry.forEach(dataSource -> {
             processingPurposeIds.add(dataSource.getId());
         });

@@ -63,7 +63,7 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivity.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
         processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
-        return processingActivityMongoRepository.save(sequenceGenerator(processingActivity));
+        return processingActivityMongoRepository.save(getNextSequence(processingActivity));
 
     }
 
@@ -114,7 +114,7 @@ public class ProcessingActivityService extends MongoBaseService {
         exist.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
         exist.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         exist.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
-        return processingActivityMongoRepository.save(sequenceGenerator(exist));
+        return processingActivityMongoRepository.save(getNextSequence(exist));
 
     }
 
@@ -143,7 +143,7 @@ public class ProcessingActivityService extends MongoBaseService {
             if (!responsibilityTypeDTO.getOrganizationId().equals(organizationId)) {
                 ResponsibilityType responsibilityType = new ResponsibilityType(responsibilityTypeDTO.getName(), countryId);
                 responsibilityType.setOrganizationId(organizationId);
-                responsibilityType = responsibilityTypeMongoRepository.save(sequenceGenerator(responsibilityType));
+                responsibilityType = responsibilityTypeMongoRepository.save(getNextSequence(responsibilityType));
                 processingActivity.setResponsibilityType(responsibilityType.getId());
             } else {
                 processingActivity.setResponsibilityType(responsibilityTypeDTO.getId());
