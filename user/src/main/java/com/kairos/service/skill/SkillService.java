@@ -439,6 +439,14 @@ public class SkillService extends UserBaseService {
         return map;
     }
 
+    /**
+     * @param
+     * @param staffId
+     * @param removedSkillIds
+     * @param isSelected
+     * @param unitId
+     * @return
+     */
     public List assignSkillToStaff(long staffId, List<Long> removedSkillIds, boolean isSelected, long unitId) {
 
         Staff staff = staffGraphRepository.findOne(staffId);

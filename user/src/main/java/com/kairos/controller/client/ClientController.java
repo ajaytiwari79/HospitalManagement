@@ -111,7 +111,7 @@ public class ClientController {
     @ApiOperation("Add People In HouseHold")
     @RequestMapping(value = "/{clientId}/household", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> updateClientHouseholdList(@RequestBody ClientMinimumDTO client, @PathVariable long unitId, @PathVariable long clientId) throws CloneNotSupportedException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.addHouseholdToClient(client, unitId, clientId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.addHouseholdMemberOfClient(client, unitId, clientId));
     }
 
     @ApiOperation("Get People In HouseHold")

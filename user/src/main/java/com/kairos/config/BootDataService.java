@@ -509,7 +509,7 @@ public class BootDataService {
 
         citizenStatusGraphRepository.saveAll(Arrays.asList(registeredStatus, livingPartnerStatus, disvorcedStatus, marriedStatus, singleStatus, deadStatus));
     }
-
+/*
     private void createCitizen() {
         johnOliver = new Client();
         johnOliver.setClientType(ClientEnum.CITIZEN);
@@ -560,7 +560,7 @@ public class BootDataService {
 //        secondHousehold.setLastName("Laursen");
 //        secondHousehold .setCprNumber("310849-4742");
 //
-//        johnOliver.setPeopleInHouseholdList(Arrays.asList(firstHousehold,secondHousehold));
+/        johnOliver.setPeopleInHouseholdList(Arrays.asList(firstHousehold,secondHousehold))
 
 
         johnOliver.setWheelChair(false);
@@ -613,8 +613,7 @@ public class BootDataService {
         clientLanguageRelationGraphRepository.save(clientLanguageRelation);
 
     }
-
-    private void createCountryLevelOrganization() {
+*/    private void createCountryLevelOrganization() {
 
         kairosCountryLevel = new Organization();
         kairosCountryLevel.setKairosHub(true);

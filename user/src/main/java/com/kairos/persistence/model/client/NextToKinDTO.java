@@ -4,6 +4,7 @@ package com.kairos.persistence.model.client;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.enums.Gender;
+import com.kairos.persistence.model.auth.User;
 import com.kairos.user.organization.AddressDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -32,7 +33,9 @@ public class NextToKinDTO {
     private Gender gender;
     private Integer age;
     private boolean updateHouseholdAddress;
-
+    @NotNull(message = "Civilian Status can't be empty")
+    private Long civilianStatusId;
+    private Long id;
 
     public Gender getGender() {
         return gender;
@@ -58,8 +61,6 @@ public class NextToKinDTO {
         this.civilianStatusId = civilianStatusId;
     }
 
-    private Long civilianStatusId;
-    private Long id;
 
     public boolean isVerifiedByGoogleMap() {
         return isVerifiedByGoogleMap;
@@ -159,20 +160,20 @@ public class NextToKinDTO {
         this.updateHouseholdAddress = updateHouseholdAddress;
     }
 
-    public NextToKinDTO buildResponse(Client nextToKin, String serverUrl, long relationTypeId,
+    public NextToKinDTO buildResponse(User nextToKin, String serverUrl, long relationTypeId,
                                       NextToKinDTO nextToKinDTO){
         ObjectMapper objectMapper = new ObjectMapper();
         this.id = nextToKin.getId();
         this.firstName = nextToKin.getFirstName();
         this.lastName = nextToKin.getLastName();
-        this.civilianStatusId = nextToKin.getCivilianStatus().getId();
+        this.civilianStatusId = nextToKinDTO.getCivilianStatusId();
         this.homeAddress = objectMapper.convertValue(nextToKin.getHomeAddress(),AddressDTO.class);
         this.homeAddress.setMunicipalityId(nextToKinDTO.getHomeAddress().getMunicipalityId());
         this.homeAddress.setZipCodeId(nextToKin.getHomeAddress().getZipCode().getId());
         this.gender = nextToKin.getGender();
         this.age = nextToKin.getAge();
         this.nickName = nextToKin.getNickName();
-        this.profilePic = serverUrl + nextToKin.getProfilePic();
+        this.profilePic = serverUrl + nextToKinDTO.getProfilePic();
         this.contactDetail = nextToKin.getContactDetail();
         this.cprNumber = nextToKin.getCprNumber();
         this.relationTypeId = relationTypeId;
