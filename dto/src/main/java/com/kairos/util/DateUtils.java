@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -302,6 +303,9 @@ public class DateUtils {
 
     public static Date asDate(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+    public static Date asDate(@NotNull(message = "date can not be null")LocalDate localDate) {
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     public static LocalDate asLocalDate(Date date) {
