@@ -2,8 +2,7 @@ package com.kairos.response.dto.common;
 
 import java.math.BigInteger;
 
-public class AccessorPartyReponseDTO {
-
+public class DataSourceResponseDTO {
 
     private BigInteger id;
 

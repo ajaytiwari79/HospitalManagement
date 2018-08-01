@@ -31,4 +31,11 @@ public class HostingProvider extends MongoBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    public HostingProvider(String name) {
+        this.name = name;
     }
+
+    public HostingProvider() {
+    }
+}

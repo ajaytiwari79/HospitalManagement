@@ -30,4 +30,11 @@ public class HostingType extends MongoBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    public HostingType() {
+    }
+
+    public HostingType(String name) {
+        this.name = name;
+    }
 }

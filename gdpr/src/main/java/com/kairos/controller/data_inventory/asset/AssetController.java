@@ -2,7 +2,7 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.dto.data_inventory.AssetDTO;
-import com.kairos.service.data_inventory.AssetService;
+import com.kairos.service.data_inventory.asset.AssetService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

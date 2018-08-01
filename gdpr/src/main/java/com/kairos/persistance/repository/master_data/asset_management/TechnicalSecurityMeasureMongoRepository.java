@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
-import com.kairos.response.dto.common.TechnicalSecurityMeasureReponseDTO;
+import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -9,29 +9,38 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
 public interface TechnicalSecurityMeasureMongoRepository extends MongoRepository<TechnicalSecurityMeasure,BigInteger> {
 
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    TechnicalSecurityMeasure findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
+    @Query("{countryId:?0,_id:?1,deleted:false}")
+    TechnicalSecurityMeasure findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
-    TechnicalSecurityMeasure findByNameAndCountryId(Long countryId,Long organizationId,String name);
+    @Query("{countryId:?0,name:?1,deleted:false}")
+    TechnicalSecurityMeasure findByNameAndCountryId(Long countryId,String name);
 
 
     TechnicalSecurityMeasure findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1}")
-    List<TechnicalSecurityMeasure> findAllTechnicalSecurityMeasures(Long countryId,Long organizationId);
+    @Query("{deleted:false,countryId:?0}")
+    List<TechnicalSecurityMeasureResponseDTO> findAllTechnicalSecurityMeasures(Long countryId);
 
     @Query("{deleted:false,_id:{$in:?0}}")
-    List<TechnicalSecurityMeasureReponseDTO> findTechnicalSecurityMeasuresListByIds(List<BigInteger> ids);
+    List<TechnicalSecurityMeasureResponseDTO> findTechnicalSecurityMeasuresListByIds(List<BigInteger> ids);
 
 
-    @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
-    List<TechnicalSecurityMeasure>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);
+    @Query("{deleted:false,organizationId:?0}")
+    List<TechnicalSecurityMeasureResponseDTO> findAllOrganzationTechnicalSecurityMeasures(Long organizationId);
+
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
+    TechnicalSecurityMeasure findByOrganizationIdAndId(Long organizationId,BigInteger id);
+
+
+    @Query("{organizationId:?0,name:?1,deleted:false}")
+    TechnicalSecurityMeasure findByOrganizationIdAndName(Long organizationId,String name);
+
+
+
 }

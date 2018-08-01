@@ -31,4 +31,10 @@ public class DataSource extends  MongoBaseEntity {
         this.name = name;
     }
 
+    public DataSource(String name) {
+        this.name = name;
+    }
+
+    public DataSource() {
+    }
 }

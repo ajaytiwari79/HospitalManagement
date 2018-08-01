@@ -1,4 +1,4 @@
-package com.kairos.service.data_inventory;
+package com.kairos.service.data_inventory.asset;
 
 import com.kairos.dto.data_inventory.AssetDTO;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
