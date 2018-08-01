@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management.storage_format;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
-import com.kairos.response.dto.metadata.StorageFormatResponseDTO;
+import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

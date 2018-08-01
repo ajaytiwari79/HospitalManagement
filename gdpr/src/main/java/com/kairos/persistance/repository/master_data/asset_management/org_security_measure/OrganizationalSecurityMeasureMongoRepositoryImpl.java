@@ -3,13 +3,11 @@ package com.kairos.persistance.repository.master_data.asset_management.org_secur
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.metadata.OrganizationalSecurityMeasureResponseDTO;
+import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.Fields;
-import org.springframework.data.mongodb.core.aggregation.ReplaceRootOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import javax.inject.Inject;
 import java.util.ArrayList;

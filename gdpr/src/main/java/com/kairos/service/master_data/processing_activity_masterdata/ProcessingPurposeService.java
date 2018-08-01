@@ -9,7 +9,7 @@ import com.kairos.dto.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.metadata.ProcessingPurposeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
-import com.kairos.response.dto.metadata.ProcessingPurposeResponseDTO;
+import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;

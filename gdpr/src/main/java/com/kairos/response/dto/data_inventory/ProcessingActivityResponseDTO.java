@@ -4,10 +4,10 @@ package com.kairos.response.dto.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistance.model.data_inventory.ManagingOrganization;
 import com.kairos.persistance.model.data_inventory.Staff;
-import com.kairos.response.dto.metadata.AccessorPartyReponseDTO;
-import com.kairos.response.dto.metadata.DataSourceResponseDTO;
-import com.kairos.response.dto.metadata.ProcessingPurposeResponseDTO;
-import com.kairos.response.dto.metadata.TransferMethodResponseDTO;
+import com.kairos.response.dto.common.AccessorPartyReponseDTO;
+import com.kairos.response.dto.common.DataSourceResponseDTO;
+import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
+import com.kairos.response.dto.common.TransferMethodResponseDTO;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

@@ -1,6 +1,6 @@
 package com.kairos.persistance.repository.master_data.asset_management.org_security_measure;
 
-import com.kairos.response.dto.metadata.OrganizationalSecurityMeasureResponseDTO;
+import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
 
 import java.util.List;
 

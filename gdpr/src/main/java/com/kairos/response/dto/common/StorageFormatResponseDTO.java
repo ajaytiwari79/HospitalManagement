@@ -1,13 +1,14 @@
-package com.kairos.response.dto.metadata;
+package com.kairos.response.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.math.BigInteger;
 
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProcessingLegalBasisResponseDTO {
-
+public class StorageFormatResponseDTO {
 
     private BigInteger id;
 

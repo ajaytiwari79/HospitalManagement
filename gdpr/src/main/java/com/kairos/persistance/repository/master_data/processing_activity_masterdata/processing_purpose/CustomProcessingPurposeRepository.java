@@ -1,6 +1,6 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata.processing_purpose;
 
-import com.kairos.response.dto.metadata.ProcessingPurposeResponseDTO;
+import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
 
 import java.util.List;
 

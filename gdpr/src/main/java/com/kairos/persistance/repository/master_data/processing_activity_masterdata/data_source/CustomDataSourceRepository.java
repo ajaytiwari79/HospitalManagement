@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source;
 
 
-import com.kairos.response.dto.metadata.DataSourceResponseDTO;
+import com.kairos.response.dto.common.DataSourceResponseDTO;
 
 import java.util.List;
 

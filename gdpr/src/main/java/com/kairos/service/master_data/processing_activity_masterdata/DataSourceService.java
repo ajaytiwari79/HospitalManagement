@@ -9,7 +9,7 @@ import com.kairos.dto.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.metadata.DataSourceDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
-import com.kairos.response.dto.metadata.DataSourceResponseDTO;
+import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;

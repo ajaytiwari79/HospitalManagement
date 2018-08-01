@@ -1,4 +1,4 @@
-package com.kairos.response.dto.metadata;
+package com.kairos.response.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -6,7 +6,7 @@ import java.math.BigInteger;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AccessorPartyReponseDTO {
+public class ProcessingLegalBasisResponseDTO {
 
 
     private BigInteger id;

@@ -4,7 +4,7 @@ package com.kairos.persistance.repository.master_data.processing_activity_master
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.metadata.AccessorPartyReponseDTO;
+import com.kairos.response.dto.common.AccessorPartyReponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;

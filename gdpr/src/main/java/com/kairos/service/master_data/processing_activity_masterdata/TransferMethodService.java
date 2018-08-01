@@ -8,7 +8,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.metadata.TransferMethodDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.TransferMethod;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
-import com.kairos.response.dto.metadata.TransferMethodResponseDTO;
+import com.kairos.response.dto.common.TransferMethodResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;

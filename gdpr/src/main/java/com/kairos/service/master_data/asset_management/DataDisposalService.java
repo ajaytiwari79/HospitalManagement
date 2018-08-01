@@ -7,7 +7,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
-import com.kairos.response.dto.metadata.DataDisposalResponseDTO;
+import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;

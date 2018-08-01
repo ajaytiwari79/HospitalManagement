@@ -1,7 +1,6 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type;
 
-import com.kairos.dto.metadata.ResponsibilityTypeDTO;
-import com.kairos.response.dto.metadata.ResponsibilityTypeResponseDTO;
+import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 
 import java.util.List;
 

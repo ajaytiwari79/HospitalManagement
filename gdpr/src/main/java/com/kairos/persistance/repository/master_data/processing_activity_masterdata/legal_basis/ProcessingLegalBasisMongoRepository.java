@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata.legal_basis;
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
-import com.kairos.response.dto.metadata.ProcessingLegalBasisResponseDTO;
+import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

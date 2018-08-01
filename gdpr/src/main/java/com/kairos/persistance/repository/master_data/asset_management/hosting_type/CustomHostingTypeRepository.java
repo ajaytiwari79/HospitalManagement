@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management.hosting_type;
 
 
-import com.kairos.response.dto.metadata.HostingTypeResponseDTO;
+import com.kairos.response.dto.common.HostingTypeResponseDTO;
 
 import java.util.List;
 

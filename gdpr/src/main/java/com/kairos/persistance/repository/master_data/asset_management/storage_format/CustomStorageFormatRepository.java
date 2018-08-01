@@ -1,6 +1,6 @@
 package com.kairos.persistance.repository.master_data.asset_management.storage_format;
 
-import com.kairos.response.dto.metadata.StorageFormatResponseDTO;
+import com.kairos.response.dto.common.StorageFormatResponseDTO;
 
 import java.util.List;
 

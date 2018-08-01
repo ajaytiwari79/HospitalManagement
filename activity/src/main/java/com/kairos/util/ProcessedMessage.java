@@ -2,7 +2,7 @@ package com.kairos.util;
 
 
 /**
- * ProcessedMessage with metadata response fields
+ * ProcessedMessage with common response fields
  */
 public class ProcessedMessage {
 

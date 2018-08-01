@@ -1,16 +1,13 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type;
 
-import com.kairos.dto.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.metadata.ResponsibilityTypeResponseDTO;
+import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.Fields;
-import org.springframework.data.mongodb.core.aggregation.ReplaceRootOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.inject.Inject;

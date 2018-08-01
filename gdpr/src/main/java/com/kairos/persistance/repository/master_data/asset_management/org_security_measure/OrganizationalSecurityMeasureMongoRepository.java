@@ -2,7 +2,7 @@ package com.kairos.persistance.repository.master_data.asset_management.org_secur
 
 
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
-import com.kairos.response.dto.metadata.OrganizationalSecurityMeasureResponseDTO;
+import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

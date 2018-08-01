@@ -7,7 +7,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistance.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
-import com.kairos.response.dto.metadata.OrganizationalSecurityMeasureResponseDTO;
+import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;

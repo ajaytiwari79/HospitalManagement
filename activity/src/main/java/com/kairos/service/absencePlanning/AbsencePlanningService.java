@@ -532,7 +532,7 @@ public class AbsencePlanningService {
     }
 
     /**
-     * This method is used to get Left hand side metadata data of given unit required for further filtering Absence planner tasks.
+     * This method is used to get Left hand side common data of given unit required for further filtering Absence planner tasks.
      *
      * @param unitId
      * @return

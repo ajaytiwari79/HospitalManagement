@@ -7,7 +7,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.persistance.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
-import com.kairos.response.dto.metadata.HostingProviderResponseDTO;
+import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;

@@ -27,7 +27,7 @@
         </triggeringPolicy>
     </appender>-->
     <!--<logger name="org" level="INFO"/>-->
-    <!--<logger name="org.drools.core.metadata.DefaultAgenda" level="INFO"/>-->
+    <!--<logger name="org.drools.core.common.DefaultAgenda" level="INFO"/>-->
     <!--<logger name="com" level="INFO"/>-->
     <logger name="com.kairos.planner.vrp.taskplanning" level="DEBUG"/>
     <logger name="org.optaplanner" level="DEBUG"/>

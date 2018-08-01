@@ -8,7 +8,7 @@ import com.kairos.dto.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.metadata.AccessorPartyDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
-import com.kairos.response.dto.metadata.AccessorPartyReponseDTO;
+import com.kairos.response.dto.common.AccessorPartyReponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
