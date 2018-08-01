@@ -1,6 +1,6 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
-import com.kairos.persistance.model.master_data.processing_activity_masterdata.Destination;
+import com.kairos.persistance.model.master_data.default_proc_activity_setting.Destination;
 import com.kairos.service.master_data.processing_activity_masterdata.DestinationService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.validate_list.ValidateListOfRequestBody;

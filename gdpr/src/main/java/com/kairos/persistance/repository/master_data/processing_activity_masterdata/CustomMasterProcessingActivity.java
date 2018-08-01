@@ -2,8 +2,9 @@ package com.kairos.persistance.repository.master_data.processing_activity_master
 
 import com.kairos.dto.FilterSelection;
 import com.kairos.dto.FilterSelectionDTO;
+import com.kairos.dto.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.enums.FilterType;
-import com.kairos.persistance.model.master_data.processing_activity_masterdata.MasterProcessingActivity;
+import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -20,10 +21,11 @@ public interface CustomMasterProcessingActivity {
 
    List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId,Long organizationId);
 
-   List<MasterProcessingActivity> getMasterProcessingActivityWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
+   List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityWithFilterSelection(Long countryId,Long organizationId,FilterSelectionDTO filterSelectionDto);
 
-   Criteria buildQuery(FilterSelection filterSelection, FilterType filterType, Query query);
+   Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType);
 
+   List<MasterProcessingActivity> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId, Long organizationId, OrganizationMetaDataDTO organizationMetaDataDTO);
 
 
 }

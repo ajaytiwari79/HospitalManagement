@@ -153,9 +153,9 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public Map<String, Object> getAllActivityByUnitAndDeleted(Long unitId) {
         Map<String, Object> response = new HashMap<>();
-        Long organizationId = organizationRestClient.getCountryIdOfOrganization(unitId);
+        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
         List<ActivityTagDTO> activities = activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false);
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationId);
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         response.put("activities", activities);
         response.put("activityCategories", activityCategories);
         return response;
@@ -208,6 +208,7 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.category.notExist");
         }
         Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
+        generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
         GeneralActivityTab generalTab = new GeneralActivityTab();
         ObjectMapperUtils.copyProperties(generalDTO, generalTab);
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {

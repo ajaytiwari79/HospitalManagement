@@ -8,6 +8,7 @@ import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,15 +29,22 @@ public class WTARulesSpecification extends AbstractSpecification<ShiftWithActivi
 
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shift) {
-        ruleTemplates.forEach(ruleTemplateWrapper -> {
-            ruleTemplateWrapper.isSatisfied(ruleTemplateSpecificInfo);
-        });
+
         return true;
     }
 
     @Override
     public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
-        return null;
+        List<String> exceptionMessages = new ArrayList<>();
+        for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
+            String exceptionMessage = ruleTemplate.isSatisfied(ruleTemplateSpecificInfo);
+            if(!exceptionMessage.isEmpty()){
+                exceptionMessages.add("message.ruleTemplate.broken");
+                exceptionMessages.add(exceptionMessage);
+                break;
+            }
+        }
+        return exceptionMessages;
     }
 
 }

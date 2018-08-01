@@ -9,7 +9,11 @@ import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.client.dto.TableConfiguration;
+import com.kairos.dto.KairosScheduleJobDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
+import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.agreement.cta.*;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ClientMinimumDTO;
@@ -57,7 +61,7 @@ import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
-import com.kairos.service.integration.PriorityGroupIntegrationService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.EmploymentService;
@@ -157,7 +161,9 @@ public class UnitPositionService extends UserBaseService {
     @Inject
     ExpertiseEmploymentTypeRelationshipGraphRepository expertiseEmploymentTypeRelationshipGraphRepository;
     @Inject
-    private PriorityGroupIntegrationService priorityGroupIntegrationService;
+    private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private KafkaProducer kafkaProducer;
 
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) {
@@ -270,6 +276,7 @@ public class UnitPositionService extends UserBaseService {
         oldUnitPosition.setHistory(true);
         oldUnitPosition.setEditable(false);
         Set<Long> olderFunctionsAddedInUnitPosition = oldUnitPosition.getFunctions() != null ? oldUnitPosition.getFunctions().stream().map(Function::getId).collect(Collectors.toSet()) : Collections.emptySet();
+        //TODO Vipul update equals method
         if (!olderFunctionsAddedInUnitPosition.equals(unitPositionDTO.getFunctionIds())) {
             List<Function> functions = new ArrayList<>();
             if (!unitPositionDTO.getFunctionIds().isEmpty()) {
@@ -312,7 +319,9 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());
         unitPosition.setHourlyWages(unitPositionDTO.getHourlyWages());
         unitPosition.setSalary(unitPositionDTO.getSalary());
+        unitPosition.setStartDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate()));
     }
+
 
     private boolean calculativeValueChanged(UnitPosition oldUnitPosition, UnitPositionDTO unitPositionDTO, UnitPositionEmploymentTypeRelationShip oldUnitPositionEmploymentTypeRelationShip) {
         if (oldUnitPosition.getAvgDailyWorkingHours() != unitPositionDTO.getAvgDailyWorkingHours() ||
@@ -324,6 +333,16 @@ public class UnitPositionService extends UserBaseService {
             return true;
         }
         return false;
+    }
+
+    private void linkUnitPositionWithEmploymentType(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO) {
+        EmploymentType employmentType = employmentTypeGraphRepository.findOne(unitPositionDTO.getEmploymentTypeId());
+        if (!Optional.ofNullable(employmentType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.position.employmenttype.notexist", unitPositionDTO.getEmploymentTypeId());
+        }
+
+        UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
+        unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
     }
 
     public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO, Long unitId, String type, Boolean saveAsDraft) {
@@ -359,6 +378,7 @@ public class UnitPositionService extends UserBaseService {
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             oldUnitPosition.setEndDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate().minusDays(1L)));
             save(unitPosition);
+            linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         }
         // calculative value is not changed but still user still wants to save as draft.
@@ -366,6 +386,7 @@ public class UnitPositionService extends UserBaseService {
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             save(unitPosition);
+            linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         }
         // calculative value is not changed but still user is publishing it it means olny end date is updated.
@@ -380,6 +401,7 @@ public class UnitPositionService extends UserBaseService {
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             save(unitPosition);
+            linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         } else {
             // update in current copy
@@ -626,10 +648,7 @@ public class UnitPositionService extends UserBaseService {
 
             }
         }
-        if (unitPositionDTO.getStartLocalDate().isBefore(LocalDate.now())) {
-            exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
 
-        }
         oldUnitPosition.setStartDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate()));
 
         if (Optional.ofNullable(unitPositionDTO.getEndLocalDate()).isPresent()) {
@@ -1087,6 +1106,29 @@ public class UnitPositionService extends UserBaseService {
                 exceptionService.invalidRequestException("message.employmentdata.lessthan.mainEmploymentEndDate");
             }
         }
+
+            if (!endDateMillis.equals(employment.getEndDateMillis())) {
+                KairosScheduleJobDTO scheduledJob;
+
+                Long oneTimeTriggerDateMillis = null;
+                oneTimeTriggerDateMillis = DateUtils.getEndOfDayMillisforUnitFromEpoch(unit.getTimeZone(), endDateMillis);
+                IntegrationOperation operation = null;
+                if (Optional.ofNullable(employment.getEndDateMillis()).isPresent() && Optional.ofNullable(endDateMillis).isPresent()) {
+
+                    operation = IntegrationOperation.UPDATE;
+
+                } else if (Optional.ofNullable(employment.getEndDateMillis()).isPresent() && !Optional.ofNullable(endDateMillis).isPresent()) {
+                    operation = IntegrationOperation.DELETE;
+                } else if (!Optional.ofNullable(employment.getEndDateMillis()).isPresent() && Optional.ofNullable(endDateMillis).isPresent()) {
+
+                    operation = IntegrationOperation.CREATE;
+                }
+
+                scheduledJob = new KairosScheduleJobDTO(unit.getId(), JobType.FUNCTIONAL, JobSubType.EMPLOYMENT_END, BigInteger.valueOf(employment.getId()),
+                        operation, oneTimeTriggerDateMillis, true);
+                kafkaProducer.pushToJobQueue(scheduledJob);
+            }
+
         employment.setEndDateMillis(endDateMillis);
         employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
 
@@ -1094,11 +1136,13 @@ public class UnitPositionService extends UserBaseService {
         employment.setAccessGroupIdOnEmploymentEnd(accessGroupId);
         unitPositionGraphRepository.saveAll(unitPositions);
         employmentGraphRepository.save(employment);
+
         if (Optional.ofNullable(employmentEndDate).isPresent() && (DateUtil.getDateFromEpoch(endDateMillis).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString())) == 0)) {
             //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
             List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
             employmentService.moveToReadOnlyAccessGroup(employmentIds);
         }
+
         User user = userGraphRepository.getUserByStaffId(staffId);
         EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), employment.getReasonCode().getId(), employment.getAccessGroupIdOnEmploymentEnd());
         EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employmentUpdated, unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()));
@@ -1179,7 +1223,7 @@ public class UnitPositionService extends UserBaseService {
         currentCTAs.forEach(currentCTA -> {
             currentCTA.setVersions(ctaMapByParentId.get(currentCTA.getId()));
         });
-        TableConfiguration tableConfiguration = priorityGroupIntegrationService.getTableSettings(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
+        TableConfiguration tableConfiguration = activityIntegrationService.getTableSettings(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
         CTATableSettingWrapper ctaTableSettingWrapper = new CTATableSettingWrapper(currentCTAs, tableConfiguration);
         return ctaTableSettingWrapper;
     }

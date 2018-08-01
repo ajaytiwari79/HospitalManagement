@@ -1,14 +1,8 @@
 package com.kairos.controller.counters;
 
 
-import com.kairos.activity.enums.counter.ChartType;
-import com.kairos.activity.enums.counter.CounterSize;
-import com.kairos.activity.enums.counter.RepresentationUnit;
-import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.counter.chart.BaseChart;
-import com.kairos.persistence.model.counter.chart.GaugeChart;
-import com.kairos.persistence.model.counter.chart.SingleNumberChart;
 import com.kairos.service.counter.CounterDataService;
 import com.kairos.util.response.ResponseHandler;
 import org.springframework.http.HttpStatus;

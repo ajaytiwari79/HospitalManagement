@@ -4,7 +4,7 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
-import com.kairos.wrapper.ReasonCodeDTO;
+import com.kairos.user.reason_code.ReasonCodeDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,8 +28,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.inject.Inject;
 import java.util.List;
 
-import static com.kairos.persistence.model.enums.ReasonCodeType.ABSENCE;
-import static com.kairos.persistence.model.enums.ReasonCodeType.EMPLOYMENT;
+import static com.kairos.enums.reason_code.ReasonCodeType.ABSENCE;
+import static com.kairos.enums.reason_code.ReasonCodeType.EMPLOYMENT;
 
 /**
  * Created by pavan on 24/3/18.

@@ -92,7 +92,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "return  case when skill is NULL then [] else collect({id:id(skill),name:skill.name}) END as  skillList  ,skillCategory.name as name ,id(skillCategory) as id,skillCategory.description as description")
     List<OrgTypeSkillQueryResult> getSkillsOfOrganizationType(long orgTypeId);
 
-    @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
+    @Query("Match (n:Organization{isEnable:true,union:false,boardingCompleted:true,isKairosHub:false,gdprUnit:false})-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) where id(organizationType)={0} return DISTINCT n")
     List<Organization> getOrganizationsByOrganizationType(long orgTypeId);
 
 
@@ -152,6 +152,9 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             " optional match(oras)-[:ORGANIZATION_SUB_SERVICE]-(sub:OrganizationService) with or,ora,oras,sub, {name: oras.name,id:id(oras), organizationSubServices: CASE WHEN sub IS NOT NULL THEN collect({id:id(sub),name:sub.name}) ELSE [] END} as service_subService with or,ora,{name: ora.name,id:id(ora)," +
             "organizationServices: CASE WHEN service_subService IS NOT NULL THEN collect (service_subService) ELSE [] END} as service_SubService_ORG with or,{name: or.name,id:id(or),organizationSubTypes: CASE WHEN service_SubService_ORG IS NOT NULL THEN collect (service_SubService_ORG) ELSE [] END} as organizationType return organizationType")
     List<Map> getAllOrganizationTypeAndServiceAndSubServices(Long countryId);
+
+    @Query("MATCH (organizationSubType:OrganizationType)<-[:" +HAS_SUB_TYPE + "]-(organizationType:OrganizationType) where id(organizationSubType)={0} return id(organizationType)")
+    Long findOrganizationTypeIdBySubTypeId(Long organizationSubTypeId);
 
 
 }

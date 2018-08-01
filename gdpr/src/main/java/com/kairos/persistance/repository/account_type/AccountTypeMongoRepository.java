@@ -29,5 +29,4 @@ public interface AccountTypeMongoRepository extends  MongoRepository<AccountType
   AccountType findByName(Long countryId,String name);
 
 
-
 }

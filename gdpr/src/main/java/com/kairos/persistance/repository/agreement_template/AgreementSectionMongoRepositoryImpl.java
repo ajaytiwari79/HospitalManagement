@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.agreement_template;
 
 import com.kairos.persistance.model.agreement_template.AgreementSection;
-import com.kairos.response.dto.master_data.AgreementSectionResponseDTO;
+import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;

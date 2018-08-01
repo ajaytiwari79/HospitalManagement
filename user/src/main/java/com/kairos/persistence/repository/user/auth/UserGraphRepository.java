@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.auth;
 
-import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.auth.TabPermission;
@@ -13,9 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENTS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -29,10 +26,10 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     User findOne(Long id);
 
-    @Query("MATCH (n:User) WHERE n.timeCareExternalId={0}  RETURN n LIMIT 1")
-    User findByTimeCareExternalId(String timeCareExternalId);
+    @Query("MATCH (u:User) WHERE u.timeCareExternalId={0} OR u.userName={1} OR u.email={2}  RETURN u ")
+    User findByTimeCareExternalIdOrUserNameOrEmail(String timeCareExternalId,String userName,String email);
 
-    @Query("MATCH (n:User) WHERE n.cprNumber={0} AND Not n:Client RETURN n")
+    @Query("MATCH (n:User) WHERE n.cprNumber={0} AND Not n:Client RETURN n ")
     User findUserByCprNumber(String cprNumber);
 
     List<User> findAll();
@@ -83,4 +80,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("Match (u:User) WHERE id(u)={0} " +
             "MATCH (u)<-[:"+BELONGS_TO+"]-(s:Staff)<-[:"+BELONGS_TO+"]-(e:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization)-[:"+COUNTRY+"]->(c:Country) return c")
     Country getCountryOfUser(Long userId);
+
+    @Query("Match(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) where id(user)={0} return id(userLanguage)")
+    Long getUserSelectedLanguageId(Long userId);
 }

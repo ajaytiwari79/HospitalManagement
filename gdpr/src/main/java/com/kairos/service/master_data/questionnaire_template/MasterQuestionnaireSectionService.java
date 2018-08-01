@@ -120,7 +120,6 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
                 questionnaireSection.setQuestions((List<BigInteger>) questions.get(IDS_LIST));
             }
             masterQuestionnaireSections.add(questionnaireSection);
-
         }
         try {
             masterQuestionnaireSections = masterQuestionnaireSectionRepository.saveAll(sequenceGenerator(masterQuestionnaireSections));

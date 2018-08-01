@@ -1,0 +1,73 @@
+// To unset shiftState from previously created shifts
+db.shifts.updateMany({},{$unset:{"shiftState":1}});
+
+//To update the previously created shiftState as status array
+db.shifts.updateMany({},{$set:{"status":["PUBLISHED"]}});
+
+//To get the phases of country
+db.phases.find({"countryId":NumberLong(4)});
+
+
+
+
+//To Update the Phases of Rules Tab in Activity
+//TODO phaseId should be replaced by the resulted id of above Query
+db.activities.updateMany({"countryId":NumberLong(4)},{$set:{"rulesActivityTab.eligibleForSchedules" : [
+         {
+				"phaseId" : "1",
+				"name" : "REQUEST",
+				"description" : "REQUEST PHASE",
+				"eligibleForStaff" : false,
+				"eligibleForManagement" : false
+			},
+			{
+				"phaseId" : "2",
+				"name" : "PUZZLE",
+				"description" : "PUZZLE PHASE",
+				"eligibleForStaff" : false,
+				"eligibleForManagement" : false
+			},
+			{
+				"phaseId" : "3",
+				"name" : "CONSTRUCTION",
+				"description" : "CONSTRUCTION PHASE",
+				"eligibleForStaff" : false,
+				"eligibleForManagement" : false
+			},
+			{
+				"phaseId" : "4",
+				"name" : "DRAFT",
+				"description" : "DRAFT PHASE",
+				"eligibleForStaff" : false,
+				"eligibleForManagement" : false
+			},
+			{
+				"phaseId" : "491",
+				"name" : "REALTIME",
+				"description" : "Realtime phase",
+				"eligibleForStaff" : false,
+				"eligibleForManagement" : false
+			},
+			{
+				"phaseId" : "492",
+				"name" : "TIME & ATTENDANCE",
+				"description" : "TIME & ATTENDANCE PHASE",
+				"eligibleForStaff" : false,
+				"eligibleForManagement" : false
+			},
+			{
+				"phaseId" : "493",
+				"name" : "TENTATIVE",
+				"description" : "TENTATIVE PHASE",
+				"eligibleForStaff" : false,
+				"eligibleForManagement" : false
+			},
+			{
+				"phaseId" : "494",
+				"name" : "PAYROLL",
+				"description" : "PAYROLL PHASE",
+				"eligibleForStaff" : false,
+				"eligibleForManagement" : false
+			}]}})
+
+

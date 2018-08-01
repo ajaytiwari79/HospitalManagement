@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static com.planner.constants.ApiConstants.API_UNIT_URL;
@@ -138,6 +139,13 @@ public class PlanningController {
 	ResponseEntity<Map<String, Object>> getSolutionBySolverConfigId(@PathVariable BigInteger solverConfigId) {
 		return ResponseHandler.generateResponseWithData(StaticField.VRPPROBLEM_SUBMIT, HttpStatus.ACCEPTED,plannerService.getSolutionBySolverConfigId(solverConfigId));
 	}
+
+	@GetMapping(value = "/vrp/{solverConfigId}/get_indictment")
+	ResponseEntity<Map<String, Object>> getIndictmentBySolverConfigId(@PathVariable BigInteger solverConfigId) {
+		return ResponseHandler.generateResponseWithData(StaticField.VRPPROBLEM_SUBMIT, HttpStatus.ACCEPTED,plannerService.getIndictmentBySolverConfigId(solverConfigId));
+	}
+
+
 
 
 

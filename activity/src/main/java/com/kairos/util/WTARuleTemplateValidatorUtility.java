@@ -34,7 +34,7 @@ import static com.kairos.constants.AppConstants.*;
 
 public class WTARuleTemplateValidatorUtility {
 
-    public static int getConsecutiveDays(List<LocalDate> localDates) {
+    public static int getConsecutiveDaysInDate(List<LocalDate> localDates) {
         if(localDates.size()<2) return 0;
         //Collections.sort(localDates);
         int count = 1;
@@ -249,21 +249,7 @@ public class WTARuleTemplateValidatorUtility {
                     shiftQueryResultWithActivities.add(s);
                 }
             });
-        }/*
-        if(plannedTimeIds!=null && !plannedTimeIds.isEmpty()){
-            shifts.forEach(s->{
-                if(plannedTimeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getPlannedTypeId())){
-                    shiftQueryResultWithActivities.add(s);
-                }
-            });
         }
-        if(activitieIds!=null && !activitieIds.isEmpty()){
-            shifts.forEach(s->{
-                if(activitieIds.contains(s.getActivity().getId())){
-                    shiftQueryResultWithActivities.add(s);
-                }
-            });
-        }*/
         return shiftQueryResultWithActivities;
     }
 

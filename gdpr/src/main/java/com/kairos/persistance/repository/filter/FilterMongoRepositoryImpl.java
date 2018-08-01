@@ -6,8 +6,8 @@ import com.kairos.dto.master_data.ModuleIdDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
-import com.kairos.persistance.model.master_data.asset_management.MasterAsset;
-import com.kairos.persistance.model.master_data.processing_activity_masterdata.MasterProcessingActivity;
+import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
+import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.response.dto.filter.FilterQueryResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.facet;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static com.kairos.constants.AppConstant.CLAUSE_MODULE_NAME;
@@ -31,6 +32,7 @@ import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 import static com.kairos.constants.AppConstant.DELETED;
 import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
+import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_ID;
 
 
 public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
@@ -40,9 +42,14 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Map<String, AggregationOperation> getFilterCriteria(Long countryId,Long organizationId,List<FilterType> filterTypes) {
+    public Map<String, AggregationOperation> getFilterCriteria(Long countryId, Long organizationId, List<FilterType> filterTypes, FilterGroup filterGroup) {
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
-        aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
+        if (filterGroup.getAccessModule().get(0).getModuleId().equals(MASTER_PROCESSING_ACTIVITY_MODULE_ID)) {
+            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId).and("isSubProcess").is(false)));
+
+        } else {
+            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
+        }
         filterTypes.forEach(filterType -> {
                     aggregationOperations.put(filterType.value, buildAggregationQuery(filterType));
                 }
@@ -74,7 +81,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     }
 
     @Override
-    public Aggregation createAggregationQueryForMasterAsset(Map<String, AggregationOperation> aggregationOperations) {
+    public Aggregation createAggregationQueryForFilterCategory(Map<String, AggregationOperation> aggregationOperations) {
         GroupOperation groupOperation = group();
         List<AggregationOperation> operations = new ArrayList<>();
         operations.add(aggregationOperations.get("match"));

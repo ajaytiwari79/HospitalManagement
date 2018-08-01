@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.kairos.enums.WTATemplateType;
-import com.kairos.activity.wta.templates.AgeRange;
+import com.kairos.activity.wta.AgeRange;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 

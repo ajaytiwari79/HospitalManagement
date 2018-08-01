@@ -19,13 +19,19 @@
         <encoder>
             <pattern>%cyan([Planner]) %d %magenta(%p) [%t] %highlight(%class{0}.%M\(%L\)) | %m%n</pattern>
         </encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+        <!--<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <maxIndex>1</maxIndex>
-            <FileNamePattern>/opt/kairos/micro-service-logs/planner-service/kairos-planner.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <FileNamePattern>/opt/kairos/micro-service-logs/planner-service/kairos-planner.%d{yyyy-MM-dd_HH_mm}.%i.log</FileNamePattern>
         </rollingPolicy>
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>10000KB</MaxFileSize>
-        </triggeringPolicy>
+            <MaxFileSize>100KB</MaxFileSize>
+        </triggeringPolicy>-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>/opt/kairos/micro-service-logs/planner-service/kairos-planner.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10000KB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
     </appender>
     <logger name="com" level="INFO"/>
     <logger name="com.kairos.planner.vrp.taskplanning" level="DEBUG"/>

@@ -219,8 +219,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
 
     @Query("MATCH (user:User)-[:BELONGS_TO]-(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) where id(user)={0}\n" +
-            "match(org)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization) with org,subOrg,staff,employment \n" +
-            "optional match(subOrg)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false,published:true})<-[:BELONGS_TO_STAFF]-(staff) with unitPosition,org,subOrg,staff,employment \n" +
+            "match(org)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization)\n" +
+            "match(subOrg)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false,published:true})<-[:BELONGS_TO_STAFF]-(staff)\n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "return  id(unitPosition) as id,positionCode as positionCode,unitPosition.history as history, unitPosition.workingTimeAgreementId as workingTimeAgreementId,\n" +
             "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ORDER BY unitPosition.creationDate" +
@@ -289,7 +289,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(countryHolidayCalender:`CountryHolidayCalender`) WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,dayType,positionCode,org,CASE WHEN countryHolidayCalender IS NULL THEN [] ELSE collect(distinct ID(countryHolidayCalender)) END  as countryHolidayCalender\n" +
             "optional  MATCH (ruleTemp)-[:`HAS_ACCESS_GROUP`]-(accessGroup:`AccessGroup`) WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,positionCode,org ,\n" +
             "CASE WHEN cTARuleTemplateDayTypes IS NULL THEN [] ELSE collect(distinct {dayType:ID(dayType),countryHolidayCalenders:countryHolidayCalender}) END as calculateOnDayTypes \n" +
-            "optional  MATCH (ruleTemp)-[:`HAS_EMPLOYMENT_TYPE`]-(employmentType:`EmploymentType`)  WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,positionCode,org,CASE WHEN employmentType IS NULL THEN [] ELSE  collect(distinct ID(employmentType)) END as employmentTypes\n" +
+            "optional  MATCH (ruleTemp)-[:`HAS_EMPLOYMENT_TYPE`]-(employmentType:EmploymentType{deleted:false})  WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,positionCode,org,CASE WHEN employmentType IS NULL THEN [] ELSE  collect(distinct ID(employmentType)) END as employmentTypes\n" +
             "optional  MATCH (ruleTemp)-[:`HAS_TIME_TYPES`]-(timeType:`TimeType`) WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes,positionCode,org, CASE WHEN timeType IS NULL THEN [] ELSE collect(distinct ID(timeType)) END as timeTypes\n" +
             "optional  MATCH (ruleTemp)-[:`HAS_COMPENSATION_TABLE`]-(compensationTable:`CompensationTable`) WITH unitPosition,cta,expertise,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,positionCode,org \n" +
             "optional  MATCH (compensationTable)-[:`HAS_COMPENSATION_TABLE_INTERVAL`]-(compensationTableInterval:`CompensationTableInterval`)  \n" +
@@ -312,12 +312,13 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "employmentTypes:employmentTypes,phaseInfo:phaseInfo,plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType}}) END as ruleTemplates ORDER BY id DESC")
     List<CTAResponseDTO> getAllCtaByUserId(Long userId);
 
-    @Query("Match(staff:Staff{deleted:false})-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{deleted:false}) where up.endDateMillis is null or up.endDateMillis >= timestamp()  " +
-            "with staff,up match(staff)-[staff_expertise_relation:"+STAFF_HAS_EXPERTISE+"]->(exp:Expertise) where staff_expertise_relation.expertiseStartDate is not null" +
+    @Query("Match(staff:Staff{deleted:false})-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{deleted:false}) where unitPosition.endDateMillis is null or unitPosition.endDateMillis >= timestamp()  " +
+            "with staff,unitPosition match(staff)-[staff_expertise_relation:"+STAFF_HAS_EXPERTISE+"]->(exp:Expertise) where staff_expertise_relation.expertiseStartDate is not null" +
             "and datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).month=datetime().month and " +
             "datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).day=datetime().day and datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).year" +
             "<>datetime().year with staff,exp, datetime().year-datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).year as currentYear " +
-            "match(up)-[:"+HAS_EXPERTISE_IN+"]-(exp)-[:"+FOR_SENIORITY_LEVEL+"]-(sl:SeniorityLevel) where sl.from <= currentYear and sl.to > currentYear return up,exp")
+            "match(staff)-[:BELONGS_TO_STAFF]-(unitPosition)-[:HAS_EXPERTISE_IN]-(exp) with unitPosition,exp match(unitPosition)-[emp_type_rel:HAS_EMPLOYMENT_TYPE]-(empType:employmentType) " +
+            "optional match(unitPosition)-[:"+FOR_SENIORITY_LEVEL+"]-(sl:SeniorityLevel) where sl.from <= currentYear and sl.to > currentYear return unitPosition,exp,emp_type_rel,empType")
     List<UnitPositionSeniorityLevelQueryResult> findUnitPositionSeniorityLeveltoUpdate();
 
     @Query("Match(up:UnitPosition)-[r:HAS_SENIORITY_LEVEL]-(sl:SeniorityLevel) where id(up) in {0} delete r")

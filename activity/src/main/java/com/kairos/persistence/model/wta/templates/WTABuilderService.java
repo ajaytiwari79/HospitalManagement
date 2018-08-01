@@ -4,7 +4,7 @@ import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.template_types.*;
-import com.kairos.persistence.repository.wta.WTABaseRuleTemplateMongoRepository;
+import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
@@ -130,7 +130,10 @@ public class WTABuilderService extends MongoBaseService {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>) wtaBaseRuleTemplateMongoRepository.findAllById(oldWta.getRuleTemplateIds());
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates1 = new ArrayList<>();
         // copyProperties(wtaBaseRuleTemplates,wtaBaseRuleTemplates1);
-        save(wtaBaseRuleTemplates1);
+        if(!wtaBaseRuleTemplates1.isEmpty()){
+            save(wtaBaseRuleTemplates1);
+        }
+
     }
 
 

@@ -9,7 +9,7 @@ public class PieDataUnit {
      * @dated: Jun/29/2018
      */
 
-    public PieDataUnit(String label, double value){
+    public PieDataUnit(String label, double value) {
         this.label = label;
         this.value = value;
     }

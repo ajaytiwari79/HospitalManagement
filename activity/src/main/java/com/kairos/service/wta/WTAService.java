@@ -15,8 +15,8 @@ import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
-import com.kairos.persistence.repository.wta.WTABaseRuleTemplateMongoRepository;
+import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
+import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
@@ -42,6 +42,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
+import static javax.management.timer.Timer.ONE_DAY;
 
 
 /**
@@ -56,7 +57,7 @@ public class WTAService extends MongoBaseService {
     @Inject
     private CountryRestClient countryRestClient;
     @Inject
-    private RuleTemplateCategoryMongoRepository ruleTemplateCategoryRepository;
+    private RuleTemplateCategoryRepository ruleTemplateCategoryRepository;
     @Inject
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateGraphRepository;
     @Inject
@@ -303,14 +304,14 @@ public class WTAService extends MongoBaseService {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByCountryId(countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
-            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
-        });
-        wtaResponseDTOS.forEach(wtaResponseDTO -> {
+            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class);
             wtaResponseDTO.setStartDateMillis(wtaResponseDTO.getStartDate().getTime());
             if (wtaResponseDTO.getEndDate() != null) {
                 wtaResponseDTO.setEndDateMillis(wtaResponseDTO.getEndDate().getTime());
             }
+            wtaResponseDTOS.add(wtaResponseDTO);
         });
+
         return wtaResponseDTOS;
     }
 
@@ -355,7 +356,7 @@ public class WTAService extends MongoBaseService {
     public Map<String, Object> setWtaWithOrganizationType(Long countryId, BigInteger wtaId, long organizationSubTypeId, boolean checked) {
         Map<String, Object> map = new HashMap<>();
         /*List<WTARuleTemplateDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTARuleTemplateDTO>();*/
-        WTABasicDetailsDTO wtaBasicDetailsDTO = wtaDetailRestClient.getWtaRelatedInfo(null, organizationSubTypeId, countryId, null, null);
+        WTABasicDetailsDTO wtaBasicDetailsDTO = wtaDetailRestClient.getWtaRelatedInfo(0L, organizationSubTypeId, countryId, 0L, 0L);
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getOrganizationSubType()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.subtype.id", organizationSubTypeId);
         }
@@ -370,7 +371,7 @@ public class WTAService extends MongoBaseService {
             wtaBuilderService.copyWta(wta, newWtaObject);
 
             newWtaObject.setCountryId(wta.getCountryId());
-            newWtaObject.setOrganizationType(wta.getOrganizationType());
+            newWtaObject.setOrganizationType(new WTAOrganizationType(wtaBasicDetailsDTO.getOrganizationType().getId(), wtaBasicDetailsDTO.getOrganizationType().getName(), wtaBasicDetailsDTO.getOrganizationType().getDescription()));
 
             newWtaObject.setOrganizationSubType(new WTAOrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(), wtaBasicDetailsDTO.getOrganizationSubType().getName(), wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
             wtaBuilderService.copyRuleTemplateToNewWTA(wta, newWtaObject);
@@ -449,7 +450,6 @@ public class WTAService extends MongoBaseService {
         workingTimeAgreement.setId(null);
         workingTimeAgreement.setOrganization(null);
         workingTimeAgreement.setOrganizationParentWTA(wtaResponseDTO.getId());
-        workingTimeAgreement.setParentWTA(wtaResponseDTO.getId());
         save(workingTimeAgreement);
         wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
@@ -542,9 +542,7 @@ public class WTAService extends MongoBaseService {
         newWta.setStartDate(new Date(wtadto.getStartDateMillis()));
         newWta.setEndDate(wtadto.getEndDateMillis() != null ? new Date(wtadto.getStartDateMillis()) : null);
         newWta.setRuleTemplateIds(null);
-        if (wtadto.getEndDateMillis() != null) {
-            oldWta.setEndDate(new Date(wtadto.getEndDateMillis()));
-        }
+        oldWta.setEndDate(new Date(wtadto.getStartDateMillis()-ONE_DAY));
         oldWta.setId(null);
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
         if (wtadto.getRuleTemplates().size() > 0) {

@@ -10,6 +10,8 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
@@ -27,6 +29,8 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     private String intervalUnit;
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private List<BigInteger> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
 
 
     public long getIntervalLength() {
@@ -83,8 +87,25 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
     }
 
+    public List<BigInteger> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        String exception="";
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts(), null);
@@ -96,16 +117,14 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
                 if (limitAndCounter[1] != null) {
                     int counterValue = limitAndCounter[1] - 1;
                     if (counterValue < 0) {
-                        new InvalidRequestException(getName() + " is Broken");
-                        infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                        exception = getName();                        infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
                         infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                     }
                 } else {
-                    new InvalidRequestException(getName() + " is Broken");
-                }
+                    exception = getName();                }
             }
         }
-        return "";
+        return exception;
     }
 
 

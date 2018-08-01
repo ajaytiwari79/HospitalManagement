@@ -13,8 +13,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
@@ -57,15 +60,16 @@ public class ActivityTypesRestClient {
 
     }
 
-    public List<ActivityCategoryDTO> getActivityCategoriesForCountry (Long countryId){
+    public List<ActivityCategoryDTO> getActivityCategoriesForCountry (Long countryId,Set<BigInteger> activityCategoriesIds){
 
         final String baseUrl=getBaseUrl(false);
+        final String activityCategoriesIdsQueryString = activityCategoriesIds.toString().replace("[","").replace("]","");
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>> typeReference =
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<ActivityCategoryDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/country/{countryId}/activity/activity_categories",
+                            baseUrl + "/country/{countryId}/activity/activity_categories?activityCategoriesIds="+activityCategoriesIdsQueryString,
                             HttpMethod.GET,
                             null, typeReference,countryId);
 

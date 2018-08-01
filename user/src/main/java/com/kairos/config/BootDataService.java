@@ -2,7 +2,6 @@ package com.kairos.config;
 
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.constants.AppConstants;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.enums.ClientEnum;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
@@ -246,7 +245,7 @@ public class BootDataService {
 
     private Language danish;
 
-    Region Hovedstaden;
+    Region hovedstaden;
     Region Syddanmark;
 
     Province copenhagenCity;
@@ -264,7 +263,7 @@ public class BootDataService {
     ZipCode allegade;
 
     public void createData() {
-        if (countryGraphRepository.findAll().isEmpty()) {
+       /* if (countryGraphRepository.findAll().isEmpty()) {
 
             userBaseRepository.createFirstDBNode();
 
@@ -274,21 +273,21 @@ public class BootDataService {
             createCountries();
             //createOrganizationTypes();
             //createPaymentTypes();
-            //createCurrency();
+            createCurrency();
             createGeoGraphicalData();
             createUser();
             createStaff();
             createCountryLevelOrganization();
             createRegionLevelOrganization();
-
+            createCTARuleTemplateCategory();
             //createCityLevelOrganization();
             //createCitizen();
         }
 
-        /*createCTARuleTemplateCategory();
+        createCTARuleTemplateCategory();
         startRegisteredCronJobs();
-        createEquipmentCategories();*/
-        createCTARuleTemplateCategory("Denmark");
+        createEquipmentCategories();
+*/
 
     }
 
@@ -316,9 +315,15 @@ public class BootDataService {
 
     private void createGeoGraphicalData() {
 
+        hovedstaden = new Region();
+        hovedstaden.setCountry(denmark);
+        hovedstaden.setName("hovedstaden");
+        hovedstaden.setCode("1084");
+        regionGraphRepository.save(hovedstaden);
+
         copenhagenCity = new Province();
         copenhagenCity.setName("Copenhagen City");
-        copenhagenCity.setRegion(Hovedstaden);
+        copenhagenCity.setRegion(hovedstaden);
         copenhagenCity = provinceGraphRepository.save(copenhagenCity);
 
 
@@ -334,7 +339,7 @@ public class BootDataService {
 
         bornholm = new Province();
         bornholm.setName("Bornholm");
-        bornholm.setRegion(Hovedstaden);
+        bornholm.setRegion(hovedstaden);
         bornholm = provinceGraphRepository.save(bornholm);
 
 
@@ -466,27 +471,6 @@ public class BootDataService {
         // denmark.setCountryHolidayCalenderList(Arrays.asList(new CountryHolidayCalender("Halloween", DateUtil.getCurrentDate().getTime()), new CountryHolidayCalender("Christmas",  1474696870000L)));
         // denmark.setOrganizationServices(Arrays.asList(homeCareService, medicalCareService));
         countryGraphRepository.save(denmark);
-
-        germany = new Country();
-        germany.setName("Germany");
-        Long d = new DateTime().withTime(9, 20, 0, 0).getMillis();
-        Long e = new DateTime().withTime(15, 20, 0, 0).getMillis();
-        logger.info("Half day Leave timing: " + d + " and :   " + e);
-        // germany.setCountryHolidayCalenderList(Arrays.asList(new CountryHolidayCalender("Halloween", DateUtil.getCurrentDate().getTime() ,d,e), new CountryHolidayCalender("Christmas",  1474696870000L)));
-        // germany.setOrganizationServices(Arrays.asList(homeCareService, medicalCareService));
-        countryGraphRepository.save(germany);
-
-
-        Hovedstaden = new Region();
-        Hovedstaden.setName("Hovedstaden");
-        Syddanmark = new Region();
-        Syddanmark.setName("Syddanmark");
-
-        Hovedstaden.setCountry(denmark);
-        Syddanmark.setCountry(denmark);
-
-        Hovedstaden = regionGraphRepository.save(Hovedstaden);
-        Syddanmark = regionGraphRepository.save(Syddanmark);
         //  createCitizenStatus();
 
 
@@ -634,6 +618,7 @@ public class BootDataService {
 
         kairosCountryLevel = new Organization();
         kairosCountryLevel.setKairosHub(true);
+        kairosCountryLevel.setBoardingCompleted(true);
         kairosCountryLevel.setFormalName("Kairos (HUB)");
         kairosCountryLevel.setName("Kairos");
         kairosCountryLevel.setEanNumber("501234567890");
@@ -660,7 +645,7 @@ public class BootDataService {
         OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
         kairosCountryLevel.setOrganizationSetting(organizationSetting);
 
-        organizationService.createOrganization(kairosCountryLevel, null);
+        organizationService.createOrganization(kairosCountryLevel, null, true);
         //organizationGraphRepository.addSkillInOrganization(kairosCountryLevel.getId(),skillList,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
 
         // Create AccessGroup for Ulrik as AG_COUNTRY_ADMIN
@@ -674,52 +659,6 @@ public class BootDataService {
     }
 
     private void createUser() {
-
-      /*  michal = new User();
-        michal.setCprNumber("2311840471");
-        michal.setUserName("micky21@kairoscountrylevel.com");
-        michal.setEmail("micky21@kairoscountrylevel.com");
-        michal.setPassword(new BCryptPasswordEncoder().encode("12345"));
-        michal.setFirstName("Michael");
-        michal.setNickName("Micky");
-        michal.setLastName("John");
-        michal.setGender(Gender.MALE);
-//        michal.setContactAddress(new ContactAddress("Baker Street", 3, 1221, "Glostrup", 4533, "Apartments"));
-        michal.setContactDetail(new ContactDetail("micky21@kairoscountrylevel.com", "micky21@gmail.com", "536533", "facebook.com/micky_original"));
-        michal.setAge(27);
-        michal.setCreationDate(DateUtil.getCurrentDate().getTime());
-        michal.setLastModificationDate(DateUtil.getCurrentDate().getTime());
-
-        liva = new User();
-        liva.setCprNumber("1808920669");
-        liva.setUserName("liva33@kairoscountrylevel.com");
-        liva.setEmail("liva33@kairoscountrylevel.com");
-        liva.setPassword(new BCryptPasswordEncoder().encode("12345"));
-        liva.setFirstName("Liva");
-        liva.setNickName("Liva");
-        liva.setLastName("Rasmussen");
-        liva.setGender(Gender.FEMALE);
-//        liva.setContactAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
-        liva.setContactDetail(new ContactDetail("liva33@kairosCountryLevel.com", "liva31@gmail.com", "536533", "facebook.com/liva33_cool"));
-        liva.setAge(24);
-        liva.setCreationDate(DateUtil.getCurrentDate().getTime());
-        liva.setLastModificationDate(DateUtil.getCurrentDate().getTime());
-
-        alma = new User();
-        alma.setCprNumber("2512864166");
-        alma.setUserName("alma@kairoscountrylevel.com");
-        alma.setEmail("alma@kairoscountrylevel.com");
-        alma.setPassword(new BCryptPasswordEncoder().encode("12345"));
-        alma.setFirstName("Alma");
-        alma.setNickName("alma");
-        alma.setLastName("Krogh");
-        alma.setGender(Gender.FEMALE);
-//        alma.setContactAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
-        alma.setContactDetail(new ContactDetail("alma_01@kairoscountrylevel.com", "alma007@gmail.com", "536533", "facebook.com/alma_cool"));
-        alma.setAge(28);
-        alma.setCreationDate(DateUtil.getCurrentDate().getTime());
-        alma.setLastModificationDate(DateUtil.getCurrentDate().getTime());*/
-
         admin = new User();
         admin.setCprNumber("0309514297");
         admin.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(admin.getCprNumber()));
@@ -740,68 +679,6 @@ public class BootDataService {
     }
 
     private void createStaff() {
-
-        // Michael Staff
-
-/*
-
-        michalAsStaff = new Staff();
-//        michalAsStaff.setContactAddress(new ContactAddress("Baker Street", 3, 1221, "Glostrup", 4533, "Apartments"));
-        michalAsStaff.setGeneralNote("New Joiner, Need to learn to handle client interaction");
-        michalAsStaff.setUser(michal);
-        michalAsStaff.setSignature("mick");
-        michalAsStaff.setCardNumber("FLMPSW1134");
-        michalAsStaff.setCopyKariosMailToLogin(true);
-        michalAsStaff.setContactDetail(new ContactDetail("micky21@kairoscountrylevel.com", "micky21@gmail.com", "536533", "facebook.com/micky_original"));
-        michalAsStaff.setFamilyName("Micky");
-        michalAsStaff.setFirstName("Michael J");
-        michalAsStaff.setLastName("John");
-        michalAsStaff.setDisabled(true);
-        michalAsStaff.getContactDetail().setPrivatePhone("9711588672");
-        michalAsStaff.getContactDetail().setWorkPhone("9718420411");
-        michalAsStaff.getContactDetail().setMobilePhone("7000000000");
-        michalAsStaff.setEmail("micky21@oodlestechnologies.com");
-        michalAsStaff.setNationalInsuranceNumber("NIN44500221");
-        michalAsStaff.setLanguage(danish);
-        michalAsStaff.setPassword(new BCryptPasswordEncoder().encode("oodles"));
-
-        livaAsStaff = new Staff();
-//        livaAsStaff.setContactAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
-        livaAsStaff.setGeneralNote("New Joiner, Need to learn to handle client interaction");
-        livaAsStaff.setUser(liva);
-        livaAsStaff.setSignature("liva");
-        livaAsStaff.setCardNumber("QAMPSW1134");
-        livaAsStaff.setCopyKariosMailToLogin(true);
-        livaAsStaff.setContactDetail(new ContactDetail("liva33@kairoscountrylevel.com", "liva31@gmail.com", "536533", "facebook.com/liva33_cool"));
-        livaAsStaff.setFamilyName("Liva");
-        livaAsStaff.setFirstName("Liva J");
-        livaAsStaff.setLastName("Rasmussen");
-        livaAsStaff.setDisabled(true);
-        livaAsStaff.setNationalInsuranceNumber("NIN44500981");
-        livaAsStaff.setEmail("liva@oodlestechnologies.com");
-        livaAsStaff.setLanguage(danish);
-        livaAsStaff.setPassword(new BCryptPasswordEncoder().encode("oodles"));
-*/
-
-
- /*       almaAsStaff = new Staff();
-//        almaAsStaff.setContactAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
-        almaAsStaff.setGeneralNote("New Joiner, Need to learn to handle client interaction");
-        almaAsStaff.setUser(alma);
-        almaAsStaff.setSignature("liva");
-        almaAsStaff.setCardNumber("LPSPSW1134");
-        almaAsStaff.setCopyKariosMailToLogin(true);
-        almaAsStaff.setContactDetail(new ContactDetail("alma_01@kairoscountrylevel.com", "alma007@gmail.com", "536533", "facebook.com/alma_cool"));
-        almaAsStaff.setContactDetail(new ContactDetail("alma_01@kairoscountrylevel.com", "alma007@gmail.com", "536533", "facebook.com/alma_cool"));
-        almaAsStaff.setFamilyName("Alma");
-        almaAsStaff.setFirstName("Alma L");
-        almaAsStaff.setLastName("Krogh");
-        almaAsStaff.setDisabled(true);
-        almaAsStaff.setEmail("alma@oodlestechnologies.com");
-        almaAsStaff.setNationalInsuranceNumber("NIN44500331");
-        almaAsStaff.setLanguage(danish);
-        almaAsStaff.setPassword(new BCryptPasswordEncoder().encode("oodles"));*/
-
         adminAsStaff = new Staff();
         ContactAddress contactAddress = new ContactAddress();
 //        adminAsStaff.setContactAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
@@ -910,6 +787,7 @@ public class BootDataService {
         kairosRegionLevel.setOrganizationLevel(OrganizationLevel.REGION);
         kairosRegionLevel.setCountry(denmark);
         kairosRegionLevel.setKairosHub(false);
+        kairosRegionLevel.setBoardingCompleted(true);
         ContactAddress contactAddress = new ContactAddress();
         contactAddress.setZipCode(allegade);
         contactAddress.setFloorNumber(10);
@@ -924,7 +802,7 @@ public class BootDataService {
         kairosRegionLevel.setContactAddress(contactAddress);
         OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
         kairosRegionLevel.setOrganizationSetting(organizationSetting);
-        organizationService.createOrganization(kairosRegionLevel, kairosCountryLevel.getId());
+        organizationService.createOrganization(kairosRegionLevel, kairosCountryLevel.getId(), true);
 
         //organizationGraphRepository.addOrganizationServiceInUnit(kairosRegionLevel.getId(),Arrays.asList(privateOrganization.getOrganizationServiceList().get(0).getId()),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
     }
@@ -1037,20 +915,11 @@ public class BootDataService {
         currencyGraphRepository.save(currency);
     }
 
-    private void createCTARuleTemplateCategory(String countryName) {
-        Country country = countryGraphRepository.findCountryIdByName(countryName);
-
-        if (country == null) {
-            throw new DataNotFoundByIdException("Invalid Country");
-        }
-
-        RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
-                .findByName(country.getId(), "NONE", RuleTemplateCategoryType.CTA);
-
-
+    private void createCTARuleTemplateCategory() {
+        RuleTemplateCategory category = ruleTemplateCategoryGraphRepository.findByName(denmark.getId(), "NONE", RuleTemplateCategoryType.CTA);
         if (!Optional.ofNullable(category).isPresent()) {
             category = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.CTA);
-            category.setCountry(country);
+            category.setCountry(denmark);
             ruleTemplateCategoryService.createDefaultRuleTemplateCategory( category);
         }
 

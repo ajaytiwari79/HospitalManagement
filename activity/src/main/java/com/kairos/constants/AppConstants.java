@@ -218,7 +218,7 @@ public class AppConstants {
     public static final String FULL_TIME_WEEKLY_HOURS_TYPE = "FULL_TIME_WEEKLY_HOURS";
     public static final String WEEKLY_HOURS_TYPE = "WEEKLY_HOURS_TYPE";
     public static final String TIMEBANK_ACCOUNT = "TIMEBANK_ACCOUNT";
-    public static final String PAIDOUT_ACCOUNT = "PAIDOUT_ACCOUNT";
+    public static final String PAIDOUT_ACCOUNT = "PAID_OUT";
 
     //TimeCare date importing constants
     public static final String CALCULATED_TIME = "CalculatedTime";
@@ -256,7 +256,7 @@ public class AppConstants {
     public static final String NO_CONFLICTS = "NO CONFLICTS";
     public static final String BREAK = "BREAK";
     public static final String SHIFT = "SHIFT";
-    public static final String OPENSHIFT_EMAIL_BODY = "Hi, You have been picked for openshift.";
+    public static final String OPENSHIFT_EMAIL_BODY = "Hi, You have been picked for openshift. fibonacii order- %s";
     public static final String OPENSHIFT_SUBJECT = "Open Shift";
     public static final String NOTIFY="NOTIFY";
     public static final String ASSIGN="ASSIGN";
@@ -267,4 +267,15 @@ public class AppConstants {
     public static final String NORMAL_TIME="Normal Time";
     public static final String EXTRA_TIME="Extra Time";
     public static final String OVER_TIME="Overtime";
+
+    //for Planning period name
+    public static final String DATE_FORMET_STRING="dd.MMM.yyyy";
+    //Phases
+    public static final String REALTIME="REALTIME";
+    public static final String TIME_AND_ATTENDANCE="TIME & ATTENDANCE";
+    public static final String TENTATIVE="TENTATIVE";
+    public static final String PAYROLL="PAYROLL";
+
+
+
 }

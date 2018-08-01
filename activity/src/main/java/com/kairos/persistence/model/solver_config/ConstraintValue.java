@@ -19,7 +19,7 @@ public class ConstraintValue {
     //constraint id
     private BigInteger id;
 
-     //it is used for current constraint belongs to which level like (Hard,Medium,soft).
+    //it is used for current constraint belongs to which level like (Hard,Medium,soft).
     private ContraintLevel level;
     //it is used for current constraint belongs to which level no in bendableScore like (hard[0],soft[1]).
     private Integer levelNo;

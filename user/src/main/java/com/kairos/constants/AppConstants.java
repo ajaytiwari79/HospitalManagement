@@ -202,6 +202,7 @@ public class AppConstants {
     // Module/tab id prefix for Access Page
     public static final String MODULE_ID_PRFIX = "module_";
     public static final String TAB_ID_PRFIX = "tab_";
+    public static final String ACCESS_PAGE_HAS_LANGUAGE ="ACCESS_PAGE_HAS_LANGUAGE";
 
     //default T&A grace period data
     public static final int STAFF_GRACE_PERIOD_DAYS=2;
@@ -209,5 +210,9 @@ public class AppConstants {
 
     //Tomtom
     public static final String TOMTOM_KEY = "key";
+    public static final String SCHEDULER_TO_USER_QUEUE_TOPIC = "SchedulerToUserQueue";
+    public static final String USER_TO_SCHEDULER_JOB_QUEUE_TOPIC = "UserToSchedulerJobQueue";
+    public static final String USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC = "UserToSchedulerLogsQueue";
+
 
 }

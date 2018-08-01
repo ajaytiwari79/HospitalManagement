@@ -5,10 +5,9 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
-import com.kairos.activity.enums.counter.ChartType;
+import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.activity.enums.counter.RepresentationUnit;
-import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.counter.chart.BaseChart;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -54,7 +52,7 @@ public class CounterDataService {
     GenericIntegrationService genericIntegrationService;
 
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId){
-        VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolverConfigurationForUnit(unitId, solverConfigId);
+        VrpTaskPlanningDTO vrpTaskPlanningDTO = vrpPlanningService.getSolutionBySubmition(unitId, solverConfigId);
         List<VRPTaskDTO> tasks = taskService.getAllTask(unitId);
         Set<String> shiftIds = vrpTaskPlanningDTO.getTasks().stream().map(task -> task.getShiftId()).collect(Collectors.toSet());
         Map<String, EmployeeDTO> employeeDataIdMap = vrpTaskPlanningDTO.getEmployees().stream().collect(Collectors.toMap(employee -> employee.getId(), employee->employee));
@@ -62,8 +60,6 @@ public class CounterDataService {
         if(shiftIds == null || shiftIds.isEmpty()){
             exceptionService.dataNotFoundByIdException("error.kpi.vrp.shift.availability", shiftIds);
         }
-        logger.info("Shifts Count: "+shiftIds.size());
-        logger.info("Planned Shift Count: "+vrpTaskPlanningDTO.getShifts().size());
         List<Shift> shifts = shiftService.getAllShiftByIds(new ArrayList<>(shiftIds));
         ArrayList<KPI> kpiList = new ArrayList<>();
         //kpiList

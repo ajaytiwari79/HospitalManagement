@@ -21,7 +21,7 @@ import com.kairos.persistence.model.task_type.AddressCode;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.model.task_type.TaskTypeDefination;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.activity.ShiftMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepositoryImpl;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
@@ -51,10 +51,7 @@ import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.user.patient.PatientResourceList;
 import com.kairos.user.staff.*;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.util.DateUtils;
-import com.kairos.util.JsonUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.TaskUtil;
+import com.kairos.util.*;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResponse;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.time_bank.TimeBankCalculationService;
@@ -708,18 +705,25 @@ public class TaskService extends MongoBaseService {
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
+        Map<BigInteger,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         for (GetWorkShiftsFromWorkPlaceByIdResult timeCareShift : timeCareShiftsByPagination) {
             Shift shift = shiftsInKairos.stream().filter(shiftInKairos -> shiftInKairos.getExternalId().equals(timeCareShift.getId())).findAny().orElse(mapTimeCareShiftDataToKairos
                     (timeCareShift, workPlaceId));
-            Optional<Activity> activity = activities.parallelStream().filter(act -> act.getExternalId().equals(timeCareShift.getActivityId())).findAny();
-            if (!activity.isPresent()) {
+            Activity activity = activityMap.get(timeCareShift.getActivityId());
+            if (activity!=null) {
                 skippedShiftsWhileSave.add(timeCareShift.getId());
             } else {
-                shift.setName(activity.get().getName());
-                shift.setActivityId(activity.get().getId());
+                shift.setName(activity.getName());
+                shift.setActivityId(activity.getId());
                 shift.setStaffId(staffId);
                 shift.setUnitPositionId(unitPositionDTO.getId());
-                timeBankCalculationService.calculateScheduleAndDurationHour(shift,activity.get(),staffUnitPositionDetails);
+                List<Integer> activityDayTypes = new ArrayList<>();
+                if (staffAdditionalInfoDTO.getDayTypes() != null && !staffAdditionalInfoDTO.getDayTypes().isEmpty()) {
+                    activityDayTypes = WTARuleTemplateValidatorUtility.getValidDays(staffAdditionalInfoDTO.getDayTypes(), activity.getTimeCalculationActivityTab().getDayTypes());
+                }
+                if (activityDayTypes.contains(new DateTime(shift.getStartDate()).getDayOfWeek())) {
+                    timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
+                }
                 shiftsToCreate.add(shift);
             }
 
@@ -727,7 +731,7 @@ public class TaskService extends MongoBaseService {
         if (!shiftsToCreate.isEmpty()) {
             save(shiftsToCreate);
             timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shiftsToCreate);
-            payOutService.savePayOuts(unitPositionDTO.getId(), shiftsToCreate);
+            payOutService.savePayOuts(staffAdditionalInfoDTO, shiftsToCreate,activities);
         }
     }
 
@@ -1382,7 +1386,7 @@ public class TaskService extends MongoBaseService {
      * This method is use in citizen controller
      */
 
-    public void createTaskFromKMD(Long staffId, KMDShift shift, Long unitId) {
+    public void createTaskFromKMD(Long staffId, ImportShiftDTO shift, Long unitId) {
         try {
             TaskType taskType = taskTypeService.findByExternalId("6123");
             Map<String, Object> taskMetaData = new HashMap<>();
@@ -1439,7 +1443,7 @@ public class TaskService extends MongoBaseService {
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject objects = jsonArray.getJSONObject(i);
-            KMDTask kmdTask = JsonUtils.toObject(objects.toString(), KMDTask.class);
+            ImportTaskDTO kmdTask = JsonUtils.toObject(objects.toString(), ImportTaskDTO.class);
             Integer grantCount = 0;
             TaskDemand taskDemand = null;
             Client citizen = null;
@@ -1485,7 +1489,7 @@ public class TaskService extends MongoBaseService {
     }
 
 
-    public Task createKMDPlannedTask(KMDTask kmdTask, TaskType taskType, TaskDemand taskDemand,
+    public Task createKMDPlannedTask(ImportTaskDTO kmdTask, TaskType taskType, TaskDemand taskDemand,
                                      TaskAddress taskAddress, List<Long> staffIds) {
         //Single task
 
@@ -1520,7 +1524,7 @@ public class TaskService extends MongoBaseService {
 
     }
 
-    private TaskAddress createTaskAddress(KMDTask kmdTask) {
+    private TaskAddress createTaskAddress(ImportTaskDTO kmdTask) {
         TaskAddress taskAddress = new TaskAddress();
         CurrentAddress currentAddress = kmdTask.getPatientResourceList().get(0).getCurrentAddress();
         String addressLine1 = currentAddress.getAddressLine1();

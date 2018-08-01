@@ -11,7 +11,7 @@ import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.open_shift.OpenShiftActivityWrapper;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.persistence.model.open_shift.Order;
-import com.kairos.persistence.repository.activity.ShiftMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.open_shift.OrderMongoRepository;
@@ -267,7 +267,7 @@ public class OpenShiftService extends MongoBaseService {
     private boolean assignShiftToStaff(OpenShift openShift, Long unitId, List<Long> staffIds, Order order) {
         List<StaffUnitPositionDetails> unitPositionDetails = genericIntegrationService.getStaffIdAndUnitPositionId(unitId, staffIds, order.getExpertiseId());
         unitPositionDetails.forEach(unitPositionDetail -> {
-            if (Optional.ofNullable(unitPositionDetail.getId()).isPresent()) {
+            if (!Optional.ofNullable(unitPositionDetail.getId()).isPresent()) {
                 return;
             }
             ShiftDTO shiftDTO = new ShiftDTO(openShift.getActivityId(), unitId, unitPositionDetail.getStaffId(), unitPositionDetail.getId(), DateUtils.asLocalDate(openShift.getStartDate()),

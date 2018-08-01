@@ -12,6 +12,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -32,6 +33,7 @@ public class ActivityDTO {
     private GeneralActivityTabDTO generalActivityTab;
     private TimeCalculationActivityDTO timeCalculationActivityTab;
     private List<ActivityDTO> compositeActivities;
+
     private BalanceSettingActivityTabDTO balanceSettingsActivityTab;
     private Long countryActivityId;
     private TimeTypeDTO timeType;
@@ -217,6 +219,7 @@ public class ActivityDTO {
     public void setBalanceSettingsActivityTab(BalanceSettingActivityTabDTO balanceSettingsActivityTab) {
         this.balanceSettingsActivityTab = balanceSettingsActivityTab;
     }
+
 
     public ActivityDTO(String name, String description, Long countryId, String categoryName, Long unitId, boolean isParentActivity) {
         this.name = name;

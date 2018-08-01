@@ -31,7 +31,6 @@ public class CustomAggregationQuery {
     }
 
 
-
     public static String questionnaireTemplateAddNonDeletedQuestions() {
         return "{  '$addFields':" +
                 "{'sections.questions':" +
@@ -111,6 +110,117 @@ public class CustomAggregationQuery {
                 "  'cond': {'$eq': ['$$subAssetTypes.deleted',false]}" +
                 "  }}}}";
     }
+
+
+    public static String addNonDeletedAgreementSectionToAgreementTemplate() {
+        return "{  '$addFields':" +
+                "        {'agreementSections':" +
+                "       {'$filter' : { " +
+                "       'input': '$agreementSections'," +
+                "       'as': 'agreementSections', " +
+                "      'cond': {'$eq': ['$$agreementSections.deleted', false ]}" +
+                "     }}}}";
+
+
+    }
+
+
+
+
+    public static String agreementTemplateProjectionBeforeGroupOperationForTemplateTypeAtIndexZero() {
+        return "{'$project':{" +
+                "      'templateType':{'$arrayElemAt':['$templateType',0]}," +
+                "      'name':1," +
+                "      'agreementSections':1," +
+                "      'description':1," +
+                "       'accountTypes':1," +
+                "             'organizationTypes':1," +
+                "             'organizationSubTypes':1," +
+                "             'organizationServices':1," +
+                "              'organizationSubServices':1," +
+                "         }}";
+
+
+    }
+
+    public static String agreementTemplateGroupOperation() {
+        return "{'$group':{"+
+                "   '_id':'$_id'," +
+                "   'agreementSections':{'$push':{ '$cond': [ { '$eq': [ '$agreementSections.deleted',false ] }, '$agreementSections', {} ] }}," +
+                "   'templateType':{'$first':'$templateType'}," +
+                "    'name':{'$first':'$name'}," +
+                "    'description':{'$first':'$description'}," +
+                "     'accountTypes':{'$first':'$accountTypes'}, " +
+                "    'organizationTypes':{'$first':'$organizationTypes'}," +
+                "    'organizationSubTypes':{'$first':'$organizationSubTypes'}," +
+                "    'organizationServices':{'$first':'$organizationServices'}," +
+                "    'organizationSubServices':{'$first':'$organizationSubServices'}} } ";
+
+
+    }
+
+
+    public static String addNonDeletedTemplateTyeField() {
+        return  " {  '$addFields':" +
+                "                {'templateTypes':" +
+                "                {'$filter' : { " +
+                "                'input': '$templateTypes'," +
+                "                'as': 'templateType', " +
+                "                'cond': {'$eq': ['$$templateType.deleted', false ]}" +
+                "                }}}}" ;
+
+    }
+
+
+
+
+    public static String masterAssetProjectionWithAssetType() {
+        return " {" +
+                "'$project':{" +
+                "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "         'name':1," +
+                "       'description':1," +
+                "       'organizationSubTypes':1," +
+                "       'organizationTypes':1," +
+                "       'organizationServices':1," +
+                "       'organizationSubServices':1," +
+
+                "            }}";
+    }
+
+
+
+
+
+    public static String assetProjectionWithMetaData() {
+        return " {" +
+                "'$project':{" +
+                "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "'hostingType':{$arrayElemAt:['$hostingType',0]}," +
+                "'dataDisposal':{$arrayElemAt:['$dataDisposal',0]}," +
+                "'hostingProvider':{$arrayElemAt:['$hostingProvider',0]}," +
+                "  'name':1," +
+                "  'description':1," +
+                "  'hostingLocation':1," +
+                "  'managingDepartment':1," +
+                "  'assetOwner':1," +
+                "  'storageFormats':1," +
+                "  'orgSecurityMeasures':1," +
+                "  'technicalSecurityMeasures':1," +
+                "  'dataRetentionPeriod':1," +
+                "  'minDataSubjectVolume':1," +
+                "  'maxDataSubjectVolume':1," +
+                "  'isActive':1," +
+
+                "            }}";
+    }
+
+
+
+
+
+
+
 
 
 }
