@@ -1,4 +1,4 @@
-package com.kairos.service.data_inventory;
+package com.kairos.service.data_inventory.processing_activity;
 
 
 import com.kairos.dto.data_inventory.ProcessingActivityDTO;

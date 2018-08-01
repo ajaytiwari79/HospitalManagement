@@ -33,4 +33,10 @@ public class ProcessingPurpose extends MongoBaseEntity {
         this.name = name;
     }
 
+    public ProcessingPurpose(String name) {
+        this.name = name;
+    }
+
+    public ProcessingPurpose() {
+    }
 }

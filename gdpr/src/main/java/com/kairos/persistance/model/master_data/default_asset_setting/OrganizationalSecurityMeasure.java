@@ -30,4 +30,11 @@ public class OrganizationalSecurityMeasure extends MongoBaseEntity {
         this.name = name;
 
     }
+
+    public OrganizationalSecurityMeasure( String name) {
+        this.name = name;
     }
+
+    public OrganizationalSecurityMeasure() {
+    }
+}

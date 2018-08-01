@@ -30,4 +30,12 @@ public class StorageFormat extends MongoBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+
+    public StorageFormat(String name) {
+        this.name = name;
+    }
+
+    public StorageFormat() {
+    }
 }

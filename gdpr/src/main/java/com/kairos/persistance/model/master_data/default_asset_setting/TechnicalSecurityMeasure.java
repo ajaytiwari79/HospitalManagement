@@ -29,4 +29,11 @@ public class TechnicalSecurityMeasure extends MongoBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    public TechnicalSecurityMeasure( String name) {
+        this.name = name;
+    }
+
+    public TechnicalSecurityMeasure() {
+    }
 }

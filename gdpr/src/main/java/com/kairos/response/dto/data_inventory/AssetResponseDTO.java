@@ -30,7 +30,7 @@ public class AssetResponseDTO {
 
     private List<OrganizationalSecurityMeasureResponseDTO> orgSecurityMeasures;
 
-    private List<TechnicalSecurityMeasureReponseDTO> technicalSecurityMeasures;
+    private List<TechnicalSecurityMeasureResponseDTO> technicalSecurityMeasures;
 
     private HostingProviderResponseDTO hostingProvider;
 
@@ -85,9 +85,9 @@ public class AssetResponseDTO {
 
     public void setOrgSecurityMeasures(List<OrganizationalSecurityMeasureResponseDTO> orgSecurityMeasures) { this.orgSecurityMeasures = orgSecurityMeasures; }
 
-    public List<TechnicalSecurityMeasureReponseDTO> getTechnicalSecurityMeasures() { return technicalSecurityMeasures; }
+    public List<TechnicalSecurityMeasureResponseDTO> getTechnicalSecurityMeasures() { return technicalSecurityMeasures; }
 
-    public void setTechnicalSecurityMeasures(List<TechnicalSecurityMeasureReponseDTO> technicalSecurityMeasures) { this.technicalSecurityMeasures = technicalSecurityMeasures; }
+    public void setTechnicalSecurityMeasures(List<TechnicalSecurityMeasureResponseDTO> technicalSecurityMeasures) { this.technicalSecurityMeasures = technicalSecurityMeasures; }
 
     public HostingProviderResponseDTO getHostingProvider() { return hostingProvider; }
 

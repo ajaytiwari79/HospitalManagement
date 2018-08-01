@@ -33,4 +33,10 @@ public class AccessorParty extends MongoBaseEntity {
         this.name = name;
     }
 
+    public AccessorParty(String name) {
+        this.name = name;
+    }
+
+    public AccessorParty() {
+    }
 }
