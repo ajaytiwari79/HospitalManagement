@@ -53,7 +53,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
         Optional<PresenceTypeDTO> normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny();
         Optional<PresenceTypeDTO> extraTimePlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(EXTRA_TIME)).findAny();
-        BigInteger normalPlannedTypeId = normalPlannedType.isPresent() ? normalPlannedType.get().getId() : null;
+        BigInteger normalPlannedTypeId = normalPlannedType.map(PresenceTypeDTO::getId).orElse(null);
         BigInteger extraTimePlannedTypeId = extraTimePlannedType.isPresent() ? normalPlannedType.get().getId() : normalPlannedTypeId;
         for (Phase phase : phases) {
             switch (phase.getName()) {
@@ -127,8 +127,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     }
 
     public List<ActivityConfigurationDTO> getAbsenceActivityConfiguration(Long unitId) {
-        List<ActivityConfigurationDTO> activityConfigurations = activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
-        return activityConfigurations;
+        return activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
     }
 
     public List<ActivityConfigurationDTO> getPresenceActivityConfiguration(Long unitId) {
