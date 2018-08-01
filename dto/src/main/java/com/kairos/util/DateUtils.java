@@ -303,6 +303,13 @@ public class DateUtils {
     public static Date asDate(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
+    public static Date asDate(LocalDate localDate) {
+        Date date = null;
+        if (localDate != null) {
+            date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        }
+        return date;
+    }
 
     public static LocalDate asLocalDate(Date date) {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
