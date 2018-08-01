@@ -238,7 +238,7 @@ public class CounterRepository {
 
     public List<OrgTypeMappingDTO> getOrgTypeKPIEntryOrgTypeIds(List<Long> orgTypeIds ,Long countryId){
         Aggregation aggregation =Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("orgTypeId").in(orgTypeIds).and("countryId").is(countryId)),
+                Aggregation.match(Criteria.where("orgTypeId").in(orgTypeIds)),
                 Aggregation.lookup("kPIAssignment", "kpiAssignmentId", "_id", "kpiAssignment"),
                 Aggregation.project("kpiAssignmentId","orgTypeId").and("kpiAssignment").arrayElementAt(0).as("kpiAssignment"),
                 Aggregation.project("kpiAssignmentId","orgTypeId").and("kpiAssignment.kpiId").as("kpiId")

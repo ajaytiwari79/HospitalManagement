@@ -1,6 +1,7 @@
 package com.kairos.service.counter;
 
 
+import com.kairos.activity.counter.DefalutKPISettingDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
@@ -191,6 +192,27 @@ public class CounterManagementService extends MongoBaseService {
         return counterRepository.removeOrgTypeKPIEntry(BigInteger.valueOf(orgTypeId));
     }
 
+    public void createDefaultKpiSetting(Long unitId, DefalutKPISettingDTO defalutKPISettingDTO) {
+        List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(defalutKPISettingDTO.getOrgTypeIds(), unitId);
+        List<BigInteger> kpiIds = orgTypeMappingDTOS.stream().map(orgTypeMappingDTO -> orgTypeMappingDTO.getKpiId()).collect(Collectors.toList());
+        List<KPIAssignment> kpiAssignments = new ArrayList<>();
+        Map<BigInteger, BigInteger> KpiIdAndAssignmentKPIIds = new HashMap<>();
+        kpiIds.forEach(kpiId -> {
+            kpiAssignments.add(new KPIAssignment(kpiId, null, unitId, null, ConfLevel.UNIT));
+        });
+        save(kpiAssignments);
+        kpiAssignments.forEach(kpiAssignment -> {
+            KpiIdAndAssignmentKPIIds.put(kpiAssignment.getKpiId(), kpiAssignment.getId());
+        });
+        List<AccessGroupKPIEntry> accessGroupKPIEntrie = new ArrayList<>();
+        List<Long> countryAccessGroupIds = defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().keySet().stream().collect(Collectors.toList());
+        List<AccessGroupMappingDTO> accessGroupKPIEntries = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, ConfLevel.COUNTRY, defalutKPISettingDTO.getCountryId());
+        accessGroupKPIEntries.forEach(accessGroupMappingDTO -> {
+                accessGroupKPIEntrie.add(new AccessGroupKPIEntry(defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().get(accessGroupMappingDTO.getAccessGroupId()), KpiIdAndAssignmentKPIIds.get(accessGroupMappingDTO.getKpiId()), null, unitId, ConfLevel.UNIT));
+        });
+        save(accessGroupKPIEntrie);
+
+    }
 }
 
 

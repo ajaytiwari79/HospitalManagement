@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
+import com.kairos.activity.counter.DefalutKPISettingDTO;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
@@ -398,6 +399,7 @@ public class OrganizationService extends UserBaseService {
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         priorityGroupIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), organization.getCountry().getId());
+        priorityGroupIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType ->organizationType.getId()).collect(Collectors.toList()),countryAndOrgAccessGroupIdsMap,countryId),organization.getId());
         // DO NOT CREATE PHASE for UNION
 
 //        if (!orgDetails.getUnion()) {
