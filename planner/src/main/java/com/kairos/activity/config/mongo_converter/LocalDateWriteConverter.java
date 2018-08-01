@@ -11,6 +11,6 @@ import java.util.Date;
 public class LocalDateWriteConverter implements Converter<LocalDate,Date> {
     @Override
     public Date convert(LocalDate source) {
-        return DateUtils.asDate(source);
+        return DateUtils.getDateFromLocalDate(source);
     }
 }

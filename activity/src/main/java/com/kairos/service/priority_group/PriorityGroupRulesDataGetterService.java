@@ -116,8 +116,8 @@ public class PriorityGroupRulesDataGetterService {
                 filterShiftStartLocalDate = minDate;
             }
         }
-        filterShiftStartDate = DateUtils.asDate(filterShiftStartLocalDate);
-        filterShiftEndDate = DateUtils.asDate(maxDate.plusDays(1));
+        filterShiftStartDate = DateUtils.getDateFromLocalDate(filterShiftStartLocalDate);
+        filterShiftEndDate = DateUtils.getDateFromLocalDate(maxDate.plusDays(1));
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByUnitPositions(commonUnitPositionIds, filterShiftStartDate, filterShiftEndDate);
 
         return shifts;
@@ -153,7 +153,7 @@ public class PriorityGroupRulesDataGetterService {
                 plannedHoursWeekly = dailyTimeBankEntries.stream().filter(dailyTimeBankEntry -> dailyTimeBankEntry.getDate().isAfter(startDatePlanned)||
                         dailyTimeBankEntry.getDate().isEqual(startDatePlanned)&&dailyTimeBankEntry.getDate().isBefore(endDatePlanned)||
                         dailyTimeBankEntry.getDate().isEqual(endDatePlanned)).mapToInt(d->d.getScheduledMin() + d.getTimeBankMinWithCta()).sum();
-                timeBank = -1* timeBankCalculationService.calculateTimeBankForInterval(new Interval(DateUtils.asDate(DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate())).getTime(),endDate),
+                timeBank = -1* timeBankCalculationService.calculateTimeBankForInterval(new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate())).getTime(),endDate),
                         unitPositionWithCtaDetailsDTO,false,dailyTimeBankEntries,false);
 
                 deltaTimeBank =  -1 * timeBankCalculationService.calculateTimeBankForInterval(new Interval(startDateDeltaWeek,endDateDeltaWeek),

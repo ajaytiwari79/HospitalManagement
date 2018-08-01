@@ -88,14 +88,18 @@ public class PayGroupAreaService extends UserBaseService {
     }
 
     public PayGroupAreaQueryResult updatePayGroupArea(Long payGroupAreaId, PayGroupAreaDTO payGroupAreaDTO) {
-
         Optional<PayGroupAreaMunicipalityRelationship> municipalityRelationship = payGroupAreaRelationshipRepository.findById(payGroupAreaDTO.getId());
         if (!municipalityRelationship.isPresent()) {
             logger.info("pay group area not found");
             exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound", payGroupAreaDTO.getId());
-
         }
-
+        // PayGroup Area name duplicacy
+        if (!municipalityRelationship.get().getPayGroupArea().getName().equals(payGroupAreaDTO.getName().trim())) {
+            boolean existAlready = payGroupAreaGraphRepository.isPayGroupAreaExistWithNameInLevel(payGroupAreaDTO.getLevelId(), payGroupAreaDTO.getName().trim(), payGroupAreaId);
+            if (existAlready) {
+                exceptionService.duplicateDataException("message.payGroupArea.exists", payGroupAreaDTO.getName());
+            }
+        }
 
         List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository
                 .findPayGroupAreaByLevelAndMunicipality(payGroupAreaDTO.getLevelId(), payGroupAreaDTO.getMunicipalityId(), payGroupAreaDTO.getId());
