@@ -174,9 +174,9 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,   counterManagementService.removeOrgTypeKPIEntries(orgTypeId,countryId));
     }
 
-    @PostMapping(UNIT_URL+"/counter/dist/default_kpi_setting")
-    public ResponseEntity<Map<String, Object>> createDefaluSettingForUnit(@PathVariable Long unitId, @RequestBody DefalutKPISettingDTO defalutKPISettingDTO){
-            counterManagementService.createDefaultKpiSetting(unitId,defalutKPISettingDTO);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
-    }
+//    @PostMapping(UNIT_URL+"/counter/dist/default_kpi_setting")
+//    public ResponseEntity<Map<String, Object>> createDefaluSettingForUnit(@PathVariable Long unitId, @RequestBody DefalutKPISettingDTO defalutKPISettingDTO){
+//            counterManagementService.createDefaultKpiSetting(unitId,defalutKPISettingDTO);
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+//    }
 }

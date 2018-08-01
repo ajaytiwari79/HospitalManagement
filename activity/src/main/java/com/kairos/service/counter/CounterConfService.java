@@ -154,7 +154,7 @@ public class CounterConfService extends MongoBaseService {
         List<CounterType> addableCounters = Arrays.stream(CounterType.values()).filter(counterType -> !availableTypes.contains(counterType)).collect(Collectors.toList());
         addableCounters.forEach(counterType -> kpis.add(new KPI(counterType.getName(), null, null, counterType, false, null)));
         List<KPI> savedKPIs = save(kpis);
-        List<KPIAssignment> kpiAssignment = savedKPIs.parallelStream().map(kpi -> new KPIAssignment(kpi.getId(), countryId, null, null, ConfLevel.COUNTRY)).collect(Collectors.toList());
-        save(kpiAssignment);
+        List<ApplicableKPI> applicableKPIS = savedKPIs.parallelStream().map(kpi -> new ApplicableKPI(kpi.getId(),kpi.getId(), countryId, null, null, ConfLevel.COUNTRY)).collect(Collectors.toList());
+        save(applicableKPIS);
     }
 }

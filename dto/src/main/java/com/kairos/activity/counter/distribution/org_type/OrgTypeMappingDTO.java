@@ -5,7 +5,6 @@ import java.math.BigInteger;
 public class OrgTypeMappingDTO {
     private Long orgTypeId;
     private BigInteger kpiId;
-    private BigInteger kpiAssignmentId;
 
     public Long getOrgTypeId() {
         return orgTypeId;
@@ -23,11 +22,4 @@ public class OrgTypeMappingDTO {
         this.kpiId = kpiId;
     }
 
-    public BigInteger getKpiAssignmentId() {
-        return kpiAssignmentId;
-    }
-
-    public void setKpiAssignmentId(BigInteger kpiAssignmentId) {
-        this.kpiAssignmentId = kpiAssignmentId;
-    }
 }

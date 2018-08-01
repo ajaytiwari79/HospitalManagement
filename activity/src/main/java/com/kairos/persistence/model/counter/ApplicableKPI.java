@@ -5,31 +5,33 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 
-public class KPIAssignment extends MongoBaseEntity {
-    private BigInteger kpiId;
+public class ApplicableKPI extends MongoBaseEntity {
+    private BigInteger ActiveKpiId;
+    private BigInteger BaseKpiId;
     private Long countryId;
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
 
-    public KPIAssignment() {
+    public ApplicableKPI() {
 
     }
 
-    public KPIAssignment(BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level){
+    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+        ActiveKpiId = activeKpiId;
+        BaseKpiId = baseKpiId;
         this.countryId = countryId;
         this.unitId = unitId;
         this.staffId = staffId;
-        this.kpiId = kpiId;
         this.level = level;
     }
 
-    public BigInteger getKpiId() {
-        return kpiId;
+    public BigInteger getActiveKpiId() {
+        return ActiveKpiId;
     }
 
-    public void setKpiId(BigInteger kpiId) {
-        this.kpiId = kpiId;
+    public void setActiveKpiId(BigInteger activeKpiId) {
+        this.ActiveKpiId = activeKpiId;
     }
 
     public ConfLevel getLevel() {
@@ -50,6 +52,14 @@ public class KPIAssignment extends MongoBaseEntity {
 
     public Long getUnitId() {
         return unitId;
+    }
+
+    public BigInteger getBaseKpiId() {
+        return BaseKpiId;
+    }
+
+    public void setBaseKpiId(BigInteger baseKpiId) {
+        BaseKpiId = baseKpiId;
     }
 
     public void setUnitId(Long unitId) {

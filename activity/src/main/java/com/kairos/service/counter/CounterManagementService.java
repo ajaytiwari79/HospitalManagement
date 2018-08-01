@@ -11,7 +11,6 @@ import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
-import com.kairos.activity.counter.distribution.tab.InitialKPITabDistDataDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
@@ -21,7 +20,6 @@ import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.access_page.KPIAccessPageDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -30,8 +28,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toCollection;
+
 import static java.util.stream.Collectors.toList;
 
 /*
@@ -72,14 +69,14 @@ public class CounterManagementService extends MongoBaseService {
 
     public void updateCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {
         CategoryAssignment categoryAssignment = counterRepository.getCategoryAssignment(categoryKPIsDetails.getCategoryId(), level, refId);
-        List<KPIAssignment> kpiAssignments = counterRepository.getKPIAssignments(categoryKPIsDetails.getKpiIds(), level, refId);
+        List<ApplicableKPI> kpiAssignments = counterRepository.getKPIAssignments(categoryKPIsDetails.getKpiIds(), level, refId);
         List<CategoryKPIConf> categoryKPIConfs = counterRepository.getCategoryKPIConfs(categoryAssignment.getId());
         List<BigInteger> kpiAssignmentIds = categoryKPIConfs.stream().map(categoryKPIConf -> categoryKPIConf.getKpiAssignmentId()).collect(toList());
         kpiAssignments = kpiAssignments.parallelStream().filter(kpiAssignment -> kpiAssignmentIds.contains(kpiAssignment.getId())).collect(toList());
         if (kpiAssignments.isEmpty())
             exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
         List<CategoryKPIConf> newCategoryKPIConfs = new ArrayList<>();
-        kpiAssignments.parallelStream().forEach(kpiAssignment -> newCategoryKPIConfs.add(new CategoryKPIConf(kpiAssignment.getKpiId(), categoryAssignment.getId())));
+        kpiAssignments.parallelStream().forEach(kpiAssignment -> newCategoryKPIConfs.add(new CategoryKPIConf(kpiAssignment.getActiveKpiId(), categoryAssignment.getId())));
         save(newCategoryKPIConfs);
     }
 
@@ -96,7 +93,10 @@ public class CounterManagementService extends MongoBaseService {
         Long unitId = ConfLevel.UNIT.equals(level) ? refId : null;
         Long staffId = ConfLevel.STAFF.equals(level) ? refId : null;
         List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabKPIEntries.getTabIds(), level, refId);
-        List<KPIAssignment> kpiAssignments = counterRepository.getKPIAssignmentsByKPIId(tabKPIEntries.getKpiIds());
+//        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignmentsByKPIId(tabKPIEntries.getKpiIds());
+//        if (tabKPIEntries.getKpiIds().size() != tabKPIEntries.size()) {
+//            exceptionService.actionNotPermittedException("KPi id not valid");
+//        }
         Map<String, Map<BigInteger, BigInteger>> tabKpiMap = new HashMap<>();
         List<TabKPIConf> entriesToSave = new ArrayList<>();
         tabKPIEntries.getTabIds().forEach(tabKpiId -> {
@@ -105,13 +105,11 @@ public class CounterManagementService extends MongoBaseService {
         tabKPIMappingDTOS.forEach(tabKPIMappingDTO -> {
             tabKpiMap.get(tabKPIMappingDTO.getTabId()).put(tabKPIMappingDTO.getKpiAssignmentId(), tabKPIMappingDTO.getKpiAssignmentId());
         });
-        kpiAssignments.forEach(kpiAssignment -> {
-            tabKPIEntries.getTabIds().forEach(tabId -> {
-                if (tabKpiMap.get(tabId).get(kpiAssignment.getId()) == null) {
-                    entriesToSave.add(new TabKPIConf(tabId, kpiAssignment.getId(), countryId, unitId, staffId, level));
-                }
-            });
-        });
+      tabKPIEntries.getTabIds().forEach(tabId->{tabKPIEntries.getKpiIds().forEach(kpiId->{
+          if(tabKpiMap.get(tabId).get(kpiId)==null){
+              entriesToSave.add(new TabKPIConf(tabId,kpiId,countryId,unitId,staffId,level));
+          }
+      });});
         if (!entriesToSave.isEmpty()) {
             save(entriesToSave);
         }
@@ -131,25 +129,24 @@ public class CounterManagementService extends MongoBaseService {
     public void addAccessGroupKPIEntries(AccessGroupKPIConfDTO accessGroupKPIConf,Long refId,ConfLevel level) {
         Long countryId = ConfLevel.COUNTRY.equals(level)? refId: null;
         Long unitId=ConfLevel.UNIT.equals(level)? refId: null;
-        Map<Long, Map<BigInteger, BigInteger>> tabKPIsMap = new HashMap<>();
         List<AccessGroupKPIEntry> entriesToSave = new ArrayList<>();
-        List<KPIAssignment> kpiAssignments = counterRepository.getKPIAssignmentsByKPIId(accessGroupKPIConf.getKpiIds());
+        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignmentsByKPIId(accessGroupKPIConf.getKpiIds());
 //        if (accessGroupKPIConf.getKpiIds().size() != kpiAssignments.size()) {
 //            exceptionService.actionNotPermittedException("KPi id not valid");
 //        }
         List<AccessGroupMappingDTO> AccessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(accessGroupKPIConf.getAccessGroupIds(),level,countryId);
-        Map<Long, Map<BigInteger, BigInteger>> orgTypeKPIMap = new HashMap<>();
+        Map<Long, Map<BigInteger, BigInteger>> accessGroupKPIMap = new HashMap<>();
         accessGroupKPIConf.getAccessGroupIds().forEach(orgTypeId -> {
-            orgTypeKPIMap.put(orgTypeId, new HashMap<BigInteger, BigInteger>());
+            accessGroupKPIMap.put(orgTypeId, new HashMap<BigInteger, BigInteger>());
         });
         AccessGroupMappingDTOS.forEach(AccessGroupMappingDTO -> {
-            orgTypeKPIMap.get(AccessGroupMappingDTO.getAccessGroupId()).put(AccessGroupMappingDTO.getKpiAssignmentId(), AccessGroupMappingDTO.getKpiAssignmentId());
+            accessGroupKPIMap.get(AccessGroupMappingDTO.getAccessGroupId()).put(AccessGroupMappingDTO.getKpiId(), AccessGroupMappingDTO.getKpiId());
         });
-        kpiAssignments.forEach(kpiAssignment -> {accessGroupKPIConf.getAccessGroupIds().forEach(accessGroupId->{
-            if(orgTypeKPIMap.get(accessGroupId).get(kpiAssignment.getId()) == null){
-                entriesToSave.add(new AccessGroupKPIEntry(accessGroupId, kpiAssignment.getId(),countryId,unitId,level));
-            } });
-        });
+        accessGroupKPIConf.getAccessGroupIds().forEach(accessGroupId->{accessGroupKPIConf.getKpiIds().forEach(kpiId->{
+            if(accessGroupKPIMap.get(accessGroupId).get(kpiId)==null){
+                entriesToSave.add(new AccessGroupKPIEntry(accessGroupId,kpiId,countryId,unitId,level));
+            }
+        });});
         if(!entriesToSave.isEmpty())
             save(entriesToSave);
     }
@@ -166,24 +163,24 @@ public class CounterManagementService extends MongoBaseService {
     }
 
     public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf, Long countryId) {
-        List<OrgTypeKPIEntry> entriesToSave = new ArrayList<>();
-        List<KPIAssignment> kpiAssignments = counterRepository.getKPIAssignmentsByKPIId(orgTypeKPIConf.getKpiIds());
-//        if (orgTypeKPIConf.getKpiIds().size() != kpiAssignments.size()) {
+      //List<ApplicableKPI> applicableKPIS=counterRepository.getApplicableKPIByKPIId(orgTypeKPIConf.getKpiIds());
+//        if (orgTypeKPIConf.getKpiIds().size() != applicableKPIS.size()) {
 //            exceptionService.actionNotPermittedException("KPi id not valid");
 //        }
+        List<OrgTypeKPIEntry> entriesToSave = new ArrayList<>();
+        Map<Long, Map<BigInteger, BigInteger>> orgTypeKPIsMap = new HashMap<>();
+        orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId->{
+            orgTypeKPIsMap.put(orgTypeId,new HashMap<BigInteger, BigInteger>());
+        });
         List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(orgTypeKPIConf.getOrgTypeIds(), countryId);
-        Map<Long, Map<BigInteger, BigInteger>> orgTypeKPIMap = new HashMap<>();
-        orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId -> {
-            orgTypeKPIMap.put(orgTypeId, new HashMap<BigInteger, BigInteger>());
-        });
         orgTypeMappingDTOS.forEach(orgTypeMappingDTO -> {
-            orgTypeKPIMap.get(orgTypeMappingDTO.getOrgTypeId()).put(orgTypeMappingDTO.getKpiAssignmentId(), orgTypeMappingDTO.getKpiAssignmentId());
+            orgTypeKPIsMap.get(orgTypeMappingDTO.getOrgTypeId()).put(orgTypeMappingDTO.getKpiId(),orgTypeMappingDTO.getKpiId());
         });
-        kpiAssignments.forEach(kpiAssignment -> {orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId->{
-            if(orgTypeKPIMap.get(orgTypeId).get(kpiAssignment.getId()) == null){
-                entriesToSave.add(new OrgTypeKPIEntry(orgTypeId, kpiAssignment.getId()));
-            } });
-        });
+          orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId->{orgTypeKPIConf.getKpiIds().forEach(kpiId->{
+              if(orgTypeKPIsMap.get(orgTypeId).get(kpiId)==null){
+                  entriesToSave.add(new OrgTypeKPIEntry(orgTypeId,kpiId));
+              }
+          }); });
         if(!entriesToSave.isEmpty())
             save(entriesToSave);
     }
@@ -192,27 +189,27 @@ public class CounterManagementService extends MongoBaseService {
         return counterRepository.removeOrgTypeKPIEntry(BigInteger.valueOf(orgTypeId));
     }
 
-    public void createDefaultKpiSetting(Long unitId, DefalutKPISettingDTO defalutKPISettingDTO) {
-        List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(defalutKPISettingDTO.getOrgTypeIds(), unitId);
-        List<BigInteger> kpiIds = orgTypeMappingDTOS.stream().map(orgTypeMappingDTO -> orgTypeMappingDTO.getKpiId()).collect(Collectors.toList());
-        List<KPIAssignment> kpiAssignments = new ArrayList<>();
-        Map<BigInteger, BigInteger> KpiIdAndAssignmentKPIIds = new HashMap<>();
-        kpiIds.forEach(kpiId -> {
-            kpiAssignments.add(new KPIAssignment(kpiId, null, unitId, null, ConfLevel.UNIT));
-        });
-        save(kpiAssignments);
-        kpiAssignments.forEach(kpiAssignment -> {
-            KpiIdAndAssignmentKPIIds.put(kpiAssignment.getKpiId(), kpiAssignment.getId());
-        });
-        List<AccessGroupKPIEntry> accessGroupKPIEntrie = new ArrayList<>();
-        List<Long> countryAccessGroupIds = defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().keySet().stream().collect(Collectors.toList());
-        List<AccessGroupMappingDTO> accessGroupKPIEntries = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, ConfLevel.COUNTRY, defalutKPISettingDTO.getCountryId());
-        accessGroupKPIEntries.forEach(accessGroupMappingDTO -> {
-                accessGroupKPIEntrie.add(new AccessGroupKPIEntry(defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().get(accessGroupMappingDTO.getAccessGroupId()), KpiIdAndAssignmentKPIIds.get(accessGroupMappingDTO.getKpiId()), null, unitId, ConfLevel.UNIT));
-        });
-        save(accessGroupKPIEntrie);
-
-    }
+//    public void createDefaultKpiSetting(Long unitId, DefalutKPISettingDTO defalutKPISettingDTO) {
+//        List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(defalutKPISettingDTO.getOrgTypeIds(), unitId);
+//        List<BigInteger> kpiIds = orgTypeMappingDTOS.stream().map(orgTypeMappingDTO -> orgTypeMappingDTO.getKpiId()).collect(Collectors.toList());
+//        List<ApplicableKPI> kpiAssignments = new ArrayList<>();
+//        Map<BigInteger, BigInteger> KpiIdAndAssignmentKPIIds = new HashMap<>();
+//        kpiIds.forEach(kpiId -> {
+//            kpiAssignments.add(new ApplicableKPI(kpiId, null, unitId, null, ConfLevel.UNIT));
+//        });
+//        save(kpiAssignments);
+//        kpiAssignments.forEach(kpiAssignment -> {
+//            KpiIdAndAssignmentKPIIds.put(kpiAssignment.getActiveKpiId(), kpiAssignment.getId());
+//        });
+//        List<AccessGroupKPIEntry> accessGroupKPIEntrie = new ArrayList<>();
+//        List<Long> countryAccessGroupIds = defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().keySet().stream().collect(Collectors.toList());
+//        List<AccessGroupMappingDTO> accessGroupKPIEntries = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, ConfLevel.COUNTRY, defalutKPISettingDTO.getCountryId());
+//        accessGroupKPIEntries.forEach(accessGroupMappingDTO -> {
+//                accessGroupKPIEntrie.add(new AccessGroupKPIEntry(defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().get(accessGroupMappingDTO.getAccessGroupId()), KpiIdAndAssignmentKPIIds.get(accessGroupMappingDTO.getKpiId()), null, unitId, ConfLevel.UNIT));
+//        });
+//        save(accessGroupKPIEntrie);
+//
+//    }
 }
 
 
@@ -225,7 +222,7 @@ public class CounterManagementService extends MongoBaseService {
         });
 
         entries.parallelStream().forEach(accessGroupKPIEntry -> {
-            tabKPIsMap.get(accessGroupKPIEntry.getAccessGroupId()).put(accessGroupKPIEntry.getKpiId(), accessGroupKPIEntry.getKpiId());
+            tabKPIsMap.get(accessGroupKPIEntry.getAccessGroupId()).put(accessGroupKPIEntry.getActiveKpiId(), accessGroupKPIEntry.getActiveKpiId());
         });
 
         accessGroupKPIConf.getAccessGroupIds().parallelStream().forEach(accessGroupId -> {

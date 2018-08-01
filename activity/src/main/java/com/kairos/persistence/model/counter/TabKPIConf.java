@@ -7,7 +7,7 @@ import java.math.BigInteger;
 
 public class TabKPIConf extends MongoBaseEntity {
     private String tabId;
-    private BigInteger kpiAssignmentId;
+    private BigInteger kpiId;
     private Long countryId;
     private Long unitId;
     private Long staffId;
@@ -17,9 +17,9 @@ public class TabKPIConf extends MongoBaseEntity {
 
     }
 
-    public TabKPIConf(String tabId, BigInteger kpiAssignmentId, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level) {
         this.tabId = tabId;
-        this.kpiAssignmentId = kpiAssignmentId;
+        this.kpiId = kpiId;
         this.countryId = countryId;
         this.unitId = unitId;
         this.staffId = staffId;
@@ -34,12 +34,13 @@ public class TabKPIConf extends MongoBaseEntity {
         this.tabId = tabId;
     }
 
-    public BigInteger getKpiAssignmentId() {
-        return kpiAssignmentId;
+
+    public BigInteger getKpiId() {
+        return kpiId;
     }
 
-    public void setKpiAssignmentId(BigInteger kpiAssignmentId) {
-        this.kpiAssignmentId = kpiAssignmentId;
+    public void setKpiId(BigInteger kpiId) {
+        this.kpiId = kpiId;
     }
 
     public Long getCountryId() {

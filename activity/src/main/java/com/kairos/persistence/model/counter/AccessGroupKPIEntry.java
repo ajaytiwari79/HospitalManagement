@@ -7,7 +7,7 @@ import java.math.BigInteger;
 
 public class AccessGroupKPIEntry extends MongoBaseEntity {
     private Long accessGroupId;
-    private BigInteger kpiAssignmentId;
+    private BigInteger kpiId;
     private Long countryId;
     private Long unitId;
     private ConfLevel level;
@@ -15,9 +15,9 @@ public class AccessGroupKPIEntry extends MongoBaseEntity {
     public AccessGroupKPIEntry() {
     }
 
-    public AccessGroupKPIEntry(Long accessGroupId, BigInteger kpiAssignmentId, Long countryId, Long unitId, ConfLevel level) {
+    public AccessGroupKPIEntry(Long accessGroupId, BigInteger kpiId, Long countryId, Long unitId, ConfLevel level) {
         this.accessGroupId = accessGroupId;
-        this.kpiAssignmentId = kpiAssignmentId;
+        this.kpiId = kpiId;
         this.countryId = countryId;
         this.unitId = unitId;
         this.level = level;
@@ -32,11 +32,11 @@ public class AccessGroupKPIEntry extends MongoBaseEntity {
     }
 
     public BigInteger getKpiId() {
-        return kpiAssignmentId;
+        return kpiId;
     }
 
     public void setKpiId(BigInteger kpiId) {
-        this.kpiAssignmentId = kpiId;
+        this.kpiId = kpiId;
     }
 
     public Long getCountryId() {
@@ -63,11 +63,5 @@ public class AccessGroupKPIEntry extends MongoBaseEntity {
         this.level = level;
     }
 
-    public BigInteger getKpiAssignmentId() {
-        return kpiAssignmentId;
-    }
 
-    public void setKpiAssignmentId(BigInteger kpiAssignmentId) {
-        this.kpiAssignmentId = kpiAssignmentId;
-    }
 }
