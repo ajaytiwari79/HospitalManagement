@@ -170,12 +170,12 @@ public class AssetTypeService extends MongoBaseService {
     }
 
 
-    public Map<String, Object> deleteAssetType(Long countryId, Long organizationId, BigInteger id) {
-        AssetType exist = assetTypeMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+    public Map<String, Object> deleteAssetType(Long countryId, Long organizationId, BigInteger assetTypeId) {
+        AssetType exist = assetTypeMongoRepository.findByIdAndNonDeleted(countryId, organizationId, assetTypeId);
         if (!Optional.ofNullable(exist).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
+            throw new DataNotFoundByIdException("data not exist for id " + assetTypeId);
         }
-        List<MasterAssetBasicResponseDTO> masterAssetLinkWithAssetType = masterAssetMongoRepository.findAllMasterAssetbyAssetType(countryId, organizationId, id);
+        List<MasterAssetBasicResponseDTO> masterAssetLinkWithAssetType = masterAssetMongoRepository.findAllMasterAssetbyAssetType(countryId, organizationId, assetTypeId);
         Map<String, Object> result = new HashMap<>();
         if (!masterAssetLinkWithAssetType.isEmpty()) {
             result.put("isSuccess", false);

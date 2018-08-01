@@ -178,6 +178,7 @@ public class CustomAggregationQuery {
         return " {" +
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "         'assetSubTypes':1," +
                 "         'name':1," +
                 "       'description':1," +
                 "       'organizationSubTypes':1," +
@@ -187,9 +188,6 @@ public class CustomAggregationQuery {
 
                 "            }}";
     }
-
-
-
 
 
     public static String assetProjectionWithMetaData() {

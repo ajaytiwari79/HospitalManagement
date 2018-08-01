@@ -45,4 +45,8 @@ public class AssetTypeDTO {
     public void setSubAssetTypes(List<AssetTypeDTO> subAssetTypes) {
         this.subAssetTypes = subAssetTypes;
     }
+
+    public AssetTypeDTO(@Pattern(message = "Numbers and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$") String name) {
+        this.name = name;
+    }
 }
