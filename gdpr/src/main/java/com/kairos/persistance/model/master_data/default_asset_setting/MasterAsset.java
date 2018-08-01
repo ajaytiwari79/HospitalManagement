@@ -39,14 +39,20 @@ public class MasterAsset extends MongoBaseEntity {
     @NotNull(message = "Asset type can't be null")
     private BigInteger assetType;
 
+    @NotNull(message = "Asset Sub type can't be null")
+    private List<BigInteger> assetSubTypes;
+
     public BigInteger getAssetType() { return assetType; }
 
     public void setAssetType(BigInteger assetType) { this.assetType = assetType; }
 
-
     public Long getCountryId() {
         return countryId;
     }
+
+    public List<BigInteger> getAssetSubTypes() { return assetSubTypes; }
+
+    public void setAssetSubTypes(List<BigInteger> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
 
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
