@@ -124,9 +124,9 @@ public class HostingProviderController {
 
 
     @ApiOperation("get All hosting provider  of Current organization and Parent Oeg which were not inherited by Organization")
-    @GetMapping(UNIT_URL+"/inherit/hosting_provider")
-    public ResponseEntity<Object> getAllHostingProviderOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getAllNotInheritedHostingProviderFromParentOrgAndUnitHostingProvider(countryId,organizationId,unitId));
+    @GetMapping("/hosting_provider")
+    public ResponseEntity<Object> getAllHostingProviderOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getAllNotInheritedHostingProviderFromParentOrgAndUnitHostingProvider(countryId,parentOrgId,organizationId));
     }
 
 

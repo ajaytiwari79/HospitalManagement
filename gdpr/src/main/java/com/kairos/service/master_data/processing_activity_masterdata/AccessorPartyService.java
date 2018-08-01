@@ -72,7 +72,7 @@ public class AccessorPartyService extends MongoBaseService {
                     newAccessorParty.setOrganizationId(organizationId);
                     newAccessorPartyList.add(newAccessorParty);
                 }
-                newAccessorPartyList = accessorPartyMongoRepository.saveAll(sequenceGenerator(newAccessorPartyList));
+                newAccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(newAccessorPartyList));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newAccessorPartyList);
@@ -137,7 +137,7 @@ public class AccessorPartyService extends MongoBaseService {
         } else {
             exist = accessorPartyMongoRepository.findByid(id);
             exist.setName(accessorParty.getName());
-            return accessorPartyMongoRepository.save(sequenceGenerator(exist));
+            return accessorPartyMongoRepository.save(getNextSequence(exist));
 
         }
     }
@@ -179,7 +179,7 @@ public class AccessorPartyService extends MongoBaseService {
                 accessorPartyIds.add(accessorPartyDTO.getId());
             }
         }
-        newInheritAccessorPartiesFromCountry = accessorPartyMongoRepository.saveAll(sequenceGenerator(newInheritAccessorPartiesFromCountry));
+        newInheritAccessorPartiesFromCountry = accessorPartyMongoRepository.saveAll(getNextSequence(newInheritAccessorPartiesFromCountry));
         newInheritAccessorPartiesFromCountry.forEach(accessorParty -> {
             accessorPartyIds.add(accessorParty.getId());
         });
@@ -190,13 +190,12 @@ public class AccessorPartyService extends MongoBaseService {
     /**
      *
      * @param countryId
-     * @param organizationId -id of parent organization
-     * @param unitId - id of unit organization
+     * @param organizationId - id of current organization
      * @return     method return list of Organization Accessor party with non Inherited Accessor party from  parent
      */
-    public List<AccessorPartyReponseDTO> getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(Long countryId, Long organizationId, Long unitId) {
+    public List<AccessorPartyReponseDTO> getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(Long countryId, Long parentOrgId, Long organizationId) {
 
-      return accessorPartyMongoRepository.getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(countryId,organizationId,unitId);
+      return accessorPartyMongoRepository.getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(countryId,parentOrgId,organizationId);
     }
 
 

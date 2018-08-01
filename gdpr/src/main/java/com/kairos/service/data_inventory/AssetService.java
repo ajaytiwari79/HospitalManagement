@@ -54,7 +54,7 @@ public class AssetService extends MongoBaseService {
         asset.setDataRetentionPeriod(assetDto.getDataRetentionPeriod());
         asset.setMaxDataSubjectVolume(assetDto.getMaxDataSubjectVolume());
         asset.setMinDataSubjectVolume(assetDto.getMinDataSubjectVolume());
-        assetMongoRepository.save(sequenceGenerator(asset));
+        assetMongoRepository.save(getNextSequence(asset));
         return asset;
     }
 
@@ -145,7 +145,7 @@ public class AssetService extends MongoBaseService {
         existAsset.setDataRetentionPeriod(assetDto.getDataRetentionPeriod());
         existAsset.setMaxDataSubjectVolume(assetDto.getMaxDataSubjectVolume());
         existAsset.setMinDataSubjectVolume(assetDto.getMinDataSubjectVolume());
-        assetMongoRepository.save(sequenceGenerator(existAsset));
+        assetMongoRepository.save(getNextSequence(existAsset));
         return existAsset;
     }
 

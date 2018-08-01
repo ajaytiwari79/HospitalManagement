@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -84,7 +83,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
         questionnaireTemplate.setSections((List<BigInteger>) questionnaireSection.get(IDS_LIST));
         try {
-            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(questionnaireTemplate));
+            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(getNextSequence(questionnaireTemplate));
         } catch (Exception e) {
             masterQuestionnaireSectionRepository.deleteAll((Set<MasterQuestionnaireSection>) questionnaireSection.get(QUESTIONNAIRE_SECTIONS));
             masterQuestionMongoRepository.deleteAll((Set<MasterQuestion>) questionnaireSection.get(QUESTION_LIST));
@@ -122,7 +121,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
             masterQuestionnaireSections.add(questionnaireSection);
         }
         try {
-            masterQuestionnaireSections = masterQuestionnaireSectionRepository.saveAll(sequenceGenerator(masterQuestionnaireSections));
+            masterQuestionnaireSections = masterQuestionnaireSectionRepository.saveAll(getNextSequence(masterQuestionnaireSections));
             masterQuestionnaireSections.forEach(masterQuestionnaireSection -> {
                 questionSectionIds.add(masterQuestionnaireSection.getId());
             });
@@ -250,7 +249,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
 
         try {
-            updateSectionsList = masterQuestionnaireSectionRepository.saveAll(sequenceGenerator(updateSectionsList));
+            updateSectionsList = masterQuestionnaireSectionRepository.saveAll(getNextSequence(updateSectionsList));
 
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());

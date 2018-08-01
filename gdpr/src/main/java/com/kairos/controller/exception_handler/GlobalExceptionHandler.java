@@ -36,12 +36,11 @@ import java.util.Map;
 @Order(1)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        logger.error("error in user service ",ex);
+        logger.error("error in gdpr service ",ex);
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
         List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
         List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
@@ -62,7 +61,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
-    @ExceptionHandler(value = {DuplicateDataException.class,DataNotExists.class,DataNotFoundByIdException.class,OrganizationTypeException.class})
+    @ExceptionHandler(value = {DuplicateDataException.class,DataNotExists.class,DataNotFoundByIdException.class})
     @ResponseBody
     protected ResponseEntity<Object> exceptionHandler(RuntimeException ex , HttpServletRequest request)
     {

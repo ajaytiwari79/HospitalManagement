@@ -67,7 +67,7 @@ public class TransferMethodService extends MongoBaseService {
                     newTransferMethods.add(newTransferMethod);
                 }
 
-                newTransferMethods = transferMethodRepository.saveAll(sequenceGenerator(newTransferMethods));
+                newTransferMethods = transferMethodRepository.saveAll(getNextSequence(newTransferMethods));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTransferMethods);
@@ -136,7 +136,7 @@ public class TransferMethodService extends MongoBaseService {
         } else {
             exist = transferMethodRepository.findByid(id);
             exist.setName(transferMethod.getName());
-            return transferMethodRepository.save(sequenceGenerator(exist));
+            return transferMethodRepository.save(getNextSequence(exist));
 
         }
     }
@@ -174,7 +174,7 @@ public class TransferMethodService extends MongoBaseService {
                 transferMethodIds.add(transferMethodDTO.getId());
             }
         }
-        newInheritTransferMethodFromParentOrg = transferMethodRepository.saveAll(sequenceGenerator(newInheritTransferMethodFromParentOrg));
+        newInheritTransferMethodFromParentOrg = transferMethodRepository.saveAll(getNextSequence(newInheritTransferMethodFromParentOrg));
         newInheritTransferMethodFromParentOrg.forEach(dataSource -> {
             transferMethodIds.add(dataSource.getId());
         });

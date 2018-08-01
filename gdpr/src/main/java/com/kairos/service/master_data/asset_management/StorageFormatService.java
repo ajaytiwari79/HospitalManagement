@@ -68,7 +68,7 @@ public class StorageFormatService extends MongoBaseService {
                 }
 
 
-                newStorageFormats = storageFormatMongoRepository.saveAll(sequenceGenerator(newStorageFormats));
+                newStorageFormats = storageFormatMongoRepository.saveAll(getNextSequence(newStorageFormats));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newStorageFormats);
@@ -141,7 +141,7 @@ public class StorageFormatService extends MongoBaseService {
         } else {
             exist = storageFormatMongoRepository.findByid(id);
             exist.setName(storageFormat.getName());
-            return storageFormatMongoRepository.save(sequenceGenerator(exist));
+            return storageFormatMongoRepository.save(getNextSequence(exist));
 
         }
     }

@@ -127,9 +127,9 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("get All organization security   of Current organization and Parent Oeg which were not inherited by Organization")
-    @GetMapping(UNIT_URL+"/inherit/organization_security")
-    public ResponseEntity<Object> getAllOrgSecurityMeasureOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getAllNotInheritedFromParentOrgAndUnitOrgSecurityMeasure(countryId,organizationId,unitId));
+    @GetMapping("/organization_security")
+    public ResponseEntity<Object> getAllOrgSecurityMeasureOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getAllNotInheritedFromParentOrgAndUnitOrgSecurityMeasure(countryId,parentOrgId,organizationId));
     }
 
 

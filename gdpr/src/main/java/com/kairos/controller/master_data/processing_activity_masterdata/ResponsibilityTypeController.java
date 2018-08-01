@@ -128,9 +128,9 @@ public class ResponsibilityTypeController {
 
 
     @ApiOperation("get All responsibility type of Current organization and Parent Oeg which were not inherited by Organization")
-    @GetMapping(UNIT_URL+"/inherit/responsibility_type")
-    public ResponseEntity<Object> getAllResponsibilityTypeOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getAllNotInheritedResponsibilityTypesFromParentOrgAndUnitResponsibilityType(countryId,organizationId,unitId));
+    @GetMapping("/responsibility_type")
+    public ResponseEntity<Object> getAllResponsibilityTypeOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getAllNotInheritedResponsibilityTypesFromParentOrgAndUnitResponsibilityType(countryId,parentOrgId,organizationId));
     }
 
 

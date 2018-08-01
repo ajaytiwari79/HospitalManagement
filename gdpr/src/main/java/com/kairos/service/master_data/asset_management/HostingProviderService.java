@@ -67,7 +67,7 @@ public class HostingProviderService extends MongoBaseService {
 
                 }
 
-                newHostingProviders = hostingProviderMongoRepository.saveAll(sequenceGenerator(newHostingProviders));
+                newHostingProviders = hostingProviderMongoRepository.saveAll(getNextSequence(newHostingProviders));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingProviders);
@@ -141,7 +141,7 @@ public class HostingProviderService extends MongoBaseService {
         } else {
             exist=hostingProviderMongoRepository.findByid(id);
             exist.setName(hostingProvider.getName());
-            return hostingProviderMongoRepository.save(sequenceGenerator(exist));
+            return hostingProviderMongoRepository.save(getNextSequence(exist));
 
         }
     }

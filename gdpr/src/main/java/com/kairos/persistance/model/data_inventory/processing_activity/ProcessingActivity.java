@@ -31,9 +31,7 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private List<BigInteger> dataSources;
 
-    private List<BigInteger> sourceTransferMethods;
-
-    private List<BigInteger> destinationTransferMethods;
+    private List<BigInteger> transferMethods;
 
     private List<BigInteger> accessorParties;
 
@@ -81,10 +79,6 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setDataSources(List<BigInteger> dataSources) { this.dataSources = dataSources; }
 
-    public List<BigInteger> getSourceTransferMethods() { return sourceTransferMethods; }
-
-    public void setSourceTransferMethods(List<BigInteger> sourceTransferMethods) { this.sourceTransferMethods = sourceTransferMethods; }
-
     public Integer getControllerContactInfo() { return controllerContactInfo; }
 
     public void setControllerContactInfo(Integer controllerContactInfo) { this.controllerContactInfo = controllerContactInfo; }
@@ -117,11 +111,9 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setCountryId(Long countryId) { this.countryId = countryId; }
 
-    public List<BigInteger> getDestinationTransferMethods() {
-        return destinationTransferMethods;
-    }
+    public List<BigInteger> getTransferMethods() { return transferMethods; }
 
-    public void setDestinationTransferMethods(List<BigInteger> destinationTransferMethods) { this.destinationTransferMethods = destinationTransferMethods; }
+    public void setTransferMethods(List<BigInteger> transferMethods) { this.transferMethods = transferMethods; }
 
     public BigInteger getResponsibilityType() { return responsibilityType; }
 

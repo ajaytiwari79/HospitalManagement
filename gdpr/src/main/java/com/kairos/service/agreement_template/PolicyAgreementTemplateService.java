@@ -1,8 +1,6 @@
 package com.kairos.service.agreement_template;
 
 
-import com.kairos.custom_exception.DataNotExists;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.dto.PolicyAgreementTemplateDTO;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
@@ -80,7 +78,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         newPolicyAgreementTemplate.setTemplateType(policyAgreementTemplateDto.getTemplateTypeId());
         newPolicyAgreementTemplate.setOrganizationId(organizationId);
         try {
-            newPolicyAgreementTemplate = policyAgreementTemplateRepository.save(sequenceGenerator(newPolicyAgreementTemplate));
+            newPolicyAgreementTemplate = policyAgreementTemplateRepository.save(getNextSequence(newPolicyAgreementTemplate));
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e);

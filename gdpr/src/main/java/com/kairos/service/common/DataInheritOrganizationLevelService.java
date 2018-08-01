@@ -56,7 +56,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
                 organizationAssetList.add(asset);
             });
 
-            assetMongoRepository.saveAll(sequenceGenerator(organizationAssetList));
+            assetMongoRepository.saveAll(getNextSequence(organizationAssetList));
         }
 
         List<MasterProcessingActivity> masterProcessingActivityList = masterProcessingActivityRepository.getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(countryId, parentOrganizationId, organizationMetaData);
@@ -72,7 +72,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
                 organizationProcessingActivityList.add(processingActivity);
             });
 
-            processingActivityMongoRepository.saveAll(sequenceGenerator(organizationProcessingActivityList));
+            processingActivityMongoRepository.saveAll(getNextSequence(organizationProcessingActivityList));
         }
 
 

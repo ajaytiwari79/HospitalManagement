@@ -33,9 +33,8 @@ public class ProcessingActivityDTO {
 
     private List<DataSourceDTO> dataSources;
 
-    private List<TransferMethodDTO> sourceTransferMethods;
+    private List<TransferMethodDTO> transferMethods;
 
-    private List<TransferMethodDTO> destinationTransferMethods;
 
     private List<AccessorPartyDTO> accessorParties;
 
@@ -80,13 +79,9 @@ public class ProcessingActivityDTO {
 
     public void setDataSources(List<DataSourceDTO> dataSources) { this.dataSources = dataSources; }
 
-    public List<TransferMethodDTO> getSourceTransferMethods() { return sourceTransferMethods; }
+    public List<TransferMethodDTO> getTransferMethods() { return transferMethods; }
 
-    public void setSourceTransferMethods(List<TransferMethodDTO> sourceTransferMethods) { this.sourceTransferMethods = sourceTransferMethods; }
-
-    public List<TransferMethodDTO> getDestinationTransferMethods() { return destinationTransferMethods; }
-
-    public void setDestinationTransferMethods(List<TransferMethodDTO> destinationTransferMethods) { this.destinationTransferMethods = destinationTransferMethods; }
+    public void setTransferMethods(List<TransferMethodDTO> transferMethods) { this.transferMethods = transferMethods; }
 
     public List<AccessorPartyDTO> getAccessorParties() { return accessorParties; }
 

@@ -7,7 +7,6 @@ import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.dto.master_data.ClauseTagDTO;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.common.MongoBaseService;
-import com.kairos.service.javers.JaversCommonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -51,7 +50,7 @@ public class ClauseTagService extends MongoBaseService {
             newClauseTag.setName(clauseTag);
             newClauseTag.setCountryId(countryId);
             newClauseTag.setOrganizationId(organizationId);
-            return clauseTagMongoRepository.save(sequenceGenerator(newClauseTag));
+            return clauseTagMongoRepository.save(getNextSequence(newClauseTag));
         }
     }
 
@@ -134,7 +133,7 @@ return exist;
             throw new DuplicateDataException("tag is already exist with name " + exists.get(0).getName());
         }
         if (clauseTagList.size() != 0) {
-            clauseTagList = clauseTagMongoRepository.saveAll(sequenceGenerator(clauseTagList));
+            clauseTagList = clauseTagMongoRepository.saveAll(getNextSequence(clauseTagList));
         }
         clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds(countryId, organizationId, existClauseTagIds));
         return clauseTagList;

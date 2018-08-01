@@ -129,9 +129,9 @@ public class HostingTypeController {
     }
 
     @ApiOperation("get All hosting type  of Current organization and Parent Oeg which were not inherited by Organization")
-    @GetMapping(UNIT_URL+"/inherit/hosting_type")
-    public ResponseEntity<Object> getAllHostingTypeOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getAllNotInheritedHostingTypeFromParentOrgAndUnitHostingType(countryId,organizationId,unitId));
+    @GetMapping("/hosting_type")
+    public ResponseEntity<Object> getAllHostingTypeOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getAllNotInheritedHostingTypeFromParentOrgAndUnitHostingType(countryId,parentOrgId,organizationId));
     }
 
 

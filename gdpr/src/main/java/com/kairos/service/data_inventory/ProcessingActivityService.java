@@ -63,7 +63,7 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivity.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
         processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
-        return processingActivityMongoRepository.save(sequenceGenerator(processingActivity));
+        return processingActivityMongoRepository.save(getNextSequence(processingActivity));
 
     }
 
@@ -114,7 +114,7 @@ public class ProcessingActivityService extends MongoBaseService {
         exist.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
         exist.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         exist.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
-        return processingActivityMongoRepository.save(sequenceGenerator(exist));
+        return processingActivityMongoRepository.save(getNextSequence(exist));
 
     }
 
@@ -134,35 +134,22 @@ public class ProcessingActivityService extends MongoBaseService {
             List<BigInteger> processingPurposeIds = processingPurposeService.createProcessingPurposeForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO);
             processingActivity.setProcessingPurposes(processingPurposeIds);
 
-        } else if (Optional.ofNullable(processingActivityDTO.getSourceTransferMethods()).isPresent() && !processingActivityDTO.getSourceTransferMethods().isEmpty()) {
-
-            List<BigInteger> sourceTransferMethodIds = transferMethodService.createTransferMethodForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO.getSourceTransferMethods());
-            processingActivity.setSourceTransferMethods(sourceTransferMethodIds);
-        } else if (Optional.ofNullable(processingActivityDTO.getDestinationTransferMethods()).isPresent() && !processingActivityDTO.getDestinationTransferMethods().isEmpty()) {
-
-            List<BigInteger> destinationTransferMethodIds = transferMethodService.createTransferMethodForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO.getDestinationTransferMethods());
-            processingActivity.setSourceTransferMethods(destinationTransferMethodIds);
+        } else if (Optional.ofNullable(processingActivityDTO.getTransferMethods()).isPresent() && !processingActivityDTO.getTransferMethods().isEmpty()) {
+            List<BigInteger> transferMethodIds = transferMethodService.createTransferMethodForOrganizationOnInheritingFromParentOrganization(countryId, organizationId, processingActivityDTO.getTransferMethods());
+            processingActivity.setTransferMethods(transferMethodIds);
         } else if (Optional.ofNullable(processingActivityDTO.getResponsibilityType()).isPresent()) {
 
             ResponsibilityTypeDTO responsibilityTypeDTO = processingActivityDTO.getResponsibilityType();
             if (!responsibilityTypeDTO.getOrganizationId().equals(organizationId)) {
                 ResponsibilityType responsibilityType = new ResponsibilityType(responsibilityTypeDTO.getName(), countryId);
                 responsibilityType.setOrganizationId(organizationId);
-                responsibilityType = responsibilityTypeMongoRepository.save(sequenceGenerator(responsibilityType));
+                responsibilityType = responsibilityTypeMongoRepository.save(getNextSequence(responsibilityType));
                 processingActivity.setResponsibilityType(responsibilityType.getId());
             } else {
                 processingActivity.setResponsibilityType(responsibilityTypeDTO.getId());
             }
         }
     }
-
-
-
-
-
-
-
-
 
 
 }
