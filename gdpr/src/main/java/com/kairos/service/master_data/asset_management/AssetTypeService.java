@@ -58,7 +58,7 @@ public class AssetTypeService extends MongoBaseService {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
 
-        Map<String, Object> subAssetTypes = new HashMap<>();
+        Map<String, Object> subAssetTypes ;
         AssetType assetType = new AssetType();
         if (!assetTypeDto.getSubAssetTypes().isEmpty()) {
             subAssetTypes = createNewSubAssetTypesList(countryId, assetTypeDto.getSubAssetTypes());
