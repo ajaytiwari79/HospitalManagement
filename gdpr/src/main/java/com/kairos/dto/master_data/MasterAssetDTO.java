@@ -49,6 +49,12 @@ public class MasterAssetDTO {
     @NotNull(message = "Asset Type Can't be empty")
     private BigInteger assetTypeId;
 
+    private List<BigInteger> assetSubTypes;
+
+    public List<BigInteger> getAssetSubTypes() { return assetSubTypes; }
+
+    public void setAssetSubTypes(List<BigInteger> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
+
     public BigInteger getAssetTypeId() {
         return assetTypeId;
     }
@@ -104,4 +110,5 @@ public class MasterAssetDTO {
     public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
+
 }

@@ -177,7 +177,7 @@ public class PayOutCalculationService {
     private List<PayOut> getPayoutsByInterval(Interval interval, List<PayOut> payOuts) {
         List<PayOut> payOutList = new ArrayList<>();
         payOuts.forEach(payOut -> {
-            if (interval.contains(DateUtils.asDate(payOut.getDate()).getTime()) || interval.getStart().equals(DateUtils.toJodaDateTime(payOut.getDate()))) {
+            if (interval.contains(DateUtils.getDateFromLocalDate(payOut.getDate()).getTime()) || interval.getStart().equals(DateUtils.toJodaDateTime(payOut.getDate()))) {
                 payOutList.add(payOut);
             }
         });

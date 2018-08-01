@@ -3,7 +3,7 @@ package com.kairos.persistance.repository.master_data.asset_management.tech_secu
 import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.common.TechnicalSecurityMeasureReponseDTO;
+import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -27,7 +27,7 @@ public class TechnicalSecurityMeasureMongoRepositoryImpl implements CustomTechni
 
 
     @Override
-    public List<TechnicalSecurityMeasureReponseDTO> getAllNotInheritedTechnicalSecurityMeasureFromParentOrgAndUnitSecurityMeasure(Long countryId, Long parentOrganizationId, Long organizationId) {
+    public List<TechnicalSecurityMeasureResponseDTO> getAllNotInheritedTechnicalSecurityMeasureFromParentOrgAndUnitSecurityMeasure(Long countryId, Long parentOrganizationId, Long organizationId) {
         Document groupOPerationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
         Document projectionForFilteringDuplicateDataOfOrgAndParentOrg = Document.parse(CustomAggregationQuery.metaDataProjectionForRemovingDuplicateInheritedMetaData(organizationId));
         Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionforAddingFinalDataObject());
@@ -48,7 +48,7 @@ public class TechnicalSecurityMeasureMongoRepositoryImpl implements CustomTechni
 
                 );
 
-        AggregationResults<TechnicalSecurityMeasureReponseDTO> results = mongoTemplate.aggregate(aggregation, TechnicalSecurityMeasure.class, TechnicalSecurityMeasureReponseDTO.class);
+        AggregationResults<TechnicalSecurityMeasureResponseDTO> results = mongoTemplate.aggregate(aggregation, TechnicalSecurityMeasure.class, TechnicalSecurityMeasureResponseDTO.class);
         return results.getMappedResults();
     }
 }

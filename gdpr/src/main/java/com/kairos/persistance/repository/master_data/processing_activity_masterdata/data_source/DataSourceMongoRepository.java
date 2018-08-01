@@ -16,21 +16,31 @@ import java.util.Set;
 @JaversSpringDataAuditable
 public interface DataSourceMongoRepository extends MongoRepository<DataSource,BigInteger>,CustomDataSourceRepository {
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    DataSource findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
+    @Query("{countryId:?0,_id:?1,deleted:false}")
+    DataSource findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
-    DataSource findByNameAndCountryId(Long countryId,Long organizationId,String name);
+    @Query("{countryId:?0,name:?1,deleted:false}")
+    DataSource findByNameAndCountryId(Long countryId,String name);
 
     @Query("{_id:{$in:?0}}")
     List<DataSource> dataSourceList(List<BigInteger> ids);
 
     DataSource findByid(BigInteger id);
 
-    @Query("{countryId:?0,organizationId:?1,deleted:false}")
-    List<DataSourceResponseDTO> findAllDataSources(Long countryId, Long organizationId);
 
-    @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
-    List<DataSource>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);
+    @Query("{countryId:?0,deleted:false}")
+    List<DataSourceResponseDTO> findAllDataSources(Long countryId);
+
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<DataSource>  findByCountryAndNameList(Long countryId,Set<String> name);
+
+    @Query("{organizationId:?0,deleted:false}")
+    List<DataSourceResponseDTO> findAllOrganizationDataSources(Long organizationId);
+
+    @Query("{organizationId:?0,_id:?2,deleted:false}")
+    DataSource findByOrganizationIdAndId(Long organizationId,BigInteger id);
+
+    @Query("{organizationId:?0,name:?1,deleted:false}")
+    DataSource findByNameAndOrganizationId(Long organizationId,String name);
 
 }

@@ -1,26 +1,27 @@
+
 buildscript {
-	ext {
-		springBootVersion = '2.0.0.M7'
-		//springBootVersion = '2.0.2.RELEASE'
-		swaggerVersion = '2.5.0'
-		jacksonVersion = '2.9.2'
-		projectVersion = "0.0.1"
-		version = "0.0.1"
-	}
-	repositories {
-		mavenCentral()
-		jcenter()
-		maven { url "https://repo.spring.io/snapshot" }
-		maven { url "https://repo.spring.io/milestone" }
-		maven {
-			url "https://plugins.gradle.org/m2/"
-		}
+    ext {
+        springBootVersion = '2.0.0.M7'
+        //springBootVersion = '2.0.2.RELEASE'
+        swaggerVersion = '2.5.0'
+        jacksonVersion = '2.9.2'
+        projectVersion = "0.0.1"
+        version = "0.0.1"
+    }
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://repo.spring.io/milestone" }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
 
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 
-	}
+    }
 
 }
 apply plugin: 'java'
@@ -29,6 +30,9 @@ apply plugin: 'org.springframework.boot'
 apply plugin: "io.spring.dependency-management"
 apply plugin: 'idea'
 apply plugin: 'application'
+
+
+
 version = "$projectVersion-SNAPSHOT"
 sourceCompatibility = 1.8
 mainClassName = 'com.kairos.UserServiceApplication'
@@ -37,22 +41,27 @@ applicationDefaultJvmArgs = ["-Xdiag"]
 
 
 repositories {
-	mavenCentral()
-	jcenter()
-	maven { url "https://repo.spring.io/snapshot" }
-	maven { url "https://repo.spring.io/milestone" }
-	maven { url "http://repo.spring.io/release/" }
-	maven { url "https://plugins.gradle.org/m2/" }
+    mavenCentral()
+    jcenter()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "http://repo.spring.io/release/" }
+    maven { url "https://plugins.gradle.org/m2/" }
+    /*maven { url 'http://localhost:8080/repository/local.kairos/'
+		credentials {
+			username = "admin"
+			password = "admin2"
+		}}*/
 }
 task wrapper(type: Wrapper) { gradleVersion = '4.1' }
 
 ext {
-	springCloudVersion = 'Finchley.M5'
+    springCloudVersion = 'Finchley.M5'
 }
 
 dependencies {
-	compile project(':dto')
-	//compile('org.kairos:dto:0.0.1-SNAPSHOT')
+    compile project(':dto')
+    //compile('org.kairos:dto:0.0.1-SNAPSHOT')
 	compile('org.springframework.boot:spring-boot-starter-aop')
 	compile('org.springframework.boot:spring-boot-starter-cache')
 	compile group: 'javax.inject', name: 'javax.inject', version: '1'
@@ -84,18 +93,47 @@ dependencies {
 	compile group: 'org.json', name: 'json', version: '20160810'
 	compile group: 'com.lowagie', name: 'itext', version: '4.2.1'
 
-	//compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
+    //compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
 	compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.9.RELEASE'
 
-	compile group: 'log4j', name: 'log4j', version: '1.2.17'
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile('org.springframework.security:spring-security-test')
-	//compile('org.springframework.boot:spring-boot-starter-webflux')
+    compile group: 'log4j', name: 'log4j', version: '1.2.17'
+    compile 'org.springframework.kafka:spring-kafka:2.1.7.RELEASE'
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.security:spring-security-test')
+    //compile('org.springframework.boot:spring-boot-starter-webflux')
 
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
+
+/*configurations { c ->
+    println 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC $c'+configurations.compile.collect { it.getName() }.join(' ')
+}*/
+//Just for windows
+/*task pathingJar(type: Jar) {
+    dependsOn configurations.runtime
+    appendix = 'pathing'
+
+    doFirst {
+        manifest {
+            attributes "Class-Path": configurations.runtime.files.collect {
+                it.toURL().toString().replaceFirst(/file:\/+/, '/')
+            }.join(' ')
+        }
+    }
+}*/
+
+/*
+bootRun {
+    dependsOn pathingJar
+    doFirst {
+        println 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC'+ pathingJar.archivePath
+
+        classpath = files("$buildDir/classes/java/main", "$buildDir/resources/main", pathingJar.archivePath)
+    }
+}*/

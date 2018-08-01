@@ -33,11 +33,10 @@ public class ProcessingPurpose extends MongoBaseEntity {
         this.name = name;
     }
 
-    public ProcessingPurpose() {
-    }
 
-    public ProcessingPurpose(String name, Long countryId) {
+    public ProcessingPurpose(String name) {
         this.name = name;
-        this.countryId = countryId;
+    }
+    public ProcessingPurpose() {
     }
 }

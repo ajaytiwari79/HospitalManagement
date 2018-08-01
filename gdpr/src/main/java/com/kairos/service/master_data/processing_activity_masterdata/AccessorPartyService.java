@@ -8,7 +8,7 @@ import com.kairos.dto.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.metadata.AccessorPartyDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
-import com.kairos.response.dto.common.AccessorPartyReponseDTO;
+import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
@@ -42,14 +42,13 @@ public class AccessorPartyService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param organizationId
      * @param accessorParties
      * @return return map which contain list of new AccessorParty and list of existing AccessorParty if AccessorParty already exist
      * @description this method create new AccessorParty if AccessorParty not exist with same name ,
      * and if exist then simply add  AccessorParty to existing list and return list ;
      * findByNamesList()  return list of existing AccessorParty using collation ,used for case insensitive result
      */
-    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, Long organizationId, List<AccessorParty> accessorParties) {
+    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, List<AccessorParty> accessorParties) {
 
         Map<String, List<AccessorParty>> result = new HashMap<>();
         Set<String> accessorPartyNames = new HashSet<>();
@@ -60,16 +59,14 @@ public class AccessorPartyService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<AccessorParty> existing = findByNamesList(countryId, organizationId, accessorPartyNames, AccessorParty.class);
+            List<AccessorParty> existing = findByNamesAndCountryId(countryId, accessorPartyNames, AccessorParty.class);
             accessorPartyNames = comparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();
             if (!accessorPartyNames.isEmpty()) {
                 for (String name : accessorPartyNames) {
-                    AccessorParty newAccessorParty = new AccessorParty();
-                    newAccessorParty.setName(name);
+                    AccessorParty newAccessorParty = new AccessorParty(name);
                     newAccessorParty.setCountryId(countryId);
-                    newAccessorParty.setOrganizationId(organizationId);
                     newAccessorPartyList.add(newAccessorParty);
                 }
                 newAccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(newAccessorPartyList));
@@ -83,20 +80,19 @@ public class AccessorPartyService extends MongoBaseService {
 
     }
 
-    public List<AccessorPartyReponseDTO> getAllAccessorParty(Long countryId, Long organizationId) {
-        return accessorPartyMongoRepository.findAllAccessorParty(countryId, organizationId);
+
+    public List<AccessorPartyResponseDTO> getAllAccessorParty(Long countryId) {
+        return accessorPartyMongoRepository.findAllAccessorParty(countryId);
     }
 
     /**
-     * @param countryId
-     * @param organizationId
-     * @param id             id of AccessorParty
+     * @param id id of AccessorParty
      * @return AccessorParty object fetch by given id
      * @throws DataNotFoundByIdException throw exception if AccessorParty not found for given id
      */
-    public AccessorParty getAccessorParty(Long countryId, Long organizationId, BigInteger id) {
+    public AccessorParty getAccessorParty(Long countryId, BigInteger id) {
 
-        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -106,9 +102,9 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
 
-    public Boolean deleteAccessorParty(Long countryId, Long organizationId, BigInteger id) {
+    public Boolean deleteAccessorParty(Long countryId, BigInteger id) {
 
-        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -120,15 +116,14 @@ public class AccessorPartyService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param organizationId
-     * @param id             id of AccessorParty
+     * @param id id of AccessorParty
      * @param accessorParty
      * @return AccessorParty updated object
      * @throws DuplicateDataException throw exception if AccessorParty data not exist for given id
      */
-    public AccessorParty updateAccessorParty(Long countryId, Long organizationId, BigInteger id, AccessorParty accessorParty) {
+    public AccessorParty updateAccessorParty(Long countryId,  BigInteger id, AccessorParty accessorParty) {
 
-        AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, organizationId, accessorParty.getName());
+        AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, accessorParty.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             if (id.equals(exist.getId())) {
                 return exist;
@@ -144,16 +139,15 @@ public class AccessorPartyService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param organizationId
-     * @param name           name of AccessorParty
+     * @param name name of AccessorParty
      * @return AccessorParty object fetch on basis of  name
      * @throws DataNotExists throw exception if AccessorParty exist for given name
      */
-    public AccessorParty getAccessorPartyByName(Long countryId, Long organizationId, String name) {
+    public AccessorParty getAccessorPartyByName(Long countryId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, organizationId, name);
+            AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }
@@ -172,8 +166,8 @@ public class AccessorPartyService extends MongoBaseService {
         List<BigInteger> accessorPartyIds = new ArrayList<>();
         for (AccessorPartyDTO accessorPartyDTO : accessorParties) {
             if (!accessorPartyDTO.getOrganizationId().equals(organizationId)) {
-                AccessorParty accessorParty = new AccessorParty(accessorPartyDTO.getName(), countryId);
-                accessorParty.setOrganizationId(organizationId);
+                AccessorParty accessorParty = new AccessorParty(accessorPartyDTO.getName());
+                accessorParty.setCountryId(organizationId);
                 newInheritAccessorPartiesFromCountry.add(accessorParty);
             } else {
                 accessorPartyIds.add(accessorPartyDTO.getId());
@@ -193,7 +187,7 @@ public class AccessorPartyService extends MongoBaseService {
      * @param organizationId - id of current organization
      * @return     method return list of Organization Accessor party with non Inherited Accessor party from  parent
      */
-    public List<AccessorPartyReponseDTO> getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(Long countryId, Long parentOrgId, Long organizationId) {
+    public List<AccessorPartyResponseDTO> getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(Long countryId, Long parentOrgId, Long organizationId) {
 
       return accessorPartyMongoRepository.getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(countryId,parentOrgId,organizationId);
     }

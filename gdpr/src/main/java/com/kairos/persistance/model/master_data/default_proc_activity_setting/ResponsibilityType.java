@@ -33,11 +33,9 @@ public class ResponsibilityType extends MongoBaseEntity {
         this.name = name;
     }
 
-    public ResponsibilityType() {
-    }
-
-    public ResponsibilityType(@Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+    public ResponsibilityType( String name) {
         this.name = name;
-        this.countryId = countryId;
+    }
+    public ResponsibilityType() {
     }
 }

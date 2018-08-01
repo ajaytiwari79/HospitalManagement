@@ -54,4 +54,11 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "match(parent)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn:FunctionalPayment)\n" +
             "merge (child)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn)")
     void linkFunctionalPaymentExpertise(Long expertiseId, Long newExpertiseId);
+
+
+    @Query("match(parent:Expertise) where id(parent)={0} \n" +
+            "MATCH   (child:Expertise) where id(child)={1} \n" +
+            "match(parent)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn:FunctionalPayment)\n" +
+            "merge (child)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn)")
+    void linkFunctionalPaymentInExpertise(Long expertiseId, Long newExpertiseId);
 }

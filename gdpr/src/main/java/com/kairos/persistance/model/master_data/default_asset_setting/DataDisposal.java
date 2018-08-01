@@ -31,4 +31,10 @@ public class DataDisposal extends MongoBaseEntity {
         this.name = name;
     }
 
+    public DataDisposal( String name) {
+        this.name = name;
+    }
+
+    public DataDisposal() {
+    }
 }

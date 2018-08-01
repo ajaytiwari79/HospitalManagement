@@ -36,7 +36,7 @@ public class PayOutServiceTest {
     Interval interval = null;
 
 
-    @Test
+    /*@Test
     public void getPayOut(){
 
         DateTime startDateTime = new DateTime().withTimeAtStartOfDay();
@@ -50,7 +50,7 @@ public class PayOutServiceTest {
             logger.info("date "+ct.getDate()+" - "+ct.getPayOutMin());
         });
         logger.info("endTime "+(new Date().getTime()-startMillis));
-    }
+    }*/
 
     @Test
     public void getIntervals(){

@@ -21,7 +21,7 @@ public interface MasterAssetMongoRepository extends MongoRepository<MasterAsset,
     @Query("{deleted:false,countryId:?0,organizationId:?1}")
     List<MasterAsset> findAllMasterAssets( Long countryId,Long organizationId);
 
-    @Query("{countryId:?0,organizationId:?1,assetTypeId:?2,deleted:false}")
+    @Query("{countryId:?0,organizationId:?1,assetType:?2,deleted:false}")
     List<MasterAssetBasicResponseDTO> findAllMasterAssetbyAssetType(Long countryId, Long organizationId, BigInteger assetTypeId);
 
     MasterAsset findByid(BigInteger id);

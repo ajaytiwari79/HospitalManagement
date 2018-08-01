@@ -4,7 +4,7 @@ package com.kairos.persistance.repository.master_data.processing_activity_master
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.common.AccessorPartyReponseDTO;
+import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -27,7 +27,7 @@ public class AccessorPartyMongoRepositoryImpl implements CustomAccessorPartyRepo
 
 
     @Override
-    public List<AccessorPartyReponseDTO> getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(Long countryId, Long parentOrganizationId, Long organizationId) {
+    public List<AccessorPartyResponseDTO> getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(Long countryId, Long parentOrganizationId, Long organizationId) {
 
         Document groupOPerationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
         Document projectionForFilteringDuplicateDataOfOrgAndParentOrg = Document.parse(CustomAggregationQuery.metaDataProjectionForRemovingDuplicateInheritedMetaData(organizationId));
@@ -50,7 +50,7 @@ public class AccessorPartyMongoRepositoryImpl implements CustomAccessorPartyRepo
 
         );
 
-        AggregationResults<AccessorPartyReponseDTO> results = mongoTemplate.aggregate(aggregation, AccessorParty.class, AccessorPartyReponseDTO.class);
+        AggregationResults<AccessorPartyResponseDTO> results = mongoTemplate.aggregate(aggregation, AccessorParty.class, AccessorPartyResponseDTO.class);
         return results.getMappedResults();
     }
 

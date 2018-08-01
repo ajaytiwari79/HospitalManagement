@@ -33,11 +33,11 @@ public class ProcessingLegalBasis extends MongoBaseEntity {
         this.name = name;
     }
 
-    public ProcessingLegalBasis() {
-    }
 
-    public ProcessingLegalBasis( String name, Long countryId) {
+
+    public ProcessingLegalBasis(String name) {
         this.name = name;
-        this.countryId = countryId;
+    }
+    public ProcessingLegalBasis() {
     }
 }

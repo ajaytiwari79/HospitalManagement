@@ -16,9 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
@@ -37,20 +39,19 @@ public class ProcessingPurposeService extends MongoBaseService {
 
 
     /**
-     * @description this method create new ProcessingPurpose if ProcessingPurpose not exist with same name ,
-     * and if exist then simply add  ProcessingPurpose to existing list and return list ;
-     * findByNamesList()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      * @param countryId
-     * @param organizationId
+     * @param
      * @param processingPurposes
      * @return return map which contain list of new ProcessingPurpose and list of existing ProcessingPurpose if ProcessingPurpose already exist
-     *
+     * @description this method create new ProcessingPurpose if ProcessingPurpose not exist with same name ,
+     * and if exist then simply add  ProcessingPurpose to existing list and return list ;
+     * findByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
-    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId,Long organizationId,List<ProcessingPurpose> processingPurposes) {
+    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId, List<ProcessingPurpose> processingPurposes) {
 
         Map<String, List<ProcessingPurpose>> result = new HashMap<>();
         Set<String> processingPurposesNames = new HashSet<>();
-        if (processingPurposes.size() != 0) {
+        if (!processingPurposes.isEmpty()) {
             for (ProcessingPurpose processingPurpose : processingPurposes) {
                 if (!StringUtils.isBlank(processingPurpose.getName())) {
                     processingPurposesNames.add(processingPurpose.getName());
@@ -58,15 +59,15 @@ public class ProcessingPurposeService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ProcessingPurpose> existing =  findByNamesList(countryId,organizationId,processingPurposesNames,ProcessingPurpose.class);
+            List<ProcessingPurpose> existing = findByNamesAndCountryId(countryId, processingPurposesNames, ProcessingPurpose.class);
             processingPurposesNames = comparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
             List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
-            if (processingPurposesNames.size() != 0) {
+            if (!processingPurposesNames.isEmpty()) {
                 for (String name : processingPurposesNames) {
 
-                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name,countryId);
-                    newProcessingPurpose.setOrganizationId(organizationId);
+                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name);
+                    newProcessingPurpose.setCountryId(countryId);
                     newProcessingPurposes.add(newProcessingPurpose);
 
                 }
@@ -83,25 +84,24 @@ public class ProcessingPurposeService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
-     * @param organizationId
+     * @param
      * @return list of ProcessingPurpose
      */
-    public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long countryId,Long organizationId) {
-        return processingPurposeMongoRepository.findAllProcessingPurposes(countryId,organizationId);
+    public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long countryId) {
+        return processingPurposeMongoRepository.findAllProcessingPurposes(countryId);
     }
 
     /**
-     * @throws DataNotFoundByIdException throw exception if ProcessingPurpose not found for given id
      * @param countryId
-     * @param organizationId
-     * @param id id of ProcessingPurpose
+     * @param
+     * @param id        id of ProcessingPurpose
      * @return ProcessingPurpose object fetch by given id
+     * @throws DataNotFoundByIdException throw exception if ProcessingPurpose not found for given id
      */
-    public ProcessingPurpose getProcessingPurpose(Long countryId,Long organizationId,BigInteger id) {
+    public ProcessingPurpose getProcessingPurpose(Long countryId, BigInteger id) {
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -111,9 +111,9 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteProcessingPurpose(Long countryId,Long organizationId,BigInteger id) {
+    public Boolean deleteProcessingPurpose(Long countryId, BigInteger id) {
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -124,24 +124,24 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
     /***
-     * @throws  DuplicateDataException throw exception if ProcessingPurpose data not exist for given id
+     * @throws DuplicateDataException throw exception if ProcessingPurpose data not exist for given id
      * @param countryId
-     * @param organizationId
+     * @param
      * @param id id of ProcessingPurpose
      * @param processingPurpose
      * @return ProcessingPurpose updated object
      */
-    public ProcessingPurpose updateProcessingPurpose(Long countryId,Long organizationId,BigInteger id, ProcessingPurpose processingPurpose) {
+    public ProcessingPurpose updateProcessingPurpose(Long countryId, BigInteger id, ProcessingPurpose processingPurpose) {
 
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByName(countryId,organizationId,processingPurpose.getName());
-        if (Optional.ofNullable(exist).isPresent() ) {
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByName(countryId, processingPurpose.getName());
+        if (Optional.ofNullable(exist).isPresent()) {
             if (id.equals(exist.getId())) {
                 return exist;
             }
-            throw new DuplicateDataException("data  exist for  "+processingPurpose.getName());
+            throw new DuplicateDataException("data  exist for  " + processingPurpose.getName());
         } else {
-            exist=processingPurposeMongoRepository.findByid(id);
+            exist = processingPurposeMongoRepository.findByid(id);
             exist.setName(processingPurpose.getName());
             return processingPurposeMongoRepository.save(getNextSequence(exist));
 
@@ -150,17 +150,17 @@ public class ProcessingPurposeService extends MongoBaseService {
 
 
     /**
-     * @throws DataNotExists throw exception if ProcessingPurpose not exist for given name
      * @param countryId
-     * @param organizationId
-     * @param name name of ProcessingPurpose
+     * @param
+     * @param name      name of ProcessingPurpose
      * @return ProcessingPurpose object fetch on basis of  name
+     * @throws DataNotExists throw exception if ProcessingPurpose not exist for given name
      */
-    public ProcessingPurpose getProcessingPurposeByName(Long countryId,Long organizationId,String name) {
+    public ProcessingPurpose getProcessingPurposeByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            ProcessingPurpose exist = processingPurposeMongoRepository.findByName(countryId,organizationId,name);
+            ProcessingPurpose exist = processingPurposeMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }
@@ -171,13 +171,6 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-    public List<ProcessingPurpose> geProcessingPurposeList(Long countryId,Long organizationId,List<BigInteger> ids) {
-        return processingPurposeMongoRepository.getProcessingPurposeList(countryId,organizationId,ids);
-    }
-
-
-
-
     public List<BigInteger> createProcessingPurposeForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
         List<ProcessingPurposeDTO> processingPurposeDTOs = processingActivityDTO.getProcessingPurposes();
@@ -185,7 +178,8 @@ public class ProcessingPurposeService extends MongoBaseService {
         List<BigInteger> processingPurposeIds = new ArrayList<>();
         for (ProcessingPurposeDTO   processingPurposeDTO: processingPurposeDTOs) {
             if (!processingPurposeDTO.getOrganizationId().equals(organizationId)) {
-                ProcessingPurpose processingPurpose = new ProcessingPurpose(processingPurposeDTO.getName(), countryId);
+                ProcessingPurpose processingPurpose = new ProcessingPurpose(processingPurposeDTO.getName());
+                processingPurpose.setCountryId(countryId);
                 processingPurpose.setOrganizationId(organizationId);
                 newInheritProcessingPurposeFromCountry.add(processingPurpose);
             } else {

@@ -4,7 +4,7 @@ package com.kairos.response.dto.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistance.model.data_inventory.ManagingOrganization;
 import com.kairos.persistance.model.data_inventory.Staff;
-import com.kairos.response.dto.common.AccessorPartyReponseDTO;
+import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
@@ -35,7 +35,7 @@ public class ProcessingActivityResponseDTO {
 
     private List<DataSourceResponseDTO> dataSources;
 
-    private List<AccessorPartyReponseDTO> accessorParties;
+    private List<AccessorPartyResponseDTO> accessorParties;
 
     private List<TransferMethodResponseDTO> sourceTransferMethods;
 
@@ -109,11 +109,11 @@ public class ProcessingActivityResponseDTO {
         this.dataSources = dataSources;
     }
 
-    public List<AccessorPartyReponseDTO> getAccessorParties() {
+    public List<AccessorPartyResponseDTO> getAccessorParties() {
         return accessorParties;
     }
 
-    public void setAccessorParties(List<AccessorPartyReponseDTO> accessorParties) {
+    public void setAccessorParties(List<AccessorPartyResponseDTO> accessorParties) {
         this.accessorParties = accessorParties;
     }
 

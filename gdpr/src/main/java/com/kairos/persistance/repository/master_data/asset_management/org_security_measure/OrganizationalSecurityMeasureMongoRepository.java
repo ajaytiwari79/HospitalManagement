@@ -17,21 +17,28 @@ import java.util.Set;
 public interface OrganizationalSecurityMeasureMongoRepository extends MongoRepository<OrganizationalSecurityMeasure,BigInteger> ,CustomOrganizationalSecurityRepository{
 
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    OrganizationalSecurityMeasure findByIdAndNonDeleted(Long countryId, Long organizationId,BigInteger id);
+    @Query("{countryId:?0,_id:?1,deleted:false}")
+    OrganizationalSecurityMeasure findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
-    OrganizationalSecurityMeasure findByName(Long countryId, Long organizationId,String name);
+    @Query("{countryId:?0,name:?1,deleted:false}")
+    OrganizationalSecurityMeasure findByName(Long countryId,String name);
 
     OrganizationalSecurityMeasure findByid(BigInteger id);
 
     @Query("{deleted:false,organizationId:?1,countryId:?0}")
-    List<OrganizationalSecurityMeasure> findAllOrganizationalSecurityMeasures(Long countryId, Long organizationId);
+    List<OrganizationalSecurityMeasure> findAllOrganizationalSecurityMeasures(Long countryId);
 
     @Query("{deleted:false,_id:{$in:?0}}")
     List<OrganizationalSecurityMeasureResponseDTO> findOrganizationalSecurityMeasuresListByIds(List<BigInteger> ids);
 
-    @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
-    List<OrganizationalSecurityMeasure>  findByCountryAndNameList(Long countryId, Long organizationId,Set<String> name);
+    @Query("{deleted:false,organizationId:?0}")
+    List<OrganizationalSecurityMeasureResponseDTO> findAllOrgOrganizationalSecurityMeasures( Long organizationId);
+
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
+    OrganizationalSecurityMeasure findByOrganizationIdAndId( Long organizationId,BigInteger id);
+
+
+    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
+    OrganizationalSecurityMeasure findByOrganizationIdAndName(Long organizationId,String name);
 
 }

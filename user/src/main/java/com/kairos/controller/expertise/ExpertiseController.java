@@ -2,6 +2,7 @@ package com.kairos.controller.expertise;
 
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.user.country.experties.AgeRangeDTO;
+import com.kairos.user.country.experties.CopyExpertiseDTO;
 import com.kairos.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.service.expertise.ExpertiseService;
@@ -66,7 +67,7 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertise);
     }
 
-    @ApiOperation(value = "Get cta_response and wta by expertise")
+    @ApiOperation(value = "Get cta and wta by expertise")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/{expertiseId}/cta_wta")
     ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("staffId") Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId));
@@ -83,7 +84,7 @@ public class ExpertiseController {
     @ApiOperation(value = "Get all expertise by orgSubType")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/expertise", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getExpertiseByOrganizationSubType(@PathVariable long countryId, @PathVariable long organizationSubTypeId, @RequestParam(value = "selectedDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date selectedDate) throws ParseException {
+    public ResponseEntity<Map<String, Object>> getExpertiseByOrganizationSubType(@PathVariable long countryId, @PathVariable long organizationSubTypeId, @RequestParam(value = "selectedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date selectedDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId, selectedDate));
     }
 
@@ -137,7 +138,7 @@ public class ExpertiseController {
 
     @ApiOperation(value = "block planned time for employment type and expertise ")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> addPlannedTimeInExpertise(@PathVariable Long countryId,@PathVariable Long expertiseId, @RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+    public ResponseEntity<Map<String, Object>> addPlannedTimeInExpertise(@PathVariable Long countryId, @PathVariable Long expertiseId, @RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.addPlannedTimeInExpertise(expertiseId, expertiseEmploymentTypeDTO));
     }
 
@@ -155,8 +156,15 @@ public class ExpertiseController {
 
     @ApiOperation(value = "block planned time for employment type and expertise ")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/planned_time", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updatePlannedTimeInExpertise(@PathVariable Long expertiseId,@RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updatePlannedTimeInExpertise(expertiseId,expertiseEmploymentTypeDTO));
+    public ResponseEntity<Map<String, Object>> updatePlannedTimeInExpertise(@PathVariable Long expertiseId, @RequestBody ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updatePlannedTimeInExpertise(expertiseId, expertiseEmploymentTypeDTO));
+    }
+
+
+    @ApiOperation(value = "copy Expertise")
+    @PutMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/copy")
+    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid CopyExpertiseDTO copyExpertiseDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, copyExpertiseDTO));
     }
 
 }

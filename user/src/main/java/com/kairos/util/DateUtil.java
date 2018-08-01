@@ -279,17 +279,21 @@ public class DateUtil {
         return date;
     }
 
-    public static Long getDateFromEpoch(LocalDate dateLong) {
-        return dateLong.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+    public static Long getDateFromEpoch(LocalDate localDate) {
+        return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     }
 
     public static LocalDate getTimezonedCurrentDate(String timezone) {
         return Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of(timezone)).toLocalDate();
     }
-    public static Long getStartDateOfWeekFromDate(LocalDate date){
-          LocalDate localDate=date.with(previousOrSame(DayOfWeek.MONDAY));
-          return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
-       }
+
+    public static Long getStartDateOfWeekFromDate(LocalDate date) {
+        LocalDate localDate = date.with(previousOrSame(DayOfWeek.MONDAY));
+        return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+    }
+
+
+
 
 
 }

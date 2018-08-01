@@ -136,12 +136,38 @@ public class MongoBaseService {
     }
 
 
-    public <T extends MongoBaseEntity> List<T> findByNamesList(Long countryId, Long organizationId, Set<String> namesList, Class entity) {
+    public <T extends MongoBaseEntity> List<T> findByNamesAndCountryId(Long countryId,  Set<String> namesList, Class entity) {
 
 
         Assert.notNull(entity, "Entity must not be null!");
         Assert.notEmpty(namesList, "Entity must not be Empty!");
         Assert.notNull(countryId, "countryId must not be null");
+
+        // collection name get collection name
+        String collectionName = entity.getClass().getSimpleName();
+
+        if (namesList.size() == 0) {
+            throw new InvalidRequestException("list can't be empty");
+        }
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and("deleted").is(false).and("name").in(namesList));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.find(query, entity);
+
+    }
+
+
+
+
+
+
+    public <T extends MongoBaseEntity> List<T> findAllByNameAndOrganizationId(Long organizationId, Set<String> namesList, Class entity) {
+
+
+        Assert.notNull(entity, "Entity must not be null!");
+        Assert.notEmpty(namesList, "Entity must not be Empty!");
         Assert.notNull(organizationId, "organization Id must not be Null");
 
         // collection name get collection name
@@ -152,12 +178,16 @@ public class MongoBaseService {
         }
 
         Query query = new Query();
-        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and("deleted").is(false).and("name").in(namesList).and(ORGANIZATION_ID).is(organizationId));
+        query.addCriteria(Criteria.where(ORGANIZATION_ID).is(organizationId).and("deleted").is(false).and("name").in(namesList));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.find(query, entity);
 
     }
+
+
+
+
 
     public <T extends MongoBaseEntity> T delete(T entity) {
 

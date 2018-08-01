@@ -14,22 +14,33 @@ import java.util.Set;
 public interface ProcessingLegalBasisMongoRepository extends MongoRepository<ProcessingLegalBasis, BigInteger>,CustomProcessingLegalBasisRepository {
 
 
-    @Query("{'countryId':?0,organizationId:?1,_id:?2,deleted:false}")
-    ProcessingLegalBasis findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
+    @Query("{'countryId':?0,_id:?1,deleted:false}")
+    ProcessingLegalBasis findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
-    ProcessingLegalBasis findByName(Long countryId,Long organizationId,String name);
+    @Query("{countryId:?0,name:?1,deleted:false}")
+    ProcessingLegalBasis findByName(Long countryId,String name);
+
+
     ProcessingLegalBasis findByid(BigInteger id);
 
     @Query("{_id:{$in:?0}}")
     List<ProcessingLegalBasis> getProcessingLegalBasisList(List<BigInteger> ids);
 
+    @Query("{countryId:?0,deleted:false}")
+    List<ProcessingLegalBasisResponseDTO> findAllProcessingLegalBases(Long countryId);
 
-    @Query("{countryId:?0,organizationId:?1,deleted:false}")
-    List<ProcessingLegalBasisResponseDTO> findAllProcessingLegalBases(Long countryId, Long organizationId);
+    @Query("{organizationId:?0,deleted:false}")
+    List<ProcessingLegalBasisResponseDTO> findAllOrganizationProcessingLegalBases( Long organizationId);
 
-    @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
-    List<ProcessingLegalBasis>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
+    ProcessingLegalBasis findByOrganizationIdAndId(Long organizationId,BigInteger id);
+
+
+    @Query("{organizationId:?0,name:?1,deleted:false}")
+    ProcessingLegalBasis findByNameAndOrganizationId(Long organizationId,String name);
+
+
+
 
 
 }
