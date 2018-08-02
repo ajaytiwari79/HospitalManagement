@@ -1426,4 +1426,12 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 vrpClientService.getPreferedTimeWindow(unitId));
     }
+
+    @ApiOperation(value = "get organization ids by orgSubType ids")
+    @GetMapping(value = "/orgtype/{orgTypeId}/get_organization_ids")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationIdsBySubOrgTypeId(@PathVariable Long orgTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationIdsBySubOrgTypeId(orgTypeId));
+    }
 }

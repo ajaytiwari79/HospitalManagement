@@ -66,16 +66,16 @@ public class PayOutCalculationServiceTest {
         shifts.add(shift);
     }
 
-    @Test
-    public void calculatePayOut(){
-        when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId())));
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = payOutService.getCostTimeAgreement(1225l);
-        PayOut payOut = new PayOut(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
-        payOutCalculationService.calculateAndUpdatePayOut(interval, unitPositionWithCtaDetailsDTO,shifts, payOut);
-        Assert.assertEquals(payOut.getTotalPayOutMin(),1130);
-        Assert.assertEquals(payOut.getScheduledMin(),1020);
-        Assert.assertEquals(payOut.getContractualMin(),300);
-    }
+//    @Test
+//    public void calculatePayOut(){
+//        when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId())));
+//        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = payOutService.getCostTimeAgreement(1225l);
+//        PayOut payOut = new PayOut(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
+//        payOutCalculationService.calculateAndUpdatePayOut(interval, unitPositionWithCtaDetailsDTO,shifts, payOut);
+//        Assert.assertEquals(payOut.getTotalPayOutMin(),1130);
+//        Assert.assertEquals(payOut.getScheduledMin(),1020);
+//        Assert.assertEquals(payOut.getContractualMin(),300);
+//    }
 
 
 

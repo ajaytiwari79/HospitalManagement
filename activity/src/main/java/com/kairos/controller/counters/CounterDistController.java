@@ -139,13 +139,13 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(COUNTRY_URL+"/counter/dist/access_group/remove_dist_entry/{accessGroupKpiId}")
-    public ResponseEntity<Map<String, Object>> removeAccessGroupKPIEntryByCounty(@PathVariable Long accessGroupKpiId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,  counterManagementService.removeAccessGroupKPIEntries(accessGroupKpiId));
-    }
+//    @PutMapping(COUNTRY_URL+"/counter/dist/access_group/remove_dist_entry/{accessGroupKpiId}")
+//    public ResponseEntity<Map<String, Object>> removeAccessGroupKPIEntryByCounty(@PathVariable Long accessGroupKpiId){
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true,  counterManagementService.removeAccessGroupKPIEntries(accessGroupKpiId));
+//    }
     @PutMapping(UNIT_URL+"/counter/dist/access_group/remove_dist_entry/{accessGroupKpiId}")
-    public ResponseEntity<Map<String, Object>> removeAccessGroupKPIEntryByUnit(@PathVariable Long accessGroupKpiId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,  counterManagementService.removeAccessGroupKPIEntries(accessGroupKpiId));
+    public ResponseEntity<Map<String, Object>> removeAccessGroupKPIEntryByUnit(@PathVariable Long unitId,@PathVariable Long accessGroupKpiId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,  counterManagementService.removeAccessGroupKPIEntries(unitId,accessGroupKpiId));
     }
 
     @GetMapping(COUNTRY_URL+"/counter/dist/access_group/{accessGroupId}")
@@ -169,9 +169,9 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(COUNTRY_URL+"/counter/dist/org_type/{orgTypeId}/remove_dist_entry")
-    public ResponseEntity<Map<String, Object>> removeOrgTypeKPIEntry(@PathVariable Long orgTypeId, @PathVariable Long countryId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,   counterManagementService.removeOrgTypeKPIEntries(orgTypeId,countryId));
+    @PutMapping(COUNTRY_URL+"/counter/dist/org_type/remove_dist_entry/{orgTypeKpiId}")
+    public ResponseEntity<Map<String, Object>> removeOrgTypeKPIEntry(@PathVariable Long orgTypeKpiId, @PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,counterManagementService.removeOrgTypeKPIEntries(orgTypeKpiId,countryId));
     }
 
 //    @PostMapping(UNIT_URL+"/counter/dist/default_kpi_setting")

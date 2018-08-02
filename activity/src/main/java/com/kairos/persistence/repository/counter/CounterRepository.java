@@ -69,7 +69,7 @@ public class CounterRepository {
     }
 
     //get item by Id
-    public Object getItemById(BigInteger id, Class claz){
+    public Object getEntityById(BigInteger id, Class claz){
         Query query = new Query(Criteria.where("_id").is(id));
         return mongoTemplate.findOne(query, claz);
     }
@@ -181,6 +181,8 @@ public class CounterRepository {
 
     public List<TabKPIMappingDTO> getTabKPIConfigurationByTabIds(List<String> tabIds, ConfLevel level, Long refId){
         String refQueryField = getRefQueryField(level);
+        Query query=new Query(Criteria.where("tabId").in(tabIds).and(refQueryField).is(refId));
+//        return mongoTemplate.find(query,TabKPIConf.class);
         Aggregation ag = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("tabId").in(tabIds).and(refQueryField).is(refId))
         );
@@ -210,20 +212,38 @@ public class CounterRepository {
         return mongoTemplate.find(query, OrgTypeKPIEntry.class);
     }
 
-    public boolean removeOrgTypeKPIEntry(BigInteger id){
+
+    public OrgTypeKPIEntry findOrgTypeKPIEntry(BigInteger id){
          Query query = new Query(Criteria.where("_id").in(id));
-        mongoTemplate.remove(query, OrgTypeKPIEntry.class);
-        return true;
+        return mongoTemplate.findOne(query, OrgTypeKPIEntry.class);
     }
 
-    public boolean removeAccessGroupKPIEntry(BigInteger id){
+    public AccessGroupKPIEntry findAccessGroupKPIEntry(BigInteger id){
         Query query = new Query(Criteria.where("_id").in(id));
+        return mongoTemplate.findOne(query, AccessGroupKPIEntry.class);
+    }
+    public boolean removeOrgTypeKPIEntry(BigInteger id){
+        Query query = new Query(Criteria.where("_id").in(id));
+         mongoTemplate.remove(query, OrgTypeKPIEntry.class);
+         return true;
+    }
+
+    public boolean removeAccessGroupKPIEntry(List<Long> unitIds,BigInteger kpiId){
+        Query query = new Query(Criteria.where("unitId").in(unitIds).and("kpiId").is(kpiId));
         mongoTemplate.remove(query, AccessGroupKPIEntry.class);
         return true;
     }
 
-    public boolean removeTabKPIEntry(BigInteger id){
-        Query query = new Query(Criteria.where("_id").in(id));
+    public boolean removeApplicableKPI(List<Long> refIds,BigInteger kpiId,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where(refQueryField).in(refIds).and("activeKpiId").is(kpiId));
+        mongoTemplate.remove(query, ApplicableKPI.class);
+        return true;
+    }
+
+    public boolean removeTabKPIEntry(List<Long> refIds,BigInteger kpiId,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where(refQueryField).in(refIds).and("kpiId").is(kpiId));
         mongoTemplate.remove(query, TabKPIConf.class);
         return true;
     }

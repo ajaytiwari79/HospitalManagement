@@ -6,7 +6,6 @@ import java.util.List;
 public class TabKPIMappingDTO {
     private String tabId;
     private BigInteger kpiId;
-    private BigInteger kpiAssignmentId;
 
     public String getTabId() {
         return tabId;
@@ -24,11 +23,4 @@ public class TabKPIMappingDTO {
         this.kpiId = kpiId;
     }
 
-    public BigInteger getKpiAssignmentId() {
-        return kpiAssignmentId;
-    }
-
-    public void setKpiAssignmentId(BigInteger kpiAssignmentId) {
-        this.kpiAssignmentId = kpiAssignmentId;
-    }
 }

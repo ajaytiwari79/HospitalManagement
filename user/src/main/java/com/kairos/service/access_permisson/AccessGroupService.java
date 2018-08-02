@@ -729,4 +729,7 @@ public class AccessGroupService extends UserBaseService {
         );
         return userAccessRoleDTO;
     }
+    public List<Long> getStaffIdsByUnitIdAndAccessGroupId(Long unitId,Long accessGroupId){
+        return accessGroupRepository.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId);
+    }
 }

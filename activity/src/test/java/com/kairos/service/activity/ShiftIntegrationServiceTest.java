@@ -141,23 +141,23 @@ public class ShiftIntegrationServiceTest {
 
     }
 
-    @Test
-    public void publishShifts() throws Exception {
-
-        List<BigInteger> shifts = new ArrayList<>();
-        shifts.add(new BigInteger("110"));
-        shifts.add(new BigInteger("109"));
-        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, ShiftStatus.FIXED);
-
-        HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
-
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>>() {
-                };
-        ResponseEntity<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> response = restTemplate.exchange(
-                baseUrlForUnit + "/publish_shifts", HttpMethod.PUT, requestBodyData, typeReference);
-        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
-    }
+//    @Test
+//    public void publishShifts() throws Exception {
+//
+//        List<BigInteger> shifts = new ArrayList<>();
+//        shifts.add(new BigInteger("110"));
+//        shifts.add(new BigInteger("109"));
+//        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, ShiftStatus.FIXED);
+//
+//        HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
+//
+//        ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> typeReference =
+//                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>>() {
+//                };
+//        ResponseEntity<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> response = restTemplate.exchange(
+//                baseUrlForUnit + "/publish_shifts", HttpMethod.PUT, requestBodyData, typeReference);
+//        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+//    }
 
     @Test
     public void deleteShifts() throws Exception {

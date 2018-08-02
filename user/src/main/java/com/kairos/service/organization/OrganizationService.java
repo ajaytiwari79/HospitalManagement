@@ -1867,4 +1867,7 @@ public class OrganizationService extends UserBaseService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(parentOrganizationAndCountryData, UnitAndParentOrganizationAndCountryDTO.class);
     }
 
+    public List<Long> getOrganizationIdsBySubOrgTypeId(Long orgTypeId){
+        return organizationGraphRepository.getOrganizationIdsBySubOrgTypeId(orgTypeId);
+    }
 }

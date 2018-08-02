@@ -31,7 +31,7 @@ public class CounterConfService extends MongoBaseService {
     private CounterRepository counterRepository;
 
     public void updateCounterCriteria(BigInteger counterId, List<FilterCriteria> criteriaList){
-        Counter counter = (Counter) counterRepository.getItemById(counterId, Counter.class);
+        Counter counter = (Counter) counterRepository.getEntityById(counterId, Counter.class);
         counter.setCriteriaList(criteriaList);
         save(counter);
     }

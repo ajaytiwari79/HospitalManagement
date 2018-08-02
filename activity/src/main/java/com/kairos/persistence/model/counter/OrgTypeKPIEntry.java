@@ -11,9 +11,10 @@ public class OrgTypeKPIEntry extends MongoBaseEntity {
     public OrgTypeKPIEntry() {
     }
 
-    public OrgTypeKPIEntry(Long orgTypeId, BigInteger kpiId) {
+    public OrgTypeKPIEntry(Long orgTypeId, BigInteger kpiId,Long countryId) {
         this.orgTypeId = orgTypeId;
         this.kpiId = kpiId;
+        this.countryId=countryId;
     }
 
     public Long getOrgTypeId() {
@@ -24,12 +25,12 @@ public class OrgTypeKPIEntry extends MongoBaseEntity {
         this.orgTypeId = orgTypeId;
     }
 
-    public BigInteger getKpiAssignmentId() {
+    public BigInteger getKpiId() {
         return kpiId;
     }
 
-    public void setKpiAssignmentId(BigInteger kpiAssignmentId) {
-        this.kpiId = kpiAssignmentId;
+    public void setKpiId(BigInteger kpiId) {
+        this.kpiId = kpiId;
     }
 
     public Long getCountryId() {
