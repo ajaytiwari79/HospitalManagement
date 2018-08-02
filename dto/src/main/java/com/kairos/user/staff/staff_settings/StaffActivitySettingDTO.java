@@ -20,6 +20,17 @@ public class StaffActivitySettingDTO {
         //Default Constructor
     }
 
+    public StaffActivitySettingDTO(BigInteger activityId, Long unitPositionId, Integer shortestTime,
+                                   Integer longestTime, Integer minLength, Integer maxThisActivityPerShift, boolean eligibleForMove) {
+        this.activityId = activityId;
+        this.unitPositionId = unitPositionId;
+        this.shortestTime = shortestTime;
+        this.longestTime = longestTime;
+        this.minLength = minLength;
+        this.maxThisActivityPerShift = maxThisActivityPerShift;
+        this.eligibleForMove = eligibleForMove;
+    }
+
     public BigInteger getId() {
         return id;
     }
