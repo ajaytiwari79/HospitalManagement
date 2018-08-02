@@ -48,7 +48,7 @@ public class TemplateTypeService extends MongoBaseService {
             } else
                 throw new InvalidRequestException("name could not be empty or null");
         }
-        List<TemplateType> existing = findByNamesList(countryId,countryId,templateNames,TemplateType.class);
+        List<TemplateType> existing = findByNamesAndCountryId(countryId,templateNames,TemplateType.class);
         templateNames = comparisonUtils.getNameListForMetadata(existing, templateNames);
         List<TemplateType> newDataTemplateList = new ArrayList<>();
         if (!templateNames.isEmpty()) {

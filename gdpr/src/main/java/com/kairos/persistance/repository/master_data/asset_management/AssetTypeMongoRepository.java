@@ -19,8 +19,8 @@ public interface AssetTypeMongoRepository extends MongoRepository<AssetType,BigI
 
 
 
-    @Query("{'countryId':?0,organizationId:?1,_id:?2,deleted:false}")
-    AssetType findByIdAndNonDeleted(Long countryId,Long organizationId, BigInteger id);
+    @Query("{'countryId':?0,_id:?1,deleted:false}")
+    AssetType findByIdAndNonDeleted(Long countryId, BigInteger id);
 
     @Query("{_id:?0,deleted:false}")
     AssetTypeBasicResponseDTO findAssetTypeById( BigInteger id);
@@ -30,13 +30,16 @@ public interface AssetTypeMongoRepository extends MongoRepository<AssetType,BigI
 
     AssetType findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1}")
-    List<AssetType> findAllAssetTypes(Long countryId,Long organizationId);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2}}")
-    List<AssetType> findAllAssetTypebyIds(Long countryId,Long organizationId,List<BigInteger> ids);
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<AssetType> findAllAssetTypebyIds(Long countryId,List<BigInteger> ids);
 
 
-    @Query("{countryId:?0,organizationId:?1,nameInLowerCase:{$in:?2},deleted:false}")
-    List<AssetType>  findByCountryAndNameList(Long countryId,Long organizationId, Set<String> name);
+    @Query("{deleted:false,organizationId:?0,_id:{$in:?1}}")
+    List<AssetType> findAllAssetTypebyIdsAndOrganizationId(Long organizationId,List<BigInteger> ids);
+
+
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
+    AssetType findByOrganizationIdAndId(Long organizationId, BigInteger id);
+
 }

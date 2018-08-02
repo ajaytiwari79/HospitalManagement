@@ -13,23 +13,29 @@ import java.util.Set;
 @JaversSpringDataAuditable
 public interface HostingTypeMongoRepository extends MongoRepository<HostingType,BigInteger> {
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    HostingType findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
+    @Query("{countryId:?0,_id:?1,deleted:false}")
+    HostingType findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
-    HostingType findByName(Long countryId,Long organizationId,String name);
+    @Query("{countryId:?0,name:?1,deleted:false}")
+    HostingType findByName(Long countryId,String name);
 
     HostingType findByid(BigInteger id);
 
     @Query("{deleted:false,_id:?0}")
     HostingTypeResponseDTO findHostingTypeById(BigInteger id);
 
-    @Query("{countryId:?0,organizationId:?1,deleted:false}")
-    List<HostingType> findAllHostingTypes(Long countryId,Long organizationId);
+    @Query("{countryId:?0,deleted:false}")
+    List<HostingType> findAllHostingTypes(Long countryId);
 
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
+    HostingType findByOrganizationIdAndId(Long organizationId,BigInteger id);
 
-    @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
-    List<HostingType>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);
+    @Query("{organizationId:?0,name:?1,deleted:false}")
+    HostingType findByOrganizationIdAndName(Long organizationId,String name);
+
+    @Query("{organizationId:?1,deleted:false}")
+    List<HostingTypeResponseDTO> findAllOrganizationHostingTypes(Long organizationId);
+
 }
 
 

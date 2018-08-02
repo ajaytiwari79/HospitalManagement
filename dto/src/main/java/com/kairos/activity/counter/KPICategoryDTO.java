@@ -5,6 +5,7 @@ import java.math.BigInteger;
 public class KPICategoryDTO {
     private BigInteger id;
     private String name;
+    private Long levelId;
 
     public KPICategoryDTO(){
 
@@ -29,5 +30,13 @@ public class KPICategoryDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getLevelId() {
+        return levelId;
+    }
+
+    public void setLevelId(Long levelId) {
+        this.levelId = levelId;
     }
 }

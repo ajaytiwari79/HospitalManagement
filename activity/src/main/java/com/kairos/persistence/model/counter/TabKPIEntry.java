@@ -8,7 +8,7 @@ public class TabKPIEntry extends MongoBaseEntity {
     private String tabId;
     private BigInteger kpiId;
 
-    public TabKPIEntry(String tabId, BigInteger kpiId){
+    public TabKPIEntry(String tabId, BigInteger kpiId) {
         this.kpiId = kpiId;
         this.tabId = tabId;
     }

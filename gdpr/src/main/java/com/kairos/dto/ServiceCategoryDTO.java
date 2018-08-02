@@ -34,4 +34,9 @@ public class ServiceCategoryDTO {
 
     public ServiceCategoryDTO() {
     }
+
+    public ServiceCategoryDTO(@NotNull(message = "id can't be null") Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

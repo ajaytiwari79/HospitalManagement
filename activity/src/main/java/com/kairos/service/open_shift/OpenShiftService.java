@@ -11,7 +11,7 @@ import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.open_shift.OpenShiftActivityWrapper;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.persistence.model.open_shift.Order;
-import com.kairos.persistence.repository.activity.ShiftMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.open_shift.OrderMongoRepository;
@@ -218,7 +218,7 @@ public class OpenShiftService extends MongoBaseService {
             com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
             data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), unitPositionWithCtaDetailsDTO);
         }
-        Date endDate = DateUtils.asDate(DateUtils.asLocalDate(startDate).plusDays(6));
+        Date endDate = DateUtils.getDateFromLocalDate(DateUtils.asLocalDate(startDate).plusDays(6));
         List<OpenShift> similarShifts = openShiftMongoRepository.findAllOpenShiftsByActivityIdAndBetweenDuration(openShiftActivityWrapper.getActivity().getId(), startDate, endDate);
 
         List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();

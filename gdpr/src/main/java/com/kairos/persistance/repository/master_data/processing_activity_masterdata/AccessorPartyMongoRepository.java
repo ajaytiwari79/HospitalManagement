@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
+import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -19,21 +20,29 @@ public interface AccessorPartyMongoRepository extends MongoRepository<AccessorPa
 
 
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    AccessorParty findByIdAndNonDeleted(Long countryId,Long organizationId, BigInteger id);
+    @Query("{countryId:?0,_id:?1,deleted:false}")
+    AccessorParty findByIdAndNonDeleted(Long countryId, BigInteger id);
 
-    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
-    AccessorParty findByName(Long countryId,Long organizationId,String name);
+    @Query("{countryId:?0,name:?2,deleted:false}")
+    AccessorParty findByName(Long countryId,String name);
 
     @Query("{_id:{$in:?0}}")
     List<AccessorParty> AccessorPartyList(List<BigInteger> ids);
 
     AccessorParty findByid(BigInteger id);
 
-    @Query("{countryId:?0,organizationId:?1,deleted:false}")
-    List<AccessorParty> findAllAccessorParty(Long countryId,Long organizationId);
+    @Query("{countryId:?0,deleted:false}")
+    List<AccessorPartyResponseDTO> findAllAccessorParty(Long countryId);
 
-    @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
-    List<AccessorParty>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);
+    @Query("{countryId:?0,name:{$in:?2},deleted:false}")
+    List<AccessorParty>  findByCountryAndNameList(Long countryId,Set<String> name);
 
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
+    AccessorParty findOrganizationIdAndIdAndNonDeleted(Long organizationId, BigInteger id);
+
+    @Query("{organizationId:?0,name:?1,deleted:false}")
+    AccessorParty findByNameAndOrganizationId(Long organizationId,String name);
+
+    @Query("{organizationId:?0,deleted:false}")
+    List<AccessorPartyResponseDTO> findAllOrganizationAccessorParty(Long organizationId);
 }

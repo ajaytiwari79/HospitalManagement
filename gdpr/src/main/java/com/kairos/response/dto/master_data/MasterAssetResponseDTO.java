@@ -18,7 +18,7 @@ public class MasterAssetResponseDTO {
     private BigInteger id;
 
     @NotNullOrEmpty(message = "Name can't be empty")
-    private  String name;
+    private String name;
 
     @NotNullOrEmpty(message = "Description can't be empty")
     private String description;
@@ -33,21 +33,24 @@ public class MasterAssetResponseDTO {
 
     private List<OrganizationTypeDTO> organizationTypes;
 
-    private List <OrganizationSubTypeDTO> organizationSubTypes;
+    private List<OrganizationSubTypeDTO> organizationSubTypes;
 
-    private List <ServiceCategoryDTO> organizationServices;
+    private List<ServiceCategoryDTO> organizationServices;
 
-    private List <SubServiceCategoryDTO> organizationSubServices;
+    private List<SubServiceCategoryDTO> organizationSubServices;
 
-    private AssetTypeResponseDTO assetType;
+    private AssetTypeBasicResponseDTO assetType;
 
-    public AssetTypeResponseDTO getAssetType() {
-        return assetType;
-    }
+    public List<AssetTypeBasicResponseDTO> assetSubTypes;
 
-    public void setAssetType(AssetTypeResponseDTO assetType) {
-        this.assetType = assetType;
-    }
+
+    public AssetTypeBasicResponseDTO getAssetType() { return assetType; }
+
+    public void setAssetType(AssetTypeBasicResponseDTO assetType) { this.assetType = assetType; }
+
+    public List<AssetTypeBasicResponseDTO> getAssetSubTypes() { return assetSubTypes; }
+
+    public void setAssetSubTypes(List<AssetTypeBasicResponseDTO> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
 
     public String getName() {
         return name;

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.counter;
 
+import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 /*
@@ -10,6 +11,14 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 
 public class KPICategory extends MongoBaseEntity {
     private String name;
+    private Long levelId;   //levelId is country/unit id
+
+    public KPICategory(){}
+
+    public KPICategory(String name, Long levelId){
+        this.name = name;
+        this.levelId = levelId;
+    }
 
     public String getName() {
         return name;
@@ -17,5 +26,13 @@ public class KPICategory extends MongoBaseEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getLevelId() {
+        return levelId;
+    }
+
+    public void setLevelId(Long levelId) {
+        this.levelId = levelId;
     }
 }

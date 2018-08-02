@@ -10,7 +10,7 @@ import com.kairos.activity.enums.counter.ChartType;
 public class BaseChart {
     private ChartType type;
 
-    public BaseChart(ChartType type){
+    public BaseChart(ChartType type) {
         this.type = type;
     }
 

@@ -9,7 +9,11 @@ import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.client.dto.TableConfiguration;
+import com.kairos.dto.KairosScheduleJobDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
+import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.agreement.cta.*;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ClientMinimumDTO;
@@ -57,7 +61,8 @@ import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
-import com.kairos.service.integration.PriorityGroupIntegrationService;
+import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.kafka.UserToSchedulerQueueService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.EmploymentService;
@@ -157,7 +162,9 @@ public class UnitPositionService extends UserBaseService {
     @Inject
     ExpertiseEmploymentTypeRelationshipGraphRepository expertiseEmploymentTypeRelationshipGraphRepository;
     @Inject
-    private PriorityGroupIntegrationService priorityGroupIntegrationService;
+    private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private UserToSchedulerQueueService userToSchedulerQueueService;
 
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) {
@@ -270,6 +277,7 @@ public class UnitPositionService extends UserBaseService {
         oldUnitPosition.setHistory(true);
         oldUnitPosition.setEditable(false);
         Set<Long> olderFunctionsAddedInUnitPosition = oldUnitPosition.getFunctions() != null ? oldUnitPosition.getFunctions().stream().map(Function::getId).collect(Collectors.toSet()) : Collections.emptySet();
+        //TODO Vipul update equals method
         if (!olderFunctionsAddedInUnitPosition.equals(unitPositionDTO.getFunctionIds())) {
             List<Function> functions = new ArrayList<>();
             if (!unitPositionDTO.getFunctionIds().isEmpty()) {
@@ -314,6 +322,7 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setSalary(unitPositionDTO.getSalary());
         unitPosition.setStartDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate()));
     }
+
 
     private boolean calculativeValueChanged(UnitPosition oldUnitPosition, UnitPositionDTO unitPositionDTO, UnitPositionEmploymentTypeRelationShip oldUnitPositionEmploymentTypeRelationShip) {
         if (oldUnitPosition.getAvgDailyWorkingHours() != unitPositionDTO.getAvgDailyWorkingHours() ||
@@ -1098,6 +1107,10 @@ public class UnitPositionService extends UserBaseService {
                 exceptionService.invalidRequestException("message.employmentdata.lessthan.mainEmploymentEndDate");
             }
         }
+
+        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis,employment.getEndDateMillis(),unit.getId(),employment.getId(),
+                unit.getTimeZone());
+
         employment.setEndDateMillis(endDateMillis);
         employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
 
@@ -1105,11 +1118,13 @@ public class UnitPositionService extends UserBaseService {
         employment.setAccessGroupIdOnEmploymentEnd(accessGroupId);
         unitPositionGraphRepository.saveAll(unitPositions);
         employmentGraphRepository.save(employment);
+
         if (Optional.ofNullable(employmentEndDate).isPresent() && (DateUtil.getDateFromEpoch(endDateMillis).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString())) == 0)) {
             //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
             List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
             employmentService.moveToReadOnlyAccessGroup(employmentIds);
         }
+
         User user = userGraphRepository.getUserByStaffId(staffId);
         EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), employment.getReasonCode().getId(), employment.getAccessGroupIdOnEmploymentEnd());
         EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employmentUpdated, unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()));
@@ -1190,7 +1205,7 @@ public class UnitPositionService extends UserBaseService {
         currentCTAs.forEach(currentCTA -> {
             currentCTA.setVersions(ctaMapByParentId.get(currentCTA.getId()));
         });
-        TableConfiguration tableConfiguration = priorityGroupIntegrationService.getTableSettings(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
+        TableConfiguration tableConfiguration = activityIntegrationService.getTableSettings(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
         CTATableSettingWrapper ctaTableSettingWrapper = new CTATableSettingWrapper(currentCTAs, tableConfiguration);
         return ctaTableSettingWrapper;
     }

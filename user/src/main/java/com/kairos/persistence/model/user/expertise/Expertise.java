@@ -163,11 +163,16 @@ public class Expertise extends UserBaseEntity {
     }
 
     public List<SeniorityLevel> getSeniorityLevel() {
-        return seniorityLevel;
+        return seniorityLevel = Optional.ofNullable(seniorityLevel).orElse(new ArrayList<>());
     }
 
     public void setSeniorityLevel(List<SeniorityLevel> seniorityLevel) {
         this.seniorityLevel = seniorityLevel;
+    }
+
+    public void addSeniorityLevel(SeniorityLevel seniorityLevel) {
+        this.seniorityLevel = Optional.ofNullable(this.seniorityLevel).orElse(new ArrayList<>());
+        this.seniorityLevel.add(seniorityLevel);
     }
 
     public boolean isPublished() {
@@ -203,15 +208,25 @@ public class Expertise extends UserBaseEntity {
     }
 
     public List<CareDays> getSeniorDays() {
-        return seniorDays;
+        return seniorDays = Optional.ofNullable(seniorDays).orElse(new ArrayList<>());
     }
 
     public void setSeniorDays(List<CareDays> seniorDays) {
         this.seniorDays = seniorDays;
     }
 
+    public void addSeniorDay(CareDays seniorDays) {
+        this.seniorDays = Optional.ofNullable(this.seniorDays).orElse(new ArrayList<>());
+        this.seniorDays.add(seniorDays);
+    }
+
+    public void addChildCareDay(CareDays childCareDay) {
+        this.childCareDays = Optional.ofNullable(this.childCareDays).orElse(new ArrayList<>());
+        this.childCareDays.add(childCareDay);
+    }
+
     public List<CareDays> getChildCareDays() {
-        return childCareDays;
+        return childCareDays = Optional.ofNullable(childCareDays).orElse(new ArrayList<>());
     }
 
     public void setChildCareDays(List<CareDays> childCareDays) {
@@ -237,6 +252,21 @@ public class Expertise extends UserBaseEntity {
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
         this.published = published;
+    }
+
+    public Expertise(@NotBlank(message = "error.Expertise.name.notnull") String name, String description, Country country, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, BreakPaymentSetting breakPaymentSetting, boolean published, boolean hasDraftCopy, boolean history) {
+        this.name = name;
+        this.description = description;
+        this.country = country;
+
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
+        this.breakPaymentSetting = breakPaymentSetting;
+        this.published = published;
+        this.hasDraftCopy = hasDraftCopy;
+        this.history = history;
     }
 
     public Expertise(Long id, @NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description) {
