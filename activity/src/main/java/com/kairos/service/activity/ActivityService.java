@@ -470,7 +470,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
-        verifyTimingsOfActivity(rulesActivityDTO.getEarliestStartTime(),rulesActivityDTO.getLatestStartTime(),rulesActivityDTO.getMaximumEndTime(),rulesActivityDTO.getShortestTime(),rulesActivityDTO.getLongestTime());
+        verifyActivityTimeRules(rulesActivityDTO.getEarliestStartTime(),rulesActivityDTO.getLatestStartTime(),rulesActivityDTO.getMaximumEndTime(),rulesActivityDTO.getShortestTime(),rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = rulesActivityDTO.buildRulesActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(rulesActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -1125,7 +1125,7 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    public void verifyTimingsOfActivity(LocalTime earliestStartTime,LocalTime latestStartTime,LocalTime maximumEndTime,int shortestTime,int longestTime){
+    public void verifyActivityTimeRules(LocalTime earliestStartTime,LocalTime latestStartTime,LocalTime maximumEndTime,int shortestTime,int longestTime){
         if(shortestTime>longestTime){
             throw new ActionNotPermittedException("shortest.time.greater.longest");
         }

@@ -1,4 +1,4 @@
-package com.kairos.activity.counter.distribution.access_group;
+package com.kairos.activity.counter;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

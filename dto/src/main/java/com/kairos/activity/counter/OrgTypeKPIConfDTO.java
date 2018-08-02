@@ -1,4 +1,4 @@
-package com.kairos.activity.counter.distribution.org_type;
+package com.kairos.activity.counter;
 
 import java.math.BigInteger;
 import java.util.List;
