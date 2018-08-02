@@ -14,6 +14,7 @@ import com.kairos.activity.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
@@ -469,6 +470,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
+        verifyTimingsOfActivity(rulesActivityDTO);
         RulesActivityTab rulesActivityTab = rulesActivityDTO.buildRulesActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(rulesActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -1121,4 +1123,34 @@ public class ActivityService extends MongoBaseService {
         ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals);
         return activityWithTimeTypeDTO;
     }
+
+    private void verifyTimingsOfActivity(RulesActivityTabDTO rulesActivityTabDTO){
+        if(rulesActivityTabDTO.getShortestTime()>rulesActivityTabDTO.getLongestTime()){
+            throw new ActionNotPermittedException("shortest.time.greater.longest");
+        }
+        if(Optional.ofNullable(rulesActivityTabDTO.getEarliestStartTime()).isPresent() &&
+                Optional.ofNullable(rulesActivityTabDTO.getLatestStartTime()).isPresent() &&
+                rulesActivityTabDTO.getEarliestStartTime().isAfter(rulesActivityTabDTO.getLatestStartTime())){
+                     throw new ActionNotPermittedException("earliest.start.time.less.latest");
+                 }
+
+        if(Optional.ofNullable(rulesActivityTabDTO.getEarliestStartTime()).isPresent() &&
+                Optional.ofNullable(rulesActivityTabDTO.getLatestStartTime()).isPresent() &&
+                rulesActivityTabDTO.getEarliestStartTime().plusMinutes(rulesActivityTabDTO.getLongestTime()).isAfter(rulesActivityTabDTO.getMaximumEndTime())) {
+            throw new ActionNotPermittedException("earliest.start.time.less.latest");
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
