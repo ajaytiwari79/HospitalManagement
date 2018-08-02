@@ -1,6 +1,4 @@
-package com.kairos.activity.counter.distribution.category;
-
-import com.kairos.activity.counter.KPICategoryDTO;
+package com.kairos.activity.counter;
 
 import java.util.List;
 
