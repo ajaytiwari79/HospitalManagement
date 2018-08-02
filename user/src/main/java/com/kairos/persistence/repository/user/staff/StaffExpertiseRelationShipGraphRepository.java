@@ -1,11 +1,11 @@
 package com.kairos.persistence.repository.user.staff;
 
-import com.kairos.persistence.model.staff.StaffDetailsQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.StaffExpertiseQueryResult;
 import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import com.kairos.user.staff.StaffDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -44,7 +44,7 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
             "OPTIONAL MATCH(staff)-[rel:"+STAFF_HAS_EXPERTISE+"]->(expertise:Expertise) " +
             "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where unitPosition.startDateMillis<={1} AND  (unitPosition.endDateMillis IS NULL or unitPosition.endDateMillis>={1}) " +
             "return id(staff) as id,collect(id(expertise)) as expertiseIds,id(employmentType) as employmentTypeId")
-    List<StaffDetailsQueryResult> getStaffDetailByIds(Set<Long> staffId, Long currentMillis);
+    List<StaffDTO> getStaffDetailByIds(Set<Long> staffId, Long currentMillis);
 
 
 }
