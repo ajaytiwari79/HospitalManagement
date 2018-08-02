@@ -2159,7 +2159,7 @@ public class StaffService extends UserBaseService {
     }
 
     public List<StaffDetailsQueryResult> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
-        return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds,System.currentTimeMillis());
+        return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds,DateUtil.getCurrentDateMillis());
 
     }
 

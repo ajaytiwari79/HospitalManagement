@@ -75,7 +75,7 @@ public class StaffActivitySettingService extends MongoBaseService {
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger,Activity> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,v->v));
         List<StaffDTO> staffExpertiseWrappers= genericIntegrationService.getStaffDetailByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
-        Map<Long,StaffDTO> staffExpertiseWrapperMap=staffExpertiseWrappers.stream().collect(Collectors.toMap(StaffDTO::getStaffId,v->v));
+        Map<Long,StaffDTO> staffExpertiseWrapperMap=staffExpertiseWrappers.stream().collect(Collectors.toMap(StaffDTO::getId,v->v));
         Map<String,List<StaffActivityResponse>> responseMap=new HashMap<>();
         for(Long currentStaffId:staffAndActivitySettingWrapper.getStaffIds()){
             responseMap=assignActivitySettingsForCurrentStaff(responseMap,activityMap,staffExpertiseWrapperMap,currentStaffId,staffAndActivitySettingWrapper.getStaffActivitySettings(),unitId);
@@ -113,12 +113,12 @@ public class StaffActivitySettingService extends MongoBaseService {
         return (!messages.isEmpty())?localeService.getMessage(messages.get(0)):null;
     }
 
-   private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap,Map<BigInteger,Activity> activityMap,Map<Long,StaffDTO> longStaffExpertiseWrapperMap,Long staffId,List<StaffActivitySettingDTO> staffActivitySettingDTOS,Long unitId){
+   private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap,Map<BigInteger,Activity> activityMap,Map<Long,StaffDTO> staffExpertiseWrapperMap,Long staffId,List<StaffActivitySettingDTO> staffActivitySettingDTOS,Long unitId){
        List<StaffActivityResponse> success=(responseMap.get("success")==null)?new ArrayList<>():responseMap.get("success");
        List<StaffActivityResponse> error=(responseMap.get("error")==null)?new ArrayList<>():responseMap.get("error");
        List<StaffActivitySetting> staffActivitySettings=new ArrayList<>();
        staffActivitySettingDTOS.forEach(staffActivitySetting->{
-          String validationMessage= validateActivitySettingsForCurrentStaff(longStaffExpertiseWrapperMap.get(staffId),activityMap.get(staffActivitySetting.getActivityId()));
+          String validationMessage= validateActivitySettingsForCurrentStaff(staffExpertiseWrapperMap.get(staffId),activityMap.get(staffActivitySetting.getActivityId()));
            if(Optional.ofNullable(validationMessage).isPresent()){
                StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),validationMessage);
                error.add(staffActivityResponse);
@@ -128,7 +128,7 @@ public class StaffActivitySettingService extends MongoBaseService {
                     unitId,staffActivitySetting.getShortestTime(),staffActivitySetting.getLongestTime(),staffActivitySetting.getMinLength(),staffActivitySetting.getMaxThisActivityPerShift(),
                     staffActivitySetting.isEligibleForMove());
             staffActivitySettings.add(currentStaffActivitySetting);
-           StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),localeService.getMessage("staff_activity_settings.added"));
+           StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),localeService.getMessage("default.added"));
             success.add(staffActivityResponse);
         });
        if(!staffActivitySettings.isEmpty()){

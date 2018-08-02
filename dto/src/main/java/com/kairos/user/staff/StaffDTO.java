@@ -50,7 +50,6 @@ public class StaffDTO {
     private Gender gender;
     private boolean pregnant;
     private LocalDate dateOfBirth;
-    private Long staffId;
     private Set<Long> expertiseIds;
     private Long employmentTypeId;
 
@@ -272,14 +271,6 @@ public class StaffDTO {
 
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
     }
 
     public Set<Long> getExpertiseIds() {
