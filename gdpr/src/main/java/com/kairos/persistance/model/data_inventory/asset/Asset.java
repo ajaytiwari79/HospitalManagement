@@ -52,7 +52,6 @@ public class Asset extends MongoBaseEntity {
     @NotNull(message = "Asset Type can't be empty")
     private BigInteger assetType;
 
-    @NotEmpty(message = "Sub Asset Type can't be empty")
     private List<BigInteger> assetSubTypes;
 
     private Integer dataRetentionPeriod;

@@ -9,6 +9,7 @@ import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
+import com.kairos.util.ObjectMapperUtils;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
@@ -44,8 +45,8 @@ public class AssetService extends MongoBaseService {
 
     public Asset createAsseWithBasictDetail(Long organizationId, Asset asset) {
 
-        Asset exist = assetMongoRepository.findByName(organizationId, asset.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        Asset existingAsset = assetMongoRepository.findByName(organizationId, asset.getName());
+        if (Optional.ofNullable(existingAsset).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", " Asset ", asset.getName());
         }
         AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, asset.getAssetType());
@@ -125,7 +126,7 @@ public class AssetService extends MongoBaseService {
      * @param
      * @param organizationId
      * @param assetId        - asset id
-     * @param asset       - asset dto contain meta data about asset
+     * @param asset          - asset dto contain meta data about asset
      * @return - updated Asset
      */
     public Asset updateAssetData(Long organizationId, BigInteger assetId, Asset asset) {
