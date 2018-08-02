@@ -158,7 +158,7 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
 
-    public List<BigInteger> createAccessorPartyForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
+  /*  public List<BigInteger> createAccessorPartyForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
 
         List<AccessorPartyDTO> accessorParties = processingActivityDTO.getAccessorParties();
@@ -180,7 +180,7 @@ public class AccessorPartyService extends MongoBaseService {
 
         return accessorPartyIds;
     }
-
+*/
     /**
      *
      * @param countryId

@@ -168,6 +168,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
     }
 
+/*
 
     public List<BigInteger> createProcessingLegaBasisForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
@@ -190,6 +191,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
         });
         return legalBasisIds;
     }
+*/
 
 
     public List<ProcessingLegalBasisResponseDTO> getAllNotInheritedLegalBasisFromParentOrgAndUnitProcessingLegalBasis(Long countryId, Long organizationId, Long unitId) {

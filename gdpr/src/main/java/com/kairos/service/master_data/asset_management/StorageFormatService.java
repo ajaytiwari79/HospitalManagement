@@ -61,7 +61,6 @@ public class StorageFormatService extends MongoBaseService {
                 for (String name : storageFormatNames) {
 
                     StorageFormat newStorageFormat = new StorageFormat(name);
-                    newStorageFormat.setName(name);
                     newStorageFormat.setCountryId(countryId);
                     newStorageFormats.add(newStorageFormat);
 

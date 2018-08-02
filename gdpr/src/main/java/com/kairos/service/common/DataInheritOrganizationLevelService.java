@@ -51,7 +51,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             List<Asset> organizationAssetList = new ArrayList<>();
             masterAssetList.forEach(masterAsset -> {
 
-                Asset asset = new Asset(masterAsset.getName(), masterAsset.getDescription(), countryId, activeStatus);
+                Asset asset = new Asset(masterAsset.getName(), masterAsset.getDescription(), activeStatus);
                 asset.setOrganizationId(unitId);
                 organizationAssetList.add(asset);
             });
@@ -67,7 +67,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             List<ProcessingActivity> organizationProcessingActivityList = new ArrayList<>();
             masterProcessingActivityList.forEach(masterProcessingActivity -> {
 
-                ProcessingActivity processingActivity = new ProcessingActivity(masterProcessingActivity.getName(), masterProcessingActivity.getDescription(), countryId, activeStatus);
+                ProcessingActivity processingActivity = new ProcessingActivity(masterProcessingActivity.getName(), masterProcessingActivity.getDescription(), activeStatus);
                 processingActivity.setOrganizationId(unitId);
                 organizationProcessingActivityList.add(processingActivity);
             });

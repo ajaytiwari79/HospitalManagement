@@ -155,11 +155,10 @@ public class Asset extends MongoBaseEntity {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public Asset(String name, String description, String hostingLocation, Long countryId, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner,Boolean isActive) {
+    public Asset(String name, String description, String hostingLocation, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner,Boolean isActive) {
         this.name = name;
         this.description = description;
         this.hostingLocation=hostingLocation;
-        this.countryId = countryId;
         this.assetType = assetType;
         this.assetSubTypes=assetSubTypes;
         this.assetOwner=assetOwner;
@@ -168,10 +167,9 @@ public class Asset extends MongoBaseEntity {
     }
 
 
-    public Asset(String name, String description, Long countryId, Boolean isActive) {
+    public Asset(String name, String description, Boolean isActive) {
         this.name = name;
         this.description = description;
-        this.countryId = countryId;
         this.isActive = isActive;
     }
 }

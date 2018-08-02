@@ -162,7 +162,7 @@ public class DataSourceService extends MongoBaseService {
     }
 
 
-    public List<BigInteger> createDataSourceForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
+   /* public List<BigInteger> createDataSourceForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
         List<DataSourceDTO> dataSourceDTOS = processingActivityDTO.getDataSources();
         List<DataSource> newInheritDataSourceFromCountry = new ArrayList<>();
@@ -183,7 +183,7 @@ public class DataSourceService extends MongoBaseService {
         });
         return dataSourceIds;
     }
-
+*/
 
     /**
      * @param countryId

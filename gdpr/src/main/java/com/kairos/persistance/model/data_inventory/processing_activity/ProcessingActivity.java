@@ -14,7 +14,6 @@ import java.util.List;
 @Document(collection = "processing_activity")
 public class ProcessingActivity extends MongoBaseEntity {
 
-
     @NotBlank(message = "Name can't be empty")
     private String name;
 
@@ -37,6 +36,8 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private List<BigInteger> processingLegalBasis;
 
+    private List<BigInteger> subProcessingActivities;
+
     private BigInteger responsibilityType;
 
     private Integer controllerContactInfo;
@@ -51,9 +52,17 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private Integer dataRetentionPeriod;
 
-    private Long countryId;
-
     private Boolean isActive;
+
+    private Boolean isSubProcess=false;
+
+    public List<BigInteger> getSubProcessingActivities() { return subProcessingActivities; }
+
+    public void setSubProcessingActivities(List<BigInteger> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
+
+    public Boolean getSubProcess() { return isSubProcess; }
+
+    public void setSubProcess(Boolean subProcess) { isSubProcess = subProcess; }
 
     public String getName() { return name; }
 
@@ -107,9 +116,6 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setAccessorParties(List<BigInteger> accessorParties) { this.accessorParties = accessorParties; }
 
-    public Long getCountryId() { return countryId; }
-
-    public void setCountryId(Long countryId) { this.countryId = countryId; }
 
     public List<BigInteger> getTransferMethods() { return transferMethods; }
 
@@ -126,18 +132,18 @@ public class ProcessingActivity extends MongoBaseEntity {
     public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
 
     public void setActive(Boolean active) { isActive = active; }
-    public ProcessingActivity(String name, String description, Long countryId, ManagingOrganization managingDepartment, Staff processOwner) {
+
+    public ProcessingActivity(String name, String description, ManagingOrganization managingDepartment, Staff processOwner) {
         this.name = name;
         this.description = description;
         this.managingDepartment = managingDepartment;
         this.processOwner = processOwner;
-        this.countryId=countryId;
     }
 
-    public ProcessingActivity(String name,  String description, Long countryId, Boolean isActive) {
+    public ProcessingActivity(String name,  String description, Boolean isActive) {
         this.name = name;
         this.description = description;
-        this.countryId = countryId;
         this.isActive = isActive;
     }
+
 }

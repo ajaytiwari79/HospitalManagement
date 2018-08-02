@@ -171,7 +171,7 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-    public List<BigInteger> createProcessingPurposeForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
+   /* public List<BigInteger> createProcessingPurposeForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
         List<ProcessingPurposeDTO> processingPurposeDTOs = processingActivityDTO.getProcessingPurposes();
         List<ProcessingPurpose> newInheritProcessingPurposeFromCountry = new ArrayList<>();
@@ -193,7 +193,7 @@ public class ProcessingPurposeService extends MongoBaseService {
         return processingPurposeIds;
     }
 
-
+*/
     /**
      *
      * @param countryId
