@@ -10,7 +10,7 @@ import java.util.List;
 
 public class StaffExpertiseSpecification extends AbstractSpecification<StaffDTO> {
     private Activity activity;
-    List<String> errorMessages = new ArrayList<>();
+
 
     public StaffExpertiseSpecification(Activity activity) {
         this.activity = activity;
@@ -23,6 +23,7 @@ public class StaffExpertiseSpecification extends AbstractSpecification<StaffDTO>
 
     @Override
     public List<String> isSatisfiedString(StaffDTO staffDTO) {
+        List<String> errorMessages = new ArrayList<>();
         if (!CollectionUtils.containsAny(activity.getExpertises(), staffDTO.getExpertiseIds())) {
             errorMessages.add("expertise.absent.activity");
         }

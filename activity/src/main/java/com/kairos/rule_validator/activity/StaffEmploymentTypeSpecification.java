@@ -9,7 +9,7 @@ import java.util.List;
 
 public class StaffEmploymentTypeSpecification extends AbstractSpecification<StaffDTO> {
     private Activity activity;
-    List<String> errorMessages = new ArrayList<>();
+
 
     public StaffEmploymentTypeSpecification(Activity activity) {
         this.activity = activity;
@@ -22,6 +22,7 @@ public class StaffEmploymentTypeSpecification extends AbstractSpecification<Staf
 
     @Override
     public List<String> isSatisfiedString(StaffDTO staffDTO) {
+        List<String> errorMessages = new ArrayList<>();
         if (!activity.getEmploymentTypes().contains(staffDTO.getEmploymentTypeId())) {
             errorMessages.add("employment_type.absent.activity");
         }
