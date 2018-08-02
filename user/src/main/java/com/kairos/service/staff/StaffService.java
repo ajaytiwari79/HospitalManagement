@@ -2157,7 +2157,7 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public List<StaffExpertiseWrapperQueryResult> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
+    public List<StaffDetailsQueryResult> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
         return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds,System.currentTimeMillis());
 
     }
