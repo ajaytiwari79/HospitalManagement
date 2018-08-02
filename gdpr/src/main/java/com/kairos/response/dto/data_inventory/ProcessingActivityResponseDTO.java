@@ -9,6 +9,7 @@ import com.kairos.response.dto.common.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -54,9 +55,7 @@ public class ProcessingActivityResponseDTO {
 
     public List<ResponsibilityTypeResponseDTO> getResponsibilityType() { return responsibilityType; }
 
-    public void setResponsibilityType(List<ResponsibilityTypeResponseDTO> responsibilityType) {
-        this.responsibilityType = responsibilityType;
-    }
+    public void setResponsibilityType(List<ResponsibilityTypeResponseDTO> responsibilityType) { this.responsibilityType = responsibilityType; }
 
     public List<ProcessingLegalBasisResponseDTO> getProcessingLegalBasis() { return processingLegalBasis; }
 

@@ -10,9 +10,9 @@ public interface CustomProcessingActivityRepository {
 
     ProcessingActivity findByName( Long organizationId, String name);
 
-    List<ProcessingActivityResponseDTO>  getAllProcessingActivityWithSubProcessingActivitiesAndMetaData( Long organizationId);
+    List<ProcessingActivityResponseDTO>  getAllProcessingActivityAndMetaData( Long organizationId);
 
-    ProcessingActivityResponseDTO  getProcessingActivityWithSubProcessingActivitiesAndMetaDataById( Long organizationId, BigInteger id);
+    ProcessingActivityResponseDTO  getAllSubProcessingActivitiesOfProcessingActivity( Long organizationId, BigInteger processingActivityId);
 
 
 }

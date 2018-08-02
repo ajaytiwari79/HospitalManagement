@@ -73,7 +73,7 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
     public ProcessingActivityResponseDTO getProcessingActivityWithMetaDataById(Long orgId, BigInteger id) {
-        ProcessingActivityResponseDTO processingActivity = processingActivityMongoRepository.getProcessingActivityWithSubProcessingActivitiesAndMetaDataById(orgId, id);
+        ProcessingActivityResponseDTO processingActivity = processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", id);
         }
@@ -82,7 +82,7 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
     public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long orgId) {
-        return processingActivityMongoRepository.getAllProcessingActivityWithSubProcessingActivitiesAndMetaData(orgId);
+        return processingActivityMongoRepository.getAllProcessingActivityAndMetaData(orgId);
     }
 
 

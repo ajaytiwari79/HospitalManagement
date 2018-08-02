@@ -251,5 +251,23 @@ public class CustomAggregationQuery {
 
 
 
+    public static String projectionForProcessingActivity()
+    {
+
+        return "{ '$project':{  " +
+                "           'responsibilityType':{ '$arrayElemAt': [ '$responsibilityType', 0 ] }," +
+                "           'name':1," +
+                "           'description':1," +
+                "           'dataSources':1," +
+                "           'processingPurposes':1," +
+                "           'transferMethods':1," +
+                "           'processingLegalBasis':1," +
+                "               'accessorParties':1," +
+                "               '_id':1" +
+                "           }";
+    }
+
+
+
 
 }
