@@ -470,7 +470,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
-        verifyTimingsOfActivity(rulesActivityDTO);
+        verifyTimingsOfActivity(rulesActivityDTO.getEarliestStartTime(),rulesActivityDTO.getLatestStartTime(),rulesActivityDTO.getMaximumEndTime(),rulesActivityDTO.getShortestTime(),rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = rulesActivityDTO.buildRulesActivityTab();
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(rulesActivityDTO.getActivityId())));
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -1124,20 +1124,21 @@ public class ActivityService extends MongoBaseService {
         return activityWithTimeTypeDTO;
     }
 
-    private void verifyTimingsOfActivity(RulesActivityTabDTO rulesActivityTabDTO){
-        if(rulesActivityTabDTO.getShortestTime()>rulesActivityTabDTO.getLongestTime()){
+
+    public void verifyTimingsOfActivity(LocalTime earliestStartTime,LocalTime latestStartTime,LocalTime maximumEndTime,int shortestTime,int longestTime){
+        if(shortestTime>longestTime){
             throw new ActionNotPermittedException("shortest.time.greater.longest");
         }
-        if(Optional.ofNullable(rulesActivityTabDTO.getEarliestStartTime()).isPresent() &&
-                Optional.ofNullable(rulesActivityTabDTO.getLatestStartTime()).isPresent() &&
-                rulesActivityTabDTO.getEarliestStartTime().isAfter(rulesActivityTabDTO.getLatestStartTime())){
-                     throw new ActionNotPermittedException("earliest.start.time.less.latest");
-                 }
-
-        if(Optional.ofNullable(rulesActivityTabDTO.getEarliestStartTime()).isPresent() &&
-                Optional.ofNullable(rulesActivityTabDTO.getLatestStartTime()).isPresent() &&
-                rulesActivityTabDTO.getEarliestStartTime().plusMinutes(rulesActivityTabDTO.getLongestTime()).isAfter(rulesActivityTabDTO.getMaximumEndTime())) {
+        if(Optional.ofNullable(earliestStartTime).isPresent() &&
+                Optional.ofNullable(latestStartTime).isPresent() &&
+                earliestStartTime.isAfter(latestStartTime)){
             throw new ActionNotPermittedException("earliest.start.time.less.latest");
+        }
+
+        if(Optional.ofNullable(earliestStartTime).isPresent() &&
+                Optional.ofNullable(latestStartTime).isPresent() &&
+                earliestStartTime.plusMinutes(longestTime).isAfter(maximumEndTime)) {
+            throw new ActionNotPermittedException("longest.duration.exceed.limit");
         }
 
 
