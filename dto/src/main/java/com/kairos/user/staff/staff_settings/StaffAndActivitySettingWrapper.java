@@ -11,6 +11,11 @@ public class StaffAndActivitySettingWrapper {
         //Default Constructor
     }
 
+    public StaffAndActivitySettingWrapper(Set<Long> staffIds, List<StaffActivitySettingDTO> staffActivitySettings) {
+        this.staffIds = staffIds;
+        this.staffActivitySettings = staffActivitySettings;
+    }
+
     public Set<Long> getStaffIds() {
         return staffIds;
     }
