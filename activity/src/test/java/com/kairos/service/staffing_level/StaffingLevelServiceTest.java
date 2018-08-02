@@ -73,8 +73,8 @@ public class StaffingLevelServiceTest {
   public void  updateStaffingLevelAvailableStaffCountForNewlyCreatedShiftTest(){
       ShiftNotificationEvent shiftNotificationEvent=new ShiftNotificationEvent();
       Shift shift =new Shift();
-      //shift.setStartDate(DateUtils.asDate(LocalTime.MIN));
-      //shift.setEndDate(DateUtils.asDate(LocalTime.MAX));
+      //shift.setStartDate(DateUtils.getDateFromLocalDate(LocalTime.MIN));
+      //shift.setEndDate(DateUtils.getDateFromLocalDate(LocalTime.MAX));
       shiftNotificationEvent.setShift(shift);
       StaffingLevel staffingLevel1=staffingLevelService.updateStaffingLevelAvailableStaffCountForNewlyCreatedShift(staffingLevel,shiftNotificationEvent);
       staffingLevel1.getPresenceStaffingLevelInterval().stream().forEach(staffingLevelInterval -> Assert.assertEquals(1L,staffingLevelInterval.getAvailableNoOfStaff()));
@@ -86,13 +86,13 @@ public class StaffingLevelServiceTest {
 
         ShiftNotificationEvent shiftNotificationEvent=new ShiftNotificationEvent();
         Shift shift =new Shift();
-     //   shift.setStartDate(DateUtils.asDate(LocalTime.MIN));
-       // shift.setEndDate(DateUtils.asDate(LocalTime.MAX));
+     //   shift.setStartDate(DateUtils.getDateFromLocalDate(LocalTime.MIN));
+       // shift.setEndDate(DateUtils.getDateFromLocalDate(LocalTime.MAX));
         shiftNotificationEvent.setShift(shift);
         StaffingLevel updatedStaffingLevel1=staffingLevelService.updateStaffingLevelAvailableStaffCountForNewlyCreatedShift(staffingLevel,shiftNotificationEvent);
         Shift updatedShift=new Shift();
-        //updatedShift.setStartDate(DateUtils.asDate(LocalTime.MIN));
-        //updatedShift.setEndDate(DateUtils.asDate(LocalTime.NOON));
+        //updatedShift.setStartDate(DateUtils.getDateFromLocalDate(LocalTime.MIN));
+        //updatedShift.setEndDate(DateUtils.getDateFromLocalDate(LocalTime.NOON));
         shiftNotificationEvent.setPreviousStateShift(shift);
         shiftNotificationEvent.setShift(updatedShift);
         StaffingLevel updatedStaffingLevel2=staffingLevelService.updateStaffingLevelAvailableStaffCountForUpdatedShift(updatedStaffingLevel1,shiftNotificationEvent);

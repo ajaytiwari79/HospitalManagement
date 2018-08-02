@@ -17,20 +17,34 @@ import java.util.Set;
 public interface DataDisposalMongoRepository extends MongoRepository<DataDisposal,BigInteger> {
 
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:?2}")
-    DataDisposal findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
+    @Query("{deleted:false,countryId:?0,_id:?1}")
+    DataDisposal findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
-    DataDisposal findByName(Long countryId,Long organizationId,String name);
+    @Query("{countryId:?0,name:?1,deleted:false}")
+    DataDisposal findByName(Long countryId,String name);
 
     DataDisposal findByid(BigInteger id);
 
     @Query("{_id:?0,deleted:false}")
     DataDisposalResponseDTO findDataDisposalByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1}")
-    List<DataDisposal> findAllDataDisposals(Long countryId,Long organizationId);
+    @Query("{deleted:false,countryId:?0}")
+    List<DataDisposal> findAllDataDisposals(Long countryId);
 
-    @Query("{countryId:?0,organizationId:?1,name:{$in:?2},deleted:false}")
-    List<DataDisposal>  findByCountryAndNameList(Long countryId,Long organizationId,Set<String> name);
+    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
+    List<DataDisposal>  findByCountryAndNameList(Long countryId,Set<String> name);
+
+
+
+    @Query("{deleted:false,organizationId:?0}")
+    List<DataDisposalResponseDTO> findAllOrganizationDataDisposals(Long organizationId);
+
+    @Query("{deleted:false,organizationId:?0,_id:?1}")
+    DataDisposal findByOrganizationIdAndId(Long organizationId,BigInteger id);
+
+    @Query("{organizationId:?0,name:?1,deleted:false}")
+    DataDisposal findByOrganizationIdAndName(Long organizationId,String name);
+
+
+
 }

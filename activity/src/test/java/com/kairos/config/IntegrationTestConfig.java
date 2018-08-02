@@ -28,6 +28,7 @@ public class IntegrationTestConfig {
     private String authorization ;
 
     @Bean
+    @Profile("local")
     @Primary
     public TestRestTemplate getTestRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         restTemplateBuilder = restTemplateBuilder

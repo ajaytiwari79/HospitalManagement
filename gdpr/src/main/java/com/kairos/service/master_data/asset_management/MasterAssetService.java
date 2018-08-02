@@ -51,12 +51,13 @@ public class MasterAssetService extends MongoBaseService {
         if (masterAssetMongoRepository.findByName(countryId, organizationId, masterAssetDto.getName()) != null) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         }
-        assetTypeService.getAssetTypeById(countryId,organizationId,masterAssetDto.getAssetTypeId());
+        assetTypeService.getAssetTypeById(countryId,masterAssetDto.getAssetTypeId());
         MasterAsset newAsset = new MasterAsset(masterAssetDto.getName(),masterAssetDto.getDescription(),masterAssetDto.getOrganizationTypes(),masterAssetDto.getOrganizationSubTypes()
         ,masterAssetDto.getOrganizationServices(),masterAssetDto.getOrganizationSubServices());
         newAsset.setCountryId(countryId);
         newAsset.setOrganizationId(organizationId);
         newAsset.setAssetType(masterAssetDto.getAssetTypeId());
+        newAsset.setAssetSubTypes(masterAssetDto.getAssetSubTypes());
         return masterAssetMongoRepository.save(sequenceGenerator(newAsset));
     }
 
@@ -93,13 +94,14 @@ public class MasterAssetService extends MongoBaseService {
         if (!Optional.of(exists).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "master.asset", id);
         }
-        assetTypeService.getAssetTypeById(countryId,organizationId,masterAssetDto.getAssetTypeId());
+        assetTypeService.getAssetTypeById(countryId,masterAssetDto.getAssetTypeId());
         exists.setOrganizationTypes(masterAssetDto.getOrganizationTypes());
         exists.setOrganizationSubTypes(masterAssetDto.getOrganizationSubTypes());
         exists.setOrganizationServices(masterAssetDto.getOrganizationServices());
         exists.setOrganizationSubServices(masterAssetDto.getOrganizationSubServices());
         exists.setName(masterAssetDto.getName());
         exists.setAssetType(masterAssetDto.getAssetTypeId());
+        exists.setAssetSubTypes(masterAssetDto.getAssetSubTypes());
         exists.setDescription(masterAssetDto.getDescription());
         masterAssetMongoRepository.save(sequenceGenerator(exists));
         return exists;

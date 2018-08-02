@@ -36,7 +36,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigInteger;
+import java.util.*;
 import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -145,13 +147,11 @@ public class ShiftIntegrationServiceTest {
 
     @Test
     public void publishShifts() throws Exception {
-
         List<BigInteger> shifts = new ArrayList<>();
         shifts.add(new BigInteger("110"));
         shifts.add(new BigInteger("109"));
 
         ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, Collections.singletonList(ShiftStatus.FIXED));
-
         HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> typeReference =

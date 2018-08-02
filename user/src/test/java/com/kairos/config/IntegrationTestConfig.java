@@ -25,6 +25,7 @@ public class IntegrationTestConfig {
 
     @Bean
     @Primary
+    @Profile("local")
     public TestRestTemplate getTestRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder
                 .interceptors(new TestUserContextInterceptor())
