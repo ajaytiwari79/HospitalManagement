@@ -2,7 +2,6 @@ package com.kairos.config;
 
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.constants.AppConstants;
-import com.kairos.enums.ClientEnum;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
@@ -83,7 +82,6 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -512,7 +510,7 @@ public class BootDataService {
 /*
     private void createCitizen() {
         johnOliver = new Client();
-        johnOliver.setClientType(ClientEnum.CITIZEN);
+        johnOliver.setClientType(ClientEnum.INDIVIDUAL);
         johnOliver.setFirstName("John");
         johnOliver.setLastName("Oliver");
         johnOliver.setNickName("Johnny");

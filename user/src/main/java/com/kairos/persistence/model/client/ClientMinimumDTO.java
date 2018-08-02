@@ -2,6 +2,7 @@ package com.kairos.persistence.model.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.client.ClientEnum;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
@@ -18,7 +19,7 @@ public class ClientMinimumDTO {
     private String name;
     private Boolean hasSameAddress;
     private boolean updateAddressOfAllHouseholdMembers;
-
+    private ClientEnum clientType=ClientEnum.INDIVIDUAL;
     public ClientMinimumDTO() {
 
     }
@@ -96,4 +97,11 @@ public class ClientMinimumDTO {
         return updateAddressOfAllHouseholdMembers;
     }
 
+    public ClientEnum getClientType() {
+        return clientType;
+    }
+
+    public void setClientType(ClientEnum clientType) {
+        this.clientType = clientType;
+    }
 }

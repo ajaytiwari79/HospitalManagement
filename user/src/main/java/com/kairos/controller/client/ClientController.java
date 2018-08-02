@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -615,7 +616,7 @@ public class ClientController {
     @ApiOperation(value = "Get Organization Clients with min details")
     @RequestMapping(value = "/unit/{unitId}/client", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long organizationId, @PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long organizationId, @PathVariable Long unitId) throws InterruptedException, ExecutionException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 clientService.getOrganizationClients(unitId));
     }

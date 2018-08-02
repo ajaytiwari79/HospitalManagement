@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.CitizenHealthStatus;
-import com.kairos.enums.ClientEnum;
-import com.kairos.enums.Gender;
+import com.kairos.enums.client.ClientEnum;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.common.CitizenStatus;
@@ -33,12 +32,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Client extends UserBaseEntity {
-    private boolean isEnabled = true;
     @Relationship(type = CIVILIAN_STATUS)
     private CitizenStatus civilianStatus;
     private String profilePic;
     private String nameAmongStaff;
-
+    private ClientEnum clientType;
     // Equipment Details
     private String requiredEquipmentsList;
 
@@ -162,6 +160,9 @@ public class Client extends UserBaseEntity {
     @Relationship(type = HAS_RELATION_OF)
     private List<ClientRelationType> clientRelationTypes;
 
+    public ClientEnum getClientType() {
+        return clientType;
+    }
 
     public long getDeceasedDate() {
         return deceasedDate;
@@ -264,13 +265,7 @@ public class Client extends UserBaseEntity {
         this.useWheelChair = useWheelChair;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
-    }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
 
     public int getPriority() {
         return priority;
@@ -753,6 +748,24 @@ public class Client extends UserBaseEntity {
     public void setNoOfVisitationTasks(int noOfVisitationTasks) {
         this.noOfVisitationTasks = noOfVisitationTasks;
     }
+    public String getFullName() {
+        return this.getUser().getFirstName() + " " + this.getUser().getLastName();
+    }
+
+
+    public LocalAreaTag getLocalAreaTag() {
+        return localAreaTag;
+    }
+
+    public void setLocalAreaTag(LocalAreaTag localAreaTag) {
+        this.localAreaTag = localAreaTag;
+    }
+
+    public void addClientRelations(ClientRelationType clientRelationType) {
+        this.clientRelationTypes = Optional.ofNullable(this.clientRelationTypes).orElse(new ArrayList<>());
+        this.clientRelationTypes.add(clientRelationType);
+
+    }
 
     // General Tab Constructor
     public Map<String, Object> retrieveClientGeneralDetails() {
@@ -851,30 +864,11 @@ public class Client extends UserBaseEntity {
     }
 
 
-    public String getFullName() {
-        return this.getUser().getFirstName() + " " + this.getUser().getLastName();
-    }
-
-
-    public LocalAreaTag getLocalAreaTag() {
-        return localAreaTag;
-    }
-
-    public void setLocalAreaTag(LocalAreaTag localAreaTag) {
-        this.localAreaTag = localAreaTag;
-    }
-
-    public void addClientRelations(ClientRelationType clientRelationType) {
-        this.clientRelationTypes = Optional.ofNullable(this.clientRelationTypes).orElse(new ArrayList<>());
-        this.clientRelationTypes.add(clientRelationType);
-
-    }
 
 
     @Override
     public String toString() {
         return "{Client={" +
-                "isEnabled=" + isEnabled + '\'' +
                 ", profilePic='" + profilePic + '\'' +
                 ", nameAmongStaff='" + nameAmongStaff + '\'' +
                 ", requiredEquipmentsList='" + requiredEquipmentsList + '\'' +

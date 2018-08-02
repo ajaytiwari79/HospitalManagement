@@ -7,6 +7,7 @@ import com.kairos.client.dto.OrganizationClientWrapper;
 import com.kairos.client.dto.TaskDemandRequestWrapper;
 import com.kairos.client.dto.TaskTypeAggregateResult;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.*;
@@ -43,6 +44,7 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.*;
+import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;
@@ -65,6 +67,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,6 +76,10 @@ import javax.inject.Inject;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
@@ -158,6 +165,8 @@ public class ClientService extends UserBaseService {
     private ClientExceptionRestClient clientExceptionRestClient;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private AsynchronousService asynchronousService;
 
     /*
         public Client createCitizen(Client client) {
@@ -214,14 +223,9 @@ public class ClientService extends UserBaseService {
                 user.setLastName(clientMinimumDTO.getLastName());
                 user.setCprNumber(clientMinimumDTO.getCprnumber());
                 user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
-                if (user.getEmail() == null) {
-                    logger.debug("Creating email with CPR");
-                    String cpr = user.getCprNumber();
-                    String email = cpr + KAIROS;
-                    user.setEmail(email);
-                    user.setUserName(email);
-                }
+                client.setProfilePic(generateAgeAndGenderFromCPR(user));
                 client.setUser(user);
+                client.setClientType(clientMinimumDTO.getClientType());
                 save(client);
                 ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDateMillis());
                 relationService.createRelation(relation);
@@ -232,6 +236,7 @@ public class ClientService extends UserBaseService {
             client = new Client();
             client.setProfilePic(generateAgeAndGenderFromCPR(user));
             client.setUser(user);
+            client.setClientType(clientMinimumDTO.getClientType());
             save(client);
             ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(client, organization, new DateTime().getMillis());
             logger.debug("Creating Relation with Organization: " + organization.getName());
@@ -251,29 +256,6 @@ public class ClientService extends UserBaseService {
         return cprExists;
     }
 
-
-    public Client generateAgeAndGenderFromCPR(Client client) {
-        logger.debug("Generating Gender and Age from CPR....");
-        String cpr = client.getCprNumber();
-        String defaultPicUrl;
-        if (cpr == null || cpr == "") {
-            logger.debug("CPR number not found");
-            return null;
-        }
-        Integer ageVariable = Integer.valueOf(cpr.substring(cpr.length() - 1));
-        if (ageVariable % 2 == 0) {
-            logger.debug("Gender detected for Client: Female");
-            client.setGender(Gender.FEMALE);
-            defaultPicUrl = "default_female_icon.png";
-
-        } else {
-            logger.debug("Gender detected for Client: Male");
-            client.setGender(Gender.MALE);
-            defaultPicUrl = "default_male_icon.png";
-        }
-        client.setProfilePic(defaultPicUrl);
-        return client;
-    }
 
     public String generateAgeAndGenderFromCPR(User user) {
         logger.debug("Generating Gender and Age from CPR....");
@@ -1017,35 +999,72 @@ public class ClientService extends UserBaseService {
         return response;
     }
 
+    @Async
+    public CompletableFuture<Boolean> getPreRequisiteData(Long organizationId, Map<String, Object> clientData, List<Map<String, Object>> clientList) throws InterruptedException, ExecutionException {
 
-    public Map<String, Object> getOrganizationClients(Long organizationId) {
+        Callable<Map<String, Object>> callableTaskDemand = () -> {
+            Map<String, Object> clientInfo = taskDemandRestClient.getOrganizationClientsInfo(organizationId, clientList);
+            return clientInfo;
+        };
+        Future<Map<String, Object>> futureTaskDemand = asynchronousService.executeAsynchronously(callableTaskDemand);
+        if (futureTaskDemand.get() != null) {
+            clientData.putAll(futureTaskDemand.get());
+        }
+
+        // Time slot
+        Callable<Map<String, Object>> callableTimeSlotData = () -> {
+            Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
+            return timeSlotData;
+        };
+        Future<Map<String, Object>> futureTimeSlotData = asynchronousService.executeAsynchronously(callableTimeSlotData);
+        if (futureTimeSlotData.get() != null) {
+            clientData.put("timeSlotList", futureTimeSlotData.get());
+        }
+
+        // service Types
+
+        Callable<List<OrganizationServiceQueryResult>> callableOrganizationServices = () -> {
+            List<OrganizationServiceQueryResult> organizationServiceQueryResults = organizationServiceRepository.getOrganizationServiceByOrgId(organizationId);
+            return organizationServiceQueryResults;
+        };
+        Future<List<OrganizationServiceQueryResult>> futureOrganizationServices = asynchronousService.executeAsynchronously(callableOrganizationServices);
+        if (futureOrganizationServices.get() != null) {
+            clientData.put("serviceTypes", futureOrganizationServices.get());
+        }
+
+        // Local area tags
+
+        Callable<List<Map<String, Object>>> callableTagLists = () -> {
+            List<Map<String, Object>> tagList = organizationMetadataRepository.findAllByIsDeletedAndUnitId(organizationId);
+            return tagList;
+        };
+        Future<List<Map<String, Object>>> futureTagLists = asynchronousService.executeAsynchronously(callableTagLists);
+        if (futureTagLists.get() != null) {
+            List<Object> localAreaTagsList = new ArrayList<>();
+            for (Map<String, Object> map : futureTagLists.get()) {
+                localAreaTagsList.add(map.get("tags"));
+            }
+            clientData.put("localAreaTags", localAreaTagsList);
+        }
+
+        return CompletableFuture.completedFuture(true);
+    }
+
+    public Map<String, Object> getOrganizationClients(Long organizationId) throws InterruptedException, ExecutionException {
 
         Map<String, Object> clientData = new HashMap<String, Object>();
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        List<Map<String, Object>> clientList = organizationGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
 
-        if (mapList.isEmpty()) {
+        if (clientList.isEmpty()) {
             return null;
         }
-
-        //anilm2 replace it with rest template
-        Map<String, Object> clientInfo = taskDemandRestClient.getOrganizationClientsInfo(organizationId, mapList);
         Long countryId = countryGraphRepository.getCountryIdByUnitId(organizationId);
         List<Map<String, Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
-
-        clientData.putAll(clientInfo);
-
         clientData.put("clientStatusList", clientStatusList);
-        List<Object> localAreaTagsList = new ArrayList<>();
-        List<Map<String, Object>> tagList = organizationMetadataRepository.findAllByIsDeletedAndUnitId(organizationId);
-        for (Map<String, Object> map : tagList) {
-            localAreaTagsList.add(map.get("tags"));
-        }
-        clientData.put("localAreaTags", localAreaTagsList);
-        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
-        if (timeSlotData != null) {
-            clientData.put("timeSlotList", timeSlotData);
-        }
-        clientData.put("serviceTypes", organizationServiceRepository.getOrganizationServiceByOrgId(organizationId));
+
+        CompletableFuture<Boolean> allBasicDetails = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(ClientService.class)
+                .getPreRequisiteData(organizationId, clientData, clientList);
+        CompletableFuture.allOf(allBasicDetails).join();
 
         return clientData;
 
@@ -1397,7 +1416,7 @@ public class ClientService extends UserBaseService {
 
         }
         Client houseHoldPerson = clientGraphRepository.getClientByCPR(cprNumber);
-        ClientMinimumDTO clientMinimumDTO=null;
+        ClientMinimumDTO clientMinimumDTO = null;
         if (Optional.ofNullable(houseHoldPerson).isPresent()) {
             if (houseHoldPerson.isCitizenDead()) {
                 exceptionService.dataNotFoundByIdException("message.client.CRPNumber.deadcitizen", cprNumber);
