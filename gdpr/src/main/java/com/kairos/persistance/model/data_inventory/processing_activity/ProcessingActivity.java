@@ -52,17 +52,21 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private Integer dataRetentionPeriod;
 
-    private Boolean isActive;
+    private boolean active;
 
-    private Boolean isSubProcess=false;
+    private boolean subProcess=false;
 
     public List<BigInteger> getSubProcessingActivities() { return subProcessingActivities; }
 
     public void setSubProcessingActivities(List<BigInteger> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 
-    public Boolean getSubProcess() { return isSubProcess; }
+    public boolean isActive() { return active; }
 
-    public void setSubProcess(Boolean subProcess) { isSubProcess = subProcess; }
+    public void setActive(boolean active) { this.active = active; }
+
+    public boolean isSubProcess() { return subProcess; }
+
+    public void setSubProcess(boolean subProcess) { this.subProcess = subProcess; }
 
     public String getName() { return name; }
 
@@ -125,13 +129,11 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setResponsibilityType(BigInteger responsibilityType) { this.responsibilityType = responsibilityType; }
 
-    public Boolean getActive() { return isActive; }
 
     public List<BigInteger> getProcessingLegalBasis() { return processingLegalBasis; }
 
     public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
 
-    public void setActive(Boolean active) { isActive = active; }
 
     public ProcessingActivity(String name, String description, ManagingOrganization managingDepartment, Staff processOwner) {
         this.name = name;
@@ -140,10 +142,10 @@ public class ProcessingActivity extends MongoBaseEntity {
         this.processOwner = processOwner;
     }
 
-    public ProcessingActivity(String name,  String description, Boolean isActive) {
+    public ProcessingActivity(String name,  String description, boolean active) {
         this.name = name;
         this.description = description;
-        this.isActive = isActive;
+        this.active = active;
     }
 
 }

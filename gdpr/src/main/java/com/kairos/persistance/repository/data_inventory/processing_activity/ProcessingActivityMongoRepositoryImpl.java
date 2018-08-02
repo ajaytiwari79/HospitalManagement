@@ -36,12 +36,13 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithSubProcessingActivitiesAndMetaData( Long organizationId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("isSubProcess").is(false)),
+                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("subProcess").is(false)),
                 lookup("processing_purpose", "processingPurposes", "_id", "processingPurposes"),
                 lookup("transfer_method", "sourceTransferMethods", "_id", "sourceTransferMethods"),
                 lookup("transfer_method", "destinationTransferMethods", "_id", "destinationTransferMethods"),
                 lookup("accessor_party", "accessorParties", "_id", "accessorParties"),
-                lookup("dataSource", "dataSources", "_id", "dataSources")
+                lookup("dataSource", "dataSources", "_id", "dataSources"),
+                lookup("responsibility_type","responsibilityType","_id","responsibilityType")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
@@ -52,12 +53,13 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     @Override
     public ProcessingActivityResponseDTO getProcessingActivityWithSubProcessingActivitiesAndMetaDataById( Long organizationId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id).and("isSubProcess").is(false)),
+                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id).and("subProcess").is(false)),
                 lookup("processing_purpose", "processingPurposes", "_id", "processingPurposes"),
                 lookup("transfer_method", "sourceTransferMethods", "_id", "sourceTransferMethods"),
                 lookup("transfer_method", "destinationTransferMethods", "_id", "destinationTransferMethods"),
                 lookup("accessor_party", "accessorParties", "_id", "accessorParties"),
-                lookup("dataSource", "dataSources", "_id", "dataSources")
+                lookup("dataSource", "dataSources", "_id", "dataSources"),
+                lookup("responsibility_type","responsibilityType","_id","responsibilityType")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
