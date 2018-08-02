@@ -8,6 +8,7 @@ public class ActivityConfiguration extends MongoBaseEntity {
     private Long unitId;
     private PresencePlannedTime presencePlannedTime;
     private AbsencePlannedTime absencePlannedTime;
+    private Long countryId;
 
     public ActivityConfiguration() {
         // dc
@@ -39,6 +40,24 @@ public class ActivityConfiguration extends MongoBaseEntity {
         this.absencePlannedTime = absencePlannedTime;
     }
 
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
+    public ActivityConfiguration(PresencePlannedTime presencePlannedTime, Long countryId) {
+        this.presencePlannedTime = presencePlannedTime;
+        this.countryId = countryId;
+    }
+
+    public ActivityConfiguration(AbsencePlannedTime absencePlannedTime, Long countryId) {
+        this.absencePlannedTime = absencePlannedTime;
+        this.countryId = countryId;
+    }
+
     public ActivityConfiguration(Long unitId, PresencePlannedTime presencePlannedTime) {
         this.unitId = unitId;
         this.presencePlannedTime = presencePlannedTime;
@@ -47,5 +66,6 @@ public class ActivityConfiguration extends MongoBaseEntity {
         this.unitId = unitId;
         this.absencePlannedTime = absencePlannedTime;
     }
+
 
 }

@@ -19,4 +19,9 @@ public interface CustomActivityConfigurationRepository {
 
     List<ActivityConfiguration> findAllPresenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
 
+
+    //======
+    ActivityConfiguration findPresenceConfigurationByCountryIdAndPhaseId(Long countryId, BigInteger phaseId);
+
+
 }

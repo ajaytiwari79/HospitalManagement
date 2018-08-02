@@ -79,5 +79,12 @@ public class ActivityConfigurationRepositoryImpl implements CustomActivityConfig
         Query query = new Query(Criteria.where("unitId").is(unitId).and("absencePlannedTime.phaseId").is(phaseId));
         return mongoTemplate.find(query, ActivityConfiguration.class);
     }
+
+    public ActivityConfiguration findPresenceConfigurationByCountryIdAndPhaseId(Long countryId, BigInteger phaseId) {
+        Query query = new Query(Criteria.where("countryId").is(countryId).and("presencePlannedTime.phaseId").is(phaseId));
+        return mongoTemplate.findOne(query, ActivityConfiguration.class);
+    }
+
+
 }
 
