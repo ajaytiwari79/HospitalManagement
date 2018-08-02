@@ -317,18 +317,26 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "with staff,unitPosition match(staff)-[staff_expertise_relation:"+STAFF_HAS_EXPERTISE+"]->(exp:Expertise) where staff_expertise_relation.expertiseStartDate is not null\n" +
             "and datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).month=datetime().month and\n" +
             "datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).day=datetime().day and datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).year<>datetime().year " +
-            "with staff,exp, datetime().year-datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).year as currentYear match(staff)-[:"+BELONGS_TO_STAFF+"]-(unitPosition)-[:"+HAS_EXPERTISE_IN+"]-(exp) with staff,unitPosition,exp,currentYear\n" +
-            "match(unitPosition)-[:"+HAS_SENIORITY_LEVEL+"]-(sl:SeniorityLevel) where sl.to<=currentYear with unitPosition, exp,currentYear match(unitPosition)-[:"+HAS_EXPERTISE_IN+"]-(exp) with unitPosition,exp,currentYear\n" +
-            "match(unitPosition)-[unitPositionEmploymentTypeRelationShip:"+HAS_EMPLOYMENT_TYPE+"]-(employmentType:EmploymentType) optional " +
-            "match(exp)-[:"+FOR_SENIORITY_LEVEL+"]-(seniorityLevel:SeniorityLevel) where seniorityLevel.from <= currentYear and seniorityLevel.to > currentYear " +
+            "with staff,exp, datetime().year-datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).year as currentYear match(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(exp) with staff,unitPosition,exp,currentYear\n" +
+            "match(unitPosition)-[:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) where sl.to<=currentYear with unitPosition, exp,currentYear match(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(exp) with unitPosition,exp,currentYear\n" +
+            "match(unitPosition)-[unitPositionEmploymentTypeRelationShip:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) optional " +
+            "match(exp)-[:"+FOR_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel) where seniorityLevel.from <= currentYear and seniorityLevel.to > currentYear " +
             "return seniorityLevel,unitPosition,unitPositionEmploymentTypeRelationShip,employmentType")
     List<UnitPositionSeniorityLevelQueryResult> findUnitPositionSeniorityLeveltoUpdate();
 
-    @Query("Match(up:UnitPosition)-[r:HAS_SENIORITY_LEVEL]-(sl:SeniorityLevel) where id(up) in {0} delete r")
+    @Query("Match(up:UnitPosition)-[r:HAS_SENIORITY_LEVEL]->(sl:SeniorityLevel) where id(up) in {0} delete r")
     void deleteUnitPositionSeniorityLevelRelation(List<Long> unitPositionIds);
 
-    @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]-(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]-(expertise:Expertise) where id(staff)={0} " +
+    @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) where id(staff)={0} " +
             "and id(expertise)=expertiseId and unitPosition.startDateMillis<=timeStamp and (uniPosition.endDateMillis>=timestamp or unitPosition.endDateMillis is null)" +
-            "Match(unitPosition)-[:HAS_SENIORITY_LEVEL]-(seniorityLevel:SeniorityLevel) return unitPosition,seniorityLevel")
-    SeniorityLevel getSeniorityLevelFromStaffUnitPosition(Long staffId,Long expertiseId);
+            "Match(unitPosition)-[:HAS_SENIORITY_LEVEL]->(seniorityLevel:SeniorityLevel) return unitPosition,seniorityLevel")
+    UnitPositionSeniorityLevelQueryResult getSeniorityLevelFromStaffUnitPosition(Long staffId,Long expertiseId);
+
+    @Query("Match(staff:Staff)-[:BELONGS_TO_STAFF]->(up:UnitPosition)-[:HAS_EXPERTISE_IN]->(exp:Expertise) where id(staff)={0} and id(expertise)={1} match(up)-[rel:HAS_SENIORITY_LEVEL]->(sl:SeniorityLevel) delete rel")
+    void deleteUnitPositionSeniorityLevel(Long staffId,Long expertiseId);
+
+    @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(exp:Expertise) where id(staff)={0} and id(exp)={1} match(sl:SeniorityLevel) where id(sl)={2} with up, sl merge(up)-[:"+HAS_SENIORITY_LEVEL+"]->(sl)")
+    void createUnitPositionSeniorityLevelRelatioship(Long staffId,Long expertiseId,Long seniorityLevelId);
+
+
 }

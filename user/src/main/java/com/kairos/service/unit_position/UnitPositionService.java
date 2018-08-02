@@ -1250,6 +1250,7 @@ public class UnitPositionService extends UserBaseService {
             unitPositionEmploymentTypeRelationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition,unitPositionSeniorityLevelQueryResult.getEmploymentType(),
                     unitPositionSeniorityLevelQueryResult.getUnitPositionEmploymentTypeRelationShip().getEmploymentTypeCategory() );
             unitPositionEmploymentTypeRelationShips.add( unitPositionEmploymentTypeRelationShip);
+            unitPosition.setId(null);
             unitPositions.add(unitPosition);
         }
 

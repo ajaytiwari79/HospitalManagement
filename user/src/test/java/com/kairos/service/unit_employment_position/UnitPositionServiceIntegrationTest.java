@@ -4,6 +4,7 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.user.unit_position.UnitPositionSeniorityLevelQueryResult;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -22,6 +23,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
@@ -36,6 +38,8 @@ import java.util.Optional;
 @RunWith(OrderTestRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@ActiveProfiles(profiles = "test")
+
 public class UnitPositionServiceIntegrationTest {
     private final Logger logger = LoggerFactory.getLogger(UnitPositionServiceIntegrationTest.class);
     @Value("${server.host.http.url}")
@@ -68,13 +72,14 @@ public class UnitPositionServiceIntegrationTest {
     @Test
     public void updateSeniorityLevelOnJobTriggerTest() {
 
-
         Long expertiseStartDate = LocalDateTime.now().withYear(LocalDateTime.now().getYear()-3).withHour(0).withMinute(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        staffGraphRepository.updateStaffExpertiseRelation(13315L,7799L,expertiseStartDate);
-
+       /* staffGraphRepository.updateStaffExpertiseRelation(13315L,7799L,expertiseStartDate);
+        unitPositionGraphRepository.deleteUnitPositionSeniorityLevel(13315L,7799L);
+        unitPositionGraphRepository.createUnitPositionSeniorityLevelRelatioship(13315L,7799L,7796L);
         unitPositionService.updateSeniorityLevelOnJobTrigger();
-        //unitPositionGraphRepository.
-
+        UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult = unitPositionGraphRepository.getSeniorityLevelFromStaffUnitPosition(13315L,7799L);
+        Assert.assertTrue(unitPositionSeniorityLevelQueryResult.getSeniorityLevel().getFrom()==3&
+                unitPositionSeniorityLevelQueryResult.getSeniorityLevel().getId()==7797);*/
     }
     @Test
     public void test2_getUnitPositionsOfStaff() throws Exception {
