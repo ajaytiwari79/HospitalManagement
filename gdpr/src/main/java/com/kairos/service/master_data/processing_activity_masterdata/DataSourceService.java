@@ -162,29 +162,6 @@ public class DataSourceService extends MongoBaseService {
     }
 
 
-   /* public List<BigInteger> createDataSourceForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
-
-        List<DataSourceDTO> dataSourceDTOS = processingActivityDTO.getDataSources();
-        List<DataSource> newInheritDataSourceFromCountry = new ArrayList<>();
-        List<BigInteger> dataSourceIds = new ArrayList<>();
-        for (DataSourceDTO dataSourceDTO : dataSourceDTOS) {
-            if (!dataSourceDTO.getOrganizationId().equals(organizationId)) {
-                DataSource dataSource = new DataSource(dataSourceDTO.getName());
-                dataSource.setCountryId(countryId);
-                dataSource.setOrganizationId(organizationId);
-                newInheritDataSourceFromCountry.add(dataSource);
-            } else {
-                dataSourceIds.add(dataSourceDTO.getId());
-            }
-        }
-        newInheritDataSourceFromCountry = dataSourceMongoRepository.saveAll(getNextSequence(newInheritDataSourceFromCountry));
-        newInheritDataSourceFromCountry.forEach(dataSource -> {
-            dataSourceIds.add(dataSource.getId());
-        });
-        return dataSourceIds;
-    }
-*/
-
     /**
      * @param countryId
      * @param organizationId - id of parent organization

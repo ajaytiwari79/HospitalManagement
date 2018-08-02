@@ -203,51 +203,5 @@ public class ProcessingActivityService extends MongoBaseService {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-/*
-
-    private void buildProcessingActivityWithMetaDataAndUpdate( Long organizationId, ProcessingActivityDTO processingActivityDTO, ProcessingActivity processingActivity) {
-
-        if (Optional.ofNullable(processingActivityDTO.getAccessorParties()).isPresent() && !processingActivityDTO.getAccessorParties().isEmpty()) {
-            List<BigInteger> accessorPartyIds = accessorPartyService.createAccessorPartyForOrganizationOnInheritingFromParentOrganization( organizationId, processingActivityDTO);
-            processingActivity.setAccessorParties(accessorPartyIds);
-        } else if (Optional.ofNullable(processingActivityDTO.getDataSources()).isPresent() && !processingActivityDTO.getDataSources().isEmpty()) {
-            List<BigInteger> dataSourceIds = dataSourceService.createDataSourceForOrganizationOnInheritingFromParentOrganization( organizationId, processingActivityDTO);
-            processingActivity.setDataSources(dataSourceIds);
-        } else if (Optional.ofNullable(processingActivityDTO.getProcessingLegalBasis()).isPresent() && !processingActivityDTO.getProcessingLegalBasis().isEmpty()) {
-            List<BigInteger> processingLegalBasisIds = processingLegalBasisService.createProcessingLegaBasisForOrganizationOnInheritingFromParentOrganization( organizationId, processingActivityDTO);
-            processingActivity.setProcessingLegalBasis(processingLegalBasisIds);
-        } else if (Optional.ofNullable(processingActivityDTO.getProcessingPurposes()).isPresent() && !processingActivityDTO.getProcessingPurposes().isEmpty()) {
-            List<BigInteger> processingPurposeIds = processingPurposeService.createProcessingPurposeForOrganizationOnInheritingFromParentOrganization( organizationId, processingActivityDTO);
-            processingActivity.setProcessingPurposes(processingPurposeIds);
-
-        } else if (Optional.ofNullable(processingActivityDTO.getTransferMethods()).isPresent() && !processingActivityDTO.getTransferMethods().isEmpty()) {
-            List<BigInteger> transferMethodIds = transferMethodService.createTransferMethodForOrganizationOnInheritingFromParentOrganization( organizationId, processingActivityDTO.getTransferMethods());
-            processingActivity.setTransferMethods(transferMethodIds);
-        } else if (Optional.ofNullable(processingActivityDTO.getResponsibilityType()).isPresent()) {
-
-            ResponsibilityTypeDTO responsibilityTypeDTO = processingActivityDTO.getResponsibilityType();
-            if (!responsibilityTypeDTO.getOrganizationId().equals(organizationId)) {
-                ResponsibilityType responsibilityType = new ResponsibilityType(responsibilityTypeDTO.getName());
-                responsibilityType.setOrganizationId(organizationId);
-                responsibilityType = responsibilityTypeMongoRepository.save(getNextSequence(responsibilityType));
-                processingActivity.setResponsibilityType(responsibilityType.getId());
-            } else {
-                processingActivity.setResponsibilityType(responsibilityTypeDTO.getId());
-            }
-        }
-    }
-*/
-
-
 }
 

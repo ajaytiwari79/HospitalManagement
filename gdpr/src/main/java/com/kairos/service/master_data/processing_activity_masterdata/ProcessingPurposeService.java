@@ -171,29 +171,6 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-   /* public List<BigInteger> createProcessingPurposeForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
-
-        List<ProcessingPurposeDTO> processingPurposeDTOs = processingActivityDTO.getProcessingPurposes();
-        List<ProcessingPurpose> newInheritProcessingPurposeFromCountry = new ArrayList<>();
-        List<BigInteger> processingPurposeIds = new ArrayList<>();
-        for (ProcessingPurposeDTO   processingPurposeDTO: processingPurposeDTOs) {
-            if (!processingPurposeDTO.getOrganizationId().equals(organizationId)) {
-                ProcessingPurpose processingPurpose = new ProcessingPurpose(processingPurposeDTO.getName());
-                processingPurpose.setCountryId(countryId);
-                processingPurpose.setOrganizationId(organizationId);
-                newInheritProcessingPurposeFromCountry.add(processingPurpose);
-            } else {
-                processingPurposeIds.add(processingPurposeDTO.getId());
-            }
-        }
-        newInheritProcessingPurposeFromCountry = processingPurposeMongoRepository.saveAll(getNextSequence(newInheritProcessingPurposeFromCountry));
-        newInheritProcessingPurposeFromCountry.forEach(dataSource -> {
-            processingPurposeIds.add(dataSource.getId());
-        });
-        return processingPurposeIds;
-    }
-
-*/
     /**
      *
      * @param countryId

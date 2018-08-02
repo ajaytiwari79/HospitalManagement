@@ -158,29 +158,6 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
 
-  /*  public List<BigInteger> createAccessorPartyForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
-
-
-        List<AccessorPartyDTO> accessorParties = processingActivityDTO.getAccessorParties();
-        List<AccessorParty> newInheritAccessorPartiesFromCountry = new ArrayList<>();
-        List<BigInteger> accessorPartyIds = new ArrayList<>();
-        for (AccessorPartyDTO accessorPartyDTO : accessorParties) {
-            if (!accessorPartyDTO.getOrganizationId().equals(organizationId)) {
-                AccessorParty accessorParty = new AccessorParty(accessorPartyDTO.getName());
-                accessorParty.setCountryId(organizationId);
-                newInheritAccessorPartiesFromCountry.add(accessorParty);
-            } else {
-                accessorPartyIds.add(accessorPartyDTO.getId());
-            }
-        }
-        newInheritAccessorPartiesFromCountry = accessorPartyMongoRepository.saveAll(getNextSequence(newInheritAccessorPartiesFromCountry));
-        newInheritAccessorPartiesFromCountry.forEach(accessorParty -> {
-            accessorPartyIds.add(accessorParty.getId());
-        });
-
-        return accessorPartyIds;
-    }
-*/
     /**
      *
      * @param countryId

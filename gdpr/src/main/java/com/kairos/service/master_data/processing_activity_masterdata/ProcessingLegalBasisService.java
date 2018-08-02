@@ -168,31 +168,6 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
     }
 
-/*
-
-    public List<BigInteger> createProcessingLegaBasisForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, ProcessingActivityDTO processingActivityDTO) {
-
-        List<ProcessingLegalBasisDTO> processingLegalBasisDTOS = processingActivityDTO.getProcessingLegalBasis();
-        List<ProcessingLegalBasis> newInheritProcessingLegalBasisFromCountry = new ArrayList<>();
-        List<BigInteger> legalBasisIds = new ArrayList<>();
-        for (ProcessingLegalBasisDTO processingLegalBasisDTO : processingLegalBasisDTOS) {
-            if (!processingLegalBasisDTO.getOrganizationId().equals(organizationId)) {
-                ProcessingLegalBasis processingLegalBasis = new ProcessingLegalBasis(processingLegalBasisDTO.getName());
-                processingLegalBasis.setCountryId(countryId);
-                processingLegalBasis.setOrganizationId(organizationId);
-                newInheritProcessingLegalBasisFromCountry.add(processingLegalBasis);
-            } else {
-                legalBasisIds.add(processingLegalBasisDTO.getId());
-            }
-        }
-        newInheritProcessingLegalBasisFromCountry = legalBasisMongoRepository.saveAll(getNextSequence(newInheritProcessingLegalBasisFromCountry));
-        newInheritProcessingLegalBasisFromCountry.forEach(dataSource -> {
-            legalBasisIds.add(dataSource.getId());
-        });
-        return legalBasisIds;
-    }
-*/
-
 
     public List<ProcessingLegalBasisResponseDTO> getAllNotInheritedLegalBasisFromParentOrgAndUnitProcessingLegalBasis(Long countryId, Long organizationId, Long unitId) {
 
