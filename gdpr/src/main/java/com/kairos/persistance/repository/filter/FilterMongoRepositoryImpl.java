@@ -8,7 +8,7 @@ import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
-import com.kairos.response.dto.filter.FilterQueryResult;
+import com.kairos.response.dto.filter.FilterCategoryResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -98,7 +98,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     }
 
     @Override
-    public AggregationResults<FilterQueryResult> getFilterAggregationResult(Aggregation aggregation, FilterGroup filterGroup, String moduleId) {
+    public AggregationResults<FilterCategoryResult> getFilterAggregationResult(Aggregation aggregation, FilterGroup filterGroup, String moduleId) {
 
         List<ModuleIdDTO> moduleIdDto = filterGroup.getAccessModule();
         String domainName = null;
@@ -113,11 +113,11 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
         }
         switch (domainName) {
             case CLAUSE_MODULE_NAME:
-                return mongoTemplate.aggregate(aggregation, Clause.class, FilterQueryResult.class);
+                return mongoTemplate.aggregate(aggregation, Clause.class, FilterCategoryResult.class);
             case ASSET_MODULE_NAME:
-                return mongoTemplate.aggregate(aggregation, MasterAsset.class, FilterQueryResult.class);
+                return mongoTemplate.aggregate(aggregation, MasterAsset.class, FilterCategoryResult.class);
             case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
-                return mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, FilterQueryResult.class);
+                return mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, FilterCategoryResult.class);
             default:
                 throw new DataNotFoundByIdException("data not found by moduleId" + moduleId);
 

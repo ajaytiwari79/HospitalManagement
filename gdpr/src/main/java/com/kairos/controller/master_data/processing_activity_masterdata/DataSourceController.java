@@ -39,14 +39,11 @@ public class DataSourceController {
 
     @ApiOperation("add dataSource")
     @PostMapping("/data_source/add")
-    public ResponseEntity<Object> createDataSource(@PathVariable Long countryId,@PathVariable Long organizationId,@Valid @RequestBody ValidateListOfRequestBody<DataSource> dataSource) {
+    public ResponseEntity<Object> createDataSource(@PathVariable Long countryId,@Valid @RequestBody ValidateListOfRequestBody<DataSource> dataSource) {
        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        } else if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId,organizationId,dataSource.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId,dataSource.getRequestBody()));
 
     }
 
@@ -106,6 +103,12 @@ public class DataSourceController {
     }
 
 
+
+    @ApiOperation("get All Data source of Current organization and Parent Oeg which were not inherited by Organization")
+    @GetMapping("/data_source")
+    public ResponseEntity<Object> getAllDataSourceOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getAllNotInheritedDataSourceFromParentOrgAndUnitDataSource(countryId,parentOrgId,organizationId));
+    }
 
 
 }

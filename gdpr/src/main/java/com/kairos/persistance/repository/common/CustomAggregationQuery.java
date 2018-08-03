@@ -214,10 +214,40 @@ public class CustomAggregationQuery {
     }
 
 
+    public static String metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata()
+    {
+        return "{ $group: {" +
+                "    '_id': { 'name': '$name' },  " +
+                "    'rootObject': { '$addToSet': '$$ROOT' }," +
+                "  } }";
+    }
+
+    public static String metaDataProjectionForRemovingDuplicateInheritedMetaData(Long currentOrganizationId)
+    {
+        return "{ '$project': {" +
+                "          'data':" +
+                "              {" +
+                "           '$cond': { 'if': { $gt: [ { '$size': '$rootObject' }, 1 ] },'then':{'$filter': {" +
+                "           'input': '$rootObject'," +
+                "           'as': 'rootObject'," +
+                "           'cond': { $eq: [ '$$rootObject.organizationId', "+currentOrganizationId+" ] }" +
+                "            }} ,else:'$rootObject' } }}  }";
+    }
 
 
+    public static String metaDataProjectionforAddingFinalDataObject()
+    {
+        return "{ '$project': {" +
+                "          'data':{'$arrayElemAt':['$data',0]}," +
+                "          '_id':0" +
+                "   }}";
+    }
 
 
+    public static String metaDataReplaceRoot()
+    {
+        return "{ '$replaceRoot' : { 'newRoot' : '$data' } }";
+    }
 
 
 

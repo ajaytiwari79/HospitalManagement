@@ -60,7 +60,7 @@ public class MasterQuestionService extends MongoBaseService {
             }
         }
         try {
-            masterQuestions = questionMongoRepository.saveAll(sequenceGenerator(masterQuestions));
+            masterQuestions = questionMongoRepository.saveAll(getNextSequence(masterQuestions));
             masterQuestions.forEach(masterQuestion -> questionSectionIds.add(masterQuestion.getId()));
         } catch (MongoClientException e) {
             logger.info(e.getMessage());
@@ -106,7 +106,7 @@ public class MasterQuestionService extends MongoBaseService {
         }
         questionsIdList.remove(id);
         questionnaireSection.setQuestions(questionsIdList);
-        masterQuestionnaireSectionRepository.save(sequenceGenerator(questionnaireSection));
+        masterQuestionnaireSectionRepository.save(getNextSequence(questionnaireSection));
         delete(exist);
         return true;
 
@@ -199,7 +199,7 @@ public class MasterQuestionService extends MongoBaseService {
             }
         }
         try {
-            updatedQuestionsList = questionMongoRepository.saveAll(sequenceGenerator(updatedQuestionsList));
+            updatedQuestionsList = questionMongoRepository.saveAll(getNextSequence(updatedQuestionsList));
         } catch (MongoClientException e) {
             logger.info(e.getMessage());
             throw new MongoClientException(e.getMessage());

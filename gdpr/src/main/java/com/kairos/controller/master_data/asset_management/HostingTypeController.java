@@ -106,9 +106,11 @@ public class HostingTypeController {
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(countryId, id, hostingtype));
 
     }
+
+
+
 
 }

@@ -6,16 +6,19 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.ResponsibilityTypeMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
+import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
@@ -32,16 +35,15 @@ public class ResponsibilityTypeService extends MongoBaseService {
     private ComparisonUtils comparisonUtils;
 
 
-
     /**
-     * @description this method create new ResponsibilityType if ResponsibilityType not exist with same name ,
-     * and if exist then simply add  ResponsibilityType to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing ResponsibilityType using collation ,used for case insensitive result
+
      * @param countryId
      * @param 
      * @param responsibilityTypes
      * @return return map which contain list of new ResponsibilityType and list of existing ResponsibilityType if ResponsibilityType already exist
-     *
+     * @description this method create new ResponsibilityType if ResponsibilityType not exist with same name ,
+     * and if exist then simply add  ResponsibilityType to existing list and return list ;
+     * findByNamesList()  return list of existing ResponsibilityType using collation ,used for case insensitive result
      */
     public Map<String, List<ResponsibilityType>> createResponsibilityType(Long countryId,List<ResponsibilityType> responsibilityTypes) {
 
@@ -62,13 +64,13 @@ public class ResponsibilityTypeService extends MongoBaseService {
             if (!responsibilityTypeNames.isEmpty()) {
                 for (String name : responsibilityTypeNames) {
 
-                    ResponsibilityType newResponsibilityType = new ResponsibilityType();
+                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name);
                     newResponsibilityType.setCountryId(countryId);
                     newResponsibilityTypes.add(newResponsibilityType);
 
                 }
 
-                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(sequenceGenerator(newResponsibilityTypes));
+                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(getNextSequence(newResponsibilityTypes));
 
             }
             result.put(EXISTING_DATA_LIST, existing);
@@ -81,7 +83,6 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
     /**
-     *
      * @param countryId
      * @param 
      * @return list of ResponsibilityType
@@ -91,11 +92,9 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
     /**
-     * @throws DataNotFoundByIdException throw exception if ResponsibilityType not found for given id
-     * @param countryId
-     * @param 
      * @param id id of ResponsibilityType
      * @return ResponsibilityType object fetch by given id
+     * @throws DataNotFoundByIdException throw exception if ResponsibilityType not found for given id
      */
     public ResponsibilityType getResponsibilityType(Long countryId,BigInteger id) {
 
@@ -109,26 +108,27 @@ public class ResponsibilityTypeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteResponsibilityType(Long countryId,BigInteger id) {
 
+    public Boolean deleteResponsibilityType(Long countryId,BigInteger id) {
         ResponsibilityType exist = responsibilityTypeMongoRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
             delete(exist);
             return true;
-
         }
     }
 
+
     /***
-     * @throws  DuplicateDataException throw exception if ResponsibilityType data not exist for given id
+     * @throws DuplicateDataException throw exception if ResponsibilityType data not exist for given id
      * @param countryId
      * @param 
      * @param id id of ResponsibilityType
      * @param responsibilityType
      * @return ResponsibilityType updated object
      */
+
     public ResponsibilityType updateResponsibilityType(Long countryId,BigInteger id, ResponsibilityType responsibilityType) {
 
 
@@ -137,21 +137,20 @@ public class ResponsibilityTypeService extends MongoBaseService {
             if (id.equals(exist.getId())) {
                 return exist;
             }
-            throw new DuplicateDataException("data  exist for  "+responsibilityType.getName());
+            throw new DuplicateDataException("data  exist for  " + responsibilityType.getName());
         } else {
-            exist=responsibilityTypeMongoRepository.findByid(id);
+            exist = responsibilityTypeMongoRepository.findByid(id);
             exist.setName(responsibilityType.getName());
-            return responsibilityTypeMongoRepository.save(sequenceGenerator(exist));
+            return responsibilityTypeMongoRepository.save(getNextSequence(exist));
 
         }
     }
 
     /**
-     * @throws DataNotExists throw exception if ResponsibilityType not exist for given name
      * @param countryId
-     * @param 
      * @param name name of ResponsibilityType
      * @return ResponsibilityType object fetch on basis of  name
+     * @throws DataNotExists throw exception if ResponsibilityType not exist for given name
      */
     public ResponsibilityType getResponsibilityTypeByName(Long countryId,String name) {
 
@@ -165,6 +164,18 @@ public class ResponsibilityTypeService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+    /**
+     * @param countryId
+     * @param parentOrganizationId -id of parent organization
+     * @param unitId               - id of cuurent organization
+     * @return method return list of processingPurposes (organzation processing purpose and processing purposes which were not inherited by organization from parent till now )
+     */
+    public List<ResponsibilityTypeResponseDTO> getAllNotInheritedResponsibilityTypesFromParentOrgAndUnitResponsibilityType(Long countryId, Long parentOrganizationId, Long unitId) {
+
+        return responsibilityTypeMongoRepository.getAllNotInheritedResponsibilityTypesFromParentOrgAndUnitResponsibilityType(countryId, parentOrganizationId, unitId);
     }
 
 

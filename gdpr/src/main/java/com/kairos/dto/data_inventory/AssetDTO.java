@@ -13,12 +13,14 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssetDTO {
 
+    private BigInteger id;
 
     @NotNullOrEmpty(message = "name can't be empty ")
     @Pattern(message = "Number and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
@@ -56,9 +58,7 @@ public class AssetDTO {
     @NotNull(message = "Asset  Types can't be empty")
     private BigInteger assetType;
 
-    @NotNull(message = "Asset Sub Types can't be empty")
-    @NotEmpty(message = "Asset Sub Types can't be empty")
-    private List<BigInteger> assetSubTypes;
+    private List<BigInteger> assetSubTypes=new ArrayList<>();
 
     private Integer dataRetentionPeriod;
 
@@ -68,7 +68,15 @@ public class AssetDTO {
 
     private RiskSeverity risk;
 
-    private Boolean isActive;
+    private Boolean active;
+
+   public Boolean getActive() { return active; }
+
+   public void setActive(Boolean active) { this.active = active; }
+
+   public BigInteger getId() { return id; }
+
+    public void setId(BigInteger id) { this.id = id; }
 
     public String getName() { return name; }
 
@@ -142,9 +150,6 @@ public class AssetDTO {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
- public Boolean getActive() { return isActive; }
-
- public void setActive(Boolean active) { isActive = active; }
 
  public AssetDTO() { }
 }

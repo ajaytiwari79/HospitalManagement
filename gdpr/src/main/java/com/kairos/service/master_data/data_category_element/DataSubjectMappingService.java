@@ -50,7 +50,7 @@ public class DataSubjectMappingService extends MongoBaseService {
                 , dataSubjectMappingDto.getDataCategories());
         dataSubjectMapping.setCountryId(countryId);
         dataSubjectMapping.setOrganizationId(organizationId);
-        return dataSubjectMappingRepository.save(sequenceGenerator(dataSubjectMapping));
+        return dataSubjectMappingRepository.save(getNextSequence(dataSubjectMapping));
 
 
     }
@@ -107,7 +107,7 @@ public class DataSubjectMappingService extends MongoBaseService {
         existing.setOrganizationTypes(dataSubjectMappingDto.getOrganizationTypes());
         existing.setOrganizationSubTypes(dataSubjectMappingDto.getOrganizationSubTypes());
         existing.setDataCategories(dataSubjectMappingDto.getDataCategories());
-        return dataSubjectMappingRepository.save(sequenceGenerator(existing));
+        return dataSubjectMappingRepository.save(getNextSequence(existing));
     }
 
 

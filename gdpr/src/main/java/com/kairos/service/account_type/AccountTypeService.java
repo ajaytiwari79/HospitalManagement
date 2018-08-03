@@ -37,7 +37,7 @@ public class AccountTypeService extends MongoBaseService {
         AccountType newAccount = new AccountType();
         newAccount.setName(accountType.getName());
         newAccount.setCountryId(countryId);
-        return accountTypeRepository.save(sequenceGenerator(newAccount));
+        return accountTypeRepository.save(getNextSequence(newAccount));
 
     }
 
@@ -88,7 +88,7 @@ public class AccountTypeService extends MongoBaseService {
         }
         exists = accountTypeRepository.findByIdAndNonDeleted(countryId, id);
         exists.setName(accountType.getName());
-        return accountTypeRepository.save(sequenceGenerator(exists));
+        return accountTypeRepository.save(getNextSequence(exists));
 
     }
 

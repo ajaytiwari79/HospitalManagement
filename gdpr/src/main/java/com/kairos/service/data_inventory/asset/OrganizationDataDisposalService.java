@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
-import com.kairos.persistance.repository.master_data.asset_management.DataDisposalMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
@@ -70,7 +70,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
 
                 }
 
-                newDataDisposals =dataDisposalMongoRepository.saveAll(sequenceGenerator(newDataDisposals));
+                newDataDisposals =dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newDataDisposals);
@@ -141,7 +141,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
         } else {
             exist = dataDisposalMongoRepository.findByid(id);
             exist.setName(dataDisposal.getName());
-            return dataDisposalMongoRepository.save(sequenceGenerator(exist));
+            return dataDisposalMongoRepository.save(getNextSequence(exist));
 
         }
     }
