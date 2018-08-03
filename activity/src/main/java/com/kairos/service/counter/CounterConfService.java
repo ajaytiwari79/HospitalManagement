@@ -1,5 +1,6 @@
 package com.kairos.service.counter;
 
+import com.kairos.ApplicableFor;
 import com.kairos.activity.counter.FilterCriteria;
 import com.kairos.activity.counter.KPICategoryUpdationDTO;
 import com.kairos.enums.CounterType;
@@ -108,7 +109,7 @@ public class CounterConfService extends MongoBaseService {
         List<CounterType> availableTypes = availableCounters.stream().map(counter -> counter.getType()).collect(Collectors.toList());
         List<CounterType> addableCounters = Arrays.stream(CounterType.values()).filter(counterType -> !availableTypes.contains(counterType)).collect(Collectors.toList());
         addableCounters.forEach(counterType -> {
-            kpis.add(new KPI(counterType.getName(), null, null, counterType, false, null));
+            kpis.add(new KPI(counterType.getName(), null, null, counterType, false, null,Collections.singleton(ApplicableFor.OPEN_SHIFT)));
         });
         save(kpis);
     }

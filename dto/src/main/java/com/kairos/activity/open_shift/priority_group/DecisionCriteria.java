@@ -1,71 +1,20 @@
 package com.kairos.activity.open_shift.priority_group;
 
-public class DecisionCriteria {
-    private boolean lowestTotalCost;
-    private boolean lowestTimeBank;
-    private boolean lowestPlannedHour;  // Per week
-    private boolean moreRestingTime;   //Need to know in detail
-    private boolean highestPoints;
-    private boolean mostExperienceInUnit;
-    private boolean mostExperienceInActivity;
+import java.math.BigInteger;
+import java.util.Set;
 
+public class DecisionCriteria {
+
+    private Set<BigInteger> counterIds;
     public DecisionCriteria() {
         //Default Constructor
     }
 
-    public boolean isLowestTotalCost() {
-        return lowestTotalCost;
+    public Set<BigInteger> getCounterIds() {
+        return counterIds;
     }
 
-    public void setLowestTotalCost(boolean lowestTotalCost) {
-        this.lowestTotalCost = lowestTotalCost;
-    }
-
-    public boolean isLowestTimeBank() {
-        return lowestTimeBank;
-    }
-
-    public void setLowestTimeBank(boolean lowestTimeBank) {
-        this.lowestTimeBank = lowestTimeBank;
-    }
-
-    public boolean isLowestPlannedHour() {
-        return lowestPlannedHour;
-    }
-
-    public void setLowestPlannedHour(boolean lowestPlannedHour) {
-        this.lowestPlannedHour = lowestPlannedHour;
-    }
-
-    public boolean isMoreRestingTime() {
-        return moreRestingTime;
-    }
-
-    public void setMoreRestingTime(boolean moreRestingTime) {
-        this.moreRestingTime = moreRestingTime;
-    }
-
-    public boolean isHighestPoints() {
-        return highestPoints;
-    }
-
-    public void setHighestPoints(boolean highestPoints) {
-        this.highestPoints = highestPoints;
-    }
-
-    public boolean isMostExperienceInUnit() {
-        return mostExperienceInUnit;
-    }
-
-    public void setMostExperienceInUnit(boolean mostExperienceInUnit) {
-        this.mostExperienceInUnit = mostExperienceInUnit;
-    }
-
-    public boolean isMostExperienceInActivity() {
-        return mostExperienceInActivity;
-    }
-
-    public void setMostExperienceInActivity(boolean mostExperienceInActivity) {
-        this.mostExperienceInActivity = mostExperienceInActivity;
+    public void setCounterIds(Set<BigInteger> counterIds) {
+        this.counterIds = counterIds;
     }
 }

@@ -1,12 +1,11 @@
 package com.kairos.persistence.repository.counter;
 
-import com.kairos.activity.counter.CounterOrderDTO;
-import com.kairos.activity.counter.ModuleCounterGroupingDTO;
-import com.kairos.activity.counter.RefCounterDefDTO;
-import com.kairos.activity.counter.RoleCounterDTO;
+import com.kairos.ApplicableFor;
+import com.kairos.activity.counter.*;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
+import com.kairos.util.ObjectMapperUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -20,6 +19,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -232,5 +232,11 @@ public class CounterRepository {
     public void removeOrgTypeKPIEntry(OrgTypeKPIEntry entry){
         Query query = new Query(Criteria.where("orgTypeId").is(entry.getOrgTypeId()).and("kpiId").is(entry.getKpiId()));
         mongoTemplate.remove(query, OrgTypeKPIEntry.class);
+    }
+
+    public List<CounterDTO> getAllCounterApplicableFor(ApplicableFor applicableFor){
+        Query query = new Query(Criteria.where("applicableFor").in(applicableFor).and("deleted").is(false));
+        query.fields().include("id").include("title");
+        return ObjectMapperUtils.copyProperties(mongoTemplate.find(query,Counter.class),CounterDTO.class);
     }
 }
