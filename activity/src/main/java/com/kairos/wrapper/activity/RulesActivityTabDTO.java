@@ -247,8 +247,4 @@ public class RulesActivityTabDTO {
         this.maximumEndTime = maximumEndTime;
     }
 
-    @AssertTrue(message = "Latest Start time can't before earliest Start time")
-    public boolean isValid() {
-        return latestStartTime.isAfter(earliestStartTime) && earliestStartTime.plusMinutes(longestTime).isBefore(maximumEndTime);
-    }
 }
