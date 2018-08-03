@@ -14,7 +14,6 @@ import com.kairos.activity.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
-import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
@@ -470,7 +469,7 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
-        verifyActivityTimeRules(rulesActivityDTO.getEarliestStartTime(),rulesActivityDTO.getLatestStartTime(),rulesActivityDTO.getMaximumEndTime(),rulesActivityDTO.getShortestTime(),rulesActivityDTO.getLongestTime());
+        validateActivityTimeRules(rulesActivityDTO.getEarliestStartTime(),rulesActivityDTO.getLatestStartTime(),rulesActivityDTO.getMaximumEndTime(),rulesActivityDTO.getShortestTime(),rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = rulesActivityDTO.buildRulesActivityTab();
         Activity activity = activityMongoRepository.findOne(rulesActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -1125,7 +1124,7 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    public void verifyActivityTimeRules(LocalTime earliestStartTime,LocalTime latestStartTime,LocalTime maximumEndTime,int shortestTime,int longestTime){
+    public void validateActivityTimeRules(LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, int shortestTime, int longestTime){
         if(shortestTime>longestTime){
             exceptionService.actionNotPermittedException("shortest.time.greater.longest");
         }

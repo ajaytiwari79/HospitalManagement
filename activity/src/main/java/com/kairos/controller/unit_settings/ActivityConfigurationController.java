@@ -80,7 +80,7 @@ public class ActivityConfigurationController {
     @ApiOperation("Update presence Activity Configuration ")
     @PutMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/presence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updatePresenceActivityConfigurationAtCountry(@PathVariable Long countryId, @RequestBody PresencePlannedTime presencePlannedTime) {
+    public ResponseEntity<Map<String, Object>> updatePresenceActivityConfigurationInCountry(@PathVariable Long countryId, @RequestBody PresencePlannedTime presencePlannedTime) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updatePresenceActivityConfigurationAtCountry(countryId, presencePlannedTime));
     }
 
