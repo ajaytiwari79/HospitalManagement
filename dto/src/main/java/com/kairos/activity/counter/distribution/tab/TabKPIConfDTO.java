@@ -4,7 +4,6 @@ import java.math.BigInteger;
 
 public class TabKPIConfDTO {
     private String tabId;
-    private BigInteger kpiAssignmentId;
     private BigInteger kpiId;
 
     public String getTabId() {
@@ -13,14 +12,6 @@ public class TabKPIConfDTO {
 
     public void setTabId(String tabId) {
         this.tabId = tabId;
-    }
-
-    public BigInteger getKpiAssignmentId() {
-        return kpiAssignmentId;
-    }
-
-    public void setKpiAssignmentId(BigInteger kpiAssignmentId) {
-        this.kpiAssignmentId = kpiAssignmentId;
     }
 
     public BigInteger getKpiId() {
