@@ -13,8 +13,8 @@ import java.math.BigInteger;
 public interface AssetMongoRepository extends MongoRepository<Asset,BigInteger>,CustomAssetRepository {
 
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    Asset findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
+    Asset findByIdAndNonDeleted(Long organizationId,BigInteger id);
 
 
     Asset findByid(BigInteger id);

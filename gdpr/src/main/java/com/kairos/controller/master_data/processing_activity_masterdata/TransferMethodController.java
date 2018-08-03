@@ -96,6 +96,16 @@ public class TransferMethodController {
 
     }
 
+
+
+    @ApiOperation("get All transfer method of Current organization and Parent Oeg which were not inherited by Organization")
+    @GetMapping("/transfer_method")
+    public ResponseEntity<Object> getAllTransferMethodOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getAllNotInheritedTransferMethodFromParentOrgAndUnitTransferMethod(countryId,parentOrgId,parentOrgId));
+    }
+
+
+
     @ApiOperation("update transfer Method by id")
     @PutMapping("/transfer_method/update/{id}")
     public ResponseEntity<Object> updateTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody TransferMethod transferMethod) {

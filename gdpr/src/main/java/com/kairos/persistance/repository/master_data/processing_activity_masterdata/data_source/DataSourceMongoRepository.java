@@ -1,4 +1,4 @@
-package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
+package com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source;
 
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface DataSourceMongoRepository extends MongoRepository<DataSource,BigInteger> {
+public interface DataSourceMongoRepository extends MongoRepository<DataSource,BigInteger>,CustomDataSourceRepository {
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
     DataSource findByIdAndNonDeleted(Long countryId,BigInteger id);
@@ -27,8 +27,9 @@ public interface DataSourceMongoRepository extends MongoRepository<DataSource,Bi
 
     DataSource findByid(BigInteger id);
 
+
     @Query("{countryId:?0,deleted:false}")
-    List<DataSource> findAllDataSources(Long countryId);
+    List<DataSourceResponseDTO> findAllDataSources(Long countryId);
 
     @Query("{countryId:?0,name:{$in:?1},deleted:false}")
     List<DataSource>  findByCountryAndNameList(Long countryId,Set<String> name);

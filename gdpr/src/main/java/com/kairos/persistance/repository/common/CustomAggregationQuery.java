@@ -214,9 +214,58 @@ public class CustomAggregationQuery {
     }
 
 
+    public static String metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata()
+    {
+        return "{ $group: {" +
+                "    '_id': { 'name': '$name' },  " +
+                "    'rootObject': { '$addToSet': '$$ROOT' }," +
+                "  } }";
+    }
+
+    public static String metaDataProjectionForRemovingDuplicateInheritedMetaData(Long currentOrganizationId)
+    {
+        return "{ '$project': {" +
+                "          'data':" +
+                "              {" +
+                "           '$cond': { 'if': { $gt: [ { '$size': '$rootObject' }, 1 ] },'then':{'$filter': {" +
+                "           'input': '$rootObject'," +
+                "           'as': 'rootObject'," +
+                "           'cond': { $eq: [ '$$rootObject.organizationId', "+currentOrganizationId+" ] }" +
+                "            }} ,else:'$rootObject' } }}  }";
+    }
+
+
+    public static String metaDataProjectionforAddingFinalDataObject()
+    {
+        return "{ '$project': {" +
+                "          'data':{'$arrayElemAt':['$data',0]}," +
+                "          '_id':0" +
+                "   }}";
+    }
+
+
+    public static String metaDataReplaceRoot()
+    {
+        return "{ '$replaceRoot' : { 'newRoot' : '$data' } }";
+    }
 
 
 
+    public static String projectionForProcessingActivity()
+    {
+
+        return "{ '$project':{  " +
+                "           'responsibilityType':{ '$arrayElemAt': [ '$responsibilityType', 0 ] }," +
+                "           'name':1," +
+                "           'description':1," +
+                "           'dataSources':1," +
+                "           'processingPurposes':1," +
+                "           'transferMethods':1," +
+                "           'processingLegalBasis':1," +
+                "               'accessorParties':1," +
+                "               '_id':1" +
+                "           }";
+    }
 
 
 

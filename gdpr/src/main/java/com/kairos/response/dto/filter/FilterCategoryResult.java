@@ -8,7 +8,7 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class FilterQueryResult {
+public class FilterCategoryResult {
 
     private List<FilterAttributes> organizationTypes = new ArrayList<>();
     private List<FilterAttributes> organizationSubTypes = new ArrayList<>();

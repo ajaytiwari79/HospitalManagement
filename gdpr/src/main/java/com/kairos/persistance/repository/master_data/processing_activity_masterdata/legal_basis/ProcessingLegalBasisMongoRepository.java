@@ -1,4 +1,4 @@
-package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
+package com.kairos.persistance.repository.master_data.processing_activity_masterdata.legal_basis;
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @JaversSpringDataAuditable
-public interface ProcessingLegalBasisMongoRepository extends MongoRepository<ProcessingLegalBasis, BigInteger> {
+public interface ProcessingLegalBasisMongoRepository extends MongoRepository<ProcessingLegalBasis, BigInteger>,CustomProcessingLegalBasisRepository {
 
 
     @Query("{'countryId':?0,_id:?1,deleted:false}")
@@ -35,8 +35,11 @@ public interface ProcessingLegalBasisMongoRepository extends MongoRepository<Pro
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     ProcessingLegalBasis findByOrganizationIdAndId(Long organizationId,BigInteger id);
 
+
     @Query("{organizationId:?0,name:?1,deleted:false}")
     ProcessingLegalBasis findByNameAndOrganizationId(Long organizationId,String name);
+
+
 
 
 

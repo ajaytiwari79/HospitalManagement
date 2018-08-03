@@ -58,7 +58,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         masterProcessingActivity.setCountryId(countryId);
         masterProcessingActivity.setOrganizationId(organizationId);
         try {
-            masterProcessingActivity = masterProcessingActivityRepository.save(sequenceGenerator(masterProcessingActivity));
+            masterProcessingActivity = masterProcessingActivityRepository.save(getNextSequence(masterProcessingActivity));
         } catch (MongoClientException e) {
             masterProcessingActivityRepository.deleteAll((List<MasterProcessingActivity>) subProcessingActivity.get(PROCESSING_ACTIVITIES));
             LOGGER.info(e.getMessage());
@@ -95,7 +95,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             subProcessingActivityList.add(subProcessingActivity);
         }
 
-        subProcessingActivityList = masterProcessingActivityRepository.saveAll(sequenceGenerator(subProcessingActivityList));
+        subProcessingActivityList = masterProcessingActivityRepository.saveAll(getNextSequence(subProcessingActivityList));
         List<BigInteger> subProcessingActivityIds = new ArrayList<>();
         subProcessingActivityList.forEach(o -> subProcessingActivityIds.add(o.getId()));
         Map<String, Object> result = new HashMap<>();
@@ -143,7 +143,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             exists.setDescription(masterProcessingActivityDto.getDescription());
             exists.setName(masterProcessingActivityDto.getName());
             try {
-                exists = masterProcessingActivityRepository.save(sequenceGenerator(exists));
+                exists = masterProcessingActivityRepository.save(getNextSequence(exists));
 
             } catch (MongoClientException e) {
                 LOGGER.info(e.getMessage());
@@ -229,7 +229,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         });
         Map<String, Object> result = new HashMap<>();
         try {
-            subProcessingActivityList = masterProcessingActivityRepository.saveAll(sequenceGenerator(subProcessingActivityList));
+            subProcessingActivityList = masterProcessingActivityRepository.saveAll(getNextSequence(subProcessingActivityList));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());

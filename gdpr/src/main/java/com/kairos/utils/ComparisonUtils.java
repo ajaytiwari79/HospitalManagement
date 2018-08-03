@@ -12,9 +12,6 @@ import java.util.*;
 public class ComparisonUtils {
 
 
-    @Inject
-    private MongoTemplate mongoTemplate;
-
     public <T> Set<String> getNameListForMetadata(List<T> existingObject, Set<String> namesList) {
 
         if (existingObject.size() == 0) {
