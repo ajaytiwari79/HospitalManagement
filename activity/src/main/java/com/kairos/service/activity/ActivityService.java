@@ -1143,15 +1143,4 @@ public class ActivityService extends MongoBaseService {
 
 
     }
-
-
-
-
-
-
-
-
-
-
-
 }
