@@ -145,7 +145,7 @@ public class CounterManagementService extends MongoBaseService {
 //        if (accessGroupKPIConf.getKpiIds().size() != kpiAssignments.size()) {
 //            exceptionService.actionNotPermittedException("KPi id not valid");
 //        }
-        List<AccessGroupMappingDTO> AccessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(accessGroupKPIConf.getAccessGroupIds(),accessGroupKPIConf.getKpiIds(),level,countryId);
+        List<AccessGroupMappingDTO> AccessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(accessGroupKPIConf.getAccessGroupIds(),accessGroupKPIConf.getKpiIds(),level,refId);
         Map<Long, Map<BigInteger, BigInteger>> accessGroupKPIMap = new HashMap<>();
         accessGroupKPIConf.getAccessGroupIds().forEach(orgTypeId -> {
             accessGroupKPIMap.put(orgTypeId, new HashMap<BigInteger, BigInteger>());
@@ -185,10 +185,10 @@ public class CounterManagementService extends MongoBaseService {
     }
 
     public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf, Long countryId) {
-      List<ApplicableKPI> applicableKPIS=counterRepository.getApplicableKPIByKPIId(orgTypeKPIConf.getKpiIds());
-        if (orgTypeKPIConf.getKpiIds().size() != applicableKPIS.size()) {
-            exceptionService.actionNotPermittedException("KPi id not valid");
-        }
+//      List<ApplicableKPI> applicableKPIS=counterRepository.getApplicableKPIByKPIId(orgTypeKPIConf.getKpiIds());
+//        if (orgTypeKPIConf.getKpiIds().size() != applicableKPIS.size()) {
+//            exceptionService.actionNotPermittedException("KPi id not valid");
+//        }
         List<OrgTypeKPIEntry> entriesToSave = new ArrayList<>();
         Map<Long, Map<BigInteger, BigInteger>> orgTypeKPIsMap = new HashMap<>();
         orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId->{

@@ -183,9 +183,9 @@ public class CounterRepository {
         String refQueryField = getRefQueryField(level);
         Query query=null;
         if(kpiIds.isEmpty()) {
-            Criteria.where("tabId").in(tabIds).and(refQueryField).is(refId);
+            query=new Query(Criteria.where("tabId").in(tabIds).and(refQueryField).is(refId));
         }else{
-            Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and(refQueryField).is(refId);
+           query=new Query(Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and(refQueryField).is(refId));
         }
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,TabKPIConf.class),TabKPIMappingDTO.class);
     }
@@ -269,9 +269,9 @@ public class CounterRepository {
         String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
         Query query=null;
         if(kpiIds.isEmpty()){
-            Criteria.where("accessGroupId").in(accessGroupIds).and(queryField).is(refId);
+            query=new Query(Criteria.where("accessGroupId").in(accessGroupIds).and(queryField).is(refId));
         }else{
-            Criteria.where("accessGroupId").in(accessGroupIds).and("kpiId").in(kpiIds).and(queryField).is(refId);
+            query=new Query(Criteria.where("accessGroupId").in(accessGroupIds).and("kpiId").in(kpiIds).and(queryField).is(refId));
         }
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,AccessGroupKPIEntry.class),AccessGroupMappingDTO.class);
     }
