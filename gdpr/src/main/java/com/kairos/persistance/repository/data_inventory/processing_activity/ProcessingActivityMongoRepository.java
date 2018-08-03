@@ -9,15 +9,21 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
 public interface ProcessingActivityMongoRepository extends MongoRepository<ProcessingActivity,BigInteger> ,CustomProcessingActivityRepository {
 
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    ProcessingActivity findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
+    ProcessingActivity findByIdAndNonDeleted(Long organizationId,BigInteger id);
 
     ProcessingActivity findByid(BigInteger id);
+
+
+
+    @Query("{organizationId:?0,_id:{$in:?1},deleted:false,isSubProcess:false}")
+    List<ProcessingActivity> findSubProcessingActvitiesByIds(Long organizationId, List<BigInteger> id);
 
 }

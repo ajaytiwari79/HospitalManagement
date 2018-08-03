@@ -314,7 +314,7 @@ public class CostTimeAgreementService extends UserBaseService {
             throws InterruptedException, ExecutionException {
 
         /*Callable<List<TimeType>> timeTypesTask = () -> {
-            Iterable<TimeType> timeTypes = timeTypeGraphRepository.findAllById(ctaRuleTemplateDTO.getTimeTypes(), 0);
+            Iterable<TimeType> timeTypes = timeTypeGraphRepository.findAllByIds(ctaRuleTemplateDTO.getTimeTypes(), 0);
             return StreamSupport.stream(timeTypes.spliterator(), true).collect(Collectors.toList());
         };
 
@@ -328,7 +328,7 @@ public class CostTimeAgreementService extends UserBaseService {
         Future<List<EmploymentType>> employmentTypesFuture = asynchronousService.executeAsynchronously(employmentTypesTask);
 
         /*Callable<List<AccessGroup>> accessGroupsTask = () -> {
-            Iterable<AccessGroup> accessGroups = accessGroupRepository.findAllById(ctaRuleTemplateDTO.getCalculateValueIfPlanned(), 0);
+            Iterable<AccessGroup> accessGroups = accessGroupRepository.findAllByIds(ctaRuleTemplateDTO.getCalculateValueIfPlanned(), 0);
             return StreamSupport.stream(accessGroups.spliterator(), true).collect(Collectors.toList());
 
         };

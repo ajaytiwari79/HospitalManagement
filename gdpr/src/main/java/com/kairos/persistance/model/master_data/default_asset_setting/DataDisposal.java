@@ -24,11 +24,17 @@ public class DataDisposal extends MongoBaseEntity {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    public DataDisposal( String name) {
+        this.name = name;
+    }
+
+    public DataDisposal() {
+    }
 }

@@ -2,6 +2,12 @@ package com.kairos.service.javers;
 
 
 import com.kairos.persistance.repository.master_data.asset_management.*;
+import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;

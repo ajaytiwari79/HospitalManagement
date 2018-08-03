@@ -6,7 +6,8 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
-import com.kairos.persistance.repository.master_data.asset_management.HostingProviderMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
+import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
@@ -34,14 +35,13 @@ public class HostingProviderService extends MongoBaseService {
     /**
      * @description this method create new HostingProvider if HostingProvider not exist with same name ,
      * and if exist then simply add  HostingProvider to existing list and return list ;
-     * findByNamesList()  return list of existing HostingProvider using collation ,used for case insensitive result
+     * findByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
      * @param countryId
-     * @param organizationId
      * @param hostingProviders
      * @return return map which contain list of new HostingProvider and list of existing HostingProvider if HostingProvider already exist
      *
      */
-    public Map<String, List<HostingProvider>> createHostingProviders(Long countryId,Long organizationId, List<HostingProvider> hostingProviders) {
+    public Map<String, List<HostingProvider>> createHostingProviders(Long countryId, List<HostingProvider> hostingProviders) {
 
         Map<String, List<HostingProvider>> result = new HashMap<>();
         Set<String> hostingProviderNames = new HashSet<>();
@@ -52,7 +52,7 @@ public class HostingProviderService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<HostingProvider> existing  = findByNamesList(countryId,organizationId,hostingProviderNames,HostingProvider.class);
+            List<HostingProvider> existing  = findByNamesAndCountryId(countryId,hostingProviderNames,HostingProvider.class);
             hostingProviderNames = comparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
             List<HostingProvider> newHostingProviders = new ArrayList<>();
             if (hostingProviderNames.size()!=0) {
@@ -61,12 +61,11 @@ public class HostingProviderService extends MongoBaseService {
                     HostingProvider newHostingProvider = new HostingProvider();
                     newHostingProvider.setName(name);
                     newHostingProvider.setCountryId(countryId);
-                    newHostingProvider.setOrganizationId(organizationId);
                     newHostingProviders.add(newHostingProvider);
 
                 }
 
-                newHostingProviders = hostingProviderMongoRepository.saveAll(sequenceGenerator(newHostingProviders));
+                newHostingProviders = hostingProviderMongoRepository.saveAll(getNextSequence(newHostingProviders));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingProviders);
@@ -81,24 +80,24 @@ public class HostingProviderService extends MongoBaseService {
     /**
      *
      * @param countryId
-     * @param organizationId
+     * @param 
      * @return list of HostingProvider
      */
-    public List<HostingProvider> getAllHostingProvider(Long countryId,Long organizationId) {
-        return hostingProviderMongoRepository.findAllHostingProviders(countryId,organizationId);
+    public List<HostingProvider> getAllHostingProvider(Long countryId) {
+        return hostingProviderMongoRepository.findAllHostingProviders(countryId);
     }
 
 
     /**
      * @throws DataNotFoundByIdException if HostingProvider not exist for given id
      * @param countryId
-     * @param organizationId
+     * @param 
      * @param id
      * @return HostingProvider object fetch by id
      */
-    public HostingProvider getHostingProviderById(Long countryId,Long organizationId, BigInteger id) {
+    public HostingProvider getHostingProviderById(Long countryId, BigInteger id) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -108,9 +107,9 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-    public Boolean deleteHostingProvider(Long countryId,Long organizationId,BigInteger id) {
+    public Boolean deleteHostingProvider(Long countryId,BigInteger id) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        HostingProvider exist = hostingProviderMongoRepository.findByIdAndNonDeleted(countryId,id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -124,14 +123,14 @@ public class HostingProviderService extends MongoBaseService {
     /**
      * @throws DuplicateDataException if HostingProvider exist with same name
      * @param countryId
-     * @param organizationId
+     * @param 
      * @param id id of HostingProvider
      * @param hostingProvider
      * @return return updated HostingProvider object
      */
-    public HostingProvider updateHostingProvider(Long countryId,Long organizationId,BigInteger id, HostingProvider hostingProvider) {
+    public HostingProvider updateHostingProvider(Long countryId,BigInteger id, HostingProvider hostingProvider) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByName(countryId,organizationId,hostingProvider.getName());
+        HostingProvider exist = hostingProviderMongoRepository.findByName(countryId,hostingProvider.getName());
         if (Optional.ofNullable(exist).isPresent() ) {
             if (id.equals(exist.getId())) {
                 return exist;
@@ -140,7 +139,7 @@ public class HostingProviderService extends MongoBaseService {
         } else {
             exist=hostingProviderMongoRepository.findByid(id);
             exist.setName(hostingProvider.getName());
-            return hostingProviderMongoRepository.save(sequenceGenerator(exist));
+            return hostingProviderMongoRepository.save(getNextSequence(exist));
 
         }
     }
@@ -149,15 +148,15 @@ public class HostingProviderService extends MongoBaseService {
     /**
      * @throws DataNotExists if hosting provider not exist for given name
      * @param countryId
-     * @param organizationId
+     * @param 
      * @param name name of hsoting provider
      * @return return object of hosting provider
      */
-    public HostingProvider getHostingProviderByName(Long countryId, Long organizationId,String name) {
+    public HostingProvider getHostingProviderByName(Long countryId,String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            HostingProvider exist = hostingProviderMongoRepository.findByName(countryId,organizationId,name);
+            HostingProvider exist = hostingProviderMongoRepository.findByName(countryId,name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }
@@ -166,6 +165,16 @@ public class HostingProviderService extends MongoBaseService {
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
+
+
+    public List<HostingProviderResponseDTO> getAllNotInheritedHostingProviderFromParentOrgAndUnitHostingProvider(Long countryId, Long parentOrganizationId, Long unitId){
+
+        return hostingProviderMongoRepository.getAllNotInheritedHostingProviderFromParentOrgAndUnitHostingProvider(countryId,parentOrganizationId,unitId);
+    }
+
+
+
+
 
 
 }

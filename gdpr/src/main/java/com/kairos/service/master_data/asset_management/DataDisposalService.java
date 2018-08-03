@@ -6,7 +6,8 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
-import com.kairos.persistance.repository.master_data.asset_management.DataDisposalMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
+import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,14 +35,13 @@ public class DataDisposalService extends MongoBaseService {
     /**
      * @description this method create new data Disposal if data disposal not exist with same name ,
      * and if exist then simply add  data disposal to existing list and return list ;
-     * findByNamesList()  return list of existing data disposal using collation ,used for case insensitive result
+     * findByNamesAndCountryId()  return list of existing data disposal using collation ,used for case insensitive result
      * @param countryId
-     * @param organizationId
      * @param dataDisposals
      * @return return map which contain list of new data disposal and list of existing data disposal if data disposal already exist
      *
      */
-    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId, Long organizationId, List<DataDisposal> dataDisposals) {
+    public Map<String, List<DataDisposal>> createDataDisposal(Long countryId, List<DataDisposal> dataDisposals) {
 
         Map<String, List<DataDisposal>> result = new HashMap<>();
         Set<String> dataDisposalsNames = new HashSet<>();
@@ -53,21 +53,19 @@ public class DataDisposalService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
 
-            List<DataDisposal> existing =  findByNamesList(countryId,organizationId,dataDisposalsNames,DataDisposal.class);
+            List<DataDisposal> existing =  findByNamesAndCountryId(countryId,dataDisposalsNames,DataDisposal.class);
             dataDisposalsNames = comparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
             List<DataDisposal> newDataDisposals = new ArrayList<>();
             if (dataDisposalsNames.size() != 0) {
                 for (String name : dataDisposalsNames) {
 
-                    DataDisposal newDataDisposal = new DataDisposal();
-                    newDataDisposal.setName(name);
+                    DataDisposal newDataDisposal = new DataDisposal(name);
                     newDataDisposal.setCountryId(countryId);
-                    newDataDisposal.setOrganizationId(organizationId);
                     newDataDisposals.add(newDataDisposal);
 
                 }
 
-                newDataDisposals =dataDisposalMongoRepository.saveAll(sequenceGenerator(newDataDisposals));
+                newDataDisposals =dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newDataDisposals);
@@ -81,24 +79,23 @@ public class DataDisposalService extends MongoBaseService {
     /**
      *
      * @param countryId
-     * @param organizationId
      * @return list of DataDisposal
      */
-    public List<DataDisposal> getAllDataDisposal(Long countryId, Long organizationId) {
-        return dataDisposalMongoRepository.findAllDataDisposals(countryId, organizationId);
+    public List<DataDisposal> getAllDataDisposal(Long countryId) {
+        return dataDisposalMongoRepository.findAllDataDisposals(countryId);
     }
 
 
     /**
      * @throws DataNotFoundByIdException if data disposal not found for id
      * @param countryId
-     * @param organizationId
+     * @param 
      * @param id id of data disposal
      * @return onject of data disposal
      */
-    public DataDisposal getDataDisposalById(Long countryId, Long organizationId, BigInteger id) {
+    public DataDisposal getDataDisposalById(Long countryId,  BigInteger id) {
 
-        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -108,9 +105,9 @@ public class DataDisposalService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataDisposalById(Long countryId, Long organizationId, BigInteger id) {
+    public Boolean deleteDataDisposalById(Long countryId,  BigInteger id) {
 
-        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        DataDisposal exist = dataDisposalMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -124,15 +121,15 @@ public class DataDisposalService extends MongoBaseService {
     /**
      * @throws DuplicateDataException if data disposal exist with same name then throw exception
      * @param countryId
-     * @param organizationId
+     * @param 
      * @param id id of Data Disposal
      * @param dataDisposal
      * @return updated data disposal object
      */
-    public DataDisposal updateDataDisposal(Long countryId, Long organizationId, BigInteger id, DataDisposal dataDisposal) {
+    public DataDisposal updateDataDisposal(Long countryId,  BigInteger id, DataDisposal dataDisposal) {
 
 
-        DataDisposal exist = dataDisposalMongoRepository.findByName(countryId, organizationId, dataDisposal.getName());
+        DataDisposal exist = dataDisposalMongoRepository.findByName(countryId, dataDisposal.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             if (id.equals(exist.getId())) {
                 return exist;
@@ -141,7 +138,7 @@ public class DataDisposalService extends MongoBaseService {
         } else {
             exist = dataDisposalMongoRepository.findByid(id);
             exist.setName(dataDisposal.getName());
-            return dataDisposalMongoRepository.save(sequenceGenerator(exist));
+            return dataDisposalMongoRepository.save(getNextSequence(exist));
 
         }
     }
@@ -154,11 +151,11 @@ public class DataDisposalService extends MongoBaseService {
      * @description this method is used for get  data disposal by name
      * @return object of data disposal
      */
-    public DataDisposal getDataDisposalByName(Long countryId, Long organizationId, String name) {
+    public DataDisposal getDataDisposalByName(Long countryId,  String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataDisposal exist = dataDisposalMongoRepository.findByName(countryId, organizationId, name);
+            DataDisposal exist = dataDisposalMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }
@@ -167,6 +164,17 @@ public class DataDisposalService extends MongoBaseService {
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
+
+
+
+
+    public List<DataDisposalResponseDTO> getAllNotInheritedDataDisposalFromParentOrgAndUnitDataDisposal(Long countryId,Long parentOrganizationId,Long unitId){
+
+        return dataDisposalMongoRepository.getAllNotInheritedDataDisposalFromParentOrgAndUnitDataDisposal(countryId,parentOrganizationId,unitId);
+    }
+
+
+
 
 
 }

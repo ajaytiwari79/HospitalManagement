@@ -18,7 +18,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StaffDTO {
-   private Long id;
+    private Long id;
     private String firstName;
     private String lastName;
     private BigInteger cprNumber;
@@ -50,6 +50,8 @@ public class StaffDTO {
     private Gender gender;
     private boolean pregnant;
     private LocalDate dateOfBirth;
+    private Set<Long> expertiseIds;
+    private Long employmentTypeId;
 
     public Long getUnitEmploymentPositionId() {
         return unitEmploymentPositionId;
@@ -269,5 +271,21 @@ public class StaffDTO {
 
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public Set<Long> getExpertiseIds() {
+        return expertiseIds;
+    }
+
+    public void setExpertiseIds(Set<Long> expertiseIds) {
+        this.expertiseIds = expertiseIds;
+    }
+
+    public Long getEmploymentTypeId() {
+        return employmentTypeId;
+    }
+
+    public void setEmploymentTypeId(Long employmentTypeId) {
+        this.employmentTypeId = employmentTypeId;
     }
 }

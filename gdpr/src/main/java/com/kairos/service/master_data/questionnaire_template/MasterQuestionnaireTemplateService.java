@@ -65,7 +65,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         questionnaireTemplate.setOrganizationId(organizationId);
         questionnaireTemplate = buildQuestionnaireTemplate(templateDto, questionnaireTemplate);
         try {
-            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(questionnaireTemplate));
+            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(getNextSequence(questionnaireTemplate));
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new MongoException(e.getMessage());
@@ -103,7 +103,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
             case ASSET_TYPE:
                 if (assetTypeId == null) {
                     exceptionService.invalidRequestException("message.invalid.request", "asset type is null");
-                } else if (assetTypeMongoRepository.findByIdAndNonDeleted(UserContext.getCountryId(),UserContext.getOrgId(), assetTypeId) != null) {
+                } else if (assetTypeMongoRepository.findByIdAndNonDeleted(UserContext.getCountryId(), assetTypeId) != null) {
                     questionnaireTemplate.setTemplateType(templateType.value);
                     questionnaireTemplate.setAssetType(assetTypeId);
                 } else {
@@ -159,7 +159,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         existing.setDescription(templateDto.getDescription());
         existing = buildQuestionnaireTemplate(templateDto, existing);
         try {
-            existing = masterQuestionnaireTemplateMongoRepository.save(sequenceGenerator(existing));
+            existing = masterQuestionnaireTemplateMongoRepository.save(getNextSequence(existing));
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new MongoException(e.getMessage());

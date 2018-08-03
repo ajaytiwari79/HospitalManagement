@@ -48,7 +48,7 @@ public class TemplateTypeService extends MongoBaseService {
             } else
                 throw new InvalidRequestException("name could not be empty or null");
         }
-        List<TemplateType> existing = findByNamesList(countryId,countryId,templateNames,TemplateType.class);
+        List<TemplateType> existing = findByNamesAndCountryId(countryId,templateNames,TemplateType.class);
         templateNames = comparisonUtils.getNameListForMetadata(existing, templateNames);
         List<TemplateType> newDataTemplateList = new ArrayList<>();
         if (!templateNames.isEmpty()) {
@@ -59,7 +59,7 @@ public class TemplateTypeService extends MongoBaseService {
                 templateType1.setCountryId(countryId);
                  newDataTemplateList.add(templateType1);
             }
-            newDataTemplateList = templateTypeRepository.saveAll(sequenceGenerator(newDataTemplateList));
+            newDataTemplateList = templateTypeRepository.saveAll(getNextSequence(newDataTemplateList));
         }
         result.put(EXISTING_DATA_LIST, existing);
         result.put(NEW_DATA_LIST, newDataTemplateList);
@@ -125,7 +125,7 @@ public class TemplateTypeService extends MongoBaseService {
         }
         exists = templateTypeRepository.findByIdAndNonDeleted(id, countryId);
         exists.setName(templateType.getName());
-        templateTypeRepository.save(sequenceGenerator(exists));
+        templateTypeRepository.save(getNextSequence(exists));
         return exists;
 
     }

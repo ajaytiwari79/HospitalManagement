@@ -16,11 +16,11 @@ public class AssetTypeDTO {
     private BigInteger id;
 
     @NotNullOrEmpty(message = "Name cannot be empty ")
-    @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "Numbers and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     @Valid
-    private List<AssetTypeDTO> subAssetTypes=new ArrayList<>();
+    private List<AssetTypeDTO> subAssetTypes = new ArrayList<>();
 
     public BigInteger getId() {
         return id;
@@ -44,5 +44,12 @@ public class AssetTypeDTO {
 
     public void setSubAssetTypes(List<AssetTypeDTO> subAssetTypes) {
         this.subAssetTypes = subAssetTypes;
+    }
+
+    public AssetTypeDTO(String name) {
+        this.name = name;
+    }
+
+    public AssetTypeDTO() {
     }
 }

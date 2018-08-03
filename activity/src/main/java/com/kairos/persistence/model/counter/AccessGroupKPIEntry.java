@@ -8,11 +8,10 @@ public class AccessGroupKPIEntry extends MongoBaseEntity {
     private Long accessGroupId;
     private BigInteger kpiId;
 
-    public AccessGroupKPIEntry() {
-    }
+    public AccessGroupKPIEntry(){}
 
-    public AccessGroupKPIEntry(Long accessGroupId, BigInteger kpiId) {
-        this.accessGroupId = accessGroupId;
+    public AccessGroupKPIEntry(Long accessGroupId, BigInteger kpiId){
+        this.accessGroupId=accessGroupId;
         this.kpiId = kpiId;
     }
 

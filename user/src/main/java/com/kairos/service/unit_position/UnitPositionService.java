@@ -62,6 +62,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.kafka.UserToSchedulerQueueService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.EmploymentService;
@@ -163,7 +164,7 @@ public class UnitPositionService extends UserBaseService {
     @Inject
     private ActivityIntegrationService activityIntegrationService;
     @Inject
-    private KafkaProducer kafkaProducer;
+    private UserToSchedulerQueueService userToSchedulerQueueService;
 
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) {
@@ -1107,27 +1108,8 @@ public class UnitPositionService extends UserBaseService {
             }
         }
 
-            if (!endDateMillis.equals(employment.getEndDateMillis())) {
-                KairosScheduleJobDTO scheduledJob;
-
-                Long oneTimeTriggerDateMillis = null;
-                oneTimeTriggerDateMillis = DateUtils.getEndOfDayMillisforUnitFromEpoch(unit.getTimeZone(), endDateMillis);
-                IntegrationOperation operation = null;
-                if (Optional.ofNullable(employment.getEndDateMillis()).isPresent() && Optional.ofNullable(endDateMillis).isPresent()) {
-
-                    operation = IntegrationOperation.UPDATE;
-
-                } else if (Optional.ofNullable(employment.getEndDateMillis()).isPresent() && !Optional.ofNullable(endDateMillis).isPresent()) {
-                    operation = IntegrationOperation.DELETE;
-                } else if (!Optional.ofNullable(employment.getEndDateMillis()).isPresent() && Optional.ofNullable(endDateMillis).isPresent()) {
-
-                    operation = IntegrationOperation.CREATE;
-                }
-
-                scheduledJob = new KairosScheduleJobDTO(unit.getId(), JobType.FUNCTIONAL, JobSubType.EMPLOYMENT_END, BigInteger.valueOf(employment.getId()),
-                        operation, oneTimeTriggerDateMillis, true);
-                kafkaProducer.pushToJobQueue(scheduledJob);
-            }
+        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis,employment.getEndDateMillis(),unit.getId(),employment.getId(),
+                unit.getTimeZone());
 
         employment.setEndDateMillis(endDateMillis);
         employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);

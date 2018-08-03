@@ -12,5 +12,4 @@ public class UserServiceApplicationTests {
 	@Test
 	public void contextLoads() {
 	}
-
 }

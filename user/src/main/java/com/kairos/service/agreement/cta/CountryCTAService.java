@@ -175,9 +175,8 @@ public class CountryCTAService extends UserBaseService {
                 .collect(Collectors.toSet());
 
         Callable<List<EmploymentType>> callableEmploymentTypes = () -> {
-            List<EmploymentType> employmentTypes = employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds);
-            return employmentTypes;
-        };
+            return employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds);
+            };
         Future<List<EmploymentType>> futureEmploymentTypes = asynchronousService.executeAsynchronously(callableEmploymentTypes);
         Map<Long, EmploymentType> employmentTypeMap = futureEmploymentTypes.get().stream().collect(Collectors.toMap(EmploymentType::getId, v -> v));
         ctaDetailsWrapper.setEmploymentTypeIdMap(employmentTypeMap);

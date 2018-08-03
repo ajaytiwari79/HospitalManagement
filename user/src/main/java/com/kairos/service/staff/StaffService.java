@@ -2131,4 +2131,10 @@ public class StaffService extends UserBaseService {
 
     }
 
+    public List<com.kairos.user.staff.StaffDTO> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
+        return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds,DateUtil.getCurrentDateMillis());
+
+    }
+
+
 }
