@@ -24,7 +24,7 @@ public class OrganizationDataCategoryService extends MongoBaseService {
     private ExceptionService exceptionService;
 
 
-    public List<DataCategory> createDataCategoryWithDataElements(Long orgId, List<DataCategoryDTO> dataCategoryDTOS) {
+    public List<DataCategory> createDataCategoryWithDataElements(Long unitId, List<DataCategoryDTO> dataCategoryDTOS) {
 
         Set<String> datCategoryNameList = new HashSet<>();
         Map<String,List<DataElementDTO>> dataElementsCorrespondingToDataCategory=new HashMap<>();
@@ -32,7 +32,7 @@ public class OrganizationDataCategoryService extends MongoBaseService {
             datCategoryNameList.add(dataCategoryDTO.getName());
             dataElementsCorrespondingToDataCategory.put(dataCategoryDTO.getName(),dataCategoryDTO.getDataElements());
         }
-        List<DataCategory> dataCategories = dataCategoryMongoRepository.findByNamesAndUnitId(orgId, datCategoryNameList);
+        List<DataCategory> dataCategories = dataCategoryMongoRepository.findByNamesAndUnitId(unitId, datCategoryNameList);
         if (!dataCategories.isEmpty()) {
             exceptionService.duplicateDataException("message.duplicate", "Data Category", dataCategories.get(0).getName());
         }
@@ -45,9 +45,8 @@ public class OrganizationDataCategoryService extends MongoBaseService {
 
 
 
-    public void buildDataCategoryWithDataElements(Long organizationId,Map<String,List<DataElementDTO>> dataElementsCorrespondingToDataCategory)
+    public void buildDataCategoryWithDataElements(Long unitId,Map<String,List<DataElementDTO>> dataElementsCorrespondingToDataCategory)
     {
-
 
         List<DataCategory> dataCategories=new ArrayList<>();
       for (Map.Entry<String,List<DataElementDTO>> dataCategoryEntrySet:dataElementsCorrespondingToDataCategory.entrySet())
