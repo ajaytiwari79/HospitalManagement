@@ -33,11 +33,9 @@ public class ResponsibilityType extends MongoBaseEntity {
         this.name = name;
     }
 
-
     public ResponsibilityType( String name) {
         this.name = name;
     }
-
     public ResponsibilityType() {
     }
 }

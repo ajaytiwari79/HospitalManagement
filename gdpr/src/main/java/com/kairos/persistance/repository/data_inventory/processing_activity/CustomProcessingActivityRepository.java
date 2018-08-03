@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface CustomProcessingActivityRepository {
 
-    ProcessingActivity findByName(Long countryid, Long organizationId, String name);
+    ProcessingActivity findByName( Long organizationId, String name);
 
-    List<ProcessingActivityResponseDTO>  getAllProcessingActivityWithMetaData(Long countryId, Long organizationId);
+    List<ProcessingActivityResponseDTO>  getAllProcessingActivityAndMetaData( Long organizationId);
 
-    ProcessingActivityResponseDTO  getProcessingActivityWithMetaDataById(Long countryId, Long organizationId, BigInteger id);
+    ProcessingActivityResponseDTO  getAllSubProcessingActivitiesOfProcessingActivity( Long organizationId, BigInteger processingActivityId);
 
 
 }

@@ -1,4 +1,4 @@
-package com.kairos.persistance.repository.master_data.asset_management;
+package com.kairos.persistance.repository.master_data.asset_management.org_security_measure;
 
 
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface OrganizationalSecurityMeasureMongoRepository extends MongoRepository<OrganizationalSecurityMeasure,BigInteger> {
+public interface OrganizationalSecurityMeasureMongoRepository extends MongoRepository<OrganizationalSecurityMeasure,BigInteger> ,CustomOrganizationalSecurityRepository{
 
 
     @Query("{countryId:?0,_id:?1,deleted:false}")

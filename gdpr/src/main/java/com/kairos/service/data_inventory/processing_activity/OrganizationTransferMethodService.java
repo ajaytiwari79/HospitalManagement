@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.TransferMethod;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.TransferMethodMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.master_data.processing_activity_masterdata.TransferMethodService;
@@ -68,7 +68,7 @@ public class OrganizationTransferMethodService  extends MongoBaseService {
                     newTransferMethods.add(newTransferMethod);
                 }
 
-                newTransferMethods = transferMethodRepository.saveAll(sequenceGenerator(newTransferMethods));
+                newTransferMethods = transferMethodRepository.saveAll(getNextSequence(newTransferMethods));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTransferMethods);
@@ -134,7 +134,7 @@ public class OrganizationTransferMethodService  extends MongoBaseService {
         } else {
             exist = transferMethodRepository.findByid(id);
             exist.setName(transferMethod.getName());
-            return transferMethodRepository.save(sequenceGenerator(exist));
+            return transferMethodRepository.save(getNextSequence(exist));
 
         }
     }

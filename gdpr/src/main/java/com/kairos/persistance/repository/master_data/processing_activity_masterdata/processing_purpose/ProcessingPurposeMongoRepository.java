@@ -1,4 +1,4 @@
-package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
+package com.kairos.persistance.repository.master_data.processing_activity_masterdata.processing_purpose;
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface ProcessingPurposeMongoRepository extends MongoRepository<ProcessingPurpose, BigInteger> {
+public interface ProcessingPurposeMongoRepository extends MongoRepository<ProcessingPurpose, BigInteger>,CustomProcessingPurposeRepository {
 
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
@@ -27,6 +27,7 @@ public interface ProcessingPurposeMongoRepository extends MongoRepository<Proces
 
     @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
     List<ProcessingPurpose> getProcessingPurposeList(Long countryId,List<BigInteger> ids);
+
 
 
     @Query("{countryId:?0,deleted:false}")

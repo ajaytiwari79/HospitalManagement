@@ -1,4 +1,4 @@
-package com.kairos.persistance.repository.master_data.asset_management;
+package com.kairos.persistance.repository.master_data.asset_management.tech_security_measure;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface TechnicalSecurityMeasureMongoRepository extends MongoRepository<TechnicalSecurityMeasure,BigInteger> {
+public interface TechnicalSecurityMeasureMongoRepository extends MongoRepository<TechnicalSecurityMeasure,BigInteger> ,CustomTechnicalSecurityRepository{
 
 
     @Query("{countryId:?0,_id:?1,deleted:false}")

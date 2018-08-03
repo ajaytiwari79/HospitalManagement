@@ -5,17 +5,22 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.data_inventory.ProcessingActivityDTO;
+import com.kairos.dto.metadata.DataSourceDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.DataSourceMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
+import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
@@ -34,14 +39,13 @@ public class DataSourceService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param organizationId
      * @param dataSources
      * @return return map which contain list of new DataSource and list of existing DataSource if DataSource already exist
      * @description this method create new DataSource if DataSource not exist with same name ,
      * and if exist then simply add  DataSource to existing list and return list ;
      * findByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
-    public Map<String, List<DataSource>> createDataSource(Long countryId, Long organizationId, List<DataSource> dataSources) {
+    public Map<String, List<DataSource>> createDataSource(Long countryId, List<DataSource> dataSources) {
 
         Map<String, List<DataSource>> result = new HashMap<>();
         Set<String> dataSourceNames = new HashSet<>();
@@ -59,15 +63,13 @@ public class DataSourceService extends MongoBaseService {
             if (dataSourceNames.size() != 0) {
                 for (String name : dataSourceNames) {
 
-                    DataSource newDataSource = new DataSource();
-                    newDataSource.setName(name);
+                    DataSource newDataSource = new DataSource(name);
                     newDataSource.setCountryId(countryId);
-                    newDataSource.setOrganizationId(organizationId);
                     newDataSources.add(newDataSource);
 
                 }
 
-                newDataSources = dataSourceMongoRepository.saveAll(sequenceGenerator(newDataSources));
+                newDataSources = dataSourceMongoRepository.saveAll(getNextSequence(newDataSources));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newDataSources);
@@ -79,19 +81,18 @@ public class DataSourceService extends MongoBaseService {
     }
 
     /**
-     *
      * @param countryId
      * @return list of DataSource
      */
-    public List<DataSource> getAllDataSource(Long countryId) {
+    public List<DataSourceResponseDTO> getAllDataSource(Long countryId) {
         return dataSourceMongoRepository.findAllDataSources(countryId);
+
     }
 
     /**
-     * @throws DataNotFoundByIdException throw exception if DataSource not found for given id
      * @param countryId
-     * @param id id of DataSource
      * @return DataSource object fetch by given id
+     * @throws DataNotFoundByIdException throw exception if DataSource not found for given id
      */
     public DataSource getDataSource(Long countryId, BigInteger id) {
 
@@ -135,7 +136,7 @@ public class DataSourceService extends MongoBaseService {
         } else {
             exist = dataSourceMongoRepository.findByid(id);
             exist.setName(dataSource.getName());
-            return dataSourceMongoRepository.save(sequenceGenerator(exist));
+            return dataSourceMongoRepository.save(getNextSequence(exist));
 
         }
     }
@@ -158,6 +159,17 @@ public class DataSourceService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+    /**
+     * @param countryId
+     * @param organizationId - id of parent organization
+     * @param unitId         - id of unit organization
+     * @return method return list of organization Data Sources with Data Sources which were not inherited by organization  till now
+     */
+    public List<DataSourceResponseDTO> getAllNotInheritedDataSourceFromParentOrgAndUnitDataSource(Long countryId, Long organizationId, Long unitId) {
+        return dataSourceMongoRepository.getAllNotInheritedDataSourceFromParentOrgAndUnitDataSource(countryId, organizationId, unitId);
     }
 
 

@@ -6,7 +6,8 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
-import com.kairos.persistance.repository.master_data.asset_management.HostingTypeMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
+import com.kairos.response.dto.common.HostingTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,7 +63,7 @@ public class HostingTypeService extends MongoBaseService {
                     newHostingType.setCountryId(countryId);
                     newHostingTypes.add(newHostingType);
                 }
-                newHostingTypes = hostingTypeMongoRepository.saveAll(sequenceGenerator(newHostingTypes));
+                newHostingTypes = hostingTypeMongoRepository.saveAll(getNextSequence(newHostingTypes));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingTypes);
@@ -136,7 +137,7 @@ public class HostingTypeService extends MongoBaseService {
         } else {
             exist = hostingTypeMongoRepository.findByid(id);
             exist.setName(hostingType.getName());
-            return hostingTypeMongoRepository.save(sequenceGenerator(exist));
+            return hostingTypeMongoRepository.save(getNextSequence(exist));
 
         }
     }
@@ -161,6 +162,13 @@ public class HostingTypeService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+
+    public List<HostingTypeResponseDTO> getAllNotInheritedHostingTypeFromParentOrgAndUnitHostingType(Long countryId, Long parentOrganizationId, Long unitId){
+
+        return hostingTypeMongoRepository.getAllNotInheritedHostingTypeFromParentOrgAndUnitHostingType(countryId,parentOrganizationId,unitId);
     }
 
 

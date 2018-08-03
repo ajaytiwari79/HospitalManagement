@@ -108,7 +108,7 @@ public class AgreementSectionService extends MongoBaseService {
         agreementSectionList = updateExisitingClauseAndAddSubSectionToAgreementSection(agreementSectionClauseAndClauseDtoHashMap, agreementSubSectionClauseAndClauseDtoHashMap, exisitingClauseList, agreementSectionList, newCreatedClausesList);
         List<BigInteger> agreementSectionIdList = new ArrayList<>();
 
-        agreementSectionList = agreementSectionMongoRepository.saveAll(sequenceGenerator(agreementSectionList));
+        agreementSectionList = agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionList));
         agreementSectionList.forEach(agreementSection -> {
             agreementSectionIdList.add(agreementSection.getId());
         });
@@ -226,7 +226,7 @@ public class AgreementSectionService extends MongoBaseService {
             addNewCreatedClauseIdsToSectionOrSubSection(newClauseBasicDTOList, newCreatedClauseMap, agreementSection);
         }
         if (!updateExisitingClauseList.isEmpty()) {
-            clauseMongoRepository.saveAll(sequenceGenerator(updateExisitingClauseList));
+            clauseMongoRepository.saveAll(getNextSequence(updateExisitingClauseList));
         }
         return agreementSectionList;
     }
@@ -243,7 +243,7 @@ public class AgreementSectionService extends MongoBaseService {
             updateExisitngClauseList = agreementSectionUpdateClauseListAndAddIdsToSection(changedClauseBasicDTOList, updateClauseMap, updateExisitngClauseList, agreementSection);
             addNewCreatedClauseIdsToSectionOrSubSection(newClauseBasicDTOList, newCreatedClauseMap, agreementSection);
         }
-        agreementSubSectionList = agreementSectionMongoRepository.saveAll(sequenceGenerator(agreementSubSectionList));
+        agreementSubSectionList = agreementSectionMongoRepository.saveAll(getNextSequence(agreementSubSectionList));
         List<BigInteger> subSectionIdList = new ArrayList<>();
         agreementSubSectionList.forEach(agreementSection -> {
             subSectionIdList.add(agreementSection.getId());
@@ -392,7 +392,7 @@ public class AgreementSectionService extends MongoBaseService {
         }
         agreementSectionList = updateExisitingClauseAndAddSubSectionToAgreementSection(agreementSectionClauseAndClauseDtoHashMap, agreementSubSectionClauseAndClauseDtoHashMap, exisitingClauseList, agreementSectionList, newCreatedClausesList);
         agreementSectionIdList.clear();
-        agreementSectionList = agreementSectionMongoRepository.saveAll(sequenceGenerator(agreementSectionList));
+        agreementSectionList = agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionList));
         agreementSectionList.forEach(agreementSection -> {
             agreementSectionIdList.add(agreementSection.getId());
         });
@@ -478,7 +478,7 @@ public class AgreementSectionService extends MongoBaseService {
         PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, orgId, templateId);
         List<BigInteger> agreementSectionIdList = policyAgreementTemplate.getAgreementSections();
         agreementSectionIdList.remove(id);
-        policyAgreementTemplateRepository.save(sequenceGenerator(policyAgreementTemplate));
+        policyAgreementTemplateRepository.save(getNextSequence(policyAgreementTemplate));
         agreementSectionMongoRepository.delete(exist);
         return true;
     }

@@ -6,7 +6,8 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
-import com.kairos.persistance.repository.master_data.asset_management.HostingProviderMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
+import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public class HostingProviderService extends MongoBaseService {
 
                 }
 
-                newHostingProviders = hostingProviderMongoRepository.saveAll(sequenceGenerator(newHostingProviders));
+                newHostingProviders = hostingProviderMongoRepository.saveAll(getNextSequence(newHostingProviders));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingProviders);
@@ -138,7 +139,7 @@ public class HostingProviderService extends MongoBaseService {
         } else {
             exist=hostingProviderMongoRepository.findByid(id);
             exist.setName(hostingProvider.getName());
-            return hostingProviderMongoRepository.save(sequenceGenerator(exist));
+            return hostingProviderMongoRepository.save(getNextSequence(exist));
 
         }
     }
@@ -164,6 +165,16 @@ public class HostingProviderService extends MongoBaseService {
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
+
+
+    public List<HostingProviderResponseDTO> getAllNotInheritedHostingProviderFromParentOrgAndUnitHostingProvider(Long countryId, Long parentOrganizationId, Long unitId){
+
+        return hostingProviderMongoRepository.getAllNotInheritedHostingProviderFromParentOrgAndUnitHostingProvider(countryId,parentOrganizationId,unitId);
+    }
+
+
+
+
 
 
 }

@@ -1,4 +1,4 @@
-package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
+package com.kairos.persistance.repository.master_data.processing_activity_masterdata.transfer_method;
 
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.TransferMethod;
@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface TransferMethodMongoRepository extends MongoRepository<TransferMethod,BigInteger> {
+public interface TransferMethodMongoRepository extends MongoRepository<TransferMethod,BigInteger>,CustomTransferMethodRepository {
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
     TransferMethod findByIdAndNonDeleted(Long countryId,BigInteger id);

@@ -92,8 +92,8 @@ public class TechnicalSecurityController {
 
     }
 
-    @ApiOperation("update TechnicalSecurityMeasure by id")
-    @PutMapping("/technical_security/update/{id}")
+
+
     public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody TechnicalSecurityMeasure securityMeasure) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -104,6 +104,14 @@ public class TechnicalSecurityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure(countryId, id, securityMeasure));
 
     }
+
+
+    @ApiOperation("get All technical security of Current organization and Parent Oeg which were not inherited by Organization")
+    @GetMapping("/technical_security")
+    public ResponseEntity<Object> getAllTechnicalMeasurefOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getAllNotInheritedTechnicalSecurityMeasureFromParentOrgAndUnitSecurityMeasure(countryId,parentOrgId,organizationId));
+    }
+
 
 
 }
