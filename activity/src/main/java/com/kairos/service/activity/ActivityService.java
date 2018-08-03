@@ -1127,18 +1127,18 @@ public class ActivityService extends MongoBaseService {
 
     public void verifyActivityTimeRules(LocalTime earliestStartTime,LocalTime latestStartTime,LocalTime maximumEndTime,int shortestTime,int longestTime){
         if(shortestTime>longestTime){
-            throw new ActionNotPermittedException("shortest.time.greater.longest");
+            exceptionService.actionNotPermittedException("shortest.time.greater.longest");
         }
         if(Optional.ofNullable(earliestStartTime).isPresent() &&
                 Optional.ofNullable(latestStartTime).isPresent() &&
                 earliestStartTime.isAfter(latestStartTime)){
-            throw new ActionNotPermittedException("earliest.start.time.less.latest");
+            exceptionService.actionNotPermittedException("earliest.start.time.less.latest");
         }
 
         if(Optional.ofNullable(earliestStartTime).isPresent() &&
                 Optional.ofNullable(latestStartTime).isPresent() &&
                 earliestStartTime.plusMinutes(longestTime).isAfter(maximumEndTime)) {
-            throw new ActionNotPermittedException("longest.duration.exceed.limit");
+            exceptionService.actionNotPermittedException("longest.duration.exceed.limit");
         }
 
 
