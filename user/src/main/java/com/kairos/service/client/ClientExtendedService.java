@@ -4,6 +4,9 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.*;
+import com.kairos.persistence.model.client.relationships.ClientLanguageRelation;
+import com.kairos.persistence.model.client.relationships.ClientNextToKinRelationship;
+import com.kairos.persistence.model.client.relationships.ClientRelativeRelation;
 import com.kairos.persistence.model.country.RelationType;
 import com.kairos.persistence.model.country.common.CitizenStatus;
 import com.kairos.persistence.model.user.language.Language;
@@ -121,10 +124,13 @@ public class ClientExtendedService extends UserBaseService {
         Client nextToKinClientObject;
         ContactDetail contactDetail = null;
         if (!Optional.ofNullable(nextToKin).isPresent()) {
-            nextToKin = new User();
-            nextToKinClientObject= new Client();
+            nextToKin = new User(nextToKinDTO.getCprNumber().trim(), nextToKinDTO.getFirstName(), nextToKinDTO.getLastName(), null);
+            nextToKin.setNickName(nextToKinDTO.getNickName());
+            nextToKinClientObject = new Client();
+
+            nextToKinClientObject.setCivilianStatus(getCivilianStatus(nextToKinDTO));
         } else {
-             nextToKinClientObject = clientGraphRepository.getClientByUserId(nextToKin.getId());
+            nextToKinClientObject = clientGraphRepository.getClientByUserId(nextToKin.getId());
             if (nextToKinClientObject.getId().equals(clientId)) {
                 exceptionService.dataNotMatchedException("message.client.nextToKin.notMatch");
 
@@ -149,10 +155,10 @@ public class ClientExtendedService extends UserBaseService {
         nextToKinClientObject.saveContactDetail(nextToKinDTO, contactDetail);
         nextToKin.setContactDetail(contactDetail);
         homeAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(), homeAddress);
-        if (!Optional.ofNullable(homeAddress).isPresent()) {
-            return null;
+        if (Optional.ofNullable(homeAddress).isPresent()) {
+            nextToKin.setHomeAddress(homeAddress);
         }
-        nextToKin.setHomeAddress(homeAddress);
+
         CitizenStatus citizenStatus = getCivilianStatus(nextToKinDTO);
         nextToKinClientObject.setCivilianStatus(citizenStatus);
         nextToKinClientObject.setUser(nextToKin);
@@ -171,9 +177,6 @@ public class ClientExtendedService extends UserBaseService {
 
     private User validateCPRNumber(String cprNumber) {
         User user = userGraphRepository.findUserByCprNumber(cprNumber.trim());
-        if (!Optional.ofNullable(user).isPresent()) {
-            exceptionService.duplicateDataException("message.client.CRPNumber.deadcitizen", cprNumber);
-        }
         return user;
     }
 
@@ -252,7 +255,7 @@ public class ClientExtendedService extends UserBaseService {
     }
 
     private CitizenStatus getCivilianStatus(NextToKinDTO nextToKinDTO) {
-        CitizenStatus citizenStatus = citizenStatusGraphRepository.findOne(nextToKinDTO.getCivilianStatusId());
+        CitizenStatus citizenStatus = citizenStatusGraphRepository.findOne(nextToKinDTO.getCivilianStatusId(), 0);
         if (!Optional.ofNullable(citizenStatus).isPresent()) {
             logger.debug("Finding civilian status using id " + nextToKinDTO.getCivilianStatusId());
             exceptionService.dataNotFoundByIdException("message.client.citizenStatus.id.notFound", citizenStatus);
@@ -308,7 +311,7 @@ public class ClientExtendedService extends UserBaseService {
 
         }
         nextToKin.setBasicDetail(nextToKinDTO);
-         Client nextToKinClient= clientGraphRepository.getClientByUserId(nextToKinId);
+        Client nextToKinClient = clientGraphRepository.getClientByUserId(nextToKinId);
         Long homeAddressId = clientGraphRepository.getIdOfHomeAddress(nextToKinId);
         if (!Optional.ofNullable(homeAddressId).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.client.homeAddress.notFound");
@@ -548,7 +551,7 @@ public class ClientExtendedService extends UserBaseService {
     public ContactDetail setSocialMediaDetails(Long clientId, ContactDetailSocialDTO socialMediaDetail) {
         // Client Social Media
         Client currentClient = clientGraphRepository.findOne(clientId);
-        logger.debug("Client found to set Social details: "  + " with id: " + clientId);
+        logger.debug("Client found to set Social details: " + " with id: " + clientId);
 
         if (currentClient != null) {
             ContactDetail detail = currentClient.getContactDetail();

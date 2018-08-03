@@ -27,7 +27,7 @@ public class NextToKinDTO {
     private String profilePic;
     @NotNull(message = "CPR number can't be empty")
     private String cprNumber;
-    private String  privateEmail;
+    private String privateEmail;
     private boolean isVerifiedByGoogleMap;
     private Long relationTypeId;
     private Gender gender;
@@ -161,15 +161,15 @@ public class NextToKinDTO {
     }
 
     public NextToKinDTO buildResponse(User nextToKin, String serverUrl, long relationTypeId,
-                                      NextToKinDTO nextToKinDTO){
+                                      NextToKinDTO nextToKinDTO) {
         ObjectMapper objectMapper = new ObjectMapper();
         this.id = nextToKin.getId();
         this.firstName = nextToKin.getFirstName();
         this.lastName = nextToKin.getLastName();
         this.civilianStatusId = nextToKinDTO.getCivilianStatusId();
-        this.homeAddress = objectMapper.convertValue(nextToKin.getHomeAddress(),AddressDTO.class);
+        this.homeAddress = objectMapper.convertValue(nextToKinDTO.getHomeAddress(), AddressDTO.class);
         this.homeAddress.setMunicipalityId(nextToKinDTO.getHomeAddress().getMunicipalityId());
-        this.homeAddress.setZipCodeId(nextToKin.getHomeAddress().getZipCode().getId());
+        this.homeAddress.setZipCodeId((long) nextToKinDTO.getHomeAddress().getZipCodeValue());
         this.gender = nextToKin.getGender();
         this.age = nextToKin.getAge();
         this.nickName = nextToKin.getNickName();

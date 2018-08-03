@@ -6,7 +6,7 @@ import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.user.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.client.Client;
-import com.kairos.persistence.model.client.ClientOrganizationRelation;
+import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;

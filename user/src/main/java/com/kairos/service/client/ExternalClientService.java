@@ -1,7 +1,7 @@
 package com.kairos.service.client;
 
 import com.kairos.persistence.model.client.Client;
-import com.kairos.persistence.model.client.ClientOrganizationRelation;
+import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.common.CitizenStatus;
@@ -23,7 +23,6 @@ import com.kairos.user.organization.AddressDTO;
 import com.kairos.user.patient.PatientRelative;
 import com.kairos.user.patient.PatientWrapper;
 import com.kairos.user.staff.CurrentAddress;
-import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.AppConstants.KAIROS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SECONDARY_ADDRESS;
 

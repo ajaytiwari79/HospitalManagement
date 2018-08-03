@@ -11,6 +11,13 @@ import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.*;
+import com.kairos.persistence.model.client.queryResults.ClientHomeAddressQueryResult;
+import com.kairos.persistence.model.client.queryResults.ClientMinimumDTO;
+import com.kairos.persistence.model.client.queryResults.ClientOrganizationIdsDTO;
+import com.kairos.persistence.model.client.queryResults.ClientStaffQueryResult;
+import com.kairos.persistence.model.client.relationships.ClientContactPersonRelationship;
+import com.kairos.persistence.model.client.relationships.ClientLanguageRelation;
+import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
@@ -61,6 +68,7 @@ import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.userContext.UserContext;
 import com.kairos.vrp.TaskAddress;
+import com.kairos.wrapper.ClientPersonalCalenderPrerequisiteDTO;
 import com.kairos.wrapper.ContactPersonTabDataDTO;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import org.joda.time.DateTime;
@@ -83,7 +91,6 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
-import static com.kairos.constants.AppConstants.KAIROS;
 import static com.kairos.enums.CitizenHealthStatus.DECEASED;
 import static com.kairos.enums.CitizenHealthStatus.TERMINATED;
 import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
@@ -380,64 +387,62 @@ public class ClientService extends UserBaseService {
 
     public Map<String, Object> retrieveCompleteDetails(long clientId, long unitId) {
         Map<String, Object> response = new HashMap<>();
-        //Client currentClient = clientGraphRepository.findOne(clientId);
-        Client currentClient = clientGraphRepository.getClientByClientIdAndUnitId(clientId, unitId);
+        Client currentClient = clientGraphRepository.findOne(clientId);
+        //Client currentClient = clientGraphRepository.getClientByClientIdAndUnitId(clientId, unitId);
+        if (!Optional.ofNullable(currentClient).isPresent() || !Optional.ofNullable(currentClient.getUser()).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
+        }
+        // Client General Information
+        Map<String, Object> clientGeneralDetails = currentClient.retrieveClientGeneralDetails();
 
-        // Client Data
-        if (currentClient != null) {
-            // Client General Information
-            Map<String, Object> clientGeneralDetails = currentClient.retrieveClientGeneralDetails();
+        // Client Profile Picture
+        String url = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath();
+        clientGeneralDetails.put("profilePic", url + (String) clientGeneralDetails.get("profilePic"));
+        clientGeneralDetails.put("civilianStatus", clientGraphRepository.findCitizenCivilianStatus(clientId));
 
-            // Client Profile Picture
-            String url = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath();
-            clientGeneralDetails.put("profilePic", url + (String) clientGeneralDetails.get("profilePic"));
-            clientGeneralDetails.put("civilianStatus", clientGraphRepository.findCitizenCivilianStatus(clientId));
+        // Client Language Data
+        clientGeneralDetails.put("languageUnderstands", languagesKnownToCitizen(clientId));
+        // If
+        clientGeneralDetails.put("hasHomeAddress", clientGraphRepository.isHomeAddressExists(clientId));
+        clientGeneralDetails.put("languageUnderstandsIds", clientLanguageRelationGraphRepository.findClientLanguagesId(clientId).toArray());
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 
-            // Client Language Data
-            clientGeneralDetails.put("languageUnderstands", languagesKnownToCitizen(clientId));
-            // If
-            clientGeneralDetails.put("hasHomeAddress", clientGraphRepository.isHomeAddressExists(clientId));
-            clientGeneralDetails.put("languageUnderstandsIds", clientLanguageRelationGraphRepository.findClientLanguagesId(clientId).toArray());
-            Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
+        if (countryId != null) {
+            logger.debug("Country Found");
 
-            if (countryId != null) {
-                logger.debug("Country Found");
-
-                List<Map<String, Object>> languageLevelData = languageLevelGraphRepository.getLanguageLevelByCountryId(countryId);
-                if (languageLevelData != null) {
-                    clientGeneralDetails.put("languageLevelData", FormatUtil.formatNeoResponse(languageLevelData));
-                }
-
-                List<Map<String, Object>> zipCodeMapList = zipCodeGraphRepository.getAllZipCodeByCountryIdAnotherFormat(countryId);
-                if (zipCodeMapList != null) {
-                    response.put("zipCodeData", FormatUtil.formatNeoResponse(zipCodeMapList));
-                }
-
-                List<Map<String, Object>> languageData = languageGraphRepository.getLanguageByCountryIdAnotherFormat(countryId);
-                if (languageData != null) {
-                    response.put("languageData", FormatUtil.formatNeoResponse(languageData));
-                }
-                response.put("relationTypes", countryGraphRepository.getRelationTypesByCountry(countryId));
-            } else {
-                logger.debug("Country not found");
+            List<Map<String, Object>> languageLevelData = languageLevelGraphRepository.getLanguageLevelByCountryId(countryId);
+            if (languageLevelData != null) {
+                clientGeneralDetails.put("languageLevelData", FormatUtil.formatNeoResponse(languageLevelData));
             }
 
-            // NextToKin
-            List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-            response.put("nextToKin", nextToKinDetails);
-            // Social Media Details
-            Map<String, Object> socialMediaDetails = getSocialMediaDetails(clientId);
-            response.put("socialMediaDetails", socialMediaDetails != null ? socialMediaDetails : Collections.EMPTY_MAP);
+            List<Map<String, Object>> zipCodeMapList = zipCodeGraphRepository.getAllZipCodeByCountryIdAnotherFormat(countryId);
+            if (zipCodeMapList != null) {
+                response.put("zipCodeData", FormatUtil.formatNeoResponse(zipCodeMapList));
+            }
+
+            List<Map<String, Object>> languageData = languageGraphRepository.getLanguageByCountryIdAnotherFormat(countryId);
+            if (languageData != null) {
+                response.put("languageData", FormatUtil.formatNeoResponse(languageData));
+            }
+            response.put("relationTypes", countryGraphRepository.getRelationTypesByCountry(countryId));
             response.put("civilianStatus", citizenStatusService.getCitizenStatusByCountryIdAnotherFormat(countryId));
-
-            // client General
-            response.put("clientGeneral", clientGeneralDetails);
-            return response;
         } else {
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
-
+            logger.debug("Country not found");
         }
-        return null;
+
+        // NextToKin
+        List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        response.put("nextToKin", nextToKinDetails);
+        // Social Media Details
+        Map<String, Object> socialMediaDetails = getSocialMediaDetails(clientId);
+        response.put("socialMediaDetails", socialMediaDetails != null ? socialMediaDetails : Collections.EMPTY_MAP);
+
+
+        // client General
+        response.put("clientGeneral", clientGeneralDetails);
+        return response;
+
+
     }
 
 

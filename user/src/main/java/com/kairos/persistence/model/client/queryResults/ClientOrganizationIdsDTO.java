@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.client;
+package com.kairos.persistence.model.client.queryResults;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.neo4j.annotation.QueryResult;
