@@ -4,6 +4,7 @@ import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vipul on 9/5/18.
@@ -17,7 +18,10 @@ public class ShiftPublishDTO {
         //default
     }
 
-
+    public ShiftPublishDTO(List<BigInteger> shiftIds, List<ShiftStatus> status) {
+        this.shiftIds = shiftIds;
+        this.status = status;
+    }
 
     public List<BigInteger> getShiftIds() {
         return shiftIds;

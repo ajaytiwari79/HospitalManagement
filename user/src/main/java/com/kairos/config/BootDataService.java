@@ -263,7 +263,7 @@ public class BootDataService {
     ZipCode allegade;
 
     public void createData() {
-        if (countryGraphRepository.findAll().isEmpty()) {
+       /* if (countryGraphRepository.findAll().isEmpty()) {
 
             userBaseRepository.createFirstDBNode();
 
@@ -284,10 +284,10 @@ public class BootDataService {
             //createCitizen();
         }
 
-        /*createCTARuleTemplateCategory();
+        createCTARuleTemplateCategory();
         startRegisteredCronJobs();
-        createEquipmentCategories();*/
-
+        createEquipmentCategories();
+*/
 
     }
 

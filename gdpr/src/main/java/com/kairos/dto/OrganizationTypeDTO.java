@@ -34,4 +34,9 @@ public class OrganizationTypeDTO {
 
     public OrganizationTypeDTO() {
     }
+
+    public OrganizationTypeDTO(@NotNull(message = "id can't be null") Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

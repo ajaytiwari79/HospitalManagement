@@ -19,6 +19,7 @@ rootProject.name = 'kairos-user'
 include 'dto'
 include 'user'
 include 'activity'
+include 'scheduler-service'
 include 'planner'
 include "planner:optaplanner-shiftplanning"
 include "planner:optaplanner-taskplanning"

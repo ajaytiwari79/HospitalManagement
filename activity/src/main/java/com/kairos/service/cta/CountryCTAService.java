@@ -95,7 +95,7 @@ public class CountryCTAService extends MongoBaseService {
             ruleTemplates.add(ctaRuleTemplate);
         }
         save(ruleTemplates);
-        List<BigInteger> ruleTemplateIds = ruleTemplates.stream().map(rt->rt.getId()).collect(Collectors.toList());
+        List<BigInteger> ruleTemplateIds = ruleTemplates.stream().map(rt->rt.getId()).collect(CExpertiseServiceollectors.toList());
         costTimeAgreement.setExpertise(ctaDetailsWrapper.getExpertise());
         // if creating fro country and we are not updating then only.
         if (creatingFromCountry && !doUpdate) {

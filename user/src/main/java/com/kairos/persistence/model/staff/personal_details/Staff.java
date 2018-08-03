@@ -57,7 +57,6 @@ public class Staff extends UserBaseEntity {
     private Long inactiveFrom;
     long organizationId;
     private long visitourId;
-//    private String cprNumber;
     private String visitourTeamId;
     private Language language;
 
@@ -101,15 +100,12 @@ public class Staff extends UserBaseEntity {
     private String user_id;
 
 
-    public Staff(String firstName) {
-        this.firstName = firstName;
-    }
+
 
     public Staff() {
     }
 
     public Staff(String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {
-      //  this.employedSince = employedSince;
         this.email = email;
         this.userName = userName;
         this.firstName = firstName;
@@ -119,7 +115,9 @@ public class Staff extends UserBaseEntity {
         this.inactiveFrom = inactiveFrom;
 //        this.cprNumber = cprNumber;
     }
-
+    public Staff(String firstName) {
+        this.firstName = firstName;
+    }
     public ContactAddress getContactAddress() {
         return contactAddress;
     }
@@ -149,14 +147,6 @@ public class Staff extends UserBaseEntity {
         this.reqFromPerson = requestFromPerson;
     }
 
-
-    /*public Long getEmployedSince() {
-        return employedSince;
-    }
-
-    public void setEmployedSince(Long employedSince) {
-        this.employedSince = employedSince;
-    }*/
 
     public String getNationalInsuranceNumber() {
         return nationalInsuranceNumber;
@@ -317,14 +307,6 @@ public class Staff extends UserBaseEntity {
     public void setOrganizationId(long organizationId) {
         this.organizationId = organizationId;
     }
-
-    /*public String getCprNumber() {
-        return cprNumber;
-    }
-
-    public void setCprNumber(String cprNumber) {
-        this.cprNumber = cprNumber;
-    }*/
 
     public EngineerType getEngineerType() {
         return engineerType;
@@ -509,16 +491,5 @@ public class Staff extends UserBaseEntity {
         this.user_id = user_id;
     }
 
-    /*    public Gender getGender() {
-
-/*    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    }*/
 
 }

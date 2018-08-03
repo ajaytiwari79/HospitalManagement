@@ -4,9 +4,11 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
+import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.country.experties.UnionServiceWrapper;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.country.experties.CopyExpertiseDTO;
 import com.kairos.user.country.experties.CountryExpertiseDTO;
 import com.kairos.user.country.experties.SeniorityLevelDTO;
 import com.kairos.util.DateUtil;
@@ -15,6 +17,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +50,7 @@ public class ExpertiseServiceIntegrationTest {
 
     static private String baseUrlWithCountry;
     static Long organizationLevelId, serviceId, unionId, payTableId, expertiseId;
+    private final Logger logger = LoggerFactory.getLogger(ExpertiseServiceIntegrationTest.class);
 
     @Before
     public void setUp() throws Exception {
@@ -147,6 +152,29 @@ public class ExpertiseServiceIntegrationTest {
 
     }
 
+
+    @Test
+    @OrderTest(order = -1)
+    public void copyExpertise() throws Exception {
+        long expertiseId = 2l;
+        SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO(1, 4, null, new BigDecimal(1.5), new BigDecimal(2.5), new BigDecimal(5.6));
+        CopyExpertiseDTO expertiseDTO = new CopyExpertiseDTO("copied", DateUtil.getCurrentLocalDate(), DateUtil.getCurrentLocalDate().plusYears(1L), "", organizationLevelId, Collections.singleton(serviceId)
+                , unionId, 12, 12, Collections.singletonList(seniorityLevelDTO), BreakPaymentSetting.PAID);
+        HttpEntity<CopyExpertiseDTO> entity = new HttpEntity<>(expertiseDTO);
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<CopyExpertiseDTO>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<CopyExpertiseDTO>>() {
+                };
+        String url=baseUrlWithCountry + "/expertise/" + expertiseId + "/copy";
+
+        logger.info(url);
+        ResponseEntity<RestTemplateResponseEnvelope<CopyExpertiseDTO>> response = restTemplate.exchange(
+                baseUrlWithCountry + "/expertise/" + expertiseId + "/copy",
+                HttpMethod.PUT, entity, typeReference);
+        RestTemplateResponseEnvelope<CopyExpertiseDTO> responseBody = response.getBody();
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
@@ -163,7 +191,7 @@ public class ExpertiseServiceIntegrationTest {
             exceptionService.unsupportedOperationException("message.organization.id.notnull");
 
         }
-    return null;
+        return null;
     }
 
 

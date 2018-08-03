@@ -39,10 +39,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.QueryParam;
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -492,8 +489,7 @@ public class StaffController {
     @RequestMapping(value = "/create_staff_from_web", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) throws ParseException {
-        Staff staff = staffService.createStaffFromWeb(unitId, staffCreationDTO);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staff);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.createStaffFromWeb(unitId, staffCreationDTO));
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/basic_info")
@@ -686,6 +682,10 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByUnit(unitId));
     }
 
-
-
+    @PostMapping(value = "/details")
+    @ApiOperation("get staff details  by ids")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffDetailByIds(@PathVariable Long unitId,@RequestBody Set<Long> staffIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffDetailByIds(unitId,staffIds));
+    }
 }

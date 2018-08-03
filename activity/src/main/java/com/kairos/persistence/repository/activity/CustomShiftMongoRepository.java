@@ -7,6 +7,7 @@ import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -32,5 +33,7 @@ public interface CustomShiftMongoRepository {
     List<ShiftCountDTO> getAssignedShiftsCountByUnitPositionId(List<Long> unitPositionIds, Date startDate);
 
     List<DateWiseShiftResponse> findAllByIdGroupByDate(List<BigInteger> shiftIds);
+
+    void deleteShiftsAfterDate(Long staffId, LocalDateTime employmentEndDate);
 
 }
