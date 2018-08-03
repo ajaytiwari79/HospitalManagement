@@ -5,6 +5,8 @@ import com.kairos.activity.open_shift.DurationField;
 import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
 import com.kairos.persistence.model.activity.tabs.RulesActivityTab;
 
+import javax.validation.constraints.AssertTrue;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -29,15 +31,17 @@ public class RulesActivityTabDTO {
     private boolean approvalAllowed = false;
 
     // in Minutes
-    private Integer earliestStartTime;
-    private Integer latestStartTime;
-    private Integer shortestTime;
-    private Integer longestTime;
+    private LocalTime earliestStartTime;
+    private LocalTime latestStartTime;
+    private int shortestTime;
+    private int longestTime;
     private boolean eligibleForCopy;
 
     private DurationField plannedTimeInAdvance;
     private DurationField approvalTimeInAdvance;
     private Float approvalPercentage;
+    private LocalTime maximumEndTime;
+
 
 
     public boolean isEligibleForStaffingLevel() {
@@ -72,7 +76,7 @@ public class RulesActivityTabDTO {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
 
                  eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
-                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage);
+                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage,maximumEndTime);
 
 
         return rulesActivityTab;
@@ -170,37 +174,38 @@ public class RulesActivityTabDTO {
         this.approvalAllowed = approvalAllowed;
     }
 
-    public Integer getEarliestStartTime() {
+    public LocalTime getEarliestStartTime() {
         return earliestStartTime;
     }
 
-    public void setEarliestStartTime(Integer earliestStartTime) {
+    public void setEarliestStartTime(LocalTime earliestStartTime) {
         this.earliestStartTime = earliestStartTime;
     }
 
-    public Integer getLatestStartTime() {
+    public LocalTime getLatestStartTime() {
         return latestStartTime;
     }
 
-    public void setLatestStartTime(Integer latestStartTime) {
+    public void setLatestStartTime(LocalTime latestStartTime) {
         this.latestStartTime = latestStartTime;
     }
 
-    public Integer getShortestTime() {
+    public int getShortestTime() {
         return shortestTime;
     }
 
-    public void setShortestTime(Integer shortestTime) {
+    public void setShortestTime(int shortestTime) {
         this.shortestTime = shortestTime;
     }
 
-    public Integer getLongestTime() {
+    public int getLongestTime() {
         return longestTime;
     }
 
-    public void setLongestTime(Integer longestTime) {
+    public void setLongestTime(int longestTime) {
         this.longestTime = longestTime;
     }
+
     public boolean isEligibleForCopy() {
         return eligibleForCopy;
     }
@@ -231,5 +236,18 @@ public class RulesActivityTabDTO {
 
     public void setApprovalPercentage(Float approvalPercentage) {
         this.approvalPercentage = approvalPercentage;
+    }
+
+    public LocalTime getMaximumEndTime() {
+        return maximumEndTime;
+    }
+
+    public void setMaximumEndTime(LocalTime maximumEndTime) {
+        this.maximumEndTime = maximumEndTime;
+    }
+
+    @AssertTrue(message = "Latest Start time can't before earliest Start time")
+    public boolean isValid() {
+        return latestStartTime.isAfter(earliestStartTime) && earliestStartTime.plusMinutes(longestTime).isBefore(maximumEndTime);
     }
 }

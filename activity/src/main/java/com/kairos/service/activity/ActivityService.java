@@ -481,9 +481,7 @@ public class ActivityService extends MongoBaseService {
         }
 
         save(activity);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab);
-
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(rulesActivityTab);
     }
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long countryId) {
@@ -494,8 +492,7 @@ public class ActivityService extends MongoBaseService {
 
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
 
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes, employmentTypeDTOS);
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(rulesActivityTab, dayTypes, employmentTypeDTOS);
     }
 
     public ActivityTabsWrapper updateNotesTabOfActivity(NotesActivityDTO notesActivityDTO) {
@@ -514,16 +511,14 @@ public class ActivityService extends MongoBaseService {
         }
         activity.setNotesActivityTab(notesActivityTab);
         save(activity);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(notesActivityTab);
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(notesActivityTab);
     }
 
     public ActivityTabsWrapper getNotesTabOfActivity(BigInteger activityId) {
 
 
         Activity activity = activityMongoRepository.findOne(activityId);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getNotesActivityTab());
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(activity.getNotesActivityTab());
     }
 
 
@@ -536,8 +531,7 @@ public class ActivityService extends MongoBaseService {
         }
         activity.setCommunicationActivityTab(communicationActivityTab);
         save(activity);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(communicationActivityTab);
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(communicationActivityTab);
     }
 
     public ActivityTabsWrapper getCommunicationTabOfActivity(BigInteger activityId) {
@@ -547,8 +541,7 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getCommunicationActivityTab());
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(activity.getCommunicationActivityTab());
     }
     // BONUS
 
@@ -561,17 +554,15 @@ public class ActivityService extends MongoBaseService {
         BonusActivityTab bonusActivityTab = new BonusActivityTab(bonusActivityDTO.getBonusHoursType(), bonusActivityDTO.isOverRuleCtaWta());
         activity.setBonusActivityTab(bonusActivityTab);
         save(activity);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(bonusActivityTab);
-        return activityTabsWrapper;
-    }
+        return new ActivityTabsWrapper(bonusActivityTab);
+        }
 
     public ActivityTabsWrapper getBonusTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getBonusActivityTab());
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(activity.getBonusActivityTab());
     }
 
     // PERMISSIONS
@@ -584,8 +575,7 @@ public class ActivityService extends MongoBaseService {
         }
         activity.setPermissionsActivityTab(permissionsActivityTab);
         save(activity);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(permissionsActivityTab);
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(permissionsActivityTab);
     }
 
     public ActivityTabsWrapper getPermissionsTabOfActivity(BigInteger activityId) {
@@ -593,8 +583,7 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getPermissionsActivityTab());
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(activity.getPermissionsActivityTab());
     }
 
     // skills
@@ -608,17 +597,14 @@ public class ActivityService extends MongoBaseService {
 
         activity.setSkillActivityTab(skillActivityTab);
         save(activity);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(skillActivityTab);
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(skillActivityTab);
     }
 
 
     public ActivityTabsWrapper getSkillTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getSkillActivityTab());
-        return activityTabsWrapper;
-
-    }
+        return new ActivityTabsWrapper(activity.getSkillActivityTab());
+        }
 
     // organization Mapping
     public void updateOrgMappingDetailOfActivity(OrganizationMappingActivityDTO organizationMappingActivityDTO, BigInteger activityId) {
@@ -696,21 +682,17 @@ public class ActivityService extends MongoBaseService {
         }
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
         save(activity);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(optaPlannerSettingActivityTab);
-        return activityTabsWrapper;
-
-    }
+        return new ActivityTabsWrapper(optaPlannerSettingActivityTab);
+     }
 
     public ActivityTabsWrapper getOptaPlannerSettingsTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getOptaPlannerSettingActivityTab());
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(activity.getOptaPlannerSettingActivityTab());
     }
 
     public ActivityTabsWrapper getCtaAndWtaSettingsTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getCtaAndWtaSettingsActivityTab());
-        return activityTabsWrapper;
+        return new ActivityTabsWrapper(activity.getCtaAndWtaSettingsActivityTab());
     }
 
     public ActivityTabsWrapper updateCtaAndWtaSettingsTabOfActivity(CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTabDTO) {
@@ -723,10 +705,8 @@ public class ActivityService extends MongoBaseService {
 
         activity.setCtaAndWtaSettingsActivityTab(ctaAndWtaSettingsActivityTab);
         save(activity);
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(ctaAndWtaSettingsActivityTab);
-        return activityTabsWrapper;
-
-    }
+        return new ActivityTabsWrapper(ctaAndWtaSettingsActivityTab);
+        }
 
     public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId, String type) {
         List<DayType> dayTypes = organizationRestClient.getDayTypes(unitId);
@@ -780,8 +760,7 @@ public class ActivityService extends MongoBaseService {
         List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
 
         List<ShiftTemplateDTO> shiftTemplates = shiftTemplateService.getAllShiftTemplates(unitId);
-        PhaseActivityDTO phaseActivityDTO = new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, userAccessRoleDTO, shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId));
-        return phaseActivityDTO;
+        return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, userAccessRoleDTO, shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId));
     }
 
     public GeneralActivityTab addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {
