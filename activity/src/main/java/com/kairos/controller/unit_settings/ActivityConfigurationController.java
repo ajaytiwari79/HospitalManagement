@@ -80,53 +80,53 @@ public class ActivityConfigurationController {
     @ApiOperation("Update presence Activity Configuration ")
     @PutMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/presence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updatePresenceActivityConfigurationInCountry(@PathVariable Long countryId, @RequestBody PresencePlannedTime presencePlannedTime) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updatePresenceActivityConfigurationAtCountry(countryId, presencePlannedTime));
+    public ResponseEntity<Map<String, Object>> updatePresenceActivityConfigurationForCountry(@PathVariable Long countryId, @RequestBody PresencePlannedTime presencePlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updatePresenceActivityConfigurationForCountry(countryId, presencePlannedTime));
     }
 
     @ApiOperation("Update absence Activity Configuration ")
     @PutMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/absence/{activityConfigurationId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateAbsenceActivityConfigurationAtCountry(@PathVariable Long countryId, @PathVariable BigInteger activityConfigurationId, @RequestBody AbsencePlannedTime absencePlannedTime) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfigurationAtCountry(countryId, activityConfigurationId, absencePlannedTime));
+    public ResponseEntity<Map<String, Object>> updateAbsenceActivityConfigurationForCountry(@PathVariable Long countryId, @PathVariable BigInteger activityConfigurationId, @RequestBody AbsencePlannedTime absencePlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateAbsenceActivityConfigurationForCountry(countryId, activityConfigurationId, absencePlannedTime));
     }
 
 
     @ApiOperation("create exception absence Activity Configuration ")
     @PostMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/absence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createAbsenceExceptionActivityConfigurationAtCountry(@PathVariable Long countryId, @RequestBody AbsencePlannedTime absencePlannedTime) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.createAbsenceExceptionActivityConfigurationAtCountry(countryId, absencePlannedTime));
+    public ResponseEntity<Map<String, Object>> createAbsenceExceptionActivityConfigurationForCountry(@PathVariable Long countryId, @RequestBody AbsencePlannedTime absencePlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.createAbsenceExceptionActivityConfigurationForCountry(countryId, absencePlannedTime));
     }
 
 
     @ApiOperation("CREATE Activity Configuration ")
     @PostMapping(value = COUNTRY_ACTIVITY_CONFIGURATION)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createDefaultPhaseSettingsAtCountry(@PathVariable Long countryId) {
-        activityConfigurationService.createDefaultSettingsAtCountry( countryId, null);
+    public ResponseEntity<Map<String, Object>> createDefaultPhaseSettingsForCountry(@PathVariable Long countryId) {
+        activityConfigurationService.createDefaultSettingsForCountry( countryId, null);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
     @ApiOperation("Get presence Activity Configuration")
     @GetMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/presence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAbsenceActivityConfigurationAtCountry(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getPresenceActivityConfigurationAtCountry(countryId));
+    public ResponseEntity<Map<String, Object>> getAbsenceActivityConfigurationForCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getPresenceActivityConfigurationForCountry(countryId));
     }
 
     @ApiOperation("Get absence Activity Configuration")
     @GetMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/absence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getPresenceActivityConfigurationAtCountry(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getAbsenceActivityConfigurationAtCountry(countryId));
+    public ResponseEntity<Map<String, Object>> getPresenceActivityConfigurationForCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getAbsenceActivityConfigurationForCountry(countryId));
     }
 
     @ApiOperation("Get default data ")
     @GetMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/default_data")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getDefaultDataAtCountry(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getDefaultDataAtCountry(countryId));
+    public ResponseEntity<Map<String, Object>> getDefaultDataForCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getDefaultDataForCountry(countryId));
     }
 
 

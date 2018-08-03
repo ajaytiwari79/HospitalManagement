@@ -140,11 +140,11 @@ public class ActivityConfigurationService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.country.id");
         }
         List<PhaseResponseDTO> phases = phaseMongoRepository.getAllPlanningPhasesByUnit(unitId);
-        return getDefaultDataAtCountry(phases,countryId);
+        return getDefaultDataForCountry(phases,countryId);
     }
 
 
-    public void createDefaultSettingsAtCountry(Long countryId, List<Phase> phases) {
+    public void createDefaultSettingsForCountry(Long countryId, List<Phase> phases) {
         // TODO REMOVE
         List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
         if (phases == null || phases.isEmpty()){
@@ -188,7 +188,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         activityConfigurations.add(new ActivityConfiguration( new AbsencePlannedTime(phaseId, applicablePlannedTimeId, false),countryId));
     }
 
-    public PresencePlannedTime updatePresenceActivityConfigurationAtCountry(Long countryId, PresencePlannedTime presencePlannedTime) {
+    public PresencePlannedTime updatePresenceActivityConfigurationForCountry(Long countryId, PresencePlannedTime presencePlannedTime) {
         ActivityConfiguration activityConfiguration = activityConfigurationRepository.findPresenceConfigurationByCountryIdAndPhaseId(countryId, presencePlannedTime.getPhaseId());
         if (!Optional.of(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.presenceActivityConfiguration.notFound");
@@ -200,7 +200,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         return presencePlannedTime;
     }
 
-    public AbsencePlannedTime updateAbsenceActivityConfigurationAtCountry(Long countryId, BigInteger activityConfigurationId, AbsencePlannedTime absencePlannedTime) {
+    public AbsencePlannedTime updateAbsenceActivityConfigurationForCountry(Long countryId, BigInteger activityConfigurationId, AbsencePlannedTime absencePlannedTime) {
         Optional<ActivityConfiguration> activityConfiguration = activityConfigurationRepository.findById(activityConfigurationId);
         if (!Optional.of(activityConfiguration).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.absenceActivityConfiguration.notFound");
@@ -215,7 +215,7 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     }
 
-    public BigInteger createAbsenceExceptionActivityConfigurationAtCountry(Long countryId, AbsencePlannedTime absencePlannedTime) {
+    public BigInteger createAbsenceExceptionActivityConfigurationForCountry(Long countryId, AbsencePlannedTime absencePlannedTime) {
         if (!Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.timetype.unselected");
         }
@@ -225,21 +225,21 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     }
 
-    public List<ActivityConfigurationDTO> getAbsenceActivityConfigurationAtCountry(Long countryId) {
+    public List<ActivityConfigurationDTO> getAbsenceActivityConfigurationForCountry(Long countryId) {
         return activityConfigurationRepository.findAbsenceConfigurationByCountryId(countryId);
     }
 
-    public List<ActivityConfigurationDTO> getPresenceActivityConfigurationAtCountry(Long countryId) {
+    public List<ActivityConfigurationDTO> getPresenceActivityConfigurationForCountry(Long countryId) {
          return activityConfigurationRepository.findPresenceConfigurationByCountryId(countryId);
     }
 
 
-    public ActivityConfigurationWrapper getDefaultDataAtCountry(Long countryId) {
+    public ActivityConfigurationWrapper getDefaultDataForCountry(Long countryId) {
         List<PhaseResponseDTO> phases = phaseMongoRepository.findPlanningPhasesByCountry(countryId);
-        return getDefaultDataAtCountry(phases,countryId);
+        return getDefaultDataForCountry(phases,countryId);
     }
 
-    private ActivityConfigurationWrapper getDefaultDataAtCountry(List<PhaseResponseDTO> phases,Long countryId) {
+    private ActivityConfigurationWrapper getDefaultDataForCountry(List<PhaseResponseDTO> phases,Long countryId) {
         List<TimeTypeDTO> topLevelTimeType = timeTypeMongoRepository.getTopLevelTimeTypeIds(countryId);
         List<BigInteger> topLevelTimeTypeIds = topLevelTimeType.stream().map(TimeTypeDTO::getId).collect(Collectors.toList());
         List<TimeTypeResponseDTO> secondLevelTimeTypes = timeTypeMongoRepository.findAllChildByParentId(topLevelTimeTypeIds);
