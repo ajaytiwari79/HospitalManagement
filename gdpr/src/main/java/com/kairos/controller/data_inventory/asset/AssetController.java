@@ -29,7 +29,7 @@ public class AssetController {
 
     @ApiOperation(value = "create asset for organization with basic detail")
     @PostMapping("/asset")
-    public ResponseEntity<Object> createAssetWithBasicDetail( @PathVariable Long unitId, @Valid @RequestBody Asset asset) {
+    public ResponseEntity<Object> createAssetWithBasicDetail( @PathVariable Long unitId, @Valid @RequestBody AssetDTO asset) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "ManagingOrganization id can't be Null");
         }
@@ -51,7 +51,7 @@ public class AssetController {
 
     @ApiOperation(value = "update asset basic detail")
     @PutMapping("/asset/update/{assetId}")
-    public ResponseEntity<Object> updateAssetData( @PathVariable Long unitId,@PathVariable BigInteger assetId, @Valid @RequestBody Asset asset) {
+    public ResponseEntity<Object> updateAssetData( @PathVariable Long unitId,@PathVariable BigInteger assetId, @Valid @RequestBody AssetDTO asset) {
 
        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "ManagingOrganization id can't be Null");
