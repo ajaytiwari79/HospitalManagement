@@ -18,7 +18,7 @@ public interface HostingProviderMongoRepository extends MongoRepository<HostingP
     @Query("{countryId:?0,_id:?1,deleted:false}")
     HostingProvider findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1,name:?2}")
+    @Query("{deleted:false,countryId:?0,name:?1}")
     HostingProvider findByName(Long countryId,String name);
 
     @Query("{deleted:false,_id:?0}")
