@@ -23,6 +23,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RuleTemplateCategoryDTO {
 
+
     @NotNull(message = "error.RuleTemplateCategory.name.notnull")
     // @JsonProperty(value = "categoryName")
     private String name;

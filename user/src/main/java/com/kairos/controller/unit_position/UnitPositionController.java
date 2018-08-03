@@ -1,6 +1,7 @@
 package com.kairos.controller.unit_position;
 
 
+import com.kairos.activity.cta.CollectiveTimeAgreementDTO;
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.user.staff.unit_position.UnitPositionDTO;
@@ -19,8 +20,10 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -73,6 +76,18 @@ public class UnitPositionController {
     @GetMapping(value = "/unit_position/{unitPositionId}/wta")
     public ResponseEntity<Map<String, Object>> getUnitPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionWTA(unitId, unitPositionId));
+    }
+
+    @ApiOperation(value = "Update Unit Position's CTA")
+    @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta/{ctaId}")
+    public ResponseEntity<Map<String, Object>> updateCostTimeAgreementForUnitPosition(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable BigInteger ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO ctaDTO) throws ExecutionException, InterruptedException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.updateCostTimeAgreementForUnitPosition(unitId, unitPositionId, ctaId, ctaDTO));
+    }
+
+    @ApiOperation(value = "get unit_position's CTA")
+    @GetMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta")
+    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitId, unitPositionId));
     }
 
     @ApiOperation(value = "get unit_position's CTA")

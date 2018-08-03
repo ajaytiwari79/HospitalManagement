@@ -314,6 +314,7 @@ public class CostTimeAgreementService extends UserBaseService {
             throws InterruptedException, ExecutionException {
 
         /*Callable<List<TimeType>> timeTypesTask = () -> {
+        /*Callable<List<TimeType>> timeTypesTask = () -> {
             Iterable<TimeType> timeTypes = timeTypeGraphRepository.findAllById(ctaRuleTemplateDTO.getTimeTypes(), 0);
             return StreamSupport.stream(timeTypes.spliterator(), true).collect(Collectors.toList());
         };
@@ -643,8 +644,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
             List<Long> ruleTemplateIds = null;
             if (Optional.ofNullable(oldCTA.getRuleTemplates()).isPresent() && !oldCTA.getRuleTemplates().isEmpty()) {
-                ruleTemplateIds = new ArrayList<>();
-                oldCTA.getRuleTemplates().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
+                ruleTemplateIds = oldCTA.getRuleTemplates().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
             }
             copyRules(oldCTA, ctaDTO, ruleTemplateIds);
             this.save(oldCTA);

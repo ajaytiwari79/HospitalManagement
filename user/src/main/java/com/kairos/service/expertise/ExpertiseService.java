@@ -11,11 +11,11 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
 import com.kairos.persistence.model.country.experties.*;
+import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.user.country.experties.*;
 import com.kairos.user.country.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
@@ -102,6 +102,8 @@ public class ExpertiseService extends UserBaseService {
 
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
+
+    @Inject private com.kairos.service.organization.OrganizationService organizationService;
 
     public ExpertiseResponseDTO saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -756,6 +758,11 @@ public class ExpertiseService extends UserBaseService {
         countryDetail.put("employmentTypes", employmentTypes);
         countryDetail.put("presenceTypes", presenceTypes);
         return countryDetail;
+    }
+
+    public List<ExpertiseTagDTO> getExpertiseForOrgCTA(long unitId) {
+        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+        return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
     }
 
 }

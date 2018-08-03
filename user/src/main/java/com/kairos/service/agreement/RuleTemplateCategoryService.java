@@ -14,6 +14,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.country.basic_details.CountryDTO;
 import com.kairos.util.ArrayUtil;
 import com.kairos.wrapper.RuleTemplateDTO;
 import org.slf4j.Logger;
@@ -68,7 +69,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
     }
 
     public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
-        Country country = countryService.getCountryById(countryId);
+        CountryDTO country = countryService.getCountryById(countryId);
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notExist");
 

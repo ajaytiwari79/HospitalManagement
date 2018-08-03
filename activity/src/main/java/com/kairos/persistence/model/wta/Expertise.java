@@ -5,16 +5,15 @@ package com.kairos.persistence.model.wta;
  * @date - 11/4/18
  */
 
-public class WTAOrganizationType {
-
+public class Expertise {
     private Long id;
     private String name;
     private String description;
 
-    public WTAOrganizationType() {
+    public Expertise() {
     }
 
-    public WTAOrganizationType(Long id, String name, String description) {
+    public Expertise(Long id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;

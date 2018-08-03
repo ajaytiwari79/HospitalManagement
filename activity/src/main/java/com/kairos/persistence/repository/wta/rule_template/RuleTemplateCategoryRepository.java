@@ -13,7 +13,7 @@ import java.util.List;
 
 
 /**
- * Created by vipul on 2/8/17.
+ * Created by pradeep on 2/8/17.
  */
 @Repository
 public interface RuleTemplateCategoryRepository extends MongoBaseRepository<RuleTemplateCategory, BigInteger> ,CustomRuleTemplateCategoryRepository {
