@@ -472,7 +472,7 @@ public class ActivityService extends MongoBaseService {
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
         verifyActivityTimeRules(rulesActivityDTO.getEarliestStartTime(),rulesActivityDTO.getLatestStartTime(),rulesActivityDTO.getMaximumEndTime(),rulesActivityDTO.getShortestTime(),rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = rulesActivityDTO.buildRulesActivityTab();
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(rulesActivityDTO.getActivityId())));
+        Activity activity = activityMongoRepository.findOne(rulesActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", rulesActivityDTO.getActivityId());
         }

@@ -6,6 +6,7 @@ import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
 import com.kairos.persistence.model.activity.tabs.RulesActivityTab;
 
 import javax.validation.constraints.AssertTrue;
+import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RulesActivityTabDTO {
 
-    private Long activityId;
+    private BigInteger activityId;
     private boolean eligibleForFinalSchedule;
     private boolean eligibleForDraftSchedule;
     private boolean eligibleForRequest;
@@ -82,11 +83,11 @@ public class RulesActivityTabDTO {
         return rulesActivityTab;
     }
 
-    public Long getActivityId() {
+    public BigInteger getActivityId() {
         return activityId;
     }
 
-    public void setActivityId(Long activityId) {
+    public void setActivityId(BigInteger activityId) {
         this.activityId = activityId;
     }
 
