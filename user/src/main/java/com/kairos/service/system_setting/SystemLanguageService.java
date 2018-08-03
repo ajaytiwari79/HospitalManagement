@@ -99,6 +99,9 @@ public class SystemLanguageService extends UserBaseService {
         if(!Optional.ofNullable(systemLanguage).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.system.language.notFound",systemLanguageId);
         }
+        if(systemLanguage.isDefaultLanguage()) {
+            exceptionService.dataNotFoundByIdException("message.system.language.default.cannot.delete");
+        }
 
         systemLanguage.setDeleted(true);
         save(systemLanguage);
