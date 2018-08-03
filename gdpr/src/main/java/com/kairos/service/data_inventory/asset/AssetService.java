@@ -43,30 +43,31 @@ public class AssetService extends MongoBaseService {
     private AssetTypeMongoRepository assetTypeMongoRepository;
 
 
-    public Asset createAsseWithBasictDetail(Long organizationId, Asset asset) {
+    public AssetDTO createAsseWithBasictDetail(Long organizationId, AssetDTO assetDTO) {
 
-        Asset existingAsset = assetMongoRepository.findByName(organizationId, asset.getName());
+        Asset existingAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
         if (Optional.ofNullable(existingAsset).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", " Asset ", asset.getName());
+            exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
         }
-        AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, asset.getAssetType());
-        if (!assetType.getSubAssetTypes().containsAll(asset.getAssetSubTypes())) {
+        AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
+        if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
             exceptionService.invalidRequestException("message.invalid.request", "Asset Sub Type is Not Selected");
         }
-        Asset newAsset = new Asset(asset.getName(), asset.getDescription(), asset.getHostingLocation(),
-                asset.getAssetType(), asset.getAssetSubTypes(), asset.getManagingDepartment(), asset.getAssetOwner(), true);
+        Asset newAsset = new Asset(assetDTO.getName(), assetDTO.getDescription(), assetDTO.getHostingLocation(),
+                assetDTO.getAssetType(), assetDTO.getAssetSubTypes(), assetDTO.getManagingDepartment(), assetDTO.getAssetOwner(), true);
         newAsset.setOrganizationId(organizationId);
-        newAsset.setHostingProvider(asset.getHostingProvider());
-        newAsset.setHostingType(asset.getHostingType());
-        newAsset.setOrgSecurityMeasures(asset.getOrgSecurityMeasures());
-        newAsset.setTechnicalSecurityMeasures(asset.getTechnicalSecurityMeasures());
-        newAsset.setStorageFormats(asset.getStorageFormats());
-        newAsset.setDataDisposal(asset.getDataDisposal());
-        newAsset.setDataRetentionPeriod(asset.getDataRetentionPeriod());
-        newAsset.setMaxDataSubjectVolume(asset.getMaxDataSubjectVolume());
-        newAsset.setMinDataSubjectVolume(asset.getMinDataSubjectVolume());
-        assetMongoRepository.save(getNextSequence(newAsset));
-        return newAsset;
+        newAsset.setHostingProvider(assetDTO.getHostingProvider());
+        newAsset.setHostingType(assetDTO.getHostingType());
+        newAsset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
+        newAsset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
+        newAsset.setStorageFormats(assetDTO.getStorageFormats());
+        newAsset.setDataDisposal(assetDTO.getDataDisposal());
+        newAsset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
+        newAsset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
+        newAsset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
+        newAsset = assetMongoRepository.save(getNextSequence(newAsset));
+        assetDTO.setId(newAsset.getId());
+        return assetDTO;
     }
 
 
@@ -126,42 +127,43 @@ public class AssetService extends MongoBaseService {
      * @param
      * @param organizationId
      * @param assetId        - asset id
-     * @param asset          - asset dto contain meta data about asset
+     * @param assetDTO       - asset dto contain meta data about asset
      * @return - updated Asset
      */
-    public Asset updateAssetData(Long organizationId, BigInteger assetId, Asset asset) {
+    public AssetDTO updateAssetData(Long organizationId, BigInteger assetId, AssetDTO assetDTO) {
 
-        Asset existAsset = assetMongoRepository.findByName(organizationId, asset.getName());
-        if (Optional.ofNullable(existAsset).isPresent() && !assetId.equals(existAsset.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", " Asset ", asset.getName());
+        Asset asset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
+        if (Optional.ofNullable(asset).isPresent() && !assetId.equals(asset.getId())) {
+            exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
         }
-        existAsset = assetMongoRepository.findByIdAndNonDeleted(organizationId, assetId);
-        if (!Optional.ofNullable(existAsset).isPresent()) {
+        asset = assetMongoRepository.findByIdAndNonDeleted(organizationId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset ", assetId);
         }
-        AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, asset.getAssetType());
-        if (!assetType.getSubAssetTypes().containsAll(asset.getAssetSubTypes())) {
+        AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
+        if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
             exceptionService.invalidRequestException("message.invalid.request", "Asset Sub Type is Not Selected");
         }
-        existAsset.setHostingLocation(asset.getHostingLocation());
-        existAsset.setName(asset.getName());
-        existAsset.setDescription(asset.getDescription());
-        existAsset.setManagingDepartment(asset.getManagingDepartment());
-        existAsset.setAssetOwner(asset.getAssetOwner());
-        existAsset.setActive(asset.getActive());
-        existAsset.setAssetType(asset.getAssetType());
-        existAsset.setAssetSubTypes(asset.getAssetSubTypes());
-        existAsset.setHostingProvider(asset.getHostingProvider());
-        existAsset.setHostingType(asset.getHostingType());
-        existAsset.setOrgSecurityMeasures(asset.getOrgSecurityMeasures());
-        existAsset.setTechnicalSecurityMeasures(asset.getTechnicalSecurityMeasures());
-        existAsset.setStorageFormats(asset.getStorageFormats());
-        existAsset.setDataDisposal(asset.getDataDisposal());
-        existAsset.setDataRetentionPeriod(asset.getDataRetentionPeriod());
-        existAsset.setMaxDataSubjectVolume(asset.getMaxDataSubjectVolume());
-        existAsset.setMinDataSubjectVolume(asset.getMinDataSubjectVolume());
-        assetMongoRepository.save(getNextSequence(existAsset));
-        return existAsset;
+        asset.setHostingLocation(assetDTO.getHostingLocation());
+        asset.setName(assetDTO.getName());
+        asset.setDescription(assetDTO.getDescription());
+        asset.setManagingDepartment(assetDTO.getManagingDepartment());
+        asset.setAssetOwner(assetDTO.getAssetOwner());
+        asset.setActive(assetDTO.getActive());
+        asset.setAssetType(assetDTO.getAssetType());
+        asset.setAssetSubTypes(assetDTO.getAssetSubTypes());
+        asset.setHostingProvider(assetDTO.getHostingProvider());
+        asset.setHostingType(assetDTO.getHostingType());
+        asset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
+        asset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
+        asset.setStorageFormats(assetDTO.getStorageFormats());
+        asset.setDataDisposal(assetDTO.getDataDisposal());
+        asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
+        asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
+        asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
+        asset = assetMongoRepository.save(getNextSequence(asset));
+        assetDTO.setId(asset.getId());
+        return assetDTO;
     }
 
 

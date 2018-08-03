@@ -20,6 +20,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssetDTO {
 
+    private BigInteger id;
 
     @NotNullOrEmpty(message = "name can't be empty ")
     @Pattern(message = "Number and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
@@ -67,7 +68,15 @@ public class AssetDTO {
 
     private RiskSeverity risk;
 
-    private Boolean isActive;
+    private Boolean active;
+
+   public Boolean getActive() { return active; }
+
+   public void setActive(Boolean active) { this.active = active; }
+
+   public BigInteger getId() { return id; }
+
+    public void setId(BigInteger id) { this.id = id; }
 
     public String getName() { return name; }
 
@@ -141,9 +150,6 @@ public class AssetDTO {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
- public Boolean getActive() { return isActive; }
-
- public void setActive(Boolean active) { isActive = active; }
 
  public AssetDTO() { }
 }
