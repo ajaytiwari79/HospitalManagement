@@ -23,7 +23,7 @@ public class OrganizationalSecurityMeasure extends MongoBaseEntity {
         this.countryId = countryId;
     }
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {

@@ -64,7 +64,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
             if (!responsibilityTypeNames.isEmpty()) {
                 for (String name : responsibilityTypeNames) {
 
-                    ResponsibilityType newResponsibilityType = new ResponsibilityType();
+                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name);
                     newResponsibilityType.setCountryId(countryId);
                     newResponsibilityTypes.add(newResponsibilityType);
 

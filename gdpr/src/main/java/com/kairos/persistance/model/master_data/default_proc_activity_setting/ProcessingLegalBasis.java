@@ -26,7 +26,7 @@ public class ProcessingLegalBasis extends MongoBaseEntity {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {

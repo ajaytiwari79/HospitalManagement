@@ -24,7 +24,7 @@ public interface AccessorPartyMongoRepository extends MongoRepository<AccessorPa
     @Query("{countryId:?0,_id:?1,deleted:false}")
     AccessorParty findByIdAndNonDeleted(Long countryId, BigInteger id);
 
-    @Query("{countryId:?0,name:?2,deleted:false}")
+    @Query("{countryId:?0,name:?1,deleted:false}")
     AccessorParty findByName(Long countryId,String name);
 
     @Query("{_id:{$in:?0}}")
