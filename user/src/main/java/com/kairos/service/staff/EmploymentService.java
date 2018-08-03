@@ -124,7 +124,7 @@ public class EmploymentService extends UserBaseService {
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
 
-        if (Optional.ofNullable(objectToUpdate).isPresent()) {
+        if (!Optional.ofNullable(objectToUpdate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
         } else if (objectToUpdate.getExternalId()!=null && !staffEmploymentDetail.getTimeCareExternalId().equals(objectToUpdate.getExternalId())) {
             exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
