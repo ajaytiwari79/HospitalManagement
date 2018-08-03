@@ -140,13 +140,7 @@ public class ActivityConfigurationService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.country.id");
         }
         List<PhaseResponseDTO> phases = phaseMongoRepository.getAllPlanningPhasesByUnit(unitId);
-        List<TimeTypeDTO> topLevelTimeType = timeTypeMongoRepository.getTopLevelTimeTypeIds(countryId);
-        List<BigInteger> topLevelTimeTypeIds = topLevelTimeType.stream().map(TimeTypeDTO::getId).collect(Collectors.toList());
-        List<TimeTypeResponseDTO> secondLevelTimeTypes = timeTypeMongoRepository.findAllChildByParentId(topLevelTimeTypeIds);
-        List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
-        ActivityConfigurationWrapper activityConfigurationWrapper = new ActivityConfigurationWrapper(phases, secondLevelTimeTypes, plannedTimeTypes);
-
-        return activityConfigurationWrapper;
+        return getDefaultDataAtCountry(phases,countryId);
     }
 
     //==============
@@ -234,26 +228,25 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     }
 
-    public List<ActivityConfigurationDTO> getAbsenceActivityConfigurationAtCountry(Long unitId) {
-        return activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
+    public List<ActivityConfigurationDTO> getAbsenceActivityConfigurationAtCountry(Long countryId) {
+        return activityConfigurationRepository.findAbsenceConfigurationByCountryId(countryId);
     }
 
-    public List<ActivityConfigurationDTO> getPresenceActivityConfigurationAtCountry(Long unitId) {
-        return activityConfigurationRepository.findPresenceConfigurationByUnitId(unitId);
+    public List<ActivityConfigurationDTO> getPresenceActivityConfigurationAtCountry(Long countryId) {
+         return activityConfigurationRepository.findPresenceConfigurationByCountryId(countryId);
     }
 
-    public ActivityConfigurationWrapper getDefaultDataAtCountry(Long unitId) {
-        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
-        if (!Optional.ofNullable(countryId).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id");
-        }
-        List<PhaseResponseDTO> phases = phaseMongoRepository.getAllPlanningPhasesByUnit(unitId);
+
+    public ActivityConfigurationWrapper getDefaultDataAtCountry(Long countryId) {
+        List<PhaseResponseDTO> phases = phaseMongoRepository.findPlanningPhasesByCountry(countryId);
+        return getDefaultDataAtCountry(phases,countryId);
+    }
+
+    private ActivityConfigurationWrapper getDefaultDataAtCountry(List<PhaseResponseDTO> phases,Long countryId) {
         List<TimeTypeDTO> topLevelTimeType = timeTypeMongoRepository.getTopLevelTimeTypeIds(countryId);
         List<BigInteger> topLevelTimeTypeIds = topLevelTimeType.stream().map(TimeTypeDTO::getId).collect(Collectors.toList());
         List<TimeTypeResponseDTO> secondLevelTimeTypes = timeTypeMongoRepository.findAllChildByParentId(topLevelTimeTypeIds);
         List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
-        ActivityConfigurationWrapper activityConfigurationWrapper = new ActivityConfigurationWrapper(phases, secondLevelTimeTypes, plannedTimeTypes);
-
-        return activityConfigurationWrapper;
+        return new ActivityConfigurationWrapper(phases, secondLevelTimeTypes, plannedTimeTypes);
     }
 }

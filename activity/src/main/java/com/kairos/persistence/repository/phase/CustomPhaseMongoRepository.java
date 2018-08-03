@@ -24,4 +24,5 @@ public interface CustomPhaseMongoRepository {
      List<PhaseDTO> getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence);
      List<Phase> getPlanningPhasesByUnit(Long unitId);
      List<Phase> getPlanningPhasesByCountry(Long countryId);
+     List<PhaseResponseDTO> findPlanningPhasesByCountry(Long countryId);
 }

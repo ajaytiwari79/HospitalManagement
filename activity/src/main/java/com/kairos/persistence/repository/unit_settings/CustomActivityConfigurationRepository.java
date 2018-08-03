@@ -23,5 +23,9 @@ public interface CustomActivityConfigurationRepository {
     //======
     ActivityConfiguration findPresenceConfigurationByCountryIdAndPhaseId(Long countryId, BigInteger phaseId);
 
+    List<ActivityConfigurationDTO> findPresenceConfigurationByCountryId(Long countryId);
+
+    List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryId(Long unitId);
+
 
 }

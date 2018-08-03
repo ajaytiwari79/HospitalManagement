@@ -112,22 +112,22 @@ public class ActivityConfigurationController {
     @ApiOperation("Get presence Activity Configuration")
     @GetMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/presence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAbsenceActivityConfigurationAtCountry(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getPresenceActivityConfigurationAtCountry(unitId));
+    public ResponseEntity<Map<String, Object>> getAbsenceActivityConfigurationAtCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getPresenceActivityConfigurationAtCountry(countryId));
     }
 
     @ApiOperation("Get absence Activity Configuration")
     @GetMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/absence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getPresenceActivityConfigurationAtCountry(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getAbsenceActivityConfigurationAtCountry(unitId));
+    public ResponseEntity<Map<String, Object>> getPresenceActivityConfigurationAtCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getAbsenceActivityConfigurationAtCountry(countryId));
     }
 
     @ApiOperation("Get default data ")
     @GetMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/default_data")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDefaultDataAtCountry(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getDefaultDataAtCountry(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getDefaultDataAtCountry(countryId));
     }
 
 
