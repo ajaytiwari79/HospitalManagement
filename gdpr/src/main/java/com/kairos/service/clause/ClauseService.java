@@ -88,7 +88,7 @@ public class ClauseService extends MongoBaseService {
         try {
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
             newClause.setTags(tagList);
-            newClause = clauseMongoRepository.save(sequenceGenerator(newClause));
+            newClause = clauseMongoRepository.save(getNextSequence(newClause));
             return newClause;
         } catch (DuplicateDataException e) {
             clauseTagMongoRepository.deleteAll(tagList);
@@ -137,7 +137,7 @@ public class ClauseService extends MongoBaseService {
             exists.setTags(tagList);
             exists.setTemplateTypes(clauseDto.getTemplateTypes());
             // exists.setOrganizationList(clauseDto.getOrganizationList());
-            exists = clauseMongoRepository.save(sequenceGenerator(exists));
+            exists = clauseMongoRepository.save(getNextSequence(exists));
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
@@ -189,7 +189,7 @@ public class ClauseService extends MongoBaseService {
             newCLauseList.add(clause);
 
         }
-        return clauseMongoRepository.saveAll(sequenceGenerator(newCLauseList));
+        return clauseMongoRepository.saveAll(getNextSequence(newCLauseList));
     }
 
 

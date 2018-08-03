@@ -54,7 +54,7 @@ public class DataCategoryService extends MongoBaseService {
         try {
             DataCategory newDataCategory = new DataCategory(dataCategoryDto.getName(),(List<BigInteger>) dataElementList.get(IDS_LIST),countryId);
             newDataCategory.setOrganizationId(organizationId);
-            dataCategory = dataCategoryMongoRepository.save(sequenceGenerator(newDataCategory));
+            dataCategory = dataCategoryMongoRepository.save(getNextSequence(newDataCategory));
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
             dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_ELEMENTS_LIST));
@@ -143,7 +143,7 @@ public class DataCategoryService extends MongoBaseService {
         try {
             dataCategory.setName(dataCategoryDto.getName());
             dataCategory.setDataElements((List<BigInteger>) dataElementListMap.get(IDS_LIST));
-            dataCategory = dataCategoryMongoRepository.save(sequenceGenerator(dataCategory));
+            dataCategory = dataCategoryMongoRepository.save(getNextSequence(dataCategory));
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
             dataElementMognoRepository.deleteAll((List<DataElement>) dataElementListMap.get(DATA_ELEMENTS_LIST));

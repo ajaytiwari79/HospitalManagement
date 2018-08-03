@@ -6,7 +6,8 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
-import com.kairos.persistance.repository.master_data.asset_management.StorageFormatMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
+import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -60,14 +61,13 @@ public class StorageFormatService extends MongoBaseService {
                 for (String name : storageFormatNames) {
 
                     StorageFormat newStorageFormat = new StorageFormat(name);
-                    newStorageFormat.setName(name);
                     newStorageFormat.setCountryId(countryId);
                     newStorageFormats.add(newStorageFormat);
 
                 }
 
 
-                newStorageFormats = storageFormatMongoRepository.saveAll(sequenceGenerator(newStorageFormats));
+                newStorageFormats = storageFormatMongoRepository.saveAll(getNextSequence(newStorageFormats));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newStorageFormats);
@@ -139,7 +139,7 @@ public class StorageFormatService extends MongoBaseService {
         } else {
             exist = storageFormatMongoRepository.findByid(id);
             exist.setName(storageFormat.getName());
-            return storageFormatMongoRepository.save(sequenceGenerator(exist));
+            return storageFormatMongoRepository.save(getNextSequence(exist));
 
         }
     }
@@ -162,6 +162,13 @@ public class StorageFormatService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+
+    public List<StorageFormatResponseDTO> getAllNotInheritedStorageFormatFromParentOrgAndUnitStorageFormat(Long countryId, Long parentOrganizationId, Long unitId){
+
+        return storageFormatMongoRepository.getAllNotInheritedStorageFormatFromParentOrgAndUnitStorageFormat(countryId,parentOrganizationId,unitId);
     }
 
 

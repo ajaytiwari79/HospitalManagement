@@ -103,10 +103,14 @@ public class AccessorPartyController {
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.updateAccessorParty(countryId, id, accessorParty));
-
     }
 
+    @ApiOperation("get All AccessorParty of Current organization and Parent Oeg which were not inherited by Organization")
+    @GetMapping("/accessor_party")
+    public ResponseEntity<Object> getAllAccessorPartyOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam long parentOrgId) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(countryId,parentOrgId,organizationId));
+    }
 
 }

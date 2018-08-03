@@ -5,7 +5,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
-import com.kairos.persistance.repository.master_data.asset_management.TechnicalSecurityMeasureMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
@@ -65,7 +65,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
 
                 }
-                newTechnicalMeasures = technicalSecurityMeasureMongoRepository.saveAll(sequenceGenerator(newTechnicalMeasures));
+                newTechnicalMeasures = technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(newTechnicalMeasures));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTechnicalMeasures);
@@ -136,7 +136,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
         } else {
             exist = technicalSecurityMeasureMongoRepository.findByid(id);
             exist.setName(techSecurityMeasure.getName());
-            return technicalSecurityMeasureMongoRepository.save(sequenceGenerator(exist));
+            return technicalSecurityMeasureMongoRepository.save(getNextSequence(exist));
 
         }
     }
