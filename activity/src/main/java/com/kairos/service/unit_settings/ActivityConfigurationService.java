@@ -143,7 +143,6 @@ public class ActivityConfigurationService extends MongoBaseService {
         return getDefaultDataAtCountry(phases,countryId);
     }
 
-    //==============
 
     public void createDefaultSettingsAtCountry(Long countryId, List<Phase> phases) {
         // TODO REMOVE
@@ -175,8 +174,6 @@ public class ActivityConfigurationService extends MongoBaseService {
                     createDefaultAbsenceSettingsAtCountry(phase.getId(), normalPlannedTypeId, activityConfigurations, countryId);
                     createDefaultPresentSettingsAtCountry(phase.getId(), normalPlannedTypeId, activityConfigurations, countryId);
                     break;
-                default:
-                    // no operation
             }
         }
         save(activityConfigurations);

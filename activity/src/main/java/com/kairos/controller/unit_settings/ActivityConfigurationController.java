@@ -76,7 +76,6 @@ public class ActivityConfigurationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getDefaultData(unitId));
     }
 
-    //============
 
     @ApiOperation("Update presence Activity Configuration ")
     @PutMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/presence")

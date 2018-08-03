@@ -29,10 +29,6 @@ public class ActivityConfigurationRepositoryImpl implements CustomActivityConfig
         return mongoTemplate.findOne(query, ActivityConfiguration.class);
     }
 
-    public ActivityConfiguration findAbsenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId, Boolean exception) {
-        Query query = new Query(Criteria.where("unitId").is(unitId).and("absencePlannedTime.phaseId").is(phaseId).and("absencePlannedTime.exception").is(exception));
-        return mongoTemplate.findOne(query, ActivityConfiguration.class);
-    }
 
     public List<ActivityConfigurationDTO> findPresenceConfigurationByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
@@ -70,10 +66,6 @@ public class ActivityConfigurationRepositoryImpl implements CustomActivityConfig
         return result.getMappedResults();
     }
 
-    public List<ActivityConfiguration> findAllPresenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId) {
-        Query query = new Query(Criteria.where("unitId").is(unitId).and("presencePlannedTime.phaseId").is(phaseId));
-        return mongoTemplate.find(query, ActivityConfiguration.class);
-    }
 
     public List<ActivityConfiguration> findAllAbsenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId) {
         Query query = new Query(Criteria.where("unitId").is(unitId).and("absencePlannedTime.phaseId").is(phaseId));
@@ -120,9 +112,5 @@ public class ActivityConfigurationRepositoryImpl implements CustomActivityConfig
         AggregationResults<ActivityConfigurationDTO> result = mongoTemplate.aggregate(aggregation, ActivityConfiguration.class, ActivityConfigurationDTO.class);
         return result.getMappedResults();
     }
-
-
-
-
 }
 
