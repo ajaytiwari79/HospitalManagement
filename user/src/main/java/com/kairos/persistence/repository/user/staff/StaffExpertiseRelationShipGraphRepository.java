@@ -47,4 +47,5 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
     List<StaffDTO> getStaffDetailByIds(Set<Long> staffId, Long currentMillis);
 
 
+
 }
