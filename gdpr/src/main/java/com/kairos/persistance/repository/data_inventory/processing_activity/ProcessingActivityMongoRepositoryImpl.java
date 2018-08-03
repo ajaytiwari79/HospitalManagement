@@ -1,17 +1,11 @@
 package com.kairos.persistance.repository.data_inventory.processing_activity;
 
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
-import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
-import com.kairos.persistance.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
-import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -26,16 +20,13 @@ import static com.kairos.constants.AppConstant.*;
 public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingActivityRepository {
 
 
-
-
-    Document projectionOpertaion= Document.parse(CustomAggregationQuery.projectionForProcessingActivity());
-
     @Inject
     private MongoTemplate mongoTemplate;
 
+
     @Override
     public ProcessingActivity findByName( Long organizationId, String name) {
-        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("name").is(name).and("isSubProcess").is(false));
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("name").is(name).and("subProcess").is(false));
         query.collation(Collation.of("en").strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, ProcessingActivity.class);
     }
@@ -81,4 +72,5 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
         return result.getUniqueMappedResult();
     }
+
 }
