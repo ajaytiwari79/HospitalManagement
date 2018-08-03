@@ -68,7 +68,7 @@ public class AssetTypeService extends MongoBaseService {
         assetType.setName(assetTypeDto.getName());
         assetType.setCountryId(countryId);
         try {
-            assetType = assetTypeMongoRepository.save(sequenceGenerator(assetType));
+            assetType = assetTypeMongoRepository.save(getNextSequence(assetType));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -95,7 +95,7 @@ public class AssetTypeService extends MongoBaseService {
         Map<String, Object> result = new HashMap<>();
         List<BigInteger> subAssetTypesIds = new ArrayList<>();
         try {
-            subAssetTypes = assetTypeMongoRepository.saveAll(sequenceGenerator(subAssetTypes));
+            subAssetTypes = assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypes));
             subAssetTypes.forEach(subAssetType -> {
                 subAssetTypesIds.add(subAssetType.getId());
             });
@@ -132,7 +132,7 @@ public class AssetTypeService extends MongoBaseService {
         });
         Map<String, Object> result = new HashMap<>();
         try {
-            subAssetTypesList = assetTypeMongoRepository.saveAll(sequenceGenerator(subAssetTypesList));
+            subAssetTypesList = assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypesList));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -184,7 +184,7 @@ public class AssetTypeService extends MongoBaseService {
             List<AssetType> subAssetTypes = assetTypeMongoRepository.findAllAssetTypebyIds(countryId, exist.getSubAssetTypes());
             if (!subAssetTypes.isEmpty()) {
                 subAssetTypes.forEach(subAssetType -> subAssetType.setDeleted(true));
-                assetTypeMongoRepository.saveAll(sequenceGenerator(subAssetTypes));
+                assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypes));
             }
             delete(exist);
             result.put("isSuccess", true);
@@ -233,7 +233,7 @@ public class AssetTypeService extends MongoBaseService {
 
         try {
             exist.setSubAssetTypes(updatedAndNewSubAssetTypeIds);
-            exist = assetTypeMongoRepository.save(sequenceGenerator(exist));
+            exist = assetTypeMongoRepository.save(getNextSequence(exist));
         } catch (Exception e) {
             List<AssetType> subAssetTypes = new ArrayList<>();
             subAssetTypes.addAll((List<AssetType>) newSubAssetTypes.get(ASSET_TYPES_LIST));

@@ -31,8 +31,8 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
 
 
     @Override
-    public Asset findByName(Long countryid, Long organizationId, String name) {
-        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryid).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("name").is(name));
+    public Asset findByName( Long organizationId, String name) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("name").is(name));
         query.collation(Collation.of("en").strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, Asset.class);
 
@@ -40,9 +40,9 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
 
 
     @Override
-    public AssetResponseDTO findAssetWithMetaDataById(Long countryId, Long organizationId, BigInteger id) {
+    public AssetResponseDTO findAssetWithMetaDataById( Long organizationId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
+                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
                 lookup("storage_format", "storageFormats", "_id", "storageFormats"),
                 lookup("organization_security_measure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
                 lookup("technical_security_measure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
@@ -60,11 +60,11 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
     }
 
     @Override
-    public List<AssetResponseDTO> findAllAssetWithMetaData(Long countryId, Long organizationId) {
+    public List<AssetResponseDTO> findAllAssetWithMetaData( Long organizationId) {
 
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
+                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
                 lookup("storage_format", "storageFormats", "_id", "storageFormats"),
                 lookup("organization_security_measure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
                 lookup("technical_security_measure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
