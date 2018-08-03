@@ -10,6 +10,7 @@ import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.StaffEmploymentTypeSpecification;
 import com.kairos.rule_validator.activity.StaffExpertiseSpecification;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.locale.LocaleService;
 import com.kairos.user.staff.StaffDTO;
@@ -31,8 +32,11 @@ public class StaffActivitySettingService extends MongoBaseService {
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private GenericIntegrationService genericIntegrationService;
     @Inject private LocaleService localeService;
+    @Inject private ActivityService activityService;
 
     public StaffActivitySettingDTO createStaffActivitySetting(Long unitId,StaffActivitySettingDTO staffActivitySettingDTO){
+        activityService.verifyActivityTimeRules(staffActivitySettingDTO.getEarliestStartTime(),staffActivitySettingDTO.getLatestStartTime(),
+                staffActivitySettingDTO.getMaximumEndTime(),staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=new StaffActivitySetting();
         ObjectMapperUtils.copyProperties(staffActivitySettingDTO,staffActivitySetting);
         staffActivitySetting.setUnitId(unitId);
@@ -46,6 +50,8 @@ public class StaffActivitySettingService extends MongoBaseService {
     }
 
     public StaffActivitySettingDTO updateStaffActivitySettings(BigInteger staffActivitySettingId,Long unitId, StaffActivitySettingDTO staffActivitySettingDTO){
+        activityService.verifyActivityTimeRules(staffActivitySettingDTO.getEarliestStartTime(),staffActivitySettingDTO.getLatestStartTime(),
+                staffActivitySettingDTO.getMaximumEndTime(),staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=staffActivitySettingRepository.findByIdAndDeletedFalse(staffActivitySettingId);
         if(!Optional.ofNullable(staffActivitySetting).isPresent()){
             exceptionService.dataNotFoundException("message.staff.activity.settings.absent");

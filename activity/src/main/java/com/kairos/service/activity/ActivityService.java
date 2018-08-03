@@ -14,6 +14,7 @@ import com.kairos.activity.staffing_level.StaffingLevelDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
@@ -469,8 +470,9 @@ public class ActivityService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
+        verifyActivityTimeRules(rulesActivityDTO.getEarliestStartTime(),rulesActivityDTO.getLatestStartTime(),rulesActivityDTO.getMaximumEndTime(),rulesActivityDTO.getShortestTime(),rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = rulesActivityDTO.buildRulesActivityTab();
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(rulesActivityDTO.getActivityId())));
+        Activity activity = activityMongoRepository.findOne(rulesActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", rulesActivityDTO.getActivityId());
         }
@@ -1120,5 +1122,25 @@ public class ActivityService extends MongoBaseService {
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
         ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals);
         return activityWithTimeTypeDTO;
+    }
+
+
+    public void verifyActivityTimeRules(LocalTime earliestStartTime,LocalTime latestStartTime,LocalTime maximumEndTime,int shortestTime,int longestTime){
+        if(shortestTime>longestTime){
+            exceptionService.actionNotPermittedException("shortest.time.greater.longest");
+        }
+        if(Optional.ofNullable(earliestStartTime).isPresent() &&
+                Optional.ofNullable(latestStartTime).isPresent() &&
+                earliestStartTime.isAfter(latestStartTime)){
+            exceptionService.actionNotPermittedException("earliest.start.time.less.latest");
+        }
+
+        if(Optional.ofNullable(earliestStartTime).isPresent() &&
+                Optional.ofNullable(latestStartTime).isPresent() &&
+                earliestStartTime.plusMinutes(longestTime).isAfter(maximumEndTime)) {
+            exceptionService.actionNotPermittedException("longest.duration.exceed.limit");
+        }
+
+
     }
 }
