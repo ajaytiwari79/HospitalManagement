@@ -2,9 +2,9 @@ package com.kairos.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -14,7 +14,7 @@ import java.util.List;
 public class DataCategoryDTO {
 
 
-    @NotNullOrEmpty(message = "Name  can't be  Empty")
+    @NotBlank(message = "Name  can't be  Empty")
     @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
@@ -26,7 +26,7 @@ public class DataCategoryDTO {
     private Long countryId;
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
