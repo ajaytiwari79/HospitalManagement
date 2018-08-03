@@ -123,6 +123,13 @@ public class EmploymentService extends UserBaseService {
 
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
+
+        if (Optional.ofNullable(objectToUpdate).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+        } else if (objectToUpdate.getExternalId()!=null && !staffEmploymentDetail.getTimeCareExternalId().equals(objectToUpdate.getExternalId())) {
+            exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
+        }
+
         EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());
         Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         if(Optional.ofNullable(employmentUnitPosition).isPresent()) {
@@ -134,14 +141,6 @@ public class EmploymentService extends UserBaseService {
 
         }
 
-        if (objectToUpdate == null) {
-            logger.info("Staff does not found by id {}", staffId);
-            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
-
-        } else if (!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
-           exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
-
-        }
         EngineerType engineerType = engineerTypeGraphRepository.findOne(staffEmploymentDetail.getEngineerTypeId());
         objectToUpdate.setEmail(staffEmploymentDetail.getEmail());
         objectToUpdate.setCardNumber(staffEmploymentDetail.getCardNumber());
