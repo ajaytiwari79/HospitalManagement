@@ -26,6 +26,7 @@ public class Counter extends MongoBaseEntity {
     private Set<ApplicableFor> applicableFor=Collections.singleton(ApplicableFor.OPEN_SHIFT);
 
     public Counter() {
+        //Default Constructor
     }
 
     public Counter(CounterType type){
