@@ -77,6 +77,9 @@ public class StaffActivitySettingService extends MongoBaseService {
     }
 
     public Map<String,List<StaffActivityResponse>> assignActivitySettingToStaffs(Long unitId, StaffAndActivitySettingWrapper staffAndActivitySettingWrapper){
+        if(staffAndActivitySettingWrapper.getStaffIds().isEmpty() || staffAndActivitySettingWrapper.getStaffActivitySettings().isEmpty()){
+            exceptionService.actionNotPermittedException("error.empty.staff.or.activity.setting");
+        }
         Set<BigInteger> activityIds=staffAndActivitySettingWrapper.getStaffActivitySettings().stream().map(StaffActivitySettingDTO::getActivityId).collect(Collectors.toSet());
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger,Activity> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,v->v));
@@ -145,7 +148,4 @@ public class StaffActivitySettingService extends MongoBaseService {
        responseMap.put("error",error);
        return responseMap;
    }
-
-
-
 }

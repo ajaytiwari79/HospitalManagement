@@ -5,15 +5,19 @@ import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by prabjot on 10/1/17.
  */
+@QueryResult
 public class StaffPersonalDetail {
 
+    private Long id;
     @NotEmpty(message = "error.Staff.firstname.notnull") @NotNull(message = "error.Staff.firstname.notnull")
     private String firstName;
     @NotEmpty(message = "error.Staff.lastname.notnull") @NotNull(message = "error.Staff.lastname.notnull")
@@ -44,6 +48,27 @@ public class StaffPersonalDetail {
     private String careOfName;
     private Gender gender;
     private boolean pregnant;
+    private Long employmentTypeId;
+
+    public StaffPersonalDetail() {
+        //Default Constructor
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getEmploymentTypeId() {
+        return employmentTypeId;
+    }
+
+    public void setEmploymentTypeId(Long employmentTypeId) {
+        this.employmentTypeId = employmentTypeId;
+    }
 
     public String getFirstName() {
         return firstName;
