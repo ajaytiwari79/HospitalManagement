@@ -54,25 +54,26 @@ public class AssetService extends MongoBaseService {
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset ", assetDTO.getAssetType());
         } else {
-
-            if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
-                exceptionService.invalidRequestException("message.invalid", " invalid Sub Asset is Selected ");
+            if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent()) {
+                if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
+                    exceptionService.invalidRequestException("message.invalid", " invalid Sub Asset is Selected ");
+                }
             }
-            Asset newAsset = new Asset(assetDTO.getName(), assetDTO.getDescription(), assetDTO.getHostingLocation(),
-                    assetDTO.getAssetType(), assetDTO.getAssetSubTypes(), assetDTO.getManagingDepartment(), assetDTO.getAssetOwner(), true);
-            newAsset.setOrganizationId(organizationId);
-            newAsset.setHostingProvider(assetDTO.getHostingProvider());
-            newAsset.setHostingType(assetDTO.getHostingType());
-            newAsset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
-            newAsset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
-            newAsset.setStorageFormats(assetDTO.getStorageFormats());
-            newAsset.setDataDisposal(assetDTO.getDataDisposal());
-            newAsset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
-            newAsset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
-            newAsset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
-            newAsset = assetMongoRepository.save(getNextSequence(newAsset));
-            assetDTO.setId(newAsset.getId());
         }
+        Asset newAsset = new Asset(assetDTO.getName(), assetDTO.getDescription(), assetDTO.getHostingLocation(),
+                assetDTO.getAssetType(), assetDTO.getAssetSubTypes(), assetDTO.getManagingDepartment(), assetDTO.getAssetOwner(), true);
+        newAsset.setOrganizationId(organizationId);
+        newAsset.setHostingProvider(assetDTO.getHostingProvider());
+        newAsset.setHostingType(assetDTO.getHostingType());
+        newAsset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
+        newAsset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
+        newAsset.setStorageFormats(assetDTO.getStorageFormats());
+        newAsset.setDataDisposal(assetDTO.getDataDisposal());
+        newAsset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
+        newAsset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
+        newAsset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
+        newAsset = assetMongoRepository.save(getNextSequence(newAsset));
+        assetDTO.setId(newAsset.getId());
         return assetDTO;
     }
 
@@ -151,12 +152,14 @@ public class AssetService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("messgae.dataNotFound", " Asset Type", assetDTO.getAssetType());
 
         } else {
-            if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
-                exceptionService.invalidRequestException("message.invalid", " invalid Sub Asset is Selected ");
+            if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent()) {
+                if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
+                    exceptionService.invalidRequestException("message.invalid", " invalid Sub Asset is Selected ");
+                }
             }
-            ObjectMapperUtils.copyProperties(assetDTO, asset);
-            assetMongoRepository.save(getNextSequence(asset));
         }
+        ObjectMapperUtils.copyProperties(assetDTO, asset);
+        assetMongoRepository.save(getNextSequence(asset));
         return assetDTO;
     }
 
