@@ -21,6 +21,10 @@ public class AppConstant {
     public static final String NEW_DATA_LIST = "new";
     public static final String AGREEMENT_SECTION = "agreement_section";
     public static final String AGREEMENT_SECTION_WRAPPER= "agreement_section_wrapper";
+    public static final String DATA_ELEMENT_LIST = "data-elements";
+    public static final String DATA_CATEGORY_LIST = "data-elements";
+
+
     public static final String AGREEMENT_SUB_SECTION_MAP_CONTAINING_CLAUSE = "agreement_sub_section_map_with_clauses";
 
 

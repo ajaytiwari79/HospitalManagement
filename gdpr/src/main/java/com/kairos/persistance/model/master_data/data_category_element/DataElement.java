@@ -38,6 +38,10 @@ public class DataElement extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
+    public DataElement( String name) {
+        this.name = name;
+    }
+
     public DataElement() {
     }
 }

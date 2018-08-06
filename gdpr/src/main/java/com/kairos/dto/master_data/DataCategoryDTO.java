@@ -23,7 +23,6 @@ public class DataCategoryDTO {
     @Valid
     List<DataElementDTO> dataElements;
 
-    private Long countryId;
 
     public String getName() {
         return name.trim();
@@ -41,11 +40,4 @@ public class DataCategoryDTO {
         this.dataElements = dataElements;
     }
 
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
 }

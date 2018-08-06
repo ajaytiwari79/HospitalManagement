@@ -98,4 +98,9 @@ public class DataSubjectMapping extends MongoBaseEntity {
 
     public DataSubjectMapping() {
     }
+
+
+    public DataSubjectMapping(String name) {
+        this.name = name;
+    }
 }

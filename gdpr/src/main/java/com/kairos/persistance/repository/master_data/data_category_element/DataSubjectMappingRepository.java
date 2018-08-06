@@ -24,4 +24,9 @@ public interface DataSubjectMappingRepository extends MongoRepository<DataSubjec
     DataSubjectMapping findByCountryIdAndName(Long countryId,Long organizationId,String name);
 
 
+    @Query("{deleted:false,organizationId:?0,_id:?1}")
+    DataSubjectMapping findByUnitIdAndId(Long organizationId,BigInteger id);
+
+
+
 }
