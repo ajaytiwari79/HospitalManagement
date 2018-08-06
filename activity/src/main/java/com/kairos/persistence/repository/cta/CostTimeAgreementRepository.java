@@ -15,20 +15,14 @@ import java.util.List;
  * @date - 30/7/18
  */
 @Repository
-public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTimeAgreement,BigInteger>{
+public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTimeAgreement,BigInteger>,CustomCostTimeAgreementRepository{
 
 
-    @Query("")
-    List<CTAResponseDTO> findCTAByCountryId(Long countryId);
 
-
-    @Query("")
-    List<CTAResponseDTO> findCTAByUnitId(Long unitId);
-
-    @Query("")
+    @Query("{}")
     CostTimeAgreement findCTAByCountryAndIdAndDeleted(Long countryId, Long ctaId, Boolean deleted);
 
-    @Query("")
+  /*  @Query("")
     List<CostTimeAgreement> getAllCTAByOrganizationSubType(List<Long> organizationSubTypeIds, Boolean deleted);
 
     @Query("")
@@ -47,19 +41,19 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
     void detachParentCTA(BigInteger ctaId);
 
     @Query("")
-    List<CostTimeAgreement> getListOfOrganizationCTAByParentCountryCTA(BigInteger countryCTAId);
+    List<CostTimeAgreement> getListOfOrganizationCTAByParentCountryCTA(BigInteger countryCTAId);*/
 
-    @Query("")
+    @Query("{}")
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name);
 
-    @Query("")
+    @Query("{}")
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name, BigInteger ctaId);
 
-    @Query("")
+    @Query("{}")
     Boolean isCTAExistWithSameNameInUnit(Long unitId, String name, BigInteger ctaId);
 
 
-    @Query("")
+   /* @Query("")
     void linkParentCountryCTAToOrganization(BigInteger countryCtaId, BigInteger orgCtaId);
 
     @Query("")
@@ -72,27 +66,25 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
     void detachOldCTAFromUnitPosition(Long unitPositinId);
 
     @Query("")
-    CostTimeAgreement getLinkedCTAWithUnitPosition(Long unitPositinId);
+    CostTimeAgreement getLinkedCTAWithUnitPosition(Long unitPositinId);*/
 
-    @Query("")
+    @Query("{}")
     Long getExpertiseOfCTA(BigInteger ctaId);
 
-    @Query("")
+    @Query("{}")
     Long getOrgTypeOfCTA(BigInteger ctaId);
 
-    @Query("")
+    @Query("{}")
     Long getOrgSubTypeOfCTA(BigInteger ctaId);
 
-    @Query("")
+    @Query("{}")
     List<CostTimeAgreement> getCTAsByOrganiationSubTypeIdsIn(List<Long> organizationSubTypeIds, long countryId);
 
-    @Query("")
-    void linkUnitCTAToOrganization(BigInteger unitCtaId, Long organizationId);
+/*    @Query("")
+    void linkUnitCTAToOrganization(BigInteger unitCtaId, Long organizationId);*/
 
 
-    @Query("")
-    List<CTAResponseDTO> getAllCTAByOrganizationSubType(Long organizationSubTypeId);
 
-    @Query("")
+    @Query("{}")
     Integer getLastSuffixNumberOfCTAName(String name);
 }

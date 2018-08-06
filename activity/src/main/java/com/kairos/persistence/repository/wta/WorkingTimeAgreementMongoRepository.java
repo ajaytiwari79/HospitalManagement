@@ -22,6 +22,7 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
 
     @Query("{countryId:?0,id:?1,deleted:false}")
     WorkingTimeAgreement getWTAByCountryId(long countryId, BigInteger wtaId);
+
     @Query("{id:?0,deleted:false}")
     WorkingTimeAgreement removeOldParentWTAMapping(BigInteger wtaId);
 

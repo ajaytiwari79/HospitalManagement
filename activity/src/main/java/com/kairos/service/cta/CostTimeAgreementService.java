@@ -23,6 +23,7 @@ import com.kairos.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.userContext.UserContext;
+import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,21 +52,14 @@ public class CostTimeAgreementService extends MongoBaseService {
     private final Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
 
 
-    private @Inject
-    RuleTemplateCategoryRepository ruleTemplateCategoryRepository;
-    private @Inject
-    CountryRestClient countryRestClient;
-    private @Inject
-    CTARuleTemplateRepository ctaRuleTemplateRepository;
-    private @Inject
-    ExceptionService exceptionService;
-    private @Inject
-    CountryCTAService countryCTAService;
+    @Inject private RuleTemplateCategoryRepository ruleTemplateCategoryRepository;
+    @Inject private CountryRestClient countryRestClient;
+    @Inject private CTARuleTemplateRepository ctaRuleTemplateRepository;
+    @Inject private ExceptionService exceptionService;
+    @Inject private CountryCTAService countryCTAService;
     @Inject private OrganizationRestClient organizationRestClient;
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
-
-    private @Inject
-    GenericRestClient genericRestClient;
+    @Inject private GenericRestClient genericRestClient;
 
     
 
@@ -90,12 +84,9 @@ public class CostTimeAgreementService extends MongoBaseService {
 
         }
         CountryDTO countryDTO = countryRestClient.getCountryById(countryId);
-        // Set id null as new entry should be created
         ctaRuleTemplateDTO.setId(null);
         CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate();
         Long userId = UserContext.getUserDetails().getId();
-        //User user = userGraphRepository.findOne(userId, 0);
-        // While updating rule template, do not update template type
         ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplateDTO.getName());
         this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, false,countryDTO);
         ctaRuleTemplate.setLastModifiedBy(userId);
@@ -249,6 +240,8 @@ public class CostTimeAgreementService extends MongoBaseService {
 
 
 
+
+
     public List<CTAResponseDTO> loadAllCTAByCountry(Long countryId) {
         List<CTAResponseDTO> costTimeAgreements = costTimeAgreementRepository.findCTAByCountryId(countryId);
         return costTimeAgreements;
@@ -317,21 +310,21 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
 
-    public Long getExpertiseIdOfCTA(Long ctaId) {
+    public Long getExpertiseIdOfCTA(BigInteger ctaId) {
         return costTimeAgreementRepository.getExpertiseOfCTA(ctaId);
     }
 
-    public Long getOrgTypeOfCTA(Long ctaId) {
+    public Long getOrgTypeOfCTA(BigInteger ctaId) {
         return costTimeAgreementRepository.getOrgTypeOfCTA(ctaId);
     }
 
-    public Long getOrgSubTypeOfCTA(Long ctaId) {
+    public Long getOrgSubTypeOfCTA(BigInteger ctaId) {
         return costTimeAgreementRepository.getOrgSubTypeOfCTA(ctaId);
     }
 
     public CollectiveTimeAgreementDTO createCopyOfUnitCTA(Long unitId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
         logger.info("saving CostTimeAgreement unit {}", unitId);
-        if (costTimeAgreementRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName().trim(), -1L)) {
+        if (costTimeAgreementRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName().trim(), new BigInteger("1"))) {
             exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
 
         }
@@ -351,16 +344,10 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
     public CollectiveTimeAgreementDTO setCTAWithOrganizationType(Long countryId, BigInteger ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, long organizationSubTypeId, boolean checked) {
-        CTABasicDetailsDTO ctaBasicDetailsDTO = genericRestClient.publishRequest(null,true,IntegrationOperation.GET,"",Arrays.asList(new BasicNameValuePair("",organizationSubTypeId)),CTABasicDetailsDTO.class);
-        if (!Optional.ofNullable(ctaBasicDetailsDTO.getOrganizationSubType()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.InvalidOrganizationSubtype", organizationSubTypeId);
-
-        }
         if (checked) {
             Integer lastSuffixNumber = costTimeAgreementRepository.getLastSuffixNumberOfCTAName("(?i)" + collectiveTimeAgreementDTO.getName());
             String name = collectiveTimeAgreementDTO.getName();
             collectiveTimeAgreementDTO.setName(name.contains("-") ? name.replace(name.substring(name.lastIndexOf("-") + 1, name.length()), (++lastSuffixNumber).toString()) : collectiveTimeAgreementDTO.getName() + "-" + ++lastSuffixNumber);
-            collectiveTimeAgreementDTO.setOrganizationType(ctaBasicDetailsDTO.getOrganizationType().getId());
             collectiveTimeAgreementDTO.setOrganizationSubType(organizationSubTypeId);
             return countryCTAService.createCostTimeAgreementInCountry(countryId, collectiveTimeAgreementDTO);
         } else {

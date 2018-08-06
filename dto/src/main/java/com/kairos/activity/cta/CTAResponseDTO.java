@@ -6,6 +6,7 @@ import com.kairos.user.organization.OrganizationTypeDTO;
 import com.kairos.user.organization.position_code.PositionCodeDTO;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 public class CTAResponseDTO {
     @NotNull
-    private Long id;
+    private BigInteger id;
     private Long parentCTAId;
     private String name;
     private String description;
@@ -77,11 +78,11 @@ public class CTAResponseDTO {
         this.positionCode = positionCode;
     }
 
-    public Long getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 

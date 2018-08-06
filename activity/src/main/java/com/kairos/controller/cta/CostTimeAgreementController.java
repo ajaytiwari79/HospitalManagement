@@ -50,7 +50,7 @@ public class CostTimeAgreementController {
 
     @RequestMapping(value = "/country/{countryId}/cta/{ctaId}", method = RequestMethod.PUT)
     @ApiOperation("Update CTA")
-    public ResponseEntity<Map<String, Object>> updateCTA(@PathVariable Long countryId, @PathVariable Long ctaId
+    public ResponseEntity<Map<String, Object>> updateCTA(@PathVariable Long countryId, @PathVariable BigInteger ctaId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 countryCTAService.updateCostTimeAgreement(countryId, null, ctaId, collectiveTimeAgreementDTO));
@@ -58,7 +58,7 @@ public class CostTimeAgreementController {
 
     @RequestMapping(value = "/unit/{unitId}/cta/{ctaId}", method = RequestMethod.PUT)
     @ApiOperation("Update CTA Of Unit")
-    public ResponseEntity<Map<String, Object>> updateUnitCTA(@PathVariable Long unitId, @PathVariable Long ctaId
+    public ResponseEntity<Map<String, Object>> updateUnitCTA(@PathVariable Long unitId, @PathVariable BigInteger ctaId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 countryCTAService.updateCostTimeAgreement(null, unitId, ctaId, collectiveTimeAgreementDTO));

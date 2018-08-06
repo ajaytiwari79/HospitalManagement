@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
+import com.kairos.activity.cta.CTABasicDetailsDTO;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
@@ -1864,5 +1865,54 @@ public class OrganizationService extends UserBaseService {
         List<Map<String, Object>> parentOrganizationAndCountryData = organizationGraphRepository.getUnitAndParentOrganizationAndCountryIds();
         return ObjectMapperUtils.copyPropertiesOfListByMapper(parentOrganizationAndCountryData, UnitAndParentOrganizationAndCountryDTO.class);
     }
+
+    public CTABasicDetailsDTO getCTABasicDetailInfo(Long expertiseId,Long organizationSubTypeId,Long countryId){
+        CTABasicDetailsDTO ctaBasicDetailsDTO = new CTABasicDetailsDTO();
+        if (Optional.ofNullable(expertiseId).isPresent()) {
+            Expertise expertise = expertiseGraphRepository.findOne(expertiseId, 0);
+            if (expertise != null) {
+                ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
+                BeanUtils.copyProperties(expertise, expertiseResponseDTO);
+                ctaBasicDetailsDTO.setExpertise(expertiseResponseDTO);
+            }
+        }
+        if (Optional.ofNullable(countryId).isPresent()) {
+            Country country = countryGraphRepository.findOne(countryId, 0);
+            if (country != null) {
+                CountryDTO countryDTO = new CountryDTO();
+                BeanUtils.copyProperties(country, countryDTO);
+                ctaBasicDetailsDTO.setCountryDTO(countryDTO);
+            }
+        }
+        OrganizationType organizationType = organizationTypeGraphRepository.findOrganizationTypeBySubTypeId(organizationSubTypeId);
+        if (Optional.ofNullable(organizationType).isPresent()) {
+            OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO();
+            BeanUtils.copyProperties(organizationType, organizationTypeDTO);
+            ctaBasicDetailsDTO.setOrganizationType(organizationTypeDTO);
+        }
+
+        if (Optional.ofNullable(organizationSubTypeId).isPresent()) {
+            OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
+            List<Organization> organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+            if (Optional.ofNullable(organizationSubType).isPresent()) {
+                OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
+                BeanUtils.copyProperties(organizationSubType, organizationSubTypeDTO);
+                ctaBasicDetailsDTO.setOrganizationSubType(organizationSubTypeDTO);
+            }
+            if (Optional.ofNullable(organizations).isPresent()) {
+                List<OrganizationBasicDTO> organizationBasicDTOS = new ArrayList<>();
+                organizations.forEach(organization -> {
+                    OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
+                    ObjectMapperUtils.copyProperties(organization, organizationBasicDTO);
+                    organizationBasicDTOS.add(organizationBasicDTO);
+                });
+                ctaBasicDetailsDTO.setOrganizations(organizationBasicDTOS);
+            }
+        }
+        return ctaBasicDetailsDTO;
+    }
+
+
+
 
 }
