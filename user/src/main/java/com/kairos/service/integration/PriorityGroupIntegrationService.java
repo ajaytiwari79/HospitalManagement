@@ -67,5 +67,9 @@ public class PriorityGroupIntegrationService {
     public void createDefaultKPISetting(DefalutKPISettingDTO defalutKPISettingDTO ,Long unitId){
         genericRestClient.publish(defalutKPISettingDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/default_kpi_setting", null);
     }
+
+    public void createDefaultKPISettingForStaff(DefalutKPISettingDTO defalutKPISettingDTO ,Long unitId){
+        genericRestClient.publish(defalutKPISettingDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff_default_kpi_setting", null);
+    }
 }
 

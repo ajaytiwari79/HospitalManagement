@@ -198,8 +198,8 @@ public class CounterRepository {
 
     //accessGroupKPI distribution crud
 
-    public List<AccessGroupKPIEntry> getAccessGroupKPIConfigurationByAccessGroupId(List<Long> accessGroupIds){
-        Query query = new Query(Criteria.where("accessGroupId").in(accessGroupIds));
+    public List<AccessGroupKPIEntry> getAccessGroupKPIByUnitIdAndKpiIds(List<BigInteger> kpiIds,Long unitId){
+        Query query = new Query(Criteria.where("kpiId").in(kpiIds).and("unitId").is(unitId));
         return mongoTemplate.find(query, AccessGroupKPIEntry.class);
     }
 
@@ -244,8 +244,8 @@ public class CounterRepository {
         return mongoTemplate.find(query,ApplicableKPI.class);
     }
 
-    public List<ApplicableKPI> getApplicableKPIByKPIId(List<BigInteger> kpiIds){
-        Query query=new Query(Criteria.where("ActiveKpiId").in(kpiIds));
+    public List<ApplicableKPI> getApplicableKPIByParentUnitId(Long unitId){
+        Query query=new Query(Criteria.where("unitId").in(unitId));
         return mongoTemplate.find(query,ApplicableKPI.class);
     }
 
@@ -274,6 +274,20 @@ public class CounterRepository {
             query=new Query(Criteria.where("accessGroupId").in(accessGroupIds).and("kpiId").in(kpiIds).and(queryField).is(refId));
         }
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,AccessGroupKPIEntry.class),AccessGroupMappingDTO.class);
+    }
+
+
+
+    public List<ApplicableKPI> getApplicableKPIByUnitOrCountryId(Long refId,ConfLevel level){
+        String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
+        Query query=new Query(Criteria.where(queryField).is(refId));
+        return mongoTemplate.find(query,ApplicableKPI.class);
+    }
+
+    public List<TabKPIConf> findTabKPIIdsByKpiIdAndUnitOrCountry(List<BigInteger> kpiIds,Long refid,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query=new Query(Criteria.where(refQueryField).is(refid).and("KpiId").in(kpiIds));
+        return mongoTemplate.find(query,TabKPIConf.class);
     }
 }
 /*

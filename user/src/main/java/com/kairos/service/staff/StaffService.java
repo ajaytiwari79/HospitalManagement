@@ -1,6 +1,7 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.counter.DefalutKPISettingDTO;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.activity.task.StaffTaskDTO;
@@ -70,6 +71,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.integration.PlannerSyncService;
+import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
@@ -110,6 +112,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -206,6 +209,9 @@ public class StaffService extends UserBaseService {
     private SystemLanguageService systemLanguageService;
     @Inject
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
+    @Inject
+    private PriorityGroupIntegrationService priorityGroupIntegrationService;
+
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -1113,6 +1119,9 @@ public class StaffService extends UserBaseService {
         staff.setUser(null); // removing user to send in FE
 //        staff.setGender(user.getGender());
         //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
+        DefalutKPISettingDTO defalutKPISettingDTO=new DefalutKPISettingDTO();
+        defalutKPISettingDTO.setStaffIds(Arrays.asList(staff.getId()));
+        priorityGroupIntegrationService.createDefaultKPISettingForStaff(defalutKPISettingDTO,unitId);
         return staff;
     }
 

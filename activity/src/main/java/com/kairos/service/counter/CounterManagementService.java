@@ -1,6 +1,7 @@
 package com.kairos.service.counter;
 
 
+import com.kairos.activity.counter.DefalutKPISettingDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
@@ -215,6 +216,74 @@ public class CounterManagementService extends MongoBaseService {
         counterRepository.removeApplicableKPI(unitIds,orgTypeKPIEntries.getKpiId(),ConfLevel.UNIT);
         counterRepository.removeEntityById(orgTypeKPIEntries.getId(),OrgTypeKPIEntry.class);
        return true;
+    }
+
+    public void createDefalutStaffKPISetting(Long unitId,DefalutKPISettingDTO defalutKPISettingDTO) {
+        List<ApplicableKPI> applicableKPISForUnit = counterRepository.getApplicableKPIByUnitOrCountryId(defalutKPISettingDTO.getParentUnitId(), ConfLevel.UNIT);
+        List<BigInteger> applicableKpiIds = applicableKPISForUnit.stream().map(applicableKPI -> applicableKPI.getBaseKpiId()).collect(Collectors.toList());
+        List<TabKPIConf> tabKPIConfKPIEntries = new ArrayList<>();
+        List<TabKPIConf> tabKPIConf = counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds, defalutKPISettingDTO.getParentUnitId(), ConfLevel.UNIT);
+        defalutKPISettingDTO.getStaffIds().forEach(staffId -> {
+            tabKPIConf.stream().forEach(tabKPIConfKPI -> {
+                tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, null, null, ConfLevel.UNIT));
+            });
+        });
+        List<ApplicableKPI> applicableKPIS = new ArrayList<>();
+       applicableKpiIds.forEach(kpiId->{defalutKPISettingDTO.getStaffIds().forEach(staffId->{
+           applicableKPIS.add(new ApplicableKPI(kpiId,kpiId,null,null,staffId,ConfLevel.STAFF));
+       });
+       });
+       save(applicableKPIS);
+       save(tabKPIConfKPIEntries);
+    }
+
+    public void createDefaultKpiSetting(Long unitId, DefalutKPISettingDTO defalutKPISettingDTO) {
+        List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(defalutKPISettingDTO.getOrgTypeIds(), new ArrayList<>(), unitId);
+            List<BigInteger> kpiIds = orgTypeMappingDTOS.stream().map(orgTypeMappingDTO -> orgTypeMappingDTO.getKpiId()).collect(Collectors.toList());
+        List<ApplicableKPI> applicableKPIS = new ArrayList<>();
+        kpiIds.forEach(kpiId -> {
+            applicableKPIS.add(new ApplicableKPI(kpiId,kpiId,null, unitId, null, ConfLevel.UNIT));
+        });
+        if(Optional.ofNullable(defalutKPISettingDTO.getParentUnitId()).isPresent()) {
+            setDefaultDateFromParentUnitTounit(defalutKPISettingDTO,unitId);
+        }else{
+            setDefaultDateFromCountryToUnit(defalutKPISettingDTO,unitId);
+        }
+        save(applicableKPIS);
+    }
+
+    public void setDefaultDateFromCountryToUnit(DefalutKPISettingDTO defalutKPISettingDTO,Long unitId) {
+        List<AccessGroupKPIEntry> accessGroupKPIEntries = new ArrayList<>();
+        List<TabKPIConf> tabKPIConfKPIEntries=new ArrayList<>();
+        List<Long> countryAccessGroupIds = defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().keySet().stream().collect(Collectors.toList());
+        List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, new ArrayList<>(), ConfLevel.COUNTRY, defalutKPISettingDTO.getCountryId());
+        accessGroupMappingDTOS.forEach(accessGroupMappingDTO -> {
+            accessGroupKPIEntries.add(new AccessGroupKPIEntry(defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().get(accessGroupMappingDTO.getAccessGroupId()), accessGroupMappingDTO.getKpiId(), null, unitId, ConfLevel.UNIT));
+        });
+        List<ApplicableKPI> applicableKPISForUnit=counterRepository.getApplicableKPIByUnitOrCountryId(defalutKPISettingDTO.getCountryId(),ConfLevel.COUNTRY);
+        List<BigInteger> applicableKpiIds=applicableKPISForUnit.stream().map(applicableKPI -> applicableKPI.getBaseKpiId()).collect(Collectors.toList());
+        List<TabKPIConf> tabKPIConf=counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds,defalutKPISettingDTO.getCountryId(),ConfLevel.COUNTRY);
+        tabKPIConf.stream().forEach(tabKPIConfKPI->{
+            tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(),tabKPIConfKPI.getKpiId(),null,unitId,null,ConfLevel.UNIT));
+        });
+        save(tabKPIConfKPIEntries);
+        save(accessGroupKPIEntries);
+    }
+    public void setDefaultDateFromParentUnitTounit(DefalutKPISettingDTO defalutKPISettingDTO,Long unitId){
+        List<AccessGroupKPIEntry> accessGroupKPIEntries = new ArrayList<>();
+        List<TabKPIConf> tabKPIConfKPIEntries=new ArrayList<>();
+        List<ApplicableKPI> applicableKPISForUnit=counterRepository.getApplicableKPIByUnitOrCountryId(defalutKPISettingDTO.getParentUnitId(),ConfLevel.UNIT);
+        List<BigInteger> applicableKpiIds=applicableKPISForUnit.stream().map(applicableKPI -> applicableKPI.getBaseKpiId()).collect(Collectors.toList());
+        List<AccessGroupKPIEntry> accessGroupMappingDTOSForunit=counterRepository.getAccessGroupKPIByUnitIdAndKpiIds(applicableKpiIds,defalutKPISettingDTO.getParentUnitId());
+        accessGroupMappingDTOSForunit.stream().forEach(accessGroupKPIEntry -> {
+            accessGroupKPIEntries.add(new AccessGroupKPIEntry(accessGroupKPIEntry.getAccessGroupId(),accessGroupKPIEntry.getKpiId(),null,unitId,ConfLevel.UNIT));
+        });
+        List<TabKPIConf> tabKPIConf=counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds,defalutKPISettingDTO.getParentUnitId(),ConfLevel.UNIT);
+        tabKPIConf.stream().forEach(tabKPIConfKPI->{
+            tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(),tabKPIConfKPI.getKpiId(),null,unitId,null,ConfLevel.UNIT));
+        });
+        save(tabKPIConfKPIEntries);
+        save(accessGroupKPIEntries);
     }
 
 }
