@@ -1216,17 +1216,32 @@ public class UnitPositionService extends UserBaseService {
         List<UnitPositionSeniorityLevelQueryResult> unitPositionSeniorityLevelQueryResults = unitPositionGraphRepository.findUnitPositionSeniorityLeveltoUpdate();
         List<Long> unitPositionIds = unitPositionSeniorityLevelQueryResults.stream().map(unitPositionQueryResult->unitPositionQueryResult.getUnitPosition().getId()).
                 collect(Collectors.toList());
+
+        List<UnitPositionCompleteQueryResult> unitPositionsComplete = unitPositionGraphRepository.findUnitPositionCompleteObject(unitPositionIds);
+        Map<Long,UnitPosition> unitPositionMap = new HashMap<Long,UnitPosition>();
+        for(UnitPositionCompleteQueryResult unitPositionCompleteQueryResult:unitPositionsComplete) {
+            UnitPosition unitPositionComplete = unitPositionCompleteQueryResult.getUnitPosition();
+            unitPositionComplete.setExpertise(unitPositionCompleteQueryResult.getExpertise());
+            unitPositionComplete.setFunctions(unitPositionCompleteQueryResult.getFunctions());
+            unitPositionComplete.setReasonCode(unitPositionCompleteQueryResult.getReasonCode());
+            unitPositionComplete.setCta(unitPositionCompleteQueryResult.getCta());
+            unitPositionComplete.setStaff(unitPositionCompleteQueryResult.getStaff());
+            unitPositionComplete.setPositionCode(unitPositionCompleteQueryResult.getPositionCode());
+            unitPositionComplete.setUnit(unitPositionCompleteQueryResult.getUnit());
+            unitPositionComplete.setUnion(unitPositionCompleteQueryResult.getUnionOrg());
+            unitPositionMap.put(unitPositionComplete.getId(),unitPositionComplete);
+        }
+
         List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips = new ArrayList<>();
-        unitPositionGraphRepository.deleteUnitPositionSeniorityLevelRelation(unitPositionIds);
         List<UnitPosition> unitPositions = new ArrayList<>();
         for(UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult :unitPositionSeniorityLevelQueryResults) {
             UnitPosition unitPosition = new UnitPosition();
             UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip;
-            UnitPosition oldUnitPosition = unitPositionSeniorityLevelQueryResult.getUnitPosition();
+            UnitPosition oldUnitPosition = unitPositionMap.get(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId());
             ObjectMapperUtils.copyProperties(oldUnitPosition,unitPosition);
-            oldUnitPosition.setEndDateMillis(DateUtils.getOneDayBeforeMillis());
-            unitPosition.setStartDateMillis(DateUtils.getCurrentMillis());
             unitPosition.setEndDateMillis(oldUnitPosition.getEndDateMillis());
+            oldUnitPosition.setEndDateMillis(DateUtils.getOneDayBeforeMillis());
+            unitPosition.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
             unitPosition.setSeniorityLevel(unitPositionSeniorityLevelQueryResult.getSeniorityLevel());
             unitPosition.setParentUnitPosition(oldUnitPosition);
             unitPositionEmploymentTypeRelationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition,unitPositionSeniorityLevelQueryResult.getEmploymentType(),

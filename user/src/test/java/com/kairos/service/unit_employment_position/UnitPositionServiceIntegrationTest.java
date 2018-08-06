@@ -73,13 +73,13 @@ public class UnitPositionServiceIntegrationTest {
     public void updateSeniorityLevelOnJobTriggerTest() {
 
         Long expertiseStartDate = LocalDateTime.now().withYear(LocalDateTime.now().getYear()-3).withHour(0).withMinute(0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-       /* staffGraphRepository.updateStaffExpertiseRelation(13315L,7799L,expertiseStartDate);
-        unitPositionGraphRepository.deleteUnitPositionSeniorityLevel(13315L,7799L);
-        unitPositionGraphRepository.createUnitPositionSeniorityLevelRelatioship(13315L,7799L,7796L);
+        staffGraphRepository.updateStaffExpertiseRelation(13316L,7799L,expertiseStartDate);
+        unitPositionGraphRepository.deleteUnitPositionSeniorityLevel(13316L,7799L);
+        unitPositionGraphRepository.createUnitPositionSeniorityLevelRelatioship(13316L,7799L,7796L);
         unitPositionService.updateSeniorityLevelOnJobTrigger();
-        UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult = unitPositionGraphRepository.getSeniorityLevelFromStaffUnitPosition(13315L,7799L);
+        UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult = unitPositionGraphRepository.getSeniorityLevelFromStaffUnitPosition(13316L,7799L);
         Assert.assertTrue(unitPositionSeniorityLevelQueryResult.getSeniorityLevel().getFrom()==3&
-                unitPositionSeniorityLevelQueryResult.getSeniorityLevel().getId()==7797);*/
+                unitPositionSeniorityLevelQueryResult.getSeniorityLevel().getId()==7797);
     }
     @Test
     public void test2_getUnitPositionsOfStaff() throws Exception {
