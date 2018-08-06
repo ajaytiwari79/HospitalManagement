@@ -261,7 +261,7 @@ public class OpenShiftService extends MongoBaseService {
                 return;
             }
             ShiftDTO shiftDTO = new ShiftDTO(openShift.getActivityId(), unitId, unitPositionDetail.getStaffId(), unitPositionDetail.getId(), DateUtils.asLocalDate(openShift.getStartDate()),
-                    DateUtils.asLocalDate(openShift.getEndDate()), DateUtils.asLocalTime(openShift.getStartDate()), DateUtils.asLocalTime(openShift.getStartDate()));
+                    DateUtils.asLocalDate(openShift.getEndDate()), DateUtils.asLocalTime(openShift.getStartDate()), DateUtils.asLocalTime(openShift.getEndDate()));
             shiftDTO.setShiftDate(DateUtils.asLocalDate(openShift.getStartDate()));
             shiftDTO.setParentOpenShiftId(openShift.getId());
             shiftService.createShift(unitId, shiftDTO, "Organization", false);
