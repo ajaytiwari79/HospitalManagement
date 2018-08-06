@@ -324,24 +324,22 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "return seniorityLevel,unitPosition,unitPositionEmploymentTypeRelationShip,employmentType")
     List<UnitPositionSeniorityLevelQueryResult> findUnitPositionSeniorityLeveltoUpdate();
 
-    @Query("Match(up:UnitPosition)-[r:HAS_SENIORITY_LEVEL]->(sl:SeniorityLevel) where id(up) in {0} delete r")
-    void deleteUnitPositionSeniorityLevelRelation(List<Long> unitPositionIds);
 
     @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) where id(staff)={0} " +
             "and id(expertise)=expertiseId and unitPosition.startDateMillis<=timeStamp and (uniPosition.endDateMillis>=timestamp or unitPosition.endDateMillis is null)" +
-            "Match(unitPosition)-[:HAS_SENIORITY_LEVEL]->(seniorityLevel:SeniorityLevel) return unitPosition,seniorityLevel")
+            "Match(unitPosition)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel) return unitPosition,seniorityLevel")
     UnitPositionSeniorityLevelQueryResult getSeniorityLevelFromStaffUnitPosition(Long staffId,Long expertiseId);
 
-    @Query("Match(staff:Staff)-[:BELONGS_TO_STAFF]->(up:UnitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) where id(staff)={0} and id(expertise)={1} match(up)-[rel:HAS_SENIORITY_LEVEL]->(sl:SeniorityLevel) delete rel")
+    @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) where id(staff)={0} and id(expertise)={1} match(up)-[rel:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) delete rel")
     void deleteUnitPositionSeniorityLevel(Long staffId,Long expertiseId);
 
     @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expetise:Expertise) where id(staff)={0} and id(expetise)={1} match(sl:SeniorityLevel) where id(sl)={2} with up, sl merge(up)-[:"+HAS_SENIORITY_LEVEL+"]->(sl)")
     void createUnitPositionSeniorityLevelRelatioship(Long staffId,Long expertiseId,Long seniorityLevelId);
 
-    @Query("Match(unitPosition:UnitPosition) where id(unitPosition) in {0} with unitPosition  Match(unitPosition)-[:HAS_EXPERTISE_IN]-(expertise:Expertise) " +
-            "Match(unitPosition)-[:HAS_CTA]-(cta:CostTimeAgreement) Match(unitPosition)-[:HAS_POSITION_CODE]-(positionCode:PositionCode) Match(unitPosition)-" +
-            "[:BELONGS_TO_STAFF]-(staff:Staff) Match(unitPosition)-[:IN_UNIT]-(unit:Organization) optional Match(unitPosition)-[:SUPPORTED_BY_UNION]-" +
-            "(unionOrg:Organization) optional Match(unitPosition)-[:HAS_REASON_CODE]-(reasonCode:ReasonCode) optional Match(unitPosition)-[:HAS_FUNCTION]-" +
+    @Query("Match(unitPosition:UnitPosition) where id(unitPosition) in {0} with unitPosition  Match(unitPosition)-[:"+HAS_EXPERTISE_IN+"]-(expertise:Expertise) " +
+            "Match(unitPosition)-[:"+HAS_CTA+"]-(cta:CostTimeAgreement) Match(unitPosition)-[:"+HAS_POSITION_CODE+"]-(positionCode:PositionCode) Match(unitPosition)-" +
+            "[:"+BELONGS_TO_STAFF+"]-(staff:Staff) Match(unitPosition)-[:"+IN_UNIT+"]-(unit:Organization) optional Match(unitPosition)-[:"+SUPPORTED_BY_UNION+"]-" +
+            "(unionOrg:Organization) optional Match(unitPosition)-[:"+HAS_REASON_CODE+"]-(reasonCode:ReasonCode) optional Match(unitPosition)-[:"+HAS_FUNCTION+"]-" +
             "(function:Function) return unitPosition,expertise, cta, positionCode,staff, unit, unionOrg, reasonCode, function as functions")
     List<UnitPositionCompleteQueryResult> findUnitPositionCompleteObject(List<Long> unitPositionIds);
 

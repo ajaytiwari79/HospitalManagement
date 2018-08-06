@@ -1239,7 +1239,6 @@ public class UnitPositionService extends UserBaseService {
             UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip;
             UnitPosition oldUnitPosition = unitPositionMap.get(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId());
             ObjectMapperUtils.copyProperties(oldUnitPosition,unitPosition);
-            unitPosition.setEndDateMillis(oldUnitPosition.getEndDateMillis());
             oldUnitPosition.setEndDateMillis(DateUtils.getOneDayBeforeMillis());
             oldUnitPosition.setHistory(true);
             oldUnitPosition.setEditable(false);
