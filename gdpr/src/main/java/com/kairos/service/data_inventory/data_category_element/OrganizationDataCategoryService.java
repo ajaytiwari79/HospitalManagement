@@ -6,7 +6,9 @@ import com.kairos.dto.master_data.DataElementDTO;
 import com.kairos.persistance.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
 import com.kairos.persistance.repository.master_data.data_category_element.DataCategoryMongoRepository;
-import com.kairos.persistance.repository.master_data.data_category_element.DataElementMognoRepository;
+import com.kairos.persistance.repository.master_data.data_category_element.DataElementMongoRepository;
+import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.mongodb.MongoException;
@@ -39,7 +41,10 @@ public class OrganizationDataCategoryService extends MongoBaseService {
 
 
     @Inject
-    private DataElementMognoRepository dataElementMognoRepository;
+    private DataElementMongoRepository dataElementMognoRepository;
+
+    @Inject
+    private DataSubjectMappingRepository dataSubjectMappingRepository;
 
 
     public Map<String, Object> createDataCategoryWithDataElements(Long unitId, List<DataCategoryDTO> dataCategoryDTOS) {
@@ -111,18 +116,28 @@ public class OrganizationDataCategoryService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataCategoryAndDataElement(Long unitId, BigInteger dataCategoryId) {
+    public  Map<String,Object>   deleteDataCategoryAndDataElement(Long unitId, BigInteger dataCategoryId) {
 
+        Map<String,Object>  result=new HashMap<>();
         DataCategory dataCategory = dataCategoryMongoRepository.findByUnitIdAndId(unitId, dataCategoryId);
         if (Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Category ", dataCategoryId);
         }
-        List<DataElement> dataElementList = dataElementMognoRepository.findAllDataElementByUnitIdAndIdss(unitId, dataCategory.getDataElements());
-        if (!dataElementList.isEmpty()) {
-            deleteAll(dataElementList);
+        List<DataSubjectMappingBasicResponseDTO> dataSubjectLinkedToDataCategory=dataSubjectMappingRepository.findByUnitDataSubjectLinkWithDataCategory(unitId,dataCategoryId);
+        if (!dataSubjectLinkedToDataCategory.isEmpty())
+        {
+            result.put(IS_SUCCESS,false);
+            result.put(DATA_SUBJECT_LIST,dataSubjectLinkedToDataCategory);
         }
-        delete(dataCategory);
-        return true;
+        else {
+            List<DataElement> dataElementList = dataElementMognoRepository.findAllDataElementByUnitIdAndIdss(unitId, dataCategory.getDataElements());
+            if (!dataElementList.isEmpty()) {
+                deleteAll(dataElementList);
+            }
+            delete(dataCategory);
+            result.put(IS_SUCCESS,true);
+        }
+        return result;
     }
 
 

@@ -4,7 +4,7 @@ package com.kairos.service.data_inventory.data_category_element;
 import com.kairos.persistance.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
 import com.kairos.persistance.repository.master_data.data_category_element.DataCategoryMongoRepository;
-import com.kairos.persistance.repository.master_data.data_category_element.DataElementMognoRepository;
+import com.kairos.persistance.repository.master_data.data_category_element.DataElementMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -13,14 +13,12 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
-import static com.kairos.constants.AppConstant.*;
-
 @Service
 public class OrganizationDataElementService extends MongoBaseService {
 
 
     @Inject
-    private DataElementMognoRepository dataElementMongoRepository;
+    private DataElementMongoRepository dataElementMongoRepository;
 
     @Inject
     private ExceptionService exceptionService;

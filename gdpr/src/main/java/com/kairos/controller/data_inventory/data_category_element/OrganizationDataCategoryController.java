@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Map;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.AppConstant.*;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
@@ -33,21 +35,21 @@ public class OrganizationDataCategoryController {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
+
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataCategoryService.createDataCategoryWithDataElements(unitId
                 , dataCategoryDTOs.getRequestBody()));
     }
 
 
     @ApiOperation(value = "Delete Data category by id")
-    @DeleteMapping("/data_category/delete/{dataCategoryId}")
-    public ResponseEntity<Object> deleteDataCategoryById(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId) {
+    @DeleteMapping("/data_category/delete/{id}")
+    public ResponseEntity<Object> deleteDataCategoryById(@PathVariable Long unitId, @PathVariable BigInteger id) {
 
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        Map<String, Object> result = organizationDataCategoryService.deleteDataCategoryAndDataElement(unitId, id);
+        if (result.get(IS_SUCCESS).equals(true)) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
         }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataCategoryService.deleteDataCategoryAndDataElement(unitId, dataCategoryId));
+        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, result.get(DATA_SUBJECT_LIST));
     }
 
 

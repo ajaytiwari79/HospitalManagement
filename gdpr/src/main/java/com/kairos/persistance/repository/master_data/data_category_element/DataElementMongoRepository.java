@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface DataElementMognoRepository extends MongoRepository<DataElement, BigInteger> {
+public interface DataElementMongoRepository extends MongoRepository<DataElement, BigInteger> {
 
     DataElement findByid(BigInteger id);
 

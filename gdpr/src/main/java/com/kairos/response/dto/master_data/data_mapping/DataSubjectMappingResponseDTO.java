@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DataSubjectMappingResponseDto {
+public class DataSubjectMappingResponseDTO {
 
     private BigInteger id;
 
@@ -24,7 +24,7 @@ public class DataSubjectMappingResponseDto {
 
     private List<OrganizationSubTypeDTO> organizationSubTypes;
 
-    private Set<DataCategoryResponseDto> dataCategories;
+    private Set<DataCategoryResponseDTO> dataCategories;
 
     public BigInteger getId() {
         return id;
@@ -66,11 +66,11 @@ public class DataSubjectMappingResponseDto {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public Set<DataCategoryResponseDto> getDataCategories() {
+    public Set<DataCategoryResponseDTO> getDataCategories() {
         return dataCategories;
     }
 
-    public void setDataCategories(Set<DataCategoryResponseDto> dataCategories) {
+    public void setDataCategories(Set<DataCategoryResponseDTO> dataCategories) {
         this.dataCategories = dataCategories;
     }
 

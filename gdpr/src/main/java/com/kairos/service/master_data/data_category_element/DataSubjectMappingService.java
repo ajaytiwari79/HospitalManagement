@@ -4,7 +4,7 @@ package com.kairos.service.master_data.data_category_element;
 import com.kairos.dto.master_data.DataSubjectMappingDTO;
 import com.kairos.persistance.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDto;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -67,8 +67,8 @@ public class DataSubjectMappingService extends MongoBaseService {
 
     }
 
-    public DataSubjectMappingResponseDto getDataSubjectAndMappingWithData(Long countryId, Long organizationId, BigInteger id) {
-        DataSubjectMappingResponseDto dataSubjectMapping = dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategory(countryId, organizationId, id);
+    public DataSubjectMappingResponseDTO getDataSubjectAndMappingWithData(Long countryId, Long organizationId, BigInteger id) {
+        DataSubjectMappingResponseDTO dataSubjectMapping = dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategory(countryId, organizationId, id);
         if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data subject", id);
         }
@@ -80,7 +80,7 @@ public class DataSubjectMappingService extends MongoBaseService {
      * @param organizationId
      * @return list of DataSubject With Data category List
      */
-    public List<DataSubjectMappingResponseDto> getAllDataSubjectAndMappingWithData(Long countryId, Long organizationId) {
+    public List<DataSubjectMappingResponseDTO> getAllDataSubjectAndMappingWithData(Long countryId, Long organizationId) {
         return dataSubjectMappingRepository.getAllDataSubjectAndMappingWithDataCategory(countryId, organizationId);
     }
 

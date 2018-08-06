@@ -7,8 +7,9 @@ import com.kairos.persistance.model.master_data.data_category_element.DataCatego
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
 import com.kairos.persistance.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistance.repository.master_data.data_category_element.DataCategoryMongoRepository;
-import com.kairos.persistance.repository.master_data.data_category_element.DataElementMognoRepository;
+import com.kairos.persistance.repository.master_data.data_category_element.DataElementMongoRepository;
 import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.mongodb.MongoException;
@@ -42,7 +43,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
     private DataCategoryMongoRepository dataCategoryMongoRepository;
 
     @Inject
-    private DataElementMognoRepository dataElementMongoRepository;
+    private DataElementMongoRepository dataElementMongoRepository;
 
 
     public List<DataSubjectMapping> createDataSubjectWithDataCategoriesAndDataElements(Long unitId, List<OrganizationDataSubjectDTO> dataSubjectDTOS) {
@@ -83,6 +84,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
             for (String dataSubjectName : dataSubjectNameList) {
                 DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectName);
                 dataSubjectMapping.setDataCategories(dataCategoryIdList);
+                dataSubjectMapping.setOrganizationId(unitId);
                 dataSubjectMappingList.add(dataSubjectMapping);
             }
         }
@@ -108,6 +110,20 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
         delete(dataSubjectMapping);
         return true;
     }
+
+
+
+    public List<DataSubjectMappingResponseDTO> getAllDataSubjectByUnitId(Long unitId)
+    {
+        return dataSubjectMappingRepository.getAllDataSubjectAndMappingWithDataCategoryByUnitId(unitId);
+    }
+
+
+    public DataSubjectMappingResponseDTO getDataSubjectByUnitId(Long unitId, BigInteger dataSubjectId)
+    {
+        return dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategoryByUinitId(unitId,dataSubjectId);
+    }
+
 
 
 }

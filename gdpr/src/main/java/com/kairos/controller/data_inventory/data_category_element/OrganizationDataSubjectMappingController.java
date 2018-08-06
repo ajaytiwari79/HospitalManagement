@@ -49,4 +49,31 @@ public class OrganizationDataSubjectMappingController {
     }
 
 
+
+    @ApiOperation(value = "create data Subject with data category and data element")
+    @GetMapping("dataSubject_mapping/all")
+    public ResponseEntity<Object> getAllDataSubjectWithDataCaegoryAndDataElementByUnitId(@PathVariable Long unitId) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization Id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataSubjectMappingService.getAllDataSubjectByUnitId(unitId));
+    }
+
+
+    @ApiOperation(value = "create data Subject with data category and data element")
+    @GetMapping("dataSubject_mapping/{dataSubjectId}")
+    public ResponseEntity<Object> getDataSubjectWithDataCaegoryAndDataElementByUnitId(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization Id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataSubjectMappingService.getDataSubjectByUnitId(unitId, dataSubjectId));
+    }
+
+
+
+
+
+
+
+
 }
