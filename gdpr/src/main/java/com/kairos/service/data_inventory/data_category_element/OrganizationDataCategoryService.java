@@ -27,10 +27,10 @@ public class OrganizationDataCategoryService extends MongoBaseService {
     public List<DataCategory> createDataCategoryWithDataElements(Long unitId, List<DataCategoryDTO> dataCategoryDTOS) {
 
         Set<String> datCategoryNameList = new HashSet<>();
-        Map<String,List<DataElementDTO>> dataElementsCorrespondingToDataCategory=new HashMap<>();
+        Map<String, List<DataElementDTO>> dataElementsCorrespondingToDataCategory = new HashMap<>();
         for (DataCategoryDTO dataCategoryDTO : dataCategoryDTOS) {
             datCategoryNameList.add(dataCategoryDTO.getName());
-            dataElementsCorrespondingToDataCategory.put(dataCategoryDTO.getName(),dataCategoryDTO.getDataElements());
+            dataElementsCorrespondingToDataCategory.put(dataCategoryDTO.getName(), dataCategoryDTO.getDataElements());
         }
         List<DataCategory> dataCategories = dataCategoryMongoRepository.findByNamesAndUnitId(unitId, datCategoryNameList);
         if (!dataCategories.isEmpty()) {
@@ -41,33 +41,19 @@ public class OrganizationDataCategoryService extends MongoBaseService {
     }
 
 
+    public void buildDataCategoryWithDataElements(Long unitId, Map<String, List<DataElementDTO>> dataElementsCorrespondingToDataCategory) {
 
+        List<DataCategory> dataCategories = new ArrayList<>();
+        List<DataElementDTO> dataElementDTOList = new ArrayList<>();
+        for (Map.Entry<String, List<DataElementDTO>> dataCategoryEntrySet : dataElementsCorrespondingToDataCategory.entrySet()) {
+            DataCategory dataCategory = new DataCategory(dataCategoryEntrySet.getKey());
+            dataElementDTOList.addAll(dataCategoryEntrySet.getValue());
 
-
-
-    public void buildDataCategoryWithDataElements(Long unitId,Map<String,List<DataElementDTO>> dataElementsCorrespondingToDataCategory)
-    {
-
-        List<DataCategory> dataCategories=new ArrayList<>();
-      for (Map.Entry<String,List<DataElementDTO>> dataCategoryEntrySet:dataElementsCorrespondingToDataCategory.entrySet())
-      {
-
-          DataCategory dataCategory=new DataCategory();
-
-
-
-
-
-
-      }
-
-
+        }
 
 
 
     }
-
-
 
 
 }
