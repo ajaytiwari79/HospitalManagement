@@ -1241,6 +1241,8 @@ public class UnitPositionService extends UserBaseService {
             ObjectMapperUtils.copyProperties(oldUnitPosition,unitPosition);
             unitPosition.setEndDateMillis(oldUnitPosition.getEndDateMillis());
             oldUnitPosition.setEndDateMillis(DateUtils.getOneDayBeforeMillis());
+            oldUnitPosition.setHistory(true);
+            oldUnitPosition.setEditable(false);
             unitPosition.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
             unitPosition.setSeniorityLevel(unitPositionSeniorityLevelQueryResult.getSeniorityLevel());
             unitPosition.setParentUnitPosition(oldUnitPosition);
