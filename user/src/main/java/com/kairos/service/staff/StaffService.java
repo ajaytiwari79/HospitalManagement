@@ -834,6 +834,7 @@ public class StaffService extends UserBaseService {
 
                 }
             }
+            priorityGroupIntegrationService.createDefaultKPISettingForStaff(new DefalutKPISettingDTO(staffList.stream().map(staff -> staff.getId()).collect(Collectors.toList())),unitId);
             return staffUploadBySheetQueryResult;
         } catch (IOException e) {
             e.printStackTrace();
@@ -1121,7 +1122,7 @@ public class StaffService extends UserBaseService {
         //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
         DefalutKPISettingDTO defalutKPISettingDTO=new DefalutKPISettingDTO();
         defalutKPISettingDTO.setStaffIds(Arrays.asList(staff.getId()));
-        priorityGroupIntegrationService.createDefaultKPISettingForStaff(defalutKPISettingDTO,unitId);
+        priorityGroupIntegrationService.createDefaultKPISettingForStaff(new DefalutKPISettingDTO(Arrays.asList(staff.getId())),unitId);
         return staff;
     }
 

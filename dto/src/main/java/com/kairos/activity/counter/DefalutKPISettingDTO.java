@@ -22,6 +22,10 @@ public class DefalutKPISettingDTO {
         this.countryAndOrgAccessGroupIdsMap = countryAndOrgAccessGroupIdsMap;
     }
 
+    public DefalutKPISettingDTO(List<Long> staffIds) {
+        this.staffIds = staffIds;
+    }
+
     public List<Long> getOrgTypeIds() {
         return orgTypeIds;
     }

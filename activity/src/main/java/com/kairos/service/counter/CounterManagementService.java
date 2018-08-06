@@ -219,13 +219,13 @@ public class CounterManagementService extends MongoBaseService {
     }
 
     public void createDefalutStaffKPISetting(Long unitId,DefalutKPISettingDTO defalutKPISettingDTO) {
-        List<ApplicableKPI> applicableKPISForUnit = counterRepository.getApplicableKPIByUnitOrCountryId(defalutKPISettingDTO.getParentUnitId(), ConfLevel.UNIT);
+        List<ApplicableKPI> applicableKPISForUnit = counterRepository.getApplicableKPIByUnitOrCountryId(unitId, ConfLevel.UNIT);
         List<BigInteger> applicableKpiIds = applicableKPISForUnit.stream().map(applicableKPI -> applicableKPI.getBaseKpiId()).collect(Collectors.toList());
         List<TabKPIConf> tabKPIConfKPIEntries = new ArrayList<>();
-        List<TabKPIConf> tabKPIConf = counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds, defalutKPISettingDTO.getParentUnitId(), ConfLevel.UNIT);
+        List<TabKPIConf> tabKPIConf = counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds, unitId, ConfLevel.UNIT);
         defalutKPISettingDTO.getStaffIds().forEach(staffId -> {
             tabKPIConf.stream().forEach(tabKPIConfKPI -> {
-                tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, null, null, ConfLevel.UNIT));
+                tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, null, staffId, ConfLevel.STAFF));
             });
         });
         List<ApplicableKPI> applicableKPIS = new ArrayList<>();
