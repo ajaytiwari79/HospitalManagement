@@ -72,11 +72,11 @@ public class DataElementService extends MongoBaseService {
     }
 
     public DataElement getDataElement(Long countryId, Long organizationId, BigInteger id) {
-        DataElement exist = dataElementMognoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        DataElement dataElement = dataElementMognoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        if (!Optional.ofNullable(dataElement).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", id);
         }
-        return exist;
+        return dataElement;
 
     }
 

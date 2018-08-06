@@ -18,7 +18,10 @@ public interface CustomDataSubjectMappingRepository {
 
     List<DataSubjectMappingResponseDTO> getAllDataSubjectAndMappingWithDataCategory(Long countryId, Long organizationId);
 
-    List<DataSubjectMapping> findByNamesAndUnitId(Long unitId, Set<String> names);
+    List<DataSubjectMapping> findByNameListAndUnitId(Long unitId, Set<String> names);
+
+
+    DataSubjectMapping findByNameAndUnitId(Long unitId, String name);
 
     List<DataSubjectMappingResponseDTO> getAllDataSubjectAndMappingWithDataCategoryByUnitId(Long unitId);
 

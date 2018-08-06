@@ -8,6 +8,7 @@ import com.kairos.persistance.model.master_data.data_category_element.DataElemen
 import com.kairos.persistance.repository.master_data.data_category_element.DataCategoryMongoRepository;
 import com.kairos.persistance.repository.master_data.data_category_element.DataElementMongoRepository;
 import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
+import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -116,29 +117,37 @@ public class OrganizationDataCategoryService extends MongoBaseService {
     }
 
 
-    public  Map<String,Object>   deleteDataCategoryAndDataElement(Long unitId, BigInteger dataCategoryId) {
+    public Map<String, Object> deleteDataCategoryAndDataElement(Long unitId, BigInteger dataCategoryId) {
 
-        Map<String,Object>  result=new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         DataCategory dataCategory = dataCategoryMongoRepository.findByUnitIdAndId(unitId, dataCategoryId);
         if (Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Category ", dataCategoryId);
         }
-        List<DataSubjectMappingBasicResponseDTO> dataSubjectLinkedToDataCategory=dataSubjectMappingRepository.findByUnitDataSubjectLinkWithDataCategory(unitId,dataCategoryId);
-        if (!dataSubjectLinkedToDataCategory.isEmpty())
-        {
-            result.put(IS_SUCCESS,false);
-            result.put(DATA_SUBJECT_LIST,dataSubjectLinkedToDataCategory);
-        }
-        else {
-            List<DataElement> dataElementList = dataElementMognoRepository.findAllDataElementByUnitIdAndIdss(unitId, dataCategory.getDataElements());
+        List<DataSubjectMappingBasicResponseDTO> dataSubjectLinkedToDataCategory = dataSubjectMappingRepository.findByUnitDataSubjectLinkWithDataCategory(unitId, dataCategoryId);
+        if (!dataSubjectLinkedToDataCategory.isEmpty()) {
+            result.put(IS_SUCCESS, false);
+            result.put(DATA_SUBJECT_LIST, dataSubjectLinkedToDataCategory);
+        } else {
+            List<DataElement> dataElementList = dataElementMognoRepository.findAllDataElementByUnitIdAndIds(unitId, dataCategory.getDataElements());
             if (!dataElementList.isEmpty()) {
                 deleteAll(dataElementList);
             }
             delete(dataCategory);
-            result.put(IS_SUCCESS,true);
+            result.put(IS_SUCCESS, true);
         }
         return result;
     }
 
+    public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long unitId) {
+        return dataCategoryMongoRepository.getAllDataCategoryWithDataElementByUnitId(unitId);
+
+    }
+
+
+    public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, BigInteger dataCategoryId) {
+
+        return dataCategoryMongoRepository.getDataCategoryWithDataElementByUnitIdAndId(unitId, dataCategoryId);
+    }
 
 }
