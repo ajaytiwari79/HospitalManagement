@@ -6,7 +6,7 @@ public class AbsencePlannedTime {
     private BigInteger phaseId;
     private BigInteger timeTypeId;  // if exception is true then time type is null
     private BigInteger plannedTimeId;
-    boolean exception = false;
+    private boolean exception;
 
     public AbsencePlannedTime() {
         // DC
