@@ -148,13 +148,13 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
 
         String dynamicWhereQuery = "";
         queryParameters.put("unitId", organizationId);
-        if (clientFilterDTO.getName() != null) {
+        if (clientFilterDTO.getName() != null && !clientFilterDTO.getName().isEmpty()) {
             queryParameters.put("name", clientFilterDTO.getName());
-            dynamicWhereQuery += "AND ( c.firstName=~{name} OR c.lastName=~{name})";
+            dynamicWhereQuery += " AND ( c.firstName=~{name} OR c.lastName=~{name}) ";
         }
-        if (clientFilterDTO.getCprNumber() != null) {
+        if (clientFilterDTO.getCprNumber() != null &&  !clientFilterDTO.getCprNumber().isEmpty()) {
             queryParameters.put("cprNumber", clientFilterDTO.getCprNumber());
-            dynamicWhereQuery += "AND user.cprNumber STARTS WITH {cprNumber}";
+            dynamicWhereQuery += " AND c.cprNumber STARTS WITH {cprNumber} ";
         }
         queryParameters.put("phoneNumber", clientFilterDTO.getPhoneNumber());
         queryParameters.put("civilianStatus", clientFilterDTO.getClientStatus());
