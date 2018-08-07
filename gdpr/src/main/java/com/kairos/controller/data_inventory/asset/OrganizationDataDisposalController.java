@@ -3,7 +3,7 @@ package com.kairos.controller.data_inventory.asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.service.data_inventory.asset.OrganizationDataDisposalService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class OrganizationDataDisposalController {
 
     @ApiOperation("add DataDisposal")
     @PostMapping("/data_disposal/add")
-    public ResponseEntity<Object> createDataDisposal(@PathVariable Long unitId, @Valid @RequestBody ValidateListOfRequestBody<DataDisposal> dataDisposals) {
+    public ResponseEntity<Object> createDataDisposal(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataDisposal> dataDisposals) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }

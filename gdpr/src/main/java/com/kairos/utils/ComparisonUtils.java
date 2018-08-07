@@ -6,11 +6,10 @@ import org.springframework.util.Assert;
 import java.lang.reflect.Method;
 import java.util.*;
 
-@Component
 public class ComparisonUtils {
 
 
-    public <T> Set<String> getNameListForMetadata(List<T> existingObject, Set<String> namesList) {
+    public static <T> Set<String> getNameListForMetadata(List<T> existingObject, Set<String> namesList) {
 
         if (existingObject.size() == 0) {
             return namesList;
@@ -27,7 +26,9 @@ public class ComparisonUtils {
 
                 Method getNameMethod = c.getMethod(methodName);
                 for (T object : existingObject) {
-                    existingNames.add((String) getNameMethod.invoke(object));
+                   // existingNames.add((String) getNameMethod.invoke(object));
+                    String name=(String) getNameMethod.invoke(object);
+                    existingNamesMapData.put(name.toLowerCase(),name);
                 }
             }
              catch (Exception e) {
@@ -35,10 +36,10 @@ public class ComparisonUtils {
                 throw new RuntimeException(e);
             }
 
-            existingNames.forEach(s -> {
+           /* existingNames.forEach(s -> {
                 existingNamesMapData.put(s.toLowerCase(), s);
 
-            });
+            });*/
             Set<String> newNamesList = new HashSet<>();
             namesList.forEach(name -> {
                 if (!Optional.ofNullable(existingNamesMapData.get(name.toLowerCase())).isPresent()) {

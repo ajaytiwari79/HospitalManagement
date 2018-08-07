@@ -30,8 +30,6 @@ public class OrganizationStorageFormatService extends MongoBaseService {
     @Inject
     private StorageFormatMongoRepository storageFormatMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
 
     /**
      * @param
@@ -54,7 +52,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<StorageFormat> existing = findAllByNameAndOrganizationId(organizationId, storageFormatNames, StorageFormat.class);
-            storageFormatNames = comparisonUtils.getNameListForMetadata(existing, storageFormatNames);
+            storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
             List<StorageFormat> newStorageFormats = new ArrayList<>();
             if (!storageFormatNames.isEmpty()) {

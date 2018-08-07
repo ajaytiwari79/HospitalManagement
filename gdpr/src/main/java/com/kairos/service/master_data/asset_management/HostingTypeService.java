@@ -30,9 +30,6 @@ public class HostingTypeService extends MongoBaseService {
     @Inject
     private HostingTypeMongoRepository hostingTypeMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
     /**
      * @param countryId
@@ -55,7 +52,7 @@ public class HostingTypeService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<HostingType> existing = findByNamesAndCountryId(countryId, hostingTypeNames, HostingType.class);
-            hostingTypeNames = comparisonUtils.getNameListForMetadata(existing, hostingTypeNames);
+            hostingTypeNames = ComparisonUtils.getNameListForMetadata(existing, hostingTypeNames);
             List<HostingType> newHostingTypes = new ArrayList<>();
             if (hostingTypeNames.size() != 0) {
                 for (String name : hostingTypeNames) {

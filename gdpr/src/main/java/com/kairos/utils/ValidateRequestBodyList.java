@@ -1,9 +1,9 @@
-package com.kairos.utils.validate_list;
+package com.kairos.utils;
 
 import javax.validation.Valid;
 import java.util.List;
 
-public class ValidateListOfRequestBody<T> {
+public class ValidateRequestBodyList<T> {
 
 
     @Valid
@@ -17,10 +17,10 @@ public class ValidateListOfRequestBody<T> {
         this.requestBody = requestBody;
     }
 
-    public ValidateListOfRequestBody( List<T> requestBody) {
+    public ValidateRequestBodyList(List<T> requestBody) {
         this.requestBody = requestBody;
     }
 
-    public ValidateListOfRequestBody() {
+    public ValidateRequestBodyList() {
     }
 }

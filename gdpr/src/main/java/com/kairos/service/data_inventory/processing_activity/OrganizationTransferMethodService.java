@@ -32,9 +32,6 @@ public class OrganizationTransferMethodService  extends MongoBaseService {
     @Inject
     private TransferMethodMongoRepository transferMethodRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
     /**
      * @description this method create new TransferMethod if TransferMethod not exist with same name ,
@@ -58,7 +55,7 @@ public class OrganizationTransferMethodService  extends MongoBaseService {
 
             }
             List<TransferMethod> existing = findAllByNameAndOrganizationId(organizationId, transferMethodNames, TransferMethod.class);
-            transferMethodNames = comparisonUtils.getNameListForMetadata(existing, transferMethodNames);
+            transferMethodNames = ComparisonUtils.getNameListForMetadata(existing, transferMethodNames);
 
             List<TransferMethod> newTransferMethods = new ArrayList<>();
             if (transferMethodNames.size() != 0) {

@@ -30,9 +30,6 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
 
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
     /**
      * @param countryId
      * @param
@@ -54,7 +51,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<TechnicalSecurityMeasure> existing = findByNamesAndCountryId(countryId, techSecurityMeasureNames, TechnicalSecurityMeasure.class);
-            techSecurityMeasureNames = comparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
+            techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
 
             List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
             if (techSecurityMeasureNames.size() != 0) {

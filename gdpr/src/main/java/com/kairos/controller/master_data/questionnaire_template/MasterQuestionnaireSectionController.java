@@ -3,7 +3,7 @@ package com.kairos.controller.master_data.questionnaire_template;
 import com.kairos.dto.master_data.MasterQuestionnaireSectionDTO;
 import com.kairos.service.master_data.questionnaire_template.MasterQuestionnaireSectionService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
@@ -36,7 +35,7 @@ public class MasterQuestionnaireSectionController {
      */
     @ApiOperation(value = "create and add questionnaire section to questionnaire template ")
     @PostMapping("/questionnaire_template/{templateId}/section")
-    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @Validated @RequestBody ValidateListOfRequestBody<MasterQuestionnaireSectionDTO> questionnaireSectionsDto) {
+    public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @Validated @RequestBody ValidateRequestBodyList<MasterQuestionnaireSectionDTO> questionnaireSectionsDto) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {

@@ -31,9 +31,6 @@ public class OrganizationDataSourceService extends MongoBaseService {
     @Inject
     private DataSourceMongoRepository dataSourceMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
     /**
      * @param organizationId
@@ -55,7 +52,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<DataSource> existing = findAllByNameAndOrganizationId( organizationId, dataSourceNames, DataSource.class);
-            dataSourceNames = comparisonUtils.getNameListForMetadata(existing, dataSourceNames);
+            dataSourceNames = ComparisonUtils.getNameListForMetadata(existing, dataSourceNames);
 
             List<DataSource> newDataSources = new ArrayList<>();
             if (dataSourceNames.size() != 0) {

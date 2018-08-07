@@ -34,9 +34,6 @@ public class ProcessingPurposeService extends MongoBaseService {
     private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
 
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
     /**
      * @param countryId
@@ -60,7 +57,7 @@ public class ProcessingPurposeService extends MongoBaseService {
 
             }
             List<ProcessingPurpose> existing = findByNamesAndCountryId(countryId, processingPurposesNames, ProcessingPurpose.class);
-            processingPurposesNames = comparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
+            processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
             List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
             if (!processingPurposesNames.isEmpty()) {

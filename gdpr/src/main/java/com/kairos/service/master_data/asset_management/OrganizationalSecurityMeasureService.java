@@ -28,9 +28,6 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     @Inject
     private OrganizationalSecurityMeasureMongoRepository organizationalSecurityMeasureMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
 
     /**
@@ -56,7 +53,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
             }
 
             List<OrganizationalSecurityMeasure> existing = findByNamesAndCountryId(countryId,orgSecurityMeasureNames,OrganizationalSecurityMeasure.class);
-            orgSecurityMeasureNames = comparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
+            orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
             List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
             if (orgSecurityMeasureNames.size() != 0) {
                 for (String name : orgSecurityMeasureNames) {

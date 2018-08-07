@@ -4,7 +4,7 @@ package com.kairos.controller.master_data.asset_management;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
 import com.kairos.service.master_data.asset_management.HostingTypeService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class HostingTypeController {
 
     @ApiOperation("add HostingType")
     @PostMapping("/hosting_type/add")
-    public ResponseEntity<Object> createHostingType(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<HostingType> hostingTypes) {
+    public ResponseEntity<Object> createHostingType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<HostingType> hostingTypes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }

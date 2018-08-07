@@ -33,9 +33,6 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
     private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
 
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
     /**
      * @description this method create new ProcessingPurpose if ProcessingPurpose not exist with same name ,
@@ -59,7 +56,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
 
             }
             List<ProcessingPurpose> existing =  findAllByNameAndOrganizationId(organizationId,processingPurposesNames,ProcessingPurpose.class);
-            processingPurposesNames = comparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
+            processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
             List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
             if (processingPurposesNames.size() != 0) {

@@ -32,10 +32,6 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
     @Inject
     private ProcessingLegalBasisMongoRepository legalBasisMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
-
     /**
      * @description this method create new ProcessingLegalBasis if ProcessingLegalBasis not exist with same name ,
      * and if exist then simply add  ProcessingLegalBasis to existing list and return list ;
@@ -58,7 +54,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
 
             }
             List<ProcessingLegalBasis> existing =  findAllByNameAndOrganizationId(organizationId,legalBasisNames,ProcessingLegalBasis.class);
-            legalBasisNames = comparisonUtils.getNameListForMetadata(existing, legalBasisNames);
+            legalBasisNames = ComparisonUtils.getNameListForMetadata(existing, legalBasisNames);
 
             List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
             if (legalBasisNames.size() != 0) {

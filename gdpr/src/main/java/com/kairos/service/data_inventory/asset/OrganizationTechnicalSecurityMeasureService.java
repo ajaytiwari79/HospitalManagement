@@ -31,9 +31,6 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
     private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
 
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
     /**
      * @param
      * @param organizationId
@@ -55,7 +52,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<TechnicalSecurityMeasure> existing = findAllByNameAndOrganizationId(organizationId, techSecurityMeasureNames, TechnicalSecurityMeasure.class);
-            techSecurityMeasureNames = comparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
+            techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
 
             List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
             if (!techSecurityMeasureNames.isEmpty()) {

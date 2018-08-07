@@ -30,8 +30,6 @@ public class StorageFormatService extends MongoBaseService {
     @Inject
     private StorageFormatMongoRepository storageFormatMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
 
     /**
      * @param countryId
@@ -54,7 +52,7 @@ public class StorageFormatService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<StorageFormat> existing = findByNamesAndCountryId(countryId, storageFormatNames, StorageFormat.class);
-            storageFormatNames = comparisonUtils.getNameListForMetadata(existing, storageFormatNames);
+            storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
             List<StorageFormat> newStorageFormats = new ArrayList<>();
             if (storageFormatNames.size() != 0) {
