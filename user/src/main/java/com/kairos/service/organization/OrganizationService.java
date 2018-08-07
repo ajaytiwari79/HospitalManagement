@@ -387,10 +387,8 @@ public class OrganizationService extends UserBaseService {
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
-//        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
         vrpClientService.createPreferedTimeWindow(organization.getId());
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
-//        accessGroupService.createDefaultAccessGroups(organization);
         countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
@@ -401,15 +399,6 @@ public class OrganizationService extends UserBaseService {
         priorityGroupIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), organization.getCountry().getId());
         //defalut KPI setting
         priorityGroupIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType ->organizationType.getId()).collect(Collectors.toList()),countryId,null,countryAndOrgAccessGroupIdsMap),organization.getId());
-
-
-        // DO NOT CREATE PHASE for UNION
-
-//        if (!orgDetails.getUnion()) {
-//            phaseRestClient.createDefaultPhases(organization.getId());
-//            periodRestClient.createDefaultPeriodSettings(organization.getId());
-//        }
-
         //Copying Priority Groups to Unit from Country
 
         priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(organization.getCountry().getId(), organization.getId());
@@ -471,11 +460,6 @@ public class OrganizationService extends UserBaseService {
             Organization gdprUnit = organizationGraphRepository.findOne(gdprUnitId);
             gdprUnit.setGdprUnit(true);
             organizationGraphRepository.save(gdprUnit);
-
-            // Create Employment for Unit Manager
-            // Check if user exists or Create User
-//            createUnitManager(gdprUnit.getId(), gdprUnitDTO);
-
             organizationResponseWrapper = new OrganizationResponseWrapper();
             organizationResponseWrapper.setOrgData(organizationResponse(gdprUnit, gdprUnitDTO.getTypeId(), gdprUnitDTO.getSubTypeId(), gdprUnitDTO.getCompanyCategoryId(), gdprUnitDTO.getUnitManager()));
             organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(UserContext.getUserDetails().getId()));
@@ -505,10 +489,8 @@ public class OrganizationService extends UserBaseService {
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
-//        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
         vrpClientService.createPreferedTimeWindow(organization.getId());
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
-
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
         validateAccessGroupIdForUnitManager(countryId, orgDetails.getUnitManager().getAccessGroupId(), orgDetails.getCompanyType());
         countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
@@ -518,7 +500,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-
+        priorityGroupIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType ->organizationType.getId()).collect(Collectors.toList()),countryId,null,countryAndOrgAccessGroupIdsMap),organization.getId());
         // Create Unit Manager
         orgDetails.getUnitManager().setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(orgDetails.getUnitManager().getAccessGroupId()));
         createUnitManager(organization.getId(), orgDetails);

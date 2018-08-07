@@ -1117,11 +1117,7 @@ public class StaffService extends UserBaseService {
         addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getCurrentDateMillis(), isEmploymentExist);
-        staff.setUser(null); // removing user to send in FE
-//        staff.setGender(user.getGender());
-        //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
-        DefalutKPISettingDTO defalutKPISettingDTO=new DefalutKPISettingDTO();
-        defalutKPISettingDTO.setStaffIds(Arrays.asList(staff.getId()));
+        staff.setUser(null);
         priorityGroupIntegrationService.createDefaultKPISettingForStaff(new DefalutKPISettingDTO(Arrays.asList(staff.getId())),unitId);
         return staff;
     }
@@ -1298,7 +1294,6 @@ public class StaffService extends UserBaseService {
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
-
         parent.getEmployments().add(employment);
         save(parent);
         UnitPermission unitPermission = new UnitPermission();
@@ -1310,6 +1305,7 @@ public class StaffService extends UserBaseService {
 
         employment.getUnitPermissions().add(unitPermission);
         save(employment);
+        priorityGroupIntegrationService.createDefaultKPISettingForStaff(new DefalutKPISettingDTO(Arrays.asList(employment.getStaff().getId())),organizationId);
     }
 
     public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
