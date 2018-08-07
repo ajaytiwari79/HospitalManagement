@@ -62,7 +62,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     @Query("MATCH (payTable:PayTable)<-[rel:" + HAS_TEMP_PAY_TABLE + "]-(parentPayTable:PayTable{deleted:false}) where id(payTable)={0}  detach delete rel \n" +
             "set parentPayTable.hasTempCopy=false " +
             " set parentPayTable.editable=true " +
-            "id(parentPayTable) as id,parentPayTable.name as name,parentPayTable.published as published,parentPayTable.startDateMillis as startDateMillis,parentPayTable.endDateMillis as endDateMillis,parentPayTable.description as description,parentPayTable.shortName as shortName, parentPayTable.paymentUnit as paymentUnit ORDER BY startDateMillis DESC LIMIT 1")
+            "RETURN id(parentPayTable) as id,parentPayTable.name as name,parentPayTable.published as published,parentPayTable.startDateMillis as startDateMillis,parentPayTable.endDateMillis as endDateMillis,parentPayTable.description as description,parentPayTable.shortName as shortName, parentPayTable.paymentUnit as paymentUnit ORDER BY startDateMillis DESC LIMIT 1")
     PayTableResponse getParentPayTableByPayTableId(Long payTableId);
 
     @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false}) where id(level)={0} " +
