@@ -27,4 +27,9 @@ public interface DataCategoryMongoRepository extends MongoRepository<DataCategor
     List<DataCategory> findDataCategoryByIds(Long countryId,Long organizationId,Set<BigInteger> ids);
 
 
+    @Query("{deleted:false,organizationId:?0,_id:?1}")
+    DataCategory findByUnitIdAndId(Long unitId,BigInteger id);
+
+
+
 }

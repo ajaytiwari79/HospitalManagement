@@ -1,12 +1,14 @@
 package com.kairos.response.dto.master_data.data_mapping;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigInteger;
-
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DataElementBasicResponseDto {
+public class DataCategoryResponseDTO {
 
     private BigInteger id;
 
@@ -14,14 +16,14 @@ public class DataElementBasicResponseDto {
 
     private Long countryId;
 
-    private Boolean deleted;
+    private List<DataElementBasicResponseDTO> dataElements=new ArrayList<>();
 
-    public Boolean getDeleted() {
-        return deleted;
+    public List<DataElementBasicResponseDTO> getDataElements() {
+        return dataElements;
     }
 
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
+    public void setDataElements(List<DataElementBasicResponseDTO> dataElements) {
+        this.dataElements = dataElements;
     }
 
     public BigInteger getId() {
@@ -48,6 +50,7 @@ public class DataElementBasicResponseDto {
         this.countryId = countryId;
     }
 
-    public DataElementBasicResponseDto() {
+    public DataCategoryResponseDTO( ){
+
     }
 }

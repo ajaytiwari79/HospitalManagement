@@ -9,4 +9,5 @@ public interface CustomAccessorPartyRepository {
 
 
     List<AccessorPartyResponseDTO> getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(Long countryId, Long parentOrganizationId, Long organizationId);
+
 }

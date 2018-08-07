@@ -78,7 +78,7 @@ public class JaversCommonService {
     }
 
     private List<Object> getOldFieldsValues(List<String> fields, List<CdoSnapshot> auditHistoryList, int index, int version, BigInteger ownerId, Class ownerClass) {
-        List<Object> oldValues = new ArrayList<Object>();
+        List<Object> oldValues = new ArrayList<>();
         for (String field : fields) {
             if (version >= 2) {
                 if (auditHistoryList.get(index-1).getState().getPropertyValue(field) != null && auditHistoryList.get(index - 1).getState().getPropertyValue(field) instanceof ValueObjectId) {
@@ -104,7 +104,7 @@ public class JaversCommonService {
     }
 
     private List<Object> getFieldsValue(CdoSnapshot historyMap, List<String> fields, BigInteger ownerId, Class ownerClass) {
-        List<Object> fieldValues = new ArrayList<Object>();
+        List<Object> fieldValues = new ArrayList<>();
         for (String field : fields) {
             if ( historyMap.getState().getPropertyValue(field) != null  && historyMap.getState().getPropertyValue(field) instanceof ValueObjectId) {
                 ValueObjectId valueObject = (ValueObjectId) historyMap.getState().getPropertyValue(field);

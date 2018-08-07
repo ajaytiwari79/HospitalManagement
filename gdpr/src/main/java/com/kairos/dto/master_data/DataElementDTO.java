@@ -2,8 +2,8 @@ package com.kairos.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
@@ -13,7 +13,7 @@ public class DataElementDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "Name can't be empty")
+    @NotBlank(message = "Name can't be empty")
     @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
@@ -27,7 +27,7 @@ public class DataElementDTO {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {

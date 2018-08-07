@@ -31,6 +31,7 @@ public class DataElementService extends MongoBaseService {
     private DataElementMongoRepository dataElementMongoRepository;
 
 
+
     /**@decription method create new Data Elements throw exception if data element already exist
      * @param countryId
      * @param organizationId
@@ -72,11 +73,11 @@ public class DataElementService extends MongoBaseService {
     }
 
     public DataElement getDataElement(Long countryId, Long organizationId, BigInteger id) {
-        DataElement exist = dataElementMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        DataElement dataElement = dataElementMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        if (!Optional.ofNullable(dataElement).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", id);
         }
-        return exist;
+        return dataElement;
 
     }
 

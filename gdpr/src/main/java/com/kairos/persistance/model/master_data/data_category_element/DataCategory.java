@@ -49,6 +49,8 @@ public class DataCategory extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
+
+
     public DataCategory() {
     }
 

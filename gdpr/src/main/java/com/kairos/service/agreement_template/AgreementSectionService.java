@@ -81,7 +81,6 @@ public class AgreementSectionService extends MongoBaseService {
      */
     //updated for section and sub section creations
     public List<BigInteger> createAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
-
         checkForDuplicacyInTitleOfAgreementSectionAndSubSection(agreementSectionDTOS);
         List<AgreementSection> agreementSectionList = new ArrayList<>();
         List<ClauseBasicDTO> changedClausesDTOList = new ArrayList<>();
@@ -279,7 +278,7 @@ public class AgreementSectionService extends MongoBaseService {
      * @param clauseBasicDTOS         -dto contain list of clause which are created at the time of section creation
      * @param newCreatedClauseHashMap -contain new created clause value corresponding to its title
      * @param agreementSection        -agreement section contain name and list ids of clauses,
-     * @description -this method is used in updateExistingClauseAndAddToAgreementSection .this method add ids of new created clause  to section which clause belong.
+     * @description -this method is used in update Existing ClauseAndAddToAgreementSection .this method add ids of new created clause  to section which clause belong.
      */
     //updated
     public void addNewCreatedClauseIdsToSectionOrSubSection(List<ClauseBasicDTO> clauseBasicDTOS, Map<String, Clause> newCreatedClauseHashMap, AgreementSection agreementSection) {
@@ -315,6 +314,7 @@ public class AgreementSectionService extends MongoBaseService {
         List<BigInteger> agreementSectionIdList = new ArrayList<>();
         if (!newAgreementSectionDTOList.isEmpty()) {
             List<BigInteger> newCreatedAgreementSectionsId = createAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, organizationId, newAgreementSectionDTOList, policyAgreementTemplate);
+
             agreementSectionIdList.addAll(newCreatedAgreementSectionsId);
 
         }
