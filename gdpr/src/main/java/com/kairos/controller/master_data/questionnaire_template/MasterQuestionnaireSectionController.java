@@ -32,7 +32,7 @@ public class MasterQuestionnaireSectionController {
      * @param countryId
      * @param templateId id of MAsterQuestionnaireTemplate
      * @param questionnaireSectionsDto
-     * @return  master questionnaire template with questionniare sections
+     * @return  master questionnaire template with questionnaire sections
      */
     @ApiOperation(value = "create and add questionnaire section to questionnaire template ")
     @PostMapping("/questionnaire_template/{templateId}/section")

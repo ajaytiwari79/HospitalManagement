@@ -164,9 +164,9 @@ public class AccessorPartyService extends MongoBaseService {
      * @param organizationId - id of current organization
      * @return     method return list of Organization Accessor party with non Inherited Accessor party from  parent
      */
-    public List<AccessorPartyResponseDTO> getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(Long countryId, Long parentOrgId, Long organizationId) {
+    public List<AccessorPartyResponseDTO> getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(Long countryId, Long parentOrgId, Long organizationId) {
 
-      return accessorPartyMongoRepository.getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(countryId,parentOrgId,organizationId);
+      return accessorPartyMongoRepository.getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(countryId,parentOrgId,organizationId);
     }
 
 

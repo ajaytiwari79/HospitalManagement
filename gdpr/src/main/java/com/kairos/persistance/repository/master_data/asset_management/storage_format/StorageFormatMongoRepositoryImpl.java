@@ -27,7 +27,7 @@ public class StorageFormatMongoRepositoryImpl implements CustomStorageFormatRepo
 
     @Override
     public List<StorageFormatResponseDTO> getAllNotInheritedStorageFormatFromParentOrgAndUnitStorageFormat(Long countryId, Long parentOrganizationId, Long organizationId) {
-        Document groupOPerationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
+        Document groupOperationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
         Document projectionForFilteringDuplicateDataOfOrgAndParentOrg = Document.parse(CustomAggregationQuery.metaDataProjectionForRemovingDuplicateInheritedMetaData(organizationId));
         Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionforAddingFinalDataObject());
         Document replaceRootOperation = Document.parse(CustomAggregationQuery.metaDataReplaceRoot());

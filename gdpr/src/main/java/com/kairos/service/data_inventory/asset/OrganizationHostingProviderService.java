@@ -146,7 +146,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
 
     /**
      * @param organizationId
-     * @param name           name of hsoting provider
+     * @param name           name of hosting provider
      * @return return object of hosting provider
      * @throws DataNotExists if hosting provider not exist for given name
      */

@@ -2,7 +2,7 @@ package com.kairos.service.data_inventory.data_category_element;
 
 
 import com.kairos.dto.master_data.DataElementDTO;
-import com.kairos.persistance.repository.master_data.data_category_element.DataElementMognoRepository;
+import com.kairos.persistance.repository.master_data.data_category_element.DataElementMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ public class OrganizationDataElementService extends MongoBaseService {
 
 
     @Inject
-    private DataElementMognoRepository dataElementMognoRepository;
+    private DataElementMongoRepository dataElementMongoRepository;
 
 
 

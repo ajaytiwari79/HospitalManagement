@@ -149,7 +149,7 @@ public class StorageFormatService extends MongoBaseService {
      * @param
      * @param name      name of StorageFormat
      * @return StorageFormat object fetch on basis of  name
-     * @throws DataNotExists throw exception if StorageFormatnot exist for given name
+     * @throws DataNotExists throw exception if StorageFormat not exist for given name
      */
     public StorageFormat getStorageFormatByName(Long countryId, String name) {
 

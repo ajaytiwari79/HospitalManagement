@@ -95,7 +95,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      * @throws DataNotFoundByIdException if data disposal not found for id
      * @param organizationId
      * @param id id of data disposal
-     * @return onject of data disposal
+     * @return object of data disposal
      */
     public DataDisposal getDataDisposalById(Long organizationId, BigInteger id) {
 

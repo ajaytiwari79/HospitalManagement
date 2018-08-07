@@ -84,19 +84,19 @@ public class JaversCommonService {
                 if (auditHistoryList.get(index-1).getState().getPropertyValue(field) != null && auditHistoryList.get(index - 1).getState().getPropertyValue(field) instanceof ValueObjectId) {
                     ValueObjectId valueObject = (ValueObjectId) auditHistoryList.get(index - 1).getState().getPropertyValue(field);
                     List<CdoSnapshot> valueObjectCdoSnapshots = javers.findSnapshots(QueryBuilder.byValueObjectId(ownerId, ownerClass, valueObject.getFragment()).build());
-                    addChangedOrAuditvalueObject(valueObjectCdoSnapshots.get(0));
+                    addChangedOrAuditValueObject(valueObjectCdoSnapshots.get(0));
                 } else if ( auditHistoryList.get(index-1).getState().getPropertyValue(field) != null && auditHistoryList.get(index - 1).getState().getPropertyValue(field) instanceof ArrayList) {
                     ArrayList valueObjectList = (ArrayList) auditHistoryList.get(index - 1).getState().getPropertyValue(field);
                     if (valueObjectList.get(0) instanceof ValueObjectId) {
                         ValueObjectId valueObject = (ValueObjectId) valueObjectList.get(0);
                         List<CdoSnapshot> valueObjectCdoSnapshots = javers.findSnapshots(QueryBuilder.byValueObjectId(valueObject.masterObjectId(), ownerClass, valueObject.getFragment()).build());
-                        oldValues.add(addChangedOrAuditvalueObject(valueObjectCdoSnapshots));
+                        oldValues.add(addChangedOrAuditValueObject(valueObjectCdoSnapshots));
                     } else {
-                        addRefrencedDataOrDefaultValue(oldValues, field, auditHistoryList.get(index - 1));
+                        addReferencedDataOrDefaultValue(oldValues, field, auditHistoryList.get(index - 1));
                     }
                 } else {
 
-                    addRefrencedDataOrDefaultValue(oldValues, field, auditHistoryList.get(index - 1));
+                    addReferencedDataOrDefaultValue(oldValues, field, auditHistoryList.get(index - 1));
                 }
             }
         }
@@ -109,26 +109,26 @@ public class JaversCommonService {
             if ( historyMap.getState().getPropertyValue(field) != null  && historyMap.getState().getPropertyValue(field) instanceof ValueObjectId) {
                 ValueObjectId valueObject = (ValueObjectId) historyMap.getState().getPropertyValue(field);
                 List<CdoSnapshot> valueObjectCdoSnapshots = javers.findSnapshots(QueryBuilder.byValueObjectId(ownerId, ownerClass, valueObject.getFragment()).build());
-                addChangedOrAuditvalueObject(valueObjectCdoSnapshots.get(0));
+                addChangedOrAuditValueObject(valueObjectCdoSnapshots.get(0));
 
             } else if (historyMap.getState().getPropertyValue(field) != null  && historyMap.getState().getPropertyValue(field) instanceof ArrayList) {
                 ArrayList valueObjectList = (ArrayList) historyMap.getState().getPropertyValue(field);
                 if (valueObjectList.get(0) instanceof ValueObjectId) {
                     ValueObjectId valueObject = (ValueObjectId) valueObjectList.get(0);
                     List<CdoSnapshot> valueObjectCdoSnapshots = javers.findSnapshots(QueryBuilder.byValueObjectId(ownerId, ownerClass, valueObject.getFragment()).build());
-                    fieldValues.add(addChangedOrAuditvalueObject(valueObjectCdoSnapshots));
+                    fieldValues.add(addChangedOrAuditValueObject(valueObjectCdoSnapshots));
                 } else {
-                    addRefrencedDataOrDefaultValue(fieldValues, field, historyMap);
+                    addReferencedDataOrDefaultValue(fieldValues, field, historyMap);
                 }
             } else {
-                addRefrencedDataOrDefaultValue(fieldValues, field, historyMap);
+                addReferencedDataOrDefaultValue(fieldValues, field, historyMap);
             }
         }
         return fieldValues;
     }
 
 
-    public List<Map<String, Object>> addChangedOrAuditvalueObject(List<CdoSnapshot> valueObjectSnapShots) {
+    public List<Map<String, Object>> addChangedOrAuditValueObject(List<CdoSnapshot> valueObjectSnapShots) {
 
 
         List<Map<String, Object>> auditHistoryListData = new ArrayList<>();
@@ -143,7 +143,7 @@ public class JaversCommonService {
         return auditHistoryListData;
     }
 
-    public List<Map<String, Object>> addChangedOrAuditvalueObject(CdoSnapshot valueObjectSnapShot) {
+    public List<Map<String, Object>> addChangedOrAuditValueObject(CdoSnapshot valueObjectSnapShot) {
 
         List<Map<String, Object>> auditHistoryListData = new ArrayList<>();
         Map<String, Object> historyMap = new HashMap<>();
@@ -155,7 +155,7 @@ public class JaversCommonService {
         return auditHistoryListData;
     }
 
-    public void addRefrencedDataOrDefaultValue(List<Object> fieldValues, String field, CdoSnapshot historyMap) {
+    public void addReferencedDataOrDefaultValue(List<Object> fieldValues, String field, CdoSnapshot historyMap) {
 
 
         switch (field) {

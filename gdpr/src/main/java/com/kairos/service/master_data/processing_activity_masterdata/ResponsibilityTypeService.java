@@ -170,8 +170,8 @@ public class ResponsibilityTypeService extends MongoBaseService {
     /**
      * @param countryId
      * @param parentOrganizationId -id of parent organization
-     * @param unitId               - id of cuurent organization
-     * @return method return list of processingPurposes (organzation processing purpose and processing purposes which were not inherited by organization from parent till now )
+     * @param unitId               - id of current organization
+     * @return method return list of processingPurposes (organization processing purpose and processing purposes which were not inherited by organization from parent till now )
      */
     public List<ResponsibilityTypeResponseDTO> getAllNotInheritedResponsibilityTypesFromParentOrgAndUnitResponsibilityType(Long countryId, Long parentOrganizationId, Long unitId) {
 

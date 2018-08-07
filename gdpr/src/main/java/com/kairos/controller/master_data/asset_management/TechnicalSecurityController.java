@@ -108,7 +108,7 @@ public class TechnicalSecurityController {
 
     @ApiOperation("get All technical security of Current organization and Parent Oeg which were not inherited by Organization")
     @GetMapping("/technical_security")
-    public ResponseEntity<Object> getAllTechnicalMeasurefOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+    public ResponseEntity<Object> getAllTechnicalMeasureOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getAllNotInheritedTechnicalSecurityMeasureFromParentOrgAndUnitSecurityMeasure(countryId,parentOrgId,organizationId));
     }
 

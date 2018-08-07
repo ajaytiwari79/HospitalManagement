@@ -4,7 +4,7 @@ import com.kairos.dto.master_data.DataCategoryDTO;
 import com.kairos.persistance.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
 import com.kairos.persistance.repository.master_data.data_category_element.DataCategoryMongoRepository;
-import com.kairos.persistance.repository.master_data.data_category_element.DataElementMognoRepository;
+import com.kairos.persistance.repository.master_data.data_category_element.DataElementMongoRepository;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDto;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -35,13 +35,13 @@ public class DataCategoryService extends MongoBaseService {
     private DataElementService dataElementService;
 
     @Inject
-    private DataElementMognoRepository dataElementMognoRepository;
+    private DataElementMongoRepository dataElementMongoRepository;
 
 
     /**
      * @descitpion this method create new data category and add new data elements to data Category
      * @param countryId
-     * @param dataCategoryDto contain data categoy name and list of data elements
+     * @param dataCategoryDto contain data category name and list of data elements
      * @return return data category object.
      */
     public DataCategory addDataCategoryAndDataElement(Long countryId,Long organizationId,DataCategoryDTO dataCategoryDto) {
@@ -57,7 +57,7 @@ public class DataCategoryService extends MongoBaseService {
             dataCategory = dataCategoryMongoRepository.save(getNextSequence(newDataCategory));
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
-            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_ELEMENTS_LIST));
+            dataElementMongoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_ELEMENTS_LIST));
         }
         return dataCategory;
     }
@@ -146,7 +146,7 @@ public class DataCategoryService extends MongoBaseService {
             dataCategory = dataCategoryMongoRepository.save(getNextSequence(dataCategory));
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
-            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementListMap.get(DATA_ELEMENTS_LIST));
+            dataElementMongoRepository.deleteAll((List<DataElement>) dataElementListMap.get(DATA_ELEMENTS_LIST));
         }
 
         return dataCategory;

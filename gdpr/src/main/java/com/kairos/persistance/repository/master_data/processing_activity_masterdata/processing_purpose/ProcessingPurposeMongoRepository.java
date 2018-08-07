@@ -34,7 +34,7 @@ public interface ProcessingPurposeMongoRepository extends MongoRepository<Proces
     List<ProcessingPurposeResponseDTO> findAllProcessingPurposes(Long countryId);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<ProcessingPurposeResponseDTO> findAllOrganizaionProcessingPurposes( Long organizationId);
+    List<ProcessingPurposeResponseDTO> findAllOrganizationProcessingPurposes( Long organizationId);
 
 
     @Query("{organizationId:?0,name:?1,deleted:false}")

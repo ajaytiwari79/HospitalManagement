@@ -74,11 +74,11 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     }
 
 
-    /**@descriptiom buildQuestionniareTemplate()  buld questionnaire template ,add template type to questionniare template (Template Type enum) and if enum type
+    /**@descriptiom buildQuestionnaireTemplate()  build questionnaire template ,add template type to questionnaire template (Template Type enum) and if enum type
      * is ASSET_TYPE then add asset to template and return ;(addTemplateTypeToQuestionnaireTemplate)
-     * @param templateDto   create basic questionniare Template without sections
+     * @param templateDto   create basic questionnaire Template without sections
      * @param questionnaireTemplate is template in which we add properties of Template Type and Asset Type if present
-     * @return object of questionniare template with template type
+     * @return object of questionnaire template with template type
      * @throws  InvalidRequestException; if template type enum value not exist
      */
     public MasterQuestionnaireTemplate buildQuestionnaireTemplate(MasterQuestionnaireTemplateDTO templateDto, MasterQuestionnaireTemplate questionnaireTemplate) {
@@ -124,7 +124,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * @param countryId
      * @param organizationId
      * @param id - id of questionnaire template
-     * @return true id deletion is successfull
+     * @return true id deletion is successful
      */
     public Boolean deleteMasterQuestionnaireTemplate(Long countryId,Long organizationId, BigInteger id) {
         MasterQuestionnaireTemplate exist = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
@@ -141,10 +141,10 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
     /**
      *
      * @param countryId
-     * @param orgId organization id to which questionniare template belong
-     * @param id questionniare template id
+     * @param orgId organization id to which questionnaire template belong
+     * @param id questionnaire template id
      * @param templateDto
-     * @return updated Questionniare template with basic data (name,decription ,template type)
+     * @return updated Questionnaire template with basic data (name,description ,template type)
      */
     public MasterQuestionnaireTemplate updateQuestionnaireTemplate(Long countryId, Long orgId,BigInteger id, MasterQuestionnaireTemplateDTO templateDto) {
         MasterQuestionnaireTemplate existing = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId,orgId,templateDto.getName().trim());
@@ -169,7 +169,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
 
     /**
      * @description  we get  section[ {} ] as query response from mongo on using group operation,
-     * That why  we are not using JsonInclude.NON_EMPTY so we can get reponse of section as [{id=null,name=null,description=null}] instead of section [{}]
+     * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
      * and filter section in application layer and send empty array of section []
      * @param countryId
      * @param id questionnaire template id
@@ -187,7 +187,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
 
     /**
      * @description we get  section[ {} ] as query response from mongo on using group operation,
-     *  That why  we are not using JsonInclude.NON_EMPTY so we can get reponse of section as [{id=null,name=null,description=null}] instead of section [{}]
+     *  That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
      *  and filter section in application layer and send empty array of section []
      * @param countryId
      * @param organizationId

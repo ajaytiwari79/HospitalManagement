@@ -8,5 +8,5 @@ import java.util.List;
 public interface CustomAccessorPartyRepository {
 
 
-    List<AccessorPartyResponseDTO> getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(Long countryId, Long parentOrganizationId, Long organizationId);
+    List<AccessorPartyResponseDTO> getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(Long countryId, Long parentOrganizationId, Long organizationId);
 }

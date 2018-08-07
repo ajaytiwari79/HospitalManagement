@@ -45,10 +45,10 @@ public class MasterQuestionnaireTemplateController {
     }
 
     /**
-     * @description method fecth all MasterQuestionnaireTemplate with MasterQuestionnaireSections list (which contain MasterQuestion list)
+     * @description method fetch all MasterQuestionnaireTemplate with MasterQuestionnaireSections list (which contain MasterQuestion list)
      * @param countryId
      * @param organizationId
-     * @return  return List MasterQuestionnaireTemplate With MasterQuestionnaireSection list(which contain List of MasterQUestions)
+     * @return  return List MasterQuestionnaireTemplate With MasterQuestionnaireSection list(which contain List of MasterQuestions)
      */
     @ApiOperation(value = "get all questionnaire template basic response ")
     @GetMapping("/questionnaire_template/all")
@@ -67,7 +67,7 @@ public class MasterQuestionnaireTemplateController {
      * @param countryId
      * @param organizationId
      * @param id id of MasterQuestionnaireTemplate
-     * @return  return MasterQuestionnaireTemplate With MasterQuestionnaireSection list(which contain List of MasterQUestions)
+     * @return  return MasterQuestionnaireTemplate With MasterQuestionnaireSection list(which contain List of MasterQuestions)
      */
     @ApiOperation(value = "get questionnaire template With Sections by Id ")
     @GetMapping("/questionnaire_template/{id}")

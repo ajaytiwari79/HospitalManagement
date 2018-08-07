@@ -65,7 +65,7 @@ public class AssetController {
 
     @ApiOperation(value = "Get Asset With meta data by Id")
     @GetMapping("/asset/{assetId}")
-    public ResponseEntity<Object> getAssetWithMetaDatabyId( @PathVariable Long unitId,@PathVariable BigInteger assetId) {
+    public ResponseEntity<Object> getAssetWithMetaDataById( @PathVariable Long unitId,@PathVariable BigInteger assetId) {
 
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "ManagingOrganization id can't be Null");

@@ -75,8 +75,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @param countryId
      * @param organizationId
      * @param subProcessingActivities
-     * @param parentProcessingActivity required to get oranization types ,sub types and Services category and Sub Service Category list for sub processing activity
-     * @return return map of Subprocessing activities list and ids of sub processing activity
+     * @param parentProcessingActivity required to get organization types ,sub types and Services category and Sub Service Category list for sub processing activity
+     * @return return map of Sub processing activities list and ids of sub processing activity
      */
     public Map<String, Object> createNewSubProcessingActivity(Long countryId, Long organizationId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityDTO parentProcessingActivity) {
 

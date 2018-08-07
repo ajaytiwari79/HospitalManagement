@@ -28,7 +28,7 @@ public class ProcessingPurposeMongoRepositoryImpl implements CustomProcessingPur
     @Override
     public List<ProcessingPurposeResponseDTO> getAllNotInheritedProcessingPurposesFromParentOrgAndUnitProcessingPurpose(Long countryId, Long parentOrganizationId, Long organizationId) {
 
-            Document groupOPerationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
+            Document groupIOperationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
             Document projectionForFilteringDuplicateDataOfOrgAndParentOrg = Document.parse(CustomAggregationQuery.metaDataProjectionForRemovingDuplicateInheritedMetaData(organizationId));
             Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionforAddingFinalDataObject());
             Document replaceRootOperation = Document.parse(CustomAggregationQuery.metaDataReplaceRoot());

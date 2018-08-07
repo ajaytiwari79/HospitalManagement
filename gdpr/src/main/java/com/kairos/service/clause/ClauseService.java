@@ -110,7 +110,7 @@ public class ClauseService extends MongoBaseService {
      * @param clauseDto      contain update data for clause
      * @return updated clause object
      * @throws DataNotFoundByIdException: if clause not found for particular id, {@link DuplicateDataException if clause already exist with same name}
-     * @description this method updateclause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
+     * @description this method update clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
      */
     public Clause updateClause(Long countryId, Long organizationId, BigInteger clauseId, ClauseDTO clauseDto) {
 
@@ -156,9 +156,9 @@ public class ClauseService extends MongoBaseService {
      * @param countryId
      * @param organizationId
      * @param clauseBasicDTOS         List od Clause Dto contain basic detail ,title and description of clause.
-     * @param policyAgreementTemplate - policy agreement template contain list or organization types,Sub types,Service Catgeory and Sub Service Category and Account types.
+     * @param policyAgreementTemplate - policy agreement template contain list or organization types,Sub types,Service Category and Sub Service Category and Account types.
      * @return
-     * @description this method create is used in Agreement section Service for creating new Clauses on creation of sections in policy agreement tenplate.
+     * @description this method create is used in Agreement section Service for creating new Clauses on creation of sections in policy agreement template.
      */
     public List<Clause> createNewClauseUsingAgreementTemplateMetadata(Long countryId, Long organizationId, List<ClauseBasicDTO> clauseBasicDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
@@ -167,7 +167,7 @@ public class ClauseService extends MongoBaseService {
         clauseBasicDTOS.forEach(
                 clauseBasicDTO -> {
                     if (clauseTitles.contains(clauseBasicDTO.getTitle())) {
-                        exceptionService.duplicateDataException("message.duplicate", "Caluse title ", clauseBasicDTO.getTitle());
+                        exceptionService.duplicateDataException("message.duplicate", "Clause title ", clauseBasicDTO.getTitle());
                     }
                     clauseTitles.add(clauseBasicDTO.getTitle());
                 }
@@ -176,7 +176,7 @@ public class ClauseService extends MongoBaseService {
         if (!existingClause.isEmpty()) {
             exceptionService.duplicateDataException("message.duplicate", " Clause " + existingClause.get(0).getTitle());
         }
-        List<Clause> newCLauseList = new ArrayList<>();
+        List<Clause> newClauseList = new ArrayList<>();
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
             Clause clause = new Clause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), countryId, policyAgreementTemplate.getOrganizationTypes(), policyAgreementTemplate.getOrganizationSubTypes()
                     , policyAgreementTemplate.getOrganizationServices(), policyAgreementTemplate.getOrganizationSubServices());
@@ -186,17 +186,17 @@ public class ClauseService extends MongoBaseService {
             clause.setTemplateTypes(templateTypes);
             clause.setOrganizationId(organizationId);
             clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
-            newCLauseList.add(clause);
+            newClauseList.add(clause);
 
         }
-        return clauseMongoRepository.saveAll(getNextSequence(newCLauseList));
+        return clauseMongoRepository.saveAll(getNextSequence(newClauseList));
     }
 
 
     /**
      * @param countryId
      * @param organizationId
-     * @return return caluse with account type basic response,org types ,sub types,service category ,sub service category and tags
+     * @return return clause with account type basic response,org types ,sub types,service category ,sub service category and tags
      * @description
      */
     public List<ClauseResponseDTO> getAllClauses(Long countryId, Long organizationId) {
@@ -219,7 +219,7 @@ public class ClauseService extends MongoBaseService {
      * @param countryId
      * @param organizationId
      * @param id
-     * @return bollean true if data deleted successfully
+     * @return boolean true if data deleted successfully
      * @throws DataNotFoundByIdException; if clause not found for id
      */
     public Boolean deleteClause(Long countryId, Long organizationId, BigInteger id) {

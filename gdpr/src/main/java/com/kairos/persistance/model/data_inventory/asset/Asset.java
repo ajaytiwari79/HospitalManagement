@@ -26,7 +26,7 @@ public class Asset extends MongoBaseEntity {
 
     private Long countryId;
 
-    @NotBlank(message = "Hosting Loction can't be empty")
+    @NotBlank(message = "Hosting Location can't be empty")
     private String hostingLocation;
 
     @NotNull(message = "Managing department can't be empty")

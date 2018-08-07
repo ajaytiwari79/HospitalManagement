@@ -149,7 +149,7 @@ public class HostingProviderService extends MongoBaseService {
      * @throws DataNotExists if hosting provider not exist for given name
      * @param countryId
      * @param 
-     * @param name name of hsoting provider
+     * @param name name of hosting provider
      * @return return object of hosting provider
      */
     public HostingProvider getHostingProviderByName(Long countryId,String name) {

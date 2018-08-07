@@ -21,6 +21,6 @@ public interface ProcessingActivityMongoRepository extends MongoRepository<Proce
 
 
     @Query("{organizationId:?0,_id:{$in:?1},deleted:false,subProcess:false}")
-    List<ProcessingActivity> findSubProcessingActvitiesByIds(Long organizationId, List<BigInteger> ids);
+    List<ProcessingActivity> findSubProcessingActivitiesByIds(Long organizationId, List<BigInteger> ids);
 
 }
