@@ -43,7 +43,7 @@ public class AppConstant {
     public static final String ASSET_TYPES_LIST = "asset_types";
 
 
-    //metaData reffrence key for asset and processing activity
+    //metaData reference key for asset and processing activity
     public static final String ASSET_TYPE = "assetType";
     public static final String ASSET_SUB_TYPE = "assetSubTypes";
     public static final String STORAGE_FORMAT = "storageFormats";

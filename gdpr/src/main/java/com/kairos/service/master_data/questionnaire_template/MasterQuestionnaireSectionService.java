@@ -57,9 +57,9 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param templateId                    questionniare template id ,required to fetch
+     * @param templateId                    questionnaire template id ,required to fetch
      * @param masterQuestionnaireSectionDto contains list of sections ,And section contain list of questions
-     * @return add sections ids to questionniare template and return questionniare template
+     * @return add sections ids to questionnaire template and return questionnaire template
      * @description questionnaireSection contain list of sections and list of sections ids.
      */
     public MasterQuestionnaireTemplateResponseDTO addMasterQuestionnaireSectionToQuestionnaireTemplate(Long countryId, Long orgId, BigInteger templateId, List<MasterQuestionnaireSectionDTO> masterQuestionnaireSectionDto) {
@@ -99,7 +99,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @param countryId
      * @param orgId
      * @param masterQuestionnaireSectionDTOs contain list of sections ,and section list of questions
-     * @return return map ,which contain list of section ,list of sections id and list of questions which is nedded for rollback
+     * @return return map ,which contain list of section ,list of sections id and list of questions which is needed for rollback
      * @description method create new question sections belong to questionnaire template and and questions which belong to section.
      * and rollback if exception occur in questionnaire section service to delete inserted questions
      */
@@ -158,7 +158,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         MasterQuestionnaireTemplate questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId, orgId, templateId);
         List<BigInteger> questionnaireTemplateSectionIdList = questionnaireTemplate.getSections();
         if (!questionnaireTemplateSectionIdList.contains(id)) {
-            exceptionService.invalidRequestException("message.invalid", "section not present intemplate");
+            exceptionService.invalidRequestException("message.invalid", "section not present in template");
         }
         questionnaireTemplateSectionIdList.remove(id);
         questionnaireTemplate.setSections(questionnaireTemplateSectionIdList);
@@ -173,10 +173,10 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param questionnaireSectionDto contain list of  existing sections and new sections,( section conation list of existing questions and new question)
+     * @param questionnaireSectionDto contain list of  existing sections and new sections,( section contain list of existing questions and new question)
      * @return return update master questionnaire template with sections qnd questions
-     * @description this method update existing sections (if contian id) and create new sections(if not contain id in request)
-     * and update exisiting questions if contain id in request and create new question if not contain id in request which belongs to section
+     * @description this method update existing sections (if contain id) and create new sections(if not contain id in request)
+     * and update existing questions if contain id in request and create new question if not contain id in request which belongs to section
      **/
     public Map<String, Object> updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> questionnaireSectionDto) {
 
@@ -220,7 +220,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param updateSectionsAndQuestionsListDto contain list of Questionniare section and questions list
+     * @param updateSectionsAndQuestionsListDto contain list of Questionnaire section and questions list
      * @return map which contain list of sections ,section ids and questions.
      * @description this method update list of existing sections and update questions if exist already other wise create questions
      */
@@ -268,7 +268,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @param countryId
      * @param orgId
      * @param sectionIdList
-     * @return true on successfull deletion on questionnaire sections and questions
+     * @return true on successful deletion on questionnaire sections and questions
      */
     public Boolean deleteAll(Long countryId, Long orgId, List<BigInteger> sectionIdList) {
         List<MasterQuestionnaireSection> questionnaireSections = masterQuestionnaireSectionRepository.getQuestionnaireSectionListByIds(countryId, orgId, sectionIdList);

@@ -35,13 +35,14 @@ public class DataCategoryService extends MongoBaseService {
     private DataElementService dataElementService;
 
     @Inject
-    private DataElementMongoRepository dataElementMognoRepository;
+    private DataElementMongoRepository dataElementMongoRepository;
+
 
 
     /**
      * @descitpion this method create new data category and add new data elements to data Category
      * @param countryId
-     * @param dataCategoryDto contain data categoy name and list of data elements
+     * @param dataCategoryDto contain data category name and list of data elements
      * @return return data category object.
      */
     public DataCategory addDataCategoryAndDataElement(Long countryId,Long organizationId,DataCategoryDTO dataCategoryDto) {
@@ -57,7 +58,7 @@ public class DataCategoryService extends MongoBaseService {
             dataCategory = dataCategoryMongoRepository.save(getNextSequence(newDataCategory));
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
-            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_ELEMENTS_LIST));
+            dataElementMongoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_ELEMENTS_LIST));
         }
         return dataCategory;
     }
@@ -146,7 +147,7 @@ public class DataCategoryService extends MongoBaseService {
             dataCategory = dataCategoryMongoRepository.save(getNextSequence(dataCategory));
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
-            dataElementMognoRepository.deleteAll((List<DataElement>) dataElementListMap.get(DATA_ELEMENTS_LIST));
+            dataElementMongoRepository.deleteAll((List<DataElement>) dataElementListMap.get(DATA_ELEMENTS_LIST));
         }
 
         return dataCategory;

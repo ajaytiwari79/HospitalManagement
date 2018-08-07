@@ -43,8 +43,7 @@ public class AssetService extends MongoBaseService {
     private AssetTypeMongoRepository assetTypeMongoRepository;
 
 
-    public AssetDTO createAsseWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
-
+    public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
         Asset existingAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
         if (Optional.ofNullable(existingAsset).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());

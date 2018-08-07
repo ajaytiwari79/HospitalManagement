@@ -93,8 +93,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param organizationId
      * @param id
      * @return
-     * @description -method getPolicyAgreementWithSectionsAndClausesById()  uses Mongo QUuery which  return agreement template with sections and clauses if agreementSections is  present ,if not agreementSections present then
-     * it return agreementSections as agreementSections[ {} ] from data base ,which is converted into AgreementSectionResponseDTO[{id=null ,name=null}], thats  why we are checking if id is null present then simply add new agreementSections[]
+     * @description -method getPolicyAgreementWithSectionsAndClausesById()  uses Mongo Query which  return agreement template with sections and clauses if agreementSections is  present ,if not agreementSections present then
+     * it return agreementSections as agreementSections[ {} ] from data base ,which is converted into AgreementSectionResponseDTO[{id=null ,name=null}], that's  why we are checking if id is null present then simply add new agreementSections[]
      * instead of agreementSections[ {} ] .
      */
     public PolicyAgreementTemplateResponseDTO getPolicyAgreementTemplateWithAgreementSectionAndClausesById(Long countryId, Long organizationId, BigInteger id) {
@@ -111,8 +111,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param countryId
      * @param organizationId
      * @return -method return list all policy Agreement Template with sections and Clauses
-     * @description -method getAllPolicyAgreementWithSectionsAndClauses()  uses Mongo QUuery which  return agreement template with sections and clauses if agreementSections is  present ,if not agreementSections present then
-     * it return agreementSections as agreementSections[ {} ] from data base ,which is converted into AgreementSectionResponseDTO[{id=null ,name=null}], thats  why we are checking if id is null present then simply add new agreementSections[]
+     * @description -method getAllPolicyAgreementWithSectionsAndClauses()  uses Mongo Query which  return agreement template with sections and clauses if agreementSections is  present ,if not agreementSections present then
+     * it return agreementSections as agreementSections[ {} ] from data base ,which is converted into AgreementSectionResponseDTO[{id=null ,name=null}], that's  why we are checking if id is null present then simply add new agreementSections[]
      * instead of agreementSections[ {} ] .
      */
     public List<PolicyAgreementTemplateResponseDTO> getAllPolicyAgreementTemplateWithAgreementSectionAndClauses(Long countryId, Long organizationId) {
