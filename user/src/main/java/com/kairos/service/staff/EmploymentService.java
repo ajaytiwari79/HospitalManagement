@@ -879,11 +879,6 @@ public class EmploymentService extends UserBaseService {
         }
         employmentGraphRepository.save(employment);
 
-        if(Optional.ofNullable(employmentEndDate).isPresent()&&(DateUtil.getDateFromEpoch(employmentEndDate).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0)) {
-            //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-            List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
-            moveToReadOnlyAccessGroup(employmentIds);
-        }
         EmploymentReasonCodeQueryResult employmentReasonCode = employmentGraphRepository.findEmploymentreasonCodeByStaff(staffId);
         employment.setReasonCode(employmentReasonCode.getReasonCode());
 
