@@ -27,7 +27,7 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
     private MongoTemplate mongoTemplate;
 
 
-    private Document projectionOpertaion = Document.parse(CustomAggregationQuery.assetProjectionWithMetaData());
+    private Document projectionOperation = Document.parse(CustomAggregationQuery.assetProjectionWithMetaData());
 
 
     @Override
@@ -51,7 +51,7 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
                 lookup("hosting_provider", "hostingProvider", "_id", "hostingProvider"),
                 lookup("hosting_type", "hostingType", "_id", "hostingType"),
                 lookup("data_disposal", "dataDisposal", "_id", "dataDisposal"),
-                new CustomAggregationOperation(projectionOpertaion)
+                new CustomAggregationOperation(projectionOperation)
         );
 
         AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);
@@ -73,7 +73,7 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
                 lookup("hosting_provider", "hostingProvider", "_id", "hostingProvider"),
                 lookup("hosting_type", "hostingType", "_id", "hostingType"),
                 lookup("data_disposal", "dataDisposal", "_id", "dataDisposal"),
-                new CustomAggregationOperation(projectionOpertaion)
+                new CustomAggregationOperation(projectionOperation)
 
         );
         AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);

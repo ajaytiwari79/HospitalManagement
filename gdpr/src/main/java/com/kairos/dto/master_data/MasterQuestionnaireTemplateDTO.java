@@ -2,8 +2,8 @@ package com.kairos.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
@@ -11,14 +11,14 @@ import java.math.BigInteger;
 public class MasterQuestionnaireTemplateDTO {
 
 
-    @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
+    @NotBlank(message = "name.cannot.be.empty.or.null")
     @Pattern(message = "Number and Special character are not allowed for Title",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 
-    @NotNullOrEmpty(message = "Description cannot be empty")
+    @NotBlank(message = "Description cannot be empty")
     private String description;
 
-    @NotNullOrEmpty(message = "Template type cannot be empty ")
+    @NotBlank(message = "Template type cannot be empty ")
     private String templateType;
 
     private BigInteger assetType;

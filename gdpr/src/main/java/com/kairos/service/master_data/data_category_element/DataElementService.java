@@ -3,7 +3,7 @@ package com.kairos.service.master_data.data_category_element;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.master_data.DataElementDTO;
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
-import com.kairos.persistance.repository.master_data.data_category_element.DataElementMognoRepository;
+import com.kairos.persistance.repository.master_data.data_category_element.DataElementMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class DataElementService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private DataElementMognoRepository dataElementMognoRepository;
+    private DataElementMongoRepository dataElementMognoRepository;
 
 
     /**@decription method create new Data Elements throw exception if data element already exist
@@ -72,11 +72,11 @@ public class DataElementService extends MongoBaseService {
     }
 
     public DataElement getDataElement(Long countryId, Long organizationId, BigInteger id) {
-        DataElement exist = dataElementMognoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        DataElement dataElement = dataElementMognoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        if (!Optional.ofNullable(dataElement).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", id);
         }
-        return exist;
+        return dataElement;
 
     }
 

@@ -1,10 +1,8 @@
 package com.kairos.utils;
 
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.inject.Inject;
 import java.lang.reflect.Method;
 import java.util.*;
 

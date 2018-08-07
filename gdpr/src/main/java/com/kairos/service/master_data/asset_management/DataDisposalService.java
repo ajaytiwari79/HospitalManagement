@@ -91,7 +91,7 @@ public class DataDisposalService extends MongoBaseService {
      * @param countryId
      * @param 
      * @param id id of data disposal
-     * @return onject of data disposal
+     * @return object of data disposal
      */
     public DataDisposal getDataDisposalById(Long countryId,  BigInteger id) {
 

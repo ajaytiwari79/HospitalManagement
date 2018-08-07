@@ -230,7 +230,7 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String metaDataProjectionforAddingFinalDataObject() {
+    public static String metaDataProjectionForAddingFinalDataObject() {
         return "{ '$project': {" +
                 "          'data':{'$arrayElemAt':['$data',0]}," +
                 "          '_id':0" +

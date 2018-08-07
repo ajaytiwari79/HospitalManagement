@@ -15,7 +15,7 @@ public class DataCategoryDTO {
 
 
     @NotBlank(message = "Name  can't be  Empty")
-    @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "Number and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     @NotNull(message = "Data Element can't be  Empty")
@@ -23,7 +23,6 @@ public class DataCategoryDTO {
     @Valid
     List<DataElementDTO> dataElements;
 
-    private Long countryId;
 
     public String getName() {
         return name.trim();
@@ -41,11 +40,4 @@ public class DataCategoryDTO {
         this.dataElements = dataElements;
     }
 
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
 }
