@@ -710,7 +710,7 @@ public class TaskService extends MongoBaseService {
             Shift shift = shiftsInKairos.stream().filter(shiftInKairos -> shiftInKairos.getExternalId().equals(timeCareShift.getId())).findAny().orElse(mapTimeCareShiftDataToKairos
                     (timeCareShift, workPlaceId));
             Activity activity = activityMap.get(timeCareShift.getActivityId());
-            if (activity==null) {
+            if (!Optional.ofNullable(activity).isPresent()) {
                 skippedShiftsWhileSave.add(timeCareShift.getId());
             } else {
                 shift.setName(activity.getName());
