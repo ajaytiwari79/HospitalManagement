@@ -19,7 +19,7 @@ public class AutomaticOpenShiftGenerationService {
     @Inject
     private OpenShiftRuleTemplateRepository openShiftRuleTemplateRepository;
 
-    public void findUnderStaffingByActivityId() {
+    public void findUnderStaffingByActivityId(Long unitId) {
 
         List<OpenShiftRuleTemplateDTO> openShiftRuleTemplates = openShiftRuleTemplateRepository.findByUnitIdAndDeletedFalse(unitId);
 
