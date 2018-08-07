@@ -5,7 +5,7 @@ import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.country.pay_table.PayTableResponseWrapper;
-import com.kairos.persistence.model.pay_table.OrganizationLevelPayTableDTO;
+import com.kairos.persistence.model.pay_table.OrganizationLevelPayGroupAreaDTO;
 import com.kairos.persistence.model.pay_table.PayTableResponse;
 import com.kairos.user.country.pay_table.PayTableDTO;
 import com.kairos.user.country.pay_table.PayTableUpdateDTO;
@@ -77,13 +77,13 @@ public class PayTableServiceIntegrationTest {
     @Test
     @OrderTest(order = 2)
     public void getOrganizationLevelWisePayTables() {
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrganizationLevelPayTableDTO>>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrganizationLevelPayTableDTO>>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrganizationLevelPayGroupAreaDTO>>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrganizationLevelPayGroupAreaDTO>>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<List<OrganizationLevelPayTableDTO>>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<List<OrganizationLevelPayGroupAreaDTO>>> response = restTemplate.exchange(
                 baseUrlWithCountry + "/organization_level_pay_table",
                 HttpMethod.GET, null, typeReference);
-        RestTemplateResponseEnvelope<List<OrganizationLevelPayTableDTO>> responseBody = response.getBody();
+        RestTemplateResponseEnvelope<List<OrganizationLevelPayGroupAreaDTO>> responseBody = response.getBody();
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
 
     }

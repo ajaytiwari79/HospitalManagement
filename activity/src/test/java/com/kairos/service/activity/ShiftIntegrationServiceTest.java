@@ -171,7 +171,7 @@ public class ShiftIntegrationServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<Map<String, Object>>> response = testRestTemplate.exchange(
-                baseUrlForUnit + "/staff/8771/shifts_and_openshifts?employmentEndDate="+ DateUtils.getCurrentMillis(), HttpMethod.PUT, null, typeReference);
+                baseUrlForUnit + "/staff/8771/shifts_and_openshifts?employmentEndDate="+ DateUtils.getCurrentDayStartMillis(), HttpMethod.PUT, null, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 

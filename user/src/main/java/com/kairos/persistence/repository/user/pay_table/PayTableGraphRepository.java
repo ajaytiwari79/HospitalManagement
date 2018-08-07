@@ -24,14 +24,15 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             " with count(payTable) as payTableCount\n" +
             " RETURN case when payTableCount>0 THEN  true ELSE false END as response")
     Boolean checkPayTableNameAlreadyExitsByName(Long countryId, Long currentPayTableId, String payTableName);
+
     @Query("MATCH (c:Country) where id(c)={0} \n" +
-            "MATCH(c)-[:HAS_LEVEL]->(level:Level{isEnabled:true})\n" +
+            "MATCH(c)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true})\n" +
             "OPTIONAL MATCH (level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false})\n" +
-            "with level,Case when payTable IS NOT NULL THEN collect({id:id(payTable),name:payTable.name,published:payTable.published,startDateMillis:payTable.startDateMillis,endDateMillis:payTable.endDateMillis,description:payTable.description,shortName:payTable.shortName, paymentUnit:payTable.paymentUnit}) else [] end as payTables\n" +
-            "with level,payTables \n OPTIONAL MATCH  (level:Level)-[:IN_LEVEL]-(payGroupArea:PayGroupArea{deleted:false})\n" +
+            "with level,count(payTable) as totalPayTable \n" +
+            "OPTIONAL MATCH  (level:Level)-[:"+IN_LEVEL+"]-(payGroupArea:PayGroupArea{deleted:false})\n" +
             "return id(level) as id,level.name as name ,level.description as description, Case when payGroupArea IS NOT NULL THEN \n" +
-            "collect({ payGroupAreaId:id(payGroupArea),name:payGroupArea.name}) else [] end as payGroupAreas,payTables as payTables")
-    List<OrganizationLevelPayTableDTO> getOrganizationLevelWisePayTables(Long countryId);
+            "collect({ payGroupAreaId:id(payGroupArea),name:payGroupArea.name}) else [] end as payGroupAreas,totalPayTable as payTablesCount ORDER BY name")
+    List<OrganizationLevelPayGroupAreaDTO> getOrganizationLevelWisePayGroupAreas(Long countryId);
 
     @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false}) where id(payTable)={0} AND payGrade.payGradeLevel={1} "
             + "with count(payGrade) as payGradeCount \n" +
@@ -56,10 +57,17 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "OPTIONAL MATCH(payTable)-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false})\n" +
             "RETURN id(payTable) as id,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis," +
             " payTable.name as name ,collect({id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}) as payGrades")
-    List<PayTableResponse> findActivePayTableByOrganizationLevel(Long organizationLevelId, Long startDate);
+    List<PayTableResponse> findActivePayTablesByOrganizationLevel(Long organizationLevelId, Long startDate);
 
     @Query("MATCH (payTable:PayTable)<-[rel:" + HAS_TEMP_PAY_TABLE + "]-(parentPayTable:PayTable{deleted:false}) where id(payTable)={0}  detach delete rel \n" +
-            "set parentPayTable.hasTempCopy=false" +
-            " set parentPayTable.editable=true return id(parentPayTable)")
-    Long getParentPayTableByPayTableId(Long payTableId);
+            "set parentPayTable.hasTempCopy=false " +
+            " set parentPayTable.editable=true " +
+            "RETURN id(parentPayTable) as id,parentPayTable.name as name,parentPayTable.published as published,parentPayTable.startDateMillis as startDateMillis,parentPayTable.endDateMillis as endDateMillis,parentPayTable.description as description,parentPayTable.shortName as shortName, parentPayTable.paymentUnit as paymentUnit ORDER BY startDateMillis DESC LIMIT 1")
+    PayTableResponse getParentPayTableByPayTableId(Long payTableId);
+
+    @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false}) where id(level)={0} " +
+            "RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.editable as editable,payTable.hasTempCopy as hasTempCopy,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName, payTable.paymentUnit as paymentUnit ORDER BY startDateMillis ")
+    List<PayTableResponse> findActivePayTablesByOrganizationLevel(Long organizationLevelId);
+
+
 }
