@@ -124,7 +124,7 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
             case ORGANIZATION_SUB_SERVICES:
                 return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
             default:
-                throw new InvalidRequestException("data not found for Filtertype " + filterType);
+                throw new InvalidRequestException("data not found for Filter Type " + filterType);
 
 
         }

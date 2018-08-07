@@ -147,7 +147,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @param organizationId
      * @param name           name of StorageFormat
      * @return StorageFormat object fetch on basis of  name
-     * @throws DataNotExists throw exception if StorageFormatnot exist for given name
+     * @throws DataNotExists throw exception if StorageFormat not exist for given name
      */
     public StorageFormat getStorageFormatByName(Long organizationId, String name) {
 

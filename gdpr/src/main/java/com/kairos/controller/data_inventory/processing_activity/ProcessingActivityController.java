@@ -51,7 +51,7 @@ public class ProcessingActivityController {
 
     @ApiOperation(value = "Get Processing Activity with meta data by Id")
     @GetMapping("/processing_activity/{id}")
-    public ResponseEntity<Object> getProcessingActivityWithMetaDatabyId(@PathVariable Long unitId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> getProcessingActivityWithMetaDataById(@PathVariable Long unitId, @PathVariable BigInteger id) {
 
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be Null");

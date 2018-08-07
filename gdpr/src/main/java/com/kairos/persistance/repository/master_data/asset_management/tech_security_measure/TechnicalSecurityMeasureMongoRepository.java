@@ -32,7 +32,7 @@ public interface TechnicalSecurityMeasureMongoRepository extends MongoRepository
 
 
     @Query("{deleted:false,organizationId:?0}")
-    List<TechnicalSecurityMeasureResponseDTO> findAllOrganzationTechnicalSecurityMeasures(Long organizationId);
+    List<TechnicalSecurityMeasureResponseDTO> findAllOrganizationTechnicalSecurityMeasures(Long organizationId);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     TechnicalSecurityMeasure findByOrganizationIdAndId(Long organizationId,BigInteger id);

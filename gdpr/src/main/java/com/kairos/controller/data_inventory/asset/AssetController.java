@@ -33,7 +33,7 @@ public class AssetController {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "ManagingOrganization id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.createAsseWithBasicDetail( unitId, asset));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.createAssetWithBasicDetail( unitId, asset));
     }
 
 

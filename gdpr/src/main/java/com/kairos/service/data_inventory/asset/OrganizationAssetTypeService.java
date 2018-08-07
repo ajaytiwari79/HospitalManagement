@@ -169,7 +169,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      * @param
      * @param organizationId
      * @param id             id of Asset Type to which Sub Asset Types Link.
-     * @param assetTypeDto   asset type Dto contain list of Existing sub Asset typeswhich need to be update and New SubAsset Types  which we need to create and add to asset afterward.
+     * @param assetTypeDto   asset type Dto contain list of Existing sub Asset types which need to be update and New SubAsset Types  which we need to create and add to asset afterward.
      * @return Asset Type with updated Sub Asset and new Sub Asset Types
      * @throws DuplicateDataException if Asset type is already present with same name .
      * @description method simply (update already exit Sub asset types if id is present)and (add create new sub asset types if id is not present in sub asset types)

@@ -109,7 +109,7 @@ public class AccessorPartyController {
     @GetMapping("/accessor_party")
     public ResponseEntity<Object> getAllAccessorPartyOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam long parentOrgId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccesorParty(countryId,parentOrgId,organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(countryId,parentOrgId,organizationId));
     }
 
 }

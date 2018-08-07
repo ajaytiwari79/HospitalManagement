@@ -81,15 +81,15 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
 
         Criteria criteria = Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId);
-        List<Criteria> processingActivityCriterias = new ArrayList<>(filterSelectionDto.getFiltersData().size());
+        List<Criteria> processingActivityCriteriaList = new ArrayList<>(filterSelectionDto.getFiltersData().size());
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
             if (filterSelection.getValue().size() != 0) {
-                processingActivityCriterias.add(buildMatchCriteria(filterSelection, filterSelection.getName()));
+                processingActivityCriteriaList.add(buildMatchCriteria(filterSelection, filterSelection.getName()));
             }
         });
 
-        if (!processingActivityCriterias.isEmpty()) {
-            criteria = criteria.andOperator(processingActivityCriterias.toArray(new Criteria[processingActivityCriterias.size()]));
+        if (!processingActivityCriteriaList.isEmpty()) {
+            criteria = criteria.andOperator(processingActivityCriteriaList.toArray(new Criteria[processingActivityCriteriaList.size()]));
 
         }
         Aggregation aggregation = Aggregation.newAggregation(
