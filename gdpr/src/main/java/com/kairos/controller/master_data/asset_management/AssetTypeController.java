@@ -89,11 +89,8 @@ public class AssetTypeController {
     @ApiOperation("delete AssetType  by id")
     @DeleteMapping("/asset_type/delete/{id}")
     public ResponseEntity<Object> deleteAssetTypeById(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        Map<String, Object> result = assetTypeService.deleteAssetType(countryId, id);
-        if ((Boolean) result.get("isSuccess")) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, false, result);
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, false, assetTypeService.deleteAssetType(countryId,id));
 
     }
 

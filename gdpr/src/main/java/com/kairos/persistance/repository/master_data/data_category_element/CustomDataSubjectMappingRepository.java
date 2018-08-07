@@ -6,6 +6,7 @@ import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingRespon
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 public interface CustomDataSubjectMappingRepository {
 
@@ -18,4 +19,5 @@ public interface CustomDataSubjectMappingRepository {
     List<DataSubjectMappingResponseDto> getAllDataSubjectAndMappingWithDataCategory(Long countryId,Long organizationId);
 
 
+    List<DataSubjectMapping> findByNamesAndUnitId(Long unitId, Set<String> names);
 }

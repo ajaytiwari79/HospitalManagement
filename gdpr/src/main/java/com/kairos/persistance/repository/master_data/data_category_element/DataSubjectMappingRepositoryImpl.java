@@ -19,9 +19,7 @@ import static com.kairos.constants.AppConstant.DELETED;
 import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import java.math.BigInteger;
 import java.util.List;
-
-
-
+import java.util.Set;
 
 
 public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappingRepository {
@@ -32,11 +30,22 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     @Override
     public DataSubjectMapping findByName(Long countryId, Long organizationId, String name) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, DataSubjectMapping.class);
 
+
+    }
+
+
+    @Override
+    public List<DataSubjectMapping> findByNamesAndUnitId(Long unitId, Set<String> names) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(DELETED).is(false).and("name").in(names).and(ORGANIZATION_ID).is(unitId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.find(query, DataSubjectMapping.class);
 
     }
 
