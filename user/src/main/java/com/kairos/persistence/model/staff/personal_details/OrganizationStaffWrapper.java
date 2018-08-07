@@ -1,23 +1,28 @@
-package com.kairos.wrapper.organization;
+package com.kairos.persistence.model.staff.personal_details;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
- * Created by vipul on 1/3/18.
+ * Created by vipul on 6/2/18.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
-public class StaffUnitPositionWrapper {
+public class OrganizationStaffWrapper {
+    private Organization organization;
     private Staff staff;
     private UnitPosition unitPosition;
 
+    public OrganizationStaffWrapper() {
+    }
 
-    public StaffUnitPositionWrapper() {
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public Staff getStaff() {
