@@ -5,13 +5,11 @@ import com.kairos.dto.PolicyAgreementTemplateDTO;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
-import com.kairos.persistance.repository.common.MongoSequenceRepository;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
-import com.kairos.utils.ComparisonUtils;
 import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,16 +30,10 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
     @Inject
-    private ComparisonUtils comparisonUtils;
-
-    @Inject
     private AccountTypeService accountTypeService;
 
     @Inject
     private AgreementSectionService agreementSectionService;
-
-    @Inject
-    private MongoSequenceRepository mongoSequenceRepository;
 
     @Inject
     private ExceptionService exceptionService;

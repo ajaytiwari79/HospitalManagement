@@ -16,10 +16,8 @@ import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
-import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -37,15 +35,10 @@ public class ClauseService extends MongoBaseService {
 
     @Inject
     private AccountTypeService accountTypeService;
-    @Inject
-    private MongoTemplate mongoTemplate;
 
 
     @Inject
     private AccountTypeMongoRepository accountTypeMongoRepository;
-
-    @Inject
-    private ComparisonUtils comparisonUtils;
 
 
     @Inject
