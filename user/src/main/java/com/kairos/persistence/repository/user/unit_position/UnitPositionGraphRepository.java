@@ -206,7 +206,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "{id:id(org),name:org.name} as unitInfo")
     List<UnitPositionQueryResult> getAllUnitPositionsForCurrentOrganization(long staffId);
 
-    @Query("MATCH(unitPosition:UnitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
+    @Query("MATCH(unitPosition:UnitPosition{deleted:false,published:true})-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
             "MATCH(unitPosition)<-[:" + BELONGS_TO_STAFF + "]-(staff:Staff) " +
             "MATCH(unitPosition)-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={0} AND id(staff)={1} and id(expertise)={2} \n" +
             "AND unitPosition.startDateMillis<={3} AND  (unitPosition.endDateMillis IS NULL or unitPosition.endDateMillis>={3})  \n" +
@@ -214,7 +214,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     Long getUnitPositionIdByStaffAndExpertise(Long unitId, Long staffId, Long expertiseId, Long currentMillis);
 
     @Query("MATCH (unit:Organization) WHERE id(unit)={0} \n" +
-            "MATCH (unit)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition)-[:" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) \n" +
+            "MATCH (unit)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition{deleted:false,published:true})-[:" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) \n" +
             "RETURN id(unitPosition) as unitPositionId, id(expertise) as expertiseId")
     List<Map<Long, Long>> getMapOfUnitPositionAndExpertiseId(Long unitId);
 
@@ -325,7 +325,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     List<UnitPositionSeniorityLevelQueryResult> findUnitPositionSeniorityLeveltoUpdate();
 
 
-    @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) where id(staff)={0} " +
+    @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{deleted:false,published:true})-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) where id(staff)={0} " +
             "and id(expertise)=expertiseId and unitPosition.startDateMillis<=timeStamp and (uniPosition.endDateMillis>=timestamp or unitPosition.endDateMillis is null)" +
             "Match(unitPosition)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel) return unitPosition,seniorityLevel")
     UnitPositionSeniorityLevelQueryResult getSeniorityLevelFromStaffUnitPosition(Long staffId,Long expertiseId);
