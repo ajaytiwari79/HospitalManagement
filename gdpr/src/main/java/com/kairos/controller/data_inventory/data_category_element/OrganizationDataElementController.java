@@ -7,10 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 
@@ -33,11 +30,32 @@ public class OrganizationDataElementController {
     @DeleteMapping("/data_category/{dataCategoryId}/data_element/{elementId}")
     public ResponseEntity<Object> deleteDataElement(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId, @PathVariable BigInteger elementId) {
 
-        if (unitId==null)
-        {
-        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"Organization Id can't be null");
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationDataElementService.deleteDataElementById(unitId,dataCategoryId,elementId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataElementService.deleteDataElementById(unitId, dataCategoryId, elementId));
+    }
+
+
+    @ApiOperation(value = "get all Data Element")
+    @GetMapping("/data_element/all")
+    public ResponseEntity<Object> getAllDataElementByUnitId(@PathVariable Long unitId) {
+
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataElementService.getAllDataElementbyUnitId(unitId));
+    }
+
+
+    @ApiOperation(value = "get all Data Element")
+    @GetMapping("/data_element/{id}")
+    public ResponseEntity<Object> getDataElementByUnitIdAndId(@PathVariable Long unitId, @PathVariable BigInteger id) {
+
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataElementService.getDataElementbyUnitIdAndId(unitId, id));
     }
 
 

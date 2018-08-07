@@ -2,6 +2,7 @@ package com.kairos.controller.data_inventory.data_category_element;
 
 
 import com.kairos.dto.data_inventory.OrganizationDataSubjectDTO;
+import com.kairos.dto.data_inventory.OrganizationDataSubjectBasicDTO;
 import com.kairos.service.data_inventory.data_category_element.OrganizationDataSubjectMappingService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.validate_list.ValidateListOfRequestBody;
@@ -70,6 +71,15 @@ public class OrganizationDataSubjectMappingController {
     }
 
 
+
+    @ApiOperation(value = "create data Subject with data category and data element")
+    @PutMapping("dataSubject_mapping/update/{dataSubjectId}")
+    public ResponseEntity<Object> getAllDataSubjectWithDataCaegoryAndDataElementByUnitId(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId, @RequestBody @Valid OrganizationDataSubjectBasicDTO dataSubjectMappingDTO) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization Id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataSubjectMappingService.updateDataSubjectMappingById(unitId,dataSubjectId,dataSubjectMappingDTO));
+    }
 
 
 

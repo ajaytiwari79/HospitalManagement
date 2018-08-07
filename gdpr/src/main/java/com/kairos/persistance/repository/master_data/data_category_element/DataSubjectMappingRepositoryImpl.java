@@ -38,9 +38,21 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
 
     }
 
+    @Override
+    public DataSubjectMapping findByNameAndUnitId(Long unitId, String name) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(DELETED).is(false).and("name").is(name).and(ORGANIZATION_ID).is(unitId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.findOne(query, DataSubjectMapping.class);
+
+
+    }
+
+
 
     @Override
-    public List<DataSubjectMapping> findByNamesAndUnitId(Long unitId, Set<String> names) {
+    public List<DataSubjectMapping> findByNameListAndUnitId(Long unitId, Set<String> names) {
         Query query = new Query();
         query.addCriteria(Criteria.where(DELETED).is(false).and("name").in(names).and(ORGANIZATION_ID).is(unitId));
         query.collation(Collation.of("en").
@@ -150,4 +162,6 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
         AggregationResults<DataSubjectMappingResponseDTO> result = mongoTemplate.aggregate(aggregation, DataSubjectMapping.class, DataSubjectMappingResponseDTO.class);
         return result.getUniqueMappedResult();
     }
+
+
 }

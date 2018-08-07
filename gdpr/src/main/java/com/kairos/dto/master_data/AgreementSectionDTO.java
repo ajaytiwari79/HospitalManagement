@@ -3,6 +3,7 @@ package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.List;
@@ -13,6 +14,7 @@ public class AgreementSectionDTO {
 
     private BigInteger id;
 
+    @NotBlank(message = "Section Name can't be Empty")
     @Pattern(message = "Numebers and special character are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 

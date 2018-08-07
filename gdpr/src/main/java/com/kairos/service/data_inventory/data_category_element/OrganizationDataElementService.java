@@ -5,6 +5,7 @@ import com.kairos.persistance.model.master_data.data_category_element.DataCatego
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
 import com.kairos.persistance.repository.master_data.data_category_element.DataCategoryMongoRepository;
 import com.kairos.persistance.repository.master_data.data_category_element.DataElementMongoRepository;
+import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -55,9 +56,18 @@ public class OrganizationDataElementService extends MongoBaseService {
         dataElementIds.remove(dataElementId);
         dataCategoryMongoRepository.save(getNextSequence(dataCategory));
         dataElementMongoRepository.delete(dataElement);
-
         return true;
 
+    }
+
+
+    public List<DataElementBasicResponseDTO> getAllDataElementbyUnitId(Long unitId) {
+        return dataElementMongoRepository.getAllDataElementByUnitId(unitId);
+    }
+
+
+    public DataElementBasicResponseDTO getDataElementbyUnitIdAndId(Long unitId, BigInteger id) {
+        return dataElementMongoRepository.getDataElementByUnitIdAndId(unitId, id);
     }
 
 

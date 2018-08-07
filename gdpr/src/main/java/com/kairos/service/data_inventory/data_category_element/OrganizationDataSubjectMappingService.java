@@ -3,6 +3,8 @@ package com.kairos.service.data_inventory.data_category_element;
 
 import com.kairos.dto.data_inventory.OrganizationDataSubjectDTO;
 import com.kairos.dto.master_data.DataCategoryDTO;
+import com.kairos.dto.master_data.DataSubjectMappingDTO;
+import com.kairos.dto.data_inventory.OrganizationDataSubjectBasicDTO;
 import com.kairos.persistance.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
 import com.kairos.persistance.model.master_data.data_category_element.DataSubjectMapping;
@@ -55,7 +57,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
             dataSubjectNameList.addAll(dataSubjectDTO.getDataSubjectNames());
             dataCategoryDTOList.addAll(dataSubjectDTO.getDataCategories());
         }
-        List<DataSubjectMapping> dataSubjects = dataSubjectMappingRepository.findByNamesAndUnitId(unitId, dataSubjectNameList);
+        List<DataSubjectMapping> dataSubjects = dataSubjectMappingRepository.findByNameListAndUnitId(unitId, dataSubjectNameList);
         if (!dataSubjects.isEmpty()) {
             exceptionService.duplicateDataException("message.duplicate", "Data Subject ", dataSubjects.get(0).getName());
         }
@@ -112,18 +114,33 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
     }
 
 
-
-    public List<DataSubjectMappingResponseDTO> getAllDataSubjectByUnitId(Long unitId)
-    {
+    public List<DataSubjectMappingResponseDTO> getAllDataSubjectByUnitId(Long unitId) {
         return dataSubjectMappingRepository.getAllDataSubjectAndMappingWithDataCategoryByUnitId(unitId);
     }
 
 
-    public DataSubjectMappingResponseDTO getDataSubjectByUnitId(Long unitId, BigInteger dataSubjectId)
-    {
-        return dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategoryByUinitId(unitId,dataSubjectId);
+    public DataSubjectMappingResponseDTO getDataSubjectByUnitId(Long unitId, BigInteger dataSubjectId) {
+        return dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategoryByUinitId(unitId, dataSubjectId);
     }
 
+
+    public OrganizationDataSubjectBasicDTO updateDataSubjectMappingById(Long unitId, BigInteger dataSubjectId, OrganizationDataSubjectBasicDTO dataSubjectMappingDTO) {
+
+        DataSubjectMapping dataSubjectMapping = dataSubjectMappingRepository.findByNameAndUnitId(unitId, dataSubjectMappingDTO.getName());
+        if (Optional.ofNullable(dataSubjectMapping).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.duplicate", "Data Subject ", dataSubjectMappingDTO.getName());
+        }
+        dataSubjectMapping = dataSubjectMappingRepository.findByUnitIdAndId(unitId, dataSubjectId);
+        if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Subject ", dataSubjectId);
+        }
+        dataSubjectMapping.setName(dataSubjectMappingDTO.getName());
+        dataSubjectMapping.setDataCategories(dataSubjectMappingDTO.getDataCategories());
+        dataSubjectMappingRepository.save(getNextSequence(dataSubjectMapping));
+        return dataSubjectMappingDTO;
+
+
+    }
 
 
 }

@@ -83,4 +83,37 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
         return mongoTemplate.find(query, DataCategory.class);
 
     }
+
+
+    @Override
+    public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long unitId) {
+        String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
+        Document projectionOperation = Document.parse(projection);
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId)),
+                lookup("data_element", "dataElements", "_id", "dataElements"),
+                new CustomAggregationOperation(projectionOperation)
+        );
+
+        AggregationResults<DataCategoryResponseDTO> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, BigInteger dataCategoryId) {
+
+        String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
+        Document projectionOperation = Document.parse(projection);
+        Aggregation aggregation = Aggregation.newAggregation(
+
+                match(Criteria.where("_id").is(dataCategoryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(unitId)),
+                lookup("data_element", "dataElements", "_id", "dataElements"),
+                new CustomAggregationOperation(projectionOperation)
+        );
+
+
+        AggregationResults<DataCategoryResponseDTO> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDTO.class);
+        return result.getUniqueMappedResult();
+    }
 }

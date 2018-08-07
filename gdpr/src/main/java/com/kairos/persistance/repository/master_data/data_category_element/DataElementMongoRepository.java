@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.data_category_element;
 
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
+import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -29,7 +30,15 @@ public interface DataElementMongoRepository extends MongoRepository<DataElement,
 
 
     @Query("{deleted:false,organizationId:?0,_id:{$in:?1}}")
-    List<DataElement> findAllDataElementByUnitIdAndIdss( Long unitId,List<BigInteger> ids);
+    List<DataElement> findAllDataElementByUnitIdAndIds( Long unitId,List<BigInteger> ids);
+
+
+    @Query("{deleted:false,organizationId:?0}")
+    List<DataElementBasicResponseDTO> getAllDataElementByUnitId(Long unitId);
+
+
+    @Query("{deleted:false,organizationId:?0,_id:?1}")
+    DataElementBasicResponseDTO getDataElementByUnitIdAndId( Long organizationId,BigInteger id);
 
 
     @Query("{deleted:false,organizationId:?0,_id:?1}")

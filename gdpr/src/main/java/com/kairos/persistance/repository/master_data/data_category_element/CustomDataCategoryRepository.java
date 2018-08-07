@@ -15,7 +15,12 @@ public interface CustomDataCategoryRepository {
 
     List<DataCategoryResponseDTO> getAllDataCategoryWithDataElement(Long countryId, Long organizationId);
 
-
     List<DataCategory> findByNamesAndUnitId(Long unitId, Set<String> names);
+
+    List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long unitId);
+
+    DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, BigInteger dataCategoryId);
+
+
 
 }
