@@ -16,7 +16,7 @@ import com.kairos.enums.scheduler.JobType;
 import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.agreement.cta.*;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.ClientMinimumDTO;
+import com.kairos.persistence.model.client.queryResults.ClientMinimumDTO;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.Function;

@@ -29,7 +29,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("MATCH (u:User) WHERE u.timeCareExternalId={0} OR u.userName={1} OR u.email={2}  RETURN u ")
     User findByTimeCareExternalIdOrUserNameOrEmail(String timeCareExternalId,String userName,String email);
 
-    @Query("MATCH (n:User) WHERE n.cprNumber={0} AND Not n:Client RETURN n ")
+    @Query("MATCH (n:User) WHERE n.cprNumber={0}  RETURN n ")
     User findUserByCprNumber(String cprNumber);
 
     List<User> findAll();

@@ -28,9 +28,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NodeEntity
 public class Staff extends UserBaseEntity {
 
-    String generalNote;
-    String reqFromPerson;
-  //  private Long employedSince;
+    private String generalNote;
+    private String reqFromPerson;
+
     private String cardNumber;
     private boolean copyKariosMailToLogin;
     private String sendNotificationBy;
@@ -57,6 +57,7 @@ public class Staff extends UserBaseEntity {
     private Long inactiveFrom;
     long organizationId;
     private long visitourId;
+
     private String visitourTeamId;
     private Language language;
 
@@ -72,8 +73,6 @@ public class Staff extends UserBaseEntity {
 
     @Relationship(type = BELONGS_TO)
     User user;
-    @Relationship(type = IS_A)
-    Client client;
 
     EngineerType engineerType;
 
@@ -113,7 +112,6 @@ public class Staff extends UserBaseEntity {
         this.familyName = familyName;
         this.currentStatus = currentStatus;
         this.inactiveFrom = inactiveFrom;
-//        this.cprNumber = cprNumber;
     }
     public Staff(String firstName) {
         this.firstName = firstName;
@@ -146,8 +144,6 @@ public class Staff extends UserBaseEntity {
         this.generalNote = generalNote;
         this.reqFromPerson = requestFromPerson;
     }
-
-
     public String getNationalInsuranceNumber() {
         return nationalInsuranceNumber;
     }
@@ -420,18 +416,10 @@ public class Staff extends UserBaseEntity {
         this.kmdExternalId = kmdExternalId;
     }
 
-    public void addFavouriteFilters(StaffFavouriteFilter staffFavouriteFilter){
+    public void addFavouriteFilters(StaffFavouriteFilter staffFavouriteFilter) {
         List<StaffFavouriteFilter> staffFavouriteFilterList = Optional.ofNullable(this.staffFavouriteFilterList).orElse(new ArrayList<>());
         staffFavouriteFilterList.add(staffFavouriteFilter);
         this.staffFavouriteFilterList = staffFavouriteFilterList;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
     }
 
     public List<StaffFavouriteFilter> getStaffFavouriteFilterList() {
@@ -468,7 +456,7 @@ public class Staff extends UserBaseEntity {
 
 
     public StaffSettings getStaffSettings() {
-        return staffSettings=Optional.ofNullable(staffSettings).orElse(new StaffSettings());
+        return staffSettings = Optional.ofNullable(staffSettings).orElse(new StaffSettings());
     }
 
     public void setStaffSettings(StaffSettings staffSettings) {

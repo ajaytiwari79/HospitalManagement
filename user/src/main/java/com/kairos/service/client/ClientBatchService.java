@@ -1,10 +1,12 @@
 package com.kairos.service.client;
 
 import com.kairos.config.env.EnvConfig;
+import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.user.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.client.Client;
-import com.kairos.persistence.model.client.ClientOrganizationRelation;
+import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -48,6 +50,9 @@ public class ClientBatchService {
 
     @Inject
     private ClientGraphRepository clientGraphRepository;
+
+    @Inject
+    private UserGraphRepository userGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
@@ -68,6 +73,7 @@ public class ClientBatchService {
     EnvConfig envConfig;
     @Inject
     private ExceptionService exceptionService;
+
     public void updateClientFromExcel(MultipartFile multipartFile) {
 
         int clientUpdated = 0;
@@ -82,11 +88,11 @@ public class ClientBatchService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                exceptionService.internalServerError("error.xssfsheet.noMoreRow",1);
+                exceptionService.internalServerError("error.xssfsheet.noMoreRow", 1);
 
             }
 
-            Client client;
+            User client;
             Cell cell;
             Row row;
             long clientId;
@@ -99,7 +105,7 @@ public class ClientBatchService {
                     cell.setCellType(Cell.CELL_TYPE_STRING);
                     clientId = Long.valueOf(cell.getStringCellValue());
 
-                    client = clientGraphRepository.findOne(clientId);
+                    client = clientGraphRepository.getUserByClientId(clientId);
                     if (client != null) {
                         cell = row.getCell(4);
                         firstName = cell.getStringCellValue();
@@ -108,7 +114,7 @@ public class ClientBatchService {
 
                         client.setFirstName(firstName);
                         client.setLastName(lastName);
-                        clientGraphRepository.save(client);
+                        userGraphRepository.save(client);
                         clientUpdated++;
                     }
                 }
@@ -127,7 +133,7 @@ public class ClientBatchService {
         }
         logger.info("Organization found is : " + currentOrganization.getName());
         List<Map<String, Object>> clientList = new ArrayList<>();
-        List<Map<String, Object>> hounseUnverifiedClient = new ArrayList<>();
+        List<Map<String, Object>> houseUnverifiedClient = new ArrayList<>();
         InputStream stream;
         int counter = 0;
         int newClient = 0;
@@ -142,11 +148,11 @@ public class ClientBatchService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                exceptionService.internalServerError("error.xssfsheet.noMoreRow",2);
+                exceptionService.internalServerError("error.xssfsheet.noMoreRow", 2);
 
             }
 
-            Client client;
+
             AddressDTO addressDTO;
             ContactAddress contactAddress = null;
             ClientOrganizationRelation relation;
@@ -156,7 +162,8 @@ public class ClientBatchService {
             boolean addToUnverifiedHouse = false;
 
             while (rowIterator.hasNext()) {
-
+                Client client;
+                User user;
                 boolean connectToOrganization = false;
 
                 Row row = rowIterator.next();
@@ -169,11 +176,11 @@ public class ClientBatchService {
                 }
 
                 String firstName = "";
-                String lastName = "";
-                String cpr = "";
+                StringBuilder lastName = new StringBuilder();
+                String cpr;
 
                 String street = "";
-                String hnr = "";
+                StringBuilder hnr = new StringBuilder();
                 int zipCode = 0;
                 String city = "";
 
@@ -210,9 +217,8 @@ public class ClientBatchService {
                 for (int i = 0; i <= values.length - 1; i++) {
                     if (i == 0) {
                         firstName = values[i];
-                        continue;
                     } else {
-                        lastName = lastName + " " + values[i];
+                        lastName.append(" ").append(values[i]);
                     }
                 }
 
@@ -229,22 +235,21 @@ public class ClientBatchService {
 
 
                 // Check if Client already exist in database with CPR number
-                client = clientGraphRepository.findByCprNumber(cpr);
-                if (client == null) {
+                user = userGraphRepository.findUserByCprNumber(cpr);
+                if (!Optional.ofNullable(user).isPresent()) {
+                    user = new User(firstName, lastName.toString(), cpr, CPRUtil.fetchDateOfBirthFromCPR(cpr));
                     client = new Client();
-                    client.setFirstName(firstName);
-                    client.setLastName(lastName);
-                    client.setCprNumber(cpr);
-                    client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(cpr));
-                    clientService.generateAgeAndGenderFromCPR(client);
-                    logger.info("Client not found in Database Creating new: " + client.getFirstName());
+                    client.setUser(user);
+                    client.setProfilePic(clientService.generateAgeAndGenderFromCPR(user));
+                    logger.info("user not found in Database Creating new: " + user.getFirstName());
                     createClient = true;
                     newClient++;
                 } else {
-                    logger.info("Client found in Database Using Existing : " + client.getFirstName());
+                    logger.info("user found in Database Using Existing : " + user.getFirstName());
                     createClient = false;
                     existingClient++;
-                    clientService.generateAgeAndGenderFromCPR(client);
+                    client = clientGraphRepository.getClientByUserId(user.getId());
+                    client.setProfilePic(clientService.generateAgeAndGenderFromCPR(user));
                     contactAddress = clientGraphRepository.findOne(client.getId()).getHomeAddress();
                 }
 
@@ -276,17 +281,17 @@ public class ClientBatchService {
                         street = addressData[i];
                         continue;
                     } else {
-                        hnr = hnr + " " + addressData[i];
+                        hnr.append(" ").append(addressData[i]);
                     }
                 }
                 street = street.trim();
-                hnr = hnr.trim();
+                hnr = new StringBuilder(hnr.toString().trim());
                 logger.info("Street: " + street);
                 logger.info("HNR: " + hnr);
 
                 addressDTO = new AddressDTO();
                 addressDTO.setCity(city);
-                addressDTO.setHouseNumber(hnr);
+                addressDTO.setHouseNumber(hnr.toString());
                 addressDTO.setZipCodeValue(zipCode);
                 addressDTO.setStreet1(street);
 
@@ -310,11 +315,11 @@ public class ClientBatchService {
 
                 // Creating client
                 if (createClient) {
-                    if (client.getEmail() == null) {
+                    if (user.getEmail() == null) {
                         logger.info("Creating email with CPR");
-                        String email = client.getCprNumber() + KAIROS;
-                        client.setEmail(email);
-                        client.setUserName(email);
+                        String email = user.getCprNumber() + KAIROS;
+                        user.setEmail(email);
+                        user.setUserName(email);
                     }
                     clientGraphRepository.save(client);
                 }
@@ -323,8 +328,8 @@ public class ClientBatchService {
                 // Unverified  House Number Clients
                 if (addToUnverifiedHouse) {
                     Map<String, Object> map = new HashMap<>();
-                    map.put(client.getId().toString(), client.getFirstName() + " " + client.getLastName());
-                    hounseUnverifiedClient.add(map);
+                    map.put(client.getId().toString(), user.getFirstName() + " " + user.getLastName());
+                    houseUnverifiedClient.add(map);
                     logger.info("Adding to Unverified Address List ");
                 }
 
@@ -362,7 +367,7 @@ public class ClientBatchService {
                     Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                     if (geographyData == null) {
                         logger.info("Geography  not found with zipcodeId: " + municipality.getId());
-                        exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
+                        exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
 
                     }
                     logger.info("Geography Data: " + geographyData);
@@ -393,10 +398,10 @@ public class ClientBatchService {
                         relationService.createRelation(relation);
 
                         Map<String, Object> clientInfo = new HashMap<>();
-                        clientInfo.put("name", client.getFirstName() + " " + client.getLastName());
-                        clientInfo.put("gender", client.getGender());
-                        clientInfo.put("age", client.getAge());
-                        clientInfo.put("emailId", client.getEmail());
+                        clientInfo.put("name", user.getFirstName() + " " + user.getLastName());
+                        clientInfo.put("gender", user.getGender());
+                        clientInfo.put("age", user.getAge());
+                        clientInfo.put("emailId", user.getEmail());
                         clientInfo.put("id", client.getId());
                         clientInfo.put("drivingDistance", "");
                         clientInfo.put("joiningDate", relation.getJoinDate());
@@ -428,7 +433,7 @@ public class ClientBatchService {
         Map<String, Object> clientStats = new HashMap<>();
         clientStats.put("Added Client", clientList.size());
 
-        hounseUnverifiedClient.add(clientStats);
+        houseUnverifiedClient.add(clientStats);
         logger.info("-----------------House Not Verified-----------------------");
         return clientList;
     }
