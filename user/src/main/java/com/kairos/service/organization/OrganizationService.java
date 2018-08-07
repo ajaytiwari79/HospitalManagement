@@ -101,7 +101,7 @@ import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
-import com.kairos.wrapper.organization.OrganizationStaffWrapper;
+import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
 import com.kairos.wrapper.organization.StaffUnitPositionWrapper;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.WordUtils;
@@ -1157,11 +1157,8 @@ public class OrganizationService extends UserBaseService {
     }
 
     public OrganizationStaffWrapper getOrganizationAndStaffByExternalId(String externalId, Long staffExternalId, Long staffTimeCareEmploymentId) {
-        OrganizationStaffWrapper organizationStaffWrapper = new OrganizationStaffWrapper();
+        OrganizationStaffWrapper organizationStaffWrapper = staffGraphRepository.getStaff(staffExternalId, staffTimeCareEmploymentId);
         organizationStaffWrapper.setOrganization(organizationGraphRepository.findByExternalId(externalId));
-        StaffUnitPositionWrapper staffData = staffGraphRepository.getStaff(staffExternalId, staffTimeCareEmploymentId);
-        organizationStaffWrapper.setStaff(staffData.getStaff());
-        organizationStaffWrapper.setUnitPosition(staffData.getUnitPosition());
         return organizationStaffWrapper;
     }
 

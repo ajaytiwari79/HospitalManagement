@@ -6,6 +6,7 @@ import com.kairos.persistence.model.organization.StaffRelationship;
 import com.kairos.persistence.model.staff.employment.MainEmploymentQueryResult;
 import com.kairos.persistence.model.staff.employment.StaffEmploymentDTO;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
+import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
@@ -412,8 +413,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     List<Long> findStaffByExternalIdIn(Set<Long> externalIdsOfStaff);
 
     @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false}) where staff.externalId={0} AND unitPosition.timeCareExternalId={1} " +
-            "return unitPosition,staff ")
-    StaffUnitPositionWrapper getStaff(Long externalId, Long timeCareExternalId);
+            "return unitPosition as unitPosition ,staff as staff ")
+    OrganizationStaffWrapper getStaff(Long externalId, Long timeCareExternalId);
 
     @Query("Match(staff:Staff)-[:BELONGS_TO]-(emp:Employment) where id(staff) = {0} return staff, emp.startDateMillis")
     StaffEmploymentDTO findStaffAndEmploymentByStaffId(Long staffId);

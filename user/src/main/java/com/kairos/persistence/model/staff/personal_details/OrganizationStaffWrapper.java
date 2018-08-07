@@ -1,12 +1,14 @@
-package com.kairos.wrapper.organization;
+package com.kairos.persistence.model.staff.personal_details;
 
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
  * Created by vipul on 6/2/18.
  */
+@QueryResult
 public class OrganizationStaffWrapper {
     private Organization organization;
     private Staff staff;
