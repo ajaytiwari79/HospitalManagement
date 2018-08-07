@@ -104,8 +104,7 @@ public class PayTableService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.country.level.id.notFound",countryId);
 
         }
-        List<OrganizationLevelPayGroupAreaDTO> organizationLevelPayGroupAreaDTOS = payTableGraphRepository.getOrganizationLevelWisePayGroupAreas(countryId);
-        return organizationLevelPayGroupAreaDTOS;
+        return payTableGraphRepository.getOrganizationLevelWisePayGroupAreas(countryId);
     }
 
     public PayTableResponse createPayTable(Long countryId, PayTableDTO payTableDTO) {
@@ -526,9 +525,8 @@ public class PayTableService extends UserBaseService {
 
 
     public List<PayTableResponse>  getPayTablesByOrganizationLevel(Long organizationLevelId) {
-        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId);
 
-        return payTableQueryResults;
+        return payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId);
 
     }
 
