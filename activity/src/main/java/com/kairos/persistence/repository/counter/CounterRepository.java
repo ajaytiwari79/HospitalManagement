@@ -168,9 +168,8 @@ public class CounterRepository {
         Aggregation ag = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("categoryAssignmentId").in(categoryAssignmentIds))
                 , Aggregation.lookup("categoryAssignment", "categoryAssignmentId", "id", "categoryAssignment")
-                , Aggregation.lookup("kpiAssignment", "kpiAssignmentId", "id", "kpiAssignment")
-                , Aggregation.project().and("kpiAssignment").arrayElementAt(0).as("kpiAssignment").and("categoryAssignment").arrayElementAt(0).as("categoryAssignment")
-                , Aggregation.group("categoryAssignment.categoryId").push("kpiAssignment.kpiId").as("kpiIds")
+                , Aggregation.project().and("categoryAssignment").arrayElementAt(0).as("categoryAssignment")
+                , Aggregation.group("categoryAssignment.categoryId").push("kpiId").as("kpiIds")
                 , Aggregation.project().and("id").as("categoryId").and("kpiIds")
         );
         AggregationResults<CategoryKPIMappingDTO> results = mongoTemplate.aggregate(ag, CategoryKPIConf.class, CategoryKPIMappingDTO.class);
