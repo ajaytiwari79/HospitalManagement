@@ -6,6 +6,7 @@ import com.kairos.user.staff.StaffDTO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class StaffEmploymentTypeSpecification extends AbstractSpecification<StaffDTO> {
     private Activity activity;
@@ -23,7 +24,7 @@ public class StaffEmploymentTypeSpecification extends AbstractSpecification<Staf
     @Override
     public List<String> isSatisfiedString(StaffDTO staffDTO) {
         List<String> errorMessages = new ArrayList<>();
-        if (!activity.getEmploymentTypes().contains(staffDTO.getEmploymentTypeId())) {
+        if ((!Optional.ofNullable(activity.getEmploymentTypes()).isPresent()) || (!activity.getEmploymentTypes().contains(staffDTO.getEmploymentTypeId()))) {
             errorMessages.add("employment_type.absent.activity");
         }
         return errorMessages;

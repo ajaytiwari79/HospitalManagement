@@ -17,8 +17,6 @@ public class DataElementDTO {
     @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    private Long countryId;
-
 
     public BigInteger getId() {
         return id;
@@ -36,11 +34,4 @@ public class DataElementDTO {
         this.name = name;
     }
 
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
 }

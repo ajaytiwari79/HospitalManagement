@@ -1,7 +1,5 @@
 package com.kairos.persistance.repository.data_inventory.processing_activity;
 
-
-import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -13,7 +11,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface ProcessingActivityMongoRepository extends MongoRepository<ProcessingActivity,BigInteger> ,CustomProcessingActivityRepository {
+public interface ProcessingActivityMongoRepository extends MongoRepository<ProcessingActivity,BigInteger>,CustomProcessingActivityRepository {
 
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
@@ -22,8 +20,7 @@ public interface ProcessingActivityMongoRepository extends MongoRepository<Proce
     ProcessingActivity findByid(BigInteger id);
 
 
-
-    @Query("{organizationId:?0,_id:{$in:?1},deleted:false,isSubProcess:false}")
-    List<ProcessingActivity> findSubProcessingActvitiesByIds(Long organizationId, List<BigInteger> id);
+    @Query("{organizationId:?0,_id:{$in:?1},deleted:false,subProcess:false}")
+    List<ProcessingActivity> findSubProcessingActvitiesByIds(Long organizationId, List<BigInteger> ids);
 
 }

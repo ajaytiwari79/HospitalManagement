@@ -18,6 +18,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
@@ -32,14 +33,15 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
     @Override
     public DataCategory findByName(Long countryId, Long organizationId, String name) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, DataCategory.class);
 
     }
+
     @Override
-    public DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId,Long organizationId,BigInteger id) {
+    public DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId, Long organizationId, BigInteger id) {
 
         String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
         Document projectionOperation = Document.parse(projection);
@@ -51,13 +53,12 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
         );
 
 
-
         AggregationResults<DataCategoryResponseDto> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDto.class);
         return result.getUniqueMappedResult();
     }
 
     @Override
-    public List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId,Long organizationId) {
+    public List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId, Long organizationId) {
 
         String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
         Document projectionOperation = Document.parse(projection);
@@ -70,5 +71,16 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
 
         AggregationResults<DataCategoryResponseDto> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDto.class);
         return result.getMappedResults();
+    }
+
+
+    @Override
+    public List<DataCategory> findByNamesAndUnitId(Long unitId, Set<String> names) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(DELETED).is(false).and("name").in(names).and(ORGANIZATION_ID).is(unitId));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.find(query, DataCategory.class);
+
     }
 }
