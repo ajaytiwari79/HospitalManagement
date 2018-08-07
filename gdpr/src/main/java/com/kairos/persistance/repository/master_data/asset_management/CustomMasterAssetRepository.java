@@ -5,10 +5,8 @@ import com.kairos.dto.FilterSelectionDTO;
 import com.kairos.dto.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
-import com.kairos.response.dto.filter.FilterQueryResult;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
 import java.math.BigInteger;
 import java.util.List;

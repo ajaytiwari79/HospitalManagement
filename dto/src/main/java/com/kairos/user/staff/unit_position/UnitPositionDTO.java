@@ -40,6 +40,7 @@ public class UnitPositionDTO {
     private EmploymentCategory employmentTypeCategory;
     @NotNull(message = "wta can't be null")
     private BigInteger wtaId;
+    @NotNull(message = "cta can't be null")
     private Long ctaId;
     @NotNull(message = "staffId is missing")
     @Range(min = 0, message = "staffId is missing")

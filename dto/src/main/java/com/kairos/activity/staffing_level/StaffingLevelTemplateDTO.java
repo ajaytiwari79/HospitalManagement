@@ -107,21 +107,6 @@ public class StaffingLevelTemplateDTO {
     }
 
 
-//
-//    public static StaffingLevelTemplate buildStaffingLevelTemplate(StaffingLevelTemplateDTO staffingLevelTemplateDTO){
-//        StaffingLevelTemplate staffingLevelTemplate=new StaffingLevelTemplate();
-//        BeanUtils.copyProperties(staffingLevelTemplateDTO,staffingLevelTemplate);
-//        return staffingLevelTemplate;
-//
-//    }
-//
-//    public static StaffingLevelTemplate updateStaffingTemplate(BigInteger staffingTemplateId,StaffingLevelTemplateDTO staffingLevelTemplateDTO,
-//         StaffingLevelTemplate staffingLevelTemplate){
-//
-//        BeanUtils.copyProperties(staffingLevelTemplateDTO,staffingLevelTemplate);
-//        staffingLevelTemplate.setId(staffingTemplateId);
-//        return staffingLevelTemplate;
-//
-//    }
+
 
 }

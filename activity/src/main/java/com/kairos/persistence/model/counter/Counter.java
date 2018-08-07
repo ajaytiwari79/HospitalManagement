@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.counter;
 
 import com.kairos.activity.counter.FilterCriteria;
-import com.kairos.activity.counter.enums.CounterType;
+import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -17,20 +17,15 @@ public class Counter extends MongoBaseEntity {
     private CounterType type;
     private String title;
     private boolean treatAsCounter;
-    private BigInteger primaryCounter; //to directly identify the base counters child
-    private BigInteger parentCounter;  //to identify parent counter
+    private BigInteger primaryCounter;
     private BigInteger categoryId;
     private List<FilterCriteria> criteriaList;
 
-
-    public Counter() {
-    }
-
-    public Counter(CounterType type) {
+    public Counter(CounterType type){
         this.type = type;
     }
 
-    public Counter(String title, CounterType type, boolean treatAsCounter, BigInteger primaryCounter) {
+    public Counter(String title, CounterType type, boolean treatAsCounter, BigInteger primaryCounter){
         this.treatAsCounter = treatAsCounter;
         this.primaryCounter = primaryCounter;
         this.type = type;
@@ -87,13 +82,5 @@ public class Counter extends MongoBaseEntity {
 
     public void setCategoryId(BigInteger categoryId) {
         this.categoryId = categoryId;
-    }
-
-    public BigInteger getParentCounter() {
-        return parentCounter;
-    }
-
-    public void setParentCounter(BigInteger parentCounter) {
-        this.parentCounter = parentCounter;
     }
 }
