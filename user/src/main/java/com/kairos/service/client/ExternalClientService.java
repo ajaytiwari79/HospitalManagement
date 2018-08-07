@@ -282,7 +282,7 @@ public class ExternalClientService extends UserBaseService {
             if (citizenStatus != null) {
                 client.setCivilianStatus(citizenStatusGraphRepository.findOne(citizenStatus.getId()));
             }
-// UNCOMMNETS AFTER FIX
+    // TODO UNCOMMENT AFTER FIX
          /*   if (client.getEmail() == null) {
                 logger.debug("Creating email with CPR");
                 String cpr = client.getCprNumber();

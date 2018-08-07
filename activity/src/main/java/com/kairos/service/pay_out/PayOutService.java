@@ -149,6 +149,7 @@ public class PayOutService extends MongoBaseService {
         ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
         List<PayOut> payOuts = payOutRepository.findAllByShiftId(shift.getId());
+        if(!payOuts.isEmpty()){
         while (startDate.isBefore(endDate)) {
             DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
             PayOut payOut = payOuts.stream().filter(p -> p.getDate().equals(interval.getStartLocalDate())).findFirst().get();
@@ -166,7 +167,6 @@ public class PayOutService extends MongoBaseService {
             }
             startDate = startDate.plusDays(1);
         }
-        if(!payOuts.isEmpty()){
             save(payOuts);
         }
 
