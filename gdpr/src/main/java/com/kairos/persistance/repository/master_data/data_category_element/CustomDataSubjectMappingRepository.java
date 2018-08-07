@@ -25,7 +25,7 @@ public interface CustomDataSubjectMappingRepository {
 
     List<DataSubjectMappingResponseDTO> getAllDataSubjectAndMappingWithDataCategoryByUnitId(Long unitId);
 
-    DataSubjectMappingResponseDTO getDataSubjectAndMappingWithDataCategoryByUinitId(Long unitId, BigInteger dataSubjectId);
+    DataSubjectMappingResponseDTO getDataSubjectAndMappingWithDataCategoryByUnitId(Long unitId, BigInteger dataSubjectId);
 
 
 }

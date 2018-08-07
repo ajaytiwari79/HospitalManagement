@@ -2,7 +2,6 @@ package com.kairos.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -51,7 +50,7 @@ public class MasterQuestionnaireSectionDTO {
     }
 
     public String getTitle() {
-        return title;
+        return title.trim();
     }
 
     public void setTitle(String title) {

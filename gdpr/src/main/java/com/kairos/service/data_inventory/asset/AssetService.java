@@ -10,7 +10,6 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.util.ObjectMapperUtils;
-import jdk.nashorn.internal.runtime.options.Option;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
@@ -44,7 +43,7 @@ public class AssetService extends MongoBaseService {
     private AssetTypeMongoRepository assetTypeMongoRepository;
 
 
-    public AssetDTO createAsseWithBasictDetail(Long organizationId, AssetDTO assetDTO) {
+    public AssetDTO createAsseWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
 
         Asset existingAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
         if (Optional.ofNullable(existingAsset).isPresent()) {
@@ -92,7 +91,7 @@ public class AssetService extends MongoBaseService {
      * @param
      * @param organizationId
      * @param id
-     * @return method return Asset with Meta Data (storgae format ,data Disposal, hosting type and etc)
+     * @return method return Asset with Meta Data (storage format ,data Disposal, hosting type and etc)
      */
     public AssetResponseDTO getAssetWithMetadataById(Long organizationId, BigInteger id) {
         AssetResponseDTO asset = assetMongoRepository.findAssetWithMetaDataById(organizationId, id);
@@ -116,8 +115,8 @@ public class AssetService extends MongoBaseService {
     /**
      * @param assetId
      * @return
-     * @description method return aduit history of asset , old Object list and latest version also.
-     * return object contain  changed field with key feilds and values with key Values in return list of map
+     * @description method return audit history of asset , old Object list and latest version also.
+     * return object contain  changed field with key fields and values with key Values in return list of map
      */
     public List<Map<String, Object>> getAssetActivities(BigInteger assetId) throws ClassNotFoundException {
 
@@ -149,7 +148,7 @@ public class AssetService extends MongoBaseService {
         }
         AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("messgae.dataNotFound", " Asset Type", assetDTO.getAssetType());
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset Type", assetDTO.getAssetType());
 
         } else {
             if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent()) {

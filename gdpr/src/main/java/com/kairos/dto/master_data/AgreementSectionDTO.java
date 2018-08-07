@@ -15,7 +15,7 @@ public class AgreementSectionDTO {
     private BigInteger id;
 
     @NotBlank(message = "Section Name can't be Empty")
-    @Pattern(message = "Numebers and special character are not allowed",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "Numeber and special character are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     private List<ClauseBasicDTO> clauses;

@@ -19,7 +19,6 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 /*
  *

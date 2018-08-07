@@ -138,7 +138,7 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     }
 
     @Override
-    public DataSubjectMappingResponseDTO getDataSubjectAndMappingWithDataCategoryByUinitId(Long unitId, BigInteger dataSubjectId) {
+    public DataSubjectMappingResponseDTO getDataSubjectAndMappingWithDataCategoryByUnitId(Long unitId, BigInteger dataSubjectId) {
         String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter=Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(

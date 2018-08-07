@@ -28,6 +28,12 @@ public class OrganizationDataElementService extends MongoBaseService {
     private DataCategoryMongoRepository dataCategoryMongoRepository;
 
 
+    /**
+     *
+     * @param unitId
+     * @param dataElementList  List of Data Elements
+     * @return method return  list of  data Element and check of duplicate name in data Elements
+     */
     public List<DataElement> saveDataElementsAndCheckDuplicateyEntry(Long unitId, List<DataElement> dataElementList) {
 
         Set<String> dataELementNameList = new HashSet<>();
@@ -44,6 +50,13 @@ public class OrganizationDataElementService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param unitId - organization id
+     * @param dataCategoryId - Data Category Id to which Data element belong
+     * @param dataElementId - Data Element id
+     * @return method delete Data element and remove id of data Element from data Category.
+     */
     public Boolean deleteDataElementById(Long unitId, BigInteger dataCategoryId, BigInteger dataElementId) {
 
 

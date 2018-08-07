@@ -2,7 +2,6 @@ package com.kairos.service.master_data.asset_management;
 
 import com.kairos.KairosGdprApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.dto.data_inventory.AssetDTO;
 import com.kairos.dto.master_data.AssetTypeDTO;
 import com.kairos.dto.master_data.MasterAssetDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;

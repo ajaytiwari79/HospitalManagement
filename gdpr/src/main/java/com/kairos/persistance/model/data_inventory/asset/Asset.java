@@ -9,7 +9,6 @@ import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;

@@ -3,7 +3,6 @@ package com.kairos.service.data_inventory.data_category_element;
 
 import com.kairos.dto.data_inventory.OrganizationDataSubjectDTO;
 import com.kairos.dto.master_data.DataCategoryDTO;
-import com.kairos.dto.master_data.DataSubjectMappingDTO;
 import com.kairos.dto.data_inventory.OrganizationDataSubjectBasicDTO;
 import com.kairos.persistance.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
@@ -30,7 +29,7 @@ import java.util.*;
 public class OrganizationDataSubjectMappingService extends MongoBaseService {
 
 
-    Logger LOGGER = LoggerFactory.getLogger(OrganizationDataSubjectMappingService.class);
+    private Logger LOGGER = LoggerFactory.getLogger(OrganizationDataSubjectMappingService.class);
 
     @Inject
     private DataSubjectMappingRepository dataSubjectMappingRepository;
@@ -47,6 +46,13 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
     @Inject
     private DataElementMongoRepository dataElementMongoRepository;
 
+    /**
+     * @description  -method uses buildDataSubjectWithDataCategoriesAndDataElement to build Data Subject Object and Map Data Categories With Data Subject,
+     * Method check for Duplicate name of Data Subject
+     * @param unitId -organization id
+     * @param dataSubjectDTOS Data Subject List conatin Set<String> names of data Subject and list of  Data Category corresponding to Data Subject
+     * @return method return list of Data Subject
+     */
 
     public List<DataSubjectMapping> createDataSubjectWithDataCategoriesAndDataElements(Long unitId, List<OrganizationDataSubjectDTO> dataSubjectDTOS) {
 
@@ -57,14 +63,21 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
             dataSubjectNameList.addAll(dataSubjectDTO.getDataSubjectNames());
             dataCategoryDTOList.addAll(dataSubjectDTO.getDataCategories());
         }
-        List<DataSubjectMapping> dataSubjects = dataSubjectMappingRepository.findByNameListAndUnitId(unitId, dataSubjectNameList);
-        if (!dataSubjects.isEmpty()) {
-            exceptionService.duplicateDataException("message.duplicate", "Data Subject ", dataSubjects.get(0).getName());
+        List<DataSubjectMapping> previousDataSubjectList = dataSubjectMappingRepository.findByNameListAndUnitId(unitId, dataSubjectNameList);
+        if (!previousDataSubjectList.isEmpty()) {
+            exceptionService.duplicateDataException("message.duplicate", "Data Subject ", previousDataSubjectList.get(0).getName());
         }
         return buildDataSubjectWithDataCategoriesAndDataElement(unitId, dataSubjectDTOS, dataCategoryDTOList);
     }
 
 
+    /**
+     * @descirption
+     * @param unitId
+     * @param dataSubjectDTOS
+     * @param dataCategoryDTOS  list od Data Category dto which contain List of Data Element corresponding to Data Category.
+     * @return method build data Subject object and Return list of Data Subjects
+     */
     private List<DataSubjectMapping> buildDataSubjectWithDataCategoriesAndDataElement(Long unitId, List<OrganizationDataSubjectDTO> dataSubjectDTOS, List<DataCategoryDTO> dataCategoryDTOS) {
 
 
@@ -77,7 +90,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
         List<DataSubjectMapping> dataSubjectMappingList = new ArrayList<>();
         for (OrganizationDataSubjectDTO dataSubjectDTO : dataSubjectDTOS) {
             Set<BigInteger> dataCategoryIdList = new HashSet<>();
-            if (!dataSubjectDTO.getDataCategories().isEmpty()) {
+            if (Optional.ofNullable(dataSubjectDTO.getDataCategories()).isPresent() && !dataSubjectDTO.getDataCategories().isEmpty()) {
                 dataSubjectDTO.getDataCategories().forEach(dataCategoryDTO -> {
                     dataCategoryIdList.add(dataCategoryIdCorrespondingToName.get(dataCategoryDTO.getName()));
                 });
@@ -103,6 +116,12 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param unitId - organization id
+     * @param dataSubjectId - Data Subject id
+     * @return return true on successfull deletion of data Subject
+     */
     public Boolean deleteDataSubjectById(Long unitId, BigInteger dataSubjectId) {
 
         DataSubjectMapping dataSubjectMapping = dataSubjectMappingRepository.findByUnitIdAndId(unitId, dataSubjectId);
@@ -120,7 +139,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
 
 
     public DataSubjectMappingResponseDTO getDataSubjectByUnitId(Long unitId, BigInteger dataSubjectId) {
-        return dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategoryByUinitId(unitId, dataSubjectId);
+        return dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategoryByUnitId(unitId, dataSubjectId);
     }
 
 

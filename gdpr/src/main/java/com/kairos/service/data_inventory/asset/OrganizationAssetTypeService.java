@@ -50,7 +50,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
     public AssetType createAssetTypeAndAddSubAssetTypes(Long organizationId, AssetTypeDTO assetTypeDto) {
 
 
-        AssetType exist = assetTypeMongoRepository.findByNameAndOrganziationId(organizationId, assetTypeDto.getName());
+        AssetType exist = assetTypeMongoRepository.findByNameAndOrganizationId(organizationId, assetTypeDto.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
@@ -175,7 +175,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      * @description method simply (update already exit Sub asset types if id is present)and (add create new sub asset types if id is not present in sub asset types)
      */
     public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long organizationId, BigInteger id, AssetTypeDTO assetTypeDto) {
-        AssetType exist = assetTypeMongoRepository.findByNameAndOrganziationId(organizationId, assetTypeDto.getName());
+        AssetType exist = assetTypeMongoRepository.findByNameAndOrganizationId(organizationId, assetTypeDto.getName());
         if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
             throw new DuplicateDataException("data  exist for  " + assetTypeDto.getName());
         }
@@ -227,7 +227,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      */
     public AssetType getAssetTypeByName(Long organizationId, String name) {
         if (!StringUtils.isBlank(name)) {
-            AssetType exist = assetTypeMongoRepository.findByNameAndOrganziationId(organizationId, name);
+            AssetType exist = assetTypeMongoRepository.findByNameAndOrganizationId(organizationId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

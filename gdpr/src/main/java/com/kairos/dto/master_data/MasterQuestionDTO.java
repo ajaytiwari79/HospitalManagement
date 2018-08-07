@@ -2,7 +2,6 @@ package com.kairos.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -46,7 +45,7 @@ public class MasterQuestionDTO {
     }
 
     public String getQuestion() {
-        return question;
+        return question.trim();
     }
 
     public void setQuestion(String question) {

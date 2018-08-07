@@ -48,10 +48,14 @@ public class OrganizationDataCategoryService extends MongoBaseService {
     private DataSubjectMappingRepository dataSubjectMappingRepository;
 
 
+    /**
+     * @param unitId - organization id to which data category belong
+     * @param dataCategoryDTOS- list of dataCategory Dto contain list of Data Elements
+     * @return method return list of Data element and list of Data category
+     */
     public Map<String, Object> createDataCategoryWithDataElements(Long unitId, List<DataCategoryDTO> dataCategoryDTOS) {
 
         Set<String> datCategoryNameList = new HashSet<>();
-    ;
         for (DataCategoryDTO dataCategoryDTO : dataCategoryDTOS) {
             datCategoryNameList.add(dataCategoryDTO.getName());
         }
@@ -74,6 +78,13 @@ public class OrganizationDataCategoryService extends MongoBaseService {
     }
 
 
+    /**
+     * @description -  Map<DataCategory, List<DataElement>> contain list of data elements corresponding to data Category,and
+     * saveDataElementsAndCheckDuplicateyEntry method create Data Elements ,at the end we map data Category with data element and return list of Data Category with data Element
+     * @param unitId
+     * @param dataCategoryDTOS List og Data Category Dto which contain data elemnts Dto list
+     * @return method return list of Data Elements and data category
+     */
     private Map<String, Object> buildDataCategoryWithDataElements(Long unitId, List<DataCategoryDTO> dataCategoryDTOS) {
 
 
@@ -118,6 +129,13 @@ public class OrganizationDataCategoryService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param unitId  - organization Id
+     * @param dataCategoryId - data Category id
+     * @return method  return map with status isSucces true or false on successfull deletion of Data category if
+     *         Data Category is Linked with Data Subjects then status is false nad we return list of Data Subjects to which Data Category is linked
+     */
     public Map<String, Object> deleteDataCategoryAndDataElement(Long unitId, BigInteger dataCategoryId) {
 
         Map<String, Object> result = new HashMap<>();
@@ -140,12 +158,21 @@ public class OrganizationDataCategoryService extends MongoBaseService {
         return result;
     }
 
+
+    /**
+     * @param unitId
+     * @return -return list of Data Category with Data elements
+     */
     public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long unitId) {
         return dataCategoryMongoRepository.getAllDataCategoryWithDataElementByUnitId(unitId);
 
     }
 
-
+    /**
+     * @param unitId
+     * @param dataCategoryId
+     * @return return Data Category with Data Elements list
+     */
     public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, BigInteger dataCategoryId) {
 
         return dataCategoryMongoRepository.getDataCategoryWithDataElementByUnitIdAndId(unitId, dataCategoryId);
