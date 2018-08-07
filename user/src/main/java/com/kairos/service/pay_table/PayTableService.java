@@ -74,7 +74,7 @@ public class PayTableService extends UserBaseService {
 
         List<PayGroupAreaQueryResult> payGroupAreaQueryResults = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(organizationLevelId);
         List<FunctionDTO> functions = functionGraphRepository.getFunctionsByOrganizationLevel(organizationLevelId);
-        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTableByOrganizationLevel(organizationLevelId, startDate);
+        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId, startDate);
         PayTableResponse result = null;
         if (payTableQueryResults.size() > 1) {
             // multiple payTables are found NOW need to filter by date
@@ -526,7 +526,7 @@ public class PayTableService extends UserBaseService {
 
 
     public List<PayTableResponse>  getPayTablesByOrganizationLevel(Long organizationLevelId) {
-        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTableByOrganizationLevel(organizationLevelId);
+        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId);
 
         return payTableQueryResults;
 

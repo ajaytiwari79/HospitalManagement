@@ -26,10 +26,10 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     Boolean checkPayTableNameAlreadyExitsByName(Long countryId, Long currentPayTableId, String payTableName);
 
     @Query("MATCH (c:Country) where id(c)={0} \n" +
-            "MATCH(c)-[:HAS_LEVEL]->(level:Level{isEnabled:true})\n" +
+            "MATCH(c)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true})\n" +
             "OPTIONAL MATCH (level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false})\n" +
             "with level,count(payTable) as totalPayTable \n" +
-            "OPTIONAL MATCH  (level:Level)-[:IN_LEVEL]-(payGroupArea:PayGroupArea{deleted:false})\n" +
+            "OPTIONAL MATCH  (level:Level)-[:"+IN_LEVEL+"]-(payGroupArea:PayGroupArea{deleted:false})\n" +
             "return id(level) as id,level.name as name ,level.description as description, Case when payGroupArea IS NOT NULL THEN \n" +
             "collect({ payGroupAreaId:id(payGroupArea),name:payGroupArea.name}) else [] end as payGroupAreas,totalPayTable as payTablesCount ORDER BY name")
     List<OrganizationLevelPayGroupAreaDTO> getOrganizationLevelWisePayGroupAreas(Long countryId);
@@ -57,7 +57,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "OPTIONAL MATCH(payTable)-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false})\n" +
             "RETURN id(payTable) as id,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis," +
             " payTable.name as name ,collect({id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}) as payGrades")
-    List<PayTableResponse> findActivePayTableByOrganizationLevel(Long organizationLevelId, Long startDate);
+    List<PayTableResponse> findActivePayTablesByOrganizationLevel(Long organizationLevelId, Long startDate);
 
     @Query("MATCH (payTable:PayTable)<-[rel:" + HAS_TEMP_PAY_TABLE + "]-(parentPayTable:PayTable{deleted:false}) where id(payTable)={0}  detach delete rel \n" +
             "set parentPayTable.hasTempCopy=false " +
@@ -67,7 +67,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
 
     @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false}) where id(level)={0} " +
             "RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.editable as editable,payTable.hasTempCopy as hasTempCopy,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName, payTable.paymentUnit as paymentUnit ORDER BY startDateMillis ")
-    List<PayTableResponse> findActivePayTableByOrganizationLevel(Long organizationLevelId);
+    List<PayTableResponse> findActivePayTablesByOrganizationLevel(Long organizationLevelId);
 
 
 }

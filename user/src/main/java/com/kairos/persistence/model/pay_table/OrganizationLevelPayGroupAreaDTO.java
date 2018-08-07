@@ -16,7 +16,7 @@ public class OrganizationLevelPayGroupAreaDTO {
     private Long id;
     private String name;
     private String description;
-    private Long payTablesCount;
+    private Integer payTablesCount;
     private List<PayGroupArea> payGroupAreas;
 
     public OrganizationLevelPayGroupAreaDTO() {
@@ -46,11 +46,11 @@ public class OrganizationLevelPayGroupAreaDTO {
         this.description = description;
     }
 
-    public Long getPayTablesCount() {
+    public Integer getPayTablesCount() {
         return payTablesCount;
     }
 
-    public void setPayTablesCount(Long payTablesCount) {
+    public void setPayTablesCount(Integer payTablesCount) {
         this.payTablesCount = payTablesCount;
     }
 
