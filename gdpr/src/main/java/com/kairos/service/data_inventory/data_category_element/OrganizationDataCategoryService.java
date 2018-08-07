@@ -50,6 +50,7 @@ public class OrganizationDataCategoryService extends MongoBaseService {
     public Map<String, Object> createDataCategoryWithDataElements(Long unitId, List<DataCategoryDTO> dataCategoryDTOS) {
 
         Set<String> datCategoryNameList = new HashSet<>();
+    ;
         for (DataCategoryDTO dataCategoryDTO : dataCategoryDTOS) {
             datCategoryNameList.add(dataCategoryDTO.getName());
         }

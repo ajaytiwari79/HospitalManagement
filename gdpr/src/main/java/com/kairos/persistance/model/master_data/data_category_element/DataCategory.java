@@ -49,10 +49,12 @@ public class DataCategory extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
-    public DataCategory(@Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$") String name) {
-        this.name = name;
-    }
+
 
     public DataCategory() {
+    }
+
+    public DataCategory(String name) {
+        this.name = name;
     }
 }
