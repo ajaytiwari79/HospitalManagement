@@ -38,6 +38,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -149,6 +150,7 @@ public class ShiftIntegrationServiceTest {
         List<BigInteger> shifts = new ArrayList<>();
         shifts.add(new BigInteger("110"));
         shifts.add(new BigInteger("109"));
+
         ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, Collections.singletonList(ShiftStatus.FIXED));
         HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
 

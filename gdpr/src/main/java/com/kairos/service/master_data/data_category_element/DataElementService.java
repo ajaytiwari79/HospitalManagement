@@ -56,7 +56,7 @@ public class DataElementService extends MongoBaseService {
             dataElementList.add(newDataElement);
         }
         try {
-            dataElementList = dataElementMognoRepository.saveAll(sequenceGenerator(dataElementList));
+            dataElementList = dataElementMognoRepository.saveAll(getNextSequence(dataElementList));
             dataElementList.forEach(dataElement -> {
                 dataElementIdList.add(dataElement.getId());
             });
@@ -103,7 +103,7 @@ public class DataElementService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", id);
         }
         exist.setName(dataElement.getName());
-        return dataElementMognoRepository.save(sequenceGenerator(exist));
+        return dataElementMognoRepository.save(getNextSequence(exist));
     }
 
     /**
@@ -171,7 +171,7 @@ public class DataElementService extends MongoBaseService {
         });
         Map<String, Object> result = new HashMap<>();
         try {
-            dataElementList = dataElementMognoRepository.saveAll(sequenceGenerator(dataElementList));
+            dataElementList = dataElementMognoRepository.saveAll(getNextSequence(dataElementList));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());

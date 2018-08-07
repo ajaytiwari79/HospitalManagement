@@ -10,6 +10,7 @@ import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.TimeSlotType;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.auth.User;
@@ -18,7 +19,6 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
-import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
@@ -2160,5 +2160,11 @@ public class StaffService extends UserBaseService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
 
     }
+
+    public List<StaffPersonalDetail> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
+        return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds,DateUtil.getCurrentDateMillis());
+
+    }
+
 
 }

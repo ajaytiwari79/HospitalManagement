@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.ProcessingPurposeMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
@@ -70,7 +70,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
                     newProcessingPurposes.add(newProcessingPurpose);
 
                 }
-                newProcessingPurposes = processingPurposeMongoRepository.saveAll(sequenceGenerator(newProcessingPurposes));
+                newProcessingPurposes = processingPurposeMongoRepository.saveAll(getNextSequence(newProcessingPurposes));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingPurposes);
@@ -139,7 +139,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
         } else {
             exist=processingPurposeMongoRepository.findByid(id);
             exist.setName(processingPurpose.getName());
-            return processingPurposeMongoRepository.save(sequenceGenerator(exist));
+            return processingPurposeMongoRepository.save(getNextSequence(exist));
 
         }
     }

@@ -51,4 +51,8 @@ public class DataCategory extends MongoBaseEntity {
 
     public DataCategory() {
     }
+
+    public DataCategory(String name) {
+        this.name = name;
+    }
 }

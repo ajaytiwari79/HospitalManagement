@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.ResponsibilityTypeMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
@@ -70,7 +70,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
                 }
 
-                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(sequenceGenerator(newResponsibilityTypes));
+                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(getNextSequence(newResponsibilityTypes));
 
             }
             result.put(EXISTING_DATA_LIST, existing);
@@ -139,7 +139,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
         } else {
             exist=responsibilityTypeMongoRepository.findByid(id);
             exist.setName(responsibilityType.getName());
-            return responsibilityTypeMongoRepository.save(sequenceGenerator(exist));
+            return responsibilityTypeMongoRepository.save(getNextSequence(exist));
 
         }
     }

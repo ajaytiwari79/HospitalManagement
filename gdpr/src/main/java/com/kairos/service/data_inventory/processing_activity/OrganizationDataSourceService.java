@@ -5,7 +5,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.DataSourceMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
@@ -66,7 +66,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
                 }
 
-                newDataSources = dataSourceMongoRepository.saveAll(sequenceGenerator(newDataSources));
+                newDataSources = dataSourceMongoRepository.saveAll(getNextSequence(newDataSources));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newDataSources);
@@ -133,7 +133,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
         } else {
             exist = dataSourceMongoRepository.findByid(id);
             exist.setName(dataSource.getName());
-            return dataSourceMongoRepository.save(sequenceGenerator(exist));
+            return dataSourceMongoRepository.save(getNextSequence(exist));
 
         }
     }

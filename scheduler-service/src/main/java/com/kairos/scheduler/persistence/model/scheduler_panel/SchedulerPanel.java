@@ -113,25 +113,6 @@ public class SchedulerPanel extends MongoBaseEntity {
         this.selectedHours = selectedHours;
     }
 
-
-
-   /* public String getRunOnce() {
-        return runOnce;
-    }
-
-    public void setRunOnce(String runOnce) {
-        this.runOnce = runOnce;
-    }*/
-
-//    public List<String> getDays() {
-//        return days;
-//    }
-//
-//    public void setDays(List<String> days) {
-//        this.days = days;
-//    }
-
-
     public String getName() {
         return name;
     }
@@ -155,14 +136,6 @@ public class SchedulerPanel extends MongoBaseEntity {
     public void setInterval(String interval) {
         this.interval = interval;
     }
-
-   /* public String getRepeat() {
-        return repeat;
-    }
-
-    public void setRepeat(String repeat) {
-        this.repeat = repeat;
-    }*/
 
     public boolean isActive() {
         return active;

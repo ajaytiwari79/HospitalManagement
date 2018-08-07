@@ -26,17 +26,17 @@ public class TransferMethod extends MongoBaseEntity {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+
     public TransferMethod( String name) {
         this.name = name;
     }
-
     public TransferMethod() {
     }
 }
