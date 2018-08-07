@@ -6,6 +6,13 @@ public class AccessGroupMappingDTO {
     private Long accessGroupId;
     private BigInteger kpiId;
 
+    public AccessGroupMappingDTO() {
+    }
+
+    public AccessGroupMappingDTO(Long accessGroupId, BigInteger kpiId) {
+        this.accessGroupId = accessGroupId;
+        this.kpiId = kpiId;
+    }
 
     public Long getAccessGroupId() {
         return accessGroupId;

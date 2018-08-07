@@ -11,9 +11,9 @@ public class TabKPIEntryConfDTO {
 
     }
 
-    public TabKPIEntryConfDTO(List tabIds, List kpiIds){
-        this.kpiIds = kpiIds;
+    public TabKPIEntryConfDTO(List<String> tabIds, List<BigInteger> kpiIds) {
         this.tabIds = tabIds;
+        this.kpiIds = kpiIds;
     }
 
     public List<String> getTabIds() {

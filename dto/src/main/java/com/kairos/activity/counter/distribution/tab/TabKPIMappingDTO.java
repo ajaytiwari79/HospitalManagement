@@ -7,6 +7,14 @@ public class TabKPIMappingDTO {
     private String tabId;
     private BigInteger kpiId;
 
+    public TabKPIMappingDTO() {
+    }
+
+    public TabKPIMappingDTO(String tabId, BigInteger kpiId) {
+        this.tabId = tabId;
+        this.kpiId = kpiId;
+    }
+
     public String getTabId() {
         return tabId;
     }

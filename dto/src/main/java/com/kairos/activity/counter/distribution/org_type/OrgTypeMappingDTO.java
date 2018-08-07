@@ -6,6 +6,15 @@ public class OrgTypeMappingDTO {
     private Long orgTypeId;
     private BigInteger kpiId;
 
+    public OrgTypeMappingDTO() {
+
+    }
+
+    public OrgTypeMappingDTO(Long orgTypeId, BigInteger kpiId) {
+        this.orgTypeId = orgTypeId;
+        this.kpiId = kpiId;
+    }
+
     public Long getOrgTypeId() {
         return orgTypeId;
     }
