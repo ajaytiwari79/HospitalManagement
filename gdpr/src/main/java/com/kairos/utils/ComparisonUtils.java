@@ -1,6 +1,5 @@
 package com.kairos.utils;
 
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.Method;
@@ -15,8 +14,6 @@ public class ComparisonUtils {
             return namesList;
         } else {
             Map<String, String> existingNamesMapData = new HashMap<>();
-            List<String> existingNames = new ArrayList<>();
-
             Assert.notEmpty(existingObject, "Entity must Not be Empty");
             Assert.notEmpty(namesList, "Entity must Not be Empty");
 
@@ -26,20 +23,13 @@ public class ComparisonUtils {
 
                 Method getNameMethod = c.getMethod(methodName);
                 for (T object : existingObject) {
-                   // existingNames.add((String) getNameMethod.invoke(object));
-                    String name=(String) getNameMethod.invoke(object);
-                    existingNamesMapData.put(name.toLowerCase(),name);
+                    String name = (String) getNameMethod.invoke(object);
+                    existingNamesMapData.put(name.toLowerCase(), name);
                 }
-            }
-             catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
-
-           /* existingNames.forEach(s -> {
-                existingNamesMapData.put(s.toLowerCase(), s);
-
-            });*/
             Set<String> newNamesList = new HashSet<>();
             namesList.forEach(name -> {
                 if (!Optional.ofNullable(existingNamesMapData.get(name.toLowerCase())).isPresent()) {

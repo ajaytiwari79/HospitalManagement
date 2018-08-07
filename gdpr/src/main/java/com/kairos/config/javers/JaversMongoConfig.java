@@ -3,8 +3,8 @@ package com.kairos.config.javers;
 
 import com.google.common.collect.ImmutableMap;
 import com.kairos.config.mongoEnv.EnvConfig;
-import com.kairos.utils.codec.BigIntegerCodecProvider;
-import com.kairos.utils.codec.BigIntegerTransformer;
+import com.kairos.config.codec.BigIntegerCodecProvider;
+import com.kairos.config.codec.BigIntegerTransformer;
 import com.mongodb.*;
 import org.bson.BSON;
 import org.bson.codecs.configuration.CodecRegistries;
