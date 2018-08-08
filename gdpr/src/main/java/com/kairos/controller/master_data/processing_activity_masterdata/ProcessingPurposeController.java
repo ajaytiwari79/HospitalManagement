@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
+import com.kairos.dto.metadata.ProcessingPurposeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingPurposeService;
 import com.kairos.utils.ResponseHandler;
@@ -39,7 +40,7 @@ public class ProcessingPurposeController {
 
     @ApiOperation("add processing purpose")
     @PostMapping("/processing_purpose/add")
-    public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ProcessingPurpose> processingPurposes) {
+    public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ProcessingPurposeDTO> processingPurposes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
@@ -104,7 +105,7 @@ public class ProcessingPurposeController {
 
     @ApiOperation("update processing purpose by id")
     @PutMapping("/processing_purpose/update/{id}")
-    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingPurpose processingPurpose) {
+    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingPurposeDTO processingPurpose) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {

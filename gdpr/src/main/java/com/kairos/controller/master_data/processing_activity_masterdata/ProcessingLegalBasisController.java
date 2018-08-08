@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
+import com.kairos.dto.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingLegalBasisService;
 import com.kairos.utils.ResponseHandler;
@@ -38,7 +39,7 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("add ProcessingLegalBasis")
     @PostMapping("/legal_basis/add")
-    public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ProcessingLegalBasis> legalBases) {
+    public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ProcessingLegalBasisDTO> legalBases) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
@@ -96,7 +97,7 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("update ProcessingLegalBasis by id")
     @PutMapping("/legal_basis/update/{id}")
-    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingLegalBasis legalBasis) {
+    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingLegalBasisDTO legalBasis) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {

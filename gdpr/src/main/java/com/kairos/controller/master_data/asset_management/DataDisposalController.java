@@ -1,5 +1,6 @@
 package com.kairos.controller.master_data.asset_management;
 
+import com.kairos.dto.metadata.DataDisposalDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.service.master_data.asset_management.DataDisposalService;
 import com.kairos.utils.ResponseHandler;
@@ -37,11 +38,11 @@ public class DataDisposalController {
 
     @ApiOperation("add DataDisposal")
     @PostMapping("/data_disposal/add")
-    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataDisposal> dataDisposals) {
+    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposals.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposalDTOs.getRequestBody()));
 
     }
 
@@ -96,13 +97,13 @@ public class DataDisposalController {
 
     @ApiOperation("update DataDisposal by id")
     @PutMapping("/data_disposal/update/{id}")
-    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody DataDisposal dataDisposal) {
+    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(countryId, id, dataDisposal));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(countryId, id, dataDisposalDTO));
     }
 
 

@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
+import com.kairos.dto.metadata.StorageFormatDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ResponseHandler;
@@ -39,7 +40,7 @@ public class StorageFormatController {
 
     @ApiOperation("add StorageFormat")
     @PostMapping("/storage_format/add")
-    public ResponseEntity<Object> createStorageFormat(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<StorageFormat> storageFormat) {
+    public ResponseEntity<Object> createStorageFormat(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormat) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
@@ -105,7 +106,7 @@ public class StorageFormatController {
 
     @ApiOperation("update StorageFormat by id")
     @PutMapping("/storage_format/update/{id}")
-    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody StorageFormat storageFormat) {
+    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody StorageFormatDTO storageFormat) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {

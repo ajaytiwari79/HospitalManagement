@@ -1,6 +1,5 @@
 package com.kairos.dto.metadata;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.constraints.NotBlank;
@@ -8,8 +7,7 @@ import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AccessorPartyDTO {
-
+public class DataDisposalDTO {
 
     private BigInteger id;
 

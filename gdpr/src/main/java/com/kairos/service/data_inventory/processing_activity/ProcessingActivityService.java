@@ -63,11 +63,11 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
     public Boolean deleteProcessingActivity(Long organizationId, BigInteger id) {
-        ProcessingActivity exist = processingActivityMongoRepository.findByIdAndNonDeleted(organizationId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(organizationId, id);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", id);
         }
-        delete(exist);
+        delete(processingActivity);
         return true;
 
     }
@@ -88,31 +88,31 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
 
-    public ProcessingActivity updateProcessingActivity(Long organizationId, BigInteger id, ProcessingActivityDTO processingActivityDTO) {
+    public ProcessingActivityDTO updateProcessingActivity(Long organizationId, BigInteger id, ProcessingActivityDTO processingActivityDTO) {
 
 
-        ProcessingActivity exist = processingActivityMongoRepository.findByName(organizationId, processingActivityDTO.getName());
-        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByName(organizationId, processingActivityDTO.getName());
+        if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
             exceptionService.duplicateDataException("message.duplicate", " Processing Activity ", processingActivityDTO.getName());
         }
-        exist = processingActivityMongoRepository.findByIdAndNonDeleted(organizationId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(organizationId, id);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", id);
         }
-
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
-            exist.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(organizationId, processingActivityDTO.getSubProcessingActivities()));
+            processingActivity.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(organizationId, processingActivityDTO.getSubProcessingActivities()));
 
         }
-        exist.setName(processingActivityDTO.getName());
-        exist.setDescription(processingActivityDTO.getDescription());
-        exist.setManagingDepartment(processingActivityDTO.getManagingDepartment());
-        exist.setProcessOwner(processingActivityDTO.getProcessOwner());
-        exist.setControllerContactInfo(processingActivityDTO.getControllerContactInfo());
-        exist.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
-        exist.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
-        exist.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
-        return processingActivityMongoRepository.save(exist);
+        processingActivity.setName(processingActivityDTO.getName());
+        processingActivity.setDescription(processingActivityDTO.getDescription());
+        processingActivity.setManagingDepartment(processingActivityDTO.getManagingDepartment());
+        processingActivity.setProcessOwner(processingActivityDTO.getProcessOwner());
+        processingActivity.setControllerContactInfo(processingActivityDTO.getControllerContactInfo());
+        processingActivity.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
+        processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
+        processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
+         processingActivityMongoRepository.save(processingActivity);
+        return processingActivityDTO;
 
     }
 

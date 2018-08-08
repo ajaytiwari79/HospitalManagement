@@ -10,6 +10,7 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterQuestionnaireTemplateDTO {
 
+    private BigInteger id;
 
     @NotBlank(message = "name.cannot.be.empty.or.null")
     @Pattern(message = "Number and Special character are not allowed for Title",regexp ="^[a-zA-Z\\s]+$" )
@@ -23,11 +24,8 @@ public class MasterQuestionnaireTemplateDTO {
 
     private BigInteger assetType;
 
-    private Long countryId;
-
-
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
@@ -58,12 +56,12 @@ public class MasterQuestionnaireTemplateDTO {
         this.assetType = assetType;
     }
 
-    public Long getCountryId() {
-        return countryId;
+    public BigInteger getId() {
+        return id;
     }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public MasterQuestionnaireTemplateDTO() {

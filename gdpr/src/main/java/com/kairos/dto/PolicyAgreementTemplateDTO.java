@@ -67,7 +67,7 @@ public class PolicyAgreementTemplateDTO {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public String getDescription() {

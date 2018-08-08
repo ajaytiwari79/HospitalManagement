@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AccessorPartyDTO {
+public class HostingProviderDTO {
 
 
     private BigInteger id;

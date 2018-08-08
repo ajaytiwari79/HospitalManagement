@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AccessorPartyDTO {
+public class OrganizationalSecurityMeasureDTO {
 
 
     private BigInteger id;
@@ -30,4 +30,10 @@ public class AccessorPartyDTO {
     public String getName() { return name.trim(); }
 
     public void setName(String name) { this.name = name; }
+
+
+
+
+
+
 }

@@ -5,10 +5,12 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.metadata.DataSourceDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.service.common.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -31,6 +33,9 @@ public class DataSourceService extends MongoBaseService {
     @Inject
     private DataSourceMongoRepository dataSourceMongoRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
+
 
     /**
      * @param countryId
@@ -40,16 +45,13 @@ public class DataSourceService extends MongoBaseService {
      * and if exist then simply add  DataSource to existing list and return list ;
      * findByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
-    public Map<String, List<DataSource>> createDataSource(Long countryId, List<DataSource> dataSources) {
+    public Map<String, List<DataSource>> createDataSource(Long countryId, List<DataSourceDTO> dataSources) {
 
         Map<String, List<DataSource>> result = new HashMap<>();
         Set<String> dataSourceNames = new HashSet<>();
         if (!dataSources.isEmpty()) {
-            for (DataSource dataSource : dataSources) {
-                if (!StringUtils.isBlank(dataSource.getName())) {
-                    dataSourceNames.add(dataSource.getName());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
+            for (DataSourceDTO dataSource : dataSources) {
+                dataSourceNames.add(dataSource.getName());
             }
             List<DataSource> existing = findByNamesAndCountryId(countryId, dataSourceNames, DataSource.class);
             dataSourceNames = ComparisonUtils.getNameListForMetadata(existing, dataSourceNames);
@@ -103,50 +105,52 @@ public class DataSourceService extends MongoBaseService {
 
     public Boolean deleteDataSource(Long countryId, BigInteger id) {
 
-        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        DataSource dataSource = dataSourceMongoRepository.findByIdAndNonDeleted(countryId, id);
+        if (!Optional.ofNullable(dataSource).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(exist);
-            return true;
-
         }
+        delete(dataSource);
+        return true;
+
     }
 
     /***
      * @throws DuplicateDataException throw exception if DataSource data not exist for given id
      * @param countryId
      * @param id id of DataSource
-     * @param dataSource
+     * @param dataSourceDTO
      * @return DataSource updated object
      */
-    public DataSource updateDataSource(Long countryId,  BigInteger id, DataSource dataSource) {
+    public DataSourceDTO updateDataSource(Long countryId, BigInteger id, DataSourceDTO dataSourceDTO) {
 
-        DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, dataSource.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            if (id.equals(exist.getId())) {
-                return exist;
+        DataSource dataSource = dataSourceMongoRepository.findByNameAndCountryId(countryId, dataSourceDTO.getName());
+        if (Optional.ofNullable(dataSource).isPresent()) {
+            if (id.equals(dataSource.getId())) {
+                return dataSourceDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + dataSource.getName());
-        } else {
-            exist = dataSourceMongoRepository.findByid(id);
-            exist.setName(dataSource.getName());
-            return dataSourceMongoRepository.save(exist);
-
+            throw new DuplicateDataException("data  exist for  " + dataSourceDTO.getName());
         }
+        dataSource = dataSourceMongoRepository.findByid(id);
+        if (!Optional.ofNullable(dataSource).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Source", id);
+        }
+        dataSource.setName(dataSourceDTO.getName());
+        dataSourceMongoRepository.save(dataSource);
+        return dataSourceDTO;
+
     }
 
     /**
      * @param countryId
-     * @param name           name of DataSource
+     * @param name      name of DataSource
      * @return DataSource object fetch on basis of  name
      * @throws DataNotExists throw exception if DataSource not exist for given name
      */
-    public DataSource getDataSourceByName(Long countryId,  String name) {
+    public DataSource getDataSourceByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId,  name);
+            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
+import com.kairos.dto.metadata.AccessorPartyDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
 import com.kairos.utils.ResponseHandler;
@@ -38,7 +39,7 @@ public class AccessorPartyController {
 
     @ApiOperation("add AccessorParty")
     @PostMapping("/accessor_party/add")
-    public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<AccessorParty> accessorParties) {
+    public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<AccessorPartyDTO> accessorParties) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
@@ -96,7 +97,7 @@ public class AccessorPartyController {
 
     @ApiOperation("update AccessorParty by id")
     @PutMapping("/accessor_party/update/{id}")
-    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody AccessorParty accessorParty) {
+    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody AccessorPartyDTO accessorParty) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {

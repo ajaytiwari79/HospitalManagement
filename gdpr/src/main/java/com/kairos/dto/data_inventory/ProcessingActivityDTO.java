@@ -65,7 +65,7 @@ public class ProcessingActivityDTO {
 
     public void setSubProcessingActivities(List<ProcessingActivityDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 
-    public String getName() { return name; }
+    public String getName() { return name.trim(); }
 
     public void setName(String name) { this.name = name; }
 

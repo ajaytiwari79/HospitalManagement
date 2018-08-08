@@ -42,7 +42,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @return master processing Activity with Sub processing activity .
      * create Master processing activity and new Sub processing activity list and set ids to master processing activities
      */
-    public MasterProcessingActivity createMasterProcessingActivity(Long countryId, Long organizationId, MasterProcessingActivityDTO masterProcessingActivityDto) {
+    public MasterProcessingActivityDTO createMasterProcessingActivity(Long countryId, Long organizationId, MasterProcessingActivityDTO masterProcessingActivityDto) {
 
         if (masterProcessingActivityRepository.findByName(countryId, organizationId, masterProcessingActivityDto.getName()) != null) {
             exceptionService.duplicateDataException("message.duplicate", "processing activity", masterProcessingActivityDto.getName().toLowerCase());
@@ -66,7 +66,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
         }
-        return masterProcessingActivity;
+        masterProcessingActivityDto.setId(masterProcessingActivity.getId());
+        return masterProcessingActivityDto;
     }
 
 
@@ -121,7 +122,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @param masterProcessingActivityDto  contain list of existing(which need to be update) and new(for creating new sub process) Sub processing activities
      * @return master processing activity with sub processing activities list ids
      */
-    public MasterProcessingActivity updateMasterProcessingActivityAndSubProcessingActivities(Long countryId, Long organizationId, BigInteger id, MasterProcessingActivityDTO masterProcessingActivityDto) {
+    public MasterProcessingActivityDTO updateMasterProcessingActivityAndSubProcessingActivities(Long countryId, Long organizationId, BigInteger id, MasterProcessingActivityDTO masterProcessingActivityDto) {
 
         MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByName(countryId, organizationId, masterProcessingActivityDto.getName());
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
@@ -152,7 +153,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
                 throw new RuntimeException(e.getMessage());
             }
         }
-        return processingActivity;
+        return masterProcessingActivityDto;
     }
 
 

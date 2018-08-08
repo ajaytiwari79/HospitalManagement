@@ -2,6 +2,7 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.controller.master_data.asset_management.HostingTypeController;
+import com.kairos.dto.metadata.HostingTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
 import com.kairos.service.data_inventory.asset.OrganizationHostingTypeService;
 import com.kairos.utils.ResponseHandler;
@@ -34,13 +35,13 @@ public class OrganizationHostingTypeController {
 
     @ApiOperation("add HostingType")
     @PostMapping("/hosting_type/add")
-    public ResponseEntity<Object> createHostingType(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingType> hostingTypes) {
+    public ResponseEntity<Object> createHostingType(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingTypeDTO> hostingTypeDTOs) {
 
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(unitId, hostingTypes.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(unitId, hostingTypeDTOs.getRequestBody()));
 
     }
 
@@ -95,13 +96,13 @@ public class OrganizationHostingTypeController {
 
     @ApiOperation("update HostingType by id")
     @PutMapping("/hosting_type/update/{id}")
-    public ResponseEntity<Object> updateHostingType(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody HostingType hostingtype) {
+    public ResponseEntity<Object> updateHostingType(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody HostingTypeDTO hostingTypeDTO) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(unitId, id, hostingtype));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(unitId, id, hostingTypeDTO));
     }
 
 }
