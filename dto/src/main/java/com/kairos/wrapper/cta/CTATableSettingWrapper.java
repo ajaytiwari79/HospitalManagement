@@ -1,7 +1,7 @@
 package com.kairos.wrapper.cta;
 
+import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.client.dto.TableConfiguration;
-import com.kairos.persistence.model.agreement.cta.CTAResponseDTO;
 
 import java.util.List;
 

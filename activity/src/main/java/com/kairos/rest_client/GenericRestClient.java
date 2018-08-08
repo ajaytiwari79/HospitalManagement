@@ -96,7 +96,7 @@ public class GenericRestClient {
     }
 
 
-    public <T> String getURIWithParam(String uri,List<NameValuePair> queryParam){
+    public String getURIWithParam(String uri,List<NameValuePair> queryParam){
         try {
         URIBuilder builder = new URIBuilder(uri);
             if(!queryParam.isEmpty()) {

@@ -38,6 +38,16 @@ public class CTAResponseDTO {
         //Default constructor
     }
 
+    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, Long startDateMillis, Long endDateMillis, Boolean disabled) {
+        this.id = id;
+        this.name = name;
+        this.expertise = expertise;
+        this.ruleTemplates = ruleTemplates;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.disabled = disabled;
+    }
+
     public ExpertiseResponseDTO getExpertise() {
         return expertise;
     }

@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.unit_position;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.activity.wta.version.WTAVersionDTO;
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
@@ -41,7 +42,7 @@ public class UnitPositionQueryResult {
     private Double salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
-    private CostTimeAgreement costTimeAgreement;
+    private CTAResponseDTO costTimeAgreement;
     private Organization union;
     private Long lastWorkingDateMillis;
     private Long parentUnitId;
@@ -49,6 +50,7 @@ public class UnitPositionQueryResult {
     private Long reasonCodeId;
     private Map<String, Object> unitInfo;
     private WTAResponseDTO workingTimeAgreement;
+    private BigInteger costTimeAgreementId;
 
 
     private Boolean history;
@@ -71,6 +73,14 @@ public class UnitPositionQueryResult {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 
+
+    public BigInteger getCostTimeAgreementId() {
+        return costTimeAgreementId;
+    }
+
+    public void setCostTimeAgreementId(BigInteger costTimeAgreementId) {
+        this.costTimeAgreementId = costTimeAgreementId;
+    }
 
     public BigInteger getWorkingTimeAgreementId() {
         return workingTimeAgreementId;
@@ -186,11 +196,11 @@ public class UnitPositionQueryResult {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 */
-    public CostTimeAgreement getCostTimeAgreement() {
+    public CTAResponseDTO getCostTimeAgreement() {
         return costTimeAgreement;
     }
 
-    public void setCostTimeAgreement(CostTimeAgreement costTimeAgreement) {
+    public void setCostTimeAgreement(CTAResponseDTO costTimeAgreement) {
         this.costTimeAgreement = costTimeAgreement;
     }
 
@@ -305,7 +315,7 @@ public class UnitPositionQueryResult {
     }
 
 
-    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CostTimeAgreement cta, WTAResponseDTO wta) {
+    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CTAResponseDTO cta, WTAResponseDTO wta) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;

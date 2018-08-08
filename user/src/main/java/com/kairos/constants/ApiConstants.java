@@ -25,6 +25,7 @@ public final class ApiConstants {
 
 
 
-    private ApiConstants() {
-    }
+    //RestTemplate URL
+    public static final String GET_VERSION_CTA = "/get_versions_cta";
+    public static final String GET_DEFAULT_CTA = "/get_default_cta";
 }

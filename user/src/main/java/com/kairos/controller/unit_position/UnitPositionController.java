@@ -78,7 +78,7 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionWTA(unitId, unitPositionId));
     }
 
-    @ApiOperation(value = "Update Unit Position's CTA")
+    /*@ApiOperation(value = "Update Unit Position's CTA")
     @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta/{ctaId}")
     public ResponseEntity<Map<String, Object>> updateCostTimeAgreementForUnitPosition(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable BigInteger ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO ctaDTO) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.updateCostTimeAgreementForUnitPosition(unitId, unitPositionId, ctaId, ctaDTO));
@@ -88,13 +88,13 @@ public class UnitPositionController {
     @GetMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta")
     public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitId, unitPositionId));
-    }
+    }*/
 
-    @ApiOperation(value = "get unit_position's CTA")
+   /* @ApiOperation(value = "get unit_position's CTA")
     @GetMapping(value = "/getCTAbyUnitPosition/{unitPositionId}")
     public ResponseEntity<Map<String, Object>> getUnitPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitPositionId, unitId));
-    }
+    }*/
 
 
     @ApiOperation(value = "apply function to unit position")

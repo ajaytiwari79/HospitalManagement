@@ -3,18 +3,17 @@ package com.kairos.service.unit_position;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.activity.time_bank.CTAIntervalDTO;
 import com.kairos.activity.time_bank.CTARuleTemplateDTO;
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.activity.wta.version.WTATableSettingWrapper;
-import com.kairos.client.dto.TableConfiguration;
-import com.kairos.dto.KairosScheduleJobDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
-import com.kairos.kafka.producer.KafkaProducer;
-import com.kairos.persistence.model.agreement.cta.*;
+import com.kairos.persistence.model.agreement.cta.CTAListQueryResult;
+import com.kairos.persistence.model.agreement.cta.CTARuleTemplateQueryResult;
+import com.kairos.persistence.model.agreement.cta.CompensationTableInterval;
+import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ClientMinimumDTO;
 import com.kairos.persistence.model.country.DayType;
@@ -58,10 +57,11 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionFunction
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
+import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.kafka.UserToSchedulerQueueService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
@@ -75,6 +75,8 @@ import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.wrapper.PositionWrapper;
 import com.kairos.wrapper.cta.CTATableSettingWrapper;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,8 +95,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.constants.ApiConstants.GET_DEFAULT_CTA;
+import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.util.DateUtils.ONLY_DATE;
-import static com.kairos.util.table_constants.TableSettingsConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -115,8 +118,8 @@ public class UnitPositionService extends UserBaseService {
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private UnitPermissionGraphRepository unitPermissionGraphRepository;
-    @Inject
-    private CollectiveTimeAgreementGraphRepository costTimeAgreementGraphRepository;
+    //@Inject
+    //private CollectiveTimeAgreementGraphRepository costTimeAgreementGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
@@ -165,6 +168,8 @@ public class UnitPositionService extends UserBaseService {
     private ActivityIntegrationService activityIntegrationService;
     @Inject
     private UserToSchedulerQueueService userToSchedulerQueueService;
+    @Inject
+    private GenericRestClient genericRestClient;
 
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) {
@@ -464,18 +469,14 @@ public class UnitPositionService extends UserBaseService {
         }
         unitPosition.setUnit(unitPositionInOrganization.get());
 
-       /* Optional<WorkingTimeAgreement> wta = workingTimeAgreementGraphRepository.findById(unitPositionDTO.getWtaId());
+       /* Optional<WorkingTimeAgreement> wta = workingTimeAgreementGraphRepository.findById(UnitPositionDTO.getWtaId());
         if (!wta.isPresent()) {
             throw new DataNotFoundByIdException("Invalid wta id ");
         }
         copyAndLinkNewWTA(unitPosition, wta.get());
 */
-        CostTimeAgreement cta = (unitPositionDTO.getCtaId() == null) ? null :
-                costTimeAgreementGraphRepository.findOne(unitPositionDTO.getCtaId());
-        if (cta != null) {
-            unitPosition.setCta(cta);
-        }
 
+        unitPosition.setCostTimeAgreementId(unitPositionDTO.getCtaId());
         Optional<Expertise> expertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId(), 1);
         if (!expertise.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.expertise.id.notFound", unitPositionDTO.getExpertiseId());
@@ -547,7 +548,7 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setEditable(true);
         unitPosition.setHistory(false);
 
-        //unitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
+        //unitPosition.setWorkingDaysInWeek(UnitPositionDTO.getWorkingDaysInWeek());
         if (createFromTimeCare) {
             unitPosition.setTimeCareExternalId(unitPositionDTO.getTimeCareExternalId());
         }
@@ -670,7 +671,7 @@ public class UnitPositionService extends UserBaseService {
                 oldUnitPosition.setReasonCode(reasonCode.get());
             }
         }
-        //oldUnitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
+        //oldUnitPosition.setWorkingDaysInWeek(UnitPositionDTO.getWorkingDaysInWeek());
         oldUnitPosition.setTotalWeeklyMinutes((unitPositionDTO.getTotalWeeklyHours() * 60));
         oldUnitPosition.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());
         oldUnitPosition.setHourlyWages(unitPositionDTO.getHourlyWages());
@@ -780,7 +781,7 @@ public class UnitPositionService extends UserBaseService {
                 unitPosition.getPositionCode(),
                 unitPosition.getUnion(),
                 unitPosition.getLastWorkingDateMillis(),
-                unitPosition.getCta(), wtaResponseDTO);
+                null, wtaResponseDTO);
         result.setUnitId(unitPosition.getUnit().getId());
         result.setReasonCodeId(unitPosition.getReasonCode() != null ? unitPosition.getReasonCode().getId() : null);
         result.setParentUnitId(parentOrganizationId);
@@ -815,7 +816,7 @@ public class UnitPositionService extends UserBaseService {
         UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
                 unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),
                 unitPosition.getId(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
-                unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), null/*unitPosition.getWorkingTimeAgreement()*/);
+                unitPosition.getLastWorkingDateMillis(), null, null/*unitPosition.getWorkingTimeAgreement()*/);
         result.setReasonCodeId(unitPosition.getReasonCode() != null ? unitPosition.getReasonCode().getId() : null);
         result.setUnitId(unitPositionQueryResult.getUnitId());
         result.setEditable(unitPosition.isEditable());
@@ -839,7 +840,7 @@ public class UnitPositionService extends UserBaseService {
         return workingTimeAgreement;
     }
 
-    public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
+    /*public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
 
         StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
@@ -865,13 +866,13 @@ public class UnitPositionService extends UserBaseService {
         ObjectMapperUtils.copyProperties(unitPosition.getEmploymentType(), employmentType);
         unitPositionWithCtaDetailsDTO.setEmploymentType(employmentType);
         return unitPositionWithCtaDetailsDTO;
-    }
+    }*/
 
 
     public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionWithCTA(Long unitPositionId, Organization organization, Long countryId) {
 
         StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
-        CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
+        //CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
 
         com.kairos.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.activity.shift.StaffUnitPositionDetails();
         unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.activity.shift.Expertise.class));
@@ -895,7 +896,7 @@ public class UnitPositionService extends UserBaseService {
 
         }
         unitPositionDetails.setUnitTimeZone(organization.getTimeZone());
-        unitPositionDetails.setCtaRuleTemplates(getCtaRuleTemplates(ctaQueryResults));
+       // unitPositionDetails.setCtaRuleTemplates(getCtaRuleTemplates(ctaQueryResults));
         return unitPositionDetails;
     }
 
@@ -958,7 +959,7 @@ public class UnitPositionService extends UserBaseService {
         return null;
     }
 
-    public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, BigInteger wtaId, Long ctaId, Long unitId) {
+    public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, BigInteger wtaId, BigInteger ctaId, Long unitId) {
         Long startDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getStartDate());
         Long endDateMillis = null;
         if (!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")) {
@@ -992,7 +993,7 @@ public class UnitPositionService extends UserBaseService {
         }
 
         //WorkingTimeAgreement wta = unitPositionGraphRepository.getOneDefaultWTA(organization.getId(), expertise.getId());
-        CostTimeAgreement cta = unitPositionGraphRepository.getOneDefaultCTA(organization.getId(), expertise.getId());
+        CTAResponseDTO cta = genericRestClient.publishRequest(null,organization.getId(),true,IntegrationOperation.GET,GET_DEFAULT_CTA,null,CTAResponseDTO.class);
         /*if (wta == null) {
             throw new DataNotFoundByIdException("NO WTA found for organization : " + organization.getId());
         }*/
@@ -1108,7 +1109,7 @@ public class UnitPositionService extends UserBaseService {
             }
         }
 
-        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis,employment.getEndDateMillis(),unit.getId(),employment.getId(),
+        userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(endDateMillis, employment.getEndDateMillis(), unit.getId(), employment.getId(),
                 unit.getTimeZone());
 
         employment.setEndDateMillis(endDateMillis);
@@ -1199,14 +1200,17 @@ public class UnitPositionService extends UserBaseService {
 
     public CTATableSettingWrapper getAllCTAOfStaff(Long unitId, Long staffId) {
         User user = userGraphRepository.getUserByStaffId(staffId);
-        List<CTAResponseDTO> currentCTAs = unitPositionGraphRepository.getAllCtaByUserId(user.getId());
-        List<CTAResponseDTO> ctaResponseDTOS = unitPositionGraphRepository.getAllVersionsOfCTAByIds(currentCTAs.stream().map(u -> u.getId()).collect(Collectors.toList()));
-        Map<Long, List<CTAResponseDTO>> ctaMapByParentId = ctaResponseDTOS.stream().collect(Collectors.groupingBy(w -> w.getParentCTAId(), Collectors.toList()));
-        currentCTAs.forEach(currentCTA -> {
-            currentCTA.setVersions(ctaMapByParentId.get(currentCTA.getId()));
+        List<UnitPositionQueryResult> unitPositionQueryResults = unitPositionGraphRepository.getAllUnitPositionsBasicDetailsAndWTAByUser(user.getId());
+        List<BigInteger> ctaIds = unitPositionQueryResults.stream().map(u -> u.getCostTimeAgreementId()).collect(Collectors.toList());
+        List<NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("ctaIds", ctaIds.toString().replace("[", "").replace("]", "")));
+        CTATableSettingWrapper ctaTableSettingWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_CTA, requestParam, CTATableSettingWrapper.class);
+        ctaTableSettingWrapper.getAgreements().forEach(currentCTA -> {
+            UnitPositionQueryResult currentActiveUnitPosition = unitPositionQueryResults.stream().filter(currentUnitPosition -> currentUnitPosition.getCostTimeAgreementId().equals(currentCTA.getId())
+                    && currentUnitPosition.getHistory().equals(false)).findFirst().get();
+            currentCTA.setUnitInfo(currentActiveUnitPosition.getUnitInfo());
+            currentCTA.setUnitPositionId(currentActiveUnitPosition.getId());
+            currentCTA.setPositionCode(ObjectMapperUtils.copyPropertiesByMapper(currentActiveUnitPosition.getPositionCode(), PositionCodeDTO.class));
         });
-        TableConfiguration tableConfiguration = activityIntegrationService.getTableSettings(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
-        CTATableSettingWrapper ctaTableSettingWrapper = new CTATableSettingWrapper(currentCTAs, tableConfiguration);
         return ctaTableSettingWrapper;
     }
 

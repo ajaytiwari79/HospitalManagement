@@ -20,15 +20,15 @@ import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CTARuleTemplateDTO {
-    //    @NotNull
-    public BigInteger id;
+
+    private BigInteger id;
     @NotEmpty(message = "error.cta.ruleTemplate.name.notEmpty")
     @NotNull(message = "error.cta.ruleTemplate.name.notNull")
-    public String name;
-    public String description;
-    public boolean disabled;
+    private String name;
+    private String description;
+    private boolean disabled;
     @NotNull
-    public BigInteger ruleTemplateCategory;
+    private BigInteger ruleTemplateCategory;
     private String ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
@@ -36,25 +36,19 @@ public class CTARuleTemplateDTO {
     private CompensationTable compensationTable;
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
-    //    private List<CTARuleTemplateDayTypeDTO>calculateOnDayTypes=new ArrayList<>();
     private List<CTARuleTemplatePhaseInfo> phaseInfo = new ArrayList<>();
     private BudgetType budgetType;
     private List<CalculateValueIfPlanned> calculateValueIfPlanned = new ArrayList<>();
     private List<Long> employmentTypes = new ArrayList<>();
-    //    private ActivityType activityType;
     private PlanningCategory planningCategory;
     private List<Long> staffFunctions = new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
     private boolean calculateScheduledHours;
-    //    private List<Long> timeTypes =new ArrayList<>();
     private CalculationFor calculationFor;
 
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
     private List<BigInteger> activityIds;
 
-    /* @Modified by VIPUL
-    * for KP-2927
-    * */
     private Set<BigInteger> timeTypeIds;
     private Set<BigInteger> plannedTimeIds;
 
@@ -168,14 +162,6 @@ public class CTARuleTemplateDTO {
         this.approvalWorkFlow = approvalWorkFlow;
     }
 
-    /*public List<CTARuleTemplateDayTypeDTO> getCalculateOnDayTypes() {
-        return calculateOnDayTypes;
-    }
-
-    public void setCalculateOnDayTypes(List<CTARuleTemplateDayTypeDTO> calculateOnDayTypes) {
-        this.calculateOnDayTypes = calculateOnDayTypes;
-    }*/
-
     public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {
         return phaseInfo;
     }
@@ -208,13 +194,7 @@ public class CTARuleTemplateDTO {
         this.employmentTypes = employmentTypes;
     }
 
-    /*public ActivityType getActivityType() {
-        return activityType;
-    }
 
-    public void setActivityType(ActivityType activityType) {
-        this.activityType = activityType;
-    }*/
 
     public List<Long> getDayTypeIds() {
         return dayTypeIds;
@@ -248,13 +228,6 @@ public class CTARuleTemplateDTO {
         this.plannedTimeWithFactor = plannedTimeWithFactor;
     }
 
-/*    public List<Long> getTimeTypes() {
-        return timeTypes;
-    }
-
-    public void setTimeTypes(List<Long> timeTypes) {
-        this.timeTypes = timeTypes;
-    }*/
 
     public ActivityTypeForCostCalculation getActivityTypeForCostCalculation() {
         return activityTypeForCostCalculation;

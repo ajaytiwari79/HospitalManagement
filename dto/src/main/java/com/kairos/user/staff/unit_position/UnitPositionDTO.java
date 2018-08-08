@@ -40,7 +40,7 @@ public class UnitPositionDTO {
     private EmploymentCategory employmentTypeCategory;
     @NotNull(message = "wta can't be null")
     private BigInteger wtaId;
-    private Long ctaId;
+    private BigInteger ctaId;
     @NotNull(message = "staffId is missing")
     @Range(min = 0, message = "staffId is missing")
     private Long staffId;
@@ -60,6 +60,7 @@ public class UnitPositionDTO {
     private Long seniorityLevelId;
     private Set<Long> functionIds = new HashSet<>();
     private Long timeCareExternalId;
+    private boolean published;
 
     public Long getAccessGroupIdOnEmploymentEnd() {
         return accessGroupIdOnEmploymentEnd;
@@ -91,7 +92,7 @@ public class UnitPositionDTO {
 
 
     public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId,
-                           Long staffId, BigInteger wtaId, Long ctaId, Long unitId, Long timeCareExternalId) {
+                           Long staffId, BigInteger wtaId, BigInteger ctaId, Long unitId, Long timeCareExternalId) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.employmentTypeId = employmentTypeId;
@@ -108,6 +109,7 @@ public class UnitPositionDTO {
         this.unitId = unitId;
         this.workingDaysInWeek = workingDaysInWeek;
     }
+
 
 
     public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
@@ -182,11 +184,11 @@ public class UnitPositionDTO {
         this.wtaId = wtaId;
     }
 
-    public Long getCtaId() {
+    public BigInteger getCtaId() {
         return ctaId;
     }
 
-    public void setCtaId(Long ctaId) {
+    public void setCtaId(BigInteger ctaId) {
         this.ctaId = ctaId;
     }
 

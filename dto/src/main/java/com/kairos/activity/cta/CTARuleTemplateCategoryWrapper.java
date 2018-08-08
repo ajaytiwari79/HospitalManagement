@@ -15,6 +15,15 @@ public class CTARuleTemplateCategoryWrapper {
     private List<RuleTemplateCategoryDTO> ruleTemplateCategories=new ArrayList<>();
     private List<CTARuleTemplateDTO> ruleTemplates=new ArrayList<>();
 
+
+    public CTARuleTemplateCategoryWrapper(List<RuleTemplateCategoryDTO> ruleTemplateCategories, List<CTARuleTemplateDTO> ruleTemplates) {
+        this.ruleTemplateCategories = ruleTemplateCategories;
+        this.ruleTemplates = ruleTemplates;
+    }
+
+    public CTARuleTemplateCategoryWrapper() {
+    }
+
     public List<RuleTemplateCategoryDTO> getRuleTemplateCategories() {
         return ruleTemplateCategories;
     }

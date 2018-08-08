@@ -20,7 +20,7 @@ public interface CTARuleTemplateRepository extends MongoBaseRepository<CTARuleTe
     Boolean isCTARuleTemplateExistWithSameName(Long countryId, String name);
 
     @Query("{}")
-    List<CTARuleTemplateDTO> findByRuleTemplateCategoryIdInAndCountryAndDeletedFalse(List<BigInteger> categoryList, Long countryId);
+    List<CTARuleTemplateDTO> findByRuleTemplateCategoryIdInAndCountryAndDeletedFalse(Long countryId);
 
 
     /*@Query("")

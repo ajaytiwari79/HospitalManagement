@@ -237,7 +237,7 @@ public class ActivityService extends MongoBaseService {
 
     public HashMap<Long, HashMap<Long, BigInteger>> getListOfActivityIdsOfUnitByParentIds(List<BigInteger> parentActivityIds, List<Long> unitIds) {
         List<OrganizationActivityDTO> unitActivities = activityMongoRepository.findAllActivityOfUnitsByParentActivity(parentActivityIds, unitIds);
-        HashMap<Long, HashMap<Long, BigInteger>> mappedParentUnitActivities = new HashMap<Long, HashMap<Long, BigInteger>>();
+        HashMap<Long, HashMap<Long, BigInteger>> mappedParentUnitActivities = new HashMap<>();
         unitActivities.forEach(activityDTO -> {
             HashMap<Long, BigInteger> unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
             if (!Optional.ofNullable(unitParentActivities).isPresent()) {

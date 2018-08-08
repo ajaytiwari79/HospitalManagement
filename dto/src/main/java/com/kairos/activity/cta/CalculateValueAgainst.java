@@ -39,10 +39,6 @@ public class CalculateValueAgainst{
         this.fixedValue = fixedValue;
     }
 
-    public  enum CalculateValueType {
-        FIXED_VALUE,HOURLY_WAGE_IN_UNIT_EMPLOYMENT,KM_INPUT_IN_SELECTED_SHIFT
-        ,WEEKLY_HOURS ,WEEKLY_SALARY;
-    }
 
 
 }

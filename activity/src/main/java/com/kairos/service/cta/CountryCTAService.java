@@ -19,17 +19,15 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.CTA_BASIC_INFO;
@@ -43,19 +41,21 @@ import static com.kairos.constants.ApiConstants.CTA_BASIC_INFO;
 @Transactional
 public class CountryCTAService extends MongoBaseService {
     private Logger logger = LoggerFactory.getLogger(CountryCTAService.class);
-    private @Inject
-    ExceptionService exceptionService;
-    @Inject
-    private CostTimeAgreementRepository costTimeAgreementRepository;
-    @Inject
-    private GenericRestClient genericRestClient;
+    @Inject private ExceptionService exceptionService;
+    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject private GenericRestClient genericRestClient;
     @Inject private ActivityService activityService;
 
+    /**
+     *
+     * @param countryId
+     * @param collectiveTimeAgreementDTO
+     * @return
+     */
     public CollectiveTimeAgreementDTO createCostTimeAgreementInCountry(Long countryId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) {
         logger.info("saving CostTimeAgreement country {}", countryId);
         if (costTimeAgreementRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName())) {
             exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
-
         }
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().toString()));
@@ -67,45 +67,57 @@ costTimeAgreement.setId(null);
 
         costTimeAgreement.setCountryId(countryId);
         this.save(costTimeAgreement);
-
         // TO create CTA for organizations too which are linked with same sub type
-        publishNewCountryCTAToOrganizationByOrgSubType(countryId, costTimeAgreement, collectiveTimeAgreementDTO, costTimeAgreement.getOrganizationSubType().getId(),ctaBasicDetailsDTO);
-
+        publishNewCountryCTAToOrganizationByOrgSubType(costTimeAgreement, collectiveTimeAgreementDTO, ctaBasicDetailsDTO);
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         return collectiveTimeAgreementDTO;
     }
 
 
+    /**
+     *
+     * @param costTimeAgreement
+     * @param collectiveTimeAgreementDTO
+     * @param doUpdate
+     * @param creatingFromCountry
+     * @param ctaBasicDetailsDTO
+     */
     public void buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, boolean doUpdate, boolean creatingFromCountry,CTABasicDetailsDTO ctaBasicDetailsDTO){
         // Get Rule Templates
-        List<CTARuleTemplate> ruleTemplates = new ArrayList<>();
-        for (CTARuleTemplateDTO ctaRuleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()) {
-            CTARuleTemplate ctaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);
-            CTARuleTemplate.setActivityBasesCostCalculationSettings(ctaRuleTemplate);
-            ruleTemplates.add(ctaRuleTemplate);
-        }
+        List<CTARuleTemplate> ruleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(collectiveTimeAgreementDTO.getRuleTemplates(),CTARuleTemplate.class);
         save(ruleTemplates);
         List<BigInteger> ruleTemplateIds = ruleTemplates.stream().map(rt->rt.getId()).collect(Collectors.toList());
-        costTimeAgreement.setExpertise(new Expertise(ctaBasicDetailsDTO.getExpertise().getId(),ctaBasicDetailsDTO.getExpertise().getName(),ctaBasicDetailsDTO.getExpertise().getDescription()));
-        // if creating fro country and we are not updating then only.
-        if (creatingFromCountry && !doUpdate) {
-            costTimeAgreement.setOrganizationType(new OrganizationType(ctaBasicDetailsDTO.getOrganizationType().getId(),ctaBasicDetailsDTO.getOrganizationType().getName(),ctaBasicDetailsDTO.getOrganizationType().getDescription()));
-            costTimeAgreement.setOrganizationSubType(new OrganizationType(ctaBasicDetailsDTO.getOrganizationSubType().getId(),ctaBasicDetailsDTO.getOrganizationSubType().getName(),ctaBasicDetailsDTO.getOrganizationSubType().getDescription()));
+        if(creatingFromCountry) {
+            Expertise expertise = new Expertise(ctaBasicDetailsDTO.getExpertise().getId(), ctaBasicDetailsDTO.getExpertise().getName(), ctaBasicDetailsDTO.getExpertise().getDescription());
+            costTimeAgreement.setExpertise(expertise);
+            if (!doUpdate) {
+                OrganizationType organizationType = new OrganizationType(ctaBasicDetailsDTO.getOrganizationType().getId(), ctaBasicDetailsDTO.getOrganizationType().getName(), ctaBasicDetailsDTO.getOrganizationType().getDescription());
+                costTimeAgreement.setOrganizationType(organizationType);
+                OrganizationType organizationSubType = new OrganizationType(ctaBasicDetailsDTO.getOrganizationSubType().getId(), ctaBasicDetailsDTO.getOrganizationSubType().getName(), ctaBasicDetailsDTO.getOrganizationSubType().getDescription());
+                costTimeAgreement.setOrganizationSubType(organizationSubType);
+            }
         }
         costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
         costTimeAgreement.setStartDateMillis(collectiveTimeAgreementDTO.getStartDateMillis());
         costTimeAgreement.setEndDateMillis(collectiveTimeAgreementDTO.getEndDateMillis());
     }
 
-    public Boolean publishNewCountryCTAToOrganizationByOrgSubType(Long countryId, CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, Long organizationSubTypeId,CTABasicDetailsDTO ctaBasicDetailsDTO) {
+
+    /**
+     *
+     * @param costTimeAgreement
+     * @param collectiveTimeAgreementDTO
+     * @param ctaBasicDetailsDTO
+     * @return
+     */
+    public Boolean publishNewCountryCTAToOrganizationByOrgSubType( CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO,CTABasicDetailsDTO ctaBasicDetailsDTO) {
         List<Long> organizationIds = ctaBasicDetailsDTO.getOrganizations().stream().map(o->o.getId()).collect(Collectors.toList());
         List<BigInteger> activityIds = collectiveTimeAgreementDTO.getRuleTemplates().stream().filter(ruleTemp->Optional.ofNullable(ruleTemp.getActivityIds()).isPresent()).flatMap(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getActivityIds().stream()).collect(Collectors.toList());
-
-
         HashMap<Long, HashMap<Long, BigInteger>> unitActivities = activityService.getListOfActivityIdsOfUnitByParentIds(activityIds,organizationIds);
         List<CostTimeAgreement> costTimeAgreements = new ArrayList<>(organizationIds.size());
+        costTimeAgreement.setCountryId(null);
         organizationIds.forEach(organizationId ->{
-                CostTimeAgreement newCostTimeAgreement = createCostTimeAgreementForOrganization(collectiveTimeAgreementDTO, unitActivities.get(organizationId),ctaBasicDetailsDTO);
+                CostTimeAgreement newCostTimeAgreement = createCostTimeAgreementForOrganization(costTimeAgreement,collectiveTimeAgreementDTO, unitActivities.get(organizationId),ctaBasicDetailsDTO);
                 costTimeAgreements.add(newCostTimeAgreement);
 
         });
@@ -113,11 +125,17 @@ costTimeAgreement.setId(null);
         return true;
     }
 
-    public CostTimeAgreement createCostTimeAgreementForOrganization(CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, HashMap<Long, BigInteger> parentUnitActivityMap,CTABasicDetailsDTO ctaBasicDetailsDTO) {
 
-        CostTimeAgreement costTimeAgreement = new CostTimeAgreement();
-        BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
-
+    /**
+     *
+     * @param costTimeAgreement
+     * @param collectiveTimeAgreementDTO
+     * @param parentUnitActivityMap
+     * @param ctaBasicDetailsDTO
+     * @return
+     */
+    public CostTimeAgreement createCostTimeAgreementForOrganization(CostTimeAgreement costTimeAgreement,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, HashMap<Long, BigInteger> parentUnitActivityMap,CTABasicDetailsDTO ctaBasicDetailsDTO) {
+        CostTimeAgreement organisationCTA = ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement, CostTimeAgreement.class);
         // Set activity Ids according to unit activity Ids
         for (CTARuleTemplateDTO ruleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()) {
             List<BigInteger> parentActivityIds = ruleTemplateDTO.getActivityIds();
@@ -129,36 +147,71 @@ costTimeAgreement.setId(null);
             });
             ruleTemplateDTO.setActivityIds(unitActivityIds);
         }
-
-        buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, false, false,ctaBasicDetailsDTO);
-
-        this.save(costTimeAgreement);
-        return costTimeAgreement;
+        organisationCTA.setParentCountryCTAId(costTimeAgreement.getId());
+        buildCTA(organisationCTA, collectiveTimeAgreementDTO, false, false,ctaBasicDetailsDTO);
+        return organisationCTA;
     }
 
-    public CollectiveTimeAgreementDTO updateCostTimeAgreement(Long countryId, Long unitId, BigInteger ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
 
-        if (countryId != null && costTimeAgreementRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName(), ctaId)) {
-            exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
-        } else if (unitId != null && costTimeAgreementRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName(), ctaId)) {
+    /**
+     *
+     * @param countryId
+     * @param ctaId
+     * @param collectiveTimeAgreementDTO
+     * @return
+     */
+    public CollectiveTimeAgreementDTO updateCostTimeAgreementInCountry(Long countryId,  BigInteger ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) {
+        boolean ctaExistsInCountry = costTimeAgreementRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName(), ctaId);
+        if (ctaExistsInCountry) {
             exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
         }
         CostTimeAgreement costTimeAgreement = costTimeAgreementRepository.findOne(ctaId);
-
 
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().toString()));
         requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().toString()));
         CTABasicDetailsDTO ctaBasicDetailsDTO = genericRestClient.publishRequest(null, null, false, IntegrationOperation.GET, CTA_BASIC_INFO, requestParam, CTABasicDetailsDTO.class);
+
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
-        BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
-        costTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
-        costTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
-        buildCTA(costTimeAgreement, collectiveTimeAgreementDTO,  true, countryId != null,ctaBasicDetailsDTO);
-        this.save(costTimeAgreement);
+
+        CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
+        updateCostTimeAgreement.setId(costTimeAgreement.getId());
+        updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
+        updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
+        buildCTA(updateCostTimeAgreement, collectiveTimeAgreementDTO,  true, true,ctaBasicDetailsDTO);
+        this.save(updateCostTimeAgreement);
         return collectiveTimeAgreementDTO;
     }
 
+
+    /**
+     *
+     * @param unitId
+     * @param ctaId
+     * @param collectiveTimeAgreementDTO
+     * @return
+     */
+    public CollectiveTimeAgreementDTO updateCostTimeAgreementInUnit( Long unitId, BigInteger ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) {
+        boolean ctaExistInUnit = costTimeAgreementRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName(), ctaId);
+        if (ctaExistInUnit) {
+            exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
+        }
+        CostTimeAgreement costTimeAgreement = costTimeAgreementRepository.findOne(ctaId);
+
+        List<NameValuePair> requestParam = new ArrayList<>();
+        requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().toString()));
+        requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().toString()));
+
+        logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
+
+        CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
+        updateCostTimeAgreement.setId(costTimeAgreement.getId());
+        updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
+        updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
+        buildCTA(updateCostTimeAgreement, collectiveTimeAgreementDTO,  true, false,null);
+        this.save(updateCostTimeAgreement);
+        return collectiveTimeAgreementDTO;
+    }
 
 
 

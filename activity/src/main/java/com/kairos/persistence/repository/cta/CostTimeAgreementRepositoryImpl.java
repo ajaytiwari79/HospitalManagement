@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.repository.Query;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
@@ -26,26 +27,14 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Inject private MongoTemplate mongoTemplate;
 
+
     @Override
-    public List<CTAResponseDTO> findCTAByCountryId(Long countryId){
+    public CTAResponseDTO getOneCtaById(BigInteger ctaId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("countryId").is(countryId)),
-                lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
-                project("name", "description", "disabled", "expertise", "organizationType", "organizationSubType", "countryId", "organization", "parentWTA", "countryParentWTA", "organizationParentWTA", "tags", "startDate", "endDate", "expiryDate", "ruleTemplates")
-
+                match(Criteria.where("id").is(ctaId).and("deleted").is(false)),
+                lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")
         );
-        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
-        return result.getMappedResults();
+        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation,CostTimeAgreement.class,CTAResponseDTO.class);
+        return result.getMappedResults().isEmpty()? null : result.getMappedResults().get(0);
     }
-
-    @Override
-    public List<CTAResponseDTO> getAllCTAByOrganizationSubType(Long organizationSubTypeId){
-        return null;
-    };
-
-    @Override
-    public List<CTAResponseDTO> findCTAByUnitId(Long unitId){
-        return null;
-    }
-
 }

@@ -1,5 +1,6 @@
 package com.kairos.service.agreement.cta;
 
+import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.enums.FixedValueType;
 import com.kairos.persistence.model.agreement.cta.*;
@@ -620,10 +621,8 @@ public class CostTimeAgreementService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
 
         }
-
         CostTimeAgreement oldCTA = collectiveTimeAgreementGraphRepository.getLinkedCTAWithUnitPosition(unitPositionId);
         CostTimeAgreement responseCTA;
-
         if (unitPosition.isPublished()) {
             CostTimeAgreement costTimeAgreement = new CostTimeAgreement();
             ctaDTO.setId(null);
@@ -640,7 +639,6 @@ public class CostTimeAgreementService extends UserBaseService {
             unitPositionService.save(unitPosition);
             responseCTA = new CostTimeAgreement(costTimeAgreement.getId(), costTimeAgreement.getName(), oldCTA.getExpertise(), costTimeAgreement.getRuleTemplates(), costTimeAgreement.getStartDateMillis(), costTimeAgreement.getEndDateMillis(), false);
         } else {
-
             List<Long> ruleTemplateIds = null;
             if (Optional.ofNullable(oldCTA.getRuleTemplates()).isPresent() && !oldCTA.getRuleTemplates().isEmpty()) {
                 ruleTemplateIds = oldCTA.getRuleTemplates().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
