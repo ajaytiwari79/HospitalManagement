@@ -37,7 +37,11 @@ public class AccountTypeService extends MongoBaseService {
         AccountType newAccount = new AccountType();
         newAccount.setName(accountType.getName());
         newAccount.setCountryId(countryId);
-        return accountTypeRepository.save(getNextSequence(newAccount));
+        ArrayList<AccountType> arrayList=new ArrayList();
+         arrayList.add(newAccount);
+
+        accountTypeRepository.saveAll(arrayList);
+        return accountTypeRepository.save(newAccount);
 
     }
 
