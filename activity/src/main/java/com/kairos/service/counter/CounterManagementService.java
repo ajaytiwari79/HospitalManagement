@@ -59,8 +59,7 @@ public class CounterManagementService extends MongoBaseService {
     }
 
     public List<KPIDTO> getKPIsList(Long refId, ConfLevel level) {
-        List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPIByUnitOrCountryOrStaffId(refId,level);
-        List<KPIDTO> kpiDTOs=counterRepository.getEntityItemList(applicableKPIS.stream().map(applicableKPI -> applicableKPI.getActiveKpiId()).collect(Collectors.toList()));
+        List<KPIDTO> kpiDTOs=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
         if(kpiDTOs.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
@@ -76,11 +75,11 @@ public class CounterManagementService extends MongoBaseService {
 
     public void updateCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {
         CategoryAssignment categoryAssignment = counterRepository.getCategoryAssignment(categoryKPIsDetails.getCategoryId(), level, refId);
-        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignments(categoryKPIsDetails.getKpiIds(), level, refId);
+        List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(categoryKPIsDetails.getKpiIds(), level, refId);
         List<CategoryKPIConf> categoryKPIConfs = counterRepository.getCategoryKPIConfs(categoryAssignment.getId());
-        List<BigInteger> kpiAssignmentIds = categoryKPIConfs.stream().map(categoryKPIConf -> categoryKPIConf.getKpiId()).collect(toList());
-        applicableKPIS = applicableKPIS.parallelStream().filter(kpiAssignment -> kpiAssignmentIds.contains(kpiAssignment.getId())).collect(toList());
-        if (applicableKPIS.isEmpty())
+        List<BigInteger> applicableKpiIds = categoryKPIConfs.stream().map(categoryKPIConf -> categoryKPIConf.getKpiId()).collect(toList());
+        applicableKPIS = applicableKPIS.parallelStream().filter(applicableKPI ->  applicableKpiIds.contains(applicableKPI.getId())).collect(toList());
+        if (!applicableKPIS.isEmpty())
             exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
         List<CategoryKPIConf> newCategoryKPIConfs = new ArrayList<>();
         applicableKPIS.parallelStream().forEach(kpiAssignment -> newCategoryKPIConfs.add(new CategoryKPIConf(kpiAssignment.getActiveKpiId(), categoryAssignment.getId())));
@@ -89,30 +88,23 @@ public class CounterManagementService extends MongoBaseService {
 
     //settings for KPI-Module configuration
 
-//    public InitialKPITabDistDataDTO getInitialTabKPIDataConf(String moduleId, Long refId, ConfLevel level){
-//        List<KPIAccessPageDTO> kpiTabs= genericIntegrationService.getKPIEnabledTabsForModule(moduleId, refId);
-//        Map<String, List<BigInteger>> tabKPIsMap = new HashMap<>();
-//        if(kpiTabs != null && kpiTabs.isEmpty()){
-//            exceptionService.dataNotFoundByIdException("error.dist.module_kpi_tabs.not_available");
-//        }
-//        List<TabKPIMappingDTO> mappingDTO = counterRepository.getTabKPIConfigurationByTabIds(kpiTabs.stream().map(kpiTab -> kpiTab.getModuleId()).collect(toList()), level, refId);
-//        return new InitialKPITabDistDataDTO(kpiTabs, mappingDTO);
-//    }
-    public List<BigInteger> getInitialTabKPIDataConf(String moduleId, Long refId, ConfLevel level) {
-        List<TabKPIMappingDTO> tabKPIMappingDTOS=counterRepository.getTabKPIConfigurationByTabIds(Arrays.asList(moduleId),new ArrayList<>(),level,refId);
+    public List<BigInteger> getInitialTabKPIDataConf(String moduleId,Long refId, ConfLevel level) {
+        List<TabKPIMappingDTO> tabKPIMappingDTOS=counterRepository.getTabKPIConfigurationByTabIds(Arrays.asList(moduleId),new ArrayList<>(),refId,level);
         if (tabKPIMappingDTOS == null || tabKPIMappingDTOS.isEmpty()) return new ArrayList<>();
         return tabKPIMappingDTOS.stream().map(tabKPIMappingDTO ->tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
     }
 
-    public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries, ConfLevel level, Long refId) {
-        Long countryId = ConfLevel.COUNTRY.equals(level) ? refId : null;
-        Long unitId = ConfLevel.UNIT.equals(level) ? refId : null;
-        Long staffId = ConfLevel.STAFF.equals(level) ? refId : null;
-        List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),level, refId);
-//        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignmentsByKPIId(tabKPIEntries.getKpiIds());
-//        if (tabKPIMappingDTOS.getKpiIds().size() != tabKPIEntries.size()) {
-//            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
-//        }
+
+    public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries,Long countryId,Long unitId,Long staffId, ConfLevel level) {
+        Long refId = ConfLevel.COUNTRY.equals(level) ? countryId : unitId;
+        if(ConfLevel.STAFF.equals(level)){
+            refId=staffId;
+        }
+        List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),refId,level);
+       List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignmentsByKPIId(tabKPIEntries.getKpiIds(),refId,level);
+        if (tabKPIEntries.getKpiIds().size() != applicableKPIS.size()) {
+            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
+        }
         Map<String, Map<BigInteger, BigInteger>> tabKpiMap = new HashMap<>();
         List<TabKPIConf> entriesToSave = new ArrayList<>();
         tabKPIEntries.getTabIds().forEach(tabKpiId -> {
@@ -149,8 +141,8 @@ public class CounterManagementService extends MongoBaseService {
         Long countryId = ConfLevel.COUNTRY.equals(level)? refId: null;
         Long unitId=ConfLevel.UNIT.equals(level)? refId: null;
         List<AccessGroupKPIEntry> entriesToSave = new ArrayList<>();
-      //  List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignmentsByKPIId(accessGroupKPIConf.getKpiIds());
-//        if (accessGroupKPIConf.getKpiIds().size() != kpiAssignments.size()) {
+//        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignmentsByKPIId(accessGroupKPIConf.getKpiIds(),refId,level);
+//        if (accessGroupKPIConf.getKpiIds().size() != applicableKPIS.size()) {
 //            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
 //        }
         List<AccessGroupMappingDTO> AccessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(accessGroupKPIConf.getAccessGroupIds(),accessGroupKPIConf.getKpiIds(),level,refId);
@@ -198,7 +190,7 @@ public class CounterManagementService extends MongoBaseService {
     }
 
     public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf, Long countryId) {
-//      List<ApplicableKPI> applicableKPIS=counterRepository.getApplicableKPIByKPIId(orgTypeKPIConf.getKpiIds());
+//        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignmentsByKPIId(orgTypeKPIConf.getKpiIds(),countryId,ConfLevel.COUNTRY);
 //        if (orgTypeKPIConf.getKpiIds().size() != applicableKPIS.size()) {
 //            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
 //        }
@@ -252,7 +244,7 @@ public class CounterManagementService extends MongoBaseService {
         });
         List<ApplicableKPI> applicableKPIS = new ArrayList<>();
        applicableKpiIds.forEach(kpiId->{defalutKPISettingDTO.getStaffIds().forEach(staffId->{
-           applicableKPIS.add(new ApplicableKPI(kpiId,kpiId,null,null,staffId,ConfLevel.STAFF));
+           applicableKPIS.add(new ApplicableKPI(kpiId,kpiId,null,unitId,staffId,ConfLevel.STAFF));
        });
        });
        save(applicableKPIS);
@@ -280,11 +272,11 @@ public class CounterManagementService extends MongoBaseService {
     public void setDefaultDateFromCountryToUnit(DefalutKPISettingDTO defalutKPISettingDTO,Long unitId) {
         List<AccessGroupKPIEntry> accessGroupKPIEntries = new ArrayList<>();
         List<TabKPIConf> tabKPIConfKPIEntries=new ArrayList<>();
-        List<ApplicableKPI> applicableKPISForUnit=counterRepository.getApplicableKPIByUnitOrCountryOrStaffId(defalutKPISettingDTO.getCountryId(),ConfLevel.COUNTRY);
-        if(applicableKPISForUnit.isEmpty()){
+        List<ApplicableKPI> applicableKPISForUnitOrCountry=counterRepository.getApplicableKPIByUnitOrCountryOrStaffId(defalutKPISettingDTO.getCountryId(),ConfLevel.COUNTRY);
+        if(applicableKPISForUnitOrCountry.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.applicable.kpi.notfound");
         }
-        List<BigInteger> applicableKpiIds=applicableKPISForUnit.stream().map(applicableKPI -> applicableKPI.getBaseKpiId()).collect(Collectors.toList());
+        List<BigInteger> applicableKpiIds=applicableKPISForUnitOrCountry.stream().map(applicableKPI -> applicableKPI.getBaseKpiId()).collect(Collectors.toList());
         List<Long> countryAccessGroupIds = defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().keySet().stream().collect(Collectors.toList());
         List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, new ArrayList<>(), ConfLevel.COUNTRY, defalutKPISettingDTO.getCountryId());
         if(accessGroupMappingDTOS.isEmpty()){

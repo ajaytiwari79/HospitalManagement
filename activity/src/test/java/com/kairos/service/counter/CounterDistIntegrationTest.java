@@ -2,9 +2,11 @@ package com.kairos.service.counter;
 
 
 import com.kairos.KairosActivityApplication;
+import com.kairos.activity.counter.DefalutKPISettingDTO;
 import com.kairos.activity.counter.KPIDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
+import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
@@ -29,6 +31,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,10 +71,57 @@ public class CounterDistIntegrationTest {
         String baseUrl = getBaseUrl(2567l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>>() {
         };
-        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + "/staff/13429/counter/dist/counters/", HttpMethod.GET, null, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + "/unit/4/staff/801/counter/dist/counters/", HttpMethod.GET, null, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
+    //category kpi test case
+
+    @Test
+    public void getInitialCategoryKPIDistributionDataForCountry() {
+        String baseUrl = getBaseUrl(2567l, 4l);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>>() {
+        };
+        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/category", HttpMethod.GET, null, typeReference);
+        logger.info("Status Code : " + response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void getInitialCategoryKPIDistributionDataForUnit() {
+        String baseUrl = getBaseUrl(2567l, null);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>>() {
+        };
+        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + "/unit/4/counter/dist/category", HttpMethod.GET, null, typeReference);
+        logger.info("Status Code : " + response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void saveCategoryKPIDistributionForCountry() {
+        String baseUrl = getBaseUrl(2567l, 4l);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>>() {
+        };
+        CategoryKPIsDTO categoryKPIsDTO=new CategoryKPIsDTO(BigInteger.valueOf(15),Arrays.asList(BigInteger.valueOf(29)));
+        HttpEntity<CategoryKPIsDTO> requestBodyData=new HttpEntity<>(categoryKPIsDTO);
+        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/category", HttpMethod.POST, requestBodyData, typeReference);
+        logger.info("Status Code : " + response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void saveCategoryKPIDistributionUnit() {
+        String baseUrl = getBaseUrl(2567l, null);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>>() {
+        };
+        CategoryKPIsDTO categoryKPIsDTO=new CategoryKPIsDTO();
+        HttpEntity<CategoryKPIsDTO> requestBodyData=new HttpEntity<>(categoryKPIsDTO);
+        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + "/unit/4/counter/dist/category", HttpMethod.GET, requestBodyData, typeReference);
+        logger.info("Status Code : " + response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+
 
     // tab kpi api test case
     @Test
@@ -118,7 +168,7 @@ public class CounterDistIntegrationTest {
 
     @Test
     public void addTabKPIsEntryForUnit() {
-        String baseUrl = getBaseUrl(152l, 4l);
+        String baseUrl = getBaseUrl(152l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<String>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
         };
         TabKPIEntryConfDTO tabKPIEntryConfDTO = new TabKPIEntryConfDTO(Arrays.asList("1"), Arrays.asList(BigInteger.valueOf(1)));
@@ -130,12 +180,12 @@ public class CounterDistIntegrationTest {
 
     @Test
     public void addTabKPIsEntryForStaff() {
-        String baseUrl = getBaseUrl(152l, 4l);
+        String baseUrl = getBaseUrl(152l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         };
         TabKPIEntryConfDTO tabKPIEntryConfDTO = new TabKPIEntryConfDTO(Arrays.asList("1"), Arrays.asList(BigInteger.valueOf(1)));
         HttpEntity<TabKPIEntryConfDTO> reqestBodyDate = new HttpEntity<>(tabKPIEntryConfDTO);
-        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + "unit/1452/staff/1245/counter/dist/module/create_dist_entry", HttpMethod.POST, reqestBodyDate, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + "/unit/1452/staff/1245/counter/dist/module/create_dist_entry", HttpMethod.POST, reqestBodyDate, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -282,6 +332,36 @@ public class CounterDistIntegrationTest {
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 
+    //defalut setting api test case
+
+    @Test
+    public void createDefaluSettingForUnit(){
+        String baseUrl = getBaseUrl(15l, null);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<String>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
+        };
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap=new HashMap<>();
+        countryAndOrgAccessGroupIdsMap.put(82l,101101l);
+        DefalutKPISettingDTO defalutKPISettingDTO=new DefalutKPISettingDTO(Arrays.asList(14108l),4l,19449l,countryAndOrgAccessGroupIdsMap);
+        HttpEntity<DefalutKPISettingDTO> requestBodyData = new HttpEntity<>(defalutKPISettingDTO);
+        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + "/unit/404/counter/dist/default_kpi_setting", HttpMethod.POST, requestBodyData, typeReference);
+        logger.info("Status Code : " + response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void createDefaluSettingForStaff(){
+        String baseUrl = getBaseUrl(15l, null);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<String>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
+        };
+        DefalutKPISettingDTO defalutKPISettingDTO=new DefalutKPISettingDTO(Arrays.asList(801l));
+        HttpEntity<DefalutKPISettingDTO> requestBodyData = new HttpEntity<>(defalutKPISettingDTO);
+        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + "/unit/19394/counter/dist/staff_default_kpi_setting", HttpMethod.POST, requestBodyData, typeReference);
+        logger.info("Status Code : " + response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+
+    //getbaseurl
     public final String getBaseUrl(Long organizationId, Long countryId) {
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
