@@ -136,7 +136,7 @@ public class DataDisposalService extends MongoBaseService {
         } else {
             exist = dataDisposalMongoRepository.findByid(id);
             exist.setName(dataDisposal.getName());
-            return dataDisposalMongoRepository.save(getNextSequence(exist));
+            return dataDisposalMongoRepository.save(exist);
 
         }
     }

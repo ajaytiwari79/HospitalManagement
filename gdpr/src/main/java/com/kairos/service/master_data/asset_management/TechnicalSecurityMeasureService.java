@@ -132,7 +132,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
         } else {
             exist = technicalSecurityMeasureMongoRepository.findByid(id);
             exist.setName(techSecurityMeasure.getName());
-            return technicalSecurityMeasureMongoRepository.save(getNextSequence(exist));
+            return technicalSecurityMeasureMongoRepository.save(exist);
 
         }
     }

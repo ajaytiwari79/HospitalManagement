@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.data_inventory.processing_activity;
 
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface ProcessingActivityMongoRepository extends MongoRepository<ProcessingActivity,BigInteger>,CustomProcessingActivityRepository {
+public interface ProcessingActivityMongoRepository extends MongoBaseRepository<ProcessingActivity,BigInteger>,CustomProcessingActivityRepository {
 
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")

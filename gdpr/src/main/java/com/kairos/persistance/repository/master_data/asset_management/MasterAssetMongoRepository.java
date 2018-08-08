@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.master_data.MasterAssetBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface MasterAssetMongoRepository extends MongoRepository<MasterAsset,BigInteger> ,CustomMasterAssetRepository{
+public interface MasterAssetMongoRepository extends MongoBaseRepository<MasterAsset,BigInteger>,CustomMasterAssetRepository{
 
 
     @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")

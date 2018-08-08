@@ -116,14 +116,14 @@ public class TemplateTypeService extends MongoBaseService {
      */
     public TemplateType updateTemplateName(BigInteger id, Long countryId, TemplateType templateType) {
 
-        TemplateType exists = templateTypeRepository.findByIdAndNameDeleted(templateType.getName(), countryId);
-        if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
+        TemplateType previousTemplateType = templateTypeRepository.findByIdAndNameDeleted(templateType.getName(), countryId);
+        if (Optional.ofNullable(previousTemplateType).isPresent() && !id.equals(previousTemplateType.getId())) {
             throw new DuplicateDataException("template name exist for  " + templateType.getName());
         }
-        exists = templateTypeRepository.findByIdAndNonDeleted(id, countryId);
-        exists.setName(templateType.getName());
-        templateTypeRepository.save(getNextSequence(exists));
-        return exists;
+        previousTemplateType = templateTypeRepository.findByIdAndNonDeleted(id, countryId);
+        previousTemplateType.setName(templateType.getName());
+        templateTypeRepository.save(previousTemplateType);
+        return previousTemplateType;
 
     }
 

@@ -67,7 +67,7 @@ public class OrganizationDataElementService extends MongoBaseService {
         DataCategory dataCategory = dataCategoryMongoRepository.findByUnitIdAndId(unitId, dataCategoryId);
         List<BigInteger> dataElementIds = dataCategory.getDataElements();
         dataElementIds.remove(dataElementId);
-        dataCategoryMongoRepository.save(getNextSequence(dataCategory));
+        dataCategoryMongoRepository.save(dataCategory);
         dataElementMongoRepository.delete(dataElement);
         return true;
 

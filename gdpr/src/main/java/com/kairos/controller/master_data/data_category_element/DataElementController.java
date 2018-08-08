@@ -93,7 +93,7 @@ public class DataElementController {
 
     @ApiOperation("update  data Element ")
     @PutMapping("/data_element/update/{id}")
-    public ResponseEntity<Object> updateDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataElement dataElements) {
+    public ResponseEntity<Object> updateDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataElementDTO dataElementDTO) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
@@ -103,7 +103,7 @@ public class DataElementController {
         if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.updateDataElement(countryId, organizationId, id, dataElements));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.updateDataElement(countryId, organizationId, id, dataElementDTO));
     }
 
     @ApiOperation("get data Element of unit by id")

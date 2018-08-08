@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.clause_tag;
 
 import com.kairos.persistance.model.clause_tag.ClauseTag;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface ClauseTagMongoRepository extends MongoRepository<ClauseTag,BigInteger> {
+public interface ClauseTagMongoRepository extends MongoBaseRepository<ClauseTag,BigInteger> {
 
     @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
     ClauseTag findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);

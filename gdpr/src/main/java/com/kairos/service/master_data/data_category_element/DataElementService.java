@@ -97,14 +97,14 @@ public class DataElementService extends MongoBaseService {
     }
 
 
-    public DataElement updateDataElement(Long countryId, Long organizationId, BigInteger id, DataElement dataElement) {
+    public DataElement updateDataElement(Long countryId, Long organizationId, BigInteger id, DataElementDTO dataElementDTO) {
 
-        DataElement exist = dataElementMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        DataElement dataElement = dataElementMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        if (!Optional.ofNullable(dataElement).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", id);
         }
-        exist.setName(dataElement.getName());
-        return dataElementMongoRepository.save(getNextSequence(exist));
+        dataElement.setName(dataElementDTO.getName());
+        return dataElementMongoRepository.save(dataElement);
     }
 
     /**

@@ -83,7 +83,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
         questionnaireTemplate.setSections((List<BigInteger>) questionnaireSection.get(IDS_LIST));
         try {
-            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(getNextSequence(questionnaireTemplate));
+            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(questionnaireTemplate);
         } catch (Exception e) {
             masterQuestionnaireSectionRepository.deleteAll((Set<MasterQuestionnaireSection>) questionnaireSection.get(QUESTIONNAIRE_SECTIONS));
             masterQuestionMongoRepository.deleteAll((Set<MasterQuestion>) questionnaireSection.get(QUESTION_LIST));

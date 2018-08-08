@@ -52,13 +52,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      */
     public PolicyAgreementTemplate createBasicPolicyAgreementTemplate(Long countryId, Long organizationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
 
-        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByName(countryId, organizationId, policyAgreementTemplateDto.getName());
-        if (Optional.ofNullable(policyAgreementTemplate).isPresent()) {
+        PolicyAgreementTemplate previousTemplate = policyAgreementTemplateRepository.findByName(countryId, organizationId, policyAgreementTemplateDto.getName());
+        if (Optional.ofNullable(previousTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Policy Agreement Template ", policyAgreementTemplateDto.getName());
         }
         templateTypeService.getTemplateById(policyAgreementTemplateDto.getTemplateTypeId(), countryId);
         List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, policyAgreementTemplateDto.getAccountTypes());
-        PolicyAgreementTemplate newPolicyAgreementTemplate = new PolicyAgreementTemplate(
+        PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(
                 policyAgreementTemplateDto.getName(),
                 policyAgreementTemplateDto.getDescription(),
                 countryId,
@@ -66,16 +66,16 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 policyAgreementTemplateDto.getOrganizationSubTypes(),
                 policyAgreementTemplateDto.getOrganizationServices(),
                 policyAgreementTemplateDto.getOrganizationSubServices());
-        newPolicyAgreementTemplate.setAccountTypes(accountTypes);
-        newPolicyAgreementTemplate.setTemplateType(policyAgreementTemplateDto.getTemplateTypeId());
-        newPolicyAgreementTemplate.setOrganizationId(organizationId);
+        policyAgreementTemplate.setAccountTypes(accountTypes);
+        policyAgreementTemplate.setTemplateType(policyAgreementTemplateDto.getTemplateTypeId());
+        policyAgreementTemplate.setOrganizationId(organizationId);
         try {
-            newPolicyAgreementTemplate = policyAgreementTemplateRepository.save(getNextSequence(newPolicyAgreementTemplate));
+            policyAgreementTemplate = policyAgreementTemplateRepository.save(policyAgreementTemplate);
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e);
         }
-        return newPolicyAgreementTemplate;
+        return policyAgreementTemplate;
 
     }
 

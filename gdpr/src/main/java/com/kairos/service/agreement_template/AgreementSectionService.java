@@ -478,7 +478,7 @@ public class AgreementSectionService extends MongoBaseService {
         PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, orgId, templateId);
         List<BigInteger> agreementSectionIdList = policyAgreementTemplate.getAgreementSections();
         agreementSectionIdList.remove(id);
-        policyAgreementTemplateRepository.save(getNextSequence(policyAgreementTemplate));
+        policyAgreementTemplateRepository.save(policyAgreementTemplate);
         agreementSectionMongoRepository.delete(exist);
         return true;
     }

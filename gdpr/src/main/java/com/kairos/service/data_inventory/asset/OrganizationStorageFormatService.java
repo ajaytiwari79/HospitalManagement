@@ -137,7 +137,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
         } else {
             exist = storageFormatMongoRepository.findByid(id);
             exist.setName(storageFormat.getName());
-            return storageFormatMongoRepository.save(getNextSequence(exist));
+            return storageFormatMongoRepository.save(exist);
 
         }
     }

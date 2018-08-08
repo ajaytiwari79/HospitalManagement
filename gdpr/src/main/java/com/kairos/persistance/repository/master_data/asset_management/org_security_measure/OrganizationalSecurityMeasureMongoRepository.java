@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data.asset_management.org_secur
 
 
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface OrganizationalSecurityMeasureMongoRepository extends MongoRepository<OrganizationalSecurityMeasure,BigInteger> ,CustomOrganizationalSecurityRepository{
+public interface OrganizationalSecurityMeasureMongoRepository extends MongoBaseRepository<OrganizationalSecurityMeasure,BigInteger>,CustomOrganizationalSecurityRepository{
 
 
     @Query("{countryId:?0,_id:?1,deleted:false}")

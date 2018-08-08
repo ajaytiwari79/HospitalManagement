@@ -80,7 +80,7 @@ public class ClauseDTO {
     }
 
     public String getTitle() {
-        return title;
+        return title.trim();
     }
 
     public String getDescription() {

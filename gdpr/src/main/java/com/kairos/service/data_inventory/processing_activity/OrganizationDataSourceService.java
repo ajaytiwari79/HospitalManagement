@@ -130,7 +130,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
         } else {
             exist = dataSourceMongoRepository.findByid(id);
             exist.setName(dataSource.getName());
-            return dataSourceMongoRepository.save(getNextSequence(exist));
+            return dataSourceMongoRepository.save(exist);
 
         }
     }

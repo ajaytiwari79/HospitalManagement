@@ -136,7 +136,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
         } else {
             exist=processingPurposeMongoRepository.findByid(id);
             exist.setName(processingPurpose.getName());
-            return processingPurposeMongoRepository.save(getNextSequence(exist));
+            return processingPurposeMongoRepository.save(exist);
 
         }
     }

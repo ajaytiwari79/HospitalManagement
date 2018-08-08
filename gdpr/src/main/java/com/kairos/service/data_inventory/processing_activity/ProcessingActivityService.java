@@ -45,7 +45,7 @@ public class ProcessingActivityService extends MongoBaseService {
     private ProcessingPurposeService processingPurposeService;
 
 
-    public ProcessingActivity createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
+    public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
 
         ProcessingActivity exist = processingActivityMongoRepository.findByName(organizationId, processingActivityDTO.getName());
@@ -56,8 +56,9 @@ public class ProcessingActivityService extends MongoBaseService {
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
             processingActivity.setSubProcessingActivities(createSubProcessingActivity(organizationId, processingActivityDTO.getSubProcessingActivities()));
         }
-        return processingActivityMongoRepository.save(getNextSequence(processingActivity));
-
+         processingActivityMongoRepository.save(processingActivity);
+         processingActivityDTO.setId(processingActivity.getId());
+         return processingActivityDTO;
     }
 
 
@@ -111,7 +112,7 @@ public class ProcessingActivityService extends MongoBaseService {
         exist.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
         exist.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         exist.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
-        return processingActivityMongoRepository.save(getNextSequence(exist));
+        return processingActivityMongoRepository.save(exist);
 
     }
 

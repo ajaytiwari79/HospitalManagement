@@ -134,7 +134,7 @@ public class TransferMethodService extends MongoBaseService {
         } else {
             exist = transferMethodRepository.findByid(id);
             exist.setName(transferMethod.getName());
-            return transferMethodRepository.save(getNextSequence(exist));
+            return transferMethodRepository.save(exist);
 
         }
     }
