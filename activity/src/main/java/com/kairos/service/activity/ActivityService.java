@@ -1135,7 +1135,7 @@ public class ActivityService extends MongoBaseService {
         }
 
         if(Optional.ofNullable(earliestStartTime).isPresent() &&
-                Optional.ofNullable(latestStartTime).isPresent() &&
+                Optional.ofNullable(latestStartTime).isPresent() && Optional.ofNullable(maximumEndTime).isPresent() &&
                 earliestStartTime.plusMinutes(longestTime).isAfter(maximumEndTime)) {
             exceptionService.actionNotPermittedException("longest.duration.exceed.limit");
         }
