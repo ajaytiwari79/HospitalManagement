@@ -27,9 +27,6 @@ public class TemplateTypeService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
     /**
      * @param countryId
      * @param templateTypeList
@@ -49,7 +46,7 @@ public class TemplateTypeService extends MongoBaseService {
                 throw new InvalidRequestException("name could not be empty or null");
         }
         List<TemplateType> existing = findByNamesAndCountryId(countryId,templateNames,TemplateType.class);
-        templateNames = comparisonUtils.getNameListForMetadata(existing, templateNames);
+        templateNames = ComparisonUtils.getNameListForMetadata(existing, templateNames);
         List<TemplateType> newDataTemplateList = new ArrayList<>();
         if (!templateNames.isEmpty()) {
              for (String name : templateNames) {

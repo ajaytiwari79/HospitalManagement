@@ -5,7 +5,7 @@ import com.kairos.dto.master_data.DataElementDTO;
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
 import com.kairos.service.master_data.data_category_element.DataElementService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,7 @@ public class DataElementController {
 
     @ApiOperation("create  data Element ")
     @PostMapping("/data_element/add")
-    public ResponseEntity<Object> addDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateListOfRequestBody<DataElementDTO> dataElements) {
+    public ResponseEntity<Object> addDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<DataElementDTO> dataElements) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         } else if (organizationId == null) {

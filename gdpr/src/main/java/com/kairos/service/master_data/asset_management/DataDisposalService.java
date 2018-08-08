@@ -28,8 +28,6 @@ public class DataDisposalService extends MongoBaseService {
     @Inject
     private DataDisposalMongoRepository dataDisposalMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
 
 
     /**
@@ -54,7 +52,7 @@ public class DataDisposalService extends MongoBaseService {
             }
 
             List<DataDisposal> existing =  findByNamesAndCountryId(countryId,dataDisposalsNames,DataDisposal.class);
-            dataDisposalsNames = comparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
+            dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
             List<DataDisposal> newDataDisposals = new ArrayList<>();
             if (dataDisposalsNames.size() != 0) {
                 for (String name : dataDisposalsNames) {

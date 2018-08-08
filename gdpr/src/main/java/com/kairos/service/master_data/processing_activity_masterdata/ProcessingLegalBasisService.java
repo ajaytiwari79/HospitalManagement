@@ -31,9 +31,6 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     @Inject
     private ProcessingLegalBasisMongoRepository legalBasisMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
     /**
      * @param countryId
@@ -59,7 +56,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
             }
 
             List<ProcessingLegalBasis> existing =  findByNamesAndCountryId(countryId,legalBasisNames,ProcessingLegalBasis.class);
-            legalBasisNames = comparisonUtils.getNameListForMetadata(existing, legalBasisNames);
+            legalBasisNames = ComparisonUtils.getNameListForMetadata(existing, legalBasisNames);
 
             List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
             if (!legalBasisNames.isEmpty()) {

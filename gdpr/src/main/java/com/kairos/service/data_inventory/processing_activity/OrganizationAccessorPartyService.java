@@ -24,8 +24,6 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
 
 
-    @Inject
-    private ComparisonUtils  comparisonUtils;
 
     @Inject
     private AccessorPartyMongoRepository accessorPartyMongoRepository;
@@ -51,7 +49,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<AccessorParty> existing = findAllByNameAndOrganizationId(organizationId, accessorPartyNames, AccessorParty.class);
-            accessorPartyNames = comparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
+            accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();
             if (!accessorPartyNames.isEmpty()) {

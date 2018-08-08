@@ -1,5 +1,7 @@
-package com.kairos.persistence.model.client;
+package com.kairos.persistence.model.client.relationships;
 
+import com.kairos.persistence.model.client.Client;
+import com.kairos.persistence.model.client.ClientContactPerson;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;

@@ -4,7 +4,7 @@ package com.kairos.controller.agreement_template;
 import com.kairos.dto.master_data.AgreementSectionDTO;
 import com.kairos.service.agreement_template.AgreementSectionService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class AgreementSectionController {
 
     @ApiOperation("add section to Agreement template ")
     @PostMapping(value = "/agreement_template/{templateId}/section")
-    public ResponseEntity<Object> createAgreementSection(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @RequestBody ValidateListOfRequestBody<AgreementSectionDTO> agreementSection) {
+    public ResponseEntity<Object> createAgreementSection(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @RequestBody ValidateRequestBodyList<AgreementSectionDTO> agreementSection) {
 
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");

@@ -31,9 +31,6 @@ public class DataSourceService extends MongoBaseService {
     @Inject
     private DataSourceMongoRepository dataSourceMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
     /**
      * @param countryId
@@ -47,7 +44,7 @@ public class DataSourceService extends MongoBaseService {
 
         Map<String, List<DataSource>> result = new HashMap<>();
         Set<String> dataSourceNames = new HashSet<>();
-        if (dataSources.size() != 0) {
+        if (!dataSources.isEmpty()) {
             for (DataSource dataSource : dataSources) {
                 if (!StringUtils.isBlank(dataSource.getName())) {
                     dataSourceNames.add(dataSource.getName());
@@ -55,10 +52,10 @@ public class DataSourceService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<DataSource> existing = findByNamesAndCountryId(countryId, dataSourceNames, DataSource.class);
-            dataSourceNames = comparisonUtils.getNameListForMetadata(existing, dataSourceNames);
+            dataSourceNames = ComparisonUtils.getNameListForMetadata(existing, dataSourceNames);
 
             List<DataSource> newDataSources = new ArrayList<>();
-            if (dataSourceNames.size() != 0) {
+            if (!dataSourceNames.isEmpty()) {
                 for (String name : dataSourceNames) {
 
                     DataSource newDataSource = new DataSource(name);

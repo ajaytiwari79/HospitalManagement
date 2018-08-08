@@ -34,9 +34,6 @@ public class AccessorPartyService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
     /**
      * @param countryId
@@ -58,7 +55,7 @@ public class AccessorPartyService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<AccessorParty> existing = findByNamesAndCountryId(countryId, accessorPartyNames, AccessorParty.class);
-            accessorPartyNames = comparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
+            accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();
             if (!accessorPartyNames.isEmpty()) {

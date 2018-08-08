@@ -1,4 +1,4 @@
-package com.kairos.utils.codec;
+package com.kairos.config.codec;
 
 import org.bson.BsonReader;
 import org.bson.BsonWriter;

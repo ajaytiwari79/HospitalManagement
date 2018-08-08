@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.client.NextToKinDTO;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
@@ -348,7 +349,19 @@ public class User extends UserBaseEntity {
         this.contactDetail = contactDetail;
     }
 
-
+    /**
+     * @Use   while uploading multiple client in batch
+     * @param firstName
+     * @param lastName
+     * @param cprNumber
+     * @param dateOfBirth
+     */
+    public User(String firstName, String lastName,String cprNumber,  Date dateOfBirth) {
+        this.cprNumber = cprNumber;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+    }
 
     /**
      * User Constructor
@@ -476,5 +489,13 @@ public class User extends UserBaseEntity {
 
     public void setUserLanguage(SystemLanguage userLanguage) {
         this.userLanguage = userLanguage;
+    }
+    public void setBasicDetail(NextToKinDTO nextToKinDTO) {
+        this.setFirstName(nextToKinDTO.getFirstName());
+        this.setLastName(nextToKinDTO.getLastName());
+        this.setNickName(nextToKinDTO.getNickName());
+        this.setCprNumber(nextToKinDTO.getCprNumber());
+        Integer ageVariable = Integer.valueOf(nextToKinDTO.getCprNumber().substring(nextToKinDTO.getCprNumber().length() - 1));
+        this.setGender((ageVariable % 2 == 0) ? Gender.FEMALE : Gender.MALE);
     }
 }

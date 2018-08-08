@@ -11,15 +11,15 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
-public class OrganizationLevelPayTableDTO {
+public class OrganizationLevelPayGroupAreaDTO {
 
     private Long id;
     private String name;
     private String description;
-    List<PayTable> payTables;
-    List<PayGroupArea> payGroupAreas;
+    private Integer payTablesCount;
+    private List<PayGroupArea> payGroupAreas;
 
-    public OrganizationLevelPayTableDTO() {
+    public OrganizationLevelPayGroupAreaDTO() {
     }
 
     public Long getId() {
@@ -46,12 +46,12 @@ public class OrganizationLevelPayTableDTO {
         this.description = description;
     }
 
-    public List<PayTable> getPayTables() {
-        return payTables;
+    public Integer getPayTablesCount() {
+        return payTablesCount;
     }
 
-    public void setPayTables(List<PayTable> payTables) {
-        this.payTables = payTables;
+    public void setPayTablesCount(Integer payTablesCount) {
+        this.payTablesCount = payTablesCount;
     }
 
     public List<PayGroupArea> getPayGroupAreas() {

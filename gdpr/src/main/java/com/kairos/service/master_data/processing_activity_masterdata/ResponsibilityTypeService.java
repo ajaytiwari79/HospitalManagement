@@ -31,9 +31,6 @@ public class ResponsibilityTypeService extends MongoBaseService {
     @Inject
     private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
     /**
 
@@ -58,7 +55,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
             }
             List<ResponsibilityType> existing =  findByNamesAndCountryId(countryId,responsibilityTypeNames,ResponsibilityType.class);
-            responsibilityTypeNames = comparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
+            responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
 
             List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
             if (!responsibilityTypeNames.isEmpty()) {

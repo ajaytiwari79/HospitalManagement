@@ -1,7 +1,8 @@
-package com.kairos.persistence.model.client;
+package com.kairos.persistence.model.client.queryResults;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.client.ClientEnum;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
@@ -18,12 +19,22 @@ public class ClientMinimumDTO {
     private String name;
     private Boolean hasSameAddress;
     private boolean updateAddressOfAllHouseholdMembers;
+    private ClientEnum clientType=ClientEnum.INDIVIDUAL;
+    public ClientMinimumDTO() {
 
+    }
     public ClientMinimumDTO(String firstName, String lastName, String cprNumber, boolean updateAddressOfAllHouseholdMembers) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.cprnumber = cprNumber;
         this.updateAddressOfAllHouseholdMembers = updateAddressOfAllHouseholdMembers;
+    }
+
+    public ClientMinimumDTO(long id, String firstName, String lastName, Boolean hasSameAddress) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.hasSameAddress = hasSameAddress;
     }
 
     public Boolean getHasSameAddress() {
@@ -78,6 +89,19 @@ public class ClientMinimumDTO {
         this.updateAddressOfAllHouseholdMembers = updateAddressOfAllHouseholdMembers;
     }
 
-    public ClientMinimumDTO() {
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isUpdateAddressOfAllHouseholdMembers() {
+        return updateAddressOfAllHouseholdMembers;
+    }
+
+    public ClientEnum getClientType() {
+        return clientType;
+    }
+
+    public void setClientType(ClientEnum clientType) {
+        this.clientType = clientType;
     }
 }

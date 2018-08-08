@@ -32,9 +32,6 @@ public class OrganizationHostingProviderService extends MongoBaseService {
     private HostingProviderMongoRepository hostingProviderMongoRepository;
 
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
     /**
      * @param organizationId
      * @param hostingProviders
@@ -55,7 +52,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<HostingProvider> existing = findAllByNameAndOrganizationId(organizationId, hostingProviderNames, HostingProvider.class);
-            hostingProviderNames = comparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
+            hostingProviderNames = ComparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
             List<HostingProvider> newHostingProviders = new ArrayList<>();
             if (!hostingProviderNames.isEmpty()) {
                 for (String name : hostingProviderNames) {

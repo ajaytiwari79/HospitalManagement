@@ -11,7 +11,7 @@ import java.util.List;
 public class ClientFilterDTO {
     private String name;
     private String cprNumber;
-    private int phoneNumber;
+    private Integer phoneNumber;
     private String clientStatus;
     private List<String> taskTypes;
     private List<Long> servicesTypes;
@@ -27,11 +27,11 @@ public class ClientFilterDTO {
         this.name = name;
     }
 
-    public int getPhoneNumber() {
+    public Integer getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(int phoneNumber) {
+    public void setPhoneNumber(Integer phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 

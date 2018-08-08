@@ -29,9 +29,6 @@ public class HostingProviderService extends MongoBaseService {
     private HostingProviderMongoRepository hostingProviderMongoRepository;
 
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
     /**
      * @description this method create new HostingProvider if HostingProvider not exist with same name ,
      * and if exist then simply add  HostingProvider to existing list and return list ;
@@ -53,7 +50,7 @@ public class HostingProviderService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
             }
             List<HostingProvider> existing  = findByNamesAndCountryId(countryId,hostingProviderNames,HostingProvider.class);
-            hostingProviderNames = comparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
+            hostingProviderNames = ComparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
             List<HostingProvider> newHostingProviders = new ArrayList<>();
             if (hostingProviderNames.size()!=0) {
                 for (String name : hostingProviderNames) {
