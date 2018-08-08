@@ -106,7 +106,7 @@ public class MasterQuestionService extends MongoBaseService {
         }
         questionsIdList.remove(id);
         questionnaireSection.setQuestions(questionsIdList);
-        masterQuestionnaireSectionRepository.save(getNextSequence(questionnaireSection));
+        masterQuestionnaireSectionRepository.save(questionnaireSection);
         delete(exist);
         return true;
 

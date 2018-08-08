@@ -44,6 +44,7 @@ public class MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
 
+    /*
     public <T extends MongoBaseEntity> T getNextSequence(T entity) {
 
         Assert.notNull(entity, "Entity must not be null!");
@@ -64,7 +65,7 @@ public class MongoBaseService {
         // Set updatedAt time as current time
         entity.setUpdatedAt(DateUtils.getDate());
         return entity;
-    }
+    }*/
 
     public <T extends MongoBaseEntity> List<T> getNextSequence(List<T> entities) {
         Assert.notNull(entities, "Entity must not be null!");

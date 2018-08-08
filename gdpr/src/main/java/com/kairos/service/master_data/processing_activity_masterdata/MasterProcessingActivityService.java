@@ -58,7 +58,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         masterProcessingActivity.setCountryId(countryId);
         masterProcessingActivity.setOrganizationId(organizationId);
         try {
-            masterProcessingActivity = masterProcessingActivityRepository.save(getNextSequence(masterProcessingActivity));
+            masterProcessingActivity = masterProcessingActivityRepository.save(masterProcessingActivity);
         } catch (MongoClientException e) {
             masterProcessingActivityRepository.deleteAll((List<MasterProcessingActivity>) subProcessingActivity.get(PROCESSING_ACTIVITIES));
             LOGGER.info(e.getMessage());
@@ -123,27 +123,27 @@ public class MasterProcessingActivityService extends MongoBaseService {
      */
     public MasterProcessingActivity updateMasterProcessingActivityAndSubProcessingActivities(Long countryId, Long organizationId, BigInteger id, MasterProcessingActivityDTO masterProcessingActivityDto) {
 
-        MasterProcessingActivity exists = masterProcessingActivityRepository.findByName(countryId, organizationId, masterProcessingActivityDto.getName());
-        if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
-            throw new DuplicateDataException("processing Activity with name Already Exist" + exists.getName());
+        MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByName(countryId, organizationId, masterProcessingActivityDto.getName());
+        if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
+            throw new DuplicateDataException("processing Activity with name Already Exist" + processingActivity.getName());
         }
-        exists = masterProcessingActivityRepository.findByid(id);
-        if (!Optional.ofNullable(exists).isPresent()) {
+        processingActivity = masterProcessingActivityRepository.findByid(id);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
         } else {
             Map<String, Object> subProcessingActivity = new HashMap<>();
             if (!masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
                 subProcessingActivity = updateExistingAndCreateNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto);
-                exists.setSubProcessingActivityIds((List<BigInteger>) subProcessingActivity.get(IDS_LIST));
+                processingActivity.setSubProcessingActivityIds((List<BigInteger>) subProcessingActivity.get(IDS_LIST));
             }
-            exists.setOrganizationTypes(masterProcessingActivityDto.getOrganizationTypes());
-            exists.setOrganizationSubTypes(masterProcessingActivityDto.getOrganizationSubTypes());
-            exists.setOrganizationServices(masterProcessingActivityDto.getOrganizationServices());
-            exists.setOrganizationSubServices(masterProcessingActivityDto.getOrganizationSubServices());
-            exists.setDescription(masterProcessingActivityDto.getDescription());
-            exists.setName(masterProcessingActivityDto.getName());
+            processingActivity.setOrganizationTypes(masterProcessingActivityDto.getOrganizationTypes());
+            processingActivity.setOrganizationSubTypes(masterProcessingActivityDto.getOrganizationSubTypes());
+            processingActivity.setOrganizationServices(masterProcessingActivityDto.getOrganizationServices());
+            processingActivity.setOrganizationSubServices(masterProcessingActivityDto.getOrganizationSubServices());
+            processingActivity.setDescription(masterProcessingActivityDto.getDescription());
+            processingActivity.setName(masterProcessingActivityDto.getName());
             try {
-                exists = masterProcessingActivityRepository.save(getNextSequence(exists));
+                processingActivity = masterProcessingActivityRepository.save(processingActivity);
 
             } catch (MongoClientException e) {
                 LOGGER.info(e.getMessage());
@@ -152,7 +152,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
                 throw new RuntimeException(e.getMessage());
             }
         }
-        return exists;
+        return processingActivity;
     }
 
 

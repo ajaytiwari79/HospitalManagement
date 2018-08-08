@@ -135,7 +135,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
         } else {
             exist=responsibilityTypeMongoRepository.findByid(id);
             exist.setName(responsibilityType.getName());
-            return responsibilityTypeMongoRepository.save(getNextSequence(exist));
+            return responsibilityTypeMongoRepository.save(exist);
 
         }
     }

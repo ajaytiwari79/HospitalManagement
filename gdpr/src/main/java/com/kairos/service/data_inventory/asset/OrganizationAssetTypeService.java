@@ -65,7 +65,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         assetType.setName(assetTypeDto.getName());
         assetType.setOrganizationId(organizationId);
         try {
-            assetType = assetTypeMongoRepository.save(getNextSequence(assetType));
+            assetType = assetTypeMongoRepository.save(assetType);
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -175,13 +175,13 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      * @description method simply (update already exit Sub asset types if id is present)and (add create new sub asset types if id is not present in sub asset types)
      */
     public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long organizationId, BigInteger id, AssetTypeDTO assetTypeDto) {
-        AssetType exist = assetTypeMongoRepository.findByNameAndOrganizationId(organizationId, assetTypeDto.getName());
-        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
+        AssetType assetType = assetTypeMongoRepository.findByNameAndOrganizationId(organizationId, assetTypeDto.getName());
+        if (Optional.ofNullable(assetType).isPresent() && !id.equals(assetType.getId())) {
             throw new DuplicateDataException("data  exist for  " + assetTypeDto.getName());
         }
 
-        exist = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        exist.setName(assetTypeDto.getName());
+        assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        assetType.setName(assetTypeDto.getName());
         List<AssetTypeDTO> newSubAssetTypesList = new ArrayList<>();
         List<AssetTypeDTO> updateExistingSubAssetTypes = new ArrayList<>();
         assetTypeDto.getSubAssetTypes().forEach(subAssetTypeDto -> {
@@ -203,8 +203,8 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         }
 
         try {
-            exist.setSubAssetTypes(updatedAndNewSubAssetTypeIds);
-            exist = assetTypeMongoRepository.save(getNextSequence(exist));
+            assetType.setSubAssetTypes(updatedAndNewSubAssetTypeIds);
+            assetType = assetTypeMongoRepository.save(assetType);
         } catch (Exception e) {
             List<AssetType> subAssetTypes = new ArrayList<>();
             subAssetTypes.addAll((List<AssetType>) newSubAssetTypes.get(ASSET_TYPES_LIST));
@@ -214,7 +214,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
             throw new RuntimeException(e.getMessage());
 
         }
-        return exist;
+        return assetType;
 
     }
 

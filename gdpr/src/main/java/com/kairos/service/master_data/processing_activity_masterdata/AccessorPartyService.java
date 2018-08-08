@@ -127,7 +127,7 @@ public class AccessorPartyService extends MongoBaseService {
         } else {
             exist = accessorPartyMongoRepository.findByid(id);
             exist.setName(accessorParty.getName());
-            return accessorPartyMongoRepository.save(getNextSequence(exist));
+            return accessorPartyMongoRepository.save(exist);
 
         }
     }

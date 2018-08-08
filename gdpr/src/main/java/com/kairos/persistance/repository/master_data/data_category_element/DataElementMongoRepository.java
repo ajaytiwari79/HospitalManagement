@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.data_category_element;
 
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface DataElementMongoRepository extends MongoRepository<DataElement, BigInteger> {
+public interface DataElementMongoRepository extends MongoBaseRepository<DataElement, BigInteger> {
 
     DataElement findByid(BigInteger id);
 

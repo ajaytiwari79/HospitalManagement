@@ -135,7 +135,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
         } else {
             exist=legalBasisMongoRepository.findByid(id);
             exist.setName(legalBasis.getName());
-            return legalBasisMongoRepository.save(getNextSequence(exist));
+            return legalBasisMongoRepository.save(exist);
 
         }
     }

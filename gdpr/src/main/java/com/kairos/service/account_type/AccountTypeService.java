@@ -37,10 +37,6 @@ public class AccountTypeService extends MongoBaseService {
         AccountType newAccount = new AccountType();
         newAccount.setName(accountType.getName());
         newAccount.setCountryId(countryId);
-        ArrayList<AccountType> arrayList=new ArrayList();
-         arrayList.add(newAccount);
-
-        accountTypeRepository.saveAll(arrayList);
         return accountTypeRepository.save(newAccount);
 
     }
@@ -86,13 +82,13 @@ public class AccountTypeService extends MongoBaseService {
 
     public AccountType updateAccountTypeName(Long countryId, BigInteger id, AccountType accountType) {
 
-        AccountType exists = accountTypeRepository.findByName(countryId, accountType.getName());
-        if (Optional.ofNullable(exists).isPresent() && !id.equals(exists.getId())) {
+        AccountType previousAccountType = accountTypeRepository.findByName(countryId, accountType.getName());
+        if (Optional.ofNullable(previousAccountType).isPresent() && !id.equals(previousAccountType.getId())) {
             throw new DuplicateDataException("Account type exist for " + accountType.getName());
         }
-        exists = accountTypeRepository.findByIdAndNonDeleted(countryId, id);
-        exists.setName(accountType.getName());
-        return accountTypeRepository.save(getNextSequence(exists));
+        previousAccountType = accountTypeRepository.findByIdAndNonDeleted(countryId, id);
+        previousAccountType.setName(accountType.getName());
+        return accountTypeRepository.save(previousAccountType);
 
     }
 

@@ -135,7 +135,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
         } else {
             exist = organizationalSecurityMeasureMongoRepository.findByid(id);
             exist.setName(orgSecurityMeasure.getName());
-            return organizationalSecurityMeasureMongoRepository.save(getNextSequence(exist));
+            return organizationalSecurityMeasureMongoRepository.save(exist);
 
         }
     }

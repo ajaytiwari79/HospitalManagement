@@ -136,7 +136,7 @@ public class HostingProviderService extends MongoBaseService {
         } else {
             exist=hostingProviderMongoRepository.findByid(id);
             exist.setName(hostingProvider.getName());
-            return hostingProviderMongoRepository.save(getNextSequence(exist));
+            return hostingProviderMongoRepository.save(exist);
 
         }
     }

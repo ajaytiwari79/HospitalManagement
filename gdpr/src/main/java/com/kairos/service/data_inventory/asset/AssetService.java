@@ -44,8 +44,8 @@ public class AssetService extends MongoBaseService {
 
 
     public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
-        Asset existingAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
-        if (Optional.ofNullable(existingAsset).isPresent()) {
+        Asset previousAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
+        if (Optional.ofNullable(previousAsset).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
         }
         AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
@@ -58,20 +58,20 @@ public class AssetService extends MongoBaseService {
                 }
             }
         }
-        Asset newAsset = new Asset(assetDTO.getName(), assetDTO.getDescription(), assetDTO.getHostingLocation(),
+        Asset asset = new Asset(assetDTO.getName(), assetDTO.getDescription(), assetDTO.getHostingLocation(),
                 assetDTO.getAssetType(), assetDTO.getAssetSubTypes(), assetDTO.getManagingDepartment(), assetDTO.getAssetOwner(), true);
-        newAsset.setOrganizationId(organizationId);
-        newAsset.setHostingProvider(assetDTO.getHostingProvider());
-        newAsset.setHostingType(assetDTO.getHostingType());
-        newAsset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
-        newAsset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
-        newAsset.setStorageFormats(assetDTO.getStorageFormats());
-        newAsset.setDataDisposal(assetDTO.getDataDisposal());
-        newAsset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
-        newAsset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
-        newAsset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
-        newAsset = assetMongoRepository.save(getNextSequence(newAsset));
-        assetDTO.setId(newAsset.getId());
+        asset.setOrganizationId(organizationId);
+        asset.setHostingProvider(assetDTO.getHostingProvider());
+        asset.setHostingType(assetDTO.getHostingType());
+        asset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
+        asset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
+        asset.setStorageFormats(assetDTO.getStorageFormats());
+        asset.setDataDisposal(assetDTO.getDataDisposal());
+        asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
+        asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
+        asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
+        asset = assetMongoRepository.save(asset);
+        assetDTO.setId(asset.getId());
         return assetDTO;
     }
 
@@ -157,7 +157,7 @@ public class AssetService extends MongoBaseService {
             }
         }
         ObjectMapperUtils.copyProperties(assetDTO, asset);
-        assetMongoRepository.save(getNextSequence(asset));
+        assetMongoRepository.save(asset);
         return assetDTO;
     }
 

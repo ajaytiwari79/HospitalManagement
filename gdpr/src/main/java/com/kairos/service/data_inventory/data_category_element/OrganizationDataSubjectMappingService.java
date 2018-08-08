@@ -155,7 +155,8 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
         }
         dataSubjectMapping.setName(dataSubjectMappingDTO.getName());
         dataSubjectMapping.setDataCategories(dataSubjectMappingDTO.getDataCategories());
-        dataSubjectMappingRepository.save(getNextSequence(dataSubjectMapping));
+        dataSubjectMappingRepository.save(dataSubjectMapping);
+        dataSubjectMappingDTO.setId(dataSubjectMapping.getId());
         return dataSubjectMappingDTO;
 
 

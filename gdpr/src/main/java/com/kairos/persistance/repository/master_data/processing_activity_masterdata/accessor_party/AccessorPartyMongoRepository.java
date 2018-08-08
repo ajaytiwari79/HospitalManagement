@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data.processing_activity_master
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -15,7 +16,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface AccessorPartyMongoRepository extends MongoRepository<AccessorParty,BigInteger> ,CustomAccessorPartyRepository {
+public interface AccessorPartyMongoRepository extends MongoBaseRepository<AccessorParty,BigInteger>,CustomAccessorPartyRepository {
 
 
 

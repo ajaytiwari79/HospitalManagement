@@ -65,7 +65,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         questionnaireTemplate.setOrganizationId(organizationId);
         questionnaireTemplate = buildQuestionnaireTemplate(templateDto, questionnaireTemplate);
         try {
-            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(getNextSequence(questionnaireTemplate));
+            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(questionnaireTemplate);
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new MongoException(e.getMessage());
@@ -147,24 +147,24 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * @return updated Questionnaire template with basic data (name,description ,template type)
      */
     public MasterQuestionnaireTemplate updateQuestionnaireTemplate(Long countryId, Long orgId,BigInteger id, MasterQuestionnaireTemplateDTO templateDto) {
-        MasterQuestionnaireTemplate existing = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId,orgId,templateDto.getName().trim());
-        if (Optional.ofNullable(existing).isPresent() && !id.equals(existing.getId())) {
+        MasterQuestionnaireTemplate questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId,orgId,templateDto.getName().trim());
+        if (Optional.ofNullable(questionnaireTemplate).isPresent() && !id.equals(questionnaireTemplate.getId())) {
             throw new DuplicateDataException("Template Exists with same name "+templateDto.getName());
         }
-        existing = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId,orgId,id);
-        if (!Optional.ofNullable(existing).isPresent()) {
+        questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.findByIdAndNonDeleted(countryId,orgId,id);
+        if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.dataNotFound", "questionnaire template", id);
         }
-        existing.setName(templateDto.getName());
-        existing.setDescription(templateDto.getDescription());
-        existing = buildQuestionnaireTemplate(templateDto, existing);
+        questionnaireTemplate.setName(templateDto.getName());
+        questionnaireTemplate.setDescription(templateDto.getDescription());
+        questionnaireTemplate = buildQuestionnaireTemplate(templateDto, questionnaireTemplate);
         try {
-            existing = masterQuestionnaireTemplateMongoRepository.save(getNextSequence(existing));
+            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(questionnaireTemplate);
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new MongoException(e.getMessage());
         }
-        return existing;
+        return questionnaireTemplate;
     }
 
     /**
