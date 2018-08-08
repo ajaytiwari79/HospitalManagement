@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.client;
+package com.kairos.wrapper;
 
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.user.staff.client.ClientExceptionTypesDTO;

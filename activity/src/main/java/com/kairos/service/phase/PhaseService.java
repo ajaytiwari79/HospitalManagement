@@ -149,14 +149,12 @@ public class PhaseService extends MongoBaseService {
     }
 
     private Phase buildPhaseForCountry(PhaseDTO phaseDTO) {
-        Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(),
+        return new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(),
                 phaseDTO.getCountryId(), phaseDTO.getOrganizationId(), phaseDTO.getParentCountryPhaseId(), phaseDTO.getPhaseType(), phaseDTO.getStatus());
-        return phase;
     }
 
     public List<PhaseDTO> getPhasesByCountryId(Long countryId) {
-        List<PhaseDTO> phases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
-        return phases;
+        return phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
     }
 
     public Map<String, List<PhaseDTO>> getPhasesWithCategoryByCountryId(Long countryId) {
@@ -168,14 +166,12 @@ public class PhaseService extends MongoBaseService {
     }
 
     public List<PhaseDTO> getApplicablePlanningPhasesByOrganizationId(Long orgId, Sort.Direction direction) {
-        List<PhaseDTO> phases = phaseMongoRepository.getApplicablePlanningPhasesByUnit(orgId, direction);
-        return phases;
-    }
+           return  phaseMongoRepository.getApplicablePlanningPhasesByUnit(orgId, direction);
+        }
 
     public List<PhaseDTO> getActualPhasesByOrganizationId(Long orgId) {
-        List<PhaseDTO> phases = phaseMongoRepository.getActualPhasesByUnit(orgId);
-        return phases;
-    }
+        return phaseMongoRepository.getActualPhasesByUnit(orgId);
+        }
 
 
     public boolean deletePhase(Long countryId, BigInteger phaseId) {
@@ -218,7 +214,7 @@ public class PhaseService extends MongoBaseService {
             else
                 return -1;
         });
-        if (weekDifference < 0) {
+        if (weekDifference <= 0) {
             Optional<Phase> phaseOptional = phases.stream().findFirst();
             phase = phaseOptional.get();
             return phase;
@@ -364,7 +360,7 @@ public class PhaseService extends MongoBaseService {
         int weekDifference = proposedWeekNumber-startWeekNumber;
 
         weekDifference++; // 34-30  its 4 but actually we need 5 including currently
-        if (weekDifference < 0) {
+        if (weekDifference <= 0) {
             Optional<Phase> phaseOptional = phases.stream().findFirst();
             if(phaseOptional.isPresent()){
                 phase = phaseOptional.get();

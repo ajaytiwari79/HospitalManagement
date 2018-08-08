@@ -1,5 +1,6 @@
-package com.kairos.persistence.model.client;
+package com.kairos.persistence.model.client.queryResults;
 
+import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.HousingType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;

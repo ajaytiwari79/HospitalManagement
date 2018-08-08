@@ -28,9 +28,9 @@ public class ProcessingPurposeMongoRepositoryImpl implements CustomProcessingPur
     @Override
     public List<ProcessingPurposeResponseDTO> getAllNotInheritedProcessingPurposesFromParentOrgAndUnitProcessingPurpose(Long countryId, Long parentOrganizationId, Long organizationId) {
 
-            Document groupOPerationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
+            Document groupOperationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
             Document projectionForFilteringDuplicateDataOfOrgAndParentOrg = Document.parse(CustomAggregationQuery.metaDataProjectionForRemovingDuplicateInheritedMetaData(organizationId));
-            Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionforAddingFinalDataObject());
+            Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionForAddingFinalDataObject());
             Document replaceRootOperation = Document.parse(CustomAggregationQuery.metaDataReplaceRoot());
 
 
@@ -39,7 +39,7 @@ public class ProcessingPurposeMongoRepositoryImpl implements CustomProcessingPur
 
             Aggregation aggregation = Aggregation.newAggregation(
                     match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).in(orgIdList)),
-                    new CustomAggregationOperation(groupOPerationForDuplicateDataOnInheritingFromParentOrg),
+                    new CustomAggregationOperation(groupOperationForDuplicateDataOnInheritingFromParentOrg),
                     new CustomAggregationOperation(projectionForFilteringDuplicateDataOfOrgAndParentOrg),
                     new CustomAggregationOperation(projectionOperation),
                     new CustomAggregationOperation(replaceRootOperation)

@@ -27,7 +27,7 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
     private MongoTemplate mongoTemplate;
 
 
-    private Document projectionOpertaion = Document.parse(CustomAggregationQuery.assetProjectionWithMetaData());
+    private Document projectionOperation = Document.parse(CustomAggregationQuery.assetProjectionWithMetaData());
 
 
     @Override
@@ -46,12 +46,12 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
                 lookup("storage_format", "storageFormats", "_id", "storageFormats"),
                 lookup("organization_security_measure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
                 lookup("technical_security_measure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
-                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
-                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
+                lookup("asset_type", "assetType", "_id", "assetType"),
                 lookup("hosting_provider", "hostingProvider", "_id", "hostingProvider"),
                 lookup("hosting_type", "hostingType", "_id", "hostingType"),
                 lookup("data_disposal", "dataDisposal", "_id", "dataDisposal"),
-                new CustomAggregationOperation(projectionOpertaion)
+                new CustomAggregationOperation(projectionOperation)
         );
 
         AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);
@@ -68,12 +68,12 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
                 lookup("storage_format", "storageFormats", "_id", "storageFormats"),
                 lookup("organization_security_measure", "orgSecurityMeasures", "_id", "orgSecurityMeasures"),
                 lookup("technical_security_measure", "technicalSecurityMeasures", "_id", "technicalSecurityMeasures"),
-                lookup("assetType", "assetSubTypes", "_id", "assetSubTypes"),
-                lookup("assetType", "assetType", "_id", "assetType"),
+                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
+                lookup("asset_type", "assetType", "_id", "assetType"),
                 lookup("hosting_provider", "hostingProvider", "_id", "hostingProvider"),
                 lookup("hosting_type", "hostingType", "_id", "hostingType"),
                 lookup("data_disposal", "dataDisposal", "_id", "dataDisposal"),
-                new CustomAggregationOperation(projectionOpertaion)
+                new CustomAggregationOperation(projectionOperation)
 
         );
         AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);

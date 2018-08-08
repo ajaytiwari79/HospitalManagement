@@ -9,7 +9,6 @@ import com.kairos.persistance.model.data_inventory.Staff;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
@@ -78,7 +77,7 @@ public class AssetDTO {
 
     public void setId(BigInteger id) { this.id = id; }
 
-    public String getName() { return name; }
+    public String getName() { return name.trim(); }
 
     public void setName(String name) { this.name = name; }
 

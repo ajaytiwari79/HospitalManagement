@@ -12,7 +12,6 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,7 +40,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         String unitIdString = pathVariables.get("unitId");
         String countryIdString = pathVariables.get("countryId");
         log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
-                + "]" + request.getRequestURI() + "[ orgainzationID ,Unit Id " + orgIdString + " ," + unitIdString + " ]");
+                + "]" + request.getRequestURI() + "[ organizationID ,Unit Id " + orgIdString + " ," + unitIdString + " ]");
 
         if (orgIdString != null) {
             final Long orgId = Long.valueOf(orgIdString);

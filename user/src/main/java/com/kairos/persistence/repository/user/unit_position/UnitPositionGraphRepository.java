@@ -4,10 +4,8 @@ package com.kairos.persistence.repository.user.unit_position;
 import com.kairos.persistence.model.agreement.cta.CTAResponseDTO;
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQueryResult;
-import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
-import com.kairos.persistence.model.user.unit_position.UnitPosition;
-import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
-import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
+import com.kairos.persistence.model.user.expertise.SeniorityLevel;
+import com.kairos.persistence.model.user.unit_position.*;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -208,7 +206,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "{id:id(org),name:org.name} as unitInfo")
     List<UnitPositionQueryResult> getAllUnitPositionsForCurrentOrganization(long staffId);
 
-    @Query("MATCH(unitPosition:UnitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
+    @Query("MATCH(unitPosition:UnitPosition{deleted:false,published:true})-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
             "MATCH(unitPosition)<-[:" + BELONGS_TO_STAFF + "]-(staff:Staff) " +
             "MATCH(unitPosition)-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={0} AND id(staff)={1} and id(expertise)={2} \n" +
             "AND unitPosition.startDateMillis<={3} AND  (unitPosition.endDateMillis IS NULL or unitPosition.endDateMillis>={3})  \n" +
@@ -216,7 +214,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     Long getUnitPositionIdByStaffAndExpertise(Long unitId, Long staffId, Long expertiseId, Long currentMillis);
 
     @Query("MATCH (unit:Organization) WHERE id(unit)={0} \n" +
-            "MATCH (unit)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition)-[:" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) \n" +
+            "MATCH (unit)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition{deleted:false,published:true})-[:" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) \n" +
             "RETURN id(unitPosition) as unitPositionId, id(expertise) as expertiseId")
     List<Map<Long, Long>> getMapOfUnitPositionAndExpertiseId(Long unitId);
 
@@ -314,4 +312,35 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned, \n" +
             "employmentTypes:employmentTypes,phaseInfo:phaseInfo,plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType}}) END as ruleTemplates ORDER BY id DESC")
     List<CTAResponseDTO> getAllCtaByUserId(Long userId);
+
+    @Query("Match(staff:Staff{deleted:false})-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{deleted:false,history:false})-[:"+HAS_EXPERTISE_IN+"]->(expetise:Expertise) where unitPosition.endDateMillis is null or unitPosition.endDateMillis >= timestamp()\n" +
+            "with staff,unitPosition match(staff)-[staff_expertise_relation:"+STAFF_HAS_EXPERTISE+"]->(expetise) where staff_expertise_relation.expertiseStartDate is not null\n" +
+            "and datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).month=datetime().month and\n" +
+            "datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).day=datetime().day and datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).year<>datetime().year " +
+            "with staff,expetise,unitPosition, datetime().year-datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).year as currentYear match(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expetise) with staff,unitPosition,expetise,currentYear\n" +
+            "match(unitPosition)-[:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) where sl.to<=currentYear with unitPosition, expetise,currentYear match(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expetise) with unitPosition,expetise,currentYear\n" +
+            "match(unitPosition)-[unitPositionEmploymentTypeRelationShip:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) optional " +
+            "match(expetise)-[:"+FOR_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel) where seniorityLevel.from <= currentYear and seniorityLevel.to > currentYear " +
+            "return seniorityLevel,unitPosition,unitPositionEmploymentTypeRelationShip,employmentType")
+    List<UnitPositionSeniorityLevelQueryResult> findUnitPositionSeniorityLeveltoUpdate();
+
+
+    @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition:UnitPosition{deleted:false,published:true})-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) where id(staff)={0} " +
+            "and id(expertise)=expertiseId and unitPosition.startDateMillis<=timeStamp and (uniPosition.endDateMillis>=timestamp or unitPosition.endDateMillis is null)" +
+            "Match(unitPosition)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel) return unitPosition,seniorityLevel")
+    UnitPositionSeniorityLevelQueryResult getSeniorityLevelFromStaffUnitPosition(Long staffId,Long expertiseId);
+
+    @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) where id(staff)={0} and id(expertise)={1} match(up)-[rel:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) delete rel")
+    void deleteUnitPositionSeniorityLevel(Long staffId,Long expertiseId);
+
+    @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expetise:Expertise) where id(staff)={0} and id(expetise)={1} match(sl:SeniorityLevel) where id(sl)={2} with up, sl merge(up)-[:"+HAS_SENIORITY_LEVEL+"]->(sl)")
+    void createUnitPositionSeniorityLevelRelatioship(Long staffId,Long expertiseId,Long seniorityLevelId);
+
+    @Query("Match(unitPosition:UnitPosition) where id(unitPosition) in {0} with unitPosition  Match(unitPosition)-[:"+HAS_EXPERTISE_IN+"]-(expertise:Expertise) " +
+            "Match(unitPosition)-[:"+HAS_CTA+"]-(cta:CostTimeAgreement) Match(unitPosition)-[:"+HAS_POSITION_CODE+"]-(positionCode:PositionCode) Match(unitPosition)-" +
+            "[:"+BELONGS_TO_STAFF+"]-(staff:Staff) Match(unitPosition)-[:"+IN_UNIT+"]-(unit:Organization) optional Match(unitPosition)-[:"+SUPPORTED_BY_UNION+"]-" +
+            "(unionOrg:Organization) optional Match(unitPosition)-[:"+HAS_REASON_CODE+"]-(reasonCode:ReasonCode) optional Match(unitPosition)-[:"+HAS_FUNCTION+"]-" +
+            "(function:Function) return unitPosition,expertise, cta, positionCode,staff, unit, unionOrg, reasonCode, function as functions")
+    List<UnitPositionCompleteQueryResult> findUnitPositionCompleteObject(List<Long> unitPositionIds);
+
 }

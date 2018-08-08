@@ -1,4 +1,7 @@
 package com.kairos.persistence.repository.user.client;
+import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.client.queryResults.*;
+import com.kairos.persistence.model.client.relationships.ClientContactPersonRelationship;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
@@ -131,7 +134,7 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client,Long>{
     List<Team> findForbidTeam(Long id);
 
 
-    Client findByCprNumber(String cprNumber);
+
 
     @Query("MATCH (t:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(s:Staff)-[:BELONGS_TO]->(u:User) where id(t)={0} \n" +
             "             with s AS staff , u as user\n" +
@@ -227,32 +230,36 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client,Long>{
     @Query("Match (n:Client) where id(n) in {0} return n order by id(n)")
     List<Client> findByIdIn(List<Long> ids);
 
-    @Query("MATCH (c:Client)-[r:GET_SERVICE_FROM]->(o:Organization) where id(c)={0} and id(o)={1}  return c")
+    @Query("MATCH (c:Client)-[r:"+GET_SERVICE_FROM+"]->(o:Organization) where id(c)={0} and id(o)={1} " +
+            "match(c)-[:"+IS_A+"]->(u:User) return c ,u as `c.user`")
+
     Client getClientByClientIdAndUnitId(Long clientId, Long unitId);
 
-    @Query("Match (c:Client)-[:NEXT_TO_KIN]->(nextToKin:Client) where id(c)={0}\n" +
-            "Match (nextToKin)-[:CIVILIAN_STATUS]->(citizenStatus:CitizenStatus) with c, nextToKin,citizenStatus\n" +
-            "Match (nextToKin)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with c, contactDetail,nextToKin,citizenStatus\n" +
-            "Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with c, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "Match (c)-[:HAS_RELATION_OF]->(clientRelationType:ClientRelationType) with clientRelationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "Match (nextToKin)<-[:RELATION_WITH_NEXT_TO_KIN]-(clientRelationType)-[:RELATION_TYPE]->(relationType:RelationType) with relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(country:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}}) as result, municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "return id(nextToKin) as id, id(relationType) as relationTypeId,nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,{municipalityId:id(municipality),zipCodeId:id(zipCode),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
+    @Query("Match (c:Client)-[:"+NEXT_TO_KIN+"]->(nextToKin:Client)-[:"+IS_A+"]->(user:User) where id(c)={0}\n" +
+            "optional Match (nextToKin)-[:CIVILIAN_STATUS]->(citizenStatus:CitizenStatus) with c, nextToKin,citizenStatus,user\n" +
+            "optional Match (nextToKin)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with c, contactDetail,nextToKin,citizenStatus,user\n" +
+            "optional Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with c, homeAddress,contactDetail,nextToKin,citizenStatus,user\n" +
+            "optional Match (c)-[:HAS_RELATION_OF]->(clientRelationType:ClientRelationType) with clientRelationType, homeAddress,contactDetail,nextToKin,citizenStatus,user\n" +
+            "optional Match (nextToKin)<-[:RELATION_WITH_NEXT_TO_KIN]-(clientRelationType)-[:RELATION_TYPE]->(relationType:RelationType) with relationType, homeAddress,contactDetail,nextToKin,citizenStatus,user\n" +
+            "optional Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus,user\n" +
+            "optional Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(country:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}}) as result, municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus,user\n" +
+            "return id(nextToKin) as id, id(relationType) as relationTypeId,user.age as age,user.firstName as firstName,user.lastName as lastName,user.gender as gender,user.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,user.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,{municipalityId:id(municipality),zipCodeId:id(zipCode),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
             ",latitude:homeAddress.latitude,municipalities:result} as homeAddress")
     List<NextToKinQueryResult> getNextToKinDetail(long clientId,String imageUrl);
 
-    @Query("Match (nextToKin:Client{cprNumber:{0}}) with nextToKin\n" +
-            "optional Match (nextToKin)-[:CIVILIAN_STATUS]->(citizenStatus:CitizenStatus) with nextToKin,citizenStatus\n" +
-            "optional Match (nextToKin)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with contactDetail,nextToKin,citizenStatus\n" +
-            "optional Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "optional Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "optional Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(country:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}}) as result, municipality, zipCode, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "return id(nextToKin) as id, nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,nextToKin.gender as gender,nextToKin.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,case when homeAddress is not null then {municipalityId:id(municipality),zipCodeId:id(zipCode),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
+    @Query("Match (user:User{cprNumber:{0}}) " +
+            "MATCH (user)-[:"+IS_A+"]-(nextToKin:Client)\n" +
+            "optional Match (nextToKin)-[:"+CIVILIAN_STATUS+"]->(citizenStatus:CitizenStatus) with nextToKin,user,citizenStatus\n" +
+            "optional Match (nextToKin)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) with contactDetail,nextToKin,citizenStatus,user\n" +
+            "optional Match (nextToKin)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress) with homeAddress,contactDetail,nextToKin,citizenStatus,user\n" +
+            "optional Match (municipality:Municipality)<-[:"+MUNICIPALITY+"]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, homeAddress,contactDetail,nextToKin,citizenStatus,user\n" +
+            "optional Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(country:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}}) as result, municipality, zipCode, homeAddress,contactDetail,nextToKin,citizenStatus,user\n" +
+            "return id(user) as id, user.age as age,user.firstName as firstName,user.lastName as lastName,user.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,user.gender as gender," +
+            "user.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,case when homeAddress is not null then {municipalityId:id(municipality),zipCodeId:id(zipCode),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
             ",latitude:homeAddress.latitude,municipalities:result} else null end as homeAddress")
     NextToKinQueryResult getNextToKinByCprNumber(String cprNumber,String imageUrl);
 
-    @Query("Match (c:Client)-[r:NEXT_TO_KIN]->(nextToKin:Client{cprNumber:{1}}) where id(c)={0} return count(r)>0")
+    @Query("Match (c:Client)-[r:"+NEXT_TO_KIN+"]->(nextToKin:User{cprNumber:{1}}) where id(c)={0} return count(r)>0")
     Boolean citizenInNextToKinList(Long clientId,String cprNumber);
 
     @Query("Match (client:Client) where id(client)={0} with client\n" +
@@ -306,8 +313,8 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client,Long>{
     ContactDetail getContactDetailOfNextToKin(Long nextToKinId);
 
     @Query("Match (citizen:Client) where id(citizen)={0} with citizen\n" +
-            "Match (nextToKin:Client) where id(nextToKin)={1} with nextToKin,citizen\n" +
-            "Match (citizen)-[r:NEXT_TO_KIN]->(nextToKin) return count(r)>0")
+            "Match (nextToKin:User) where id(nextToKin)={1} with nextToKin,citizen\n" +
+            "Match (citizen)-[r:"+NEXT_TO_KIN+"]->(nextToKin) return count(r)>0")
     Boolean hasAlreadyNextToKin(Long clientId,Long nextToKinId);
 
 
@@ -392,5 +399,20 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client,Long>{
 
     @Query("MATCH (c:Client),(ca:ContactAddress) WHERE id(c) IN {1} AND id(ca) = {0} CREATE UNIQUE (c)-[r:"+HAS_HOME_ADDRESS+"]->(ca) RETURN true LIMIT 1")
     Boolean updateAddressOfAllHouseHoldMembers(long contactAddressId, List<Long> listOfIdsOfHouseholdMembers);
+
+    @Query("Match  (user:User) WHERE id(user) = {0}  " +
+            "MATCH (user)-["+IS_A+"]-(client:Client)" +
+            "RETURN client")
+    Client getClientByUserId(Long userId);
+
+
+    @Query("Match  (client:Client) WHERE id(client) = {0}  " +
+            "MATCH (client)-["+IS_A+"]-(user:User)" +
+            "RETURN user")
+    User getUserByClientId(Long clientId);
+
+    @Query("MATCH (user:User) WHERE user.cprNumber={0} " +
+            "MATCH (user)-["+IS_A+"]-(client:Client) RETURN client ")
+    Client getClientByCPR(String cprNumber);
 
 }

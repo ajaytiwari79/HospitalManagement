@@ -237,10 +237,6 @@ public class RuleTemplateService extends MongoBaseService {
     }
 
     public RuleTemplateWrapper getRuleTemplate(long countryId) {
-//        CountryDTO country = countryRestClient.getCountryById(countryId);
-//        if (country == null) {
-//            exceptionService.dataNotFoundByIdException("message.country.id", countryId);
-//        }
 
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(countryId);
 

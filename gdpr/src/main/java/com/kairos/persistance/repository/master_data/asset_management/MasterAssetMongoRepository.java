@@ -22,7 +22,7 @@ public interface MasterAssetMongoRepository extends MongoRepository<MasterAsset,
     List<MasterAsset> findAllMasterAssets( Long countryId,Long organizationId);
 
     @Query("{countryId:?0,organizationId:?1,assetType:?2,deleted:false}")
-    List<MasterAssetBasicResponseDTO> findAllMasterAssetbyAssetType(Long countryId, Long organizationId, BigInteger assetTypeId);
+    List<MasterAssetBasicResponseDTO> findAllMasterAssetByAssetType(Long countryId, Long organizationId, BigInteger assetTypeId);
 
     MasterAsset findByid(BigInteger id);
 

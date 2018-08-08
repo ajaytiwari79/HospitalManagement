@@ -2,7 +2,6 @@ package com.kairos.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.metadata.*;
 import com.kairos.persistance.model.data_inventory.ManagingOrganization;
 import com.kairos.persistance.model.data_inventory.Staff;
 
@@ -23,10 +22,10 @@ public class ProcessingActivityDTO {
     @Pattern(message = "Numbers and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotBlank(message = "Discription can't be empty")
+    @NotBlank(message = "Description can't be empty")
     private String description;
 
-    @NotNull(message = "Mangaing department can't be null")
+    @NotNull(message = "Managing department can't be null")
     private ManagingOrganization managingDepartment;
 
     //@NotNull(message = "Process Owner can't be null")

@@ -1,11 +1,11 @@
-package com.kairos.enums;
+package com.kairos.enums.client;
 
 /**
  * Created by prabjot on 19/10/16.
  */
 public enum ClientEnum {
 
-    CITIZEN,ORGANIZATION;
+    INDIVIDUAL,ORGANIZATION;
 
     public enum CivilianStatus {
         DEAD("Dead"), SINGLE("Single"), MARRIED("Married"), DIVORCED("Divorced"), LONGEST_LIVING_PARTNER("Longest living partner"), REGISTERED_PARTNERSHIP("Registered partnership");
