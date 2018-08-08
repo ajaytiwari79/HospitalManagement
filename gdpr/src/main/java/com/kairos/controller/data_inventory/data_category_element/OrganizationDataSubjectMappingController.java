@@ -5,7 +5,7 @@ import com.kairos.dto.data_inventory.OrganizationDataSubjectDTO;
 import com.kairos.dto.data_inventory.OrganizationDataSubjectBasicDTO;
 import com.kairos.service.data_inventory.data_category_element.OrganizationDataSubjectMappingService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ public class OrganizationDataSubjectMappingController {
 
     @ApiOperation(value = "create data Subject with data category and data element")
     @PostMapping("dataSubject_mapping/add")
-    public ResponseEntity<Object> createDataSubjectWithDataCategoryAndDataElement(@PathVariable Long unitId, @RequestBody @Valid ValidateListOfRequestBody<OrganizationDataSubjectDTO> dataSubjectDTOs) {
+    public ResponseEntity<Object> createDataSubjectWithDataCategoryAndDataElement(@PathVariable Long unitId, @RequestBody @Valid ValidateRequestBodyList<OrganizationDataSubjectDTO> dataSubjectDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization Id can't be null");
         }

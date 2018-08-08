@@ -33,9 +33,6 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     @Inject
     private DataDisposalMongoRepository dataDisposalMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
     /**
      * @description this method create new data Disposal if data disposal not exist with same name ,
@@ -59,7 +56,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
             }
 
             List<DataDisposal> existing =  findAllByNameAndOrganizationId(organizationId,dataDisposalsNames,DataDisposal.class);
-            dataDisposalsNames = comparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
+            dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
             List<DataDisposal> newDataDisposals = new ArrayList<>();
             if (!dataDisposalsNames.isEmpty()) {
                 for (String name : dataDisposalsNames) {

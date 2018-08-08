@@ -8,7 +8,6 @@ import com.kairos.persistance.repository.master_data.asset_management.MasterAsse
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,10 +24,6 @@ public class MasterAssetService extends MongoBaseService {
 
     @Inject
     MasterAssetMongoRepository masterAssetMongoRepository;
-
-
-    @Inject
-    private ComparisonUtils comparisonUtils;
 
     @Inject
     private ExceptionService exceptionService;

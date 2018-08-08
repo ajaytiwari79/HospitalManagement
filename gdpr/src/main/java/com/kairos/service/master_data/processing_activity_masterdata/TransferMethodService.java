@@ -32,8 +32,6 @@ public class TransferMethodService extends MongoBaseService {
     @Inject
     private TransferMethodMongoRepository transferMethodRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
 
 
     /**
@@ -58,7 +56,7 @@ public class TransferMethodService extends MongoBaseService {
 
             }
             List<TransferMethod> existing = findByNamesAndCountryId(countryId, transferMethodNames, TransferMethod.class);
-            transferMethodNames = comparisonUtils.getNameListForMetadata(existing, transferMethodNames);
+            transferMethodNames = ComparisonUtils.getNameListForMetadata(existing, transferMethodNames);
 
             List<TransferMethod> newTransferMethods = new ArrayList<>();
             if (!transferMethodNames.isEmpty()) {

@@ -31,10 +31,6 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
     @Inject
     private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
-
 
     /**
      * @description this method create new ResponsibilityType if ResponsibilityType not exist with same name ,
@@ -58,7 +54,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
             }
             List<ResponsibilityType> existing =  findAllByNameAndOrganizationId(organizationId,responsibilityTypeNames,ResponsibilityType.class);
-            responsibilityTypeNames = comparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
+            responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
 
             List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
             if (!responsibilityTypeNames.isEmpty()) {
