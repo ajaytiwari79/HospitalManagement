@@ -2,9 +2,9 @@ package com.kairos.persistance.model.agreement_template;
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public class AgreementSection extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "Section Title cannot be empty")
+    @NotBlank(message = "Section Title cannot be empty")
     private String title;
 
     private List<BigInteger> clauses;

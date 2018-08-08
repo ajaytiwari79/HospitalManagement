@@ -1,8 +1,8 @@
 package com.kairos.persistance.model.data_inventory;
 
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.javers.core.metamodel.annotation.ValueObject;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 
@@ -13,7 +13,7 @@ public class ManagingOrganization {
     @NotNull
     private Long id;
 
-    @NotNullOrEmpty(message = "ManagingOrganization name can't be empty")
+    @NotBlank(message = "ManagingOrganization name can't be empty")
     private String name;
 
     public Long getId() { return id; }

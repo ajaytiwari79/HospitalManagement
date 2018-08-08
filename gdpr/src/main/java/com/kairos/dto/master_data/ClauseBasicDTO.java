@@ -17,7 +17,6 @@ public class ClauseBasicDTO {
 
     private Boolean requireUpdate=false;
 
-
     public BigInteger getId() {
         return id;
     }

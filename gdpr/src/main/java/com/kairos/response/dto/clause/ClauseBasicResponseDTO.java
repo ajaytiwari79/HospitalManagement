@@ -1,7 +1,8 @@
 package com.kairos.response.dto.clause;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
+
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 
 /*
@@ -14,10 +15,10 @@ import java.math.BigInteger;
 public class ClauseBasicResponseDTO {
 
     private BigInteger id;
-    @NotNullOrEmpty
+    @NotBlank
     private String title;
 
-    @NotNullOrEmpty
+    @NotBlank
     private String description;
 
     public BigInteger getId() {

@@ -3,6 +3,7 @@ package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
@@ -18,6 +19,7 @@ public class AgreementSectionDTO {
     @NotBlank(message = "Section Name can't be Empty")
     private String title;
 
+    @Valid
     private List<ClauseBasicDTO> clauses;
 
     private List<AgreementSectionDTO> subSections;

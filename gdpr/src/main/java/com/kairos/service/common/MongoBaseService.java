@@ -43,30 +43,6 @@ public class MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
-
-    /*
-    public <T extends MongoBaseEntity> T getNextSequence(T entity) {
-
-        Assert.notNull(entity, "Entity must not be null!");
-
-        // Get class name for sequence class
-        String className = entity.getClass().getSimpleName();
-
-        // Set Id if entity don't have Id
-        if (entity.getId() == null) {
-            entity.setId(mongoSequenceRepository.nextSequence(className));
-        }
-
-        // Set createdAt if entity don't have createdAt
-        if (entity.getCreatedAt() == null) {
-            entity.setCreatedAt(DateUtils.getDate());
-        }
-
-        // Set updatedAt time as current time
-        entity.setUpdatedAt(DateUtils.getDate());
-        return entity;
-    }*/
-
     public <T extends MongoBaseEntity> List<T> getNextSequence(List<T> entities) {
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");

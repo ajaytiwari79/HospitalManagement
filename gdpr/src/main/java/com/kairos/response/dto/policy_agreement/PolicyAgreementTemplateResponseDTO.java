@@ -8,7 +8,6 @@ import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.response.dto.master_data.AccountTypeResponseDTO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

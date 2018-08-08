@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.persistance.model.data_inventory.ManagingOrganization;
 import com.kairos.persistance.model.data_inventory.Staff;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
@@ -21,15 +21,15 @@ public class AssetDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "name can't be empty ")
+    @NotBlank(message = "name can't be empty ")
     @Pattern(message = "Number and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNullOrEmpty(message = "description  can't be  Empty ")
+    @NotBlank(message = "description  can't be  Empty ")
     private String description;
 
 
-    @NotNullOrEmpty(message = "Hosting Location can't be Empty")
+    @NotBlank(message = "Hosting Location can't be Empty")
     private String hostingLocation;
 
     @NotNull(message = "Managing department can't be empty")
