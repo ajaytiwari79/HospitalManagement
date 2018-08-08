@@ -7,6 +7,7 @@ import com.kairos.activity.counter.KPIDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
+import com.kairos.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
@@ -80,9 +81,9 @@ public class CounterDistIntegrationTest {
     @Test
     public void getInitialCategoryKPIDistributionDataForCountry() {
         String baseUrl = getBaseUrl(2567l, 4l);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>() {
         };
-        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/category", HttpMethod.GET, null, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/category", HttpMethod.GET, null, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -90,9 +91,9 @@ public class CounterDistIntegrationTest {
     @Test
     public void getInitialCategoryKPIDistributionDataForUnit() {
         String baseUrl = getBaseUrl(2567l, null);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>>() {
         };
-        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + "/unit/4/counter/dist/category", HttpMethod.GET, null, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>> response = testRestTemplate.exchange(baseUrl + "/unit/4/counter/dist/category", HttpMethod.GET, null, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }

@@ -174,10 +174,10 @@ public class CounterRepository {
     public List<CategoryKPIMappingDTO> getKPIsMappingForCategories(List<BigInteger> categoryAssignmentIds){
         Aggregation ag = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("categoryAssignmentId").in(categoryAssignmentIds))
-                , Aggregation.lookup("categoryAssignment", "categoryAssignmentId", "id", "categoryAssignment")
-                , Aggregation.project().and("categoryAssignment").arrayElementAt(0).as("categoryAssignment")
+                , Aggregation.lookup("categoryAssignment", "categoryAssignmentId", "_id", "categoryAssignment")
+                , Aggregation.project("kpiId").and("categoryAssignment").arrayElementAt(0).as("categoryAssignment")
                 , Aggregation.group("categoryAssignment.categoryId").push("kpiId").as("kpiIds")
-                , Aggregation.project().and("id").as("categoryId").and("kpiIds")
+                , Aggregation.project().and("_id").as("categoryId").and("kpiIds").as("kpiId")
         );
         AggregationResults<CategoryKPIMappingDTO> results = mongoTemplate.aggregate(ag, CategoryKPIConf.class, CategoryKPIMappingDTO.class);
         return results.getMappedResults();

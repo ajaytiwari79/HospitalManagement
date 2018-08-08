@@ -73,13 +73,13 @@ public class CounterManagementService extends MongoBaseService {
         return new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
     }
 
-    public void updateCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {
+    public void addCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {
         CategoryAssignment categoryAssignment = counterRepository.getCategoryAssignment(categoryKPIsDetails.getCategoryId(), level, refId);
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(categoryKPIsDetails.getKpiIds(), level, refId);
         List<CategoryKPIConf> categoryKPIConfs = counterRepository.getCategoryKPIConfs(categoryAssignment.getId());
         List<BigInteger> applicableKpiIds = categoryKPIConfs.stream().map(categoryKPIConf -> categoryKPIConf.getKpiId()).collect(toList());
-        applicableKPIS = applicableKPIS.parallelStream().filter(applicableKPI ->  applicableKpiIds.contains(applicableKPI.getId())).collect(toList());
-        if (!applicableKPIS.isEmpty())
+        List<ApplicableKPI> applicableKPISIds = applicableKPIS.parallelStream().filter(applicableKPI ->  applicableKpiIds.contains(applicableKPI.getId())).collect(toList());
+        if (!applicableKPISIds.isEmpty())
             exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
         List<CategoryKPIConf> newCategoryKPIConfs = new ArrayList<>();
         applicableKPIS.parallelStream().forEach(kpiAssignment -> newCategoryKPIConfs.add(new CategoryKPIConf(kpiAssignment.getActiveKpiId(), categoryAssignment.getId())));
