@@ -62,7 +62,7 @@ public class FilterService {
         FilterAndFavouriteFilterDTO filterAndFavouriteFilterDto = new FilterAndFavouriteFilterDTO();
         if (Optional.ofNullable(filterGroup).isPresent()) {
             List<FilterType> filterTypes = filterGroup.getFilterTypes();
-            filterCriteria = filterMongoRepository.getFilterCriteria(countryId, organizationId, filterTypes,filterGroup);
+            filterCriteria = filterMongoRepository.getFilterCriteria(countryId, organizationId, filterTypes, filterGroup);
             Aggregation aggregation = filterMongoRepository.createAggregationQueryForFilterCategory(filterCriteria);
             AggregationResults<FilterCategoryResult> result = filterMongoRepository.getFilterAggregationResult(aggregation, filterGroup, moduleId);
             FilterCategoryResult filterQueryResult = result.getUniqueMappedResult();
@@ -91,15 +91,15 @@ public class FilterService {
     public FilterResponseDTO buildFiltersCategoryResponse(FilterCategoryResult filterQueryResult, FilterType filterType) {
         switch (filterType) {
             case ACCOUNT_TYPES:
-                return new FilterResponseDTO(filterType, filterType.value, "Account Types", filterQueryResult.getAccountTypes());
+                return new FilterResponseDTO(filterType, filterType.value,  filterQueryResult.getAccountTypes());
             case ORGANIZATION_TYPES:
-                return new FilterResponseDTO(filterType, filterType.value, "ManagingOrganization Types", filterQueryResult.getOrganizationTypes());
+                return new FilterResponseDTO(filterType, filterType.value, filterQueryResult.getOrganizationTypes());
             case ORGANIZATION_SUB_TYPES:
-                return new FilterResponseDTO(filterType, filterType.value, "ManagingOrganization Sub Types", filterQueryResult.getOrganizationSubTypes());
+                return new FilterResponseDTO(filterType, filterType.value, filterQueryResult.getOrganizationSubTypes());
             case ORGANIZATION_SERVICES:
-                return new FilterResponseDTO(filterType, filterType.value, "Service Types", filterQueryResult.getOrganizationServices());
+                return new FilterResponseDTO(filterType, filterType.value, filterQueryResult.getOrganizationServices());
             case ORGANIZATION_SUB_SERVICES:
-                return new FilterResponseDTO(filterType, filterType.value, "Service Sub Types", filterQueryResult.getOrganizationSubServices());
+                return new FilterResponseDTO(filterType, filterType.value,  filterQueryResult.getOrganizationSubServices());
             default:
                 throw new InvalidRequestException("invalid request");
         }

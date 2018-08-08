@@ -16,14 +16,11 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.facet;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static com.kairos.constants.AppConstant.CLAUSE_MODULE_NAME;
@@ -59,20 +56,31 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
         return aggregationOperations;
     }
 
+
+    /**
+     * ACCOUNT_TYPES ,ORGANIZATION_SERVICES,ORGANIZATION_SUB_SERVICES ,ORGANIZATION_TYPES,ORGANIZATION_SUB_TYPESetc represent field name in domains(Clause,MasterAsset and Master Processing activity)
+     * @param filterType
+     * @return
+     */
     @Override
     public AggregationOperation buildAggregationQuery(FilterType filterType) {
         switch (filterType) {
 
             case ACCOUNT_TYPES:
-                return Aggregation.unwind(filterType.value);
+               // return Aggregation.unwind(filterType.value);
+                return Aggregation.unwind("accountTypes");
             case ORGANIZATION_SERVICES:
-                return Aggregation.unwind(filterType.value);
+                //return Aggregation.unwind(filterType.value);
+                return Aggregation.unwind("organizationServices");
             case ORGANIZATION_SUB_SERVICES:
-                return Aggregation.unwind(filterType.value);
+                //return Aggregation.unwind(filterType.value);
+                return Aggregation.unwind("organizationSubServices");
             case ORGANIZATION_TYPES:
-                return Aggregation.unwind(filterType.value);
+               // return Aggregation.unwind(filterType.value);
+                return Aggregation.unwind("organizationTypes");
             case ORGANIZATION_SUB_TYPES:
-                return Aggregation.unwind(filterType.value);
+                //return Aggregation.unwind(filterType.value);
+                return Aggregation.unwind("organizationSubTypes");
             default:
                 throw new InvalidRequestException("invalid request");
         }

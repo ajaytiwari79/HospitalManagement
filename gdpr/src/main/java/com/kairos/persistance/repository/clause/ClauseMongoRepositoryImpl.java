@@ -15,10 +15,12 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
@@ -62,13 +64,13 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     public List<ClauseResponseDTO> findAllClauseWithTemplateType(Long countryId, Long organizationId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
-                lookup("template_type","templateTypes","_id","templateTypes"),
+                lookup("template_type", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
 
         );
 
 
-        AggregationResults<ClauseResponseDTO> result=mongoTemplate.aggregate(aggregation,Clause.class,ClauseResponseDTO.class);
+        AggregationResults<ClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseResponseDTO.class);
         return result.getMappedResults();
     }
 
@@ -76,41 +78,37 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
     public ClauseResponseDTO findClauseWithTemplateTypeById(Long countryId, Long organizationId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
-                lookup("template_type","templateTypes","_id","templateTypes"),
+                lookup("template_type", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
 
 
         );
-        AggregationResults<ClauseResponseDTO> result=mongoTemplate.aggregate(aggregation,Clause.class,ClauseResponseDTO.class);
+        AggregationResults<ClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseResponseDTO.class);
         return result.getUniqueMappedResult();
     }
-
-
-
 
 
     @Override
     public List<ClauseResponseDTO> getClauseDataWithFilterSelection(Long countryId, Long organizationId, FilterSelectionDTO filterSelectionDto) {
 
-        Criteria criteria=Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId);
+        Criteria criteria = Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId);
         List<Criteria> clauseCriteria = new ArrayList<>(filterSelectionDto.getFiltersData().size());
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
             if (filterSelection.getValue().size() != 0) {
                 clauseCriteria.add(buildMatchCriteria(filterSelection, filterSelection.getName()));
             }
         });
-        if (!clauseCriteria.isEmpty())
-        {
+        if (!clauseCriteria.isEmpty()) {
             criteria = criteria.andOperator(clauseCriteria.toArray(new Criteria[clauseCriteria.size()]));
         }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
-                lookup("template_type","templateTypes","_id","templateTypes"),
+                lookup("template_type", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
 
         );
 
-        AggregationResults<ClauseResponseDTO> result=mongoTemplate.aggregate(aggregation,Clause.class,ClauseResponseDTO.class);
+        AggregationResults<ClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseResponseDTO.class);
         return result.getMappedResults();
     }
 
@@ -124,17 +122,17 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                 for (Long id : filterSelection.getValue()) {
                     ids.add(BigInteger.valueOf(id));
                 }
-                return Criteria.where(filterType.value + ID).in(ids);
+                return Criteria.where("accountTypes" + ID).in(ids);
             case ORGANIZATION_TYPES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationTypes" + ID).in(filterSelection.getValue());
 
             case ORGANIZATION_SUB_TYPES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationSubTypes" + ID).in(filterSelection.getValue());
             case ORGANIZATION_SERVICES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationServices" + ID).in(filterSelection.getValue());
 
             case ORGANIZATION_SUB_SERVICES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationSubServices" + ID).in(filterSelection.getValue());
             default:
                 throw new InvalidRequestException("data not found for FilterType " + filterType);
 
