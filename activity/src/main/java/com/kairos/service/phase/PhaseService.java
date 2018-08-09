@@ -351,7 +351,7 @@ public class PhaseService extends MongoBaseService {
      * @param upcomingMondayDate
      */
     private void addPlanningPhase(List<Phase> phases, LocalDate proposedDate, Map<LocalDate,List<ShiftStatus>> localDatePhaseStatusMap, LocalDate upcomingMondayDate) {
-        if(!Optional.ofNullable(phases).isPresent()){
+        if(!Optional.ofNullable(phases).isPresent() || phases.isEmpty()){
             exceptionService.actionNotPermittedException("phases.absent");
         }
         Phase phase = null;
