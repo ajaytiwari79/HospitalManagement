@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.persistence.model.shift.ShiftTemplate;
@@ -12,6 +13,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.userContext.UserContext;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +49,7 @@ public class ShiftTemplateService extends MongoBaseService {
         Set<BigInteger>  activityIds=new HashSet<>();
         shiftTemplateDTO.getShiftList().forEach(shift->{
             activityIds.add(shift.getActivityId());
-            activityIds.addAll(shift.getSubShifts().stream().map(IndividualShiftTemplateDTO::getActivityId).collect(Collectors.toSet()));
+            activityIds.addAll(shift.getSubShifts().stream().map(s->s.getActivityId()).collect(Collectors.toSet()));
         });
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         activities.forEach(activity -> {
@@ -104,14 +106,16 @@ public class ShiftTemplateService extends MongoBaseService {
         });
         Map<BigInteger,String> timeTypeMap = activityMongoRepository.findAllTimeTypeByActivityIds(activityIds).stream().collect(Collectors.toMap(k->k.getActivityId(),v->v.getTimeType()));
         Map<BigInteger, IndividualShiftTemplateDTO> individualShiftTemplateDTOMap = individualShiftTemplateDTOS.stream().collect(Collectors.toMap(IndividualShiftTemplateDTO::getId, Function.identity()));
-        shiftTemplateDTOS.forEach(shiftTemplateDTO -> shiftTemplateDTO.getIndividualShiftTemplateIds().forEach(individualShiftTemplateId->{
-            IndividualShiftTemplateDTO individualShiftTemplateDTO = individualShiftTemplateDTOMap.get(individualShiftTemplateId);
-            individualShiftTemplateDTO.setTimeType(timeTypeMap.get(individualShiftTemplateDTO.getActivityId()));
-            individualShiftTemplateDTO.getSubShifts().forEach(subShift->{
-                subShift.setTimeType(timeTypeMap.get(subShift.getActivityId()));
+        shiftTemplateDTOS.forEach(shiftTemplateDTO -> {
+            shiftTemplateDTO.getIndividualShiftTemplateIds().forEach(individualShiftTemplateId->{
+                IndividualShiftTemplateDTO individualShiftTemplateDTO = individualShiftTemplateDTOMap.get(individualShiftTemplateId);
+                individualShiftTemplateDTO.setTimeType(timeTypeMap.get(individualShiftTemplateDTO.getActivityId()));
+                individualShiftTemplateDTO.getSubShifts().forEach(subShift->{
+                    subShift.setTimeType(timeTypeMap.get(subShift.getActivityId()));
+                });
+                shiftTemplateDTO.getShiftList().add(individualShiftTemplateDTO);
             });
-            shiftTemplateDTO.getShiftList().add(individualShiftTemplateDTO);
-        }));
+        });
         return shiftTemplateDTOS;
     }
 
