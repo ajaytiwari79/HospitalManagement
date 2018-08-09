@@ -9,7 +9,6 @@ import com.kairos.dto.SubServiceCategoryDTO;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationMetaDataDTO {
 
-
     private OrganizationTypeDTO organizationType;
 
     private OrganizationSubTypeDTO organizationSubType;

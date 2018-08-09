@@ -48,7 +48,7 @@ public class FilterResponseDTO {
 
     public FilterResponseDTO(FilterType name, String displayName, List<FilterAttributes> filterAttributes) {
         this.name = name;
-        this.displayName=displayName;
+        this.displayName = displayName;
         this.filterData = filterAttributes;
     }
 
