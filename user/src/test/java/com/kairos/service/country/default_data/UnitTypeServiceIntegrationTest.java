@@ -53,10 +53,10 @@ public class UnitTypeServiceIntegrationTest {
     public void addUnitTypeInCountry() {
         UnitTypeDTO unitTypeDTO= new UnitTypeDTO("first","first desc");
         HttpEntity<UnitTypeDTO> requestBodyData = new HttpEntity<>(unitTypeDTO);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<ReasonCodeDTO>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<ReasonCodeDTO>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitTypeDTO>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitTypeDTO>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<ReasonCodeDTO>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<UnitTypeDTO>> response = restTemplate.exchange(
                 baseUrlWithCountry + "/unit_type",
                 HttpMethod.POST, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()));
