@@ -16,6 +16,12 @@ public class UnitTypeDTO {
     public UnitTypeDTO(){
         // dc
     }
+
+    public UnitTypeDTO(@NotNull String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
     public Long getId(){
         return id;
     }
