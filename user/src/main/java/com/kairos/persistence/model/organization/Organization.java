@@ -12,9 +12,9 @@
     import com.kairos.persistence.model.client.ContactDetail;
     import com.kairos.persistence.model.common.UserBaseEntity;
     import com.kairos.persistence.model.country.*;
-    import com.kairos.persistence.model.country.common.BusinessType;
-    import com.kairos.persistence.model.country.common.CompanyCategory;
-    import com.kairos.persistence.model.country.common.ContractType;
+    import com.kairos.persistence.model.country.default_data.BusinessType;
+    import com.kairos.persistence.model.country.default_data.CompanyCategory;
+    import com.kairos.persistence.model.country.default_data.ContractType;
     import com.kairos.persistence.model.country.tag.Tag;
     import com.kairos.persistence.model.organization.group.Group;
     import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;

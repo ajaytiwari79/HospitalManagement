@@ -11,7 +11,7 @@ import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.*;
-import com.kairos.persistence.model.country.common.CitizenStatus;
+import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.organization.*;

@@ -6,7 +6,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.client.*;
-import com.kairos.persistence.model.country.common.CitizenStatus;
+import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;

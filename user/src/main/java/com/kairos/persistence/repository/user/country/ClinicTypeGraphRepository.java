@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.persistence.model.country.common.ClinicType;
+import com.kairos.persistence.model.country.default_data.ClinicType;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
