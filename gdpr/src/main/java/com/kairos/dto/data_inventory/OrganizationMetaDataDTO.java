@@ -9,7 +9,6 @@ import com.kairos.dto.SubServiceCategoryDTO;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationMetaDataDTO {
 
-
     private OrganizationTypeDTO organizationType;
 
     private OrganizationSubTypeDTO organizationSubType;
@@ -30,23 +29,17 @@ public class OrganizationMetaDataDTO {
         return organizationSubType;
     }
 
-    public void setOrganizationSubType(OrganizationSubTypeDTO organizationSubType) {
-        this.organizationSubType = organizationSubType;
-    }
+    public void setOrganizationSubType(OrganizationSubTypeDTO organizationSubType) { this.organizationSubType = organizationSubType; }
 
     public ServiceCategoryDTO getOrganizationService() {
         return organizationService;
     }
 
-    public void setOrganizationService(ServiceCategoryDTO organizationService) {
-        this.organizationService = organizationService;
-    }
+    public void setOrganizationService(ServiceCategoryDTO organizationService) { this.organizationService = organizationService; }
 
     public SubServiceCategoryDTO getOrganizationSubService() {
         return organizationSubService;
     }
 
-    public void setOrganizationSubService(SubServiceCategoryDTO organizationSubService) {
-        this.organizationSubService = organizationSubService;
-    }
+    public void setOrganizationSubService(SubServiceCategoryDTO organizationSubService) { this.organizationSubService = organizationSubService; }
 }

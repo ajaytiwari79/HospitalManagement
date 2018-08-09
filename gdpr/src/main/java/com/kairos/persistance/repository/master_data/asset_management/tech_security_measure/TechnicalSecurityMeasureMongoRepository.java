@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management.tech_security_measure;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface TechnicalSecurityMeasureMongoRepository extends MongoRepository<TechnicalSecurityMeasure,BigInteger> ,CustomTechnicalSecurityRepository{
+public interface TechnicalSecurityMeasureMongoRepository extends MongoBaseRepository<TechnicalSecurityMeasure,BigInteger>,CustomTechnicalSecurityRepository{
 
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
@@ -32,7 +33,7 @@ public interface TechnicalSecurityMeasureMongoRepository extends MongoRepository
 
 
     @Query("{deleted:false,organizationId:?0}")
-    List<TechnicalSecurityMeasureResponseDTO> findAllOrganzationTechnicalSecurityMeasures(Long organizationId);
+    List<TechnicalSecurityMeasureResponseDTO> findAllOrganizationTechnicalSecurityMeasures(Long organizationId);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     TechnicalSecurityMeasure findByOrganizationIdAndId(Long organizationId,BigInteger id);

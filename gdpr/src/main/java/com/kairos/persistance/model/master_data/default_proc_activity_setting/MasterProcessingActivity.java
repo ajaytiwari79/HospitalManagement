@@ -6,9 +6,9 @@ import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
@@ -16,10 +16,10 @@ import java.util.List;
 @Document(collection = "master_processing_activity")
 public class MasterProcessingActivity extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "Name can't be empty")
+    @NotBlank(message = "Name can't be empty")
     private String name;
 
-    @NotNullOrEmpty(message = "Description can't be empty")
+    @NotBlank(message = "Description can't be empty")
     private String description;
 
     @NotNull

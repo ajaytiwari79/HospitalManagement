@@ -5,9 +5,9 @@ import com.kairos.dto.OrganizationSubTypeDTO;
 import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -21,7 +21,7 @@ import java.util.Set;
 public class ClauseDTO {
 
 
-    @NotNullOrEmpty(message = "Title cannot be empty ")
+    @NotBlank(message = "Title cannot be empty ")
     @Pattern(message = "Numbers and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
@@ -29,7 +29,7 @@ public class ClauseDTO {
     @NotEmpty(message = "Tags  can't be empty")
     private List<ClauseTagDTO> tags = new ArrayList<>();
 
-    @NotNullOrEmpty(message = "description  can't be  Empty ")
+    @NotBlank(message = "description  can't be  Empty ")
     private String description;
 
     @Valid
@@ -80,7 +80,7 @@ public class ClauseDTO {
     }
 
     public String getTitle() {
-        return title;
+        return title.trim();
     }
 
     public String getDescription() {

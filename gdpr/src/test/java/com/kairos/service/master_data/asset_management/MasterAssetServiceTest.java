@@ -55,11 +55,11 @@ public class MasterAssetServiceTest {
     @Test
     public void test_createMasterAsset() throws Exception {
         String baseUrl = getBaseUrl(24L, 4l, null);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AssetTypeResponseDTO>>> asseTypeReference =
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AssetTypeResponseDTO>>> assetTypeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AssetTypeResponseDTO>>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<List<AssetTypeResponseDTO>>> assetResponse = restTemplate.exchange(
-                baseUrl + "/asset_type/all", HttpMethod.GET, null, asseTypeReference);
+                baseUrl + "/asset_type/all", HttpMethod.GET, null, assetTypeReference);
         assetTypeId = assetResponse.getBody().getData().get(0).getId();
         MasterAssetDTO assetDTO = new MasterAssetDTO();
         assetDTO.setName("Unique name Asset");
@@ -136,7 +136,7 @@ public class MasterAssetServiceTest {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("ogranization ID must not be null");
+            throw new UnsupportedOperationException("organization ID must not be null");
         }
 
     }

@@ -20,7 +20,7 @@ public class ProcessingActivity extends MongoBaseEntity {
     @NotBlank(message = "Description can't be empty")
     private String description;
 
-    @NotNull(message = "Mangaing department can't be null")
+    @NotNull(message = "Managing department can't be null")
     private ManagingOrganization managingDepartment;
 
     @NotNull(message = "Process Owner can't be null")

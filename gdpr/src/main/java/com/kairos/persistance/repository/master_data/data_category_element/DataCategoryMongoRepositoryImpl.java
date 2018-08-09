@@ -3,7 +3,7 @@ package com.kairos.persistance.repository.master_data.data_category_element;
 import com.kairos.persistance.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDto;
+import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -41,7 +41,7 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
     }
 
     @Override
-    public DataCategoryResponseDto getDataCategoryWithDataElementById(Long countryId, Long organizationId, BigInteger id) {
+    public DataCategoryResponseDTO getDataCategoryWithDataElementById(Long countryId, Long organizationId, BigInteger id) {
 
         String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
         Document projectionOperation = Document.parse(projection);
@@ -53,12 +53,12 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
         );
 
 
-        AggregationResults<DataCategoryResponseDto> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDto.class);
+        AggregationResults<DataCategoryResponseDTO> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDTO.class);
         return result.getUniqueMappedResult();
     }
 
     @Override
-    public List<DataCategoryResponseDto> getAllDataCategoryWithDataElement(Long countryId, Long organizationId) {
+    public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElement(Long countryId, Long organizationId) {
 
         String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
         Document projectionOperation = Document.parse(projection);
@@ -69,7 +69,7 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
                 new CustomAggregationOperation(projectionOperation)
         );
 
-        AggregationResults<DataCategoryResponseDto> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDto.class);
+        AggregationResults<DataCategoryResponseDTO> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDTO.class);
         return result.getMappedResults();
     }
 
@@ -82,5 +82,38 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.find(query, DataCategory.class);
 
+    }
+
+
+    @Override
+    public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long unitId) {
+        String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
+        Document projectionOperation = Document.parse(projection);
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId)),
+                lookup("data_element", "dataElements", "_id", "dataElements"),
+                new CustomAggregationOperation(projectionOperation)
+        );
+
+        AggregationResults<DataCategoryResponseDTO> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public DataCategoryResponseDTO getDataCategoryWithDataElementByUnitIdAndId(Long unitId, BigInteger dataCategoryId) {
+
+        String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
+        Document projectionOperation = Document.parse(projection);
+        Aggregation aggregation = Aggregation.newAggregation(
+
+                match(Criteria.where("_id").is(dataCategoryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(unitId)),
+                lookup("data_element", "dataElements", "_id", "dataElements"),
+                new CustomAggregationOperation(projectionOperation)
+        );
+
+
+        AggregationResults<DataCategoryResponseDTO> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDTO.class);
+        return result.getUniqueMappedResult();
     }
 }

@@ -22,10 +22,9 @@ public class IntegrationTestConfig {
     @Value("${spring.test.authorization}")
     private String authorization ;
 
-
+    @Profile({"test","local"})
     @Bean
     @Primary
-    @Profile("local")
     public TestRestTemplate getTestRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder
                 .interceptors(new TestUserContextInterceptor())

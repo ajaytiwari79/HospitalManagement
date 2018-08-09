@@ -3,6 +3,8 @@ package com.kairos.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.List;
@@ -13,16 +15,22 @@ public class AgreementSectionDTO {
 
     private BigInteger id;
 
-    @Pattern(message = "Numebers and special character are not allowed",regexp = "^[a-zA-Z\\s]+$")
-    private String name;
+    @Pattern(message = "Numbers and special character are not allowed",regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "Section Name can't be Empty")
+    private String title;
 
+    @Valid
     private List<ClauseBasicDTO> clauses;
 
-    private List<AgreementSectionDTO> subAgreementSections;
+    private List<AgreementSectionDTO> subSections;
 
-    public List<AgreementSectionDTO> getSubAgreementSections() { return subAgreementSections; }
+    public List<AgreementSectionDTO> getSubSections() {
+        return subSections;
+    }
 
-    public void setSubAgreementSections(List<AgreementSectionDTO> subAgreementSections) { this.subAgreementSections = subAgreementSections; }
+    public void setSubSections(List<AgreementSectionDTO> subSections) {
+        this.subSections = subSections;
+    }
 
     public BigInteger getId() {
         return id;
@@ -40,14 +48,13 @@ public class AgreementSectionDTO {
         this.clauses = clauses;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
-
 
     public AgreementSectionDTO() {
     }

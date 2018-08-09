@@ -4,10 +4,12 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.metadata.HostingProviderDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.persistance.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import com.kairos.service.common.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -31,31 +33,28 @@ public class OrganizationHostingProviderService extends MongoBaseService {
     @Inject
     private HostingProviderMongoRepository hostingProviderMongoRepository;
 
-
     @Inject
-    private ComparisonUtils comparisonUtils;
+    private ExceptionService exceptionService;
+
 
     /**
      * @param organizationId
-     * @param hostingProviders
+     * @param hostingProviderDTOS
      * @return return map which contain list of new HostingProvider and list of existing HostingProvider if HostingProvider already exist
      * @description this method create new HostingProvider if HostingProvider not exist with same name ,
      * and if exist then simply add  HostingProvider to existing list and return list ;
      * findByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
      */
-    public Map<String, List<HostingProvider>> createHostingProviders(Long organizationId, List<HostingProvider> hostingProviders) {
+    public Map<String, List<HostingProvider>> createHostingProviders(Long organizationId, List<HostingProviderDTO> hostingProviderDTOS) {
 
         Map<String, List<HostingProvider>> result = new HashMap<>();
         Set<String> hostingProviderNames = new HashSet<>();
-        if (!hostingProviders.isEmpty()) {
-            for (HostingProvider hostingProvider : hostingProviders) {
-                if (!StringUtils.isBlank(hostingProvider.getName())) {
-                    hostingProviderNames.add(hostingProvider.getName());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
+        if (!hostingProviderDTOS.isEmpty()) {
+            for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
+                hostingProviderNames.add(hostingProvider.getName());
             }
             List<HostingProvider> existing = findAllByNameAndOrganizationId(organizationId, hostingProviderNames, HostingProvider.class);
-            hostingProviderNames = comparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
+            hostingProviderNames = ComparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
             List<HostingProvider> newHostingProviders = new ArrayList<>();
             if (!hostingProviderNames.isEmpty()) {
                 for (String name : hostingProviderNames) {
@@ -109,11 +108,11 @@ public class OrganizationHostingProviderService extends MongoBaseService {
 
     public Boolean deleteHostingProvider(Long organizationId, BigInteger id) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        HostingProvider hostingProvider = hostingProviderMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        if (!Optional.ofNullable(hostingProvider).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            delete(exist);
+            delete(hostingProvider);
             return true;
 
         }
@@ -122,31 +121,36 @@ public class OrganizationHostingProviderService extends MongoBaseService {
 
     /**
      * @param organizationId
-     * @param id              id of HostingProvider
-     * @param hostingProvider
-     * @return return updated HostingProvider object
+     * @param id                 id of HostingProvider
+     * @param hostingProviderDTO
+     * @return return hostingProviderDTO HostingProvider object
      * @throws DuplicateDataException if HostingProvider exist with same name
      */
-    public HostingProvider updateHostingProvider(Long organizationId, BigInteger id, HostingProvider hostingProvider) {
+    public HostingProviderDTO updateHostingProvider(Long organizationId, BigInteger id, HostingProviderDTO hostingProviderDTO) {
 
-        HostingProvider exist = hostingProviderMongoRepository.findByOrganizationIdAndName(organizationId, hostingProvider.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            if (id.equals(exist.getId())) {
-                return exist;
+        HostingProvider hostingProvider = hostingProviderMongoRepository.findByOrganizationIdAndName(organizationId, hostingProviderDTO.getName());
+        if (Optional.ofNullable(hostingProvider).isPresent()) {
+            if (id.equals(hostingProvider.getId())) {
+                return hostingProviderDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + hostingProvider.getName());
-        } else {
-            exist = hostingProviderMongoRepository.findByid(id);
-            exist.setName(hostingProvider.getName());
-            return hostingProviderMongoRepository.save(getNextSequence(exist));
-
+            throw new DuplicateDataException("data  exist for  " + hostingProviderDTO.getName());
         }
+        hostingProvider = hostingProviderMongoRepository.findByid(id);
+        if (!Optional.ofNullable(hostingProvider).isPresent()) {
+
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Provider", id);
+        }
+        hostingProvider.setName(hostingProviderDTO.getName());
+        hostingProviderMongoRepository.save(hostingProvider);
+        return hostingProviderDTO;
+
+
     }
 
 
     /**
      * @param organizationId
-     * @param name           name of hsoting provider
+     * @param name           name of hosting provider
      * @return return object of hosting provider
      * @throws DataNotExists if hosting provider not exist for given name
      */

@@ -38,7 +38,6 @@ public class OrganizationAssetTypeService extends MongoBaseService {
     private AssetTypeMongoRepository assetTypeMongoRepository;
 
 
-
     /**
      * @param
      * @param organizationId
@@ -47,15 +46,15 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      * @throws DuplicateDataException if asset type is already present with same name
      * @description method create Asset type if sub Asset Types if present then create and add sub Asset Types to Asset type.
      */
-    public AssetType createAssetTypeAndAddSubAssetTypes(Long organizationId, AssetTypeDTO assetTypeDto) {
+    public AssetTypeDTO createAssetTypeAndAddSubAssetTypes(Long organizationId, AssetTypeDTO assetTypeDto) {
 
 
-        AssetType exist = assetTypeMongoRepository.findByNameAndOrganziationId(organizationId, assetTypeDto.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        AssetType previousAssetType = assetTypeMongoRepository.findByNameAndOrganizationId(organizationId, assetTypeDto.getName());
+        if (Optional.ofNullable(previousAssetType).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
 
-        Map<String, Object> subAssetTypes = new HashMap<>();
+        Map<String, Object> subAssetTypes;
         AssetType assetType = new AssetType();
         if (!assetTypeDto.getSubAssetTypes().isEmpty()) {
             subAssetTypes = createNewSubAssetTypesList(organizationId, assetTypeDto.getSubAssetTypes());
@@ -65,12 +64,13 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         assetType.setName(assetTypeDto.getName());
         assetType.setOrganizationId(organizationId);
         try {
-            assetType = assetTypeMongoRepository.save(getNextSequence(assetType));
+            assetType = assetTypeMongoRepository.save(assetType);
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
-        return assetType;
+        assetTypeDto.setId(assetType.getId());
+        return assetTypeDto;
     }
 
     /**
@@ -169,19 +169,19 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      * @param
      * @param organizationId
      * @param id             id of Asset Type to which Sub Asset Types Link.
-     * @param assetTypeDto   asset type Dto contain list of Existing sub Asset typeswhich need to be update and New SubAsset Types  which we need to create and add to asset afterward.
+     * @param assetTypeDto   asset type Dto contain list of Existing sub Asset types which need to be update and New SubAsset Types  which we need to create and add to asset afterward.
      * @return Asset Type with updated Sub Asset and new Sub Asset Types
      * @throws DuplicateDataException if Asset type is already present with same name .
      * @description method simply (update already exit Sub asset types if id is present)and (add create new sub asset types if id is not present in sub asset types)
      */
-    public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long organizationId, BigInteger id, AssetTypeDTO assetTypeDto) {
-        AssetType exist = assetTypeMongoRepository.findByNameAndOrganziationId(organizationId, assetTypeDto.getName());
-        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
+    public AssetTypeDTO updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long organizationId, BigInteger id, AssetTypeDTO assetTypeDto) {
+        AssetType assetType = assetTypeMongoRepository.findByNameAndOrganizationId(organizationId, assetTypeDto.getName());
+        if (Optional.ofNullable(assetType).isPresent() && !id.equals(assetType.getId())) {
             throw new DuplicateDataException("data  exist for  " + assetTypeDto.getName());
         }
 
-        exist = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        exist.setName(assetTypeDto.getName());
+        assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        assetType.setName(assetTypeDto.getName());
         List<AssetTypeDTO> newSubAssetTypesList = new ArrayList<>();
         List<AssetTypeDTO> updateExistingSubAssetTypes = new ArrayList<>();
         assetTypeDto.getSubAssetTypes().forEach(subAssetTypeDto -> {
@@ -203,8 +203,8 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         }
 
         try {
-            exist.setSubAssetTypes(updatedAndNewSubAssetTypeIds);
-            exist = assetTypeMongoRepository.save(getNextSequence(exist));
+            assetType.setSubAssetTypes(updatedAndNewSubAssetTypeIds);
+            assetType = assetTypeMongoRepository.save(assetType);
         } catch (Exception e) {
             List<AssetType> subAssetTypes = new ArrayList<>();
             subAssetTypes.addAll((List<AssetType>) newSubAssetTypes.get(ASSET_TYPES_LIST));
@@ -214,7 +214,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
             throw new RuntimeException(e.getMessage());
 
         }
-        return exist;
+        return assetTypeDto;
 
     }
 
@@ -227,7 +227,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      */
     public AssetType getAssetTypeByName(Long organizationId, String name) {
         if (!StringUtils.isBlank(name)) {
-            AssetType exist = assetTypeMongoRepository.findByNameAndOrganziationId(organizationId, name);
+            AssetType exist = assetTypeMongoRepository.findByNameAndOrganizationId(organizationId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }

@@ -2,10 +2,11 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.controller.master_data.asset_management.HostingProviderController;
+import com.kairos.dto.metadata.HostingProviderDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.service.data_inventory.asset.OrganizationHostingProviderService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -32,12 +33,12 @@ public class OrganizationHostingProviderController {
 
     @ApiOperation("add HostingProvider")
     @PostMapping("/hosting_provider/add")
-    public ResponseEntity<Object> createHostingProvider(@PathVariable Long unitId, @Valid @RequestBody ValidateListOfRequestBody<HostingProvider> hostingProviders) {
+    public ResponseEntity<Object> createHostingProvider(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(unitId, hostingProviders.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(unitId, hostingProviderDTOs.getRequestBody()));
 
     }
 
@@ -88,13 +89,13 @@ public class OrganizationHostingProviderController {
 
     @ApiOperation("update HostingProvider by id")
     @PutMapping("/hosting_provider/update/{id}")
-    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody HostingProvider hostingProvider) {
+    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(unitId, id, hostingProvider));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(unitId, id, hostingProviderDTO));
 
     }
 

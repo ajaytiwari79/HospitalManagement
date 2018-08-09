@@ -161,6 +161,7 @@ public class StaffService extends UserBaseService {
     @Inject
     private PartialLeaveGraphRepository partialLeaveGraphRepository;
     @Inject
+    private
     IntegrationService integrationService;
     @Inject
     private MailService mailService;
@@ -646,8 +647,8 @@ public class StaffService extends UserBaseService {
     //Function to validate staff Mandatory Fields
     private boolean validateStaffData(Row row, int[] mandatoryCellColumnIndexs) {
         boolean isPerStaffMandatoryFieldsExists = true;
-        for (int i = 0; i < mandatoryCellColumnIndexs.length; i++) {
-            Cell cell = row.getCell(mandatoryCellColumnIndexs[i]);
+        for (int mandatoryCellColumnIndex : mandatoryCellColumnIndexs) {
+            Cell cell = row.getCell(mandatoryCellColumnIndex);
             if (cell == null) {
                 isPerStaffMandatoryFieldsExists = false;
                 break;
@@ -655,17 +656,14 @@ public class StaffService extends UserBaseService {
         }
         return isPerStaffMandatoryFieldsExists;
     }
-    /*******************************************************************************************************/
     // function to convert cell value as String for given cellIndex
 
     /*******************************************************************************************************/
 
-    private String getStringValueOfIndexedCell(Row row,int cellIndex)
-    {
-        Cell cellValue=row.getCell(cellIndex);
+    private String getStringValueOfIndexedCell(Row row, int cellIndex) {
+        Cell cellValue = row.getCell(cellIndex);
         cellValue.setCellType(Cell.CELL_TYPE_STRING);
-        String cellStringValue=cellValue.getStringCellValue().trim();
-        return cellStringValue;
+        return cellValue.getStringCellValue().trim();
     }
 
     /*******************************************************************************************************/
@@ -767,22 +765,22 @@ public class StaffService extends UserBaseService {
                     staffErrorList.add(row.getRowNum());
 
                 } else {
-                    String externalIdValueAsString=getStringValueOfIndexedCell(row,2);
+                    String externalIdValueAsString = getStringValueOfIndexedCell(row, 2);
                     Long externalId = (StringUtils.isBlank(externalIdValueAsString)) ? 0 : Long.parseLong(externalIdValueAsString);
                     if (alreadyAddedStaffIds.contains(externalId)) {
-                        logger.info(" staff with kmd external id  already found  so we are skipping this {}{}" + externalId,externalIdValueAsString);
+                        logger.info(" staff with kmd external id  already found  so we are skipping this {}{}" + externalId, externalIdValueAsString);
                         staffErrorList.add(row.getRowNum());
                         continue;
                     }
                     Staff staff = new Staff();
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
-                    staff.setUserName(getStringValueOfIndexedCell(row,19));
-                    staff.setFirstName(getStringValueOfIndexedCell(row,20));
-                    staff.setLastName(getStringValueOfIndexedCell(row,21));
+                    staff.setUserName(getStringValueOfIndexedCell(row, 19));
+                    staff.setFirstName(getStringValueOfIndexedCell(row, 20));
+                    staff.setLastName(getStringValueOfIndexedCell(row, 21));
                     staff.setFamilyName(staff.getLastName());
                     if (row.getCell(17) != null) {
-                        staff.setBadgeNumber(getStringValueOfIndexedCell(row,17));
+                        staff.setBadgeNumber(getStringValueOfIndexedCell(row, 17));
                     }
                     ContactAddress contactAddress = extractContactAddressFromRow(row);
                     if (!Optional.ofNullable(contactAddress).isPresent()) {
@@ -792,16 +790,16 @@ public class StaffService extends UserBaseService {
                     staff.setContactDetail(contactDetail);
                     staff.setContactAddress(contactAddress);
                     if (isPerStaffMandatoryFieldsExists) {
-                        User user =userGraphRepository.findByTimeCareExternalIdOrUserNameOrEmail(getStringValueOfIndexedCell(row,2)
-                                                                           ,getStringValueOfIndexedCell(row,28).toLowerCase()
-                                                                           ,getStringValueOfIndexedCell(row,28).toLowerCase()
-                                                                           );
+                        User user = userGraphRepository.findByTimeCareExternalIdOrUserNameOrEmail(getStringValueOfIndexedCell(row, 2)
+                                , getStringValueOfIndexedCell(row, 28).toLowerCase()
+                                , getStringValueOfIndexedCell(row, 28).toLowerCase()
+                        );
                         if (!Optional.ofNullable(user).isPresent()) {
                             user = new User();
                             // set User's default language
                             user.setUserLanguage(defaultSystemLanguage);
-                            user.setFirstName(getStringValueOfIndexedCell(row,20));
-                            user.setLastName(getStringValueOfIndexedCell(row,21));
+                            user.setFirstName(getStringValueOfIndexedCell(row, 20));
+                            user.setLastName(getStringValueOfIndexedCell(row, 21));
                             Long cprNumberLong = new Double(row.getCell(41).toString()).longValue();
                             user.setCprNumber(cprNumberLong.toString().trim());
                             user.setGender(CPRUtil.getGenderFromCPRNumber(user.getCprNumber()));
@@ -810,14 +808,13 @@ public class StaffService extends UserBaseService {
                             if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
                                 user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
                                 user.setEmail(contactDetail.getPrivateEmail().toLowerCase());
+                            } else {
+                                user.setEmail(user.getFirstName().trim() + KAIROS);
                             }
                             String defaultPassword = user.getFirstName().trim() + "@kairos";
                             user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
                             user.setAccessToken(defaultPassword);
                         }
-                        Client client = createClientObject(staff, user.getCprNumber());  // here client is referred as citizen
-
-                        staff.setClient(client);
                         staff.setUser(user);
                     }
                     staffGraphRepository.save(staff);
@@ -848,21 +845,21 @@ public class StaffService extends UserBaseService {
                 contactAddress.setZipCode(zipCode);
                 String address = row.getCell(23).getStringCellValue();
                 String arr[] = address.split(",");
-                String houseNumber = "";
-                String fullStreetName = "";
+                String houseNumber;
+                StringBuilder fullStreetName = new StringBuilder();
                 if (arr.length != 0) {
                     String street = arr[0];
                     String newArray[] = street.split(" ");
                     houseNumber = newArray[newArray.length - 1];
                     for (int i = 0; i < newArray.length - 1; i++) {
                         if (i == 0) {
-                            fullStreetName = fullStreetName + newArray[i];
+                            fullStreetName.append(newArray[i]);
                         } else {
-                            fullStreetName = fullStreetName + " " + newArray[i];
+                            fullStreetName.append(" ").append(newArray[i]);
                         }
                     }
                     contactAddress.setHouseNumber(houseNumber);
-                    contactAddress.setStreet1(fullStreetName);
+                    contactAddress.setStreet1(fullStreetName.toString());
                     contactAddress.setCity(row.getCell(25).toString());
                 }
                 return contactAddress;
@@ -1036,7 +1033,7 @@ public class StaffService extends UserBaseService {
     By Yasir
     Commented below method as we are no longer using FLS Visitour
      */
-    public Map<String, String> createStaffSchedule(long organizationId, Long unitId) throws ParseException {
+    public Map<String, String> createStaffSchedule(long organizationId, Long unitId) {
 
         /*Map<String, String> workScheduleStatus = new HashMap<>();
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
@@ -1103,17 +1100,15 @@ public class StaffService extends UserBaseService {
         SystemLanguage systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
         user.setUserLanguage(systemLanguage);
         staff = createStaffObject(parent, unit, payload);
-        Client client = createClientObject(staff, payload.getCprNumber());
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);
-        staff.setClient(client);
+
         addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getCurrentDateMillis(), isEmploymentExist);
-        staff.setUser(null); // removing user to send in FE
-//        staff.setGender(user.getGender());
+
         //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
-        StaffDTO staffDTO = new StaffDTO(staff.getId(),staff.getFirstName(),staff.getLastName(),user.getGender(),user.getAge());
+        StaffDTO staffDTO = new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge());
         return staffDTO;
     }
 
@@ -1184,22 +1179,6 @@ public class StaffService extends UserBaseService {
             staff.setEngineerType(engineerType);
         }
         return staff;
-    }
-
-    private Client createClientObject(Staff staff, String cprNumber) {
-        Client client = clientGraphRepository.findByCprNumber(cprNumber);
-        logger.debug("Staff cpr number", cprNumber);
-        if (!Optional.ofNullable(client).isPresent()) {
-            logger.debug("NO CITIZEN found by cpr : cpr number", cprNumber);
-            client = new Client();
-            client.setFirstName(staff.getFirstName());
-            client.setLastName(staff.getLastName());
-            client.setEmail(staff.getEmail());
-            client.setCprNumber(cprNumber);
-            client.setGender(CPRUtil.getGenderFromCPRNumber(client.getCprNumber()));
-            client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(cprNumber));
-        }
-        return client;
     }
 
     private void createEmployment(Organization organization,
@@ -1314,12 +1293,6 @@ public class StaffService extends UserBaseService {
         staff.setUser(user);
         staff.setOrganizationId(unit.getId());
         staff = staffGraphRepository.save(staff);
-
-        if (unit == null) {
-            exceptionService.internalServerError("error.unit.notNull");
-
-        }
-
         Organization parent = null;
         if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
@@ -1329,11 +1302,11 @@ public class StaffService extends UserBaseService {
         }
         if (parent == null) {
             if (employmentGraphRepository.findEmployment(unit.getId(), staff.getId()) == null) {
-                employmentGraphRepository.createEmployments(unit.getId(), Arrays.asList(staff.getId()), unit.getId());
+                employmentGraphRepository.createEmployments(unit.getId(), Collections.singletonList(staff.getId()), unit.getId());
             }
         } else {
             if (employmentGraphRepository.findEmployment(parent.getId(), staff.getId()) == null) {
-                employmentGraphRepository.createEmployments(parent.getId(), Arrays.asList(staff.getId()), unit.getId());
+                employmentGraphRepository.createEmployments(parent.getId(), Collections.singletonList(staff.getId()), unit.getId());
             }
         }
         return staff;
@@ -1541,7 +1514,7 @@ public class StaffService extends UserBaseService {
 
         }
         List<StaffAssignedTasksWrapper> tasks = taskServiceRestClient.getAssignedTasksOfStaff(staffId, date);
-        List<Long> citizenIds = tasks.stream().map(task -> task.getId()).collect(Collectors.toList());
+        List<Long> citizenIds = tasks.stream().map(StaffAssignedTasksWrapper::getId).collect(Collectors.toList());
         List<Client> clients = clientGraphRepository.findByIdIn(citizenIds);
         ObjectMapper objectMapper = new ObjectMapper();
         StaffTaskDTO staffTaskDTO;
@@ -1904,14 +1877,13 @@ public class StaffService extends UserBaseService {
             StaffWithSkillDTO staffDTO = new StaffWithSkillDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
             EmploymentUnitPositionDTO employmentUnitPositionDTO = unitPositionService.getUnitPositionsOfStaff(unitId, s.getId(), true);
             List<UnitPositionQueryResult> unitPositions = employmentUnitPositionDTO.getUnitPositions();
-            expertiesIds.forEach(expertiseId -> {
-                unitPositions.forEach(unitPosition -> {
-                    if (unitPosition.getExpertise().getId().equals(expertiseId)) {
-                        staffDTO.setUnitEmploymentPositionId(unitPosition.getId());
-                        staffDTOS.add(staffDTO);
-                    }
-                });
-            });
+            expertiesIds.forEach(expertiseId -> unitPositions.forEach(unitPosition -> {
+                        if (unitPosition.getExpertise().getId().equals(expertiseId)) {
+                            staffDTO.setUnitEmploymentPositionId(unitPosition.getId());
+                            staffDTOS.add(staffDTO);
+                        }
+                    })
+            );
 
         });
         return staffDTOS;
@@ -2162,7 +2134,7 @@ public class StaffService extends UserBaseService {
     }
 
     public List<StaffPersonalDetail> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
-        return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds,DateUtil.getCurrentDateMillis());
+        return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds, DateUtil.getCurrentDateMillis());
 
     }
 

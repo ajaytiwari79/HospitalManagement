@@ -26,7 +26,7 @@ public class ProcessingPurposeDTO {
 
     public void setId(BigInteger id) { this.id = id; }
 
-    public String getName() { return name; }
+    public String getName() { return name.trim(); }
 
     public void setName(String name) { this.name = name; }
 }

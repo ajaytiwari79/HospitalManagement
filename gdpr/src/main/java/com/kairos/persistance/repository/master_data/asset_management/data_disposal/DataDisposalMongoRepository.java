@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data.asset_management.data_disp
 
 
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -14,7 +15,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface DataDisposalMongoRepository extends MongoRepository<DataDisposal,BigInteger> ,CustomDataDisposalRepository{
+public interface DataDisposalMongoRepository extends MongoBaseRepository<DataDisposal,BigInteger>,CustomDataDisposalRepository{
 
 
     @Query("{deleted:false,countryId:?0,_id:?1}")

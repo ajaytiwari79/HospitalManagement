@@ -4,9 +4,9 @@ package com.kairos.persistance.model.master_data.data_category_element;
 import com.kairos.dto.OrganizationSubTypeDTO;
 import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -18,11 +18,11 @@ import java.util.Set;
 public class DataSubjectMapping extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "Name can't be null or empty")
+    @NotBlank(message = "Name can't be null or empty")
     @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNullOrEmpty(message = "Description Cannot be empty")
+    @NotBlank(message = "Description Cannot be empty")
     private String description;
 
     @NotEmpty(message = "ManagingOrganization Type cannot be empty")
@@ -97,5 +97,10 @@ public class DataSubjectMapping extends MongoBaseEntity {
     }
 
     public DataSubjectMapping() {
+    }
+
+
+    public DataSubjectMapping(String name) {
+        this.name = name;
     }
 }

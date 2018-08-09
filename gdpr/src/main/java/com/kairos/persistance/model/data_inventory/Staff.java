@@ -2,9 +2,9 @@ package com.kairos.persistance.model.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.javers.core.metamodel.annotation.ValueObject;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 
@@ -17,7 +17,7 @@ public class Staff {
 
     private String userName;
 
-    @NotNullOrEmpty(message = "Staff Name can't be empty ")
+    @NotBlank(message = "Staff Name can't be empty ")
     private String firstName;
 
     public Long getId() { return id; }

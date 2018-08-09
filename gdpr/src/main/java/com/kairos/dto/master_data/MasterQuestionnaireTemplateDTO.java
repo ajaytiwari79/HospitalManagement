@@ -2,32 +2,30 @@ package com.kairos.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MasterQuestionnaireTemplateDTO {
 
+    private BigInteger id;
 
-    @NotNullOrEmpty(message = "name.cannot.be.empty.or.null")
+    @NotBlank(message = "name.cannot.be.empty.or.null")
     @Pattern(message = "Number and Special character are not allowed for Title",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 
-    @NotNullOrEmpty(message = "Description cannot be empty")
+    @NotBlank(message = "Description cannot be empty")
     private String description;
 
-    @NotNullOrEmpty(message = "Template type cannot be empty ")
+    @NotBlank(message = "Template type cannot be empty ")
     private String templateType;
 
     private BigInteger assetType;
 
-    private Long countryId;
-
-
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
@@ -58,12 +56,12 @@ public class MasterQuestionnaireTemplateDTO {
         this.assetType = assetType;
     }
 
-    public Long getCountryId() {
-        return countryId;
+    public BigInteger getId() {
+        return id;
     }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public MasterQuestionnaireTemplateDTO() {

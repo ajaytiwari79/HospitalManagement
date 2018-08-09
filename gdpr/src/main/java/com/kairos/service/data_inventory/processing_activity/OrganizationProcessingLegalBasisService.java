@@ -5,10 +5,12 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
 import com.kairos.service.common.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,39 +28,33 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 public class OrganizationProcessingLegalBasisService extends MongoBaseService {
 
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationProcessingLegalBasisService.class);
 
     @Inject
     private ProcessingLegalBasisMongoRepository legalBasisMongoRepository;
 
     @Inject
-    private ComparisonUtils comparisonUtils;
-
+    private ExceptionService exceptionService;
 
     /**
+     * @param organizationId
+     * @param legalBasisDTOList
+     * @return return map which contain list of new ProcessingLegalBasis and list of existing ProcessingLegalBasis if ProcessingLegalBasis already exist
      * @description this method create new ProcessingLegalBasis if ProcessingLegalBasis not exist with same name ,
      * and if exist then simply add  ProcessingLegalBasis to existing list and return list ;
      * findByNamesAndCountryId()  return list of existing ProcessingLegalBasis using collation ,used for case insensitive result
-     * @param organizationId
-     * @param legalBasisList
-     * @return return map which contain list of new ProcessingLegalBasis and list of existing ProcessingLegalBasis if ProcessingLegalBasis already exist
-     *
      */
-    public Map<String, List<ProcessingLegalBasis>> createProcessingLegalBasis( Long organizationId, List<ProcessingLegalBasis> legalBasisList) {
+    public Map<String, List<ProcessingLegalBasis>> createProcessingLegalBasis(Long organizationId, List<ProcessingLegalBasisDTO> legalBasisDTOList) {
 
         Map<String, List<ProcessingLegalBasis>> result = new HashMap<>();
         Set<String> legalBasisNames = new HashSet<>();
-        if (legalBasisList.size() != 0) {
-            for (ProcessingLegalBasis legalBasis : legalBasisList) {
-                if (!StringUtils.isBlank(legalBasis.getName())) {
-                    legalBasisNames.add(legalBasis.getName());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
+        if (!legalBasisDTOList.isEmpty()) {
+            for (ProcessingLegalBasisDTO legalBasis : legalBasisDTOList) {
 
+                legalBasisNames.add(legalBasis.getName());
             }
-            List<ProcessingLegalBasis> existing =  findAllByNameAndOrganizationId(organizationId,legalBasisNames,ProcessingLegalBasis.class);
-            legalBasisNames = comparisonUtils.getNameListForMetadata(existing, legalBasisNames);
+            List<ProcessingLegalBasis> existing = findAllByNameAndOrganizationId(organizationId, legalBasisNames, ProcessingLegalBasis.class);
+            legalBasisNames = ComparisonUtils.getNameListForMetadata(existing, legalBasisNames);
 
             List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
             if (legalBasisNames.size() != 0) {
@@ -91,14 +87,14 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
     }
 
     /**
-     * @throws DataNotFoundByIdException throw exception if ProcessingLegalBasis not found for given id
      * @param organizationId
-     * @param id id of ProcessingLegalBasis
+     * @param id             id of ProcessingLegalBasis
      * @return ProcessingLegalBasis object fetch by given id
+     * @throws DataNotFoundByIdException throw exception if ProcessingLegalBasis not found for given id
      */
-    public ProcessingLegalBasis getProcessingLegalBasis(Long organizationId,BigInteger id) {
+    public ProcessingLegalBasis getProcessingLegalBasis(Long organizationId, BigInteger id) {
 
-        ProcessingLegalBasis exist = legalBasisMongoRepository.findByOrganizationIdAndId(organizationId,id);
+        ProcessingLegalBasis exist = legalBasisMongoRepository.findByOrganizationIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -108,13 +104,13 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
     }
 
 
-    public Boolean deleteProcessingLegalBasis(Long organizationId,BigInteger id) {
+    public Boolean deleteProcessingLegalBasis(Long organizationId, BigInteger id) {
 
-        ProcessingLegalBasis exist = legalBasisMongoRepository.findByOrganizationIdAndId(organizationId,id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        ProcessingLegalBasis processingLegalBasis = legalBasisMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        if (!Optional.ofNullable(processingLegalBasis).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            delete(exist);
+            delete(processingLegalBasis);
             return true;
 
         }
@@ -124,31 +120,34 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
      * @throws DuplicateDataException throw exception if ProcessingLegalBasis data not exist for given id
      * @param organizationId
      * @param id id of ProcessingLegalBasis
-     * @param legalBasis
+     * @param legalBasisDTO
      * @return ProcessingLegalBasis updated object
      */
-    public ProcessingLegalBasis updateProcessingLegalBasis(Long organizationId,BigInteger id, ProcessingLegalBasis legalBasis) {
+    public ProcessingLegalBasisDTO updateProcessingLegalBasis(Long organizationId, BigInteger id, ProcessingLegalBasisDTO legalBasisDTO) {
 
-
-        ProcessingLegalBasis exist = legalBasisMongoRepository.findByNameAndOrganizationId(organizationId,legalBasis.getName());
-        if (Optional.ofNullable(exist).isPresent() ) {
-            if (id.equals(exist.getId())) {
-                return exist;
+        ProcessingLegalBasis processingLegalBasis = legalBasisMongoRepository.findByNameAndOrganizationId(organizationId, legalBasisDTO.getName());
+        if (Optional.ofNullable(processingLegalBasis).isPresent()) {
+            if (id.equals(processingLegalBasis.getId())) {
+                return legalBasisDTO;
             }
-            throw new DuplicateDataException("data  exist for  "+legalBasis.getName());
-        } else {
-            exist=legalBasisMongoRepository.findByid(id);
-            exist.setName(legalBasis.getName());
-            return legalBasisMongoRepository.save(getNextSequence(exist));
-
+            throw new DuplicateDataException("data  exist for  " + legalBasisDTO.getName());
         }
+        processingLegalBasis = legalBasisMongoRepository.findByid(id);
+        if (!Optional.ofNullable(processingLegalBasis).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Legal Basis", id);
+        }
+        processingLegalBasis.setName(legalBasisDTO.getName());
+        legalBasisMongoRepository.save(processingLegalBasis);
+        return legalBasisDTO;
+
+
     }
 
     /**
-     * @throws DataNotExists throw exception if ProcessingLegalBasis not exist for given name
      * @param organizationId
-     * @param name name of ProcessingLegalBasis
+     * @param name           name of ProcessingLegalBasis
      * @return ProcessingLegalBasis object fetch on basis of  name
+     * @throws DataNotExists throw exception if ProcessingLegalBasis not exist for given name
      */
     public ProcessingLegalBasis getProcessingLegalBasisByName(Long organizationId, String name) {
 
@@ -163,8 +162,6 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
-
-
 
 
 }

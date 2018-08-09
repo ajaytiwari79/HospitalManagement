@@ -5,11 +5,9 @@ import com.kairos.enums.RiskSeverity;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.model.data_inventory.ManagingOrganization;
 import com.kairos.persistance.model.data_inventory.Staff;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
@@ -18,15 +16,15 @@ import java.util.List;
 public class Asset extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "Name can 't be empty")
+    @NotBlank(message = "Name can 't be empty")
     private String name;
 
-    @NotNullOrEmpty(message = "description can't be empty")
+    @NotBlank(message = "description can't be empty")
     private String description;
 
     private Long countryId;
 
-    @NotBlank(message = "Hosting Loction can't be empty")
+    @NotBlank(message = "Hosting Location can't be empty")
     private String hostingLocation;
 
     @NotNull(message = "Managing department can't be empty")

@@ -16,10 +16,8 @@ import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
-import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -37,15 +35,10 @@ public class ClauseService extends MongoBaseService {
 
     @Inject
     private AccountTypeService accountTypeService;
-    @Inject
-    private MongoTemplate mongoTemplate;
 
 
     @Inject
     private AccountTypeMongoRepository accountTypeMongoRepository;
-
-    @Inject
-    private ComparisonUtils comparisonUtils;
 
 
     @Inject
@@ -88,7 +81,7 @@ public class ClauseService extends MongoBaseService {
         try {
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
             newClause.setTags(tagList);
-            newClause = clauseMongoRepository.save(getNextSequence(newClause));
+            newClause = clauseMongoRepository.save(newClause);
             return newClause;
         } catch (DuplicateDataException e) {
             clauseTagMongoRepository.deleteAll(tagList);
@@ -110,40 +103,40 @@ public class ClauseService extends MongoBaseService {
      * @param clauseDto      contain update data for clause
      * @return updated clause object
      * @throws DataNotFoundByIdException: if clause not found for particular id, {@link DuplicateDataException if clause already exist with same name}
-     * @description this method updateclause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
+     * @description this method update clause ,and add tags to clause if tag already exist then simply add tag and if not then create tag and then add to clause
      */
     public Clause updateClause(Long countryId, Long organizationId, BigInteger clauseId, ClauseDTO clauseDto) {
 
-        Clause exists = clauseMongoRepository.findByTitle(countryId, organizationId, clauseDto.getTitle());
-        if (Optional.ofNullable(exists).isPresent() && !exists.getId().equals(clauseId)) {
+        Clause clause = clauseMongoRepository.findByTitle(countryId, organizationId, clauseDto.getTitle());
+        if (Optional.ofNullable(clause).isPresent() && !clause.getId().equals(clauseId)) {
             exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }
-        exists = clauseMongoRepository.findByIdAndNonDeleted(countryId, organizationId, clauseId);
-        if (!Optional.ofNullable(exists).isPresent()) {
+        clause = clauseMongoRepository.findByIdAndNonDeleted(countryId, organizationId, clauseId);
+        if (!Optional.ofNullable(clause).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + clauseId);
         }
         List<ClauseTag> tagList = new ArrayList<>();
-        exists.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
+        clause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
         List<BigInteger> templateTypesIds=clauseDto.getTemplateTypes();
         //templateTypeService.getTemplateByIdsList(templateTypesIds, countryId);
         try {
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
-            exists.setOrganizationTypes(clauseDto.getOrganizationTypes());
-            exists.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
-            exists.setOrganizationServices(clauseDto.getOrganizationServices());
-            exists.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
-            exists.setTitle(clauseDto.getTitle());
-            exists.setDescription(clauseDto.getDescription());
-            exists.setTags(tagList);
-            exists.setTemplateTypes(clauseDto.getTemplateTypes());
+            clause.setOrganizationTypes(clauseDto.getOrganizationTypes());
+            clause.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
+            clause.setOrganizationServices(clauseDto.getOrganizationServices());
+            clause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
+            clause.setTitle(clauseDto.getTitle());
+            clause.setDescription(clauseDto.getDescription());
+            clause.setTags(tagList);
+            clause.setTemplateTypes(clauseDto.getTemplateTypes());
             // exists.setOrganizationList(clauseDto.getOrganizationList());
-            exists = clauseMongoRepository.save(getNextSequence(exists));
+            clause = clauseMongoRepository.save(clause);
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
-        return exists;
+        return clause;
     }
 
 
@@ -156,9 +149,9 @@ public class ClauseService extends MongoBaseService {
      * @param countryId
      * @param organizationId
      * @param clauseBasicDTOS         List od Clause Dto contain basic detail ,title and description of clause.
-     * @param policyAgreementTemplate - policy agreement template contain list or organization types,Sub types,Service Catgeory and Sub Service Category and Account types.
+     * @param policyAgreementTemplate - policy agreement template contain list or organization types,Sub types,Service Category and Sub Service Category and Account types.
      * @return
-     * @description this method create is used in Agreement section Service for creating new Clauses on creation of sections in policy agreement tenplate.
+     * @description this method create is used in Agreement section Service for creating new Clauses on creation of sections in policy agreement template.
      */
     public List<Clause> createNewClauseUsingAgreementTemplateMetadata(Long countryId, Long organizationId, List<ClauseBasicDTO> clauseBasicDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
@@ -167,7 +160,7 @@ public class ClauseService extends MongoBaseService {
         clauseBasicDTOS.forEach(
                 clauseBasicDTO -> {
                     if (clauseTitles.contains(clauseBasicDTO.getTitle())) {
-                        exceptionService.duplicateDataException("message.duplicate", "Caluse title ", clauseBasicDTO.getTitle());
+                        exceptionService.duplicateDataException("message.duplicate", "Clause title ", clauseBasicDTO.getTitle());
                     }
                     clauseTitles.add(clauseBasicDTO.getTitle());
                 }
@@ -176,7 +169,7 @@ public class ClauseService extends MongoBaseService {
         if (!existingClause.isEmpty()) {
             exceptionService.duplicateDataException("message.duplicate", " Clause " + existingClause.get(0).getTitle());
         }
-        List<Clause> newCLauseList = new ArrayList<>();
+        List<Clause> newClauseList = new ArrayList<>();
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
             Clause clause = new Clause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), countryId, policyAgreementTemplate.getOrganizationTypes(), policyAgreementTemplate.getOrganizationSubTypes()
                     , policyAgreementTemplate.getOrganizationServices(), policyAgreementTemplate.getOrganizationSubServices());
@@ -186,17 +179,17 @@ public class ClauseService extends MongoBaseService {
             clause.setTemplateTypes(templateTypes);
             clause.setOrganizationId(organizationId);
             clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
-            newCLauseList.add(clause);
+            newClauseList.add(clause);
 
         }
-        return clauseMongoRepository.saveAll(getNextSequence(newCLauseList));
+        return clauseMongoRepository.saveAll(getNextSequence(newClauseList));
     }
 
 
     /**
      * @param countryId
      * @param organizationId
-     * @return return caluse with account type basic response,org types ,sub types,service category ,sub service category and tags
+     * @return return clause with account type basic response,org types ,sub types,service category ,sub service category and tags
      * @description
      */
     public List<ClauseResponseDTO> getAllClauses(Long countryId, Long organizationId) {
@@ -219,7 +212,7 @@ public class ClauseService extends MongoBaseService {
      * @param countryId
      * @param organizationId
      * @param id
-     * @return bollean true if data deleted successfully
+     * @return boolean true if data deleted successfully
      * @throws DataNotFoundByIdException; if clause not found for id
      */
     public Boolean deleteClause(Long countryId, Long organizationId, BigInteger id) {

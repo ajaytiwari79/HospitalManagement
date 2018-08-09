@@ -1,10 +1,11 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
+import com.kairos.dto.metadata.AccessorPartyDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -18,7 +19,6 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 /*
  *
@@ -39,7 +39,7 @@ public class AccessorPartyController {
 
     @ApiOperation("add AccessorParty")
     @PostMapping("/accessor_party/add")
-    public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<AccessorParty> accessorParties) {
+    public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<AccessorPartyDTO> accessorParties) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
@@ -97,7 +97,7 @@ public class AccessorPartyController {
 
     @ApiOperation("update AccessorParty by id")
     @PutMapping("/accessor_party/update/{id}")
-    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody AccessorParty accessorParty) {
+    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody AccessorPartyDTO accessorParty) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {
@@ -110,7 +110,7 @@ public class AccessorPartyController {
     @GetMapping("/accessor_party")
     public ResponseEntity<Object> getAllAccessorPartyOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam long parentOrgId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllNotInheritedAccesorPartyFromParentOrgAndUnitAccesorParty(countryId,parentOrgId,organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(countryId,parentOrgId,organizationId));
     }
 
 }

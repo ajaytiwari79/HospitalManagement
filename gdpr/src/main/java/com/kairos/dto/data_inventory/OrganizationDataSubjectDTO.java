@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.master_data.DataCategoryDTO;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationDataSubjectDTO {
 
+    @NotEmpty(message = "Data Subject name Can't be Empty")
     private Set<String> dataSubjectNames;
 
     @Valid

@@ -50,11 +50,11 @@ public class AssetTypeService extends MongoBaseService {
      * @throws DuplicateDataException if asset type is already present with same name
      * @description method create Asset type if sub Asset Types if present then create and add sub Asset Types to Asset type.
      */
-    public AssetType createAssetTypeAndAddSubAssetTypes(Long countryId, AssetTypeDTO assetTypeDto) {
+    public AssetTypeDTO createAssetTypeAndAddSubAssetTypes(Long countryId, AssetTypeDTO assetTypeDto) {
 
 
-        AssetType exist = assetTypeMongoRepository.findByNameAndCountryId(countryId, assetTypeDto.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        AssetType previousAssetType = assetTypeMongoRepository.findByNameAndCountryId(countryId, assetTypeDto.getName());
+        if (Optional.ofNullable(previousAssetType).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
 
@@ -68,12 +68,13 @@ public class AssetTypeService extends MongoBaseService {
         assetType.setName(assetTypeDto.getName());
         assetType.setCountryId(countryId);
         try {
-            assetType = assetTypeMongoRepository.save(getNextSequence(assetType));
+            assetType = assetTypeMongoRepository.save(assetType);
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
-        return assetType;
+        assetTypeDto.setId(assetType.getId());
+        return assetTypeDto;
     }
 
     /**
@@ -123,7 +124,7 @@ public class AssetTypeService extends MongoBaseService {
             subAssetTypesIds.add(subAssetTypeDto.getId());
             subAssetTypeDtoCorrespondingToIds.put(subAssetTypeDto.getId(), subAssetTypeDto);
         });
-        List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllAssetTypebyIds(countryId, subAssetTypesIds);
+        List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllAssetTypeByIds(countryId, subAssetTypesIds);
         subAssetTypesList.forEach(subAssetType -> {
 
             AssetTypeDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
@@ -183,19 +184,19 @@ public class AssetTypeService extends MongoBaseService {
      * @param countryId
      * @param
      * @param id           id of Asset Type to which Sub Asset Types Link.
-     * @param assetTypeDto asset type Dto contain list of Existing sub Asset typeswhich need to be update and New SubAsset Types  which we need to create and add to asset afterward.
+     * @param assetTypeDto asset type Dto contain list of Existing sub Asset types which need to be update and New SubAsset Types  which we need to create and add to asset afterward.
      * @return Asset Type with updated Sub Asset and new Sub Asset Types
      * @throws DuplicateDataException if Asset type is already present with same name .
      * @description method simply (update already exit Sub asset types if id is present)and (add create new sub asset types if id is not present in sub asset types)
      */
-    public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, BigInteger id, AssetTypeDTO assetTypeDto) {
-        AssetType exist = assetTypeMongoRepository.findByNameAndCountryId(countryId, assetTypeDto.getName());
-        if (Optional.ofNullable(exist).isPresent() && !id.equals(exist.getId())) {
+    public AssetTypeDTO updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, BigInteger id, AssetTypeDTO assetTypeDto) {
+        AssetType assetType = assetTypeMongoRepository.findByNameAndCountryId(countryId, assetTypeDto.getName());
+        if (Optional.ofNullable(assetType).isPresent() && !id.equals(assetType.getId())) {
             throw new DuplicateDataException("data  exist for  " + assetTypeDto.getName());
         }
 
-        exist = assetTypeMongoRepository.findByIdAndNonDeleted(countryId, id);
-        exist.setName(assetTypeDto.getName());
+        assetType = assetTypeMongoRepository.findByIdAndNonDeleted(countryId, id);
+        assetType.setName(assetTypeDto.getName());
         List<AssetTypeDTO> newSubAssetTypesList = new ArrayList<>();
         List<AssetTypeDTO> updateExistingSubAssetTypes = new ArrayList<>();
         assetTypeDto.getSubAssetTypes().forEach(subAssetTypeDto -> {
@@ -217,8 +218,8 @@ public class AssetTypeService extends MongoBaseService {
         }
 
         try {
-            exist.setSubAssetTypes(updatedAndNewSubAssetTypeIds);
-            exist = assetTypeMongoRepository.save(getNextSequence(exist));
+            assetType.setSubAssetTypes(updatedAndNewSubAssetTypeIds);
+            assetType = assetTypeMongoRepository.save(assetType);
         } catch (Exception e) {
             List<AssetType> subAssetTypes = new ArrayList<>();
             subAssetTypes.addAll((List<AssetType>) newSubAssetTypes.get(ASSET_TYPES_LIST));
@@ -228,7 +229,7 @@ public class AssetTypeService extends MongoBaseService {
             throw new RuntimeException(e.getMessage());
 
         }
-        return exist;
+        return assetTypeDto;
 
     }
 

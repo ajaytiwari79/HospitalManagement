@@ -7,7 +7,7 @@ import com.kairos.persistence.model.organization.PaymentSettings;
 import com.kairos.user.organization.PaymentSettingsDTO;
 import com.kairos.persistence.model.organization.PaymentSettingsQueryResult;
 import com.kairos.persistence.model.client.Client;
-import com.kairos.persistence.model.client.ClientHomeAddressQueryResult;
+import com.kairos.persistence.model.client.queryResults.ClientHomeAddressQueryResult;
 import com.kairos.persistence.model.user.region.LatLng;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;

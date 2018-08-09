@@ -2,8 +2,8 @@ package com.kairos.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
@@ -12,16 +12,16 @@ public class MasterQuestionDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "Question title  can't be  empty")
+    @NotBlank(message = "Question title  can't be  empty")
     @Pattern(message = "numeric and Special character are not allowed in question title",regexp ="^[a-zA-Z\\s]+$" )
     private String question;
 
-    @NotNullOrEmpty(message = "Description  can't be  Empty")
+    @NotBlank(message = "Description  can't be  Empty")
     private String description;
 
     private Boolean isRequired=false;
 
-    @NotNullOrEmpty(message = "Question type Must be Text ,Yes no May")
+    @NotBlank(message = "Question type Must be Text ,Yes no May")
     private String questionType;
 
     private Boolean isNotSureAllowed=false;
@@ -45,7 +45,7 @@ public class MasterQuestionDTO {
     }
 
     public String getQuestion() {
-        return question;
+        return question.trim();
     }
 
     public void setQuestion(String question) {

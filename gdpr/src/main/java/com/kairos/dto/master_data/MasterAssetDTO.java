@@ -6,9 +6,9 @@ import com.kairos.dto.OrganizationSubTypeDTO;
 import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -19,11 +19,14 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MasterAssetDTO {
 
-    @NotNullOrEmpty(message = "Name  can't be Empty")
+
+    private BigInteger id;
+
+    @NotBlank(message = "Name  can't be Empty")
     @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "title can not contain number or special character")
     private String name;
 
-    @NotNullOrEmpty(message = "Description can't be Empty")
+    @NotBlank(message = "Description can't be Empty")
     private String description;
 
     @Valid
@@ -111,4 +114,11 @@ public class MasterAssetDTO {
         this.organizationSubServices = organizationSubServices;
     }
 
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 }

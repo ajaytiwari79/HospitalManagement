@@ -10,6 +10,7 @@ import com.kairos.persistance.model.master_data.default_proc_activity_setting.Tr
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
 import com.kairos.service.common.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,32 +34,29 @@ public class TransferMethodService extends MongoBaseService {
     private TransferMethodMongoRepository transferMethodRepository;
 
     @Inject
-    private ComparisonUtils comparisonUtils;
+    private ExceptionService exceptionService;
 
 
     /**
      * @param countryId
      * @param
-     * @param transferMethods
+     * @param transferMethodDTOS
      * @return return map which contain list of new TransferMethod and list of existing TransferMethod if TransferMethod already exist
      * @description this method create new TransferMethod if TransferMethod not exist with same name ,
      * and if exist then simply add  TransferMethod to existing list and return list ;
      * findByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
      */
-    public Map<String, List<TransferMethod>> createTransferMethod(Long countryId, List<TransferMethod> transferMethods) {
+    public Map<String, List<TransferMethod>> createTransferMethod(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
 
         Map<String, List<TransferMethod>> result = new HashMap<>();
         Set<String> transferMethodNames = new HashSet<>();
-        if (!transferMethods.isEmpty()) {
-            for (TransferMethod transferMethod : transferMethods) {
-                if (!StringUtils.isBlank(transferMethod.getName())) {
-                    transferMethodNames.add(transferMethod.getName());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
+        if (!transferMethodDTOS.isEmpty()) {
+            for (TransferMethodDTO transferMethod : transferMethodDTOS) {
 
+                transferMethodNames.add(transferMethod.getName());
             }
             List<TransferMethod> existing = findByNamesAndCountryId(countryId, transferMethodNames, TransferMethod.class);
-            transferMethodNames = comparisonUtils.getNameListForMetadata(existing, transferMethodNames);
+            transferMethodNames = ComparisonUtils.getNameListForMetadata(existing, transferMethodNames);
 
             List<TransferMethod> newTransferMethods = new ArrayList<>();
             if (!transferMethodNames.isEmpty()) {
@@ -108,13 +106,12 @@ public class TransferMethodService extends MongoBaseService {
 
     public Boolean deleteTransferMethod(Long countryId, BigInteger id) {
 
-        TransferMethod exist = transferMethodRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        TransferMethod transferMethod = transferMethodRepository.findByIdAndNonDeleted(countryId, id);
+        if (!Optional.ofNullable(transferMethod).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(exist);
-            return true;
         }
+        delete(transferMethod);
+        return true;
     }
 
     /***
@@ -122,23 +119,27 @@ public class TransferMethodService extends MongoBaseService {
      * @param countryId
      * @param
      * @param id id of TransferMethod
-     * @param transferMethod
+     * @param transferMethodDTO
      * @return TransferMethod updated object
      */
-    public TransferMethod updateTransferMethod(Long countryId, BigInteger id, TransferMethod transferMethod) {
+    public TransferMethodDTO updateTransferMethod(Long countryId, BigInteger id, TransferMethodDTO transferMethodDTO) {
 
-        TransferMethod exist = transferMethodRepository.findByName(countryId, transferMethod.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            if (id.equals(exist.getId())) {
-                return exist;
+        TransferMethod transferMethod = transferMethodRepository.findByName(countryId, transferMethodDTO.getName());
+        if (Optional.ofNullable(transferMethod).isPresent()) {
+            if (id.equals(transferMethod.getId())) {
+                return transferMethodDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + transferMethod.getName());
-        } else {
-            exist = transferMethodRepository.findByid(id);
-            exist.setName(transferMethod.getName());
-            return transferMethodRepository.save(getNextSequence(exist));
+            throw new DuplicateDataException("data  exist for  " + transferMethodDTO.getName());
+        }
+        transferMethod = transferMethodRepository.findByid(id);
+        if (!Optional.ofNullable(transferMethod).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", id);
 
         }
+        transferMethod.setName(transferMethodDTO.getName());
+        transferMethodRepository.save(transferMethod);
+        return transferMethodDTO;
+
     }
 
     /**
@@ -180,12 +181,6 @@ public class TransferMethodService extends MongoBaseService {
             transferMethodIds.add(dataSource.getId());
         });
         return transferMethodIds;
-    }
-
-
-    public List<TransferMethodResponseDTO> getAllNotInheritedTransferMethodFromParentOrgAndUnitTransferMethod(Long countryId, Long parentOrganizationId, Long unitId) {
-        return transferMethodRepository.getAllNotInheritedTransferMethodFromParentOrgAndUnitTransferMethod(countryId, parentOrganizationId, unitId);
-
     }
 
 

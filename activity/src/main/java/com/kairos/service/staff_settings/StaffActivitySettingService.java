@@ -90,7 +90,6 @@ public class StaffActivitySettingService extends MongoBaseService {
             responseMap=assignActivitySettingsForCurrentStaff(responseMap,activityMap,staffExpertiseWrapperMap,currentStaffId,staffAndActivitySettingWrapper.getStaffActivitySettings(),unitId);
         }
         return responseMap;
-
     }
 
     public List<StaffActivitySettingDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId){

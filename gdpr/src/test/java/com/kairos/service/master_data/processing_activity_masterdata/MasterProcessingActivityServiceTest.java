@@ -127,7 +127,7 @@ public class MasterProcessingActivityServiceTest {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("ogranization ID must not be null");
+            throw new UnsupportedOperationException("organization ID must not be null");
         }
 
     }

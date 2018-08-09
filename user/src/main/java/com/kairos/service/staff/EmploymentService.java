@@ -166,7 +166,7 @@ public class EmploymentService extends UserBaseService {
         map.put("cardNumber", staff.getCardNumber());
         map.put("sendNotificationBy", staff.getSendNotificationBy());
         map.put("copyKariosMailToLogin", staff.isCopyKariosMailToLogin());
-        map.put("email", staff.getEmail());
+        map.put("email", user.getEmail());
         map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic());
         map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));

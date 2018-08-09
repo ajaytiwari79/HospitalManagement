@@ -16,14 +16,11 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.facet;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static com.kairos.constants.AppConstant.CLAUSE_MODULE_NAME;
@@ -51,7 +48,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
             aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
         }
         filterTypes.forEach(filterType -> {
-                    aggregationOperations.put(filterType.value, buildAggregationQuery(filterType));
+                    buildAggregationQuery(filterType,aggregationOperations);
                 }
 
         );
@@ -59,20 +56,31 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
         return aggregationOperations;
     }
 
+
+    /**accountTypes ,organizationServices ,organizationSubServices ,organizationSubTypes ,organizationTypes    are fields in domain (cluse ,asset ,master processing activity)
+     * ACCOUNT_TYPES ,ORGANIZATION_SERVICES,ORGANIZATION_SUB_SERVICES ,ORGANIZATION_TYPES,ORGANIZATION_SUB_TYPESetc represent field name in domains(Clause,MasterAsset and Master Processing activity)
+     * @param filterType
+     * @return
+     */
     @Override
-    public AggregationOperation buildAggregationQuery(FilterType filterType) {
+    public void buildAggregationQuery(FilterType filterType, Map<String, AggregationOperation> aggregationOperations ) {
         switch (filterType) {
 
             case ACCOUNT_TYPES:
-                return Aggregation.unwind(filterType.value);
+                aggregationOperations.put("accountTypes",Aggregation.unwind("accountTypes"));
+                break;
             case ORGANIZATION_SERVICES:
-                return Aggregation.unwind(filterType.value);
+                aggregationOperations.put("organizationServices",Aggregation.unwind("organizationServices"));
+                break;
             case ORGANIZATION_SUB_SERVICES:
-                return Aggregation.unwind(filterType.value);
+                aggregationOperations.put("organizationSubServices",Aggregation.unwind("organizationSubServices"));
+                break;
             case ORGANIZATION_TYPES:
-                return Aggregation.unwind(filterType.value);
+                aggregationOperations.put("organizationTypes",Aggregation.unwind("organizationTypes"));
+                break;
             case ORGANIZATION_SUB_TYPES:
-                return Aggregation.unwind(filterType.value);
+                aggregationOperations.put("organizationSubTypes",Aggregation.unwind("organizationSubTypes"));
+                break;
             default:
                 throw new InvalidRequestException("invalid request");
         }

@@ -30,9 +30,9 @@ public class ResponsibilityTypeMongoRepositoryImpl implements CustomResponsibili
     @Override
     public List<ResponsibilityTypeResponseDTO> getAllNotInheritedResponsibilityTypesFromParentOrgAndUnitResponsibilityType(Long countryId, Long parentOrganizationId, Long organizationId) {
 
-        Document groupOPerationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
+        Document groupOperationForDuplicateDataOnInheritingFromParentOrg = Document.parse(CustomAggregationQuery.metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata());
         Document projectionForFilteringDuplicateDataOfOrgAndParentOrg = Document.parse(CustomAggregationQuery.metaDataProjectionForRemovingDuplicateInheritedMetaData(organizationId));
-        Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionforAddingFinalDataObject());
+        Document projectionOperation = Document.parse(CustomAggregationQuery.metaDataProjectionForAddingFinalDataObject());
         Document replaceRootOperation = Document.parse(CustomAggregationQuery.metaDataReplaceRoot());
 
 
@@ -41,7 +41,7 @@ public class ResponsibilityTypeMongoRepositoryImpl implements CustomResponsibili
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).in(orgIdList)),
-                new CustomAggregationOperation(groupOPerationForDuplicateDataOnInheritingFromParentOrg),
+                new CustomAggregationOperation(groupOperationForDuplicateDataOnInheritingFromParentOrg),
                 new CustomAggregationOperation(projectionForFilteringDuplicateDataOfOrgAndParentOrg),
                 new CustomAggregationOperation(projectionOperation),
                 new CustomAggregationOperation(replaceRootOperation)

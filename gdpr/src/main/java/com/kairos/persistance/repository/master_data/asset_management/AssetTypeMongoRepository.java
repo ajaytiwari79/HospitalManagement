@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data.asset_management;
 
 
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface AssetTypeMongoRepository extends MongoRepository<AssetType,BigInteger>,CustomAssetTypeRepository {
+public interface AssetTypeMongoRepository extends MongoBaseRepository<AssetType,BigInteger>,CustomAssetTypeRepository {
 
 
 
@@ -31,7 +32,7 @@ public interface AssetTypeMongoRepository extends MongoRepository<AssetType,BigI
 
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<AssetType> findAllAssetTypebyIds(Long countryId,List<BigInteger> ids);
+    List<AssetType> findAllAssetTypeByIds(Long countryId,List<BigInteger> ids);
 
 
     @Query("{deleted:false,organizationId:?0,_id:{$in:?1}}")

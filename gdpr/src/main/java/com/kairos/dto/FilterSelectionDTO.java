@@ -12,7 +12,6 @@ public class FilterSelectionDTO {
     @NotEmpty(message = "Selection List cannot Empty")
     private List<FilterSelection> filtersData;
 
-
     private String moduleId;
 
     public List<FilterSelection> getFiltersData() {
