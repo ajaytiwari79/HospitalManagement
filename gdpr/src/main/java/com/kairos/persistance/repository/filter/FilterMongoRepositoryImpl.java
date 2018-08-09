@@ -57,7 +57,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     }
 
 
-    /**
+    /**accountTypes ,organizationServices ,organizationSubServices ,organizationSubTypes ,organizationTypes    are fields in domain (cluse ,asset ,master processing activity)
      * ACCOUNT_TYPES ,ORGANIZATION_SERVICES,ORGANIZATION_SUB_SERVICES ,ORGANIZATION_TYPES,ORGANIZATION_SUB_TYPESetc represent field name in domains(Clause,MasterAsset and Master Processing activity)
      * @param filterType
      * @return
@@ -67,25 +67,20 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
         switch (filterType) {
 
             case ACCOUNT_TYPES:
-               // return Aggregation.unwind(filterType.value);
                 aggregationOperations.put("accountTypes",Aggregation.unwind("accountTypes"));
                 break;
             case ORGANIZATION_SERVICES:
-                //return Aggregation.unwind(filterType.value);
                 aggregationOperations.put("organizationServices",Aggregation.unwind("organizationServices"));
                 break;
             case ORGANIZATION_SUB_SERVICES:
-                //return Aggregation.unwind(filterType.value);
                 aggregationOperations.put("organizationSubServices",Aggregation.unwind("organizationSubServices"));
                 break;
             case ORGANIZATION_TYPES:
                 aggregationOperations.put("organizationTypes",Aggregation.unwind("organizationTypes"));
                 break;
-               // return Aggregation.unwind("organizationTypes");
             case ORGANIZATION_SUB_TYPES:
                 aggregationOperations.put("organizationSubTypes",Aggregation.unwind("organizationSubTypes"));
                 break;
-               // return Aggregation.unwind("organizationSubTypes");
             default:
                 throw new InvalidRequestException("invalid request");
         }
