@@ -28,9 +28,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 
-import static com.kairos.constants.AppConstant.CLAUSE_MODULE_NAME;
-import static com.kairos.constants.AppConstant.ASSET_MODULE_NAME;
-import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
+import static com.kairos.constants.AppConstant.*;
+
 
 @Service
 public class FilterService {
@@ -95,11 +94,11 @@ public class FilterService {
             case ORGANIZATION_TYPES:
                 return new FilterResponseDTO(filterType, filterType.value, filterQueryResult.getOrganizationTypes());
             case ORGANIZATION_SUB_TYPES:
-                return new FilterResponseDTO(filterType, filterType.value, filterQueryResult.getOrganizationSubTypes());
+                return new FilterResponseDTO(filterType,filterType.value, filterQueryResult.getOrganizationSubTypes());
             case ORGANIZATION_SERVICES:
-                return new FilterResponseDTO(filterType, filterType.value, filterQueryResult.getOrganizationServices());
+                return new FilterResponseDTO(filterType,filterType.value, filterQueryResult.getOrganizationServices());
             case ORGANIZATION_SUB_SERVICES:
-                return new FilterResponseDTO(filterType, filterType.value,  filterQueryResult.getOrganizationSubServices());
+                return new FilterResponseDTO(filterType,filterType.value,  filterQueryResult.getOrganizationSubServices());
             default:
                 throw new InvalidRequestException("invalid request");
         }

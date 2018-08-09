@@ -53,4 +53,11 @@ public class AppConstant {
     public static final String HOSTING_TYPE = "hostingType";
     public static final String DATA_DISPOSAL = "dataDisposal";
 
+
+
+
+
+
+
+
 }
