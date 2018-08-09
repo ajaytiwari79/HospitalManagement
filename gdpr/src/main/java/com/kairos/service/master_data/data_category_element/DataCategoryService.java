@@ -59,7 +59,7 @@ public class DataCategoryService extends MongoBaseService {
             LOGGER.warn(e.getMessage());
             dataElementMongoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_ELEMENTS_LIST));
         }
-        dataCategoryDto.setBigInteger(dataCategory.getId());
+        dataCategoryDto.setId(dataCategory.getId());
         return dataCategoryDto;
     }
 

@@ -14,7 +14,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DataCategoryDTO {
 
-    private BigInteger bigInteger;
+    private BigInteger id;
     @NotBlank(message = "Name  can't be  Empty")
     @Pattern(message = "Number and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
@@ -41,11 +41,11 @@ public class DataCategoryDTO {
         this.dataElements = dataElements;
     }
 
-    public BigInteger getBigInteger() {
-        return bigInteger;
+    public BigInteger getId() {
+        return id;
     }
 
-    public void setBigInteger(BigInteger bigInteger) {
-        this.bigInteger = bigInteger;
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 }
