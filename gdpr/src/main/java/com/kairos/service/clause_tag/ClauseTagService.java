@@ -4,7 +4,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
-import com.kairos.dto.master_data.ClauseTagDTO;
+import com.kairos.gdpr.master_data.ClauseTagDTO;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import org.slf4j.Logger;

@@ -2,8 +2,7 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.controller.master_data.asset_management.HostingProviderController;
-import com.kairos.dto.metadata.HostingProviderDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
+import com.kairos.gdpr.metadata.HostingProviderDTO;
 import com.kairos.service.data_inventory.asset.OrganizationHostingProviderService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

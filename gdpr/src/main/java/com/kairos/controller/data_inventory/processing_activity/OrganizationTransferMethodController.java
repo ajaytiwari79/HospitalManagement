@@ -1,7 +1,6 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
-import com.kairos.dto.metadata.TransferMethodDTO;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.TransferMethod;
+import com.kairos.gdpr.metadata.TransferMethodDTO;
 import com.kairos.service.data_inventory.processing_activity.OrganizationTransferMethodService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

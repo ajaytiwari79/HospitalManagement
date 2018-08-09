@@ -2,7 +2,7 @@ package com.kairos.service.master_data.asset_management;
 
 
 import com.kairos.custom_exception.*;
-import com.kairos.dto.master_data.MasterAssetDTO;
+import com.kairos.gdpr.master_data.MasterAssetDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistance.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;

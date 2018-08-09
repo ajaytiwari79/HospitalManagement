@@ -1,7 +1,6 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
-import com.kairos.dto.metadata.AccessorPartyDTO;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
+import com.kairos.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.service.data_inventory.processing_activity.OrganizationAccessorPartyService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

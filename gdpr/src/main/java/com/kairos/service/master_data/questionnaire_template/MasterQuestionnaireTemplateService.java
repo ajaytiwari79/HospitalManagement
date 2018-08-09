@@ -3,7 +3,7 @@ package com.kairos.service.master_data.questionnaire_template;
 
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.dto.master_data.MasterQuestionnaireTemplateDTO;
+import com.kairos.gdpr.master_data.MasterQuestionnaireTemplateDTO;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireTemplate;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;

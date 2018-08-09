@@ -3,7 +3,7 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
-import com.kairos.dto.master_data.MasterProcessingActivityDTO;
+import com.kairos.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.service.common.MongoBaseService;
