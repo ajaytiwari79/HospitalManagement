@@ -6,14 +6,13 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.IN_COUNTRY;
-import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
 
 //  Created By vipul   On 9/8/18
 @NodeEntity
 public class UnitType extends UserBaseEntity {
     private String name;
     private String description;
-    @Relationship(type = IN_COUNTRY, direction = UNDIRECTED)
+    @Relationship(type = IN_COUNTRY)
     private Country country;
 
     public UnitType() {
