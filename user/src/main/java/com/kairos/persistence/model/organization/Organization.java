@@ -210,9 +210,9 @@ public class Organization extends UserBaseEntity {
     private Boolean showCountryTags = true;
     @Convert(ZoneIdStringConverter.class)
     private ZoneId timeZone;
-    @DateString("HH:MM")
+    @DateString("HH:mm")
     private Date nightStartTimeFrom;
-    @DateString("HH:MM")
+    @DateString("HH:mm")
     private Date nightEndTimeTo;
     private boolean union;
 

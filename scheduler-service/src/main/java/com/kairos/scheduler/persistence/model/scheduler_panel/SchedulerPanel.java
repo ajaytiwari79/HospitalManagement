@@ -30,15 +30,6 @@ public class SchedulerPanel extends MongoBaseEntity {
     private Date nextRunTime;
     private boolean isAlarmed;
     private Integer startMinute;
-
-    public Integer getRepeat() {
-        return repeat;
-    }
-
-    public void setRepeat(Integer repeat) {
-        this.repeat = repeat;
-    }
-
     private Integer repeat;
     private List<DayOfWeek> days;
     private LocalTime runOnce;
@@ -55,6 +46,15 @@ public class SchedulerPanel extends MongoBaseEntity {
     private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
 
+
+
+    public Integer getRepeat() {
+        return repeat;
+    }
+
+    public void setRepeat(Integer repeat) {
+        this.repeat = repeat;
+    }
     public BigInteger getEntityId() {
         return entityId;
     }

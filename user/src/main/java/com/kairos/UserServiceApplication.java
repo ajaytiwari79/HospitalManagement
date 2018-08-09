@@ -139,7 +139,19 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
                 .build();
         return template;
     }
+	@Profile({"local", "test"})
+	@Bean(name="schedulerServiceRestTemplate")
+	public RestTemplate getRestTemplateWithoutUserContextLocal(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
 
+		RestTemplate template =restTemplateBuilder
+				.interceptors(new SchedulerUserContextInterceptor(authorization))
+				.messageConverters(mappingJackson2HttpMessageConverter())
+				.build();
+		return template;
+	}
+
+	@Profile({"development","qa","production"})
+	@LoadBalanced
 	@Bean(name="schedulerServiceRestTemplate")
 	public RestTemplate getRestTemplateWithoutUserContext(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
 
@@ -149,6 +161,5 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 				.build();
 		return template;
 	}
-
 }
 

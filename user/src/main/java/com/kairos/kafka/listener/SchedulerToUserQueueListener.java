@@ -13,9 +13,9 @@ import javax.inject.Inject;
 import static com.kairos.constants.AppConstants.SCHEDULER_TO_USER_QUEUE_TOPIC;
 
 @Component
-public class ShcedulerToUserQueueListener {
+public class SchedulerToUserQueueListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(ShcedulerToUserQueueListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(SchedulerToUserQueueListener.class);
     @Inject
     private JobQueueExecutor schedulerToUserQueueService;
 
