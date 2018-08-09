@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
+import com.kairos.dto.metadata.HostingProviderDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.service.master_data.asset_management.HostingProviderService;
 import com.kairos.utils.ResponseHandler;
@@ -39,11 +40,11 @@ public class HostingProviderController {
 
     @ApiOperation("add HostingProvider")
     @PostMapping("/hosting_provider/add")
-    public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<HostingProvider> hostingProviders) {
+    public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId, hostingProviders.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId, hostingProviderDTOs.getRequestBody()));
 
     }
 
@@ -96,14 +97,14 @@ public class HostingProviderController {
 
     @ApiOperation("update HostingProvider by id")
     @PutMapping("/hosting_provider/update/{id}")
-    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody HostingProvider hostingProvider) {
+    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         }
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(countryId, id, hostingProvider));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(countryId, id, hostingProviderDTO));
 
     }
 

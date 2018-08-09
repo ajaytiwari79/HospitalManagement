@@ -2,6 +2,7 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.controller.master_data.asset_management.TechnicalSecurityController;
+import com.kairos.dto.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.service.data_inventory.asset.OrganizationTechnicalSecurityMeasureService;
 import com.kairos.utils.ResponseHandler;
@@ -34,7 +35,7 @@ public class OrganizationTechnicalSecurityController {
 
     @ApiOperation("add TechnicalSecurityMeasure")
     @PostMapping("/technical_security/add")
-    public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasure> securityMeasures) {
+    public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> securityMeasures) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
@@ -89,7 +90,7 @@ public class OrganizationTechnicalSecurityController {
 
     @ApiOperation("update TechnicalSecurityMeasure by id")
     @PutMapping("/technical_security/update/{id}")
-    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody TechnicalSecurityMeasure securityMeasure) {
+    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (unitId == null) {

@@ -50,11 +50,11 @@ public class AssetTypeService extends MongoBaseService {
      * @throws DuplicateDataException if asset type is already present with same name
      * @description method create Asset type if sub Asset Types if present then create and add sub Asset Types to Asset type.
      */
-    public AssetType createAssetTypeAndAddSubAssetTypes(Long countryId, AssetTypeDTO assetTypeDto) {
+    public AssetTypeDTO createAssetTypeAndAddSubAssetTypes(Long countryId, AssetTypeDTO assetTypeDto) {
 
 
-        AssetType exist = assetTypeMongoRepository.findByNameAndCountryId(countryId, assetTypeDto.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
+        AssetType previousAssetType = assetTypeMongoRepository.findByNameAndCountryId(countryId, assetTypeDto.getName());
+        if (Optional.ofNullable(previousAssetType).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
 
@@ -73,7 +73,8 @@ public class AssetTypeService extends MongoBaseService {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
-        return assetType;
+        assetTypeDto.setId(assetType.getId());
+        return assetTypeDto;
     }
 
     /**
@@ -188,7 +189,7 @@ public class AssetTypeService extends MongoBaseService {
      * @throws DuplicateDataException if Asset type is already present with same name .
      * @description method simply (update already exit Sub asset types if id is present)and (add create new sub asset types if id is not present in sub asset types)
      */
-    public AssetType updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, BigInteger id, AssetTypeDTO assetTypeDto) {
+    public AssetTypeDTO updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, BigInteger id, AssetTypeDTO assetTypeDto) {
         AssetType assetType = assetTypeMongoRepository.findByNameAndCountryId(countryId, assetTypeDto.getName());
         if (Optional.ofNullable(assetType).isPresent() && !id.equals(assetType.getId())) {
             throw new DuplicateDataException("data  exist for  " + assetTypeDto.getName());
@@ -228,7 +229,7 @@ public class AssetTypeService extends MongoBaseService {
             throw new RuntimeException(e.getMessage());
 
         }
-        return assetType;
+        return assetTypeDto;
 
     }
 

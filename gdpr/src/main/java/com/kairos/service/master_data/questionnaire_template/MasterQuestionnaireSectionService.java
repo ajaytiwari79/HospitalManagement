@@ -150,6 +150,14 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param orgId
+     * @param id
+     * @param templateId
+     * @return
+     */
     public Boolean deleteQuestionnaireSection(Long countryId, Long orgId, BigInteger id, BigInteger templateId) {
         MasterQuestionnaireSection questionnaireSection = masterQuestionnaireSectionRepository.findByIdAndNonDeleted(countryId, orgId, id);
         if (!Optional.ofNullable(questionnaireSection).isPresent()) {

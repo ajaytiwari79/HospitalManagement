@@ -19,6 +19,9 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MasterAssetDTO {
 
+
+    private BigInteger id;
+
     @NotBlank(message = "Name  can't be Empty")
     @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "title can not contain number or special character")
     private String name;
@@ -111,4 +114,11 @@ public class MasterAssetDTO {
         this.organizationSubServices = organizationSubServices;
     }
 
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 }

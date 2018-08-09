@@ -9,9 +9,9 @@ import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.javers.core.metamodel.annotation.*;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.List;
 @TypeName("clause")
 public class Clause extends MongoBaseEntity {
 
-    @NotNullOrEmpty
+    @NotBlank
     private String title;
     @NotNull
     private List<ClauseTag> tags = new ArrayList<>();

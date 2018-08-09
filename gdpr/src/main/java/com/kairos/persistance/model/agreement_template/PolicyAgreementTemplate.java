@@ -7,9 +7,9 @@ import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +17,10 @@ import java.util.List;
 @Document(collection = "agreement_template")
 public class PolicyAgreementTemplate extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "Name cannot be empty")
+    @NotBlank(message = "Name cannot be empty")
     private String name;
 
-    @NotNullOrEmpty(message = "Description cannot be empty")
+    @NotBlank(message = "Description cannot be empty")
     private String description;
 
     private List<AccountType> accountTypes;

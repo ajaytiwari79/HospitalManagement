@@ -6,9 +6,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DataSourceDTO {
+public class DataDisposalDTO {
 
     private BigInteger id;
 

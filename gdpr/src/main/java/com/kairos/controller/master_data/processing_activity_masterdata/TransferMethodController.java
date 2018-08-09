@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
+import com.kairos.dto.metadata.TransferMethodDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.TransferMethod;
 import com.kairos.service.master_data.processing_activity_masterdata.TransferMethodService;
 import com.kairos.utils.ResponseHandler;
@@ -39,7 +40,7 @@ public class TransferMethodController {
 
     @ApiOperation("add transfer Method ")
     @PostMapping("/transfer_method/add")
-    public ResponseEntity<Object> createTransferMethod(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TransferMethod> transferMethods) {
+    public ResponseEntity<Object> createTransferMethod(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TransferMethodDTO> transferMethods) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
@@ -97,17 +98,9 @@ public class TransferMethodController {
 
 
 
-    @ApiOperation("get All transfer method of Current organization and Parent Oeg which were not inherited by Organization")
-    @GetMapping("/transfer_method")
-    public ResponseEntity<Object> getAllTransferMethodOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getAllNotInheritedTransferMethodFromParentOrgAndUnitTransferMethod(countryId,parentOrgId,parentOrgId));
-    }
-
-
-
     @ApiOperation("update transfer Method by id")
     @PutMapping("/transfer_method/update/{id}")
-    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody TransferMethod transferMethod) {
+    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody TransferMethodDTO transferMethod) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {

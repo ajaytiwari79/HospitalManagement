@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
+import com.kairos.dto.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import com.kairos.service.master_data.processing_activity_masterdata.ResponsibilityTypeService;
 import com.kairos.utils.ResponseHandler;
@@ -38,7 +39,7 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("add ResponsibilityType  ")
     @PostMapping("/responsibility_type/add")
-    public ResponseEntity<Object> createResponsibilityType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ResponsibilityType> responsibilityTypes) {
+    public ResponseEntity<Object> createResponsibilityType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ResponsibilityTypeDTO> responsibilityTypes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
@@ -95,10 +96,9 @@ public class ResponsibilityTypeController {
     }
 
 
-
     @ApiOperation("update ResponsibilityType  by id")
     @PutMapping("/responsibility_type/update/{id}")
-    public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ResponsibilityType responsibilityType) {
+    public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ResponsibilityTypeDTO responsibilityType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {
@@ -111,8 +111,8 @@ public class ResponsibilityTypeController {
 
     @ApiOperation("get All responsibility type of Current organization and Parent Oeg which were not inherited by Organization")
     @GetMapping("/responsibility_type")
-    public ResponseEntity<Object> getAllResponsibilityTypeOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getAllNotInheritedResponsibilityTypesFromParentOrgAndUnitResponsibilityType(countryId,parentOrgId,organizationId));
+    public ResponseEntity<Object> getAllResponsibilityTypeOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getAllNotInheritedResponsibilityTypesFromParentOrgAndUnitResponsibilityType(countryId, parentOrgId, organizationId));
     }
 
 }

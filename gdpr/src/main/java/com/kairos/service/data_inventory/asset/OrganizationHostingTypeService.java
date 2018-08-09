@@ -4,10 +4,12 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.metadata.HostingTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
 import com.kairos.persistance.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.HostingTypeService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,21 +34,24 @@ public class OrganizationHostingTypeService extends MongoBaseService {
     @Inject
     private HostingTypeMongoRepository hostingTypeMongoRepository;
 
+    @Inject
+    private ExceptionService exceptionService;
+
 
     /**
      * @param organizationId
-     * @param hostingTypes
+     * @param hostingTypeDTOS
      * @return return map which contain list of new HostingType and list of existing HostingType if HostingType already exist
      * @description this method create new HostingType if HostingType not exist with same name ,
      * and if exist then simply add  HostingType to existing list and return list ;
      * findByOrganizationIdAndNamesList()  return list of existing HostingType using collation ,used for case insensitive result
      */
-    public Map<String, List<HostingType>> createHostingType(Long organizationId, List<HostingType> hostingTypes) {
+    public Map<String, List<HostingType>> createHostingType(Long organizationId, List<HostingTypeDTO> hostingTypeDTOS) {
 
         Map<String, List<HostingType>> result = new HashMap<>();
         Set<String> hostingTypeNames = new HashSet<>();
-        if (!hostingTypes.isEmpty()) {
-            for (HostingType hostingType : hostingTypes) {
+        if (!hostingTypeDTOS.isEmpty()) {
+            for (HostingTypeDTO hostingType : hostingTypeDTOS) {
                 if (!StringUtils.isBlank(hostingType.getName())) {
                     hostingTypeNames.add(hostingType.getName());
                 } else
@@ -104,11 +109,11 @@ public class OrganizationHostingTypeService extends MongoBaseService {
 
     public Boolean deleteHostingType(Long organizationId, BigInteger id) {
 
-        HostingType exist = hostingTypeMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        HostingType hostingType = hostingTypeMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        if (!Optional.ofNullable(hostingType).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
-            delete(exist);
+            delete(hostingType);
             return true;
 
         }
@@ -119,25 +124,30 @@ public class OrganizationHostingTypeService extends MongoBaseService {
      * @param
      * @param organizationId
      * @param id             id of HostingType
-     * @param hostingType
+     * @param hostingTypeDTO
      * @return HostingType updated object
      * @throws DuplicateDataException if HostingType already exist with same name
      */
-    public HostingType updateHostingType(Long organizationId, BigInteger id, HostingType hostingType) {
+    public HostingTypeDTO updateHostingType(Long organizationId, BigInteger id, HostingTypeDTO hostingTypeDTO) {
 
 
-        HostingType exist = hostingTypeMongoRepository.findByOrganizationIdAndName(organizationId, hostingType.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            if (id.equals(exist.getId())) {
-                return exist;
+        HostingType hostingType = hostingTypeMongoRepository.findByOrganizationIdAndName(organizationId, hostingTypeDTO.getName());
+        if (Optional.ofNullable(hostingType).isPresent()) {
+            if (id.equals(hostingType.getId())) {
+                return hostingTypeDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + hostingType.getName());
-        } else {
-            exist = hostingTypeMongoRepository.findByid(id);
-            exist.setName(hostingType.getName());
-            return hostingTypeMongoRepository.save(exist);
-
+            throw new DuplicateDataException("data  exist for  " + hostingTypeDTO.getName());
         }
+        hostingType = hostingTypeMongoRepository.findByid(id);
+        if (!Optional.ofNullable(hostingType).isPresent()) {
+
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Type", id);
+        }
+        hostingType.setName(hostingTypeDTO.getName());
+        hostingTypeMongoRepository.save(hostingType);
+        return hostingTypeDTO;
+
+
     }
 
 

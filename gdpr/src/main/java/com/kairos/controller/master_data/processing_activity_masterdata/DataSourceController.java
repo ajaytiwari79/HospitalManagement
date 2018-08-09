@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
+import com.kairos.dto.metadata.DataSourceDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.service.master_data.processing_activity_masterdata.DataSourceService;
 import com.kairos.utils.ResponseHandler;
@@ -38,7 +39,7 @@ public class DataSourceController {
 
     @ApiOperation("add dataSource")
     @PostMapping("/data_source/add")
-    public ResponseEntity<Object> createDataSource(@PathVariable Long countryId,@Valid @RequestBody ValidateRequestBodyList<DataSource> dataSource) {
+    public ResponseEntity<Object> createDataSource(@PathVariable Long countryId,@Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSource) {
        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
@@ -92,7 +93,7 @@ public class DataSourceController {
 
     @ApiOperation("update dataSource by id")
     @PutMapping("/data_source/update/{id}")
-    public ResponseEntity<Object> updateDataSource(@PathVariable Long countryId,@PathVariable BigInteger id, @Valid @RequestBody DataSource dataSource) {
+    public ResponseEntity<Object> updateDataSource(@PathVariable Long countryId,@PathVariable BigInteger id, @Valid @RequestBody DataSourceDTO dataSource) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } if (countryId == null) {

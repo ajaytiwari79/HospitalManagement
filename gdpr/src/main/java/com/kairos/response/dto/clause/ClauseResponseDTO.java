@@ -9,8 +9,8 @@ import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.response.dto.master_data.AccountTypeResponseDTO;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -21,11 +21,11 @@ public class ClauseResponseDTO {
 
     @NotNull
     private BigInteger id;
-    @NotNullOrEmpty
+    @NotBlank
     private String title;
     @NotNull
     private List<ClauseTag> tags = new ArrayList<>();
-    @NotNullOrEmpty
+    @NotBlank
     private String description;
 
     private List<TemplateTypeResponseDTO> templateTypes;

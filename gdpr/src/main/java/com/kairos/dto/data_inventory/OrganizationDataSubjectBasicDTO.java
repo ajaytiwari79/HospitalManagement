@@ -2,8 +2,7 @@ package com.kairos.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
-
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -16,7 +15,7 @@ public class OrganizationDataSubjectBasicDTO {
 
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "name  can't be empty")
+    @NotBlank(message = "name  can't be empty")
     @Pattern(message = "Numbers and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
@@ -34,7 +33,7 @@ public class OrganizationDataSubjectBasicDTO {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {

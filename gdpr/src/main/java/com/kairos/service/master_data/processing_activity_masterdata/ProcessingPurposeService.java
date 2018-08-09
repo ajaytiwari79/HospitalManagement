@@ -38,18 +38,18 @@ public class ProcessingPurposeService extends MongoBaseService {
     /**
      * @param countryId
      * @param
-     * @param processingPurposes
+     * @param processingPurposeDTOS
      * @return return map which contain list of new ProcessingPurpose and list of existing ProcessingPurpose if ProcessingPurpose already exist
      * @description this method create new ProcessingPurpose if ProcessingPurpose not exist with same name ,
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
      * findByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
-    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId, List<ProcessingPurpose> processingPurposes) {
+    public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
         Map<String, List<ProcessingPurpose>> result = new HashMap<>();
         Set<String> processingPurposesNames = new HashSet<>();
-        if (!processingPurposes.isEmpty()) {
-            for (ProcessingPurpose processingPurpose : processingPurposes) {
+        if (!processingPurposeDTOS.isEmpty()) {
+            for (ProcessingPurposeDTO processingPurpose : processingPurposeDTOS) {
                 if (!StringUtils.isBlank(processingPurpose.getName())) {
                     processingPurposesNames.add(processingPurpose.getName());
                 } else
@@ -110,14 +110,13 @@ public class ProcessingPurposeService extends MongoBaseService {
 
     public Boolean deleteProcessingPurpose(Long countryId, BigInteger id) {
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByIdAndNonDeleted(countryId, id);
+        if (!Optional.ofNullable(processingPurpose).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(exist);
+        }
+            delete(processingPurpose);
             return true;
 
-        }
     }
 
     /***
@@ -125,22 +124,23 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @param countryId
      * @param
      * @param id id of ProcessingPurpose
-     * @param processingPurpose
+     * @param processingPurposeDTO
      * @return ProcessingPurpose updated object
      */
-    public ProcessingPurpose updateProcessingPurpose(Long countryId, BigInteger id, ProcessingPurpose processingPurpose) {
+    public ProcessingPurposeDTO updateProcessingPurpose(Long countryId, BigInteger id, ProcessingPurposeDTO processingPurposeDTO) {
 
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByName(countryId, processingPurpose.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            if (id.equals(exist.getId())) {
-                return exist;
+        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByName(countryId, processingPurposeDTO.getName());
+        if (Optional.ofNullable(processingPurpose).isPresent()) {
+            if (id.equals(processingPurpose.getId())) {
+                return processingPurposeDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + processingPurpose.getName());
+            throw new DuplicateDataException("data  exist for  " + processingPurposeDTO.getName());
         } else {
-            exist = processingPurposeMongoRepository.findByid(id);
-            exist.setName(processingPurpose.getName());
-            return processingPurposeMongoRepository.save(exist);
+            processingPurpose = processingPurposeMongoRepository.findByid(id);
+            processingPurpose.setName(processingPurpose.getName());
+             processingPurposeMongoRepository.save(processingPurpose);
+             return processingPurposeDTO;
 
         }
     }

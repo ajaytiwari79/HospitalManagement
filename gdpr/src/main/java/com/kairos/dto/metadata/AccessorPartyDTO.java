@@ -1,10 +1,13 @@
 package com.kairos.dto.metadata;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AccessorPartyDTO {
 
 
@@ -24,7 +27,7 @@ public class AccessorPartyDTO {
 
     public void setId(BigInteger id) { this.id = id; }
 
-    public String getName() { return name; }
+    public String getName() { return name.trim(); }
 
     public void setName(String name) { this.name = name; }
 }

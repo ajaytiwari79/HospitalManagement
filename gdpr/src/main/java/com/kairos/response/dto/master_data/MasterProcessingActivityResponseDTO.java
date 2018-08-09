@@ -6,8 +6,8 @@ import com.kairos.dto.OrganizationSubTypeDTO;
 import com.kairos.dto.OrganizationTypeDTO;
 import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -19,10 +19,10 @@ public class MasterProcessingActivityResponseDTO {
     @NotNull
     private BigInteger id;
 
-    @NotNullOrEmpty
+    @NotBlank
     private String name;
 
-    @NotNullOrEmpty
+    @NotBlank
     private String description;
 
     private List<OrganizationTypeDTO> organizationTypes;

@@ -1,14 +1,15 @@
 package com.kairos.dto.metadata;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DataSourceDTO {
+public class OrganizationalSecurityMeasureDTO {
+
 
     private BigInteger id;
 
@@ -29,4 +30,10 @@ public class DataSourceDTO {
     public String getName() { return name.trim(); }
 
     public void setName(String name) { this.name = name; }
+
+
+
+
+
+
 }

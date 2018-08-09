@@ -8,14 +8,15 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DataCategoryDTO {
 
-
+    private BigInteger bigInteger;
     @NotBlank(message = "Name  can't be  Empty")
-    @Pattern(message = "Number and Special characters are not allowed",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "Number and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     @NotNull(message = "Data Element can't be  Empty")
@@ -40,4 +41,11 @@ public class DataCategoryDTO {
         this.dataElements = dataElements;
     }
 
+    public BigInteger getBigInteger() {
+        return bigInteger;
+    }
+
+    public void setBigInteger(BigInteger bigInteger) {
+        this.bigInteger = bigInteger;
+    }
 }
