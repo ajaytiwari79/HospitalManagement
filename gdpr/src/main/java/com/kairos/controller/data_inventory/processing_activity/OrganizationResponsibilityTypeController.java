@@ -1,8 +1,7 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
 
-import com.kairos.dto.metadata.ResponsibilityTypeDTO;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
+import com.kairos.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.service.data_inventory.processing_activity.OrganizationResponsibilityTypeService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

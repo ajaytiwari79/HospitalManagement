@@ -2,11 +2,11 @@ package com.kairos.service.clause;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.dto.master_data.ClauseBasicDTO;
+import com.kairos.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.persistance.model.clause.Clause;
-import com.kairos.dto.master_data.ClauseDTO;
+import com.kairos.gdpr.master_data.ClauseDTO;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;

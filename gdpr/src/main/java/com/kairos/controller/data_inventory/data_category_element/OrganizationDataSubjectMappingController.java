@@ -1,8 +1,8 @@
 package com.kairos.controller.data_inventory.data_category_element;
 
 
-import com.kairos.dto.data_inventory.OrganizationDataSubjectDTO;
-import com.kairos.dto.data_inventory.OrganizationDataSubjectBasicDTO;
+import com.kairos.gdpr.data_inventory.OrganizationDataSubjectDTO;
+import com.kairos.gdpr.data_inventory.OrganizationDataSubjectBasicDTO;
 import com.kairos.service.data_inventory.data_category_element.OrganizationDataSubjectMappingService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

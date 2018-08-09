@@ -1,8 +1,7 @@
 package com.kairos.controller.master_data.data_category_element;
 
 
-import com.kairos.dto.master_data.DataElementDTO;
-import com.kairos.persistance.model.master_data.data_category_element.DataElement;
+import com.kairos.gdpr.master_data.DataElementDTO;
 import com.kairos.service.master_data.data_category_element.DataElementService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

@@ -1,9 +1,9 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
 
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.dto.FilterSelection;
-import com.kairos.dto.FilterSelectionDTO;
-import com.kairos.dto.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.gdpr.FilterSelection;
+import com.kairos.gdpr.FilterSelectionDTO;
+import com.kairos.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;

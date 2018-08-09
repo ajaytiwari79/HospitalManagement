@@ -2,8 +2,6 @@ package com.kairos.controller.exception_handler;
 
 
 import com.kairos.custom_exception.*;
-import com.kairos.dto.exception.FieldErrorDTO;
-import com.kairos.dto.exception.ResponseEnvelope;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -3,8 +3,8 @@ package com.kairos.persistance.model.data_inventory.asset;
 
 import com.kairos.enums.RiskSeverity;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.persistance.model.data_inventory.ManagingOrganization;
-import com.kairos.persistance.model.data_inventory.Staff;
+import com.kairos.gdpr.ManagingOrganization;
+import com.kairos.gdpr.Staff;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;

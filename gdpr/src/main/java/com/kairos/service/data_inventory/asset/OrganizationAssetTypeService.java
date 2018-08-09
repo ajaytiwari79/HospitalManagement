@@ -2,14 +2,12 @@ package com.kairos.service.data_inventory.asset;
 
 
 import com.kairos.custom_exception.DataNotExists;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.dto.master_data.AssetTypeDTO;
+import com.kairos.gdpr.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
-import com.kairos.response.dto.master_data.MasterAssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.lang3.StringUtils;

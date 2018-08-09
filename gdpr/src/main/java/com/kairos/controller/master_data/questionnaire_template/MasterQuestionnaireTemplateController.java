@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data.questionnaire_template;
 
 
-import com.kairos.dto.master_data.MasterQuestionnaireTemplateDTO;
+import com.kairos.gdpr.master_data.MasterQuestionnaireTemplateDTO;
 import com.kairos.service.master_data.questionnaire_template.MasterQuestionnaireTemplateService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;

@@ -1,8 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
-import com.kairos.dto.metadata.OrganizationalSecurityMeasureDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
+import com.kairos.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.service.master_data.asset_management.OrganizationalSecurityMeasureService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

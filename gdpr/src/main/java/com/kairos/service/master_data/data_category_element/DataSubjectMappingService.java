@@ -1,7 +1,7 @@
 package com.kairos.service.master_data.data_category_element;
 
 
-import com.kairos.dto.master_data.DataSubjectMappingDTO;
+import com.kairos.gdpr.master_data.DataSubjectMappingDTO;
 import com.kairos.persistance.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
