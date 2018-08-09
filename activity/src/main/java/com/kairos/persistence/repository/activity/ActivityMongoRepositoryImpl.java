@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -34,7 +35,7 @@ import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepository {
-    @Autowired
+    @Inject
     private MongoTemplate mongoTemplate;
 
     public List<ActivityTagDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {

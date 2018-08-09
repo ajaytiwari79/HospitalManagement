@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 import java.math.BigInteger;
 import java.util.List;
 
-public interface OpenShiftRuleTemplateRepository extends MongoBaseRepository<OpenShiftRuleTemplate,BigInteger> {
+public interface OpenShiftRuleTemplateRepository extends MongoBaseRepository<OpenShiftRuleTemplate,BigInteger>,CustomOpenShiftRuleTemplateRepository {
     OpenShiftRuleTemplate findByIdAndCountryIdAndDeletedFalse(BigInteger id,long countryId);
 
     List<OpenShiftRuleTemplateDTO> findAllRuleTemplateByCountryIdAndDeletedFalse(long countryId);

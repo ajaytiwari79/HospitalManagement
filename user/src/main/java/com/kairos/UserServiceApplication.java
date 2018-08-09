@@ -141,6 +141,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
     }
 
 	@Bean(name="schedulerServiceRestTemplate")
+	@LoadBalanced
 	public RestTemplate getRestTemplateWithoutUserContext(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
 
 		RestTemplate template =restTemplateBuilder

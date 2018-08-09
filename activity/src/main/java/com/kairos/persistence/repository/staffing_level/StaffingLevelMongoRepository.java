@@ -5,6 +5,7 @@ import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -19,5 +20,7 @@ public interface StaffingLevelMongoRepository extends MongoBaseRepository<Staffi
     List<StaffingLevel> findByUnitIdAndCurrentDateBetweenAndDeletedFalse(Long unitId, Date startDate, Date endDate);
     @Query("{deleted:false,unitId:?0,currentDate:{$gte:?1,$lte:?2}}")
     List<StaffingLevel> findByUnitIdAndCurrentDate(Long unitId, Date startDate, Date endDate);
+    @Query("{deleted:false,unitId:?0,currentDate:{$in:localDates}}")
+    List<StaffingLevel>findByUnitIdAndCurrentDate(Long unitId, List<LocalDate>localDates);
 
 }
