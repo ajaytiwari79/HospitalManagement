@@ -410,7 +410,6 @@ public class AccessPageService extends UserBaseService {
 
     public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){
         List<AccessPage> accessPages = accessPageRepository.getKPITabsList(moduleId);
-        if(accessPages==null) return new ArrayList<>();
         List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
         return kpiTabs;
     }

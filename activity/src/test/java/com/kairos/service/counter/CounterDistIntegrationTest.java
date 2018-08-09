@@ -81,7 +81,7 @@ public class CounterDistIntegrationTest {
     @Test
     public void getInitialCategoryKPIDistributionDataForCountry() {
         String baseUrl = getBaseUrl(2567l, 4l);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>>() {
         };
         ResponseEntity<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/category", HttpMethod.GET, null, typeReference);
         logger.info("Status Code : " + response.getStatusCode());

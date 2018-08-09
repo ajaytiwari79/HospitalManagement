@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.counter;
 
+import com.kairos.activity.counter.ApplicableKPIDTO;
 import com.kairos.activity.counter.KPICategoryDTO;
 import com.kairos.activity.counter.KPIDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
@@ -92,15 +93,16 @@ public class CounterRepository {
 
     //test cases..
     //getCounterListByType for testcases
-    public List<KPIDTO> getCounterListForCountryOrUnitOrStaff(Long refId, ConfLevel level){
+    public List<ApplicableKPIDTO> getCounterListForCountryOrUnitOrStaff(Long refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation=Aggregation.newAggregation(
           Aggregation.match(Criteria.where(refQueryField).is(refId)),
-          Aggregation.lookup("counter","activeKpiId","_id","kpiIds")
+          Aggregation.lookup("counter","activeKpiId","_id","kpiIds"),
+           Aggregation.project("level").and("kpiIds").arrayElementAt(0).as("kpiIds")
         );
-        AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,KPIDTO.class);
+        AggregationResults<ApplicableKPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,ApplicableKPIDTO.class);
         return results.getMappedResults();
-         }
+        }
 
     private String getRefQueryField(ConfLevel level){
         switch(level){

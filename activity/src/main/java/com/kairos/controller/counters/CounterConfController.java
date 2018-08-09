@@ -30,7 +30,7 @@ public class CounterConfController {
     @Inject
     private CounterConfService counterConfService;
 
-    @GetMapping(value = "/counter"+COUNTRY_URL)
+    @PostMapping(value = "/counter"+COUNTRY_URL)
     public ResponseEntity<Map<String, Object>> addCounterEntries(@PathVariable Long countryId){
         counterConfService.addEntries(countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);

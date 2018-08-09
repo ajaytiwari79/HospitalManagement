@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.counter;
 
+import com.kairos.activity.counter.KPIDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
@@ -73,4 +74,5 @@ public class ApplicableKPI extends MongoBaseEntity {
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
+
 }

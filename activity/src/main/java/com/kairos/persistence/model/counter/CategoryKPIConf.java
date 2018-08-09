@@ -8,6 +8,9 @@ public class CategoryKPIConf extends MongoBaseEntity {
     private BigInteger kpiId;
     private BigInteger categoryAssignmentId;
 
+    public CategoryKPIConf() {
+    }
+
     public CategoryKPIConf(BigInteger kpiAssignmentId, BigInteger categoryAssignmentId){
         this.categoryAssignmentId = categoryAssignmentId;
         this.kpiId = kpiAssignmentId;

@@ -50,7 +50,7 @@ public class CounterDistController {
     }
 
     @GetMapping(STAFF_URL+"/counter/dist/counters")
-    public ResponseEntity<Map<String, Object>> getAvailableKPIsListForStaff(@PathVariable Long unitId,@PathVariable Long staffId){
+    public ResponseEntity<Map<String, Object>> getAvailableKPIsListForStaff(@PathVariable Long staffId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList(staffId, ConfLevel.STAFF));
     }
 

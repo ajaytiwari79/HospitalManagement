@@ -1,7 +1,9 @@
 package com.kairos.service.counter;
 
 
+import com.kairos.activity.counter.ApplicableKPIDTO;
 import com.kairos.activity.counter.DefalutKPISettingDTO;
+import com.kairos.activity.counter.KPICategoryDTO;
 import com.kairos.activity.counter.KPIDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
@@ -59,18 +61,20 @@ public class CounterManagementService extends MongoBaseService {
     }
 
     public List<KPIDTO> getKPIsList(Long refId, ConfLevel level) {
-        List<KPIDTO> kpiDTOs=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
-        if(kpiDTOs.isEmpty()){
+        List<ApplicableKPIDTO> applicableKPIList=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
+        if(applicableKPIList.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
-        return kpiDTOs;
+        List<KPIDTO> kpiIds=applicableKPIList.stream().map(applicableKPIDTO -> applicableKPIDTO.getKpiIds()).collect(Collectors.toList());
+        return kpiIds;
     }
 
     public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(Long refId, ConfLevel level) {
         List<CategoryAssignmentDTO> categories = counterRepository.getCategoryAssignments(null, level, refId);
         List<BigInteger> categoryAssignmentIds = categories.parallelStream().map(categoryAssignment -> categoryAssignment.getId()).collect(toList());
         List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategories(categoryAssignmentIds);
-        return new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
+        List<KPICategoryDTO> kpiCategoryDTOS=categories.stream().map(categoryAssignmentDTO -> categoryAssignmentDTO.getCategory()).collect(toList());Collectors.toList();
+        return new InitialKPICategoryDistDataDTO(kpiCategoryDTOS, categoryKPIMapping);
     }
 
     public void addCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {
@@ -102,9 +106,9 @@ public class CounterManagementService extends MongoBaseService {
         }
         List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),refId,level);
        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignmentsByKPIId(tabKPIEntries.getKpiIds(),refId,level);
-        if (tabKPIEntries.getKpiIds().size() != applicableKPIS.size()) {
-            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
-        }
+//        if (tabKPIEntries.getKpiIds().size() != applicableKPIS.size()) {
+//            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
+//        }
         Map<String, Map<BigInteger, BigInteger>> tabKpiMap = new HashMap<>();
         List<TabKPIConf> entriesToSave = new ArrayList<>();
         tabKPIEntries.getTabIds().forEach(tabKpiId -> {
