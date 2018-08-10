@@ -127,7 +127,7 @@ public class ShiftTemplateService extends MongoBaseService {
         shiftTemplateDTO.setId(shiftTemplateId);
         shiftTemplateDTO.setIndividualShiftTemplateIds(shiftTemplate.getIndividualShiftTemplateIds());
         shiftTemplateDTO.setUnitId(unitId);
-        ObjectMapperUtils.copyPropertiesUsingBeanUtils(shiftTemplateDTO,shiftTemplate,"shiftList");
+        ObjectMapperUtils.copyPropertiesUsingBeanUtils(shiftTemplateDTO,shiftTemplate,"shiftList","createdBy");
         save(shiftTemplate);
         return shiftTemplateDTO;
     }

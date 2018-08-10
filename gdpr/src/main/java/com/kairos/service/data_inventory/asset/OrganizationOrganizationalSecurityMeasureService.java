@@ -4,7 +4,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.dto.metadata.OrganizationalSecurityMeasureDTO;
+import com.kairos.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistance.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;

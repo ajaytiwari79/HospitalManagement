@@ -1,8 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
-import com.kairos.dto.metadata.StorageFormatDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
+import com.kairos.gdpr.metadata.StorageFormatDTO;
 import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

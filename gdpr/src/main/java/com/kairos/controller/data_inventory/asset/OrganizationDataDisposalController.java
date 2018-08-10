@@ -1,7 +1,6 @@
 package com.kairos.controller.data_inventory.asset;
 
-import com.kairos.dto.metadata.DataDisposalDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
+import com.kairos.gdpr.metadata.DataDisposalDTO;
 import com.kairos.service.data_inventory.asset.OrganizationDataDisposalService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

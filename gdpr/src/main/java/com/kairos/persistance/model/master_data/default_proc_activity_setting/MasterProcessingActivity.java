@@ -1,10 +1,10 @@
 package com.kairos.persistance.model.master_data.default_proc_activity_setting;
 
 
-import com.kairos.dto.OrganizationSubTypeDTO;
-import com.kairos.dto.OrganizationTypeDTO;
-import com.kairos.dto.ServiceCategoryDTO;
-import com.kairos.dto.SubServiceCategoryDTO;
+import com.kairos.gdpr.OrganizationSubType;
+import com.kairos.gdpr.OrganizationType;
+import com.kairos.gdpr.ServiceCategory;
+import com.kairos.gdpr.SubServiceCategory;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,14 +23,14 @@ public class MasterProcessingActivity extends MongoBaseEntity {
     private String description;
 
     @NotNull
-    private List<OrganizationTypeDTO> organizationTypes;
+    private List<OrganizationType> organizationTypes;
 
     @NotNull
-    private List<OrganizationSubTypeDTO> organizationSubTypes;
+    private List<OrganizationSubType> organizationSubTypes;
     @NotNull
-    private List<ServiceCategoryDTO> organizationServices;
+    private List<ServiceCategory> organizationServices;
     @NotNull
-    private List<SubServiceCategoryDTO> organizationSubServices;
+    private List<SubServiceCategory> organizationSubServices;
 
     @NotNull
     private List<BigInteger> subProcessingActivityIds;
@@ -90,35 +90,35 @@ public class MasterProcessingActivity extends MongoBaseEntity {
         this.description = description;
     }
 
-    public List<OrganizationTypeDTO> getOrganizationTypes() {
+    public List<OrganizationType> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
+    public List<OrganizationSubType> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<ServiceCategoryDTO> getOrganizationServices() {
+    public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
+    public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 
@@ -133,7 +133,7 @@ public class MasterProcessingActivity extends MongoBaseEntity {
         this.countryId=countryId;
          }
 
-    public MasterProcessingActivity(String name, String description,  List<OrganizationTypeDTO> organizationTypes,  List<OrganizationSubTypeDTO> organizationSubTypes,List<ServiceCategoryDTO> organizationServices, List<SubServiceCategoryDTO> organizationSubServices) {
+    public MasterProcessingActivity(String name, String description, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.name = name;
         this.description = description;
         this.organizationTypes = organizationTypes;

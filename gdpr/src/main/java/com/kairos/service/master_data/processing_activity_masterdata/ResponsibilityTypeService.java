@@ -5,7 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.dto.metadata.ResponsibilityTypeDTO;
+import com.kairos.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;

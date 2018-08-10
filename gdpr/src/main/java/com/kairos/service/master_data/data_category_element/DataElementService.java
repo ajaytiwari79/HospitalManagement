@@ -1,7 +1,7 @@
 package com.kairos.service.master_data.data_category_element;
 
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.dto.master_data.DataElementDTO;
+import com.kairos.gdpr.master_data.DataElementDTO;
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
 import com.kairos.persistance.repository.master_data.data_category_element.DataElementMongoRepository;
 import com.kairos.service.common.MongoBaseService;

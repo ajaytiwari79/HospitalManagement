@@ -1,8 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
-import com.kairos.dto.master_data.AssetTypeDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
+import com.kairos.gdpr.master_data.AssetTypeDTO;
 import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -16,10 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.Map;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 
 /*

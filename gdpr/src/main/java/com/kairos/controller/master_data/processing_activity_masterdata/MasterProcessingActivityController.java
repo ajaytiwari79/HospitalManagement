@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
-import com.kairos.dto.master_data.MasterProcessingActivityDTO;
+import com.kairos.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.service.master_data.processing_activity_masterdata.MasterProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;

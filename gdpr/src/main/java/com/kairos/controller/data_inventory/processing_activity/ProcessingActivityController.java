@@ -1,7 +1,7 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
 
-import com.kairos.dto.data_inventory.ProcessingActivityDTO;
+import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.service.data_inventory.processing_activity.ProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;

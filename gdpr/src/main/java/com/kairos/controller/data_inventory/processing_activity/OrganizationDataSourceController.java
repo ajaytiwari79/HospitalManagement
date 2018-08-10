@@ -1,8 +1,7 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
 
-import com.kairos.dto.metadata.DataSourceDTO;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
+import com.kairos.gdpr.metadata.DataSourceDTO;
 import com.kairos.service.data_inventory.processing_activity.OrganizationDataSourceService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

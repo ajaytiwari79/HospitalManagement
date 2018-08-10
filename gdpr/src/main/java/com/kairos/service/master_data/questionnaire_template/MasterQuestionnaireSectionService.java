@@ -1,7 +1,7 @@
 package com.kairos.service.master_data.questionnaire_template;
 
 
-import com.kairos.dto.master_data.MasterQuestionnaireSectionDTO;
+import com.kairos.gdpr.master_data.MasterQuestionnaireSectionDTO;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireSection;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireTemplate;

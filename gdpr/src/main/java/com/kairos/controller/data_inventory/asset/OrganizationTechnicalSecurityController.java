@@ -2,8 +2,7 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.controller.master_data.asset_management.TechnicalSecurityController;
-import com.kairos.dto.metadata.TechnicalSecurityMeasureDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
+import com.kairos.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.service.data_inventory.asset.OrganizationTechnicalSecurityMeasureService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

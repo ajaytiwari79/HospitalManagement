@@ -1,8 +1,7 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
 
-import com.kairos.dto.metadata.ProcessingPurposeDTO;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
+import com.kairos.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.service.data_inventory.processing_activity.OrganizationProcessingPurposeService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

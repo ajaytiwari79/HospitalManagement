@@ -1,7 +1,7 @@
 package com.kairos.service.data_inventory.processing_activity;
 
 
-import com.kairos.dto.data_inventory.ProcessingActivityDTO;
+import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;

@@ -351,6 +351,9 @@ public class PhaseService extends MongoBaseService {
      * @param upcomingMondayDate
      */
     private void addPlanningPhase(List<Phase> phases, LocalDate proposedDate, Map<LocalDate,List<ShiftStatus>> localDatePhaseStatusMap, LocalDate upcomingMondayDate) {
+        if(!Optional.ofNullable(phases).isPresent() || phases.isEmpty()){
+            exceptionService.actionNotPermittedException("phases.absent");
+        }
         Phase phase = null;
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
 
@@ -364,7 +367,7 @@ public class PhaseService extends MongoBaseService {
             Optional<Phase> phaseOptional = phases.stream().findFirst();
             if(phaseOptional.isPresent()){
                 phase = phaseOptional.get();
-                localDatePhaseStatusMap.put(proposedDate,phase.getStatus());
+
             }
 
         }
@@ -374,7 +377,7 @@ public class PhaseService extends MongoBaseService {
             if (DurationType.WEEKS .equals(phaseObject.getDurationType()) && phaseObject.getDuration() > 0) {    // Only considering Week based phases
                 for (int i = 0; i < phaseObject.getDuration(); i++) {
                     if (weekDifference == weekCount) {
-                        localDatePhaseStatusMap.put(proposedDate,phaseObject.getStatus());
+                        phase=phaseObject;
                         break outerLoop;
                     }
                     weekCount++;
@@ -383,9 +386,8 @@ public class PhaseService extends MongoBaseService {
         }
         if (!Optional.ofNullable(phase).isPresent()) {
             phase = phases.get(phases.size() - 1);
-            localDatePhaseStatusMap.put(proposedDate,phase.getStatus());
-
-        }
+            }
+        localDatePhaseStatusMap.put(proposedDate,phase.getStatus());
     }
 
 }

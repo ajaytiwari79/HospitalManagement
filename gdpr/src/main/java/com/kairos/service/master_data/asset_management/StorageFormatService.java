@@ -5,7 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.dto.metadata.StorageFormatDTO;
+import com.kairos.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistance.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
