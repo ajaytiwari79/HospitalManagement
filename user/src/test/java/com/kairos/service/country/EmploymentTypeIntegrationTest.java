@@ -1,7 +1,7 @@
 package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.persistence.model.country.common.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.util.DateUtil;
 import org.junit.Assert;
 import org.junit.Ignore;

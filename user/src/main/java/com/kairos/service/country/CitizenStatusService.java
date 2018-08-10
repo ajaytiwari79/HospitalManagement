@@ -1,5 +1,5 @@
 package com.kairos.service.country;
-import com.kairos.persistence.model.country.common.CitizenStatus;
+import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
