@@ -5,7 +5,6 @@ import com.kairos.gdpr.OrganizationSubType;
 import com.kairos.gdpr.OrganizationType;
 import com.kairos.gdpr.ServiceCategory;
 import com.kairos.gdpr.SubServiceCategory;
-import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.user.country.system_setting.AccountTypeDTO;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Document(collection = "agreement_template")
 public class PolicyAgreementTemplate extends MongoBaseEntity {
@@ -24,7 +24,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     @NotBlank(message = "Description cannot be empty")
     private String description;
 
-    private List<AccountTypeDTO> accountTypes;
+    private Set<AccountTypeDTO> accountTypes;
 
     private List<BigInteger> agreementSections=new ArrayList<>();
 
@@ -107,11 +107,11 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public List<AccountType> getAccountTypes() {
+    public Set<AccountTypeDTO> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(List<AccountType> accountTypes) {
+    public void setAccountTypes(Set<AccountTypeDTO> accountTypes) {
         this.accountTypes = accountTypes;
     }
 
