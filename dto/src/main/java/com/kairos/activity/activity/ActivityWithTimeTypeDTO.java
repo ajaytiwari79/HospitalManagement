@@ -1,5 +1,6 @@
 package com.kairos.activity.activity;
 
+import com.kairos.activity.counter.CounterDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
 
@@ -60,4 +61,5 @@ public class ActivityWithTimeTypeDTO {
     public void setMinOpenShiftHours(Integer minOpenShiftHours) {
         this.minOpenShiftHours = minOpenShiftHours;
     }
+
 }

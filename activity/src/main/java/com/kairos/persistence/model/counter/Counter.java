@@ -1,11 +1,14 @@
 package com.kairos.persistence.model.counter;
 
+import com.kairos.ApplicableFor;
 import com.kairos.activity.counter.FilterCriteria;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -20,6 +23,11 @@ public class Counter extends MongoBaseEntity {
     private BigInteger primaryCounter;
     private BigInteger categoryId;
     private List<FilterCriteria> criteriaList;
+    private Set<ApplicableFor> applicableFor=Collections.singleton(ApplicableFor.OPEN_SHIFT);
+
+    public Counter() {
+        //Default Constructor
+    }
 
     public Counter(CounterType type){
         this.type = type;
@@ -30,6 +38,14 @@ public class Counter extends MongoBaseEntity {
         this.primaryCounter = primaryCounter;
         this.type = type;
         this.title = title;
+    }
+
+    public Counter(String title, CounterType type,boolean treatAsCounter, BigInteger primaryCounter, Set<ApplicableFor> applicableFor) {
+        this.type = type;
+        this.title = title;
+        this.treatAsCounter = treatAsCounter;
+        this.primaryCounter = primaryCounter;
+        this.applicableFor = applicableFor;
     }
 
     public Counter(CounterType restingHoursPerPresenceDay, List<FilterCriteria> criteriaList) {
@@ -82,5 +98,13 @@ public class Counter extends MongoBaseEntity {
 
     public void setCategoryId(BigInteger categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public Set<ApplicableFor> getApplicableFor() {
+        return applicableFor;
+    }
+
+    public void setApplicableFor(Set<ApplicableFor> applicableFor) {
+        this.applicableFor = applicableFor;
     }
 }
