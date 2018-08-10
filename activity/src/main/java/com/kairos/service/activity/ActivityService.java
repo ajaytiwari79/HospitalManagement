@@ -10,7 +10,7 @@ import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.phase.PhaseWeeklyDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
-import com.kairos.activity.staffing_level.StaffingLevelDTO;
+import com.kairos.activity.staffing_level.StaffingLevelPlanningDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -1106,12 +1106,12 @@ public class ActivityService extends MongoBaseService {
         List<Activity> activities = activityMongoRepository.findAllActivitiesByUnitId(unitId);
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId, DateUtils.convertLocalDateToDate(LocalDate.now().minusMonths(1)), DateUtils.convertLocalDateToDate(LocalDate.now().plusMonths(1)));
         plannerSyncService.publishActivities(unitId, activities, IntegrationOperation.CREATE);
-        List<StaffingLevelDTO> staffingLevelDTOS = new ArrayList<>();
+        List<StaffingLevelPlanningDTO> staffingLevelPlanningDTOS = new ArrayList<>();
         for (StaffingLevel staffingLevel : staffingLevels) {
-            StaffingLevelDTO staffingLevelDTO = new StaffingLevelDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
-            staffingLevelDTOS.add(staffingLevelDTO);
+            StaffingLevelPlanningDTO staffingLevelPlanningDTO = new StaffingLevelPlanningDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
+            staffingLevelPlanningDTOS.add(staffingLevelPlanningDTO);
         }
-        plannerSyncService.publishStaffingLevels(unitId, staffingLevelDTOS, IntegrationOperation.CREATE);
+        plannerSyncService.publishStaffingLevels(unitId, staffingLevelPlanningDTOS, IntegrationOperation.CREATE);
         return new PlannerSyncResponseDTO(true);
     }
 
