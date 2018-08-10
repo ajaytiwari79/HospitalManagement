@@ -7,6 +7,7 @@ import com.kairos.gdpr.ServiceCategory;
 import com.kairos.gdpr.SubServiceCategory;
 import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.common.MongoBaseEntity;
+import com.kairos.user.country.system_setting.AccountTypeDTO;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -23,7 +24,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     @NotBlank(message = "Description cannot be empty")
     private String description;
 
-    private List<AccountType> accountTypes;
+    private List<AccountTypeDTO> accountTypes;
 
     private List<BigInteger> agreementSections=new ArrayList<>();
 
