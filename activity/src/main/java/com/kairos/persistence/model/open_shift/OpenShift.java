@@ -20,7 +20,6 @@ public class OpenShift extends MongoBaseEntity {
     private Long unitId;
     private BigInteger orderId;
     private BigInteger activityId;
-    private BigInteger parentOpenShiftId;
     private List<Long> assignedStaff;
 
     public OpenShift() {
@@ -35,7 +34,6 @@ public class OpenShift extends MongoBaseEntity {
         this.interestedStaff = interestedStaff;
         this.declinedBy = declinedBy;
         this.unitId = unitId;
-        this.parentOpenShiftId = parentOpenShiftId;
     }
 
     public Long getUnitId() {
@@ -102,14 +100,6 @@ public class OpenShift extends MongoBaseEntity {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
-
-    public BigInteger getParentOpenShiftId() {
-        return parentOpenShiftId;
-    }
-
-    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
-        this.parentOpenShiftId = parentOpenShiftId;
     }
 
     public List<Long> getAssignedStaff() {

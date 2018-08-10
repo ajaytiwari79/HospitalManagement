@@ -7,9 +7,11 @@ import com.kairos.dto.ServiceCategoryDTO;
 import com.kairos.dto.SubServiceCategoryDTO;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.utils.custom_annotation.NotNullOrEmpty;
+import org.javers.core.metamodel.annotation.ValueObject;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.List;
 
 @Document(collection = "master_asset")
@@ -33,6 +35,14 @@ public class MasterAsset extends MongoBaseEntity {
     private List <SubServiceCategoryDTO> organizationSubServices;
 
     private Long countryId;
+
+    @NotNull(message = "Asset type can't be null")
+    private BigInteger assetType;
+
+    public BigInteger getAssetType() { return assetType; }
+
+    public void setAssetType(BigInteger assetType) { this.assetType = assetType; }
+
 
     public Long getCountryId() {
         return countryId;

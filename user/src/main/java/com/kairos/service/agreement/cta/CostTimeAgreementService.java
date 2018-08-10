@@ -7,10 +7,10 @@ import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateCa
 import com.kairos.persistence.model.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
 import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.Currency;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseTagDTO;
@@ -51,10 +51,12 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static javax.management.timer.Timer.ONE_DAY;
+
 @Transactional
 @Service
 public class CostTimeAgreementService extends UserBaseService {
-    private Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
+    private final Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
 
 
     private @Inject
@@ -243,7 +245,7 @@ public class CostTimeAgreementService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
         List<RuleTemplateCategory> ctaRuleTemplateCategoryList = ruleTemplateCategories.parallelStream().filter(
-                ruleTemplateCategory -> RuleTemplateCategoryType.CTA.equals(ruleTemplateCategory.getRuleTemplateCategoryType()) && ruleTemplateCategory.isDeleted() == false)
+                ruleTemplateCategory -> RuleTemplateCategoryType.CTA.equals(ruleTemplateCategory.getRuleTemplateCategoryType()) && !ruleTemplateCategory.isDeleted())
                 .collect(Collectors.toList());
         List<Long> ruleTemplateCategoryIds = ctaRuleTemplateCategoryList.parallelStream().map(RuleTemplateCategory::getId)
                 .collect(Collectors.toList());
@@ -260,7 +262,7 @@ public class CostTimeAgreementService extends UserBaseService {
         return loadAllCTARuleTemplateByCountry(countryId);
     }
 
-    public CTARuleTemplate buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO, Boolean doUpdate) throws ExecutionException, InterruptedException {
+    private CTARuleTemplate buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO, Boolean doUpdate) throws ExecutionException, InterruptedException {
 
         BeanUtils.copyProperties(ctaRuleTemplateDTO, ctaRuleTemplate, "calculateOnDayTypes");
 
@@ -355,36 +357,13 @@ public class CostTimeAgreementService extends UserBaseService {
         this.save(costTimeAgreement);
         return true;
     }
-/// =============================================================================  CTA  ==================================
-
-
-    public CTARuleTemplate saveEmbeddedEntitiesOfCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, RuleTemplate oldCTA) {
-
-        // Fetch Employment Type
-        /*List<Long> employmentTypeIds = oldCTA.getEmploymentType();
-        ctaRuleTemplate.setEmploymentType(employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds, false));
-
-        // Fetch Time Type
-        List<Long> timeTypeIds = ctaRuleTemplateDTO.getTimeTypes();
-        ctaRuleTemplate.setTimeTypes(timeTypeGraphRepository.findTimeTypeByIds(timeTypeIds));
-
-        Long ruleTemplateId = ctaRuleTemplateDTO.getRuleTemplateCategory();
-        if(ruleTemplateId != null ){
-            ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategoryGraphRepository.findOne(ruleTemplateId));
-        }*/
-
-        return ctaRuleTemplate;
-    }
 
     @Async
     public CompletableFuture<Boolean> buildCTAToCopy(CostTimeAgreement costTimeAgreementToBeCreated, CostTimeAgreement oldCTA)
             throws InterruptedException, ExecutionException {
 
         // Get Experties
-        Callable<Optional<Expertise>> expertiseCallable = () -> {
-            Optional<Expertise> expertise = expertiseGraphRepository.findById(oldCTA.getExpertise().getId());
-            return expertise;
-        };
+        Callable<Optional<Expertise>> expertiseCallable = () -> expertiseGraphRepository.findById(oldCTA.getExpertise().getId());
 
         Future<Optional<Expertise>> expertiseFuture = asynchronousService.executeAsynchronously(expertiseCallable);
 
@@ -406,8 +385,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
         // Get Organization Type
         Callable<Optional<OrganizationType>> OrganizationTypesListCallable = () -> {
-            Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(oldCTA.getOrganizationType().getId());
-            return organizationType;
+            return organizationTypeGraphRepository.findById(oldCTA.getOrganizationType().getId());
         };
         Future<Optional<OrganizationType>> organizationTypesFuture = asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
 
@@ -449,7 +427,6 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
 
-
     public List<CTAListQueryResult> loadAllCTAByCountry(Long countryId) {
 //        Country country = countryGraphRepository.findOne(countryId);
         return collectiveTimeAgreementGraphRepository.findCTAByCountryId(countryId);
@@ -461,22 +438,6 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     public CTARuleTemplate saveEmbeddedEntitiesOfCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO) {
-        /*for (CTARuleTemplateDayType ctaRuleTemplateDayType : ctaRuleTemplate.getCalculateOnDayTypes()) {
-
-            DayType dayType = dayTypeGraphRepository.findOne(ctaRuleTemplateDayType.getDayType().getId());
-            List<Long> countryHolidayCalendarIds = new ArrayList<>();
-            for (CountryHolidayCalender countryHolidayCalender : ctaRuleTemplateDayType.getCountryHolidayCalenders()) {
-                countryHolidayCalendarIds.add(countryHolidayCalender.getId());
-            }
-            List<CountryHolidayCalender> countryHolidayCalenders = countryHolidayCalenderGraphRepository.getCountryHolidayCalendarsById(countryHolidayCalendarIds);
-            ctaRuleTemplateDayType.setDayType(dayTypeGraphRepository.findOne(ctaRuleTemplateDayType.getDayType().getId()));
-            ctaRuleTemplateDayType.setCountryHolidayCalenders(countryHolidayCalenders);
-        }*/
-
-        // Fetch Access Group
-//        List<Long> accessGroupIds = ctaRuleTemplateDTO.getCalculateValueIfPlanned();
-//        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupRepository.getAccessGroupById(accessGroupIds));
-
         if (ctaRuleTemplate.getId() != null) {
             ctaRuleTemplateGraphRepository.detachAllTimeTypesFromCTARuleTemplate(ctaRuleTemplate.getId());
             ctaRuleTemplateGraphRepository.detachAllTimeTypesFromCTARuleTemplate(ctaRuleTemplate.getId());
@@ -525,29 +486,6 @@ public class CostTimeAgreementService extends UserBaseService {
         };
         Future<List<RuleTemplate>> ctaRuleTemplatesFuture = asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
 
-        // Get Organization Type
-        if (Optional.ofNullable(collectiveTimeAgreementDTO.getOrganizationType()).isPresent()) {
-            Callable<Optional<OrganizationType>> OrganizationTypesListCallable = () -> {
-                Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationType());
-                return organizationType;
-            };
-            Future<Optional<OrganizationType>> organizationTypesFuture = asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
-            if (organizationTypesFuture.get().isPresent())
-                costTimeAgreement.setOrganizationType(organizationTypesFuture.get().get());
-
-        }
-
-        // Get Organization Sub Type
-        if (Optional.ofNullable(collectiveTimeAgreementDTO.getOrganizationType()).isPresent()) {
-            Callable<Optional<OrganizationType>> OrganizationSubTypesListCallable = () -> {
-                Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationSubType());
-                return organizationType;
-            };
-            Future<Optional<OrganizationType>> organizationSubTypesFuture = asynchronousService.executeAsynchronously(OrganizationSubTypesListCallable);
-            if (organizationSubTypesFuture.get().isPresent())
-                costTimeAgreement.setOrganizationSubType(organizationSubTypesFuture.get().get());
-
-        }
         //set data
         if (!doUpdate) {
             costTimeAgreement.setExpertise(expertise);
@@ -563,7 +501,7 @@ public class CostTimeAgreementService extends UserBaseService {
         return CompletableFuture.completedFuture(true);
     }
 
-    public void setActivityBasesCostCalculationSettings(CTARuleTemplate ctaRuleTemplate) {
+    private void setActivityBasesCostCalculationSettings(CTARuleTemplate ctaRuleTemplate) {
 
         switch (ctaRuleTemplate.getActivityTypeForCostCalculation()) {
             case TIME_TYPE_ACTIVITY:
@@ -620,14 +558,7 @@ public class CostTimeAgreementService extends UserBaseService {
         return ctaRuleTemplateDTO;
     }
 
-    public Boolean publishCountryCTAToNewOrganizationByOrgSubType(Long organizationId, List<Long> orgSubTypeId) {
-        List<CostTimeAgreement> costTimeAgreements = collectiveTimeAgreementGraphRepository.getAllCTAByOrganizationSubType(orgSubTypeId, false);
-        collectiveTimeAgreementGraphRepository.detachAllCTAFromOrganization(organizationId);
-        Organization org = organizationGraphRepository.findOne(organizationId);
-        org.setCostTimeAgreements(costTimeAgreements);
-        organizationGraphRepository.save(org);
-        return true;
-    }
+
 // TODO REMOVE NOT in USE
 
 //    public CostTimeAgreement updateCostTimeAgreementForOrganization(CostTimeAgreement countryCTA, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
@@ -683,42 +614,39 @@ public class CostTimeAgreementService extends UserBaseService {
         return cta;
     }
 
-    public UnitPositionQueryResult createCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+    public UnitPositionQueryResult updateCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, Long ctaId, CollectiveTimeAgreementDTO ctaDTO) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent() || unitPosition.isDeleted() == true) {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
 
         }
+
         CostTimeAgreement oldCTA = collectiveTimeAgreementGraphRepository.getLinkedCTAWithUnitPosition(unitPositionId);
-        Optional<Expertise> expertise= expertiseGraphRepository.findById(collectiveTimeAgreementDTO.getExpertise());
-        CostTimeAgreement responseCTA = new CostTimeAgreement();
+        CostTimeAgreement responseCTA;
+
         if (unitPosition.isPublished()) {
             CostTimeAgreement costTimeAgreement = new CostTimeAgreement();
-            collectiveTimeAgreementDTO.setId(null);
-            BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
+            ctaDTO.setId(null);
+            BeanUtils.copyProperties(ctaDTO, costTimeAgreement);
             costTimeAgreement.setId(null);
-
-            CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                    .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, false, null,expertise.get());
-            // Wait until they are all done
-            CompletableFuture.allOf(hasUpdated).join();
-            collectiveTimeAgreementGraphRepository.detachCTAFromUnitPosition(unitPositionId);
+            copyRules(costTimeAgreement, ctaDTO, null);
+            collectiveTimeAgreementGraphRepository.detachOldCTAFromUnitPosition(unitPositionId);
             oldCTA.setDisabled(true);
+            oldCTA.setEndDateMillis(ctaDTO.getStartDateMillis() - ONE_DAY);
+            costTimeAgreement.setDisabled(false);
             costTimeAgreement.setParent(oldCTA);
+            costTimeAgreement.setExpertise(unitPosition.getExpertise());
             unitPosition.setCta(costTimeAgreement);
             unitPositionService.save(unitPosition);
             responseCTA = new CostTimeAgreement(costTimeAgreement.getId(), costTimeAgreement.getName(), oldCTA.getExpertise(), costTimeAgreement.getRuleTemplates(), costTimeAgreement.getStartDateMillis(), costTimeAgreement.getEndDateMillis(), false);
-
         } else {
+
             List<Long> ruleTemplateIds = null;
             if (Optional.ofNullable(oldCTA.getRuleTemplates()).isPresent() && !oldCTA.getRuleTemplates().isEmpty()) {
                 ruleTemplateIds = new ArrayList<>();
-                oldCTA.getRuleTemplates().stream().map(current -> current.getId()).collect(Collectors.toList());
+                oldCTA.getRuleTemplates().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
             }
-            CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                    .buildCTA(oldCTA, collectiveTimeAgreementDTO, true, ruleTemplateIds,expertise.get());
-            // Wait until they are all done
-            CompletableFuture.allOf(hasUpdated).join();
+            copyRules(oldCTA, ctaDTO, ruleTemplateIds);
             this.save(oldCTA);
             responseCTA = new CostTimeAgreement(oldCTA.getId(), oldCTA.getName(), oldCTA.getExpertise(), oldCTA.getRuleTemplates(), oldCTA.getStartDateMillis(), oldCTA.getEndDateMillis(), false);
 
@@ -789,7 +717,7 @@ public class CostTimeAgreementService extends UserBaseService {
             collectiveTimeAgreementDTO.setOrganizationSubType(organizationSubTypeId);
             return countryCTAService.createCostTimeAgreementInCountry(countryId, collectiveTimeAgreementDTO);
         } else {
-            Optional<CostTimeAgreement> cta = collectiveTimeAgreementGraphRepository.findById(ctaId,0);
+            Optional<CostTimeAgreement> cta = collectiveTimeAgreementGraphRepository.findById(ctaId, 0);
             if (!cta.isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.cta.id.notFound", ctaId);
 
@@ -799,5 +727,50 @@ public class CostTimeAgreementService extends UserBaseService {
             save(costTimeAgreement);
         }
         return null;
+    }
+
+
+    private Boolean copyRules(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, List<Long> ruleTemplateIds) {
+
+        Set<Long> ruleTemplateCategoryIds = collectiveTimeAgreementDTO.getRuleTemplates().stream().map(CTARuleTemplateDTO::getRuleTemplateCategory).collect(Collectors.toSet());
+        List<RuleTemplateCategory> ruleTemplateCategories = ruleTemplateCategoryGraphRepository.findRuleTemplatesByIds(ruleTemplateCategoryIds);
+        Map<Long, RuleTemplateCategory> ruleTemplateCategoryMap = ruleTemplateCategories.stream().collect(Collectors.toMap(RuleTemplateCategory::getId, v -> v));
+        Set<Long> employmentTypeIds = collectiveTimeAgreementDTO.getRuleTemplates()
+                .stream().flatMap(ctaRuleTemplateDTO ->
+                        ctaRuleTemplateDTO.getEmploymentTypes().stream().map(e -> e.longValue()))
+                .collect(Collectors.toSet());
+        List<EmploymentType> employmentTypes = employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds);
+        Map<Long, EmploymentType> employmentTypeMap = employmentTypes.stream().collect(Collectors.toMap(EmploymentType::getId, v -> v));
+
+
+        List<RuleTemplate> ruleTemplates = new ArrayList<>();
+        for (CTARuleTemplateDTO ctaRuleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()) {
+            CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate();
+            BeanUtils.copyProperties(ctaRuleTemplateDTO, ctaRuleTemplate);
+            // Check if cta exists with same rule template Id
+            if (ruleTemplateIds != null && ruleTemplateIds.contains(ctaRuleTemplate.getId())) {
+                ctaRuleTemplate.cloneCTARuleTemplate();
+            }
+            setActivityBasesCostCalculationSettings(ctaRuleTemplate);
+            if (ctaRuleTemplateDTO.getRuleTemplateCategory() != null) {
+                ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategoryMap.get(ctaRuleTemplateDTO.getRuleTemplateCategory()));
+            }
+
+
+            //https://stackoverflow.com/questions/8104692/how-to-avoid-java-util-concurrentmodificationexception-when-iterating-through-an
+            ctaRuleTemplate.setEmploymentTypes(new ArrayList<>());
+            if (!ctaRuleTemplateDTO.getEmploymentTypes().isEmpty()) {
+                for (Iterator<Long> iterator = ctaRuleTemplateDTO.getEmploymentTypes().iterator(); iterator.hasNext(); ) {
+                    Long value = iterator.next();
+                    ctaRuleTemplate.addEmploymentType(employmentTypeMap.get(value));
+                }
+            }
+            ruleTemplates.add(ctaRuleTemplate);
+        }
+        costTimeAgreement.setRuleTemplates(ruleTemplates);
+        costTimeAgreement.setStartDateMillis(collectiveTimeAgreementDTO.getStartDateMillis());
+        costTimeAgreement.setEndDateMillis(collectiveTimeAgreementDTO.getEndDateMillis());
+
+        return true;
     }
 }

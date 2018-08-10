@@ -33,13 +33,13 @@ public class ClauseDTO {
     private String description;
 
     @Valid
-    @NotNull(message = "Organization  Type  can't be  null")
-    @NotEmpty(message = "Organization  Type  can't be  empty")
+    @NotNull(message = "ManagingOrganization  Type  can't be  null")
+    @NotEmpty(message = "ManagingOrganization  Type  can't be  empty")
     private List<OrganizationTypeDTO> organizationTypes;
 
     @Valid
-    @NotNull(message = "Organization Sub Type  can't be  null")
-    @NotEmpty(message = "Organization Sub Type  can't be  empty")
+    @NotNull(message = "ManagingOrganization Sub Type  can't be  null")
+    @NotEmpty(message = "ManagingOrganization Sub Type  can't be  empty")
     private List<OrganizationSubTypeDTO> organizationSubTypes;
 
     @Valid

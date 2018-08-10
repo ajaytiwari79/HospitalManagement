@@ -60,7 +60,7 @@ public class RestClientUrlUtil {
         return baseUrl;
     }
     public static final String getPlannerBaseUrl(){
-        String baseUrl=new StringBuilder(plannerServiceUrl+"unit/").toString();
+        String baseUrl=new StringBuilder(plannerServiceUrl).toString();
         return baseUrl;
 
     }

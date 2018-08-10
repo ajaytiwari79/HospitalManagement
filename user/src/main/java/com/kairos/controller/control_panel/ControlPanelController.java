@@ -80,4 +80,6 @@ public class ControlPanelController {
     public ResponseEntity<Map<String, Object>> getRequiredControlPanelDataForTask(@PathVariable long controlPanelId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, controlPanelService.getControlPanelData(controlPanelId));
     }
+
+
 }

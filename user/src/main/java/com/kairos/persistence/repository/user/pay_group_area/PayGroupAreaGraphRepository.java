@@ -43,10 +43,10 @@ public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGrou
             "DETACH DELETE rel")
     void removePayGroupAreaFromMunicipality(Long payGroupAreaId, Long municipalityId, Long relationshipId);
 
-    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(rel)={0} AND id(payGroupArea)={1} AND id(municipality)={2}\n" +
-            "RETURN  id(payGroupArea) as payGroupAreaId,payGroupArea.name as name,payGroupArea.description as description,municipality as municipality, " +
-            "rel.endDateMillis as endDateMillis,id(rel) as id,rel.startDateMillis as startDateMillis")
-    PayGroupAreaQueryResult findPayGroupAreaByIdAndMunicipality(Long id, Long payGroupAreaId, Long municipalityId);
+    @Query("MATCH (level:Level)<-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false}) where id(level)={0} and lower(payGroupArea.name)=lower({1}) " +
+            " with count(payGroupArea) as payGroupAreaCount " +
+            " return case when payGroupAreaCount>0 then true else false end as response")
+    boolean isPayGroupAreaExistWithNameInLevel(Long levelId, String payGroupAreaName);
 
     @Query("MATCH (payGroupArea:PayGroupArea{deleted:false}) where id(payGroupArea) IN {0} return payGroupArea")
     List<PayGroupArea> findAllById(List<Long> payGroupArea);

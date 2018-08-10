@@ -1066,7 +1066,7 @@ public class StaffService extends UserBaseService {
     }
 
 
-    public Staff createStaffFromWeb(Long unitId, StaffCreationDTO payload) throws ParseException {
+    public StaffDTO createStaffFromWeb(Long unitId, StaffCreationDTO payload) throws ParseException {
 
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
@@ -1113,7 +1113,8 @@ public class StaffService extends UserBaseService {
         staff.setUser(null); // removing user to send in FE
 //        staff.setGender(user.getGender());
         //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
-        return staff;
+        StaffDTO staffDTO = new StaffDTO(staff.getId(),staff.getFirstName(),staff.getLastName(),user.getGender(),user.getAge());
+        return staffDTO;
     }
 
     public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData) {

@@ -2,7 +2,7 @@ package com.kairos.wrapper.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.shift.ShiftState;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.util.DateTimeInterval;
@@ -45,16 +45,17 @@ public class ShiftWithActivityDTO {
     private int scheduledMinutes;
     private int durationMinutes;
     private ShiftWithActivityDTO subShift;
-    private ShiftState shiftState;
+    private List<ShiftStatus> status;
     private List<BigInteger> brokenRuleTemplateIds = new ArrayList<>();
     private BigInteger plannedTypeId ;
     private String timeType;
-    public ShiftState getShiftState() {
-        return shiftState;
+
+    public List<ShiftStatus> getStatus() {
+        return status;
     }
 
-    public void setShiftState(ShiftState shiftState) {
-        this.shiftState = shiftState;
+    public void setStatus(List<ShiftStatus> status) {
+        this.status = status;
     }
 
     public Long getUnitPositionId() {

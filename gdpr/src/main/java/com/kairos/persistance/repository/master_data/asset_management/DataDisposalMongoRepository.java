@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data.asset_management;
 
 
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
+import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -24,6 +25,8 @@ public interface DataDisposalMongoRepository extends MongoRepository<DataDisposa
 
     DataDisposal findByid(BigInteger id);
 
+    @Query("{_id:?0,deleted:false}")
+    DataDisposalResponseDTO findDataDisposalByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0,organizationId:?1}")
     List<DataDisposal> findAllDataDisposals(Long countryId,Long organizationId);

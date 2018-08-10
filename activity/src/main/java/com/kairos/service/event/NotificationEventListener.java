@@ -41,8 +41,11 @@ public class NotificationEventListener {
         Map<BigInteger,List<StaffUnitPositionQueryResult>> openShiftStaffMap = priorityGroupRuleDataDTO.getOpenShiftStaffMap();
         for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry:openShiftStaffMap.entrySet()) {
 
+            int fibonacciCounter = 0;//Using it to put fibonacci order in email for testing.
             for(StaffUnitPositionQueryResult staffUnitPositionQueryResult:entry.getValue()) {
-                mailService.sendPlainMail(staffUnitPositionQueryResult.getStaffEmail(), AppConstants.OPENSHIFT_EMAIL_BODY,AppConstants.OPENSHIFT_SUBJECT);
+
+                mailService.sendPlainMail(staffUnitPositionQueryResult.getStaffEmail(), String.format(AppConstants.OPENSHIFT_EMAIL_BODY,fibonacciCounter++),AppConstants.OPENSHIFT_SUBJECT);
+
             }
         }
     }

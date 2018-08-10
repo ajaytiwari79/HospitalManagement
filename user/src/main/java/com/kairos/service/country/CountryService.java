@@ -53,6 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -482,7 +483,7 @@ public class CountryService extends UserBaseService {
      */
     //TODO Reduce web service calls/multiple calls
     public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTATemplate(Long countryId, Long unitId){
-        List<ActivityTypeDTO> activityTypeDTOS = new ArrayList<>();
+        List<ActivityTypeDTO> activityTypeDTOS;
          if(Optional.ofNullable(unitId).isPresent()){
             countryId = organizationService.getCountryIdOfOrganization(unitId);
              activityTypeDTOS = activityTypesRestClient.getActivitiesForUnit(unitId);
@@ -491,7 +492,8 @@ public class CountryService extends UserBaseService {
 
          }
 
-        List<ActivityCategoryDTO> activityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId);
+        Set<BigInteger> activityCategoriesIds = activityTypeDTOS.stream().map(activityTypeDTO->activityTypeDTO.getCategoryId()).collect(Collectors.toSet());
+        List<ActivityCategoryDTO> activityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId, activityCategoriesIds);
 
          List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
          List<EmploymentType> employmentTypes=countryGraphRepository.getEmploymentTypeByCountry(countryId,false);

@@ -1,8 +1,7 @@
 package com.kairos.activity.wta.rule_template_category;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.user.country.tag.TagDTO;
-
+import com.kairos.activity.tags.TagDTO;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

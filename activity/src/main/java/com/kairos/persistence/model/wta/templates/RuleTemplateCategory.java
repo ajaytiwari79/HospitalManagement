@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.RuleTemplateCategoryType;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Document
 public class RuleTemplateCategory extends MongoBaseEntity {
 
      @NotNull(message = "error.RuleTemplateCategory.name.notnull")
@@ -26,6 +28,8 @@ public class RuleTemplateCategory extends MongoBaseEntity {
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
     private Long countryId;
+    private List<BigInteger> tags = new ArrayList<>();
+
     public RuleTemplateCategory(String name, String description, RuleTemplateCategoryType ruleTemplateCategoryType) {
         this.name = name;
         this.description = description;
@@ -40,9 +44,6 @@ public class RuleTemplateCategory extends MongoBaseEntity {
     public RuleTemplateCategory(String name) {
         this.name = name;
     }
-
-    private List<BigInteger> tags = new ArrayList<>();
-
 
     public String getName() {
         return name;

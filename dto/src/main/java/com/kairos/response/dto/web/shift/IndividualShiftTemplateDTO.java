@@ -22,6 +22,8 @@ public class IndividualShiftTemplateDTO {
     private LocalTime endTime;
     private boolean mainShift;
     private List<IndividualShiftTemplateDTO> subShifts;
+    private String timeType;
+    private int durationMinutes;
 
     public IndividualShiftTemplateDTO() {
         //Default Constructor
@@ -101,5 +103,21 @@ public class IndividualShiftTemplateDTO {
 
     public void setMainShift(boolean mainShift) {
         this.mainShift = mainShift;
+    }
+
+    public String getTimeType() {
+        return timeType;
+    }
+
+    public void setTimeType(String timeType) {
+        this.timeType = timeType;
+    }
+
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public void setDurationMinutes(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
     }
 }

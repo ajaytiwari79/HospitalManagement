@@ -1,0 +1,17 @@
+package com.kairos.persistence.repository.time_bank;
+
+import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
+
+import java.util.Date;
+
+/**
+ * @author pradeep
+ * @date - 27/7/18
+ */
+
+public interface CustomTimeBankRepository {
+
+    DailyTimeBankEntry findLastTimeBankByUnitPositionId(Long unitPositionId, Date date);
+
+    void updateAccumulatedTimeBank(Long unitPositionId,int timeBank);
+}

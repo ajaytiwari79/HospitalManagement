@@ -38,7 +38,7 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
         UserPrincipal user=(UserPrincipal)authentication.getUserAuthentication().getPrincipal();
         final Map<String, Object> userDetails = new HashMap<>();
         Map<String,Object> userDetailsMap = ObjectMapperUtils.copyPropertiesByMapper(user.getDetails(), Map.class);
-        userDetailsMap.put("language", userService.getSystemLanguageOfUser(user.getUser().getId()));
+        userDetailsMap.put("languageId", userService.getUserSelectedLanguageId(user.getUser().getId()));
          userDetails.put("details", userDetailsMap);
          authentication.setDetails(userDetails);
         return super.createAccessToken(authentication);

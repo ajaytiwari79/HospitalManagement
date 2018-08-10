@@ -312,10 +312,9 @@ public class CountryCTAService extends UserBaseService {
         return collectiveTimeAgreementDTO;
     }
 
+
     public CTARuleTemplate saveEmbeddedEntitiesOfCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO, CTADetailsWrapper ctaDetailsWrapper) {
-        if (ctaRuleTemplate.getId() != null) {
-            ctaRuleTemplateGraphRepository.detachAllTimeTypesFromCTARuleTemplate(ctaRuleTemplate.getId());
-        }
+
         if (!ctaRuleTemplateDTO.getEmploymentTypes().isEmpty()) {
             ctaRuleTemplateDTO.getEmploymentTypes().forEach(c -> {
                 ctaRuleTemplate.getEmploymentTypes().add(ctaDetailsWrapper.getEmploymentTypeIdMap().get(c));

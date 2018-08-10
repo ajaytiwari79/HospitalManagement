@@ -190,7 +190,7 @@ public class TaskExceptionService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.restrictionfrequency.id",restrictionFrequencyId);
         }
         List<Long> citizenIds=clientRestClient.getCitizenIds();
-        //DayOfWeek dayOfWeek = LocalDate.now().getDayOfWeek();
+        //DayOfWeek dayOfWeek = LocalDate.now().getHeaderName();
         LocalDateTime dateFrom = LocalDateTime.now().withHour(DAY_START_HOUR).withMinute(DAY_START_MINUTE).withSecond(DAY_START_SECOND);
         LocalDateTime dateTo = LocalDateTime.now().withHour(DAY_END_HOUR).withMinute(DAY_END_MINUTE).withSecond(DAY_END_SECOND);
         dateTo = dateTo.plusDays(restrictionFrequency.getValue());

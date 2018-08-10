@@ -13,15 +13,15 @@ public class ScheduleTimeByTimeTypeDTO {
 
     private int totalMin;
     private BigInteger timeTypeId;
-    private String label;
+    private String name;
 
 
-    public String getLabel() {
-        return label;
+    public String getName() {
+        return name;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setName(String name) {
+        this.name = name;
     }
 
     private List<ScheduleTimeByTimeTypeDTO> children = new ArrayList();

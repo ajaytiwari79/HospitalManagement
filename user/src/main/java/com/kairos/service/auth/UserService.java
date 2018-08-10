@@ -654,7 +654,7 @@ public class UserService extends UserBaseService {
         return true;
     }
 
-    public boolean updateSystemLanguageOfUser(Long userLanguageId){
+    public boolean updateSelectedLanguageOfUser(Long userLanguageId){
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(userLanguageId);
         currentUser.setUserLanguage(systemLanguage);
@@ -662,8 +662,7 @@ public class UserService extends UserBaseService {
         return true;
     }
 
-    public String getSystemLanguageOfUser(Long userId){
-        String language =  countryGraphRepository.getSystemLanguageOfUser(userId);
-        return (Optional.ofNullable(language).orElse(""));
+    public Long getUserSelectedLanguageId(Long userId){
+        return userGraphRepository.getUserSelectedLanguageId(userId);
     }
 }

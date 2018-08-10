@@ -19,11 +19,15 @@ public class AppConstant {
 
     public static final String EXISTING_DATA_LIST= "existing";
     public static final String NEW_DATA_LIST = "new";
+    public static final String AGREEMENT_SECTION = "agreement_section";
+    public static final String AGREEMENT_SECTION_WRAPPER= "agreement_section_wrapper";
+    public static final String AGREEMENT_SUB_SECTION_MAP_CONTAINING_CLAUSE = "agreement_sub_section_map_with_clauses";
+
+
+
 
     //rollback
     public static final String QUESTION_LIST = "question_list";
-    public static final String AGREEMENT_SECTION_LIST = "agreement_sections";
-
     public static final String QUESTIONNAIRE_SECTIONS = "questionnaire_sectionList";
     public static final String PROCESSING_ACTIVITIES = "processing_activities";
     public static final String IDS_LIST = "ids";
@@ -31,5 +35,14 @@ public class AppConstant {
     public static final String ASSET_TYPES_LIST = "asset_types";
 
 
+    //metaData refrence key for asset and processing activity
+    public static final String ASSET_TYPE = "assetType";
+    public static final String ASSET_SUB_TYPE = "assetSubTypes";
+    public static final String STORAGE_FORMAT = "storageFormats";
+    public static final String ORG_SECURITY_MEASURE = "orgSecurityMeasures";
+    public static final String TECHNICAL_SECURITY_MEASURE = "technicalSecurityMeasures";
+    public static final String HOSTING_PROVIDER = "hostingProvider";
+    public static final String HOSTING_TYPE = "hostingType";
+    public static final String DATA_DISPOSAL = "dataDisposal";
 
 }

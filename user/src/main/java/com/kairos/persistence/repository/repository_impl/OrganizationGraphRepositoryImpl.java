@@ -145,8 +145,17 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         Map<String, Object> queryParameters = new HashMap();
         String query = "";
         queryParameters.put("unitId", organizationId);
-        queryParameters.put("name", clientFilterDTO.getName());
-        queryParameters.put("cprNumber", clientFilterDTO.getCprNumber());
+
+        String dynamicWhereQuery = "";
+        queryParameters.put("unitId", organizationId);
+        if (clientFilterDTO.getName() != null && !clientFilterDTO.getName().isEmpty()) {
+            queryParameters.put("name", clientFilterDTO.getName());
+            dynamicWhereQuery += " AND ( c.firstName=~{name} OR c.lastName=~{name}) ";
+        }
+        if (clientFilterDTO.getCprNumber() != null &&  !clientFilterDTO.getCprNumber().isEmpty()) {
+            queryParameters.put("cprNumber", clientFilterDTO.getCprNumber());
+            dynamicWhereQuery += " AND c.cprNumber STARTS WITH {cprNumber} ";
+        }
         queryParameters.put("phoneNumber", clientFilterDTO.getPhoneNumber());
         queryParameters.put("civilianStatus", clientFilterDTO.getClientStatus());
         queryParameters.put("skip", Integer.valueOf(skip));
@@ -163,7 +172,8 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         }
 
         if(citizenIds.isEmpty() && clientFilterDTO.getServicesTypes().isEmpty() && clientFilterDTO.getTimeSlots().isEmpty() && clientFilterDTO.getTaskTypes().isEmpty() && !clientFilterDTO.isNewDemands()){
-            query = "MATCH (c:Client)-[r:GET_SERVICE_FROM]->(o:Organization) WHERE id(o)= {unitId} AND c.healthStatus IN {healthStatus} AND ( c.firstName=~{name} OR c.lastName=~{name} ) AND c.cprNumber STARTS WITH {cprNumber} with c,r\n";
+            query = "MATCH (c:Client)-[r:GET_SERVICE_FROM]->(o:Organization) WHERE id(o)= {unitId} AND c.healthStatus IN {healthStatus} " + dynamicWhereQuery + " with c,r\n";
+
 
         }else{
             query = "MATCH (c:Client{healthStatus:'ALIVE'})-[r:GET_SERVICE_FROM]->(o:Organization) WHERE id(o)= {unitId} AND id(c) in {citizenIds} AND c.healthStatus IN {healthStatus} AND ( c.firstName=~{name} OR c.lastName=~{name} ) AND c.cprNumber STARTS WITH {cprNumber} with c,r\n";
@@ -171,7 +181,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         }
         query +=   "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r\n";
         query+=    "OPTIONAL MATCH (c)-[houseHoldRel:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(houseHold) with ca,c,r,houseHoldRel,houseHold\n";
-        if(StringUtils.isBlank("" +clientFilterDTO.getPhoneNumber())){
+        if (clientFilterDTO.getPhoneNumber() == null) {
             query += "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) with cd,ca,c,r,houseHoldRel,houseHold\n";
         }else{
             query += "MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) WHERE cd.privatePhone STARTS WITH {phoneNumber} with cd,ca,c,r,houseHoldRel,houseHold\n";

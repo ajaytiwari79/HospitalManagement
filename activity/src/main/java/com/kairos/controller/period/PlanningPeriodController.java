@@ -5,6 +5,7 @@ import com.kairos.util.response.ResponseHandler;
 import com.kairos.activity.period.PlanningPeriodDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,11 +70,19 @@ public class PlanningPeriodController {
     }
 
     @ApiOperation(value = "update period's flipping Date")
-    @PutMapping(value = "/period/{periodId}/flip_phase/{timestamp}")
+    @PutMapping(value = "/period/{periodId}/flip_phase/{date}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable BigInteger periodId, @PathVariable Long unitId, @PathVariable LocalDate date) {
+    public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable BigInteger periodId, @PathVariable Long unitId, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updateFlippingDate(periodId, unitId, date));
 
+    }
+
+    @ApiOperation(value = "Migrate Planning Period")
+    @PostMapping(value="/migrate_planning_period")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> migratePlanningPeriod(@PathVariable Long unitId,  @RequestBody @Valid PlanningPeriodDTO planningPeriodDTO) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.migratePlanningPeriods(unitId, planningPeriodDTO));
     }
 
 }

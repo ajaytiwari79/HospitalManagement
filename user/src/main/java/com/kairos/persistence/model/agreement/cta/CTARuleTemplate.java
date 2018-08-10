@@ -12,6 +12,7 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -244,6 +245,12 @@ public class CTARuleTemplate extends RuleTemplate {
         this.employmentTypes = employmentTypes;
     }
 
+    public void addEmploymentType(EmploymentType employmentType) {
+
+        this.employmentTypes = Optional.ofNullable(employmentTypes).orElse(new ArrayList<>());
+        this.employmentTypes.add(employmentType);
+    }
+
    /* public ActivityType getActivityType() {
         return activityType;
     }
@@ -388,6 +395,7 @@ public class CTARuleTemplate extends RuleTemplate {
                 .toString();
 
     }
+
     public static void setActivityBasesCostCalculationSettings(CTARuleTemplate ctaRuleTemplate) {
 
         switch (ctaRuleTemplate.getActivityTypeForCostCalculation()) {

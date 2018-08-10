@@ -3,6 +3,9 @@ package com.kairos.service.staff;
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
+import com.kairos.persistence.model.staff.employment.Employment;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -18,8 +21,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by vipul on 6/3/18.
@@ -32,10 +39,16 @@ public class EmploymentServiceIntegrationTest {
     @Value("${server.host.http.url}")
     private String url;
     @Autowired
-    TestRestTemplate restTemplate;
+    private TestRestTemplate restTemplate;
     static private Long createdId;
     static private String baseUrlWithUnit;
     static private Long staffId;
+    @Inject
+    private EmploymentService employmentService;
+    @Inject
+    private EmploymentGraphRepository employmentGraphRepository;
+    @Inject
+    private AccessGroupRepository accessGroupRepository;
 
     @Before
     public void setUp() throws Exception {
@@ -68,6 +81,17 @@ public class EmploymentServiceIntegrationTest {
 
     }
 
+    @Test
+    public void moveToReadOnlyAccessGroup() {
+
+        Optional<Employment> employment =  employmentGraphRepository.findById(8767L);
+        employment.get().setAccessGroupIdOnEmploymentEnd(14628L);
+        employmentGraphRepository.save(employment.get());
+        Assert.assertTrue(employmentService.moveToReadOnlyAccessGroup(Stream.of(8767L).collect(Collectors.toList())));
+        Long accessGroupId = accessGroupRepository.findAccessGroupByEmploymentId(8767L);
+        Assert.assertTrue(accessGroupId.equals(14628L));
+
+    }
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)

@@ -96,7 +96,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
         List<Criteria> clauseCriteria = new ArrayList<>(filterSelectionDto.getFiltersData().size());
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
             if (filterSelection.getValue().size() != 0) {
-                clauseCriteria.add(buildQuery(filterSelection, filterSelection.getName()));
+                clauseCriteria.add(buildMatchCriteria(filterSelection, filterSelection.getName()));
             }
         });
         if (!clauseCriteria.isEmpty())
@@ -116,7 +116,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public Criteria buildQuery(FilterSelection filterSelection, FilterType filterType) {
+    public Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType) {
 
         switch (filterType) {
             case ACCOUNT_TYPES:

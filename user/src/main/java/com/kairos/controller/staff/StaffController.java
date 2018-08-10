@@ -492,8 +492,7 @@ public class StaffController {
     @RequestMapping(value = "/create_staff_from_web", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) throws ParseException {
-        Staff staff = staffService.createStaffFromWeb(unitId, staffCreationDTO);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staff);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.createStaffFromWeb(unitId, staffCreationDTO));
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/basic_info")

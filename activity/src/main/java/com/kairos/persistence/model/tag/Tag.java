@@ -3,6 +3,7 @@ package com.kairos.persistence.model.tag;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -13,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Tag extends MongoBaseEntity {
 
     private String name;
-
+    @Indexed
     private MasterDataTypeEnum masterDataType;
 
     private boolean countryTag;

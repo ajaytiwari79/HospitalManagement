@@ -1,14 +1,11 @@
 package com.kairos.persistence.model.counter;
 
-import com.kairos.activity.counter.FilterCriteria;
-import com.kairos.activity.enums.counter.ChartType;
+import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.activity.enums.counter.CounterSize;
-import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.chart.BaseChart;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.util.List;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -20,7 +17,7 @@ public class KPI extends Counter {
     private BaseChart chart;
     private CounterSize size;
 
-    public KPI(String title, BaseChart chart, CounterSize size, CounterType type, boolean treatAsCounter, BigInteger primaryCounter){
+    public KPI(String title, BaseChart chart, CounterSize size, CounterType type, boolean treatAsCounter, BigInteger primaryCounter) {
         super(title, type, treatAsCounter, primaryCounter);
         this.chart = chart;
         this.size = size;

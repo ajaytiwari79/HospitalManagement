@@ -15,30 +15,6 @@ public class ComparisonUtils {
     @Inject
     private MongoTemplate mongoTemplate;
 
-    public Set<String> checkForExistingObjectAndRemoveFromList(Set<String> namesList, Set<String> existingNames) {
-
-        Assert.notEmpty(existingNames, "Entity must Not be Empty");
-        Assert.notEmpty(namesList, "Entity must Not be Empty");
-        Map<String, String> existingNamesMapData = new HashMap<>();
-
-        if (existingNames.size() == 0) {
-            return namesList;
-        }
-        existingNames.forEach(s -> {
-
-            existingNamesMapData.put(s.toLowerCase(), s);
-
-        });
-        Set<String> newNamesList = new HashSet<>();
-        namesList.forEach(name -> {
-            if (!Optional.ofNullable(existingNamesMapData.get(name.toLowerCase())).isPresent()) {
-                newNamesList.add(name);
-            }
-        });
-        return newNamesList;
-    }
-
-
     public <T> Set<String> getNameListForMetadata(List<T> existingObject, Set<String> namesList) {
 
         if (existingObject.size() == 0) {
@@ -77,5 +53,6 @@ public class ComparisonUtils {
             return newNamesList;
         }
     }
+
 
 }

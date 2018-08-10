@@ -199,7 +199,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     CTAListQueryResult getCTAByUnitPositionId(Long unitPositionId);
 
     @Query("MATCH (cta:CostTimeAgreement)-[r:HAS_CTA]-(up:UnitPosition) WHERE id(up)={0} DELETE r")
-    void detachCTAFromUnitPosition(Long unitPositinId);
+    void detachOldCTAFromUnitPosition(Long unitPositinId);
 
     @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[r:HAS_CTA]-(up:UnitPosition) WHERE id(up)={0} RETURN cta")
     CostTimeAgreement getLinkedCTAWithUnitPosition(Long unitPositinId);

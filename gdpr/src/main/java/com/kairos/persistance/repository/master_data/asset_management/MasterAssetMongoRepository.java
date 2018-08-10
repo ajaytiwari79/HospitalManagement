@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
+import com.kairos.response.dto.master_data.MasterAssetBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -20,8 +21,8 @@ public interface MasterAssetMongoRepository extends MongoRepository<MasterAsset,
     @Query("{deleted:false,countryId:?0,organizationId:?1}")
     List<MasterAsset> findAllMasterAssets( Long countryId,Long organizationId);
 
-    @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
-    MasterAsset findByNameAndCountry(Long countryId,Long organizationId,String name);
+    @Query("{countryId:?0,organizationId:?1,assetTypeId:?2,deleted:false}")
+    List<MasterAssetBasicResponseDTO> findAllMasterAssetbyAssetType(Long countryId, Long organizationId, BigInteger assetTypeId);
 
     MasterAsset findByid(BigInteger id);
 

@@ -153,9 +153,9 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public Map<String, Object> getAllActivityByUnitAndDeleted(Long unitId) {
         Map<String, Object> response = new HashMap<>();
-        Long organizationId = organizationRestClient.getCountryIdOfOrganization(unitId);
+        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
         List<ActivityTagDTO> activities = activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false);
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationId);
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         response.put("activities", activities);
         response.put("activityCategories", activityCategories);
         return response;

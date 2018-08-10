@@ -25,12 +25,12 @@ public class DataSubjectMapping extends MongoBaseEntity {
     @NotNullOrEmpty(message = "Description Cannot be empty")
     private String description;
 
-    @NotEmpty(message = "Organization Type cannot be empty")
-    @NotNull(message = "Organization Type cannot null")
+    @NotEmpty(message = "ManagingOrganization Type cannot be empty")
+    @NotNull(message = "ManagingOrganization Type cannot null")
     private List<OrganizationTypeDTO> organizationTypes;
 
-    @NotEmpty(message = "Organization Type cannot be empty")
-    @NotNull(message = "Organization Sub Type cannot be empty")
+    @NotEmpty(message = "ManagingOrganization Type cannot be empty")
+    @NotNull(message = "ManagingOrganization Sub Type cannot be empty")
     private List<OrganizationSubTypeDTO> organizationSubTypes;
 
     @NotNull(message = "Data category cannot null")

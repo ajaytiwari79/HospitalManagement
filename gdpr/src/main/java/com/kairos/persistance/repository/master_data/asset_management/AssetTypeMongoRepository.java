@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data.asset_management;
 
 
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
+import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -20,6 +21,12 @@ public interface AssetTypeMongoRepository extends MongoRepository<AssetType,BigI
 
     @Query("{'countryId':?0,organizationId:?1,_id:?2,deleted:false}")
     AssetType findByIdAndNonDeleted(Long countryId,Long organizationId, BigInteger id);
+
+    @Query("{_id:?0,deleted:false}")
+    AssetTypeBasicResponseDTO findAssetTypeById( BigInteger id);
+
+    @Query("{_id:{$in:?0},deleted:false}")
+    List<AssetTypeBasicResponseDTO> findAssetTypeListByIds(List<BigInteger> ids);
 
     AssetType findByid(BigInteger id);
 

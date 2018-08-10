@@ -3,7 +3,7 @@ package com.kairos.persistance.repository.master_data.asset_management;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.master_data.AssetTypeResponseDto;
+import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -43,7 +43,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
     }
 
     @Override
-    public List<AssetTypeResponseDto> getAllAssetTypesWithSubAssetTypes(Long countryId, Long organizationId) {
+    public List<AssetTypeResponseDTO> getAllAssetTypesWithSubAssetTypes(Long countryId, Long organizationId) {
 
 
         Aggregation aggregation = Aggregation.newAggregation(
@@ -54,12 +54,12 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
         );
 
 
-        AggregationResults<AssetTypeResponseDto> result = mongoTemplate.aggregate(aggregation,AssetType.class,AssetTypeResponseDto.class);
+        AggregationResults<AssetTypeResponseDTO> result = mongoTemplate.aggregate(aggregation,AssetType.class,AssetTypeResponseDTO.class);
         return result.getMappedResults();
     }
 
     @Override
-    public AssetTypeResponseDto getAssetTypesWithSubAssetTypes(Long countryId, Long organizationId, BigInteger id) {
+    public AssetTypeResponseDTO getAssetTypesWithSubAssetTypes(Long countryId, Long organizationId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and("isSubAsset").is(false).and(DELETED).is(false).and("_id").is(id)),
@@ -68,7 +68,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
         );
 
 
-        AggregationResults<AssetTypeResponseDto> result = mongoTemplate.aggregate(aggregation,AssetType.class,AssetTypeResponseDto.class);
+        AggregationResults<AssetTypeResponseDTO> result = mongoTemplate.aggregate(aggregation,AssetType.class,AssetTypeResponseDTO.class);
         return result.getUniqueMappedResult();
     }
 }

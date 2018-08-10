@@ -6,14 +6,12 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.util.DateTimeInterval;
-import com.kairos.enums.shift.ShiftState;
+import com.kairos.enums.shift.ShiftStatus;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by vipul on 30/8/17.
@@ -50,7 +48,7 @@ public class Shift extends MongoBaseEntity {
     private String externalId;
 
     private Long unitPositionId;
-    private ShiftState shiftState;
+    private Set<ShiftStatus> status;
     private List<BigInteger> brokenRuleTemplateIds;
 
     private BigInteger parentOpenShiftId;
@@ -260,7 +258,7 @@ public class Shift extends MongoBaseEntity {
                 ", phase=" + phase +
                 ", weekCount=" + weekCount +
                 ", unitId=" + unitId +
-                ", state=" + shiftState +
+                ", status=" + status +
                 '}';
     }
 
@@ -316,7 +314,7 @@ public class Shift extends MongoBaseEntity {
                 this.activityId, this.staffId, this.unitId, this.unitPositionId);
         shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
         shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
-        shiftQueryResult.setShiftState(this.getShiftState());
+        shiftQueryResult.setStatus(this.getStatus());
         shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
         shiftQueryResult.setPlannedTimeId(this.plannedTimeId);
         return shiftQueryResult;
@@ -340,12 +338,12 @@ public class Shift extends MongoBaseEntity {
         this.unitPositionId = unitPositionId;
     }
 
-    public ShiftState getShiftState() {
-        return shiftState;
+    public Set<ShiftStatus> getStatus() {
+        return status=Optional.ofNullable(status).orElse(new HashSet<>());
     }
 
-    public void setShiftState(ShiftState shiftState) {
-        this.shiftState = shiftState;
+    public void setStatus(Set<ShiftStatus> status) {
+        this.status = status;
     }
 
     public BigInteger getParentOpenShiftId() {
@@ -380,7 +378,7 @@ public class Shift extends MongoBaseEntity {
         this.plannedTimeId = plannedTimeId;
     }
 
-    public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, ShiftState shiftState, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
+    public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, Set<ShiftStatus> status, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -394,7 +392,7 @@ public class Shift extends MongoBaseEntity {
         this.isMainShift = isMainShift;
         this.externalId = externalId;
         this.unitPositionId = unitPositionId;
-        this.shiftState = shiftState;
+        this.status = status;
         this.parentOpenShiftId = parentOpenShiftId;
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
         this.copiedFromShiftId = copiedFromShiftId;
@@ -403,6 +401,5 @@ public class Shift extends MongoBaseEntity {
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
     }
-
 
 }

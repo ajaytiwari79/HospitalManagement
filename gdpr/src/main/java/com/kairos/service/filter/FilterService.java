@@ -97,9 +97,9 @@ public class FilterService {
             case ACCOUNT_TYPES:
                 return new FilterResponseDTO(filterType, filterType.value, "Account Types", filterQueryResult.getAccountTypes());
             case ORGANIZATION_TYPES:
-                return new FilterResponseDTO(filterType, filterType.value, "Organization Types", filterQueryResult.getOrganizationTypes());
+                return new FilterResponseDTO(filterType, filterType.value, "ManagingOrganization Types", filterQueryResult.getOrganizationTypes());
             case ORGANIZATION_SUB_TYPES:
-                return new FilterResponseDTO(filterType, filterType.value, "Organization Sub Types", filterQueryResult.getOrganizationSubTypes());
+                return new FilterResponseDTO(filterType, filterType.value, "ManagingOrganization Sub Types", filterQueryResult.getOrganizationSubTypes());
             case ORGANIZATION_SERVICES:
                 return new FilterResponseDTO(filterType, filterType.value, "Service Types", filterQueryResult.getOrganizationServices());
             case ORGANIZATION_SUB_SERVICES:
@@ -139,10 +139,9 @@ public class FilterService {
                 clauseFilterData.setData(clauses);
                 return clauseFilterData;
             case ASSET_MODULE_NAME:
-                List<MasterAsset> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
-                List<MasterAssetResponseDTO> masterAssetResponseDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(masterAssets, MasterAssetResponseDTO.class);
+                List<MasterAssetResponseDTO> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
                 FilterResponseWithData<List<MasterAssetResponseDTO>> assetFilterData = new FilterResponseWithData<>();
-                assetFilterData.setData(masterAssetResponseDTOs);
+                assetFilterData.setData(masterAssets);
                 return assetFilterData;
             case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
                 List<MasterProcessingActivityResponseDTO> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, organizationId, filterSelectionDto);

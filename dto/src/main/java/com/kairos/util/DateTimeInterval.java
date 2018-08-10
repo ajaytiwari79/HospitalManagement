@@ -86,6 +86,7 @@ public class DateTimeInterval {
         return getEnd().toLocalDate();
     }
 
+
     public LocalTime getStartLocalTime(){
         return getStart().toLocalTime();
     }

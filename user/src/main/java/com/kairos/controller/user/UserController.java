@@ -122,7 +122,7 @@ public class UserController {
     @ApiOperation(value = "Update a User default Language")
     @RequestMapping(value = "/user_language/{languageId}", method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> updateSystemLanguageOfUser(@PathVariable long languageId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateSystemLanguageOfUser(languageId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateSelectedLanguageOfUser(languageId));
     }
 
     @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/staffs")

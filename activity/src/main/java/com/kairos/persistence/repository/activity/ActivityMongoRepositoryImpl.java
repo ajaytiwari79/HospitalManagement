@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.activity;
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.CompositeActivityDTO;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
+import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.user.staff.staff_settings.StaffActivitySettingDTO;
@@ -145,7 +146,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
+                match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("isParentActivity").is(true).and("state").is(ActivityStateEnum.PUBLISHED)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 project("$id", "name", "description", "ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId")
                         .and("timeType").arrayElementAt(0).as("timeType"),
@@ -157,7 +158,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByUnit(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("isParentActivity").is(false)),
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("isParentActivity").is(false).and("state").is(ActivityStateEnum.PUBLISHED)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
                 project("$id", "name", "description", "ctaAndWtaSettingsActivityTab", "generalActivityTab.categoryId").and("timeType").arrayElementAt(0).as("timeType"),
                 match(Criteria.where("timeType.timeTypes").is(TimeTypes.WORKING_TYPE))
@@ -367,9 +368,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public ActivityWrapper findActivityAndTimeTypeByActivityId(BigInteger activityId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("id").is(activityId).and("deleted").is(false)),
-
-                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id","timeType"),
-                project().and("name").as("activity.name").and("description").as("activity.description")
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                        "timeType"),
+                project().and("id").as("activity._id").and("name").as("activity.name").and("description").as("activity.description")
                         .and("countryId").as("activity.countryId").and("expertises").as("activity.expertises")
                         .and("id").as("activity.id")
                         .and("organizationTypes").as("activity.organizationTypes").and("organizationSubTypes").as("activity.organizationSubTypes")

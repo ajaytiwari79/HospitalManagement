@@ -34,4 +34,7 @@ public interface ActivityCategoryRepository extends MongoRepository<ActivityCate
 
     @Query(value = "{ 'name':?0, 'deleted':?1 }")
     boolean existsByNameIgnoreCaseAndDeleted(String name, boolean status );
+
+    @Query("{'deleted': false,  _id : {'$in': ?0} }")
+    List<ActivityCategory> findAllByIdsIn(List<BigInteger> activityCategoriesIds);
 }

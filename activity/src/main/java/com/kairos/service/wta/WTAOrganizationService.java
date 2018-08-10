@@ -7,7 +7,7 @@ import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
-import com.kairos.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
+import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
@@ -41,7 +41,7 @@ public class WTAOrganizationService extends MongoBaseService {
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject
-    private RuleTemplateCategoryMongoRepository ruleTemplateCategoryMongoRepository;
+    private RuleTemplateCategoryRepository ruleTemplateCategoryMongoRepository;
     @Inject private OrganizationRestClient organizationRestClient;
     @Inject private RuleTemplateService ruleTemplateService;
     @Inject private WTABuilderService wtaBuilderService;

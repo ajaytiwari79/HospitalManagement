@@ -249,21 +249,7 @@ public class WTARuleTemplateValidatorUtility {
                     shiftQueryResultWithActivities.add(s);
                 }
             });
-        }/*
-        if(plannedTimeIds!=null && !plannedTimeIds.isEmpty()){
-            shifts.forEach(s->{
-                if(plannedTimeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getPlannedTypeId())){
-                    shiftQueryResultWithActivities.add(s);
-                }
-            });
         }
-        if(activitieIds!=null && !activitieIds.isEmpty()){
-            shifts.forEach(s->{
-                if(activitieIds.contains(s.getActivity().getId())){
-                    shiftQueryResultWithActivities.add(s);
-                }
-            });
-        }*/
         return shiftQueryResultWithActivities;
     }
 
