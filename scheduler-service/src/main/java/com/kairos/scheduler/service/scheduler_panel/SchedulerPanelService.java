@@ -112,7 +112,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
         }
         else {
-            schedulerPanel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate().withHour(16));
+            schedulerPanel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
         }
 
         schedulerPanel.setActive(true);
@@ -188,7 +188,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
            }
            else {
-               schedulerPanelDB.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate().withHour(16));
+               schedulerPanelDB.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
            }
 
            save(schedulerPanelDB);
