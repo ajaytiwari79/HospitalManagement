@@ -8,7 +8,11 @@ import com.kairos.persistance.repository.master_data.processing_activity_masterd
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.processing_activity_masterdata.*;
+import org.javers.core.Javers;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -43,6 +47,12 @@ public class ProcessingActivityService extends MongoBaseService {
 
     @Inject
     private ProcessingPurposeService processingPurposeService;
+
+    @Inject
+    private Javers javers;
+
+    @Inject
+    private JaversCommonService javersCommonService;
 
 
     public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
@@ -202,6 +212,32 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
 
     }
+
+    /**
+     * @param processingActivityId
+     * @return
+     * @description method return audit history of Processing Activity , old Object list and latest version also.
+     * return object contain  changed field with key fields and values with key Values in return list of map
+     */
+    public List<Map<String, Object>> getProcessingActivityActivitiesHistory(BigInteger processingActivityId,int size,int skip)   {
+
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingActivityId, ProcessingActivity.class).limit(size).skip(skip);
+        List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
+        changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
+        return javersCommonService.getHistoryMap(changes, processingActivityId, ProcessingActivity.class);
+
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

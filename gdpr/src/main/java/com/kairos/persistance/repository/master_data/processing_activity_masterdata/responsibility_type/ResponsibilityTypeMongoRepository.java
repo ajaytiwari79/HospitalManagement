@@ -23,6 +23,9 @@ public interface ResponsibilityTypeMongoRepository extends MongoBaseRepository<R
     @Query("{countryId:?0,name:?1,deleted:false}")
     ResponsibilityType findByName(Long countryId,String name);
 
+    @Query("{_id:?0,deleted:false}")
+    ResponsibilityTypeResponseDTO findResponsibilityTypeByid(BigInteger id);
+
     ResponsibilityType findByid(BigInteger id);
 
     @Query("{countryId:?0,deleted:false}")

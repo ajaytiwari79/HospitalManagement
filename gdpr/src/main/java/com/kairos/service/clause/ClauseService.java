@@ -4,14 +4,12 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.gdpr.master_data.ClauseDTO;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
-import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -32,13 +30,6 @@ public class ClauseService extends MongoBaseService {
 
     @Inject
     private ClauseMongoRepository clauseMongoRepository;
-
-    @Inject
-    private AccountTypeService accountTypeService;
-
-
-    @Inject
-    private AccountTypeMongoRepository accountTypeMongoRepository;
 
 
     @Inject
@@ -75,7 +66,7 @@ public class ClauseService extends MongoBaseService {
         Clause newClause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), countryId, clauseDto.getOrganizationTypes(), clauseDto.getOrganizationSubTypes()
                 , clauseDto.getOrganizationServices(), clauseDto.getOrganizationSubServices());
         newClause.setOrganizationId(organizationId);
-        newClause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
+        newClause.setAccountTypes(clauseDto.getAccountTypes());
         newClause.setTemplateTypes(clauseDto.getTemplateTypes());
 
         try {
@@ -116,7 +107,7 @@ public class ClauseService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + clauseId);
         }
         List<ClauseTag> tagList = new ArrayList<>();
-        clause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
+        clause.setAccountTypes(clauseDto.getAccountTypes());
         List<BigInteger> templateTypesIds=clauseDto.getTemplateTypes();
         //templateTypeService.getTemplateByIdsList(templateTypesIds, countryId);
         try {

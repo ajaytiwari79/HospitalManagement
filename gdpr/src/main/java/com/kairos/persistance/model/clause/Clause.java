@@ -6,9 +6,9 @@ import com.kairos.gdpr.OrganizationSubType;
 import com.kairos.gdpr.OrganizationType;
 import com.kairos.gdpr.ServiceCategory;
 import com.kairos.gdpr.SubServiceCategory;
-import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.MongoBaseEntity;
+import com.kairos.user.country.system_setting.AccountTypeDTO;
 import org.javers.core.metamodel.annotation.*;
 
 import javax.validation.constraints.NotBlank;
@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -37,7 +38,7 @@ public class Clause extends MongoBaseEntity {
 
     private List<SubServiceCategory> organizationSubServices;
 
-    private List<AccountType> accountTypes;
+    private Set<AccountTypeDTO> accountTypes;
 
     private Long countryId;
 
@@ -146,11 +147,11 @@ public class Clause extends MongoBaseEntity {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public List<AccountType> getAccountTypes() {
+    public Set<AccountTypeDTO> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(List<AccountType> accountTypes) {
+    public void setAccountTypes(Set<AccountTypeDTO> accountTypes) {
         this.accountTypes = accountTypes;
     }
 

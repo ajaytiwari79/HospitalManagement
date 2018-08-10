@@ -54,7 +54,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * @param countryId
      * @param organizationId
      * @param templateDto    contain data of Questionnaire template
-     * @return Object of Questionnaire template with template type and asset type if template type is(ASSET_TYPE)
+     * @return Object of Questionnaire template with template type and asset type if template type is(ASSET_TYPE_KEY)
      */
     public MasterQuestionnaireTemplateDTO addQuestionnaireTemplate(Long countryId, Long organizationId, MasterQuestionnaireTemplateDTO templateDto) {
         MasterQuestionnaireTemplate existing = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, organizationId, templateDto.getName());
@@ -81,7 +81,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * @return object of questionnaire template with template type
      * @throws InvalidRequestException; if template type enum value not exist
      * @descriptiom buildQuestionnaireTemplate()  build questionnaire template ,add template type to questionnaire template (Template Type enum) and if enum type
-     * is ASSET_TYPE then add asset to template and return ;(addTemplateTypeToQuestionnaireTemplate)
+     * is ASSET_TYPE_KEY then add asset to template and return ;(addTemplateTypeToQuestionnaireTemplate)
      */
     public MasterQuestionnaireTemplate buildQuestionnaireTemplate(MasterQuestionnaireTemplateDTO templateDto, MasterQuestionnaireTemplate questionnaireTemplate) {
         if (QuestionnaireTemplateType.valueOf(templateDto.getTemplateType()) == null) {
