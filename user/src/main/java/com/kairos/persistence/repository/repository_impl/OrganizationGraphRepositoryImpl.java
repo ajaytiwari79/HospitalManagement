@@ -149,7 +149,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
 
         if (clientFilterDTO.getName() != null&& !StringUtils.isBlank(clientFilterDTO.getName())) {
             queryParameters.put("name", clientFilterDTO.getName());
-            dynamicWhereQuery += "AND ( c.firstName=~{name} OR c.lastName=~{name})";
+            dynamicWhereQuery += "AND ( user.firstName=~{name} OR user.lastName=~{name})";
         }
         if (clientFilterDTO.getCprNumber() != null && !StringUtils.isBlank(clientFilterDTO.getCprNumber())) {
             queryParameters.put("cprNumber", clientFilterDTO.getCprNumber());
@@ -172,17 +172,16 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
 
         if (citizenIds.isEmpty() && clientFilterDTO.getServicesTypes().isEmpty() && clientFilterDTO.getTimeSlots().isEmpty() && clientFilterDTO.getTaskTypes().isEmpty() && !clientFilterDTO.isNewDemands()) {
             query = "MATCH (user:User)<-[:" + IS_A + "]-(c:Client)-[r:"+GET_SERVICE_FROM+"]->(o:Organization) WHERE id(o)= {unitId} AND c.healthStatus IN {healthStatus} " + dynamicWhereQuery + "  with c,r,user\n";
-
         } else {
-            query = "MATCH (c:Client{healthStatus:'ALIVE'})-[r:"+GET_SERVICE_FROM+"]->(o:Organization) WHERE id(o)= {unitId} AND id(c) in {citizenIds} AND c.healthStatus IN {healthStatus} AND ( c.firstName=~{name} OR c.lastName=~{name} ) AND c.cprNumber STARTS WITH {cprNumber} with c,r\n";
+            query = "MATCH (user:User)<-[:" + IS_A + "]-(c:Client{healthStatus:'ALIVE'})-[r:"+GET_SERVICE_FROM+"]->(o:Organization) WHERE id(o)= {unitId} AND id(c) in {citizenIds} AND c.healthStatus IN {healthStatus} " +dynamicWhereQuery+ " with c,r,user\n";
 
         }
-        query += "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r,user\n";
-        query += "OPTIONAL MATCH (c)-[houseHoldRel:" + PEOPLE_IN_HOUSEHOLD_LIST + "]-(houseHold) with ca,c,r,houseHoldRel,houseHold,user\n";
+        query +=   "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r,user\n";
+        query+=    "OPTIONAL MATCH (c)-[houseHoldRel:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(houseHold) with ca,c,r,houseHoldRel,houseHold,user\n";
         if (clientFilterDTO.getPhoneNumber() == null) {
             query += "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) with cd,ca,c,r,houseHoldRel,houseHold,user\n";
-        } else {
-            query += "MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) WHERE cd.privatePhone STARTS WITH {phoneNumber} with user,cd,ca,c,r,houseHoldRel,houseHold\n";
+        }else{
+            query += "MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) WHERE cd.privatePhone STARTS WITH {phoneNumber} with cd,ca,c,r,houseHoldRel,houseHold,user\n";
         }
         if (clientFilterDTO.getClientStatus() == null) {
             query += "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus) with cs,cd,ca,c,r,houseHoldRel,houseHold,user\n";
