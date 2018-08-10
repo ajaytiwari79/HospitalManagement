@@ -25,5 +25,4 @@ extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
 	}
 
 
-
 }
