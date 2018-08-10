@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.country.common;
+package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;

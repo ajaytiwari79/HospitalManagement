@@ -22,6 +22,10 @@ public class KPI extends Counter {
     private BaseChart chart;
     private CounterSize size;
 
+    public KPI() {
+        //Default Constructor
+    }
+
     public KPI(String title, BaseChart chart, CounterSize size, CounterType type, boolean treatAsCounter, BigInteger primaryCounter){
         super(title, type, treatAsCounter, primaryCounter);
         this.chart = chart;
@@ -40,5 +44,13 @@ public class KPI extends Counter {
 
     public void setChart(BaseChart chart) {
         this.chart = chart;
+    }
+
+    public CounterSize getSize() {
+        return size;
+    }
+
+    public void setSize(CounterSize size) {
+        this.size = size;
     }
 }

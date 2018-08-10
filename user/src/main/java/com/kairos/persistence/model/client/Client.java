@@ -7,7 +7,7 @@ import com.kairos.enums.CitizenHealthStatus;
 import com.kairos.enums.client.ClientEnum;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.common.CitizenStatus;
+import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.LocalAreaTag;

@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.country.common;
+package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -14,20 +14,21 @@ import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
+
 /**
  * Created by oodles on 9/1/17.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-public class ContractType extends UserBaseEntity {
+public class BusinessType extends UserBaseEntity {
 
-    @NotEmpty(message = "error.ContractType.name.notEmpty") @NotNull(message = "error.ContractType.name.notnull")
+    @NotEmpty(message = "error.BusinessType.name.notEmpty") @NotNull(message = "error.BusinessType.name.notnull")
     private String name;
 
-    private int code;
 
-    //@NotEmpty(message = "error.ContractType.description.notEmpty") @NotNull(message = "error.ContractType.description.notnull")
+
+    //@NotEmpty(message = "error.BusinessType.description.notEmpty") @NotNull(message = "error.BusinessType.description.notnull")
     private String description;
 
     @Relationship(type = BELONGS_TO)
@@ -43,13 +44,6 @@ public class ContractType extends UserBaseEntity {
         this.name = name;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
 
     public String getDescription() {
         return description;
@@ -75,18 +69,17 @@ public class ContractType extends UserBaseEntity {
         isEnabled = enabled;
     }
 
-    public ContractType() {
+    public BusinessType() {
     }
+
 
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap();
         map.put("id",this.id);
         map.put("name",this.name);
-        map.put("code",this.code);
         map.put("description",this.description);
         map.put("lastModificationDate",this.getLastModificationDate());
         map.put("creationDate",this.getCreationDate());
         return map;
     }
-
 }

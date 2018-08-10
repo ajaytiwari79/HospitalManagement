@@ -2,10 +2,10 @@ package com.kairos.controller.country;
 
 import com.kairos.activity.shift.FunctionDTO;
 import com.kairos.persistence.model.country.*;
-import com.kairos.persistence.model.country.common.BusinessType;
-import com.kairos.persistence.model.country.common.CitizenStatus;
-import com.kairos.persistence.model.country.common.ClinicType;
-import com.kairos.persistence.model.country.common.ContractType;
+import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.CitizenStatus;
+import com.kairos.persistence.model.country.default_data.ClinicType;
+import com.kairos.persistence.model.country.default_data.ContractType;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillDTO;

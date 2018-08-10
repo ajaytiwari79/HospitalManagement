@@ -15,7 +15,7 @@ public interface UnitTimeZoneMappingRepository extends MongoRepository<UnitTimeZ
 
     ZoneId findZoneIdByUnitId(Long unitId);
 
-    @Query("{unitId : ?0}")
+    @Query("{'unitId' : ?0}")
     UnitTimeZoneMapping findByUnitId(Long unitId);
 
    List<UnitTimeZoneMapping> findAllByDeletedFalseAndUnitIdIn(List<Long> unitIds);
