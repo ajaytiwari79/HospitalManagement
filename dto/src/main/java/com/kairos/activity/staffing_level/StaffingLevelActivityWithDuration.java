@@ -8,6 +8,16 @@ public class StaffingLevelActivityWithDuration {
     private boolean includeInMin;
     private int minNoOfStaff;
     private int maxNoOfStaff;
+
+    public int getUnderStaffingOverStaffingCount() {
+        return underStaffingOverStaffingCount;
+    }
+
+    public void setUnderStaffingOverStaffingCount(int underStaffingOverStaffingCount) {
+        this.underStaffingOverStaffingCount = underStaffingOverStaffingCount;
+    }
+
+    private int underStaffingOverStaffingCount;
     private Duration staffingLevelDuration;
 
     public String getName() {

@@ -82,10 +82,11 @@ public class AutomaticOpenShiftGenerationService {
                             ).collect(Collectors.groupingBy(ele -> ele.getActivityId()));
 
             for(Map.Entry<Long,List<StaffingLevelActivityWithDuration>>entry:activityWithDuration.entrySet()) {
-                shifts.stream().filter(shift -> shift.getActivityId().equals(entry.getKey())&& DateUtils.asLocalDate(shift.getStartDate()).
+               List<Shift> shiftsLcoal =  shifts.stream().filter(shift -> shift.getActivityId().equals(entry.getKey())&& DateUtils.asLocalDate(shift.getStartDate()).
                         equals(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()))|| DateUtils.asLocalDate(shift.getStartDate()).
-                                equals(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate())));
+                                equals(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()))).collect(Collectors.toList());
                 for(StaffingLevelActivityWithDuration staffingLevelActivityWithDuration : entry.getValue()) {
+
 
                 }
             }
