@@ -14,6 +14,9 @@ import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RelationshipEntity(type = RelationshipConstants.HAS_ACCESS_GROUP)
 public class CountryAccessGroupRelationship extends UserBaseEntity{
 
@@ -26,6 +29,7 @@ public class CountryAccessGroupRelationship extends UserBaseEntity{
     @Property(name = "organizationCategory")
     @EnumString(OrganizationCategory.class)
     private OrganizationCategory organizationCategory;
+    private List<Long> accountTypes = new ArrayList<>();
 
     public CountryAccessGroupRelationship(){
         // default constructor
@@ -59,5 +63,13 @@ public class CountryAccessGroupRelationship extends UserBaseEntity{
 
     public void setOrganizationCategory(OrganizationCategory organizationCategory) {
         this.organizationCategory = organizationCategory;
+    }
+
+    public List<Long> getAccountTypes() {
+        return accountTypes;
+    }
+
+    public void setAccountTypes(List<Long> accountTypes) {
+        this.accountTypes = accountTypes;
     }
 }
