@@ -198,6 +198,17 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,TabKPIConf.class),TabKPIMappingDTO.class);
     }
 
+    public List<TabKPIConf> findTabKPIConfigurationByTabIds(List<String> tabIds,List<BigInteger> kpiIds, Long refId, ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query=null;
+        if(kpiIds.isEmpty()) {
+            query=new Query(Criteria.where("tabId").in(tabIds).and(refQueryField).is(refId));
+        }else{
+            query=new Query(Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and(refQueryField).is(refId));
+        }
+        return mongoTemplate.find(query,TabKPIConf.class);
+    }
+
     public void removeTabKPIConfiguration(TabKPIMappingDTO entry,Long refId,ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Query query = new Query(Criteria.where("tabId").is(entry.getTabId()).and("kpiId").is(entry.getKpiId()).and(refQueryField).is(refId));

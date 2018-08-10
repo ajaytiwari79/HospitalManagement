@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.counter;
 
+import com.kairos.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -12,6 +14,8 @@ public class TabKPIConf extends MongoBaseEntity {
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
+    private CounterSize counterSize;
+    private KPIPosition kpiPosition;
 
     public TabKPIConf() {
 
@@ -24,6 +28,17 @@ public class TabKPIConf extends MongoBaseEntity {
         this.unitId = unitId;
         this.staffId = staffId;
         this.level = level;
+    }
+
+    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, CounterSize counterSize, KPIPosition kpiPosition) {
+        this.tabId = tabId;
+        this.kpiId = kpiId;
+        this.countryId = countryId;
+        this.unitId = unitId;
+        this.staffId = staffId;
+        this.level = level;
+        this.counterSize = counterSize;
+        this.kpiPosition = kpiPosition;
     }
 
     public String getTabId() {
@@ -73,5 +88,21 @@ public class TabKPIConf extends MongoBaseEntity {
 
     public void setLevel(ConfLevel level) {
         this.level = level;
+    }
+
+    public CounterSize getCounterSize() {
+        return counterSize;
+    }
+
+    public void setCounterSize(CounterSize counterSize) {
+        this.counterSize = counterSize;
+    }
+
+    public KPIPosition getKpiPosition() {
+        return kpiPosition;
+    }
+
+    public void setKpiPosition(KPIPosition kpiPosition) {
+        this.kpiPosition = kpiPosition;
     }
 }

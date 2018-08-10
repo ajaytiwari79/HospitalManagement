@@ -14,9 +14,12 @@ import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
+import com.kairos.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
+import com.kairos.activity.counter.distribution.tab.TabKPIEntryDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -127,6 +130,24 @@ public class CounterManagementService extends MongoBaseService {
         }
         save(entriesToSave);
     }
+
+    public void updateTabKPIEntries(TabKPIEntryDTO tabKPIEntries, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+        Long refId = ConfLevel.COUNTRY.equals(level) ? countryId : unitId;
+        if(ConfLevel.STAFF.equals(level)){
+            refId=staffId;
+        }
+        List<BigInteger> kpiIds=tabKPIEntries.getKpiEntries().stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
+        List<TabKPIConf> tabKPIConfs = counterRepository.findTabKPIConfigurationByTabIds(Arrays.asList(tabKPIEntries.getTabId()),kpiIds,refId,level);
+        tabKPIConfs.stream().forEach(tabKPIConf -> {tabKPIEntries.getKpiEntries().stream().forEach(tabKPIMappingDTO -> {
+            if(tabKPIConf.getKpiId().equals(tabKPIMappingDTO.getKpiId())){
+                tabKPIConf.setCounterSize(tabKPIMappingDTO.getCounterSize());
+                tabKPIConf.setKpiPosition(tabKPIMappingDTO.getKpiPosition());
+            }
+        });
+        });
+        save(tabKPIConfs);
+    }
+
 
     public void removeTabKPIEntries(TabKPIMappingDTO tabKPIMappingDTO,Long refId,ConfLevel level) {
        counterRepository.removeTabKPIConfiguration(tabKPIMappingDTO,refId,level);

@@ -7,6 +7,7 @@ import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
+import com.kairos.activity.counter.distribution.tab.TabKPIEntryDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.service.counter.CounterManagementService;
@@ -110,6 +111,24 @@ public class CounterDistController {
     @PostMapping(UNIT_URL+STAFF_URL+"/counter/dist/module/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addTabKPIsEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody TabKPIEntryConfDTO tabKPIEntry){
         counterManagementService.addTabKPIEntries(tabKPIEntry,null,unitId,staffId,ConfLevel.STAFF);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    }
+
+    @PutMapping(COUNTRY_URL+"/counter/dist/module/update_dist_entry")
+    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForCounty(@RequestBody TabKPIEntryDTO tabKPIEntry, @PathVariable Long countryId){
+        counterManagementService.updateTabKPIEntries(tabKPIEntry,countryId,null,null,ConfLevel.COUNTRY);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping(UNIT_URL+"/counter/dist/module/update_dist_entry")
+    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForUnit(@RequestBody TabKPIEntryDTO tabKPIEntry,@PathVariable Long unitId){
+        counterManagementService.updateTabKPIEntries(tabKPIEntry,null,unitId,null,ConfLevel.UNIT);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping(UNIT_URL+STAFF_URL+"/counter/dist/module/update_dist_entry")
+    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody TabKPIEntryDTO tabKPIEntry){
+        counterManagementService.updateTabKPIEntries(tabKPIEntry,null,unitId,staffId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 

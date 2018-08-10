@@ -1,5 +1,7 @@
 package com.kairos.activity.counter.distribution.tab;
 
+import com.kairos.activity.enums.counter.CounterSize;
+
 import java.math.BigInteger;
 import java.util.List;
 
@@ -7,7 +9,7 @@ public class TabKPIEntryConfDTO {
     private List<String> tabIds;
     private List<BigInteger> kpiIds;
 
-    public TabKPIEntryConfDTO(){
+    public TabKPIEntryConfDTO() {
 
     }
 
@@ -32,3 +34,5 @@ public class TabKPIEntryConfDTO {
         this.kpiIds = kpiIds;
     }
 }
+
+
