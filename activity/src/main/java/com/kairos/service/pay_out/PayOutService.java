@@ -1,32 +1,34 @@
 package com.kairos.service.pay_out;
 
 
-import com.kairos.activity.pay_out.CalculatedPayOutByDateDTO;
-import com.kairos.activity.pay_out.PayOutDTO;
-import com.kairos.activity.pay_out.UnitPositionWithCtaDetailsDTO;
-import com.kairos.activity.time_type.TimeTypeDTO;
+import com.kairos.enums.payout.PayOutTrasactionStatus;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.pay_out.PayOutRestClient;
 import com.kairos.persistence.model.activity.Shift;
-import com.kairos.persistence.model.pay_out.DailyPayOutEntry;
+import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.activity.ShiftMongoRepository;
-import com.kairos.persistence.repository.pay_out.PayOutMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /*
 * Created By Mohit Shakya
@@ -39,7 +41,7 @@ public class PayOutService extends MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(PayOutService.class);
 
     @Inject
-    private PayOutMongoRepository payOutMongoRepository;
+    private PayOutRepository payOutRepository;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
@@ -52,111 +54,145 @@ public class PayOutService extends MongoBaseService {
     private OrganizationRestClient organizationRestClient;
     @Inject
     private TimeTypeService timeTypeService;
+    @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
 
-    public void savePayOut(Long unitPositionId, Shift shift) {
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(unitPositionId);
-        List<DailyPayOutEntry> dailyPayOuts = calculateDailyPayOut(unitPositionWithCtaDetailsDTO,shift,unitPositionId);
-        if (!dailyPayOuts.isEmpty()) {
-            save(dailyPayOuts);
+
+    /**
+     *
+     * @param staffAdditionalInfoDTO
+     * @param shift
+     * @param activity
+     */
+    public void savePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Activity activity) {
+        ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
+        List<PayOut> payOuts = new ArrayList<>();
+        while (startDate.isBefore(endDate)) {
+            DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
+            PayOut payOut = new PayOut(shift.getId(), shift.getUnitPositionId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId());
+            PayOut lastPayOut = payOutRepository.findLastPayoutByUnitPositionId(shift.getUnitPositionId(),DateUtils.getDateByZoneDateTime(startDate));
+            if(lastPayOut!=null) {
+                payOut.setPayoutBeforeThisDate(lastPayOut.getPayoutBeforeThisDate() + lastPayOut.getTotalPayOutMin());
+            }
+            payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activity, payOut);
+            if(payOut.getTotalPayOutMin()>0) {
+                payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
+                payOuts.add(payOut);
+            }
+            startDate = startDate.plusDays(1);
+        }
+        if (!payOuts.isEmpty()) {
+            save(payOuts);
         }
     }
 
-    public void savePayOuts(Long unitPositionId, List<Shift> shifts) {
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(unitPositionId);
-        List<DailyPayOutEntry> updatedDailyPayOutEntries = new ArrayList<>();
+
+    /**
+     *
+     * @param staffAdditionalInfoDTO
+     * @param shifts
+     * @param activities
+     */
+    public void savePayOuts(StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<Shift> shifts, List<Activity> activities) {
+        List<PayOut> payOuts = new ArrayList<>();
+        Map<BigInteger,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         for (Shift shift : shifts) {
-            List<DailyPayOutEntry> dailyPayOutEntries = calculateDailyPayOut(unitPositionWithCtaDetailsDTO,shift,unitPositionId);
-            updatedDailyPayOutEntries.addAll(dailyPayOutEntries);
-        }
-        if(!updatedDailyPayOutEntries.isEmpty()) {
-            save(updatedDailyPayOutEntries);
-        }
-    }
-
-    private List<DailyPayOutEntry> calculateDailyPayOut(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Shift shift, Long unitPositionId){
-        unitPositionWithCtaDetailsDTO.setStaffId(shift.getStaffId());
-        DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
-        DateTime endDate = new DateTime(shift.getEndDate()).withTimeAtStartOfDay();
-        List<DailyPayOutEntry> dailyPayOuts = payOutMongoRepository.findAllByUnitPositionAndDate(unitPositionId, startDate.toDate(), endDate.toDate());
-        payOutMongoRepository.deleteAll(dailyPayOuts);
-        dailyPayOuts = new ArrayList<>();
-        Interval interval = new Interval(startDate, startDate.plusDays(1).withTimeAtStartOfDay());
-        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionId, interval.getStart().toDate(), interval.getEnd().toDate());
-        DailyPayOutEntry dailyPayOut = new DailyPayOutEntry(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
-        shifts = filterSubshifts(shifts);
-        if (shifts != null && !shifts.isEmpty()) {
-            payOutCalculationService.getPayOutByInterval(unitPositionWithCtaDetailsDTO, interval, shifts, dailyPayOut);
-            dailyPayOuts.add(dailyPayOut);
-
-        }
-        if (!startDate.toLocalDate().equals(endDate.toLocalDate())) {
-            interval = new Interval(endDate, endDate.plusDays(1).withTimeAtStartOfDay());
-            shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionId, interval.getStart().toDate(), interval.getEnd().toDate());
-            shifts = filterSubshifts(shifts);
-            if (shifts != null && !shifts.isEmpty()) {
-                payOutCalculationService.getPayOutByInterval(unitPositionWithCtaDetailsDTO, interval, shifts, dailyPayOut);
-                dailyPayOuts.add(dailyPayOut);
+            ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
+            ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
+            while (startDate.isBefore(endDate)) {
+                DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
+                PayOut payOut = new PayOut(shift.getId(), shift.getUnitPositionId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId());
+                PayOut lastPayOut = payOutRepository.findLastPayoutByUnitPositionId(shift.getUnitPositionId(),DateUtils.getDateByZoneDateTime(startDate));
+                if(lastPayOut!=null) {
+                    payOut.setPayoutBeforeThisDate(lastPayOut.getPayoutBeforeThisDate() + lastPayOut.getTotalPayOutMin());
+                }
+                Activity activity = activityMap.get(shift.getActivityId());
+                payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activity, payOut);
+                if(payOut.getTotalPayOutMin()>0) {
+                    payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
+                    payOuts.add(payOut);
+                }
+                startDate = startDate.plusDays(1);
             }
         }
-        return dailyPayOuts;
+        if (!payOuts.isEmpty()) {
+            save(payOuts);
+        }
     }
 
+    /**
+     *
+     * @param payOutTransactionId
+     * @return boolean
+     */
+    public boolean approvePayOutRequest(BigInteger payOutTransactionId){
+        PayOutTransaction payOutTransaction = payOutTransactionMongoRepository.findOne(payOutTransactionId);
+        PayOutTransaction approvedPayOutTransaction = new PayOutTransaction(payOutTransaction.getStaffId(),payOutTransaction.getUnitPositionId(), PayOutTrasactionStatus.APPROVED,payOutTransaction.getMinutes(), LocalDate.now());
+        save(approvedPayOutTransaction);
+        PayOut payOut = new PayOut(payOutTransaction.getUnitPositionId(),payOutTransaction.getStaffId(),payOutTransaction.getMinutes(),payOutTransaction.getDate());
+        PayOut lastPayOut = payOutRepository.findLastPayoutByUnitPositionId(payOutTransaction.getUnitPositionId(),DateUtils.getDateFromLocalDate(payOutTransaction.getDate()));
+        if(lastPayOut!=null) {
+            payOut.setPayoutBeforeThisDate(lastPayOut.getPayoutBeforeThisDate() + lastPayOut.getTotalPayOutMin());
+        }
+        payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
+        save(payOut);
+        return true;
+    }
 
-    public List<ShiftWithActivityDTO> filterSubshifts(List<ShiftWithActivityDTO> shifts){
-        List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>(shifts.size());
-        for (ShiftWithActivityDTO shift : shifts) {
-            if (shift.getSubShift() != null && shift.getSubShift().getStartDate() != null) {
-                ShiftWithActivityDTO shiftWithActivityDTO = new ShiftWithActivityDTO(shift.getStartDate(), shift.getEndDate(), shift.getActivity());
-                shiftQueryResultWithActivities.add(shiftWithActivityDTO);
-            } else {
-                shiftQueryResultWithActivities.add(shift);
+    /**
+     *
+     * @param staffAdditionalInfoDTO
+     * @param shift
+     * @param activity
+     */
+    public void updatePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Activity activity) {
+        ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
+        List<PayOut> payOuts = payOutRepository.findAllByShiftId(shift.getId());
+        if(!payOuts.isEmpty()){
+        while (startDate.isBefore(endDate)) {
+            DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
+            PayOut payOut = payOuts.stream().filter(p -> p.getDate().equals(interval.getStartLocalDate())).findFirst().get();
+            PayOut lastPayOut = payOutRepository.findLastPayoutByUnitPositionId(shift.getUnitPositionId(),DateUtils.getDateByZoneDateTime(startDate));
+            if(payOut==null){
+                payOut = new PayOut(shift.getId(), shift.getUnitPositionId(), shift.getStaffId(), interval.getStartLocalDate(),shift.getUnitId());
             }
-        }
-        return shiftQueryResultWithActivities;
-    }
-
-
-    @Deprecated
-    public Boolean createBlankPayOut(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
-        DateTime startDate = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).withTimeAtStartOfDay();
-        startDate = startDate.plusDays(1);//Todo this should be removed
-        DateTime endDate = startDate.plusYears(3);
-        List<DailyPayOutEntry> newDailyPayOutEntries = new ArrayList<>();
-        while (startDate.isBefore(endDate)) {
-            DailyPayOutEntry dailyPayOutEntry = new DailyPayOutEntry(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.toLocalDate(startDate));
-            int contractualMin = startDate.getDayOfWeek() <= unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek() ? unitPositionWithCtaDetailsDTO.getContractedMinByWeek() / unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek() : 0;
-            dailyPayOutEntry.setTotalPayOutMin(-contractualMin);
-            dailyPayOutEntry.setContractualMin(contractualMin);
-            dailyPayOutEntry.setPayOutCTADistributionList(payOutCalculationService.getDistribution(unitPositionWithCtaDetailsDTO));
-            newDailyPayOutEntries.add(dailyPayOutEntry);
+            if(lastPayOut!=null) {
+                payOut.setPayoutBeforeThisDate(lastPayOut.getPayoutBeforeThisDate() + lastPayOut.getTotalPayOutMin());
+            }
+            payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activity, payOut);
+            if(payOut.getTotalPayOutMin()>0) {
+                payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
+                payOuts.add(payOut);
+            }
             startDate = startDate.plusDays(1);
         }
-        if (!newDailyPayOutEntries.isEmpty()) {
-            save(newDailyPayOutEntries);
+            save(payOuts);
         }
-        return null;
+
     }
 
-    public Boolean updateBlankPayOut(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
-        DateTime startDate = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).withTimeAtStartOfDay();
-        DateTime endDate = startDate.plusYears(3);
-        List<DailyPayOutEntry> newDailyPayOutEntries = new ArrayList<>();
-        while (startDate.isBefore(endDate)) {
-            DailyPayOutEntry dailyPayOutEntry = new DailyPayOutEntry(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.toLocalDate(startDate));
-            int contractualMin = startDate.getDayOfWeek() <= unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek() ? unitPositionWithCtaDetailsDTO.getContractedMinByWeek() / unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek() : 0;
-            dailyPayOutEntry.setTotalPayOutMin(-contractualMin);
-            dailyPayOutEntry.setContractualMin(contractualMin);
-            dailyPayOutEntry.setPayOutCTADistributionList(payOutCalculationService.getDistribution(unitPositionWithCtaDetailsDTO));
-            newDailyPayOutEntries.add(dailyPayOutEntry);
-            startDate = startDate.plusDays(1);
+    /**
+     *
+     * @param shiftId
+     */
+    public void deletePayOut(BigInteger shiftId){
+        List<PayOut> payOuts = payOutRepository.findAllByShiftId(shiftId);
+        if(!payOuts.isEmpty()) {
+            payOuts.forEach(p -> {
+                p.setDeleted(true);
+            });
+            save(payOuts);
         }
-        if (!newDailyPayOutEntries.isEmpty()) {
-            save(newDailyPayOutEntries);
-        }
-        return null;
     }
 
 
+    /**
+     *
+     * @param unitPositionIds
+     * @param shiftQueryResultWithActivities
+     * @return Map<Long, List<ShiftWithActivityDTO>>
+     */
     public Map<Long, List<ShiftWithActivityDTO>> getShiftsMapByUEPs(List<Long> unitPositionIds, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
         Map<Long, List<ShiftWithActivityDTO>> shiftsMap = new HashMap<>(unitPositionIds.size());
         unitPositionIds.forEach(uEPId -> {
@@ -165,8 +201,13 @@ public class PayOutService extends MongoBaseService {
         return shiftsMap;
     }
 
-
-    public List<ShiftWithActivityDTO> getShiftsByUEP(Long unitPositionId, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
+    /**
+     *
+     * @param unitPositionId
+     * @param shiftQueryResultWithActivities
+     * @return List<ShiftWithActivityDTO>
+     */
+    private List<ShiftWithActivityDTO> getShiftsByUEP(Long unitPositionId, List<ShiftWithActivityDTO> shiftQueryResultWithActivities) {
         List<ShiftWithActivityDTO> shifts = new ArrayList<>();
         shiftQueryResultWithActivities.forEach(s -> {
             if (s.getUnitPositionId().equals(unitPositionId)) {
@@ -176,80 +217,5 @@ public class PayOutService extends MongoBaseService {
         return shifts;
     }
 
-
-    public List<CalculatedPayOutByDateDTO> getPayOutFromCurrentDateByUEP(Long unitPositonId) {
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(145l);//payOutRestClient.getCTAbyUnitEmployementPosition(unitEmploymentPositonId);
-        List<ShiftWithActivityDTO> shifts = null;//shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitEmploymentPositonId,new Date(),new Date());
-        return payOutCalculationService.getPayOutByDates(unitPositionWithCtaDetailsDTO, shifts, 365);
-    }
-
-    public UnitPositionWithCtaDetailsDTO getCostTimeAgreement(Long unitPositionId) {
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = payOutRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
-        return unitPositionWithCtaDetailsDTO;
-    }
-
-
-    public PayOutDTO getAdvanceViewPayOut(Long unitId, Long unitPositionId, String query, Date startDate, Date endDate) {
-        PayOutDTO payOutDTO = null;
-        List<DailyPayOutEntry> dailyPayOuts = payOutMongoRepository.findAllByUnitPositionAndDate(unitPositionId, startDate, endDate);
-        List<ShiftWithActivityDTO> shiftQueryResultWithActivities = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionId, startDate, endDate);
-        shiftQueryResultWithActivities = filterSubshifts(shiftQueryResultWithActivities);
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(unitPositionId);
-        int totalPayOutBeforeStartDate = 0;
-        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeTypeByCountryId(unitPositionWithCtaDetailsDTO.getCountryId());
-        if(new DateTime(startDate).isAfter(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()))){
-            Interval interval = new Interval(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()),new DateTime(startDate));
-            List<DailyPayOutEntry> dailyPayOutsBeforeStartDate = payOutMongoRepository.findAllByUnitPositionAndBeforeDate(unitPositionId, new DateTime(startDate).toDate());
-
-            int totalPayOut = payOutCalculationService.calculatePayOutForInterval(interval, unitPositionWithCtaDetailsDTO,false,dailyPayOutsBeforeStartDate,false);
-
-            totalPayOutBeforeStartDate = dailyPayOutsBeforeStartDate != null && !dailyPayOutsBeforeStartDate.isEmpty()
-                    ? dailyPayOutsBeforeStartDate.stream().mapToInt(dailyPayOut -> dailyPayOut.getTotalPayOutMin()).sum() : 0;
-            totalPayOutBeforeStartDate = totalPayOutBeforeStartDate - totalPayOut;
-        }
-        payOutDTO = payOutCalculationService.getAdvanceViewPayOut(totalPayOutBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyPayOuts, unitPositionWithCtaDetailsDTO, timeTypeDTOS);
-        //payOutDTO1.setCostTimeAgreement(getCostTimeAgreement(145l));
-        return payOutDTO;
-    }
-
-
-    public PayOutDTO getOverviewPayOut(Long unitPositionId, Integer year) {
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(unitPositionId);
-        Interval interval = getIntervalByDateForOverviewPayOut(unitPositionWithCtaDetailsDTO, year);
-        List<DailyPayOutEntry> dailyPayOutEntries = new ArrayList<>();
-        if (interval.getStart().getYear() <= new DateTime().getYear()) {
-            dailyPayOutEntries = payOutMongoRepository.findAllByUnitPositionAndDate(unitPositionId, interval.getStart().toDate(), interval.getEnd().toDate());
-        }
-        return payOutCalculationService.getOverviewPayOut(unitPositionId, interval.getStart().dayOfYear().withMinimumValue(), interval.getEnd().dayOfYear().withMaximumValue(), dailyPayOutEntries, unitPositionWithCtaDetailsDTO);
-    }
-
-    private Interval getIntervalByDateForOverviewPayOut(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO, Integer year) {
-
-        DateTime startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
-        DateTime endDate = new DateTime().withYear(year).dayOfYear().withMaximumValue().withTimeAtStartOfDay();
-        if (startDate.getYear() == DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).getYear() && startDate.isBefore(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).withTimeAtStartOfDay())) {
-            startDate = DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).withTimeAtStartOfDay();
-        }
-        if (startDate.getYear() != DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()).getYear() && startDate.isAfter(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()))) {
-            startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
-        }
-        if (endDate.isAfter(new DateTime().plusDays(1).withTimeAtStartOfDay()) && endDate.getYear() == new DateTime().getYear()) {
-            endDate = new DateTime().withTimeAtStartOfDay();
-        }
-        //endDate = endDate.plusMonths(5);//todo this should be removed
-        return new Interval(startDate, endDate);
-    }
-
-
-    public boolean savePayOut() {
-        Shift shift = new Shift();
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
-        DateTime dt = formatter.parseDateTime("20/01/2018 03:41");
-        shift.setStartDate(dt.toDate());
-        shift.setEndDate(dt.plusHours(10).toDate());
-        savePayOut(145l, shift);
-        return true;
-
-    }
 
 }

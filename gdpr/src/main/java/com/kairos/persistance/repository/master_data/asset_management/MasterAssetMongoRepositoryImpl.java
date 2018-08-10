@@ -1,14 +1,13 @@
 package com.kairos.persistance.repository.master_data.asset_management;
 
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.dto.FilterSelection;
-import com.kairos.dto.FilterSelectionDTO;
-import com.kairos.dto.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.gdpr.FilterSelection;
+import com.kairos.gdpr.FilterSelectionDTO;
+import com.kairos.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.filter.FilterQueryResult;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -55,8 +54,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
                 lookup("asset_type", "assetType", "_id", "assetType"),
-                new CustomAggregationOperation(masterAssetProjectionOperation),
-                lookup("asset_type", "assetType.subAssetTypes", "_id", "assetType.subAssetTypes")
+                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
+                new CustomAggregationOperation(masterAssetProjectionOperation)
 
         );
 
@@ -68,10 +67,10 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     @Override
     public MasterAssetResponseDTO getMasterAssetWithAssetTypeAndSubAssetTypeById(Long countryId, Long organizationId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
                 lookup("asset_type", "assetType", "_id", "assetType"),
+                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
                 new CustomAggregationOperation(masterAssetProjectionOperation)
-                , lookup("asset_type", "assetType.subAssetTypes", "_id", "assetType.subAssetTypes")
 
 
         );
@@ -98,8 +97,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("asset_type", "assetType", "_id", "assetType"),
+                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
                 new CustomAggregationOperation(masterAssetProjectionOperation)
-                , lookup("asset_type", "assetType.subAssetTypes", "_id", "assetType.subAssetTypes")
 
 
         );
@@ -113,19 +112,19 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
 
         switch (filterType) {
             case ACCOUNT_TYPES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("accountTypes" + ID).in(filterSelection.getValue());
             case ORGANIZATION_TYPES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationTypes" + ID).in(filterSelection.getValue());
 
             case ORGANIZATION_SUB_TYPES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationSubTypes" + ID).in(filterSelection.getValue());
             case ORGANIZATION_SERVICES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationServices" + ID).in(filterSelection.getValue());
 
             case ORGANIZATION_SUB_SERVICES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationSubServices" + ID).in(filterSelection.getValue());
             default:
-                throw new InvalidRequestException("data not found for Filtertype " + filterType);
+                throw new InvalidRequestException("data not found for Filter Type " + filterType);
 
 
         }

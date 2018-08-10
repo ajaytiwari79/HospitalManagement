@@ -492,8 +492,7 @@ public class CountryService extends UserBaseService {
 
          }
 
-        List<BigInteger> activityCategoriesIds =  new ArrayList<>();
-        activityTypeDTOS.stream().forEach(activityTypeDTO -> activityCategoriesIds.add(activityTypeDTO.getCategoryId()));
+        Set<BigInteger> activityCategoriesIds = activityTypeDTOS.stream().map(activityTypeDTO->activityTypeDTO.getCategoryId()).collect(Collectors.toSet());
         List<ActivityCategoryDTO> activityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId, activityCategoriesIds);
 
          List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);

@@ -26,26 +26,30 @@ public class TimeBankDTO {
     private Long unitId;
     private String query;
 
-    private int totalTimeBankAfterCtaMin;
-    private int totalTimeBankBeforeCtaMin;
-    private int totalScheduledMin;
-    private int totalTimeBankMin;
-    private int totalContractedMin;
-    private int totalTimeBankMinLimit;
-    private int totalTimeBankMaxLimit;
-    private int totalTimeBankInPercent = 10;
-    private int totalTimeBankDiff;
+    private long totalTimeBankAfterCtaMin;
+    private long totalTimeBankBeforeCtaMin;
+    private long totalScheduledMin;
+    private long totalTimeBankMin;
+    private long totalContractedMin;
+    private long totalTimeBankMinLimit;
+    private long totalTimeBankMaxLimit;
+    private long totalTimeBankInPercent = 10;
+    private long totalTimeBankDiff;
+    private long paidoutChange;
+    private long approvePayOut;
+    private long requestPayOut;
+    private long totalDeltaBalanceConrection;
+    private String phaseName;
 
     //Distributed min on the basis of Interval;
     private List<TimeBankIntervalDTO> timeIntervals = new ArrayList<>();
-    private List<TimeBankCTADistributionDTO> timeBankDistributions = new ArrayList<>();
+    private TimeBankCTADistributionDTO timeBankDistribution;
     private ScheduleTimeByTimeTypeDTO workingTimeType;
     private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
     private UnitPositionWithCtaDetailsDTO costTimeAgreement;
 
     private List<TimeBankIntervalDTO> weeklyIntervalsTimeBank;
     private List<TimeBankIntervalDTO> monthlyIntervalsTimeBank;
-    private int minutesFromCta;
 
     public TimeBankDTO(Long unitPositionId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
      {
@@ -55,87 +59,49 @@ public class TimeBankDTO {
         this.totalWeeklyMin = totalWeeklyMins;
     }
 
-    public int getMinutesFromCta() {
-        return minutesFromCta;
+
+    public long getTotalDeltaBalanceConrection() {
+        return totalDeltaBalanceConrection;
     }
 
-    public void setMinutesFromCta(int minutesFromCta) {
-        this.minutesFromCta = minutesFromCta;
+    public void setTotalDeltaBalanceConrection(long totalDeltaBalanceConrection) {
+        this.totalDeltaBalanceConrection = totalDeltaBalanceConrection;
     }
 
-    public int getTotalTimeBankDiff() {
-        return totalTimeBankDiff;
+    public String getPhaseName() {
+        return phaseName;
     }
 
-    public void setTotalTimeBankDiff(int totalTimeBankDiff) {
-        this.totalTimeBankDiff = totalTimeBankDiff;
-    }
-
-    public int getTotalTimeBankInPercent() {
-        return totalTimeBankInPercent;
-    }
-
-    public void setTotalTimeBankInPercent(int totalTimeBankInPercent) {
-        this.totalTimeBankInPercent = totalTimeBankInPercent;
-    }
-
-    public int getTotalTimeBankMinLimit() {
-        return totalTimeBankMinLimit;
-    }
-
-    public void setTotalTimeBankMinLimit(int totalTimeBankMinLimit) {
-        this.totalTimeBankMinLimit = totalTimeBankMinLimit;
-    }
-
-    public int getTotalTimeBankMaxLimit() {
-        return totalTimeBankMaxLimit;
-    }
-
-    public void setTotalTimeBankMaxLimit(int totalTimeBankMaxLimit) {
-        this.totalTimeBankMaxLimit = totalTimeBankMaxLimit;
-    }
-
-    public List<TimeBankIntervalDTO> getWeeklyIntervalsTimeBank() {
-        return weeklyIntervalsTimeBank;
-    }
-
-    public void setWeeklyIntervalsTimeBank(List<TimeBankIntervalDTO> weeklyIntervalsTimeBank) {
-        this.weeklyIntervalsTimeBank = weeklyIntervalsTimeBank;
-    }
-
-    public List<TimeBankIntervalDTO> getMonthlyIntervalsTimeBank() {
-        return monthlyIntervalsTimeBank;
-    }
-
-    public void setMonthlyIntervalsTimeBank(List<TimeBankIntervalDTO> monthlyIntervalsTimeBank) {
-        this.monthlyIntervalsTimeBank = monthlyIntervalsTimeBank;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
-    }
-
-    public UnitPositionWithCtaDetailsDTO getCostTimeAgreement() {
-        return costTimeAgreement;
-    }
-
-    public void setCostTimeAgreement(UnitPositionWithCtaDetailsDTO costTimeAgreement) {
-        this.costTimeAgreement = costTimeAgreement;
-    }
-
-    public List<TimeBankCTADistributionDTO> getTimeBankDistributions() {
-        return timeBankDistributions;
-    }
-
-    public void setTimeBankDistributions(List<TimeBankCTADistributionDTO> timeBankDistributions) {
-        this.timeBankDistributions = timeBankDistributions;
+    public void setPhaseName(String phaseName) {
+        this.phaseName = phaseName;
     }
 
     public TimeBankDTO() {
+        this.phaseName = "Total";
+    }
+
+    public long getPaidoutChange() {
+        return paidoutChange;
+    }
+
+    public void setPaidoutChange(long paidoutChange) {
+        this.paidoutChange = paidoutChange;
+    }
+
+    public long getApprovePayOut() {
+        return approvePayOut;
+    }
+
+    public void setApprovePayOut(long approvePayOut) {
+        this.approvePayOut = approvePayOut;
+    }
+
+    public long getRequestPayOut() {
+        return requestPayOut;
+    }
+
+    public void setRequestPayOut(long requestPayOut) {
+        this.requestPayOut = requestPayOut;
     }
 
     public ScheduleTimeByTimeTypeDTO getWorkingTimeType() {
@@ -154,40 +120,116 @@ public class TimeBankDTO {
         this.nonWorkingTimeType = nonWorkingTimeType;
     }
 
-    public int getTotalTimeBankAfterCtaMin() {
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
+    public long getTotalTimeBankAfterCtaMin() {
         return totalTimeBankAfterCtaMin;
     }
 
-    public void setTotalTimeBankAfterCtaMin(int totalTimeBankAfterCtaMin) {
+    public void setTotalTimeBankAfterCtaMin(long totalTimeBankAfterCtaMin) {
         this.totalTimeBankAfterCtaMin = totalTimeBankAfterCtaMin;
     }
 
-    public int getTotalTimeBankBeforeCtaMin() {
+    public long getTotalTimeBankBeforeCtaMin() {
         return totalTimeBankBeforeCtaMin;
     }
 
-    public void setTotalTimeBankBeforeCtaMin(int totalTimeBankBeforeCtaMin) {
+    public void setTotalTimeBankBeforeCtaMin(long totalTimeBankBeforeCtaMin) {
         this.totalTimeBankBeforeCtaMin = totalTimeBankBeforeCtaMin;
     }
 
-    public int getTotalScheduledMin() {
+    public long getTotalScheduledMin() {
         return totalScheduledMin;
     }
 
-    public void setTotalScheduledMin(int totalScheduledMin) {
+    public void setTotalScheduledMin(long totalScheduledMin) {
         this.totalScheduledMin = totalScheduledMin;
     }
 
-    public int getTotalTimeBankMin() {
+    public long getTotalTimeBankMin() {
         return totalTimeBankMin;
     }
 
-    public void setTotalTimeBankMin(int totalTimeBankMin) {
+    public void setTotalTimeBankMin(long totalTimeBankMin) {
         this.totalTimeBankMin = totalTimeBankMin;
     }
 
-    public int getTotalContractedMin() {
+    public long getTotalContractedMin() {
         return totalContractedMin;
+    }
+
+    public void setTotalContractedMin(long totalContractedMin) {
+        this.totalContractedMin = totalContractedMin;
+    }
+
+    public long getTotalTimeBankMinLimit() {
+        return totalTimeBankMinLimit;
+    }
+
+    public void setTotalTimeBankMinLimit(long totalTimeBankMinLimit) {
+        this.totalTimeBankMinLimit = totalTimeBankMinLimit;
+    }
+
+    public long getTotalTimeBankMaxLimit() {
+        return totalTimeBankMaxLimit;
+    }
+
+    public void setTotalTimeBankMaxLimit(long totalTimeBankMaxLimit) {
+        this.totalTimeBankMaxLimit = totalTimeBankMaxLimit;
+    }
+
+    public long getTotalTimeBankInPercent() {
+        return totalTimeBankInPercent;
+    }
+
+    public void setTotalTimeBankInPercent(long totalTimeBankInPercent) {
+        this.totalTimeBankInPercent = totalTimeBankInPercent;
+    }
+
+    public long getTotalTimeBankDiff() {
+        return totalTimeBankDiff;
+    }
+
+    public void setTotalTimeBankDiff(long totalTimeBankDiff) {
+        this.totalTimeBankDiff = totalTimeBankDiff;
+    }
+
+    public TimeBankCTADistributionDTO getTimeBankDistribution() {
+        return timeBankDistribution;
+    }
+
+    public void setTimeBankDistribution(TimeBankCTADistributionDTO timeBankDistribution) {
+        this.timeBankDistribution = timeBankDistribution;
+    }
+
+    public UnitPositionWithCtaDetailsDTO getCostTimeAgreement() {
+        return costTimeAgreement;
+    }
+
+    public void setCostTimeAgreement(UnitPositionWithCtaDetailsDTO costTimeAgreement) {
+        this.costTimeAgreement = costTimeAgreement;
+    }
+
+    public List<TimeBankIntervalDTO> getWeeklyIntervalsTimeBank() {
+        return weeklyIntervalsTimeBank;
+    }
+
+    public void setWeeklyIntervalsTimeBank(List<TimeBankIntervalDTO> weeklyIntervalsTimeBank) {
+        this.weeklyIntervalsTimeBank = weeklyIntervalsTimeBank;
+    }
+
+    public List<TimeBankIntervalDTO> getMonthlyIntervalsTimeBank() {
+        return monthlyIntervalsTimeBank;
+    }
+
+    public void setMonthlyIntervalsTimeBank(List<TimeBankIntervalDTO> monthlyIntervalsTimeBank) {
+        this.monthlyIntervalsTimeBank = monthlyIntervalsTimeBank;
     }
 
     public void setTotalContractedMin(int totalContractedMin) {

@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.expertise;
 
+import com.kairos.persistence.model.pay_table.PayGrade;
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -19,7 +20,7 @@ public interface SeniorityLevelGraphRepository extends Neo4jBaseRepository<Senio
     @Query("match(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={0}\n" +
             "match(seniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade)" +
             "return payGrade as payGrade")
-    SeniorityLevelQueryResult getPayGradeBySeniorityLevelId(Long seniorityLevelId);
+    PayGrade getPayGradeBySeniorityLevelId(Long seniorityLevelId);
 
     @Query("match(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={0}\n" +
             "match(seniorityLevel)-[rel: " + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) detach delete rel")
@@ -35,5 +36,15 @@ public interface SeniorityLevelGraphRepository extends Neo4jBaseRepository<Senio
             "return seniorityLevel")
     List<SeniorityLevel> findAll(Set<Long> seniorityLevelIds);
 
+    @Query("match(seniorityLevel:SeniorityLevel) where id(seniorityLevel) IN {0}\n" +
+            "match(seniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) " +
+            "with CASE when count(payGrade) <> size({0}) then false else true END  as response return response")
+    boolean checkPayGradesInSeniorityLevel(List<Long> seniorityLevelIds);
+
+
+    @Query("match(expertise:Expertise) where id(expertise)={0} \n" +
+            "match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) \n" +
+            "match(seniorityLevel)-[rel: " + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) detach delete rel")
+    void unlinkAllPayGradesFromExpertise(Long expertiseId);
 
 }

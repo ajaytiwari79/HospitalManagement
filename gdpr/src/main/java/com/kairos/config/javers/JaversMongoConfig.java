@@ -59,8 +59,6 @@ public class JaversMongoConfig {
         );
         MongoClientOptions.Builder builder = MongoClientOptions.builder()
                 .codecRegistry(codecRegistry);
-        /*MongoClientOptions settings = MongoClientOptions.builder().readPreference(ReadPreference.nearest())
-                .codecRegistry(codecRegistry).build();*/
         final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getMongoUserName(), environment.getDataBaseName(), environment.getMongoPassword().toCharArray()));
         return new MongoClient(new ServerAddress(environment.getMongoHost(), environment.getMongoPort()), credentialList,builder.build());
 

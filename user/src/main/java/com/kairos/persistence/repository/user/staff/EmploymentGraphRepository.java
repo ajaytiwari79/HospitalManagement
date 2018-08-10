@@ -71,5 +71,8 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 //            "match (staff)<-[:" + BELONGS_TO + "]-(employment:Employment) RETURN employment")
 //    Employment findUnitPostionAndEmploymentByStaff(Long staffId);
 
+    @Query("Match(staff:Staff)-[:"+BELONGS_TO+"]-(emp:Employment) where id(emp)={0} return id(staff)")
+    Long findStaffByEmployment(Long employmentId);
+
 }
 

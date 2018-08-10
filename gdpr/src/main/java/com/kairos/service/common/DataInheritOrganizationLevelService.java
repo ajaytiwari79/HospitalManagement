@@ -1,7 +1,7 @@
 package com.kairos.service.common;
 
 
-import com.kairos.dto.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
@@ -51,12 +51,12 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             List<Asset> organizationAssetList = new ArrayList<>();
             masterAssetList.forEach(masterAsset -> {
 
-                Asset asset = new Asset(masterAsset.getName(), masterAsset.getDescription(), countryId, activeStatus);
+                Asset asset = new Asset(masterAsset.getName(), masterAsset.getDescription(), activeStatus);
                 asset.setOrganizationId(unitId);
                 organizationAssetList.add(asset);
             });
 
-            assetMongoRepository.saveAll(sequenceGenerator(organizationAssetList));
+            assetMongoRepository.saveAll(getNextSequence(organizationAssetList));
         }
 
         List<MasterProcessingActivity> masterProcessingActivityList = masterProcessingActivityRepository.getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(countryId, parentOrganizationId, organizationMetaData);
@@ -67,12 +67,12 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             List<ProcessingActivity> organizationProcessingActivityList = new ArrayList<>();
             masterProcessingActivityList.forEach(masterProcessingActivity -> {
 
-                ProcessingActivity processingActivity = new ProcessingActivity(masterProcessingActivity.getName(), masterProcessingActivity.getDescription(), countryId, activeStatus);
+                ProcessingActivity processingActivity = new ProcessingActivity(masterProcessingActivity.getName(), masterProcessingActivity.getDescription(), activeStatus);
                 processingActivity.setOrganizationId(unitId);
                 organizationProcessingActivityList.add(processingActivity);
             });
 
-            processingActivityMongoRepository.saveAll(sequenceGenerator(organizationProcessingActivityList));
+            processingActivityMongoRepository.saveAll(getNextSequence(organizationProcessingActivityList));
         }
 
 

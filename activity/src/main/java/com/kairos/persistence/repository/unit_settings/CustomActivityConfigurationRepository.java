@@ -7,7 +7,6 @@ import java.math.BigInteger;
 import java.util.List;
 
 public interface CustomActivityConfigurationRepository {
-    ActivityConfiguration findAbsenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId, Boolean exception);
 
     ActivityConfiguration findPresenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
 
@@ -17,6 +16,11 @@ public interface CustomActivityConfigurationRepository {
 
     List<ActivityConfiguration> findAllAbsenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
 
-    List<ActivityConfiguration> findAllPresenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
+    ActivityConfiguration findPresenceConfigurationByCountryIdAndPhaseId(Long countryId, BigInteger phaseId);
+
+    List<ActivityConfigurationDTO> findPresenceConfigurationByCountryId(Long countryId);
+
+    List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryId(Long unitId);
+
 
 }

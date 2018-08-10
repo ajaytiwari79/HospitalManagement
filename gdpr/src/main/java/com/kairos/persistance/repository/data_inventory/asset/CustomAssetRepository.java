@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface CustomAssetRepository {
 
-    Asset findByName(Long countryid, Long organizationId, String name);
+    Asset findByName( Long organizationId, String name);
 
-    AssetResponseDTO findAssetWithMetaDataById(Long countryId, Long organizationId, BigInteger id);
+    AssetResponseDTO findAssetWithMetaDataById( Long organizationId, BigInteger id);
 
-    List<AssetResponseDTO> findAllAssetWithMetaData(Long countryId, Long organizationId);
+    List<AssetResponseDTO> findAllAssetWithMetaData( Long organizationId);
 
 
 }

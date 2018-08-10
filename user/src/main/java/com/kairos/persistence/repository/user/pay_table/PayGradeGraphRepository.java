@@ -7,6 +7,8 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PAY_GROUP_AREA;
 
@@ -29,4 +31,8 @@ public interface PayGradeGraphRepository extends Neo4jBaseRepository<PayGrade, L
             "OPTIONAL match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
             "detach delete rel")
     void removeAllPayGroupAreasFromPayGrade(Long payGradeId);
+
+    @Query("MATCH (payGrade:PayGrade{deleted:false}) where id(payGrade) IN {0}\n" +
+            "return payGrade")
+    List<PayGrade> getAllPayGradesById(Set<Long> payGradeIds);
 }

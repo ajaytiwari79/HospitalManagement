@@ -105,6 +105,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        String exception="";
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts(), null);
@@ -116,16 +117,14 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
                 if (limitAndCounter[1] != null) {
                     int counterValue = limitAndCounter[1] - 1;
                     if (counterValue < 0) {
-                        new InvalidRequestException(getName() + " is Broken");
-                        infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
+                        exception = getName();                        infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
                         infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                     }
                 } else {
-                    new InvalidRequestException(getName() + " is Broken");
-                }
+                    exception = getName();                }
             }
         }
-        return "";
+        return exception;
     }
 
 

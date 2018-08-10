@@ -8,10 +8,18 @@ import java.util.List;
 
 public interface CustomAssetTypeRepository {
 
-    AssetType findByName(Long countryId,Long organizationId,String name);
+    AssetType findByNameAndCountryId(Long countryId,String name);
 
-    List<AssetTypeResponseDTO> getAllAssetTypesWithSubAssetTypes(Long countryId, Long organizationId);
+    List<AssetTypeResponseDTO> getAllCountryAssetTypesWithSubAssetTypes(Long countryId);
 
-    AssetTypeResponseDTO getAssetTypesWithSubAssetTypes(Long countryId, Long organizationId, BigInteger id);
+    AssetTypeResponseDTO getCountryAssetTypesWithSubAssetTypes(Long countryId, BigInteger id);
+
+    AssetType findByNameAndOrganizationId(Long organizationId,String name);
+
+    List<AssetTypeResponseDTO> getAllOrganizationAssetTypesWithSubAssetTypes(Long organizationId);
+
+    AssetTypeResponseDTO getOrganizationAssetTypesWithSubAssetTypes( Long organizationId, BigInteger id);
+
+
 
 }

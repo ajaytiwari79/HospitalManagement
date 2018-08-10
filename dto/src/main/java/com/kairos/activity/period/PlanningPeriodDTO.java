@@ -29,7 +29,7 @@ public class PlanningPeriodDTO {
     private LocalDate constructionToDraftDate;
     private List<PeriodPhaseFlippingDateDTO> phaseFlippingDate;
     private String periodDuration;
-
+    private boolean active=true;
 
     public PlanningPeriodDTO(){
         // default constructor
@@ -161,6 +161,14 @@ public class PlanningPeriodDTO {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
 

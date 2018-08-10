@@ -1,6 +1,6 @@
 package com.kairos.service.master_data.questionnaire_template;
 
-import com.kairos.dto.master_data.MasterQuestionDTO;
+import com.kairos.gdpr.master_data.MasterQuestionDTO;
 import com.kairos.enums.QuestionType;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireSection;
@@ -60,7 +60,7 @@ public class MasterQuestionService extends MongoBaseService {
             }
         }
         try {
-            masterQuestions = questionMongoRepository.saveAll(sequenceGenerator(masterQuestions));
+            masterQuestions = questionMongoRepository.saveAll(getNextSequence(masterQuestions));
             masterQuestions.forEach(masterQuestion -> questionSectionIds.add(masterQuestion.getId()));
         } catch (MongoClientException e) {
             logger.info(e.getMessage());
@@ -106,7 +106,7 @@ public class MasterQuestionService extends MongoBaseService {
         }
         questionsIdList.remove(id);
         questionnaireSection.setQuestions(questionsIdList);
-        masterQuestionnaireSectionRepository.save(sequenceGenerator(questionnaireSection));
+        masterQuestionnaireSectionRepository.save(questionnaireSection);
         delete(exist);
         return true;
 
@@ -199,7 +199,7 @@ public class MasterQuestionService extends MongoBaseService {
             }
         }
         try {
-            updatedQuestionsList = questionMongoRepository.saveAll(sequenceGenerator(updatedQuestionsList));
+            updatedQuestionsList = questionMongoRepository.saveAll(getNextSequence(updatedQuestionsList));
         } catch (MongoClientException e) {
             logger.info(e.getMessage());
             throw new MongoClientException(e.getMessage());

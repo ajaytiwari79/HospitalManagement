@@ -310,7 +310,7 @@ public class CounterDataService {
         return Math.round(value*100)/100.0;
     }
 
-    //TODO: scope in future, for collecting counters metadata separatly
+    //TODO: scope in future, for collecting counters common separatly
     public void getCounterMetadataForVRP(){//list of KPIs
 
     }

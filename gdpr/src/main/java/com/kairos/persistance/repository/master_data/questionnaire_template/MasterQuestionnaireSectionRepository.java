@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data.questionnaire_template;
 
 
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireSection;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface MasterQuestionnaireSectionRepository extends MongoRepository<MasterQuestionnaireSection, BigInteger> ,CustomMasterQuestionSectionRepository {
+public interface MasterQuestionnaireSectionRepository extends MongoBaseRepository<MasterQuestionnaireSection, BigInteger>,CustomMasterQuestionSectionRepository {
 
 
     @Query("{deleted:false,countryId:?0,organizationId:?1,title:?2}")

@@ -158,7 +158,7 @@ public class CitizenService {
                     ResponseEntity<String> patientResponse = loginTemplate.exchange(patientUrl, HttpMethod.GET, headersElements, String.class);
                     PatientWrapper patientWrapper = JsonUtils.toObject(patientResponse.getBody().toString(), PatientWrapper.class);
                     //   if(Integer.valueOf(patientWrapper.getId()) != 7) continue;
-                    clientService.createCitizenFromKmd(patientWrapper, organization.getId());
+                    clientService.createCitizenFromExternalService(patientWrapper, organization.getId());
                 }
 
             }
@@ -459,7 +459,7 @@ public class CitizenService {
                     ResponseEntity<String> relativeContactResponse = loginTemplate.exchange(relativeContactUrl, HttpMethod.GET, headersElements, String.class);
                     Organization organization = organizationGraphRepository.findByName(AppConstants.KMD_NEXUS_ORGANIZATION);
                     PatientRelative patientRelative = JsonUtils.toObject(relativeContactResponse.getBody(), PatientRelative.class);
-                    clientService.addClientRelativeDetailsFromKmd(patientRelative, client, organization.getId());
+                    clientService.addClientRelativeDetailsFromExternalService(patientRelative, client, organization.getId());
                 }
             }
             return "Success";

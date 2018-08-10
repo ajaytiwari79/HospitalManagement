@@ -3,13 +3,11 @@ package com.kairos.persistance.model.data_inventory.asset;
 
 import com.kairos.enums.RiskSeverity;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.persistance.model.data_inventory.ManagingOrganization;
-import com.kairos.persistance.model.data_inventory.Staff;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
+import com.kairos.gdpr.ManagingOrganization;
+import com.kairos.gdpr.Staff;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
@@ -18,15 +16,15 @@ import java.util.List;
 public class Asset extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "Name can 't be empty")
+    @NotBlank(message = "Name can 't be empty")
     private String name;
 
-    @NotNullOrEmpty(message = "description can't be empty")
+    @NotBlank(message = "description can't be empty")
     private String description;
 
     private Long countryId;
 
-    @NotBlank(message = "Hosting Loction can't be empty")
+    @NotBlank(message = "Hosting Location can't be empty")
     private String hostingLocation;
 
     @NotNull(message = "Managing department can't be empty")
@@ -52,7 +50,6 @@ public class Asset extends MongoBaseEntity {
     @NotNull(message = "Asset Type can't be empty")
     private BigInteger assetType;
 
-    @NotEmpty(message = "Sub Asset Type can't be empty")
     private List<BigInteger> assetSubTypes;
 
     private Integer dataRetentionPeriod;
@@ -155,11 +152,10 @@ public class Asset extends MongoBaseEntity {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public Asset(String name, String description, String hostingLocation, Long countryId, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner,Boolean isActive) {
+    public Asset(String name, String description, String hostingLocation, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner,Boolean isActive) {
         this.name = name;
         this.description = description;
         this.hostingLocation=hostingLocation;
-        this.countryId = countryId;
         this.assetType = assetType;
         this.assetSubTypes=assetSubTypes;
         this.assetOwner=assetOwner;
@@ -168,10 +164,9 @@ public class Asset extends MongoBaseEntity {
     }
 
 
-    public Asset(String name, String description, Long countryId, Boolean isActive) {
+    public Asset(String name, String description, Boolean isActive) {
         this.name = name;
         this.description = description;
-        this.countryId = countryId;
         this.isActive = isActive;
     }
 }

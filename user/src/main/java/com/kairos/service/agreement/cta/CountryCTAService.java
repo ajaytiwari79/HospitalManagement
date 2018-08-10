@@ -175,9 +175,8 @@ public class CountryCTAService extends UserBaseService {
                 .collect(Collectors.toSet());
 
         Callable<List<EmploymentType>> callableEmploymentTypes = () -> {
-            List<EmploymentType> employmentTypes = employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds);
-            return employmentTypes;
-        };
+            return employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds);
+            };
         Future<List<EmploymentType>> futureEmploymentTypes = asynchronousService.executeAsynchronously(callableEmploymentTypes);
         Map<Long, EmploymentType> employmentTypeMap = futureEmploymentTypes.get().stream().collect(Collectors.toMap(EmploymentType::getId, v -> v));
         ctaDetailsWrapper.setEmploymentTypeIdMap(employmentTypeMap);
@@ -315,11 +314,12 @@ public class CountryCTAService extends UserBaseService {
 
     public CTARuleTemplate saveEmbeddedEntitiesOfCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO, CTADetailsWrapper ctaDetailsWrapper) {
 
+        ctaRuleTemplate.setEmploymentTypes(new ArrayList<>());
         if (!ctaRuleTemplateDTO.getEmploymentTypes().isEmpty()) {
-            ctaRuleTemplateDTO.getEmploymentTypes().forEach(c -> {
-                ctaRuleTemplate.getEmploymentTypes().add(ctaDetailsWrapper.getEmploymentTypeIdMap().get(c));
-            });
-
+            for (Iterator<Long> iterator = ctaRuleTemplateDTO.getEmploymentTypes().iterator(); iterator.hasNext(); ) {
+                Long value = iterator.next();
+                ctaRuleTemplate.addEmploymentType(ctaDetailsWrapper.getEmploymentTypeIdMap().get(value));
+            }
         }
         if (ctaRuleTemplateDTO.getRuleTemplateCategory() != null) {
             ctaRuleTemplate.setRuleTemplateCategory(ctaDetailsWrapper.getRuleTemplateCategoryIdMap().get(ctaRuleTemplateDTO.getRuleTemplateCategory()));

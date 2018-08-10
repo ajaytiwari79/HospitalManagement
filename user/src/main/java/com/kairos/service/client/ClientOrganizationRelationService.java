@@ -1,5 +1,5 @@
 package com.kairos.service.client;
-import com.kairos.persistence.model.client.ClientOrganizationRelation;
+import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.repository.user.client.ClientOrganizationRelationGraphRepository;
 import com.kairos.util.BadgeGenerator;
 import org.springframework.stereotype.Service;

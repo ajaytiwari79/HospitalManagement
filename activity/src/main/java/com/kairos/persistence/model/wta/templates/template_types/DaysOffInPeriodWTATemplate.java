@@ -110,6 +110,7 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+        String exception="";
         if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
             int count = 0;
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
@@ -125,18 +126,16 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
                     if (limitAndCounter[1] != null) {
                         int counterValue = limitAndCounter[1] - 1;
                         if (counterValue < 0) {
-                            throw new InvalidRequestException(getName() + " is Broken");
-                        } else {
+                            exception = getName();                        } else {
                             infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
                             infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
                         }
                     } else {
-                        throw new InvalidRequestException(getName() + " is Broken");
-                    }
+                        exception = getName();                    }
                 }
             }
         }
-        return "";
+        return exception;
     }
 
 

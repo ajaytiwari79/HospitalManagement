@@ -2,9 +2,9 @@ package com.kairos.persistance.model.master_data.questionnaire_template;
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -14,7 +14,7 @@ import java.util.List;
 @Document(collection = "questionnaire_section")
 public class MasterQuestionnaireSection extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "Title can't be empty")
+    @NotBlank(message = "Title can't be empty")
     private String title;
 
     @NotNull(message = "list.cannot.be.null")

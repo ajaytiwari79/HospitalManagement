@@ -19,6 +19,9 @@ public interface PhaseMongoRepository extends MongoBaseRepository<Phase, BigInte
     @Query(value = "{sequence:?0 ,countryId:?1 ,deleted:false}", count = true)
     long findBySequenceAndCountryIdAndDeletedFalse(Integer sequence, Long countryId);
 
+//    @Query(value = "{sequence:?0 ,organizationId:?1 ,deleted:false}")
+//    Phase findBySequenceAndOrganizationIdAndDeletedFalse(Integer sequence, Long organizationId);
+
     List<PhaseDTO> findByCountryIdAndDeletedFalse(Long countryId);
 
     List<Phase> findByOrganizationIdAndPhaseTypeAndDeletedFalseAndDurationGreaterThan(Long unitId, String PhaseType, Long duration);

@@ -325,8 +325,8 @@ public class TaskPlanningSolver {
 			//Employee employee= vehicle.getEmployee();
 			//vehicleRoute.append("Employee :"+employee+"\n");
         	while(nextTask!=null){
-				employeeRoute.append(nextTask.getLabel());//employeeRoute.append(nextTask.getLabel()+"->["+nextTask.getVehicle()+"]");
-				//vehicleRoute.append("-["+nextTask.getLabel()+"]-");
+				employeeRoute.append(nextTask.getLabel());//employeeRoute.append(nextTask.getName()+"->["+nextTask.getVehicle()+"]");
+				//vehicleRoute.append("-["+nextTask.getName()+"]-");
 				//vehicleRoute.append("----");
 				if(indictmentMap.containsKey(nextTask) && sumHardScore((BendableLongScore) indictmentMap.get(nextTask).getScoreTotal())>0){
 					employeeRoute.append(""+Arrays.toString(((BendableLongScore) indictmentMap.get(nextTask).getScoreTotal()).getHardScores())+"");
