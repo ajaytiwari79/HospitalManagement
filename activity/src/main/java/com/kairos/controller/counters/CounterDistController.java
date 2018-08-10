@@ -7,7 +7,6 @@ import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
-import com.kairos.activity.counter.distribution.tab.TabKPIEntryDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.service.counter.CounterManagementService;
@@ -20,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -115,20 +115,20 @@ public class CounterDistController {
     }
 
     @PutMapping(COUNTRY_URL+"/counter/dist/module/update_dist_entry")
-    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForCounty(@RequestBody TabKPIEntryDTO tabKPIEntry, @PathVariable Long countryId){
-        counterManagementService.updateTabKPIEntries(tabKPIEntry,countryId,null,null,ConfLevel.COUNTRY);
+    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForCounty(@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS, @PathVariable Long countryId){
+        counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,countryId,null,null,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
     @PutMapping(UNIT_URL+"/counter/dist/module/update_dist_entry")
-    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForUnit(@RequestBody TabKPIEntryDTO tabKPIEntry,@PathVariable Long unitId){
-        counterManagementService.updateTabKPIEntries(tabKPIEntry,null,unitId,null,ConfLevel.UNIT);
+    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForUnit(@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS,@PathVariable Long unitId){
+        counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,null,unitId,null,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
     @PutMapping(UNIT_URL+STAFF_URL+"/counter/dist/module/update_dist_entry")
-    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody TabKPIEntryDTO tabKPIEntry){
-        counterManagementService.updateTabKPIEntries(tabKPIEntry,null,unitId,staffId,ConfLevel.STAFF);
+    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
+        counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,null,unitId,staffId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 

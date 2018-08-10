@@ -14,12 +14,9 @@ import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
-import com.kairos.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
-import com.kairos.activity.counter.distribution.tab.TabKPIEntryDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
-import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -81,16 +78,27 @@ public class CounterManagementService extends MongoBaseService {
     }
 
     public void addCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {
-        CategoryAssignment categoryAssignment = counterRepository.getCategoryAssignment(categoryKPIsDetails.getCategoryId(), level, refId);
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(categoryKPIsDetails.getKpiIds(), level, refId);
-        List<CategoryKPIConf> categoryKPIConfs = counterRepository.getCategoryKPIConfs(categoryAssignment.getId());
-        List<BigInteger> applicableKpiIds = categoryKPIConfs.stream().map(categoryKPIConf -> categoryKPIConf.getKpiId()).collect(toList());
-        List<ApplicableKPI> applicableKPISIds = applicableKPIS.parallelStream().filter(applicableKPI ->  applicableKpiIds.contains(applicableKPI.getId())).collect(toList());
-        if (!applicableKPISIds.isEmpty())
+        if(applicableKPIS.isEmpty()){
+            exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
+        }
+        CategoryAssignment categoryAssignment = counterRepository.getCategoryAssignment(categoryKPIsDetails.getCategoryId(), level, refId);
+        if(!Optional.ofNullable(categoryAssignment).isPresent()){
+            exceptionService.dataNotFoundByIdException("error.kpi_category.availability ");
+        }
+        List<CategoryKPIConf> categoryKPIConfs = counterRepository.getCategoryKPIConfs(categoryKPIsDetails.getKpiIds());
+        List<BigInteger> categoryAssignmentIds=categoryKPIConfs.stream().map(categoryKPIConf -> categoryKPIConf.getCategoryAssignmentId()).collect(toList());
+        if(categoryAssignmentIds.contains(categoryAssignment.getId())){
             exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
+        }
         List<CategoryKPIConf> newCategoryKPIConfs = new ArrayList<>();
         applicableKPIS.parallelStream().forEach(kpiAssignment -> newCategoryKPIConfs.add(new CategoryKPIConf(kpiAssignment.getActiveKpiId(), categoryAssignment.getId())));
+        if(!newCategoryKPIConfs.isEmpty())
+        {
         save(newCategoryKPIConfs);
+        counterRepository.removeCategoryKPIEntries(categoryAssignmentIds,categoryKPIsDetails.getKpiIds());
+        }
+
     }
 
     //settings for KPI-Module configuration
@@ -131,14 +139,15 @@ public class CounterManagementService extends MongoBaseService {
         save(entriesToSave);
     }
 
-    public void updateTabKPIEntries(TabKPIEntryDTO tabKPIEntries, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+    public void updateTabKPIEntries(List<TabKPIMappingDTO> tabKPIMappingDTOS, Long countryId, Long unitId, Long staffId, ConfLevel level) {
         Long refId = ConfLevel.COUNTRY.equals(level) ? countryId : unitId;
         if(ConfLevel.STAFF.equals(level)){
             refId=staffId;
         }
-        List<BigInteger> kpiIds=tabKPIEntries.getKpiEntries().stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
-        List<TabKPIConf> tabKPIConfs = counterRepository.findTabKPIConfigurationByTabIds(Arrays.asList(tabKPIEntries.getTabId()),kpiIds,refId,level);
-        tabKPIConfs.stream().forEach(tabKPIConf -> {tabKPIEntries.getKpiEntries().stream().forEach(tabKPIMappingDTO -> {
+        List<BigInteger> kpiIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
+        List<String> tabIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getTabId()).collect(toList());
+        List<TabKPIConf> tabKPIConfs = counterRepository.findTabKPIConfigurationByTabIds(tabIds,kpiIds,refId,level);
+        tabKPIConfs.stream().forEach(tabKPIConf -> {tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
             if(tabKPIConf.getKpiId().equals(tabKPIMappingDTO.getKpiId())){
                 tabKPIConf.setCounterSize(tabKPIMappingDTO.getCounterSize());
                 tabKPIConf.setKpiPosition(tabKPIMappingDTO.getKpiPosition());
@@ -409,4 +418,20 @@ public class CounterManagementService extends MongoBaseService {
 //        if (AccessGroupMappingDTOS == null || AccessGroupMappingDTOS.isEmpty()) return new ArrayList<>();
 //        return AccessGroupMappingDTOS.stream().map(entry -> entry.getKpiId()).collect(Collectors.toList());
 //    }
+
+
+ //List<CategoryAssignment> categoryAssignments=counterRepository.findCategoryAssignment(categoryKPIsDetails.getKpiIds(),level,refId);
+//        List<BigInteger> categoryAssignmentIds=categoryAssignments.stream().map(categoryAssignment -> categoryAssignment.getId()).collect(toList());
+//        List<BigInteger> categoryIds=categoryAssignments.stream().map(categoryAssignment -> categoryAssignment.getCategoryId()).collect(toList());
+//        if(categoryIds.contains(categoryKPIsDetails.getCategoryId())){
+//            exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
+//        }
+       //
+
+       // List<CategoryKPIConf> categoryKPIConfs = counterRepository.getCategoryKPIConfs(categoryAssignment.getId());
+        //List<BigInteger> kpiIds = categoryKPIConfs.stream().map(categoryKPIConf -> categoryKPIConf.getKpiId()).collect(toList());
+        //List<ApplicableKPI> applicableKPISIds = applicableKPIS.parallelStream().filter(applicableKPI ->  kpiIds.contains(applicableKPI.getId())).collect(toList());
+       // if (!applicableKPISIds.isEmpty())
+            //exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
+
  */

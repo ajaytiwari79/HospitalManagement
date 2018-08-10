@@ -1,9 +1,12 @@
 package com.kairos.activity.counter;
 
+import com.kairos.util.NotNullOrEmpty;
+
 import java.math.BigInteger;
 
 public class KPICategoryDTO {
     private BigInteger id;
+    @NotNullOrEmpty(message = "name can't be empty")
     private String name;
     private Long levelId;
 

@@ -19,6 +19,13 @@ public class TabKPIMappingDTO {
         this.kpiId = kpiId;
     }
 
+    public TabKPIMappingDTO(String tabId, BigInteger kpiId, CounterSize counterSize, KPIPosition kpiPosition) {
+        this.tabId = tabId;
+        this.kpiId = kpiId;
+        this.counterSize = counterSize;
+        this.kpiPosition = kpiPosition;
+    }
+
     public String getTabId() {
         return tabId;
     }

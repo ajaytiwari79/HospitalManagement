@@ -7,6 +7,7 @@ import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingD
 import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
 import com.kairos.activity.counter.distribution.category.CategoryAssignmentDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
+import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
@@ -117,13 +118,7 @@ public class CounterRepository {
     //KPI assignment CRUD
     public List<ApplicableKPI> getApplicableKPI(List<BigInteger> kpiIds, ConfLevel level, Long refId){
         String refQueryField = getRefQueryField(level);
-        Criteria matchCriteria;
-        if(kpiIds!=null){
-            matchCriteria = Criteria.where("activeKpiId").in(kpiIds).and(refQueryField).is(refId);
-        }else{
-            matchCriteria = Criteria.where(refQueryField).is(refId);
-        }
-        Query query = new Query(matchCriteria);
+        Query query = new Query(Criteria.where("activeKpiId").in(kpiIds).and(refQueryField).is(refId));
         return mongoTemplate.find(query, ApplicableKPI.class);
     }
 
@@ -166,10 +161,28 @@ public class CounterRepository {
         return mongoTemplate.findOne(query, CategoryAssignment.class);
     }
 
+    public List<CategoryAssignment> findCategoryAssignment(List<BigInteger> kpiIds, ConfLevel level, Long refId){
+        String queryField = (ConfLevel.COUNTRY.equals(level))? "countryId":"unitId";
+        Aggregation aggregation=Aggregation.newAggregation(
+          Aggregation.match(Criteria.where("kpiId").in(kpiIds)),
+          Aggregation.lookup("categoryAssignment","categoryAssignmentId","_id","categoryAssignment"),
+          Aggregation.match(Criteria.where("categoryAssignment."+queryField).is(refId)),
+          Aggregation.project().and("categoryAssignment.categoryId").as("categoryId").and("categoryAssignment."+queryField).as(queryField)
+                .and("categoryAssignment._id").as("_id")
+        );
+        AggregationResults<CategoryAssignment> results=mongoTemplate.aggregate(aggregation,CategoryKPIConf.class,CategoryAssignment.class);
+        return results.getMappedResults();
+    }
+
+    public void removeCategoryKPIEntries(List<BigInteger> categoryAssignmentIds,List<BigInteger> kpiIds){
+        Query query=new Query(Criteria.where("categoryAssignmentId").in(categoryAssignmentIds).and("kpiId").in(kpiIds));
+        mongoTemplate.remove(query, CategoryKPIConf.class);
+    }
+
     //CategoryKPI distribution
 
-    public List<CategoryKPIConf> getCategoryKPIConfs(BigInteger categoryAssignmentId){
-        Query query = new Query(Criteria.where("categoryAssignmentId").is(categoryAssignmentId));
+    public List<CategoryKPIConf> getCategoryKPIConfs(List<BigInteger> kpiIds){
+        Query query = new Query(Criteria.where("kpiId").in(kpiIds));
         return mongoTemplate.find(query, CategoryKPIConf.class);
     }
 
@@ -184,6 +197,8 @@ public class CounterRepository {
         AggregationResults<CategoryKPIMappingDTO> results = mongoTemplate.aggregate(ag, CategoryKPIConf.class, CategoryKPIMappingDTO.class);
         return results.getMappedResults();
     }
+
+
 
     //tabKPI distribution crud
 
@@ -214,6 +229,7 @@ public class CounterRepository {
         Query query = new Query(Criteria.where("tabId").is(entry.getTabId()).and("kpiId").is(entry.getKpiId()).and(refQueryField).is(refId));
         mongoTemplate.remove(query, TabKPIConf.class);
     }
+
 
     //accessGroupKPI distribution crud
 

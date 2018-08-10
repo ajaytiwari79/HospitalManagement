@@ -10,8 +10,10 @@ import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
+import com.kairos.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
+import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
@@ -31,10 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.lang.reflect.Type;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -187,6 +186,43 @@ public class CounterDistIntegrationTest {
         TabKPIEntryConfDTO tabKPIEntryConfDTO = new TabKPIEntryConfDTO(Arrays.asList("1"), Arrays.asList(BigInteger.valueOf(1)));
         HttpEntity<TabKPIEntryConfDTO> reqestBodyDate = new HttpEntity<>(tabKPIEntryConfDTO);
         ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + "/unit/1452/staff/1245/counter/dist/module/create_dist_entry", HttpMethod.POST, reqestBodyDate, typeReference);
+        logger.info("Status Code : " + response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void updateTabKPIsEntryForCounty() {
+        String baseUrl = getBaseUrl(152l, 4l);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        };
+        List<TabKPIMappingDTO> tabKPIEntryConfDTO =new ArrayList<>();
+        tabKPIEntryConfDTO.add(new TabKPIMappingDTO("1",BigInteger.valueOf(23), CounterSize.SIZE_2X2,new KPIPosition(1,4)));
+        HttpEntity<List<TabKPIMappingDTO>> reqestBodyDate = new HttpEntity<>(tabKPIEntryConfDTO);
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/module/remove_dist_entry", HttpMethod.PUT, reqestBodyDate, typeReference);
+        logger.info("Status Code : " + response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+    @Test
+    public void updateTabKPIsEntryForUnit() {
+        String baseUrl = getBaseUrl(152l, null);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        };
+        List<TabKPIMappingDTO> tabKPIEntryConfDTO =new ArrayList<>();
+        tabKPIEntryConfDTO.add(new TabKPIMappingDTO("1",BigInteger.valueOf(23), CounterSize.SIZE_2X2,new KPIPosition(1,4)));
+        HttpEntity<List<TabKPIMappingDTO>> reqestBodyDate = new HttpEntity<>(tabKPIEntryConfDTO);
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/module/remove_dist_entry", HttpMethod.PUT, reqestBodyDate, typeReference);
+        logger.info("Status Code : " + response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+    @Test
+    public void updateTabKPIsEntryForStaff() {
+        String baseUrl = getBaseUrl(152l, null);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        };
+        List<TabKPIMappingDTO> tabKPIEntryConfDTO =new ArrayList<>();
+        tabKPIEntryConfDTO.add(new TabKPIMappingDTO("1",BigInteger.valueOf(23), CounterSize.SIZE_2X2,new KPIPosition(1,4)));
+        HttpEntity<List<TabKPIMappingDTO>> reqestBodyDate = new HttpEntity<>(tabKPIEntryConfDTO);
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/module/remove_dist_entry", HttpMethod.PUT, reqestBodyDate, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }

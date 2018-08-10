@@ -125,7 +125,7 @@ public class CounterConfIntegrationTest {
         kpiCategory2.setId(BigInteger.valueOf(21));
         kpiCategories.add(kpiCategory1);
         kpiCategories.add(kpiCategory2);
-        KPICategory kpiCategory3=new KPICategory("Working Time for Country after update ", 3l);
+        KPICategory kpiCategory3=new KPICategory("", 3l);
         kpiCategory3.setId(BigInteger.valueOf(14));
         kpiCategories1.add(kpiCategory3);
         KPICategoryUpdationDTO kpiCategoryUpdationDTO=new KPICategoryUpdationDTO(kpiCategories,kpiCategories1);

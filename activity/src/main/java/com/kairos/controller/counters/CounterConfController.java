@@ -9,9 +9,11 @@ import com.kairos.service.counter.CounterConfService;
 import com.kairos.util.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
@@ -69,13 +71,13 @@ public class CounterConfController {
     }
 
     @PutMapping(value = COUNTRY_URL+"/category")
-    public ResponseEntity<Map<String, Object>> updateCategoriesForCountry(@RequestBody KPICategoryUpdationDTO categories, @PathVariable Long countryId){
+    public ResponseEntity<Map<String, Object>> updateCategoriesForCountry(@RequestBody @Valid KPICategoryUpdationDTO categories, @PathVariable Long countryId){
         counterConfService.updateCategories(categories, ConfLevel.COUNTRY, countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
     @PutMapping(value =UNIT_URL+"/category")
-    public ResponseEntity<Map<String, Object>> updateCategoriesForUnit(@RequestBody KPICategoryUpdationDTO categories, @PathVariable Long unitId){
+    public ResponseEntity<Map<String, Object>> updateCategoriesForUnit(@RequestBody @Valid KPICategoryUpdationDTO categories, @PathVariable Long unitId){
         counterConfService.updateCategories(categories, ConfLevel.UNIT, unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
