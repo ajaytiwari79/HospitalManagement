@@ -1,7 +1,7 @@
 package com.kairos.service.integration;
 
 import com.kairos.activity.activity.activity_tabs.ActivityNoTabsDTO;
-import com.kairos.activity.staffing_level.StaffingLevelDTO;
+import com.kairos.activity.staffing_level.StaffingLevelPlanningDTO;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.planner.PlannerRestClient;
 import com.kairos.enums.IntegrationOperation;
@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,12 +27,12 @@ public class PlannerSyncService {
     private PlannerRestClient plannerRestClient;
 
     @Async
-    public Future<RestTemplateResponseEnvelope<Map>> publishStaffingLevel(Long unitId, StaffingLevelDTO staffingLevelDto, IntegrationOperation integrationOperation) {
+    public Future<RestTemplateResponseEnvelope<Map>> publishStaffingLevel(Long unitId, StaffingLevelPlanningDTO staffingLevelPlanningDto, IntegrationOperation integrationOperation) {
         return null;//new AsyncResult(plannerRestClient.publish(staffingLevelDto, unitId, integrationOperation));
     }
 
     @Async
-    public void publishStaffingLevels(Long unitId, List<StaffingLevelDTO> staffingLevelDtos, IntegrationOperation integrationOperation) {
+    public void publishStaffingLevels(Long unitId, List<StaffingLevelPlanningDTO> staffingLevelPlanningDtos, IntegrationOperation integrationOperation) {
         //plannerRestClient.publish(staffingLevelDtos, unitId, integrationOperation);
     }
 
