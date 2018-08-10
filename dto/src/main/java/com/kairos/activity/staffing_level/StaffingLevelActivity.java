@@ -3,12 +3,13 @@ package com.kairos.activity.staffing_level;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
 public class StaffingLevelActivity {
 
     private String name;
-    private Long activityId;
+    private BigInteger activityId;
    // private int noOfStaff;
     private boolean includeInMin;
     private int minNoOfStaff;
@@ -41,25 +42,24 @@ public class StaffingLevelActivity {
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
-    public StaffingLevelActivity(Long activityId, int minNoOfStaff, int maxNoOfStaff) {
-        this.activityId = activityId;
-        this.minNoOfStaff = minNoOfStaff;
-        this.maxNoOfStaff = maxNoOfStaff;
-    }
-
-
-    public StaffingLevelActivity(Long activityId, String name, int minNoOfStaff, int maxNoOfStaff) {
+    public StaffingLevelActivity(BigInteger activityId, String name, int minNoOfStaff, int maxNoOfStaff) {
         this.activityId = activityId;
         this.name = name;
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
-    public Long getActivityId() {
+    public StaffingLevelActivity(BigInteger activityId, int minNoOfStaff, int maxNoOfStaff) {
+        this.activityId = activityId;
+        this.minNoOfStaff = minNoOfStaff;
+        this.maxNoOfStaff = maxNoOfStaff;
+    }
+
+    public BigInteger getActivityId() {
         return activityId;
     }
 
-    public void setActivityId(Long activityId) {
+    public void setActivityId(BigInteger activityId) {
         this.activityId = activityId;
     }
 

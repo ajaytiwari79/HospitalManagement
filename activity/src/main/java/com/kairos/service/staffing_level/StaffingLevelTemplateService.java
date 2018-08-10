@@ -1,9 +1,12 @@
 package com.kairos.service.staffing_level;
 
+import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.staffing_level.StaffingLevelTemplateDTO;
 import com.kairos.enums.Day;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRepository;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
@@ -18,12 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,6 +38,8 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     private OrganizationRestClient organizationRestClient;
     @Autowired
     private ExceptionService exceptionService;
+    @Inject
+    private ActivityMongoRepository activityMongoRepository;
 
     /**
      * @param staffingLevelTemplateDTO
@@ -44,6 +47,13 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      */
     public StaffingLevelTemplateDTO createStaffingTemplate(StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
         logger.info("saving staffing level Template  {}", staffingLevelTemplateDTO);
+        Set<BigInteger> activityIds=new HashSet<>();
+        staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+            staffingLevelInterval.getStaffingLevelActivities().forEach(staffingLevelActivity -> {
+                     activityIds.add(staffingLevelActivity.getActivityId());
+                });
+        });
+        List<ActivityDTO> activities=activityMongoRepository.getAllInvalidActivitys(activityIds,staffingLevelTemplateDTO.getValidity().getStartDate(),staffingLevelTemplateDTO.getValidity().getEndDate());
 
         StaffingLevelTemplate staffingLevelTemplate = new StaffingLevelTemplate();
         ObjectMapperUtils.copyProperties(staffingLevelTemplateDTO, staffingLevelTemplate);
