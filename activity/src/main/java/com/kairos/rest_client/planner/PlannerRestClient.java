@@ -1,12 +1,8 @@
 package com.kairos.rest_client.planner;
 
-import com.kairos.activity.activity.activity_tabs.ActivityNoTabsDTO;
-import com.kairos.activity.staffing_level.StaffingLevelDTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.solver_config.PlannerUrl;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.kairos.util.RestClientUrlUtil.getPlannerBaseUrl;
 @Service

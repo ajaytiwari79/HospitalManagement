@@ -9,9 +9,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by sachin
+ * Created by sachin verma
  */
-public class StaffingLevelDTO {
+public class StaffingLevelPlanningDTO {
     private BigInteger id;
     @NotNull
     private Long phaseId;
@@ -22,11 +22,11 @@ public class StaffingLevelDTO {
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private List<StaffingLevelInterval> absenceStaffingLevelInterval =new ArrayList<>();
 
-    public StaffingLevelDTO() {
+    public StaffingLevelPlanningDTO() {
     }
 
-    public StaffingLevelDTO(BigInteger id, @NotNull Long phaseId, Date currentDate, Long weekCount, StaffingLevelSetting staffingLevelSetting,
-                            List<StaffingLevelInterval> presenceStaffingLevelInterval, List<StaffingLevelInterval> absenceStaffingLevelInterval) {
+    public StaffingLevelPlanningDTO(BigInteger id, @NotNull Long phaseId, Date currentDate, Long weekCount, StaffingLevelSetting staffingLevelSetting,
+                                    List<StaffingLevelInterval> presenceStaffingLevelInterval, List<StaffingLevelInterval> absenceStaffingLevelInterval) {
         this.id = id;
         this.phaseId = phaseId;
         this.currentDate = currentDate;
