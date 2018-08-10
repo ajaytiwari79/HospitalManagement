@@ -29,7 +29,6 @@ public class CountryAccessGroupRelationship extends UserBaseEntity{
     @Property(name = "organizationCategory")
     @EnumString(OrganizationCategory.class)
     private OrganizationCategory organizationCategory;
-    private List<Long> accountTypes = new ArrayList<>();
 
     public CountryAccessGroupRelationship(){
         // default constructor
@@ -40,6 +39,7 @@ public class CountryAccessGroupRelationship extends UserBaseEntity{
         this.accessGroup = accessGroup;
         this.organizationCategory = category;
     }
+
 
     public Country getCountry() {
         return country;
@@ -65,11 +65,4 @@ public class CountryAccessGroupRelationship extends UserBaseEntity{
         this.organizationCategory = organizationCategory;
     }
 
-    public List<Long> getAccountTypes() {
-        return accountTypes;
-    }
-
-    public void setAccountTypes(List<Long> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
 }
