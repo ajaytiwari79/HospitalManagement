@@ -50,12 +50,6 @@ public class AccountTypeService extends UserBaseService {
     }
 
 
-    public AccountType getAccountByName(Long countryId, String name) {
-        AccountType account = accountTypeRepository.findByName(countryId, name);
-        return account;
-
-    }
-
 //
 //    public List<AccountType> getAccountTypeList(Long countryId, Set<Long> ids) {
 //        List<AccountType> accountTypes = accountTypeRepository.getAccountTypeList(ids);
