@@ -50,10 +50,13 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Set<BigInteger> activityIds);
 
-//    @Query(value = "{_id:{$in:?0}, deleted:false, 'generalActivityTab.startDate':{ $lte: ?1 } ,  $or: [ { 'generalActivityTab.endDate':null }, {'generalActivityTab.endDate':{ $gte: ?1 }} ] }",fields = "{'_id','name'}")
+//    @Query("{_id:{$in:?0}, deleted:false, 'generalActivityTab.startDate':{ $lt: ?1 } , $cond: { if: { $ne:{'generalActivityTab.endDate':null,?1:null }, then: {'generalActivityTab.endDate':{ $lt: ?1 }}, elseif: { $ne:{'generalActivityTab.endDate':null}}, then:{?1:null} } }}")
 //    List<ActivityDTO> getAllInvalidActivity(Set<BigInteger> activityIds, LocalDate startDate,LocalDate endDate);
 
+    @Query("{_id:{$in:?0}, deleted:false, 'generalActivityTab.startDate':{ $lt: ?1 } }")
+    List<ActivityDTO> getInvalidActivitiesByStartDate(Set<BigInteger> activityIds, LocalDate startDate);
 
-    @Query(value = "{_id:{$in:?0}, deleted:false, 'generalActivityTab.startDate':{ $gt: ?1 } , $cond: { if: { $ne:{'generalActivityTab.endDate':null,?1:null }, then: {'generalActivityTab.endDate':{ $lt: ?1 }}, elseif: { $ne:{'generalActivityTab.endDate':null}}, then:{?1:null} }} }")
-    List<ActivityDTO> getAllInvalidActivitys(Set<BigInteger> activityIds, LocalDate startDate,LocalDate endDate);
+    @Query("{_id:{$in:?0}, deleted:false  ,$or : [{'generalActivityTab.startDate':{ $lt: ?1 }}, {'generalActivityTab.endDate':null},{'generalActivityTab.endDate': {$gt:?2}}]}")
+    List<ActivityDTO> getInvalidActivitiesBetweenDateRange(Set<BigInteger> activityIds, LocalDate startDate,LocalDate endDate);
+
 }

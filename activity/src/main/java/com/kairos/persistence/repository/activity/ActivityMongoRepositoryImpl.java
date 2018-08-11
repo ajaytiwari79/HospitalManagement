@@ -18,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.math.BigInteger;
@@ -413,6 +415,20 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<StaffActivitySettingDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, StaffActivitySettingDTO.class);
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
+    }
+
+    @Override
+    public List<ActivityDTO> getAllInvalidActivitys(Set<BigInteger> activityIds, LocalDate startDate, LocalDate endDate) {
+        Criteria criteria = Criteria.where("id").in(activityIds);
+        criteria = endDate==null ? criteria.and("generalActivityTab.startDate").lt(startDate) : criteria.and("generalActivityTab.startDate").lt(startDate).gt(endDate).and("generalActivityTab.endDate").exists(false);
+
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                project("id","name")
+        );
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
     }
 
 

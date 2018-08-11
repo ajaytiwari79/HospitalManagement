@@ -1,6 +1,8 @@
 package com.kairos.service.staffing_level;
 
 import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.activity.ActivityResponse;
+import com.kairos.activity.shift.ShiftResponse;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.staffing_level.StaffingLevelTemplateDTO;
 import com.kairos.enums.Day;
@@ -11,6 +13,7 @@ import com.kairos.persistence.repository.staffing_level.StaffingLevelTemplateRep
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.locale.LocaleService;
 import com.kairos.user.country.day_type.DayType;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
@@ -40,6 +43,8 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
+    @Inject
+    private LocaleService localeService;
 
     /**
      * @param staffingLevelTemplateDTO
@@ -47,13 +52,25 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      */
     public StaffingLevelTemplateDTO createStaffingTemplate(StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
         logger.info("saving staffing level Template  {}", staffingLevelTemplateDTO);
+        Map<String, List<ActivityResponse>> response = new HashMap<>();
+        List<ActivityResponse> errorMessages = new ArrayList<>();
         Set<BigInteger> activityIds=new HashSet<>();
         staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
             staffingLevelInterval.getStaffingLevelActivities().forEach(staffingLevelActivity -> {
                      activityIds.add(staffingLevelActivity.getActivityId());
                 });
         });
-        List<ActivityDTO> activities=activityMongoRepository.getAllInvalidActivitys(activityIds,staffingLevelTemplateDTO.getValidity().getStartDate(),staffingLevelTemplateDTO.getValidity().getEndDate());
+
+        List<ActivityDTO> activitiesNotInRange=  staffingLevelTemplateDTO.getValidity().getEndDate()==null?activityMongoRepository.getInvalidActivitiesByStartDate(activityIds,staffingLevelTemplateDTO.getValidity().getStartDate()):
+                activityMongoRepository.getInvalidActivitiesBetweenDateRange(activityIds,staffingLevelTemplateDTO.getValidity().getStartDate(),staffingLevelTemplateDTO.getValidity().getEndDate());
+
+        if(!activitiesNotInRange.isEmpty()){
+            activitiesNotInRange.forEach(activityNotInRange->{
+                errorMessages.add(new ActivityResponse(activityNotInRange.getId(),activityNotInRange.getName(),activityNotInRange.getStartDate(),
+                        activityNotInRange.getEndDate(),localeService.getMessage("activity.out.of.range")));
+            });
+            exceptionService.actionNotPermittedException("activity.out.of.range",errorMessages);
+        }
 
         StaffingLevelTemplate staffingLevelTemplate = new StaffingLevelTemplate();
         ObjectMapperUtils.copyProperties(staffingLevelTemplateDTO, staffingLevelTemplate);
