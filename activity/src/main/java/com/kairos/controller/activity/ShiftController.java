@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -155,4 +156,13 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null );
 
     }
+    @ApiOperation("delete a Shift of a staff")
+    @DeleteMapping(value = "/delete_shifts/staff/{staffId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteShiftsAfterEndDate(@PathVariable Long unitId,@PathVariable Long staffId,@RequestParam("endDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDateTime endDate) {
+        shiftService.deleteShifts(staffId,unitId,endDate);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+
 }

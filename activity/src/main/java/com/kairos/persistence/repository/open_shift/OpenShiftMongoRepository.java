@@ -34,4 +34,5 @@ public interface OpenShiftMongoRepository extends MongoBaseRepository<OpenShift,
 
     @Query("{'deleted':false, interestedStaff:?0, 'startDate':{$gt:?1}}")
     List<OpenShift> findAllOpenShiftsByInterestedStaff(Long staffId, LocalDateTime employmentEnd);
+
 }

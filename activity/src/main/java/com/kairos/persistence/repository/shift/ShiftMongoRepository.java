@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -51,5 +52,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query("{'deleted':false,'staffId':{'$in':?0},'startDate':{$lte:?1},'endDate':{'$gte':?1}}")
     ShiftQueryResult findShiftByStaffIdsAndDate(List<Long> staffids,Date date);
+
+    @Query("{'deleted':false,'staffId':?0,'unitId':?1,'startDate':{$gt:?2}}")
+    List<Shift> findAllShiftsByStaffIdAndUnitIdAndGreaterThanStartDate(Long staffId,Long unitId,LocalDateTime employmentEndDate);
 
 }

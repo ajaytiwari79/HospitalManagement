@@ -1269,4 +1269,15 @@ public class ShiftService extends MongoBaseService {
         }
 
     }
+    public void deleteShifts(Long staffId, Long unitId, LocalDateTime employmentEndDate) {
+
+        List<Shift> shifts=shiftMongoRepository.findAllShiftsByStaffIdAndUnitIdAndGreaterThanStartDate(staffId,unitId,employmentEndDate);
+        if(!shifts.isEmpty()){
+            shifts.forEach(shift -> {shift.setDeleted(true);});
+            save(shifts);
+        }
+
+    }
+
+
 }

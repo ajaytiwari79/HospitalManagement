@@ -360,6 +360,9 @@ public class UnitPositionService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.positionid.notfound", unitPositionId);
 
         }
+        activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId,oldUnitPosition.getEndDateMillis(),oldUnitPosition.getStaff().getId());
+
+
 
         UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(unitPositionId);
         EmploymentQueryResult employmentQueryResult;
