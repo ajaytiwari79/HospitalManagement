@@ -102,7 +102,8 @@ dependencies {
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.springframework.security:spring-security-test')
     //compile('org.springframework.boot:spring-boot-starter-webflux')
-
+    // https://mvnrepository.com/artifact/org.mockito/mockito-core
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.21.0'
 }
 
 dependencyManagement {
