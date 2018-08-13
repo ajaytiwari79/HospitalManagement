@@ -265,15 +265,17 @@ public class StaffAddressService extends UserBaseService {
     }
 
     public ContactAddressDTO getContactAddress(ContactAddress contactAddress) {
-        ContactAddressDTO contactAddressDTO = null;
+        ContactAddressDTO contactAddressDTO;
         if(Optional.ofNullable(contactAddress).isPresent()){
             contactAddressDTO = new ContactAddressDTO(contactAddress.getHouseNumber(),contactAddress.getFloorNumber(),contactAddress.getStreet1(),contactAddress.getCity(),
                     contactAddress.getRegionName(),contactAddress.getCountry(),contactAddress.getLatitude(),contactAddress.getLongitude(),contactAddress.getProvince(),contactAddress.getCountry(),
                     contactAddress.isAddressProtected(),contactAddress.isVerifiedByVisitour());
             contactAddressDTO.setZipCodeId(contactAddress.getZipCode()!=null ? contactAddress.getZipCode().getId(): null);
             contactAddressDTO.setMunicipalityId((contactAddress.getMunicipality()==null) ?null :contactAddress.getMunicipality().getId());
+        }else{
+            contactAddressDTO = new ContactAddressDTO();
         }
-        return (contactAddressDTO!=null)? contactAddressDTO : new ContactAddressDTO();
+        return contactAddressDTO;
     }
 
     public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
