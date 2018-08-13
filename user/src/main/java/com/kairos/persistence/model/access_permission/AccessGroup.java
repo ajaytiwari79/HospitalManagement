@@ -2,13 +2,18 @@ package com.kairos.persistence.model.access_permission;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.user.access_permission.AccessGroupRole;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
+import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCOUNT_TYPE;
 
 /**
  * Created by prabjot on 9/27/16.
@@ -17,7 +22,8 @@ import javax.validation.constraints.NotNull;
 @NodeEntity
 public class AccessGroup extends UserBaseEntity {
 
-    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
+    @NotEmpty(message = "error.name.notnull")
+    @NotNull(message = "error.name.notnull")
     private String name;
     private boolean enabled = true;
     private boolean typeOfTaskGiver;
@@ -26,6 +32,8 @@ public class AccessGroup extends UserBaseEntity {
     @Property(name = "role")
     @EnumString(AccessGroupRole.class)
     private AccessGroupRole role;
+    @Relationship(type = HAS_ACCOUNT_TYPE)
+    private List<AccountType> accountType;
 
     public AccessGroup(String name, String description, AccessGroupRole role) {
         this.name = name;
@@ -33,7 +41,15 @@ public class AccessGroup extends UserBaseEntity {
         this.role = role;
     }
 
-    public AccessGroup(){}
+    public AccessGroup(@NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull") String name, String description, AccessGroupRole role, List<AccountType> accountType) {
+        this.name = name;
+        this.description = description;
+        this.role = role;
+        this.accountType = accountType;
+    }
+
+    public AccessGroup() {
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -73,5 +89,13 @@ public class AccessGroup extends UserBaseEntity {
 
     public void setRole(AccessGroupRole role) {
         this.role = role;
+    }
+
+    public List<AccountType> getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(List<AccountType> accountType) {
+        this.accountType = accountType;
     }
 }

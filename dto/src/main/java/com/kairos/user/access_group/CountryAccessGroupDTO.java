@@ -8,7 +8,9 @@ import com.kairos.user.access_permission.AccessGroupRole;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by prerna on 5/3/18.
@@ -25,7 +27,7 @@ public class CountryAccessGroupDTO {
     private OrganizationCategory organizationCategory;
     private AccessGroupRole role;
     private boolean enabled = true;
-    private List<Long> accountTypes = new ArrayList<>();
+    private Set<Long> accountTypes = new HashSet<>();
 
     public CountryAccessGroupDTO() {
         // default constructor
@@ -86,11 +88,11 @@ public class CountryAccessGroupDTO {
         this.role = role;
     }
 
-    public List<Long> getAccountTypes() {
+    public Set<Long> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(List<Long> accountTypes) {
+    public void setAccountTypes(Set<Long> accountTypes) {
         this.accountTypes = accountTypes;
     }
 
