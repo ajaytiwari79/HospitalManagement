@@ -26,6 +26,7 @@ import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.user.access_permission.AccessPermissionDTO;
 import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
+import com.kairos.user.country.system_setting.AccountTypeDTO;
 import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.util.DateUtil;
 import com.kairos.util.DateUtils;
@@ -549,7 +550,7 @@ public class AccessGroupService extends UserBaseService {
     }
 
     public AccessGroup updateCountryAccessGroup(long countryId, Long accessGroupId, CountryAccessGroupDTO accessGroupDTO) {
-        Country country = countryGraphRepository.findOne(countryId);
+
         AccessGroup accessGrpToUpdate = accessGroupRepository.findCountryAccessGroupByIdAndCategory(countryId, accessGroupId, accessGroupDTO.getOrganizationCategory().toString());
         if (!Optional.ofNullable(accessGrpToUpdate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupId);
@@ -562,7 +563,6 @@ public class AccessGroupService extends UserBaseService {
 
         accessGrpToUpdate.setName(accessGroupDTO.getName());
         accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
-        accessGrpToUpdate.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         accessGrpToUpdate.setRole(accessGroupDTO.getRole());
         accessGrpToUpdate.setEnabled(accessGroupDTO.isEnabled());
         save(accessGrpToUpdate);
@@ -587,9 +587,10 @@ public class AccessGroupService extends UserBaseService {
         return accessGroupRepository.findCountryAccessGroupByNameAndCategory(countryId, name, category.toString());
     }
 
-    public List<OrganizationCategoryDTO> getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId) {
+    public Map<String, Object> getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId) {
         List<OrganizationCategoryDTO> organizationCategoryDTOS = OrganizationCategory.getListOfOrganizationCategory();
         AccessGroupCountQueryResult accessGroupCountData = accessGroupRepository.getListOfOrgCategoryWithCountryAccessGroupCount(countryId);
+        List<AccountType> accountTypes = accountTypeGraphRepository.getAllAccountTypeByCountryId(countryId);
         organizationCategoryDTOS.forEach(orgCategoryDTO -> {
             switch (OrganizationCategory.valueOf(orgCategoryDTO.getValue())) {
                 case HUB: {
@@ -597,7 +598,7 @@ public class AccessGroupService extends UserBaseService {
                     break;
                 }
                 case ORGANIZATION: {
-                    orgCategoryDTO.setCount(accessGroupCountData.getOrganizationCount());
+                    orgCategoryDTO.setCount(accountTypes.size());
                     break;
                 }
                 case UNION: {
@@ -606,9 +607,23 @@ public class AccessGroupService extends UserBaseService {
                 }
             }
         });
-        return organizationCategoryDTOS;
+
+        Map<String, Object> response = new HashMap<>(2);
+        response.put("accountTypes", accountTypes);
+        response.put("category", organizationCategoryDTOS);
+        return response;
     }
 
+    /**
+     * @param accounttypeId
+     * @author vipul
+     * @Desc   This api is used to fetch all access group by account type id in country.
+     * @return
+     */
+    public List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId,Long accountTypeId){
+
+        return accessGroupRepository.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId);
+    }
     public List<AccessGroupQueryResult> getCountryAccessGroups(Long countryId, OrganizationCategory organizationCategory) {
 
         return accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, organizationCategory.toString());
