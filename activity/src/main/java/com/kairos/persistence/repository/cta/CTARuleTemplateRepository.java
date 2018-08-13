@@ -16,24 +16,11 @@ import java.util.List;
 @Repository
 public interface CTARuleTemplateRepository extends MongoBaseRepository<CTARuleTemplate,BigInteger>{
 
-    @Query("{}")
+    @Query(value = "{name:?1,countryId:?0}",exists = true)
     Boolean isCTARuleTemplateExistWithSameName(Long countryId, String name);
 
-    @Query("{}")
+    @Query("{countryId:?0}")
     List<CTARuleTemplateDTO> findByRuleTemplateCategoryIdInAndCountryAndDeletedFalse(Long countryId);
-
-
-    /*@Query("")
-    Boolean isDefaultCTARuleTemplateExists();
-
-    @Query("")
-    void detachAllTimeTypesFromCTARuleTemplate(Long ctaRuleTemplateId);
-
-    @Query("")
-    void detachAllEmploymentTypesFromCTARuleTemplate(Long ctaRuleTemplateId);
-
-    @Query("")
-    void addCTARuleTemplateInCountry(Long countryId, Long ctaRuleTemplateId);*/
 
 
 }

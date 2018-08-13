@@ -121,7 +121,7 @@ public class CostTimeAgreementController {
      * @param ctaId
      * @return
      */
-    @GetMapping(value = "/unit/{unitId}/cta/{ctaId}")
+    @GetMapping(value = "/unit/{unitId}/cta/{ctaId}/rule-templates")
     @ApiOperation("GET CTA RuleTemplate By ctaId")
     public ResponseEntity<Map<String, Object>> getCTARuleTemplateOfUnit(@PathVariable Long unitId,@PathVariable BigInteger ctaId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -163,7 +163,7 @@ public class CostTimeAgreementController {
      * @param ctaId
      * @return
      */
-    @GetMapping(value = "/country/{countryId}/cta/{ctaId}")
+    @GetMapping(value = "/country/{countryId}/cta/{ctaId}/rule-templates")
     @ApiOperation("GET CTA Ruletemplate By ctaId in Country")
     public ResponseEntity<Map<String, Object>> getCTARuleTemplateOfCountry(@PathVariable Long countryId,@PathVariable BigInteger ctaId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -220,8 +220,8 @@ public class CostTimeAgreementController {
      */
     @ApiOperation(value = "Get CTA by Organization sub type  by using sub type Id")
     @GetMapping(value = COUNTRY_URL + "/cta/organization_sub_type/{organizationSubTypeId}")
-    public ResponseEntity<Map<String, Object>> getAllCTAByOrganizationSubType(@PathVariable long organizationSubTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getAllCTAByOrganizationSubType(organizationSubTypeId));
+    public ResponseEntity<Map<String, Object>> getAllCTAByOrganizationSubType(@PathVariable Long countryId,@PathVariable long organizationSubTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getAllCTAByOrganizationSubType(countryId,organizationSubTypeId));
     }
 
     /**

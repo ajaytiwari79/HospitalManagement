@@ -1,19 +1,12 @@
 package com.kairos.persistence.repository.user.agreement.cta;
 
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.persistence.model.agreement.cta.CTAListQueryResult;
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseRepository<CostTimeAgreement,Long> {
-
+/*
     @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0}  WITH cta\n" +
             "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta,expertise\n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType\n" +
@@ -132,7 +125,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     CostTimeAgreement getCTAIdByCountryAndName(Long countryId, String ctaName);
 
 
-    /*@Query("MATCH (uep:UnitPosition)-[:HAS_CTA]-(cta:CostTimeAgreement{deleted:false}) WHERE id(uep)={0}  WITH cta \n" +
+    *//*@Query("MATCH (uep:UnitPosition)-[:HAS_CTA]-(cta:CostTimeAgreement{deleted:false}) WHERE id(uep)={0}  WITH cta \n" +
             "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta,expertise \n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType \n" +
             "optional match(cta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta,expertise,orgType,orgSubType \n" +
@@ -167,7 +160,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes,compensationTable,calculateValueAgainst,phaseInfo, plannedTimeWithFactor ,ruleTemplCat \n" +
             "RETURN id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, id(expertise) as expertise, id(orgType) as organizationType, id(orgSubType) as organizationSubType, cta.description as description,cta.name as name,CASE WHEN ruleTemp IS NULL THEN [] ELSE collect( {id:id(ruleTemp),ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType:ruleTemp.budgetType, planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo, activityTypeForCostCalculation:ruleTemp.activityTypeForCostCalculation,plannedTimeIds:ruleTemp.plannedTimeIds,timeTypeIds:ruleTemp.timeTypeIds, dayTypeIds:ruleTemp.dayTypeIds, activityIds:ruleTemp.activityIds\n" +
             ",plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType},calculateOnDayTypes:calculateOnDayTypes}) END as ruleTemplates ORDER BY id DESC")
-    CTAListQueryResult getCtaByUnitPositionId(Long unitEmploymentPositionId);*/
+    CTAListQueryResult getCtaByUnitPositionId(Long unitEmploymentPositionId);*//*
 
 
     @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:HAS_CTA]-(up:UnitPosition) WHERE id(up)={0} WITH cta\n" +
@@ -255,5 +248,5 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     @Query("MATCH(c:Country)-[:" + BELONGS_TO + "]-(cta:CostTimeAgreement{deleted:false})  where cta.name =~'.*{0}.*' with \n" +
             "toInt(last(split(cta.name,'-'))) as num " +
             "RETURN case when num is null  then 0 else MAX(num) end as result limit 1")
-    Integer getLastSuffixNumberOfCTAName(String name);
+    Integer getLastSuffixNumberOfCTAName(String name);*/
 }

@@ -144,8 +144,8 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     public List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("organization.id").is(unitId).and("expertise.Id").is(expertiseId)),
-                lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
-                project("name", "description", "disabled", "expertise", "organizationType", "organizationSubType", "countryId", "organization", "parentWTA", "countryParentWTA", "organizationParentWTA", "tags", "startDate", "endDate", "expiryDate", "ruleTemplates")
+                //lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
+                project("name", "description")
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();

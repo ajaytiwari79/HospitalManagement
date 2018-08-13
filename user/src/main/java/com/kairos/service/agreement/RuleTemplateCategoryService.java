@@ -31,7 +31,7 @@ import static com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryTyp
  */
 @Service
 public class RuleTemplateCategoryService extends UserBaseService {
-    @Inject
+    /*@Inject
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
     @Inject
     private CountryService countryService;
@@ -46,11 +46,11 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    /**
+    *//**
      * used to save a new Rule template in a country
      * Created by vipul on 2/8/17.
      * params countryId and rule template category via name and desc
-     */
+     *//*
     //TODO need to modified this method
     public RuleTemplateCategory createRuleTemplateCategory(long countryId, RuleTemplateCategory ruleTemplateCategory) {
 
@@ -98,12 +98,12 @@ public class RuleTemplateCategoryService extends UserBaseService {
             RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(countryId, "NONE", CTA);
             ruleTemplateCategoryGraphRepository.deleteRelationOfRuleTemplateCategoryAndCTA(templateCategoryId, ctaRuleTemplates);
             ruleTemplateCategoryGraphRepository.setAllCTAWithCategoryNone(noneRuleTemplateCategory.getId(), ctaRuleTemplates);
-        }/* else {
+        }*//* else {
             List<Long> wtaBaseRuleTemplateList = wtaBaseRuleTemplateGraphRepository.findAllWTABelongsByTemplateCategoryId(templateCategoryId);
             RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
             wtaBaseRuleTemplateGraphRepository.deleteRelationOfRuleTemplateCategoryAndWTA(templateCategoryId, wtaBaseRuleTemplateList);
             wtaBaseRuleTemplateGraphRepository.setAllWTAWithCategoryNone(noneRuleTemplateCategory.getId(), wtaBaseRuleTemplateList);
-        }*/
+        }*//*
         return true;
 
     }
@@ -209,6 +209,6 @@ public class RuleTemplateCategoryService extends UserBaseService {
         response.put("category", ruleTemplateCategory);
         return response;
 
-    }
+    }*/
 
 }

@@ -40,22 +40,7 @@ public class CostTimeAgreement extends MongoBaseEntity {
     public CostTimeAgreement() {
     }
 
-    public CostTimeAgreement(BigInteger id, String name, boolean disabled) {
-        this.id = id;
-        this.name = name;
-        this.disabled=disabled;
 
-    }
-
-    public CostTimeAgreement(BigInteger id, String name, Expertise expertise, List<BigInteger> ruleTemplateIds, Long startDateMillis, Long endDateMillis, boolean disabled) {
-        this.id=id;
-        this.name = name;
-        this.expertise = expertise;
-        this.ruleTemplateIds = ruleTemplateIds;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.disabled = disabled;
-    }
 
 
     public Organization getOrganization() {
@@ -76,6 +61,10 @@ public class CostTimeAgreement extends MongoBaseEntity {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
     }
 
     public void setDescription(String description) {
@@ -175,12 +164,6 @@ public class CostTimeAgreement extends MongoBaseEntity {
         return createdBy;
     }
 
-    public void setCreatedBy(Long createdBy) {
-        if(this.getId()!=null)
-            throw new UnsupportedOperationException("can't modified this property");
-        this.createdBy = createdBy;
-        this.createdBy = createdBy;
-    }
 
     public Long getLastModifiedBy() {
         return lastModifiedBy;

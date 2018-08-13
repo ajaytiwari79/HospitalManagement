@@ -19,17 +19,13 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
 
 
 
-    @Query("{countryId:?0,id:?1,deleted:false}")
+    @Query("{countryId:?0,_id:?1,deleted:false}")
     CostTimeAgreement findCTAByCountryAndIdAndDeleted(Long countryId, BigInteger ctaId, Boolean deleted);
 
     @Query("{countryId:?0,deleted:false}")
     List<CTAResponseDTO> findCTAByCountryId(Long countryId);
 
-    @Query("{organizationSubType.id:?0,id:?1,deleted:false}")
-    List<CTAResponseDTO> getAllCTAByOrganizationSubType(Long organizationSubTypeId);
 
-    @Query("{organization.id:?0,deleted:false}")
-    List<CTAResponseDTO> findCTAByUnitId(Long unitId);
 
   /*  @Query("")
     List<CostTimeAgreement> getAllCTAByOrganizationSubType(List<Long> organizationSubTypeIds, Boolean deleted);
@@ -52,14 +48,13 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
     @Query("")
     List<CostTimeAgreement> getListOfOrganizationCTAByParentCountryCTA(BigInteger countryCTAId);*/
 
-    @Query("{countryId:?0,name:?1,deleted:false}")
+    @Query(value = "{countryId:?0,name:?1,deleted:false}",exists = true)
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name);
 
-    @Query("{countryId:?0,name:?1,id:{$ne:?2},deleted:false}")
+    @Query("{countryId:?0,name:?1,_id:{$ne:?2},deleted:false}")
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name, BigInteger ctaId);
 
-    @Query("{organization.id:?0,name:?1,id:{$ne:?2},deleted:false}")
-    Boolean isCTAExistWithSameNameInUnit(Long unitId, String name, BigInteger ctaId);
+       
 
 
 
@@ -85,12 +80,10 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
     void linkUnitCTAToOrganization(BigInteger unitCtaId, Long organizationId);*/
 
 
-    @Query("{organization.id:?0,expertise.id:?1,deleted:false}")
-    CTAResponseDTO getDefaultCTA(Long unitId,Long expertiseId);
+
 
     @Query("{}")
     Integer getLastSuffixNumberOfCTAName(String name);
 
-    @Query("{}")
-    CTAResponseDTO getRuleTemplateOfCTA(BigInteger ctaId);
+
 }

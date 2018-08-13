@@ -1,63 +1,13 @@
 package com.kairos.service.agreement.cta;
 
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
-import com.kairos.enums.FixedValueType;
-import com.kairos.persistence.model.agreement.cta.*;
-import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateCategoryWrapper;
-import com.kairos.persistence.model.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
-import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.Currency;
-import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseTagDTO;
-import com.kairos.persistence.model.user.unit_position.UnitPosition;
-import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
-import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
-import com.kairos.persistence.repository.user.agreement.cta.CTARuleTemplateGraphRepository;
-import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
-import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.country.*;
-import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
-import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
-import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
-import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
-import com.kairos.service.auth.UserService;
-import com.kairos.service.country.CurrencyService;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.organization.OrganizationService;
-import com.kairos.service.unit_position.UnitPositionService;
-import com.kairos.util.userContext.UserContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static javax.management.timer.Timer.ONE_DAY;
 
 @Transactional
 @Service
 public class CostTimeAgreementService extends UserBaseService {
-    private final Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
+    /*private final Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
 
 
     private @Inject
@@ -308,18 +258,18 @@ public class CostTimeAgreementService extends UserBaseService {
 
         return ctaRuleTemplate;
     }
-
-    @Async
+*/
+  /*  @Async
     public CompletableFuture<Boolean> buildEmploymentTypeAndAccessGroups
             (CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO)
             throws InterruptedException, ExecutionException {
 
-        /*Callable<List<TimeType>> timeTypesTask = () -> {
+        *//*Callable<List<TimeType>> timeTypesTask = () -> {
             Iterable<TimeType> timeTypes = timeTypeGraphRepository.findAllById(ctaRuleTemplateDTO.getTimeTypes(), 0);
             return StreamSupport.stream(timeTypes.spliterator(), true).collect(Collectors.toList());
         };
 
-        Future<List<TimeType>> timeTypesFuture = asynchronousService.executeAsynchronously(timeTypesTask);*/
+        Future<List<TimeType>> timeTypesFuture = asynchronousService.executeAsynchronously(timeTypesTask);*//*
 
         Callable<List<EmploymentType>> employmentTypesTask = () -> {
             Iterable<EmploymentType> employmentTypes = employmentTypeGraphRepository.findAllById(ctaRuleTemplateDTO.getEmploymentTypes(), 0);
@@ -328,20 +278,21 @@ public class CostTimeAgreementService extends UserBaseService {
 
         Future<List<EmploymentType>> employmentTypesFuture = asynchronousService.executeAsynchronously(employmentTypesTask);
 
-        /*Callable<List<AccessGroup>> accessGroupsTask = () -> {
+        *//*Callable<List<AccessGroup>> accessGroupsTask = () -> {
             Iterable<AccessGroup> accessGroups = accessGroupRepository.findAllByIds(ctaRuleTemplateDTO.getCalculateValueIfPlanned(), 0);
             return StreamSupport.stream(accessGroups.spliterator(), true).collect(Collectors.toList());
 
         };
         Future<List<AccessGroup>> accessGroupsFuture = asynchronousService.executeAsynchronously(accessGroupsTask);
-        */
+        *//*
         //set data
 //        ctaRuleTemplate.setTimeTypes(timeTypesFuture.get());
         ctaRuleTemplate.setEmploymentTypes(employmentTypesFuture.get());
 //        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupsFuture.get());
         return CompletableFuture.completedFuture(true);
     }
-
+*/
+/*
 
     public void saveInterval() {
         CompensationTableInterval tableInterval = new CompensationTableInterval();
@@ -426,7 +377,9 @@ public class CostTimeAgreementService extends UserBaseService {
         this.save(newCostTimeAgreement);
         return newCostTimeAgreement;
     }
+*/
 
+/*
 
     public List<CTAListQueryResult> loadAllCTAByCountry(Long countryId) {
 //        Country country = countryGraphRepository.findOne(countryId);
@@ -450,9 +403,11 @@ public class CostTimeAgreementService extends UserBaseService {
 
         // Fetch Time Type
 
-        /*List<Long> timeTypeIds = ctaRuleTemplateDTO.getTimeTypes();
+        */
+/*List<Long> timeTypeIds = ctaRuleTemplateDTO.getTimeTypes();
         ctaRuleTemplate.setTimeTypes(timeTypeGraphRepository.findTimeTypeByIds(timeTypeIds));
-*/
+*//*
+
         Long ruleTemplateId = ctaRuleTemplateDTO.getRuleTemplateCategory();
         if (ruleTemplateId != null) {
             ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategoryGraphRepository.findOne(ruleTemplateId));
@@ -559,6 +514,7 @@ public class CostTimeAgreementService extends UserBaseService {
         return ctaRuleTemplateDTO;
     }
 
+*/
 
 // TODO REMOVE NOT in USE
 
@@ -595,6 +551,7 @@ public class CostTimeAgreementService extends UserBaseService {
 //        return true;
 //    }
 
+    /*
     public List<ExpertiseTagDTO> getExpertiseForOrgCTA(long unitId) {
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
@@ -769,5 +726,5 @@ public class CostTimeAgreementService extends UserBaseService {
         costTimeAgreement.setEndDateMillis(collectiveTimeAgreementDTO.getEndDateMillis());
 
         return true;
-    }
+    }*/
 }

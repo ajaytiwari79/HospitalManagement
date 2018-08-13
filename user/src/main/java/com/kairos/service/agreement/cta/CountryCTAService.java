@@ -1,51 +1,13 @@
 package com.kairos.service.agreement.cta;
 
-import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
-import com.kairos.persistence.model.agreement.cta.*;
-import com.kairos.persistence.model.agreement.cta.cta_response.CTADetailsWrapper;
-import com.kairos.persistence.model.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
-import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
-import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
-import com.kairos.persistence.repository.user.agreement.cta.CTARuleTemplateGraphRepository;
-import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
-import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.country.*;
-import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
-import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
-import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
-import com.kairos.service.auth.UserService;
-import com.kairos.service.country.CurrencyService;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.organization.OrganizationService;
-import com.kairos.service.unit_position.UnitPositionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class CountryCTAService extends UserBaseService {
-    private Logger logger = LoggerFactory.getLogger(CountryCTAService.class);
+    /*private Logger logger = LoggerFactory.getLogger(CountryCTAService.class);
     private @Inject
     UserService userService;
     private @Inject
@@ -113,10 +75,10 @@ public class CountryCTAService extends UserBaseService {
         publishNewCountryCTAToOrganizationByOrgSubType(countryId, costTimeAgreement, collectiveTimeAgreementDTO, costTimeAgreement.getOrganizationSubType().getId(), ctaDetailsWrapper);
 
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
-        /*BeanUtils.copyProperties(costTimeAgreement, collectiveTimeAgreementDTO);
+        *//*BeanUtils.copyProperties(costTimeAgreement, collectiveTimeAgreementDTO);
         for(CTARuleTemplateDTO templateDTO : collectiveTimeAgreementDTO.getRuleTemplateIds()){
             templateDTO.setRuleTemplateCategory();
-        }*/
+        }*//*
         return collectiveTimeAgreementDTO;
     }
 
@@ -325,6 +287,6 @@ public class CountryCTAService extends UserBaseService {
         }
 
         return ctaRuleTemplate;
-    }
+    }*/
 
 }

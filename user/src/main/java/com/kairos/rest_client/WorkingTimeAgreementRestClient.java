@@ -42,7 +42,7 @@ public class WorkingTimeAgreementRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/expertise/{expertiseId}/wta",
+                            baseUrl + "/expertise/{expertiseId}/cta_wta",
                             HttpMethod.GET, null, typeReference, expertiseId);
 
             RestTemplateResponseEnvelope<List<WTAResponseDTO>> response = restExchange.getBody();

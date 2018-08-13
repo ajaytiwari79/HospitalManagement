@@ -2,6 +2,8 @@ package com.kairos.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.user.organization.OrganizationTypeDTO;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -20,14 +22,13 @@ public class CollectiveTimeAgreementDTO {
     private String name;
     private String description;
     @NotNull(message = "error.cta.expertise.notNull")
-    private Long expertise;
-    private Long organizationType;
-    private Long organizationSubType;
+    private ExpertiseResponseDTO expertise;
+    private OrganizationTypeDTO organizationType;
+    private OrganizationTypeDTO organizationSubType;
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
     @NotNull(message = "error.cta.startDate.notNull")
     private Long startDateMillis;
     private Long endDateMillis;
-    private boolean disabled;
 
     public CollectiveTimeAgreementDTO() {
 
@@ -57,27 +58,27 @@ public class CollectiveTimeAgreementDTO {
         this.description = description;
     }
 
-    public Long getExpertise() {
+    public ExpertiseResponseDTO getExpertise() {
         return expertise;
     }
 
-    public void setExpertise(Long expertise) {
+    public void setExpertise(ExpertiseResponseDTO expertise) {
         this.expertise = expertise;
     }
 
-    public Long getOrganizationType() {
+    public OrganizationTypeDTO getOrganizationType() {
         return organizationType;
     }
 
-    public void setOrganizationType(Long organizationType) {
+    public void setOrganizationType(OrganizationTypeDTO organizationType) {
         this.organizationType = organizationType;
     }
 
-    public Long getOrganizationSubType() {
+    public OrganizationTypeDTO getOrganizationSubType() {
         return organizationSubType;
     }
 
-    public void setOrganizationSubType(Long organizationSubType) {
+    public void setOrganizationSubType(OrganizationTypeDTO organizationSubType) {
         this.organizationSubType = organizationSubType;
     }
 
@@ -105,23 +106,6 @@ public class CollectiveTimeAgreementDTO {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    public CollectiveTimeAgreementDTO(String name, String description, Long expertiseId, Long organizationTypeId, Long organizationSubTypeId, Long startDateMillis, List<CTARuleTemplateDTO> ruleTemplates) {
-        this.setName(name);
-        this.setDescription(description);
-        this.setExpertise(expertiseId);
-        this.setOrganizationType(organizationTypeId);
-        this.setOrganizationSubType(organizationSubTypeId);
-        this.setRuleTemplates(ruleTemplates);
-        this.setStartDateMillis(startDateMillis);
-    }
 
     @Override
     public String toString() {
@@ -132,7 +116,6 @@ public class CollectiveTimeAgreementDTO {
                 ", organizationType=" + organizationType +
                 ", organizationSubType=" + organizationSubType +
                 ", ruleTemplates=" + ruleTemplates +
-                ", disabled=" + disabled +
                 '}';
     }
 }

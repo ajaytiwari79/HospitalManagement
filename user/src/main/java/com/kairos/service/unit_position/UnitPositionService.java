@@ -1,22 +1,14 @@
 package com.kairos.service.unit_position;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.time_bank.CTAIntervalDTO;
-import com.kairos.activity.time_bank.CTARuleTemplateDTO;
+import com.kairos.activity.cta.CTAWTAWrapper;
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.persistence.model.agreement.cta.CTAListQueryResult;
-import com.kairos.persistence.model.agreement.cta.CTARuleTemplateQueryResult;
-import com.kairos.persistence.model.agreement.cta.CompensationTableInterval;
-import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ClientMinimumDTO;
-import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
@@ -36,7 +28,6 @@ import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.unit_position.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
@@ -85,16 +76,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.text.ParseException;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
 import static com.kairos.constants.ApiConstants.GET_DEFAULT_CTA;
 import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.util.DateUtils.ONLY_DATE;
@@ -724,11 +714,7 @@ public class UnitPositionService extends UserBaseService {
     }
 
     public PositionCtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId) {
-        PositionCtaWtaQueryResult positionCtaWtaQueryResult = new PositionCtaWtaQueryResult();
-        positionCtaWtaQueryResult.setCta(unitPositionGraphRepository.getCtaByExpertise(unitId, expertiseId));
-        List<WTAResponseDTO> wtaResponseDTOS = workingTimeAgreementRestClient.getWTAByExpertise(expertiseId);
-        positionCtaWtaQueryResult.setWta(wtaResponseDTOS);
-
+        PositionCtaWtaQueryResult positionCtaWtaQueryResult = genericRestClient.publishRequest(null,unitId,true,IntegrationOperation.GET,GET_CTA_WTA_BY_EXPERTISE,null,PositionCtaWtaQueryResult.class);
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
         SeniorityLevel appliedSeniorityLevel = getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
         positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
@@ -869,7 +855,7 @@ public class UnitPositionService extends UserBaseService {
     }*/
 
 
-    public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionWithCTA(Long unitPositionId, Organization organization, Long countryId) {
+    public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionDetails(Long unitPositionId, Organization organization, Long countryId) {
 
         StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         //CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
@@ -885,6 +871,7 @@ public class UnitPositionService extends UserBaseService {
         unitPositionDetails.setStartDateMillis(unitPosition.getStartDateMillis());
         unitPositionDetails.setWorkingTimeAgreementId(unitPosition.getWorkingTimeAgreementId());
         unitPositionDetails.setUnitPositionStartDate(DateUtils.asLocalDate(new Date(unitPosition.getStartDateMillis())));
+        unitPositionDetails.setCostTimeAgreementId(unitPosition.getCostTimeAgreementId());
         if (unitPosition.getEndDateMillis() != null) {
             unitPositionDetails.setUnitPositionEndDate(DateUtils.asLocalDate(new Date(unitPosition.getEndDateMillis())));
             unitPositionDetails.setEndDateMillis(unitPosition.getEndDateMillis());
@@ -900,7 +887,7 @@ public class UnitPositionService extends UserBaseService {
         return unitPositionDetails;
     }
 
-    public List<CTARuleTemplateDTO> getCtaRuleTemplates(CTAListQueryResult ctaListQueryResult) {
+    /*public List<CTARuleTemplateDTO> getCtaRuleTemplates(CTAListQueryResult ctaListQueryResult) {
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ctaListQueryResult.getRuleTemplates().size());
         List<CTARuleTemplateQueryResult> ruleTemplateQueryResults = getObjects(ctaListQueryResult.getRuleTemplates(), new TypeReference<List<CTARuleTemplateQueryResult>>() {
         });
@@ -933,9 +920,9 @@ public class UnitPositionService extends UserBaseService {
             ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
         });
         return ctaRuleTemplateDTOS;
-    }
+    }*/
 
-    private List<CTAIntervalDTO> getCtaInterval(List<CompensationTableInterval> compensationTableIntervals) {
+    /*private List<CTAIntervalDTO> getCtaInterval(List<CompensationTableInterval> compensationTableIntervals) {
         List<CTAIntervalDTO> ctaIntervalDTOS = new ArrayList<>(compensationTableIntervals.size());
         compensationTableIntervals = getObjects(compensationTableIntervals, new TypeReference<List<CompensationTableInterval>>() {
         });
@@ -958,7 +945,7 @@ public class UnitPositionService extends UserBaseService {
         }
         return null;
     }
-
+*/
     public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, BigInteger wtaId, BigInteger ctaId, Long unitId) {
         Long startDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getStartDate());
         Long endDateMillis = null;
@@ -1039,10 +1026,6 @@ public class UnitPositionService extends UserBaseService {
     }
 
 
-    // For Test Cases
-    public UnitPosition getDefaultUnitPositionByOrg(Long orgId) {
-        return unitPositionGraphRepository.getDefaultUnitPositionByOrg(orgId);
-    }
 
     public SeniorityLevel getSeniorityLevelByStaffAndExpertise(Long staffId, Expertise currentExpertise) {
 

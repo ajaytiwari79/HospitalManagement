@@ -28,7 +28,7 @@ import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 @RequestMapping(API_ORGANIZATION_URL)
 @RestController
 public class RuleTemplateCategoryController {
-    @Inject
+    /*@Inject
     private RuleTemplateCategoryService ruleTemplateCategoryService;
     @Inject
     private CountryService countryService;
@@ -61,7 +61,7 @@ public class RuleTemplateCategoryController {
     @RequestMapping(value = COUNTRY_URL+"/rule_templates/category", method = RequestMethod.POST)
     ResponseEntity<Map<String,Object>> updateRuleTemplateCategory(@Valid @RequestBody RuleTemplateCategoryCTADTO ruleTemplateCategory, @PathVariable long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.createRuleTemplateCategory(countryId,ruleTemplateCategory));
-    }
+    }*/
 
 
 

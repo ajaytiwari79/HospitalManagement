@@ -6,7 +6,7 @@ import java.util.List;
 public class CompensationTable {
     private int granularityLevel;
 //    private CompensationMeasurementType compensationMeasurementType;
-    private List<CompensationTableInterval>compensationTableInterval=new ArrayList<>();
+    private List<CompensationTableInterval> compensationTableInterval=new ArrayList<>();
 
     public CompensationTable() {
         //default

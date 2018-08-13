@@ -53,7 +53,7 @@ public class CostTimeAgreementRuleTemplateController {
     @RequestMapping(value = "/country/{countryId}/cta/rule-template/{id}", method = RequestMethod.PUT)
     @ApiOperation("get CTA rule template")
     public ResponseEntity<Map<String, Object>> updateCTARuleTemplate(@PathVariable Long countryId
-            , @RequestBody @Valid CTARuleTemplateDTO ctaRuleTemplateDTO, @PathVariable BigInteger id ) throws ExecutionException, InterruptedException {
+            , @RequestBody @Valid CTARuleTemplateDTO ctaRuleTemplateDTO, @PathVariable BigInteger id ) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.updateCTARuleTemplate(countryId,id,ctaRuleTemplateDTO));
     }
 

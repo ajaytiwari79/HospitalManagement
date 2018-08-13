@@ -2,6 +2,7 @@ package com.kairos.rest_client;
 
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.util.ObjectMapperUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
@@ -72,16 +73,15 @@ public class GenericRestClient {
     }
 
 
-    public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, Class responseType, Object... pathParams) {
-        final String baseUrl = getURIWithParam(getBaseUrl(isUnit,id),queryParam);
+    public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+        final String baseUrl = getBaseUrl(isUnit,id)+uri;
 
         try {
-
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl,
+                            baseUrl+getURIWithParam(queryParam),
                             getHttpMethod(integrationOperation),
-                            new HttpEntity<>(t), responseType,pathParams);
+                            new HttpEntity<>(t), typeReference,pathParams);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 exceptionService.internalError(response.getMessage());
@@ -96,13 +96,13 @@ public class GenericRestClient {
     }
 
 
-    public String getURIWithParam(String uri,List<NameValuePair> queryParam){
+    public String getURIWithParam(List<NameValuePair> queryParam){
         try {
-        URIBuilder builder = new URIBuilder(uri);
+        URIBuilder builder = new URIBuilder();
             if(!queryParam.isEmpty()) {
                 builder.setParameters(queryParam);
             }
-            return uri+builder.build().toString();
+            return builder.build().toString();
         } catch (URISyntaxException e) {
             exceptionService.internalError(e.getMessage());
         }

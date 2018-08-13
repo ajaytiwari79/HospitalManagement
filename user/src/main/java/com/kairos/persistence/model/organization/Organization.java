@@ -1,46 +1,45 @@
     package com.kairos.persistence.model.organization;
 
     import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-    import com.fasterxml.jackson.annotation.JsonInclude;
-    import com.google.common.base.Optional;
-    import com.google.common.collect.Lists;
-    import com.kairos.enums.OrganizationLevel;
-    import com.kairos.enums.time_slot.TimeSlotMode;
-    import com.kairos.persistence.model.access_permission.AccessGroup;
-    import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
-    import com.kairos.persistence.model.client.ContactAddress;
-    import com.kairos.persistence.model.client.ContactDetail;
-    import com.kairos.persistence.model.common.UserBaseEntity;
-    import com.kairos.persistence.model.country.*;
-    import com.kairos.persistence.model.country.common.BusinessType;
-    import com.kairos.persistence.model.country.common.CompanyCategory;
-    import com.kairos.persistence.model.country.common.ContractType;
-    import com.kairos.persistence.model.country.tag.Tag;
-    import com.kairos.persistence.model.organization.group.Group;
-    import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
-    import com.kairos.persistence.model.staff.employment.Employment;
-    import com.kairos.persistence.model.user.department.Department;
-    import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
-    import com.kairos.persistence.model.user.position_code.PositionCode;
-    import com.kairos.persistence.model.user.region.LocalAreaTag;
-    import com.kairos.persistence.model.user.region.ZipCode;
-    import com.kairos.persistence.model.user.resources.Resource;
-    import com.kairos.user.organization.CompanyType;
-    import com.kairos.user.organization.CompanyUnitType;
-    import com.kairos.util.ZoneIdStringConverter;
-    import org.neo4j.ogm.annotation.NodeEntity;
-    import org.neo4j.ogm.annotation.Property;
-    import org.neo4j.ogm.annotation.Relationship;
-    import org.neo4j.ogm.annotation.typeconversion.Convert;
-    import org.neo4j.ogm.annotation.typeconversion.DateString;
-    import org.neo4j.ogm.annotation.typeconversion.EnumString;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.kairos.enums.OrganizationLevel;
+import com.kairos.enums.time_slot.TimeSlotMode;
+import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.*;
+import com.kairos.persistence.model.country.common.BusinessType;
+import com.kairos.persistence.model.country.common.CompanyCategory;
+import com.kairos.persistence.model.country.common.ContractType;
+import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
+import com.kairos.persistence.model.staff.employment.Employment;
+import com.kairos.persistence.model.user.department.Department;
+import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
+import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.persistence.model.user.region.LocalAreaTag;
+import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.model.user.resources.Resource;
+import com.kairos.user.organization.CompanyType;
+import com.kairos.user.organization.CompanyUnitType;
+import com.kairos.util.ZoneIdStringConverter;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Property;
+import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
+import org.neo4j.ogm.annotation.typeconversion.DateString;
+import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
-    import javax.validation.constraints.NotNull;
-    import java.time.ZoneId;
-    import java.util.*;
+import javax.validation.constraints.NotNull;
+import java.time.ZoneId;
+import java.util.*;
 
-    import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
-    import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -178,8 +177,6 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = HAS_WTA)
     private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();*/
 
-    @Relationship(type = HAS_CTA)
-    private List<CostTimeAgreement> costTimeAgreements = new ArrayList<>();
 
     @Relationship(type = HAS_TIME_SLOT_SET)
     private List<TimeSlotSet> timeSlotSets = new ArrayList<>();
@@ -723,14 +720,6 @@ public class Organization extends UserBaseEntity {
         this.workingTimeAgreements = workingTimeAgreements;
     }*/
 
-
-    public List<CostTimeAgreement> getCostTimeAgreements() {
-        return costTimeAgreements;
-    }
-
-    public void setCostTimeAgreements(List<CostTimeAgreement> costTimeAgreements) {
-        this.costTimeAgreements = costTimeAgreements;
-    }
 /*
     public void addWorkingTimeAgreements(WorkingTimeAgreement workingTimeAgreement) {
         if (workingTimeAgreement == null)

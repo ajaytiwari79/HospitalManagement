@@ -307,13 +307,13 @@ public class OrganizationService extends UserBaseService {
             logger.info("Parent Organization: " + o.getName());
         } else {
             organization = save(organization);
-            if (!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)){
+            if (!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)) {
                 int count = organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
             }
         }
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
-        if(!baseOrganization){
+        if (!baseOrganization) {
             accessGroupService.createDefaultAccessGroups(organization);
             organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         }
@@ -385,7 +385,7 @@ public class OrganizationService extends UserBaseService {
         //linkWTAToOrganization(allWtaCopy, allWta);
         organization.setTimeZone(ZoneId.of(TIMEZONE_UTC));
 
-        organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
+//        organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
 //        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
         vrpClientService.createPreferedTimeWindow(organization.getId());
@@ -499,7 +499,7 @@ public class OrganizationService extends UserBaseService {
         organization.setOrganizationSetting(organizationSetting);
 
 
-        organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
+//        organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
 //        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
         vrpClientService.createPreferedTimeWindow(organization.getId());
@@ -1290,7 +1290,7 @@ public class OrganizationService extends UserBaseService {
                         logger.info("Sending Parent ID: " + workPlace.getParentWorkPlaceID());
                         Organization parentOrganization = getOrganizationByExternalId(workPlace.getParentWorkPlaceID().toString());
                         logger.info("parentOrganization  ID: " + parentOrganization.getId());
-                        createOrganization(organization, parentOrganization.getId(),false);
+                        createOrganization(organization, parentOrganization.getId(), false);
                     }
                 }
             }
@@ -1866,7 +1866,7 @@ public class OrganizationService extends UserBaseService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(parentOrganizationAndCountryData, UnitAndParentOrganizationAndCountryDTO.class);
     }
 
-    public CTABasicDetailsDTO getCTABasicDetailInfo(Long expertiseId,Long organizationSubTypeId,Long countryId){
+    public CTABasicDetailsDTO getCTABasicDetailInfo(Long expertiseId, Long organizationSubTypeId, Long countryId) {
         CTABasicDetailsDTO ctaBasicDetailsDTO = new CTABasicDetailsDTO();
         if (Optional.ofNullable(expertiseId).isPresent()) {
             Expertise expertise = expertiseGraphRepository.findOne(expertiseId, 0);
@@ -1890,29 +1890,24 @@ public class OrganizationService extends UserBaseService {
             BeanUtils.copyProperties(organizationType, organizationTypeDTO);
             ctaBasicDetailsDTO.setOrganizationType(organizationTypeDTO);
         }
-
-        if (Optional.ofNullable(organizationSubTypeId).isPresent()) {
-            OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
-            List<Organization> organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
-            if (Optional.ofNullable(organizationSubType).isPresent()) {
-                OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
-                BeanUtils.copyProperties(organizationSubType, organizationSubTypeDTO);
-                ctaBasicDetailsDTO.setOrganizationSubType(organizationSubTypeDTO);
-            }
-            if (Optional.ofNullable(organizations).isPresent()) {
-                List<OrganizationBasicDTO> organizationBasicDTOS = new ArrayList<>();
-                organizations.forEach(organization -> {
-                    OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
-                    ObjectMapperUtils.copyProperties(organization, organizationBasicDTO);
-                    organizationBasicDTOS.add(organizationBasicDTO);
-                });
-                ctaBasicDetailsDTO.setOrganizations(organizationBasicDTOS);
-            }
+        OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
+        List<Organization> organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+        if (Optional.ofNullable(organizationSubType).isPresent()) {
+            OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
+            BeanUtils.copyProperties(organizationSubType, organizationSubTypeDTO);
+            ctaBasicDetailsDTO.setOrganizationSubType(organizationSubTypeDTO);
+        }
+        if (Optional.ofNullable(organizations).isPresent()) {
+            List<OrganizationBasicDTO> organizationBasicDTOS = new ArrayList<>();
+            organizations.forEach(organization -> {
+                OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
+                ObjectMapperUtils.copyProperties(organization, organizationBasicDTO);
+                organizationBasicDTOS.add(organizationBasicDTO);
+            });
+            ctaBasicDetailsDTO.setOrganizations(organizationBasicDTOS);
         }
         return ctaBasicDetailsDTO;
     }
-
-
 
 
 }

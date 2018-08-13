@@ -915,13 +915,13 @@ public class BootDataService {
         currencyGraphRepository.save(currency);
     }
 
-    private void createCTARuleTemplateCategory() {
+    /*private void createCTARuleTemplateCategory() {
         RuleTemplateCategory category = ruleTemplateCategoryGraphRepository.findByName(denmark.getId(), "NONE", RuleTemplateCategoryType.CTA);
         if (!Optional.ofNullable(category).isPresent()) {
             category = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.CTA);
             category.setCountry(denmark);
-            ruleTemplateCategoryService.createDefaultRuleTemplateCategory( category);
-        }
+//            ruleTemplateCategoryService.createDefaultRuleTemplateCategory( category);
+        }*/
 
         // No need to create default CTA Rule templates
         /*if (costTimeAgreementService.isDefaultCTARuleTemplateExists()) {
@@ -929,9 +929,9 @@ public class BootDataService {
         } else {
             logger.info("creating CTA rule template");
             costTimeAgreementService.createDefaultCtaRuleTemplate(country.getId());
-        }*/
+        }
 
-    }
+    }*/
 
     private void createEquipmentCategories() {
         if (!equipmentCategoryGraphRepository.ifEquipmentCategoryExists()) {

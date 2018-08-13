@@ -2,17 +2,16 @@ package com.kairos.persistence.model.country;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.services.OrganizationService;
-import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.model.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.equipment.Equipment;
 import com.kairos.persistence.model.country.feature.Feature;
+import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -62,12 +61,6 @@ public class Country extends UserBaseEntity {
     @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY, direction = UNDIRECTED)
     private List<RuleTemplateCategory> ruleTemplateCategories = new ArrayList<>();
 
-    @Relationship(type = HAS_RULE_TEMPLATE)
-    private List<RuleTemplate> WTABaseRuleTemplate;
-
-    @Relationship(type = HAS_CTA_RULE_TEMPLATE)
-    private List<RuleTemplate> ctaRuleTemplates;
-
 
     @Relationship(type = COUNTRY_HAS_TAG)
     private List<Tag> tags;
@@ -109,21 +102,6 @@ public class Country extends UserBaseEntity {
         this.name = name;
     }
 
-    public List<RuleTemplate> getWTABaseRuleTemplate() {
-        return WTABaseRuleTemplate;
-    }
-
-    public void setWTABaseRuleTemplate(List<RuleTemplate> WTABaseRuleTemplate) {
-        this.WTABaseRuleTemplate = WTABaseRuleTemplate;
-    }
-
-    public List<RuleTemplate> getCtaRuleTemplates() {
-        return ctaRuleTemplates;
-    }
-
-    public void setCtaRuleTemplates(List<RuleTemplate> ctaRuleTemplates) {
-        this.ctaRuleTemplates = ctaRuleTemplates;
-    }
 
     public String getGoogleCalendarCode() {
         return googleCalendarCode;

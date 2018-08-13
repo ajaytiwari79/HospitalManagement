@@ -3,7 +3,7 @@ package com.kairos.persistence.model.user.unit_position;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.time_bank.CTARuleTemplateDTO;
+import com.kairos.activity.cta.CTARuleTemplateDTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
@@ -42,6 +42,7 @@ public class StaffUnitPositionDetails {
     private int fullTimeWeeklyMinutes;
     private PositionCode positionCode;
     private BigInteger workingTimeAgreementId;
+    private BigInteger costTimeAgreementId;
     private WTAResponseDTO workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
@@ -88,6 +89,15 @@ public class StaffUnitPositionDetails {
     private List<AppliedFunctionDTO> appliedFunctions;
 
     public StaffUnitPositionDetails() {
+    }
+
+
+    public BigInteger getCostTimeAgreementId() {
+        return costTimeAgreementId;
+    }
+
+    public void setCostTimeAgreementId(BigInteger costTimeAgreementId) {
+        this.costTimeAgreementId = costTimeAgreementId;
     }
 
     public Staff getStaff() {

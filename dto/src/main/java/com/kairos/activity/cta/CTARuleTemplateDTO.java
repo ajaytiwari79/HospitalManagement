@@ -1,6 +1,7 @@
 package com.kairos.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.user.country.agreement.cta.CalculationFor;
@@ -9,6 +10,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -53,10 +56,30 @@ public class CTARuleTemplateDTO {
     private Set<BigInteger> plannedTimeIds;
 
     private List<Long> dayTypeIds;
+    private List<DayOfWeek> days;
+    private List<LocalDate> publicHolidays;
+    private BigInteger ruleTemplateCategoryId;
 
     public CTARuleTemplateDTO() {
     }
 
+
+
+    public List<LocalDate> getPublicHolidays() {
+        return publicHolidays;
+    }
+
+    public void setPublicHolidays(List<LocalDate> publicHolidays) {
+        this.publicHolidays = publicHolidays;
+    }
+
+    public List<DayOfWeek> getDays() {
+        return days;
+    }
+
+    public void setDays(List<DayOfWeek> days) {
+        this.days = days;
+    }
 
     public boolean isCalculateScheduledHours() {
         return calculateScheduledHours;
@@ -64,6 +87,14 @@ public class CTARuleTemplateDTO {
 
     public void setCalculateScheduledHours(boolean calculateScheduledHours) {
         this.calculateScheduledHours = calculateScheduledHours;
+    }
+
+    public BigInteger getRuleTemplateCategoryId() {
+        return ruleTemplateCategoryId;
+    }
+
+    public void setRuleTemplateCategoryId(BigInteger ruleTemplateCategoryId) {
+        this.ruleTemplateCategoryId = ruleTemplateCategoryId;
     }
 
     public BigInteger getId() {

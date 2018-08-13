@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.activity.shift.*;
 import com.kairos.activity.staffing_level.StaffingLevelActivity;
@@ -7,6 +8,7 @@ import com.kairos.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
+import com.kairos.enums.Day;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.enums.shift.ShiftStatus;
@@ -27,6 +29,7 @@ import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
@@ -159,6 +162,7 @@ public class ShiftService extends MongoBaseService {
     private ActivityConfigurationRepository activityConfigurationRepository;
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
 
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
@@ -168,6 +172,8 @@ public class ShiftService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivityId());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(staffAdditionalInfoDTO.getUnitPosition().getCostTimeAgreementId());
+        staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
         }
@@ -227,6 +233,7 @@ public class ShiftService extends MongoBaseService {
         save(mainShift);
         ShiftQueryResult shiftQueryResult = mainShift.getShiftQueryResult();
         shiftQueryResult.setSubShifts(shiftQueryResults);
+        setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
         timeBankService.saveTimeBank(staffAdditionalInfoDTO, mainShift);
         payOutService.savePayOut(staffAdditionalInfoDTO, mainShift,activity);
 
@@ -283,6 +290,17 @@ public class ShiftService extends MongoBaseService {
         return plannedTimeId;
     }
 
+
+    private void setDayTypeTOCTARuleTemplate(StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+        Map<Long,List<Day>> daytypesMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k->k.getId(), v->v.getValidDays()));
+        staffAdditionalInfoDTO.getUnitPosition().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
+            Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+            for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
+                dayOfWeeks.addAll(daytypesMap.get(dayTypeId).stream().map(day -> DayOfWeek.valueOf(day.name())).collect(Collectors.toSet()));
+            }
+            ctaRuleTemplateDTO.setDays(new ArrayList<>(dayOfWeeks));
+        });
+    }
     private BigInteger getApplicablePlannedType(StaffUnitPositionDetails staffUnitPositionDetails, BigInteger plannedTypeId) {
         if (Optional.ofNullable(staffUnitPositionDetails.getIncludedPlannedTime()).isPresent()) {
             plannedTypeId = plannedTypeId.equals(staffUnitPositionDetails.getExcludedPlannedTime()) ? staffUnitPositionDetails.getIncludedPlannedTime() : plannedTypeId;
@@ -424,6 +442,7 @@ public class ShiftService extends MongoBaseService {
                 timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
             }
             shifts.add(shift);
+            setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
             boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
             if (timeType.equals(TimeTypes.WORKING_TYPE.toString())) {
@@ -449,7 +468,8 @@ public class ShiftService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.shift.state.update", shift.getStatus());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
-        WTAQueryResultDTO wtaResponseDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(staffAdditionalInfoDTO.getUnitPosition().getCostTimeAgreementId());
+        staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
         }
@@ -473,6 +493,7 @@ public class ShiftService extends MongoBaseService {
         shift.setPlannedTimeId(shiftWithActivityDTO.getPlannedTypeId());
         timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
         save(shift);
+        setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
         timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
         payOutService.updatePayOut(staffAdditionalInfoDTO, shift,activity);
         Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
@@ -540,6 +561,8 @@ public class ShiftService extends MongoBaseService {
         }
         Activity activity = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(staffAdditionalInfoDTO.getUnitPosition().getCostTimeAgreementId());
+        staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         validateStaffingLevel(shift, activity, false, staffAdditionalInfoDTO);
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
         Specification<BigInteger> shiftAllowedToDelete = new ShiftAllowedToDelete(activity.getRulesActivityTab().getEligibleForSchedules(), staffAdditionalInfoDTO.getUserAccessRoleDTO());
@@ -554,6 +577,7 @@ public class ShiftService extends MongoBaseService {
         }
         shift.setDeleted(true);
         save(shift);
+        setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
         timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
         payOutService.deletePayOut(shift.getId());
 
@@ -727,10 +751,11 @@ public class ShiftService extends MongoBaseService {
         }
 
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
-        WTAQueryResultDTO wtaResponseDTO = wtaMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
         if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getStaffId());
         }
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(staffAdditionalInfoDTO.getUnitPosition().getCostTimeAgreementId());
+        staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivityId());
         Activity activity = activityWrapper.getActivity();
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -763,6 +788,7 @@ public class ShiftService extends MongoBaseService {
             save(shift);
             shiftQueryResult = geSubShiftResponse(shift, shifts);
         }
+        setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
         timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
         payOutService.savePayOut(staffAdditionalInfoDTO, shift,activity);
         shiftQueryResult.setTimeType(activityWrapper.getTimeType());
@@ -772,7 +798,7 @@ public class ShiftService extends MongoBaseService {
     /**
      * This method is used to check the timings overlap of sub shifts
      */
-    protected void validateTimingOfShifts(ShiftDTO shiftDTO, Activity activity) {
+    private void validateTimingOfShifts(ShiftDTO shiftDTO, Activity activity) {
         Date parentShiftStartDateTime = shiftDTO.getStartDate();
         Date parentShiftEndDateTime = shiftDTO.getEndDate();
         Map<BigInteger, CompositeActivity> compositeActivityMap = activity.getCompositeActivities().stream().collect(Collectors.toMap(CompositeActivity::getActivityId, Function.identity()));
