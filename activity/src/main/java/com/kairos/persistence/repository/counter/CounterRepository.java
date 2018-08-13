@@ -155,10 +155,10 @@ public class CounterRepository {
         return results.getMappedResults();
     }
 
-    public CategoryAssignment getCategoryAssignment(BigInteger categoryId, ConfLevel level, Long refId){
+    public List<CategoryAssignment> getCategoryAssignment(BigInteger categoryId, ConfLevel level, Long refId){
         String queryField = (ConfLevel.COUNTRY.equals(level))? "countryId":"unitId";
         Query query = new Query(Criteria.where(queryField).is(refId).and("categoryId").is(categoryId));
-        return mongoTemplate.findOne(query, CategoryAssignment.class);
+        return mongoTemplate.find(query, CategoryAssignment.class);
     }
 
     public List<CategoryAssignment> findCategoryAssignment(List<BigInteger> kpiIds, ConfLevel level, Long refId){
@@ -181,8 +181,8 @@ public class CounterRepository {
 
     //CategoryKPI distribution
 
-    public List<CategoryKPIConf> getCategoryKPIConfs(List<BigInteger> kpiIds){
-        Query query = new Query(Criteria.where("kpiId").in(kpiIds));
+    public List<CategoryKPIConf> getCategoryKPIConfs(List<BigInteger> kpiIds,List<BigInteger> categoryAssignmentIds){
+        Query query = new Query(Criteria.where("kpiId").in(kpiIds).and("categoryAssignmentId").in(categoryAssignmentIds));
         return mongoTemplate.find(query, CategoryKPIConf.class);
     }
 
@@ -213,16 +213,21 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,TabKPIConf.class),TabKPIMappingDTO.class);
     }
 
-    public List<TabKPIConf> findTabKPIConfigurationByTabIds(List<String> tabIds,List<BigInteger> kpiIds, Long refId, ConfLevel level){
-        String refQueryField = getRefQueryField(level);
-        Query query=null;
-        if(kpiIds.isEmpty()) {
-            query=new Query(Criteria.where("tabId").in(tabIds).and(refQueryField).is(refId));
-        }else{
-            query=new Query(Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and(refQueryField).is(refId));
-        }
+    public List<TabKPIConf> findTabKPIConfigurationByTabIds(List<BigInteger> ids){
+        Query query=new Query(Criteria.where("_id").in(ids));
         return mongoTemplate.find(query,TabKPIConf.class);
     }
+
+//    public List<TabKPIConf> findTabKPIConfigurationByTabIds(List<String> tabIds,List<BigInteger> kpiIds, Long refId, ConfLevel level){
+//        String refQueryField = getRefQueryField(level);
+//        Query query=null;
+//        if(kpiIds.isEmpty()) {
+//            query=new Query(Criteria.where("tabId").in(tabIds).and(refQueryField).is(refId));
+//        }else{
+//            query=new Query(Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and(refQueryField).is(refId));
+//        }
+//        return mongoTemplate.find(query,TabKPIConf.class);
+//    }
 
     public void removeTabKPIConfiguration(TabKPIMappingDTO entry,Long refId,ConfLevel level){
         String refQueryField = getRefQueryField(level);

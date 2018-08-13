@@ -77,8 +77,8 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
     }
 
-    @GetMapping(value = "/country/{countryId}/module/{moduleId}/kpi_details")
-    public ResponseEntity<Map<String, Object>> getKPITabsDataForCountry(@PathVariable String moduleId){
+    @GetMapping(value = "/module/{moduleId}/kpi_details")
+    public ResponseEntity<Map<String, Object>> getKPITabsDataForModule(@PathVariable String moduleId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getKPIAccessPageList(moduleId));
     }
 

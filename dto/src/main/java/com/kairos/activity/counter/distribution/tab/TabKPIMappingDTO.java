@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 public class TabKPIMappingDTO {
+    private BigInteger id;
     private String tabId;
     private BigInteger kpiId;
     private CounterSize counterSize;
@@ -56,6 +57,13 @@ public class TabKPIMappingDTO {
 
     public void setCounterSize(CounterSize counterSize) {
         this.counterSize = counterSize;
+    }
 
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 }

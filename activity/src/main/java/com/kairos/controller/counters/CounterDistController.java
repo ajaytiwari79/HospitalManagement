@@ -81,70 +81,70 @@ public class CounterDistController {
 
     //Tab kpi Apis
 
-    @GetMapping(COUNTRY_URL+"/counter/dist/module/{moduleId}")
-    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForCountry(@PathVariable Long countryId, @PathVariable String moduleId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(moduleId, countryId, ConfLevel.COUNTRY));
+    @GetMapping(COUNTRY_URL+"/counter/dist/tab/{tabId}")
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForCountry(@PathVariable Long countryId, @PathVariable String tabId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(tabId, countryId, ConfLevel.COUNTRY));
     }
 
-    @GetMapping(UNIT_URL+"/counter/dist/module/{moduleId}")
-    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForUnit(@PathVariable Long unitId, @PathVariable String moduleId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(moduleId, unitId, ConfLevel.UNIT));
+    @GetMapping(UNIT_URL+"/counter/dist/tab/{tabId}")
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForUnit(@PathVariable Long unitId, @PathVariable String tabId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(tabId, unitId, ConfLevel.UNIT));
     }
 
-    @GetMapping(STAFF_URL+"/counter/dist/module/{moduleId}")
-    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long staffId, @PathVariable String moduleId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(moduleId,staffId, ConfLevel.STAFF));
+    @GetMapping(STAFF_URL+"/counter/dist/tab/{tabId}")
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long staffId, @PathVariable String tabId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(tabId,staffId, ConfLevel.STAFF));
     }
 
-    @PostMapping(COUNTRY_URL+"/counter/dist/module/create_dist_entry")
+    @PostMapping(COUNTRY_URL+"/counter/dist/tab/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addTabKPIsEntryForCounty(@RequestBody TabKPIEntryConfDTO tabKPIEntry,@PathVariable Long countryId){
         counterManagementService.addTabKPIEntries(tabKPIEntry,countryId,null,null,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PostMapping(UNIT_URL+"/counter/dist/module/create_dist_entry")
+    @PostMapping(UNIT_URL+"/counter/dist/tab/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addTabKPIsEntryForUnit(@RequestBody TabKPIEntryConfDTO tabKPIEntry,@PathVariable Long unitId){
         counterManagementService.addTabKPIEntries(tabKPIEntry,null,unitId,null,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PostMapping(UNIT_URL+STAFF_URL+"/counter/dist/module/create_dist_entry")
+    @PostMapping(UNIT_URL+STAFF_URL+"/counter/dist/tab/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addTabKPIsEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody TabKPIEntryConfDTO tabKPIEntry){
         counterManagementService.addTabKPIEntries(tabKPIEntry,null,unitId,staffId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
-    @PutMapping(COUNTRY_URL+"/counter/dist/module/update_dist_entry")
+    @PutMapping(COUNTRY_URL+"/counter/dist/tab/update_dist_entry")
     public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForCounty(@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS, @PathVariable Long countryId){
         counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,countryId,null,null,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(UNIT_URL+"/counter/dist/module/update_dist_entry")
+    @PutMapping(UNIT_URL+"/counter/dist/tab/update_dist_entry")
     public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForUnit(@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS,@PathVariable Long unitId){
         counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,null,unitId,null,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(UNIT_URL+STAFF_URL+"/counter/dist/module/update_dist_entry")
+    @PutMapping(UNIT_URL+STAFF_URL+"/counter/dist/tab/update_dist_entry")
     public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
         counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,null,unitId,staffId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
-    @PutMapping(COUNTRY_URL+"/counter/dist/module/remove_dist_entry")
+    @PutMapping(COUNTRY_URL+"/counter/dist/tab/remove_dist_entry")
     public ResponseEntity<Map<String, Object>> removeTabKPIEntryForCountry(@PathVariable Long countryId, @RequestBody TabKPIMappingDTO tabKPIMappingDTO){
         counterManagementService.removeTabKPIEntries(tabKPIMappingDTO,countryId,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-   @PutMapping(UNIT_URL+"/counter/dist/module/remove_dist_entry")
+   @PutMapping(UNIT_URL+"/counter/dist/tab/remove_dist_entry")
     public ResponseEntity<Map<String, Object>> removeTabKPIEntryForUnit(@PathVariable Long unitId, @RequestBody TabKPIMappingDTO tabKPIMappingDTO){
         counterManagementService.removeTabKPIEntries(tabKPIMappingDTO,unitId,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(STAFF_URL+"/counter/dist/module/remove_dist_entry")
+    @PutMapping(STAFF_URL+"/counter/dist/tab/remove_dist_entry")
     public ResponseEntity<Map<String, Object>> removeTabKPIEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody TabKPIMappingDTO tabKPIMappingDTO){
         counterManagementService.removeTabKPIEntries(tabKPIMappingDTO,staffId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
