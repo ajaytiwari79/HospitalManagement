@@ -284,8 +284,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "Optional Match (ot)-[r:"+HAS_LEVEL+"]->(level:Level{deleted:false}) with ot,bt,cc, case when r is null then [] else collect({id:id(level),name:level.name}) end as levels \n" +
             "OPTIONAL MATCH (ot)-[:"+HAS_SUB_TYPE+"]->(ost:OrganizationType{isEnable:true}) with {children: case when ost is NULL then [] else collect({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot),levels:levels} as orgTypes,bt,cc WITH collect(orgTypes) as organizationTypes,bt,cc " +
             "OPTIONAL MATCH (os:OrganizationService{isEnabled:true})<-[:HAS_ORGANIZATION_SERVICES]-(country) \n" +
-            "OPTIONAL MATCH (oss)<-[:"+ORGANIZATION_SUB_SERVICE+"]-(os) with {children: case when oss is NULL then [] else collect({name:oss.name,id:id(oss)}) end,name:os.name,id:id(os)} as orgServices,bt,organizationTypes,cc WITH collect(orgServices) as serviceTypes,bt,organizationTypes,cc \n" +
-            "return organizationTypes,bt as businessTypes,cc as companyCategories,serviceTypes")
+            "OPTIONAL MATCH (oss)<-[:"+ORGANIZATION_SUB_SERVICE+"]-(os) with {children: case when oss is NULL then [] else collect({name:oss.name,id:id(oss)}) end,name:os.name,id:id(os)} as orgServices,bt,organizationTypes,cc WITH collect(orgServices) as serviceTypes,bt,organizationTypes,cc " +
+            " match(country:Country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) with organizationTypes,bt ,cc ,serviceTypes,collect(accountType) as accountTypes \n" +
+            "return organizationTypes,bt as businessTypes,cc as companyCategories,serviceTypes,accountTypes")
     OrganizationCreationData getOrganizationCreationData(long countryId);
 
 

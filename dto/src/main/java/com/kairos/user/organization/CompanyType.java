@@ -9,13 +9,11 @@ import java.util.List;
  * Created by oodles on 16/4/18.
  */
 public enum CompanyType {
-    KAIROS_PROSPECT("Kairos Prospect"), KAIROS_CLIENT("Kairos Client"), UNION("Union"), KAIROS_HUB("Kairos Hub"),SUBCONTRACTOR_TO_CLENT("Subcontractor to client");
-
+    ORGANIZATION("organization"), HUB("Hub");
     public String value;
     CompanyType(String value) {
         this.value = value;
     }
-
 
     public static List<HashMap<String,String>> getListOfCompanyType(){
         List<HashMap<String,String>> companyTypeList = new ArrayList<>();

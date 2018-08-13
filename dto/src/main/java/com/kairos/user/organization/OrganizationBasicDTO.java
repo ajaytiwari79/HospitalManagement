@@ -39,7 +39,7 @@ public class OrganizationBasicDTO {
     private CompanyType companyType;
 
     private String vatId;
-
+    private Long accountTypeId;
     private boolean costCenter;
     private Integer costCenterId;
     private CompanyUnitType companyUnitType;
@@ -74,7 +74,7 @@ public class OrganizationBasicDTO {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public AddressDTO getContactAddress() {
@@ -311,5 +311,13 @@ public class OrganizationBasicDTO {
 
     public void setUnitManager(UnitManagerDTO unitManager) {
         this.unitManager = unitManager;
+    }
+
+    public Long getAccountTypeId() {
+        return accountTypeId;
+    }
+
+    public void setAccountTypeId(Long accountTypeId) {
+        this.accountTypeId = accountTypeId;
     }
 }

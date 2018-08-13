@@ -22,6 +22,7 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.ContractType;
 import com.kairos.persistence.model.country.default_data.OrganizationMappingDTO;
+import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.AbsenceTypes;
@@ -52,6 +53,7 @@ import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.*;
+import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
@@ -112,6 +114,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import javax.swing.text.html.Option;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.time.ZoneId;
@@ -273,6 +276,7 @@ public class OrganizationService extends UserBaseService {
     private EmploymentTypeService employmentTypeService;
     @Inject
     private VRPClientService vrpClientService;
+    @Inject private AccountTypeGraphRepository accountTypeGraphRepository;
 
 
     public Organization getOrganizationById(long id) {
@@ -358,8 +362,6 @@ public class OrganizationService extends UserBaseService {
         if (orgExistWithUrl) {
             exceptionService.dataNotFoundByIdException("error.Organization.desiredUrl.duplicate", orgDetails.getDesiredUrl());
         }
-
-
         Boolean orgExistWithName = organizationGraphRepository.checkOrgExistWithName(orgDetails.getName());
         if (orgExistWithName) {
             exceptionService.dataNotFoundByIdException("error.Organization.name.duplicate", orgDetails.getName());
@@ -369,12 +371,18 @@ public class OrganizationService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
-
+        }
+        AccountType accountType=null;
+        if (CompanyType.ORGANIZATION.equals(orgDetails.getCompanyType())){
+                accountType= accountTypeGraphRepository.findOne(orgDetails.getAccountTypeId());
+                if (!Optional.ofNullable(accountType).isPresent()){
+                    exceptionService.dataNotFoundByIdException("message.accountType.notFound");
+                }
         }
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
         validateAccessGroupIdForUnitManager(countryId, orgDetails.getUnitManager().getAccessGroupId(), orgDetails.getCompanyType());
-        Organization organization = new Organization();
-        organization.setParentOrganization(true);
+        Organization organization = new Organization(true,country,accountType,orgDetails.getCompanyType());
+             organization.setParentOrganization(true);
         organization.setCountry(country);
         organization.setBoardingCompleted(orgDetails.isBoardingCompleted());
         organization = saveOrganizationDetails(organization, orgDetails, false, countryId);
@@ -1112,7 +1120,7 @@ public class OrganizationService extends UserBaseService {
 
 
     public Map<String, Object> getParentOrganization(Long countryId) {
-        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> data = new HashMap<>(2);
         OrganizationQueryResult organizationQueryResult = organizationGraphRepository.getParentOrganizationOfRegion(countryId);
         OrganizationCreationData organizationCreationData = organizationGraphRepository.getOrganizationCreationData(countryId);
         List<Map<String, Object>> zipCodes = FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));

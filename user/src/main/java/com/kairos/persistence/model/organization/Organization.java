@@ -15,6 +15,7 @@
     import com.kairos.persistence.model.country.default_data.BusinessType;
     import com.kairos.persistence.model.country.default_data.CompanyCategory;
     import com.kairos.persistence.model.country.default_data.ContractType;
+    import com.kairos.persistence.model.country.default_data.account_type.AccountType;
     import com.kairos.persistence.model.country.tag.Tag;
     import com.kairos.persistence.model.organization.group.Group;
     import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
@@ -232,7 +233,7 @@ public class Organization extends UserBaseEntity {
     private boolean boardingCompleted;
     private boolean workCenterUnit;
     private boolean gdprUnit;
-
+    private AccountType accountType;
     //set o.nightStartTimeFrom="22:15",o.nightEndTimeTo="07:15"
     public Organization(String name, List<Group> groupList, List<Organization> children) {
         this.name = name;
@@ -241,6 +242,13 @@ public class Organization extends UserBaseEntity {
     }
 
     public Organization() {
+    }
+
+    public Organization(boolean isParentOrganization, Country country,AccountType accountType,CompanyType companyType) {
+        this.isParentOrganization = isParentOrganization;
+        this.country = country;
+        this.accountType=accountType;
+        this.companyType =companyType;
     }
 
     public boolean isUnion() {
