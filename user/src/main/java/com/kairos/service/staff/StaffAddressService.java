@@ -273,7 +273,7 @@ public class StaffAddressService extends UserBaseService {
             contactAddressDTO.setZipCodeId(contactAddress.getZipCode()!=null ? contactAddress.getZipCode().getId(): null);
             contactAddressDTO.setMunicipalityId((contactAddress.getMunicipality()==null) ?null :contactAddress.getMunicipality().getId());
         }
-        return contactAddressDTO;
+        return (contactAddressDTO!=null)? contactAddressDTO : new ContactAddressDTO();
     }
 
     public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
