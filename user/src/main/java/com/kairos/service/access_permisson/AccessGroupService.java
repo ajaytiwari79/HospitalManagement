@@ -26,10 +26,8 @@ import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.user.access_permission.AccessPermissionDTO;
 import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
-import com.kairos.user.country.system_setting.AccountTypeDTO;
 import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.util.DateUtil;
-import com.kairos.util.DateUtils;
 import com.kairos.util.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -521,11 +519,11 @@ public class AccessGroupService extends UserBaseService {
 
     public AccessGroup createCountryAccessGroup(long countryId, CountryAccessGroupDTO accessGroupDTO) {
 
-        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) && accessGroupDTO.getAccountTypes().isEmpty()) {
+        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) && accessGroupDTO.getAccountTypeIds().isEmpty()) {
             exceptionService.actionNotPermittedException("message.accountType.select");
         }
-        List<AccountType> accountType = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypes());
-        if (accountType.size() != accessGroupDTO.getAccountTypes().size()) {
+        List<AccountType> accountType = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypeIds());
+        if (accountType.size() != accessGroupDTO.getAccountTypeIds().size()) {
             exceptionService.actionNotPermittedException("message.accountType.select");
         }
         Country country = countryGraphRepository.findOne(countryId);
@@ -550,23 +548,30 @@ public class AccessGroupService extends UserBaseService {
     }
 
     public AccessGroup updateCountryAccessGroup(long countryId, Long accessGroupId, CountryAccessGroupDTO accessGroupDTO) {
+        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) && accessGroupDTO.getAccountTypeIds().isEmpty()) {
+            exceptionService.actionNotPermittedException("message.accountType.select");
+        }
 
-        AccessGroup accessGrpToUpdate = accessGroupRepository.findCountryAccessGroupByIdAndCategory(countryId, accessGroupId, accessGroupDTO.getOrganizationCategory().toString());
-        if (!Optional.ofNullable(accessGrpToUpdate).isPresent()) {
+        Optional<AccessGroup> accessGrpToUpdate = accessGroupRepository.findById(accessGroupId);
+        if (!accessGrpToUpdate.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupId);
 
         }
-        if (accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName().trim(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId)) {
+        if (accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId)) {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
         }
-
-        accessGrpToUpdate.setName(accessGroupDTO.getName());
-        accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
-        accessGrpToUpdate.setRole(accessGroupDTO.getRole());
-        accessGrpToUpdate.setEnabled(accessGroupDTO.isEnabled());
-        save(accessGrpToUpdate);
-        return accessGrpToUpdate;
+        List<AccountType> accountTypes = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypeIds());
+        if (accountTypes.size() != accessGroupDTO.getAccountTypeIds().size()) {
+            exceptionService.actionNotPermittedException("message.accountType.select");
+        }
+        accessGrpToUpdate.get().setAccountType(accountTypes);
+        accessGrpToUpdate.get().setName(accessGroupDTO.getName());
+        accessGrpToUpdate.get().setDescription(accessGroupDTO.getDescription());
+        accessGrpToUpdate.get().setRole(accessGroupDTO.getRole());
+        accessGrpToUpdate.get().setEnabled(accessGroupDTO.isEnabled());
+        save(accessGrpToUpdate.get());
+        return accessGrpToUpdate.get();
 
     }
 

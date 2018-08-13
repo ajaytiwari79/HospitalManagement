@@ -7,9 +7,7 @@ import com.kairos.user.access_permission.AccessGroupRole;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,7 +25,7 @@ public class CountryAccessGroupDTO {
     private OrganizationCategory organizationCategory;
     private AccessGroupRole role;
     private boolean enabled = true;
-    private Set<Long> accountTypes = new HashSet<>();
+    private Set<Long> accountTypeIds = new HashSet<>();
 
     public CountryAccessGroupDTO() {
         // default constructor
@@ -49,7 +47,7 @@ public class CountryAccessGroupDTO {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
@@ -88,12 +86,12 @@ public class CountryAccessGroupDTO {
         this.role = role;
     }
 
-    public Set<Long> getAccountTypes() {
-        return accountTypes;
+    public Set<Long> getAccountTypeIds() {
+        return accountTypeIds;
     }
 
-    public void setAccountTypes(Set<Long> accountTypes) {
-        this.accountTypes = accountTypes;
+    public void setAccountTypeIds(Set<Long> accountTypeIds) {
+        this.accountTypeIds = accountTypeIds;
     }
 
     @AssertTrue(message = "Access group can't be blank")

@@ -35,6 +35,10 @@ public class AccessGroup extends UserBaseEntity {
     @Relationship(type = HAS_ACCOUNT_TYPE)
     private List<AccountType> accountType;
 
+    public AccessGroup() {
+        //Default Constructor
+    }
+
     public AccessGroup(String name, String description, AccessGroupRole role) {
         this.name = name;
         this.description = description;
@@ -48,8 +52,7 @@ public class AccessGroup extends UserBaseEntity {
         this.accountType = accountType;
     }
 
-    public AccessGroup() {
-    }
+
 
     public void setName(String name) {
         this.name = name;
