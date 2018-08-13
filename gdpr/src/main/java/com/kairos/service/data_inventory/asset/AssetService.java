@@ -50,7 +50,7 @@ public class AssetService extends MongoBaseService {
         }
         AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset ", assetDTO.getAssetType());
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset  type", assetDTO.getAssetType());
         } else {
             if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent()) {
                 if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
@@ -117,9 +117,9 @@ public class AssetService extends MongoBaseService {
      * @description method return audit history of asset , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getAssetActivities(BigInteger assetId) throws ClassNotFoundException {
+    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId,int size,int skip)   {
 
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class).limit(size).skip(skip);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
         return javersCommonService.getHistoryMap(changes, assetId, Asset.class);

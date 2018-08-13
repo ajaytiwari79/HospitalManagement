@@ -24,5 +24,4 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
 	}
 
 
-
 }

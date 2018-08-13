@@ -24,14 +24,11 @@ public interface ProcessingPurposeMongoRepository extends MongoBaseRepository<Pr
 
     ProcessingPurpose findByid(BigInteger id);
 
-
-    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
-    List<ProcessingPurpose> getProcessingPurposeList(Long countryId,List<BigInteger> ids);
-
-
-
     @Query("{countryId:?0,deleted:false}")
     List<ProcessingPurposeResponseDTO> findAllProcessingPurposes(Long countryId);
+
+    @Query("{_id:{$in:?0},deleted:false}")
+    List<ProcessingPurposeResponseDTO> findProcessingPurposeByIds(List<BigInteger> processingPurposeIds);
 
     @Query("{organizationId:?0,deleted:false}")
     List<ProcessingPurposeResponseDTO> findAllOrganizationProcessingPurposes( Long organizationId);
