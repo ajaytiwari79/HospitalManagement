@@ -2,10 +2,9 @@ package com.kairos.persistance.repository.data_inventory.processing_activity;
 
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Collation;
@@ -24,24 +23,27 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     @Inject
     private MongoTemplate mongoTemplate;
 
+
     @Override
-    public ProcessingActivity findByName(Long countryid, Long organizationId, String name) {
-        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryid).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("name").is(name));
+    public ProcessingActivity findByName( Long organizationId, String name) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("name").is(name).and("subProcess").is(false));
         query.collation(Collation.of("en").strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, ProcessingActivity.class);
     }
 
 
     @Override
-    public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long countryId, Long organizationId) {
+    public List<ProcessingActivityResponseDTO> getAllProcessingActivityAndMetaData( Long organizationId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
+                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("subProcess").is(false)),
                 lookup("processing_purpose", "processingPurposes", "_id", "processingPurposes"),
-                lookup("transfer_method", "sourceTransferMethods", "_id", "sourceTransferMethods"),
-                lookup("transfer_method", "destinationTransferMethods", "_id", "destinationTransferMethods"),
+                lookup("transfer_method", "transferMethods", "_id", "transferMethods"),
                 lookup("accessor_party", "accessorParties", "_id", "accessorParties"),
-                lookup("dataSource", "dataSources", "_id", "dataSources")
+                lookup("dataSource", "dataSources", "_id", "dataSources"),
+                lookup("responsibility_type","responsibilityType","_id","responsibilityType"),
+                lookup("processingLegalBasis","processingLegalBasis","_id","processingLegalBasis")
+
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
@@ -50,17 +52,25 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     }
 
     @Override
-    public ProcessingActivityResponseDTO getProcessingActivityWithMetaDataById(Long countryId, Long organizationId, BigInteger id) {
+    public ProcessingActivityResponseDTO getAllSubProcessingActivitiesOfProcessingActivity( Long organizationId, BigInteger processingActivityId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
-                lookup("processing_purpose", "processingPurposes", "_id", "processingPurposes"),
-                lookup("transfer_method", "sourceTransferMethods", "_id", "sourceTransferMethods"),
-                lookup("transfer_method", "destinationTransferMethods", "_id", "destinationTransferMethods"),
-                lookup("accessor_party", "accessorParties", "_id", "accessorParties"),
-                lookup("dataSource", "dataSources", "_id", "dataSources")
+                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(processingActivityId).and("subProcess").is(false)),
+                unwind("subProcessingActivities"),
+                lookup("processing_purpose", "subProcessingActivities.processingPurposes", "_id", "subProcessingActivities.processingPurposes"),
+                lookup("transfer_method", "subProcessingActivities.transferMethods", "_id", "subProcessingActivities.transferMethods"),
+                lookup("accessor_party", "subProcessingActivities.accessorParties", "_id", "subProcessingActivities.accessorParties"),
+                lookup("dataSource", "subProcessingActivities.dataSources", "_id", "subProcessingActivities.dataSources"),
+                lookup("responsibility_type","subProcessingActivities.responsibilityType","_id","subProcessingActivities.responsibilityType"),
+                lookup("processingLegalBasis","subProcessingActivities.processingLegalBasis","_id","subProcessingActivities.processingLegalBasis"),
+                group("$id")
+                .addToSet("subProcessingActivities").as("subProcessingActivities"),
+                project().andExclude("_id"),
+                unwind("subProcessingActivities"),
+                sort(Sort.Direction.ASC, "name")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
         return result.getUniqueMappedResult();
     }
+
 }

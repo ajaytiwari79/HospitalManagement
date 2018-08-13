@@ -1,10 +1,10 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
+import com.kairos.gdpr.metadata.ProcessingLegalBasisDTO;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingLegalBasisService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -18,7 +18,6 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 /*
  *
@@ -39,7 +38,7 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("add ProcessingLegalBasis")
     @PostMapping("/legal_basis/add")
-    public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<ProcessingLegalBasis> legalBases) {
+    public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ProcessingLegalBasisDTO> legalBases) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
@@ -97,7 +96,7 @@ public class ProcessingLegalBasisController {
 
     @ApiOperation("update ProcessingLegalBasis by id")
     @PutMapping("/legal_basis/update/{id}")
-    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingLegalBasis legalBasis) {
+    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingLegalBasisDTO legalBasis) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {
@@ -105,7 +104,12 @@ public class ProcessingLegalBasisController {
         }
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(countryId, id, legalBasis));
+    }
 
+    @ApiOperation("get All legal basis of Current organization and Parent Oeg which were not inherited by Organization")
+    @GetMapping("/legal_basis")
+    public ResponseEntity<Object> getAllLegalBasisOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getAllNotInheritedLegalBasisFromParentOrgAndUnitProcessingLegalBasis(countryId,organizationId,parentOrgId));
     }
 
 

@@ -1,10 +1,10 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
 
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
+import com.kairos.gdpr.metadata.DataSourceDTO;
 import com.kairos.service.data_inventory.processing_activity.OrganizationDataSourceService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public class OrganizationDataSourceController {
 
     @ApiOperation("add dataSource")
     @PostMapping("/data_source/add")
-    public ResponseEntity<Object> createDataSource(@PathVariable Long unitId, @Valid @RequestBody ValidateListOfRequestBody<DataSource> dataSource) {
+    public ResponseEntity<Object> createDataSource(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSource) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
@@ -91,7 +91,7 @@ public class OrganizationDataSourceController {
 
     @ApiOperation("update dataSource by id")
     @PutMapping("/data_source/update/{id}")
-    public ResponseEntity<Object> updateDataSource(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody DataSource dataSource) {
+    public ResponseEntity<Object> updateDataSource(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody DataSourceDTO dataSource) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (unitId == null) {

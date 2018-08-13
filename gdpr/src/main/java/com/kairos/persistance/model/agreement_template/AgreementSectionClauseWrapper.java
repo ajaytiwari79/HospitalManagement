@@ -1,7 +1,6 @@
 package com.kairos.persistance.model.agreement_template;
 
-import com.kairos.dto.master_data.AgreementSectionDTO;
-import com.kairos.dto.master_data.ClauseBasicDTO;
+import com.kairos.gdpr.master_data.ClauseBasicDTO;
 
 import java.util.ArrayList;
 import java.util.List;

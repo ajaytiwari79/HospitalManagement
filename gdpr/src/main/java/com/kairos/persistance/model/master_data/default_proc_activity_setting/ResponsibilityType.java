@@ -2,16 +2,16 @@ package com.kairos.persistance.model.master_data.default_proc_activity_setting;
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Document(collection = "responsibility_type")
 public class ResponsibilityType extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
+    @NotBlank(message = "error.message.name.cannot.be.null.or.empty")
     @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
@@ -26,18 +26,16 @@ public class ResponsibilityType extends MongoBaseEntity {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-
     public ResponsibilityType( String name) {
         this.name = name;
     }
-
     public ResponsibilityType() {
     }
 }

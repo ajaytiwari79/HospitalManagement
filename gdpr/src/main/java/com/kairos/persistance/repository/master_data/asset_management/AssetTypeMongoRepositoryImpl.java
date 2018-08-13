@@ -74,7 +74,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
 
     @Override
-    public AssetType findByNameAndOrganziationId(Long organizationId, String name) {
+    public AssetType findByNameAndOrganizationId(Long organizationId, String name) {
         Query query = new Query();
         query.addCriteria(Criteria.where(ORGANIZATION_ID).is(organizationId).and("deleted").is(false).and("name").is(name).and("isSubAsset").is(false));
         query.collation(Collation.of("en").

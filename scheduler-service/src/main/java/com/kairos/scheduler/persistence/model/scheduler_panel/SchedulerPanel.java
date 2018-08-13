@@ -30,15 +30,6 @@ public class SchedulerPanel extends MongoBaseEntity {
     private Date nextRunTime;
     private boolean isAlarmed;
     private Integer startMinute;
-
-    public Integer getRepeat() {
-        return repeat;
-    }
-
-    public void setRepeat(Integer repeat) {
-        this.repeat = repeat;
-    }
-
     private Integer repeat;
     private List<DayOfWeek> days;
     private LocalTime runOnce;
@@ -55,6 +46,15 @@ public class SchedulerPanel extends MongoBaseEntity {
     private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
 
+
+
+    public Integer getRepeat() {
+        return repeat;
+    }
+
+    public void setRepeat(Integer repeat) {
+        this.repeat = repeat;
+    }
     public BigInteger getEntityId() {
         return entityId;
     }
@@ -113,25 +113,6 @@ public class SchedulerPanel extends MongoBaseEntity {
         this.selectedHours = selectedHours;
     }
 
-
-
-   /* public String getRunOnce() {
-        return runOnce;
-    }
-
-    public void setRunOnce(String runOnce) {
-        this.runOnce = runOnce;
-    }*/
-
-//    public List<String> getDays() {
-//        return days;
-//    }
-//
-//    public void setDays(List<String> days) {
-//        this.days = days;
-//    }
-
-
     public String getName() {
         return name;
     }
@@ -155,14 +136,6 @@ public class SchedulerPanel extends MongoBaseEntity {
     public void setInterval(String interval) {
         this.interval = interval;
     }
-
-   /* public String getRepeat() {
-        return repeat;
-    }
-
-    public void setRepeat(String repeat) {
-        this.repeat = repeat;
-    }*/
 
     public boolean isActive() {
         return active;

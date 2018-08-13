@@ -11,6 +11,12 @@ public class OrganizationalSecurityMeasureResponseDTO {
 
     private String name;
 
+    private Long organizationId;
+
+    public Long getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
+
     public BigInteger getId() { return id; }
 
     public void setId(BigInteger id) { this.id = id; }

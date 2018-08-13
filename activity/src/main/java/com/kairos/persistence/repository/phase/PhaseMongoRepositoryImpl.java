@@ -85,4 +85,18 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
         query.with(new Sort(Sort.Direction.DESC, "sequence"));
         return mongoTemplate.find(query, Phase.class, "phases");
     }
+    public List<Phase> getPlanningPhasesByCountry(Long countryId) {
+        Query query = Query.query(Criteria.where("countryId").is(countryId).and("duration").gt(0).and("phaseType").is(PhaseType.PLANNING));
+        query.with(new Sort(Sort.Direction.DESC, "sequence"));
+        return mongoTemplate.find(query, Phase.class, "phases");
+    }
+
+    public List<PhaseResponseDTO> findPlanningPhasesByCountry(Long countryId) {
+        Query query = Query.query(Criteria.where("countryId").is(countryId).and("duration").gt(0).and("phaseType").is(PhaseType.PLANNING));
+        query.with(new Sort(Sort.Direction.DESC, "sequence"));
+        query.fields().include("id").include("name");
+        return mongoTemplate.find(query, PhaseResponseDTO.class, "phases");
+    }
+
+
 }

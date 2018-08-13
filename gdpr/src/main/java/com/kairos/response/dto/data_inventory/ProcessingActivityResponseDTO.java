@@ -2,12 +2,9 @@ package com.kairos.response.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistance.model.data_inventory.ManagingOrganization;
-import com.kairos.persistance.model.data_inventory.Staff;
-import com.kairos.response.dto.common.AccessorPartyResponseDTO;
-import com.kairos.response.dto.common.DataSourceResponseDTO;
-import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
-import com.kairos.response.dto.common.TransferMethodResponseDTO;
+import com.kairos.gdpr.ManagingOrganization;
+import com.kairos.gdpr.Staff;
+import com.kairos.response.dto.common.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -22,10 +19,10 @@ public class ProcessingActivityResponseDTO {
     @NotBlank(message = "Name can't be empty")
     private String name;
 
-    @NotBlank(message = "Discription can't be empty")
+    @NotBlank(message = "Description can't be empty")
     private String description;
 
-    @NotNull(message = "Mangaing department can't be null")
+    @NotNull(message = "Managing department can't be null")
     private ManagingOrganization managingDepartment;
 
     @NotNull(message = "Process Owner can't be null")
@@ -37,9 +34,11 @@ public class ProcessingActivityResponseDTO {
 
     private List<AccessorPartyResponseDTO> accessorParties;
 
-    private List<TransferMethodResponseDTO> sourceTransferMethods;
+    private List<TransferMethodResponseDTO> transferMethods;
 
-    private List<TransferMethodResponseDTO> destinationTransferMethods;
+    private List<ProcessingLegalBasisResponseDTO> processingLegalBasis;
+
+    private List<ResponsibilityTypeResponseDTO> responsibilityType;
 
     private Integer controllerContactInfo;
 
@@ -52,6 +51,14 @@ public class ProcessingActivityResponseDTO {
     private Long maxDataSubjectVolume;
 
     private Integer dataRetentionPeriod;
+
+    public List<ResponsibilityTypeResponseDTO> getResponsibilityType() { return responsibilityType; }
+
+    public void setResponsibilityType(List<ResponsibilityTypeResponseDTO> responsibilityType) { this.responsibilityType = responsibilityType; }
+
+    public List<ProcessingLegalBasisResponseDTO> getProcessingLegalBasis() { return processingLegalBasis; }
+
+    public void setProcessingLegalBasis(List<ProcessingLegalBasisResponseDTO> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
 
     public BigInteger getId() {
         return id;
@@ -113,33 +120,17 @@ public class ProcessingActivityResponseDTO {
         return accessorParties;
     }
 
-    public void setAccessorParties(List<AccessorPartyResponseDTO> accessorParties) {
-        this.accessorParties = accessorParties;
-    }
+    public void setAccessorParties(List<AccessorPartyResponseDTO> accessorParties) { this.accessorParties = accessorParties; }
 
-    public List<TransferMethodResponseDTO> getSourceTransferMethods() {
-        return sourceTransferMethods;
-    }
+    public List<TransferMethodResponseDTO> getTransferMethods() { return transferMethods; }
 
-    public void setSourceTransferMethods(List<TransferMethodResponseDTO> sourceTransferMethods) {
-        this.sourceTransferMethods = sourceTransferMethods;
-    }
-
-    public List<TransferMethodResponseDTO> getDestinationTransferMethods() {
-        return destinationTransferMethods;
-    }
-
-    public void setDestinationTransferMethods(List<TransferMethodResponseDTO> destinationTransferMethods) {
-        this.destinationTransferMethods = destinationTransferMethods;
-    }
+    public void setTransferMethods(List<TransferMethodResponseDTO> transferMethods) { this.transferMethods = transferMethods; }
 
     public Integer getControllerContactInfo() {
         return controllerContactInfo;
     }
 
-    public void setControllerContactInfo(Integer controllerContactInfo) {
-        this.controllerContactInfo = controllerContactInfo;
-    }
+    public void setControllerContactInfo(Integer controllerContactInfo) { this.controllerContactInfo = controllerContactInfo; }
 
     public Integer getDpoContactInfo() {
         return dpoContactInfo;

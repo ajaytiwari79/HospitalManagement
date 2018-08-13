@@ -1,9 +1,9 @@
 package com.kairos.controller.master_data.asset_management;
 
-import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
+import com.kairos.gdpr.metadata.DataDisposalDTO;
 import com.kairos.service.master_data.asset_management.DataDisposalService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -17,7 +17,6 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 /*
  *
@@ -38,11 +37,11 @@ public class DataDisposalController {
 
     @ApiOperation("add DataDisposal")
     @PostMapping("/data_disposal/add")
-    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @Valid @RequestBody ValidateListOfRequestBody<DataDisposal> dataDisposals) {
+    public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposals.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposalDTOs.getRequestBody()));
 
     }
 
@@ -97,15 +96,20 @@ public class DataDisposalController {
 
     @ApiOperation("update DataDisposal by id")
     @PutMapping("/data_disposal/update/{id}")
-    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody DataDisposal dataDisposal) {
+    public ResponseEntity<Object> updateDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(countryId, id, dataDisposalDTO));
+    }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(countryId, id, dataDisposal));
 
+    @ApiOperation("get All data  disposal  of Current organization and Parent Oeg which were not inherited by Organization")
+    @GetMapping("/data_disposal")
+    public ResponseEntity<Object> getAllDataDisposalOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId, @PathVariable Long organizationId, @RequestParam Long parentOrgId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getAllNotInheritedDataDisposalFromParentOrgAndUnitDataDisposal(countryId, parentOrgId, organizationId));
     }
 
 }

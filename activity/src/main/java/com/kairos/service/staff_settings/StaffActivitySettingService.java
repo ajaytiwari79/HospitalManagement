@@ -10,6 +10,7 @@ import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.StaffEmploymentTypeSpecification;
 import com.kairos.rule_validator.activity.StaffExpertiseSpecification;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.locale.LocaleService;
 import com.kairos.user.staff.StaffDTO;
@@ -31,8 +32,11 @@ public class StaffActivitySettingService extends MongoBaseService {
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private GenericIntegrationService genericIntegrationService;
     @Inject private LocaleService localeService;
+    @Inject private ActivityService activityService;
 
     public StaffActivitySettingDTO createStaffActivitySetting(Long unitId,StaffActivitySettingDTO staffActivitySettingDTO){
+        activityService.validateActivityTimeRules(staffActivitySettingDTO.getEarliestStartTime(),staffActivitySettingDTO.getLatestStartTime(),
+                staffActivitySettingDTO.getMaximumEndTime(),staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=new StaffActivitySetting();
         ObjectMapperUtils.copyProperties(staffActivitySettingDTO,staffActivitySetting);
         staffActivitySetting.setUnitId(unitId);
@@ -46,6 +50,8 @@ public class StaffActivitySettingService extends MongoBaseService {
     }
 
     public StaffActivitySettingDTO updateStaffActivitySettings(BigInteger staffActivitySettingId,Long unitId, StaffActivitySettingDTO staffActivitySettingDTO){
+        activityService.validateActivityTimeRules(staffActivitySettingDTO.getEarliestStartTime(),staffActivitySettingDTO.getLatestStartTime(),
+                staffActivitySettingDTO.getMaximumEndTime(),staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=staffActivitySettingRepository.findByIdAndDeletedFalse(staffActivitySettingId);
         if(!Optional.ofNullable(staffActivitySetting).isPresent()){
             exceptionService.dataNotFoundException("message.staff.activity.settings.absent");
@@ -71,6 +77,9 @@ public class StaffActivitySettingService extends MongoBaseService {
     }
 
     public Map<String,List<StaffActivityResponse>> assignActivitySettingToStaffs(Long unitId, StaffAndActivitySettingWrapper staffAndActivitySettingWrapper){
+        if(staffAndActivitySettingWrapper.getStaffIds().isEmpty() || staffAndActivitySettingWrapper.getStaffActivitySettings().isEmpty()){
+            exceptionService.actionNotPermittedException("error.empty.staff.or.activity.setting");
+        }
         Set<BigInteger> activityIds=staffAndActivitySettingWrapper.getStaffActivitySettings().stream().map(StaffActivitySettingDTO::getActivityId).collect(Collectors.toSet());
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger,Activity> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,v->v));
@@ -81,7 +90,6 @@ public class StaffActivitySettingService extends MongoBaseService {
             responseMap=assignActivitySettingsForCurrentStaff(responseMap,activityMap,staffExpertiseWrapperMap,currentStaffId,staffAndActivitySettingWrapper.getStaffActivitySettings(),unitId);
         }
         return responseMap;
-
     }
 
     public List<StaffActivitySettingDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId){
@@ -126,7 +134,7 @@ public class StaffActivitySettingService extends MongoBaseService {
            }
             StaffActivitySetting currentStaffActivitySetting=new StaffActivitySetting(staffId,staffActivitySetting.getActivityId(),staffActivitySetting.getUnitPositionId(),
                     unitId,staffActivitySetting.getShortestTime(),staffActivitySetting.getLongestTime(),staffActivitySetting.getMinLength(),staffActivitySetting.getMaxThisActivityPerShift(),
-                    staffActivitySetting.isEligibleForMove());
+                    staffActivitySetting.isEligibleForMove(),staffActivitySetting.getEarliestStartTime(),staffActivitySetting.getLatestStartTime(),staffActivitySetting.getMaximumEndTime());
             staffActivitySettings.add(currentStaffActivitySetting);
            StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),localeService.getMessage("default.added"));
             success.add(staffActivityResponse);
@@ -139,7 +147,4 @@ public class StaffActivitySettingService extends MongoBaseService {
        responseMap.put("error",error);
        return responseMap;
    }
-
-
-
 }

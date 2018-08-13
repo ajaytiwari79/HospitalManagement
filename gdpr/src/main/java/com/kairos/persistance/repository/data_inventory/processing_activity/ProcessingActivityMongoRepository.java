@@ -1,23 +1,32 @@
 package com.kairos.persistance.repository.data_inventory.processing_activity;
 
-
-import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
+import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface ProcessingActivityMongoRepository extends MongoRepository<ProcessingActivity,BigInteger> ,CustomProcessingActivityRepository {
+public interface ProcessingActivityMongoRepository extends MongoBaseRepository<ProcessingActivity,BigInteger>,CustomProcessingActivityRepository {
 
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    ProcessingActivity findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
+    ProcessingActivity findByIdAndNonDeleted(Long organizationId,BigInteger id);
 
     ProcessingActivity findByid(BigInteger id);
+
+
+    @Query("{organizationId:?0,_id:{$in:?1},deleted:false,subProcess:false}")
+    List<ProcessingActivity> findSubProcessingActivitiesByIds(Long organizationId, List<BigInteger> ids);
+
+
+    @Query("{_id:{$in:?1},deleted:false,subProcess:false}")
+    List<ProcessingActivityResponseDTO> findAllSubProcessingActivitiesByIds(List<BigInteger> ids);
 
 }

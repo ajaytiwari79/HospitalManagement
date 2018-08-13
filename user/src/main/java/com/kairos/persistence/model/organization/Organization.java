@@ -1,6 +1,6 @@
-    package com.kairos.persistence.model.organization;
+package com.kairos.persistence.model.organization;
 
-    import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
@@ -11,9 +11,9 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.*;
-import com.kairos.persistence.model.country.common.BusinessType;
-import com.kairos.persistence.model.country.common.CompanyCategory;
-import com.kairos.persistence.model.country.common.ContractType;
+import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.CompanyCategory;
+import com.kairos.persistence.model.country.default_data.ContractType;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
@@ -40,6 +40,7 @@ import java.util.*;
 
 import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+
 
 
 /**
@@ -207,9 +208,9 @@ public class Organization extends UserBaseEntity {
     private Boolean showCountryTags = true;
     @Convert(ZoneIdStringConverter.class)
     private ZoneId timeZone;
-    @DateString("HH:MM")
+    @DateString("HH:mm")
     private Date nightStartTimeFrom;
-    @DateString("HH:MM")
+    @DateString("HH:mm")
     private Date nightEndTimeTo;
     private boolean union;
 

@@ -466,7 +466,7 @@ public class DateUtils {
                 ZoneId.systemDefault());
     }
 
-    public static Date getDateByZonedDateTime(ZonedDateTime dateTime) {
+    public static Date getDateByZonedDateTime(ZonedDateTime dateTime){
         return Date.from(dateTime.toInstant());
     }
 
@@ -511,7 +511,7 @@ public class DateUtils {
         switch (durationType) {
             // Add case for Month, Year etc
             case DAYS: {
-                return ChronoUnit.DAYS.between(startDate, endDate);
+                return ChronoUnit.DAYS.between(startDate,endDate);
             }
             default:
                 return null;
@@ -580,7 +580,7 @@ public class DateUtils {
     }
 
     public static Date getStartDateOfWeekFromDate(LocalDate date) {
-        return getDateFromLocalDate(date.with(previousOrSame(DayOfWeek.MONDAY)));
+        return asDate(date.with(previousOrSame(DayOfWeek.MONDAY)));
 
     }
 
@@ -595,34 +595,35 @@ public class DateUtils {
     public static LocalTime getLocalTimeFromLocalDateTime(LocalDateTime localDateTime) {
         return localDateTime.toLocalTime();
     }
-
     public static LocalDateTime getTimezonedCurrentDateTime(String timezone) {
         return Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of(timezone)).toLocalDateTime();
     }
-
     public static LocalDateTime getTimezonedCurrentDate(LocalDateTime dateTime) {
-        return LocalDateTime.of(dateTime.getYear(), dateTime.getMonth(), dateTime.getDayOfMonth(), dateTime.getHour(), dateTime.getMinute());
+        return  LocalDateTime.of(dateTime.getYear(),dateTime.getMonth(),dateTime.getDayOfMonth(),dateTime.getHour(),dateTime.getMinute());
     }
 
     public static LocalDateTime getLocalDateTimeFromZoneId(ZoneId unitTimeZone) {
         return LocalDateTime.now(unitTimeZone);
     }
 
-    public static Long getEndOfDayMillisforUnitFromEpoch(ZoneId zone, Long dateMillis) {
+    public static Long getEndOfDayMillisforUnitFromEpoch(ZoneId zone,Long dateMillis) {
         LocalDate date = Instant.ofEpochMilli(dateMillis).atZone(ZoneId.systemDefault()).toLocalDate();
-        ZonedDateTime zdt = ZonedDateTime.of(date, LocalTime.MAX, zone);
+        ZonedDateTime zdt = ZonedDateTime.of(date,LocalTime.MAX,zone);
         return zdt.toInstant().toEpochMilli();
     }
-
     public static LocalDateTime getLocalDatetimeFromLong(Long millis) {
         return Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
-
     public static Long getMillisFromLocalDateTime(LocalDateTime date) {
-        return date == null ? null : date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return  date==null?null:date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() ;  }
+
+    public static Long getOneDayBeforeMillis() {
+        return  LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
-
+    public static Long getCurrentDayStartMillis() {
+        return LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
     public static Long getCurrentMillis() {
         return System.currentTimeMillis();
     }

@@ -1,9 +1,9 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.TransferMethod;
+import com.kairos.gdpr.metadata.TransferMethodDTO;
 import com.kairos.service.data_inventory.processing_activity.OrganizationTransferMethodService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class OrganizationTransferMethodController {
 
     @ApiOperation("add transfer Method ")
     @PostMapping("/transfer_method/add")
-    public ResponseEntity<Object> createTransferMethod(@PathVariable Long unitId, @Valid @RequestBody ValidateListOfRequestBody<TransferMethod> transferMethods) {
+    public ResponseEntity<Object> createTransferMethod(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TransferMethodDTO> transferMethods) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
@@ -89,7 +89,7 @@ public class OrganizationTransferMethodController {
 
     @ApiOperation("update transfer Method by id")
     @PutMapping("/transfer_method/update/{id}")
-    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody TransferMethod transferMethod) {
+    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody TransferMethodDTO transferMethod) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (unitId == null) {

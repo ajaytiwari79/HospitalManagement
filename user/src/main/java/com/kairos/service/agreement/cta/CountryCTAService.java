@@ -276,11 +276,12 @@ public class CountryCTAService extends UserBaseService {
 
     public CTARuleTemplate saveEmbeddedEntitiesOfCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO, CTADetailsWrapper ctaDetailsWrapper) {
 
+        ctaRuleTemplate.setEmploymentTypes(new ArrayList<>());
         if (!ctaRuleTemplateDTO.getEmploymentTypes().isEmpty()) {
-            ctaRuleTemplateDTO.getEmploymentTypes().forEach(c -> {
-                ctaRuleTemplate.getEmploymentTypes().add(ctaDetailsWrapper.getEmploymentTypeIdMap().get(c));
-            });
-
+            for (Iterator<Long> iterator = ctaRuleTemplateDTO.getEmploymentTypes().iterator(); iterator.hasNext(); ) {
+                Long value = iterator.next();
+                ctaRuleTemplate.addEmploymentType(ctaDetailsWrapper.getEmploymentTypeIdMap().get(value));
+            }
         }
         if (ctaRuleTemplateDTO.getRuleTemplateCategory() != null) {
             ctaRuleTemplate.setRuleTemplateCategory(ctaDetailsWrapper.getRuleTemplateCategoryIdMap().get(ctaRuleTemplateDTO.getRuleTemplateCategory()));

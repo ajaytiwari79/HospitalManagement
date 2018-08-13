@@ -123,6 +123,13 @@ public class EmploymentService extends UserBaseService {
 
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
+
+        if (!Optional.ofNullable(objectToUpdate).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+        } else if (objectToUpdate.getExternalId()!=null && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
+            exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
+        }
+
         EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());
         Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         if(Optional.ofNullable(employmentUnitPosition).isPresent()) {
@@ -134,14 +141,6 @@ public class EmploymentService extends UserBaseService {
 
         }
 
-        if (objectToUpdate == null) {
-            logger.info("Staff does not found by id {}", staffId);
-            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
-
-        } else if (!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
-           exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
-
-        }
         EngineerType engineerType = engineerTypeGraphRepository.findOne(staffEmploymentDetail.getEngineerTypeId());
         objectToUpdate.setEmail(staffEmploymentDetail.getEmail());
         objectToUpdate.setCardNumber(staffEmploymentDetail.getCardNumber());
@@ -167,7 +166,7 @@ public class EmploymentService extends UserBaseService {
         map.put("cardNumber", staff.getCardNumber());
         map.put("sendNotificationBy", staff.getSendNotificationBy());
         map.put("copyKariosMailToLogin", staff.isCopyKariosMailToLogin());
-        map.put("email", staff.getEmail());
+        map.put("email", user.getEmail());
         map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic());
         map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));
@@ -879,11 +878,6 @@ public class EmploymentService extends UserBaseService {
         }
         employmentGraphRepository.save(employment);
 
-        if(Optional.ofNullable(employmentEndDate).isPresent()&&(DateUtil.getDateFromEpoch(employmentEndDate).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0)) {
-            //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-            List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
-            moveToReadOnlyAccessGroup(employmentIds);
-        }
         EmploymentReasonCodeQueryResult employmentReasonCode = employmentGraphRepository.findEmploymentreasonCodeByStaff(staffId);
         employment.setReasonCode(employmentReasonCode.getReasonCode());
 

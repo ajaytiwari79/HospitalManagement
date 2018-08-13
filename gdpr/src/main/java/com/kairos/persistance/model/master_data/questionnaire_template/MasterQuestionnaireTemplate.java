@@ -2,9 +2,9 @@ package com.kairos.persistance.model.master_data.questionnaire_template;
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -13,14 +13,14 @@ import java.util.List;
 @Document(collection = "questionnaire_template")
 public class MasterQuestionnaireTemplate extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "Name can't be empty")
+    @NotBlank(message = "Name can't be empty")
     @Pattern(message = "Number and Special character are not allowed for Title",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 
-    @NotNullOrEmpty(message = "Description cannot be empty")
+    @NotBlank(message = "Description cannot be empty")
     private String description;
 
-    @NotNullOrEmpty(message = "Template type cannot be empty ")
+    @NotBlank(message = "Template type cannot be empty ")
     private String templateType;
 
     private BigInteger assetType;

@@ -1,9 +1,8 @@
 package com.kairos.persistance.model.master_data.data_category_element;
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
-
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.List;
 @Document(collection = "data_category")
 public class DataCategory extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "Name cannot be empty")
+    @NotBlank(message = "Name cannot be empty")
     @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
@@ -49,6 +48,12 @@ public class DataCategory extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
+
+
     public DataCategory() {
+    }
+
+    public DataCategory(String name) {
+        this.name = name;
     }
 }

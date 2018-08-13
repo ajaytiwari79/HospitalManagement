@@ -1,12 +1,15 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.kairos.dto.data_inventory.AssetDTO;
+import com.kairos.gdpr.data_inventory.AssetDTO;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
+import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
+import com.kairos.util.ObjectMapperUtils;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
@@ -36,31 +39,45 @@ public class AssetService extends MongoBaseService {
     private JaversCommonService javersCommonService;
 
 
-    public Asset createAsseWithBasictDetail(Long countryId, Long organizationId, AssetDTO assetDto) {
+    @Inject
+    private AssetTypeMongoRepository assetTypeMongoRepository;
 
-        Asset exist = assetMongoRepository.findByName(countryId, organizationId, assetDto.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDto.getName());
+
+    public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
+        Asset previousAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
+        if (Optional.ofNullable(previousAsset).isPresent()) {
+            exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
         }
-        Asset asset = new Asset(assetDto.getName(), assetDto.getDescription(), assetDto.getHostingLocation(), countryId,
-                assetDto.getAssetType(), assetDto.getAssetSubTypes(), assetDto.getManagingDepartment(), assetDto.getAssetOwner(),true);
+        AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
+        if (!Optional.ofNullable(assetType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset  type", assetDTO.getAssetType());
+        } else {
+            if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent()) {
+                if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
+                    exceptionService.invalidRequestException("message.invalid", " invalid Sub Asset is Selected ");
+                }
+            }
+        }
+        Asset asset = new Asset(assetDTO.getName(), assetDTO.getDescription(), assetDTO.getHostingLocation(),
+                assetDTO.getAssetType(), assetDTO.getAssetSubTypes(), assetDTO.getManagingDepartment(), assetDTO.getAssetOwner(), true);
         asset.setOrganizationId(organizationId);
-        asset.setHostingProvider(assetDto.getHostingProvider());
-        asset.setHostingType(assetDto.getHostingType());
-        asset.setOrgSecurityMeasures(assetDto.getOrgSecurityMeasures());
-        asset.setTechnicalSecurityMeasures(assetDto.getTechnicalSecurityMeasures());
-        asset.setStorageFormats(assetDto.getStorageFormats());
-        asset.setDataDisposal(assetDto.getDataDisposal());
-        asset.setDataRetentionPeriod(assetDto.getDataRetentionPeriod());
-        asset.setMaxDataSubjectVolume(assetDto.getMaxDataSubjectVolume());
-        asset.setMinDataSubjectVolume(assetDto.getMinDataSubjectVolume());
-        assetMongoRepository.save(sequenceGenerator(asset));
-        return asset;
+        asset.setHostingProvider(assetDTO.getHostingProvider());
+        asset.setHostingType(assetDTO.getHostingType());
+        asset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
+        asset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
+        asset.setStorageFormats(assetDTO.getStorageFormats());
+        asset.setDataDisposal(assetDTO.getDataDisposal());
+        asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
+        asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
+        asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
+        asset = assetMongoRepository.save(asset);
+        assetDTO.setId(asset.getId());
+        return assetDTO;
     }
 
 
-    public Boolean deleteAssetById(Long countryId, Long organizationId, BigInteger id) {
-        Asset asset = assetMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+    public Boolean deleteAssetById(Long organizationId, BigInteger id) {
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(organizationId, id);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
         }
@@ -70,13 +87,13 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     * @param countryId
+     * @param
      * @param organizationId
      * @param id
-     * @return method return Asset with Meta Data (storgae format ,data Disposal, hosting type and etc)
+     * @return method return Asset with Meta Data (storage format ,data Disposal, hosting type and etc)
      */
-    public AssetResponseDTO getAssetWithMetadataById(Long countryId, Long organizationId, BigInteger id) {
-        AssetResponseDTO asset = assetMongoRepository.findAssetWithMetaDataById(countryId, organizationId, id);
+    public AssetResponseDTO getAssetWithMetadataById(Long organizationId, BigInteger id) {
+        AssetResponseDTO asset = assetMongoRepository.findAssetWithMetaDataById(organizationId, id);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
         }
@@ -85,24 +102,24 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     * @param countryId
+     * @param
      * @param organizationId
      * @return return list Of Asset With Meta Data
      */
-    public List<AssetResponseDTO> getAllAssetWithMetadata(Long countryId, Long organizationId) {
-        return assetMongoRepository.findAllAssetWithMetaData(countryId, organizationId);
+    public List<AssetResponseDTO> getAllAssetWithMetadata(Long organizationId) {
+        return assetMongoRepository.findAllAssetWithMetaData(organizationId);
     }
 
 
     /**
-     * @description method return aduit history of asset , old Object list and latest version also.
-     * return object contain  changed field with key feilds and values with key Values in return list of map
      * @param assetId
      * @return
+     * @description method return audit history of asset , old Object list and latest version also.
+     * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getAssetActivities( BigInteger assetId) throws ClassNotFoundException {
+    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId,int size,int skip)   {
 
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class).limit(size).skip(skip);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
         return javersCommonService.getHistoryMap(changes, assetId, Asset.class);
@@ -112,43 +129,37 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     * @param countryId
+     * @param
      * @param organizationId
      * @param assetId        - asset id
-     * @param assetDto       - asset dto contain meta data about asset
+     * @param assetDTO       - asset dto contain meta data about asset
      * @return - updated Asset
      */
-    public Asset updateAssetData(Long countryId, Long organizationId, BigInteger assetId, AssetDTO assetDto) {
+    public AssetDTO updateAssetData(Long organizationId, BigInteger assetId, AssetDTO assetDTO) {
 
-        Asset existAsset = assetMongoRepository.findByName(countryId, organizationId, assetDto.getName());
-        if (Optional.ofNullable(existAsset).isPresent() && !assetId.equals(existAsset.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDto.getName());
+        Asset asset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
+        if (Optional.ofNullable(asset).isPresent() && !assetId.equals(asset.getId())) {
+            exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
         }
-        existAsset = assetMongoRepository.findByIdAndNonDeleted(countryId, organizationId, assetId);
-        if (!Optional.ofNullable(existAsset).isPresent()) {
+        asset = assetMongoRepository.findByIdAndNonDeleted(organizationId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset ", assetId);
         }
-        existAsset.setHostingLocation(assetDto.getHostingLocation());
-        existAsset.setName(assetDto.getName());
-        existAsset.setDescription(assetDto.getDescription());
-        existAsset.setManagingDepartment(assetDto.getManagingDepartment());
-        existAsset.setAssetOwner(assetDto.getAssetOwner());
-        existAsset.setActive(assetDto.getActive());
-        existAsset.setAssetType(assetDto.getAssetType());
-        existAsset.setAssetSubTypes(assetDto.getAssetSubTypes());
-        existAsset.setHostingProvider(assetDto.getHostingProvider());
-        existAsset.setHostingType(assetDto.getHostingType());
-        existAsset.setOrgSecurityMeasures(assetDto.getOrgSecurityMeasures());
-        existAsset.setTechnicalSecurityMeasures(assetDto.getTechnicalSecurityMeasures());
-        existAsset.setStorageFormats(assetDto.getStorageFormats());
-        existAsset.setDataDisposal(assetDto.getDataDisposal());
-        existAsset.setDataRetentionPeriod(assetDto.getDataRetentionPeriod());
-        existAsset.setMaxDataSubjectVolume(assetDto.getMaxDataSubjectVolume());
-        existAsset.setMinDataSubjectVolume(assetDto.getMinDataSubjectVolume());
-        assetMongoRepository.save(sequenceGenerator(existAsset));
-        return existAsset;
-    }
+        AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
+        if (!Optional.ofNullable(assetType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset Type", assetDTO.getAssetType());
 
+        } else {
+            if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent()) {
+                if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
+                    exceptionService.invalidRequestException("message.invalid", " invalid Sub Asset is Selected ");
+                }
+            }
+        }
+        ObjectMapperUtils.copyProperties(assetDTO, asset);
+        assetMongoRepository.save(asset);
+        return assetDTO;
+    }
 
 
 }

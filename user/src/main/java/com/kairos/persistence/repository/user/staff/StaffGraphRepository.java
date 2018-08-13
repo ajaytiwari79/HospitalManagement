@@ -1,27 +1,29 @@
 package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.enums.reason_code.ReasonCodeType;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.StaffRelationship;
-import com.kairos.persistence.model.staff.employment.MainEmploymentQueryResult;
-import com.kairos.persistence.model.staff.employment.StaffEmploymentDTO;
-import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
-import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
-import com.kairos.wrapper.organization.StaffUnitPositionWrapper;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ClientStaffRelation;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.StaffRelationship;
+import com.kairos.persistence.model.staff.*;
+import com.kairos.persistence.model.staff.employment.MainEmploymentQueryResult;
+import com.kairos.persistence.model.staff.employment.StaffEmploymentDTO;
+import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
+import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
+import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -412,8 +414,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     List<Long> findStaffByExternalIdIn(Set<Long> externalIdsOfStaff);
 
     @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false}) where staff.externalId={0} AND unitPosition.timeCareExternalId={1} " +
-            "return unitPosition,staff ")
-    StaffUnitPositionWrapper getStaff(Long externalId, Long timeCareExternalId);
+            "return unitPosition as unitPosition ,staff as staff ")
+    OrganizationStaffWrapper getStaff(Long externalId, Long timeCareExternalId);
 
     @Query("Match(staff:Staff)-[:BELONGS_TO]-(emp:Employment) where id(staff) = {0} return staff, emp.startDateMillis")
     StaffEmploymentDTO findStaffAndEmploymentByStaffId(Long staffId);
@@ -508,5 +510,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization{deleted:false}) with staff,org\n"+
             "match (org)-[:" + BELONGS_TO + "]-(country:Country)<-[: " + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where reasonCode.reasonCodeType={1} RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName,org.timeZone as timeZone,COLLECT(reasonCode) as reasonCodes")
     List<StaffTimezoneQueryResult> getStaffAndUnitTimezoneByUserIdAndReasonCode(Long id,ReasonCodeType reasonCodeType);
+    @Query("Match(staff:Staff)-[rel:"+STAFF_HAS_EXPERTISE+"]-(exp:Expertise) where id(staff)={0} and id(exp)={1} set rel.expertiseStartDate = {2}  return staff,exp")
+    void updateStaffExpertiseRelation(Long staffId,Long expertiseId,Long millis);
 }
 
