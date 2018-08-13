@@ -96,10 +96,7 @@ import com.kairos.user.organization.*;
 import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.client.ContactAddressDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
-import com.kairos.util.DateConverter;
-import com.kairos.util.DateUtil;
-import com.kairos.util.FormatUtil;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.util.*;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
@@ -373,7 +370,7 @@ public class OrganizationService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
         AccountType accountType=null;
-        if (CompanyType.ORGANIZATION.equals(orgDetails.getCompanyType())){
+        if (CompanyType.COMPANY.equals(orgDetails.getCompanyType())){
                 accountType= accountTypeGraphRepository.findOne(orgDetails.getAccountTypeId());
                 if (!Optional.ofNullable(accountType).isPresent()){
                     exceptionService.dataNotFoundByIdException("message.accountType.notFound");
@@ -381,24 +378,14 @@ public class OrganizationService extends UserBaseService {
         }
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
         validateAccessGroupIdForUnitManager(countryId, orgDetails.getUnitManager().getAccessGroupId(), orgDetails.getCompanyType());
-        Organization organization = new Organization(true,country,accountType,orgDetails.getCompanyType());
-             organization.setParentOrganization(true);
-        organization.setCountry(country);
-        organization.setBoardingCompleted(orgDetails.isBoardingCompleted());
+        Organization organization = new Organization(true,country,accountType,orgDetails.getCompanyType(),orgDetails.isBoardingCompleted());
+
         organization = saveOrganizationDetails(organization, orgDetails, false, countryId);
 
 
         OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
         organization.setOrganizationSetting(organizationSetting);
-        // @ modified by vipul for KSP-107
-        /**
-         * @Modified vipul
-         * when creating an organization linking all existing wta with this subtype to organization
-         */
-        //List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
-        //List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
-        //List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
-        //linkWTAToOrganization(allWtaCopy, allWta);
+
         organization.setTimeZone(ZoneId.of(TIMEZONE_UTC));
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
@@ -410,21 +397,15 @@ public class OrganizationService extends UserBaseService {
         countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
-        long creationDate = DateUtil.getCurrentDate().getTime();
+        long creationDate = DateUtils.getCurrentDayStartMillis();
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
-        creationDate = DateUtil.getCurrentDate().getTime();
+
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
+
         activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), organization.getCountry().getId());
-        // DO NOT CREATE PHASE for UNION
-
-//        if (!orgDetails.getUnion()) {
-//            phaseRestClient.createDefaultPhases(organization.getId());
-//            periodRestClient.createDefaultPeriodSettings(organization.getId());
-//        }
-
-        //Copying Priority Groups to Unit from Country
 
         activityIntegrationService.createDefaultPriorityGroupsFromCountry(organization.getCountry().getId(), organization.getId());
+
         //Copying OpenShift RuleTemplates to Unit from Country
         //OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO=new OrgTypeAndSubTypeDTO(organization.getOorganization.getCountry().getId());
 
@@ -1763,7 +1744,7 @@ public class OrganizationService extends UserBaseService {
     public OrganizationCategory getOrganizationCategory(CompanyType companyType) {
         OrganizationCategory organizationCategory;
         switch (companyType) {
-            case KAIROS_HUB: {
+            case HUB: {
                 organizationCategory = OrganizationCategory.HUB;
                 break;
             }

@@ -9,7 +9,8 @@ import java.util.List;
  * Created by oodles on 16/4/18.
  */
 public enum CompanyType {
-    ORGANIZATION("organization"), HUB("Hub");
+    HUB("HUB"), COMPANY("Company"),UNION("union");
+
     public String value;
     CompanyType(String value) {
         this.value = value;

@@ -244,11 +244,12 @@ public class Organization extends UserBaseEntity {
     public Organization() {
     }
 
-    public Organization(boolean isParentOrganization, Country country,AccountType accountType,CompanyType companyType) {
+    public Organization(boolean isParentOrganization, Country country,AccountType accountType,CompanyType companyType,boolean boardingCompleted) {
         this.isParentOrganization = isParentOrganization;
         this.country = country;
         this.accountType=accountType;
         this.companyType =companyType;
+        this.boardingCompleted=boardingCompleted
     }
 
     public boolean isUnion() {
