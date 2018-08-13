@@ -93,4 +93,9 @@ public class StaffUnitPositionQueryResult {
     public void setUnitPositionId(Long unitPositionId) {
         this.unitPositionId = unitPositionId;
     }
+
+
+    public String toString() {
+    return this.staffId+" ---- "+this.staffEmail;
+    }
 }
