@@ -524,7 +524,7 @@ public class AccessGroupService extends UserBaseService {
         }
         List<AccountType> accountType = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypeIds());
         if (accountType.size() != accessGroupDTO.getAccountTypeIds().size()) {
-            exceptionService.actionNotPermittedException("message.accountType.select");
+            exceptionService.dataNotMatchedException("message.accountType.notFound");
         }
         Country country = countryGraphRepository.findOne(countryId);
 
@@ -540,7 +540,7 @@ public class AccessGroupService extends UserBaseService {
         accessGroupRelationship.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
-        save(country);
+      //  save(country);
 
         //set default permission of access page while creating access group
         setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), accessGroupDTO.getOrganizationCategory());
@@ -548,9 +548,6 @@ public class AccessGroupService extends UserBaseService {
     }
 
     public AccessGroup updateCountryAccessGroup(long countryId, Long accessGroupId, CountryAccessGroupDTO accessGroupDTO) {
-        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) && accessGroupDTO.getAccountTypeIds().isEmpty()) {
-            exceptionService.actionNotPermittedException("message.accountType.select");
-        }
 
         Optional<AccessGroup> accessGrpToUpdate = accessGroupRepository.findById(accessGroupId);
         if (!accessGrpToUpdate.isPresent()) {
@@ -561,11 +558,18 @@ public class AccessGroupService extends UserBaseService {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
         }
-        List<AccountType> accountTypes = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypeIds());
-        if (accountTypes.size() != accessGroupDTO.getAccountTypeIds().size()) {
-            exceptionService.actionNotPermittedException("message.accountType.select");
+        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory())) {
+            if (accessGroupDTO.getAccountTypeIds().isEmpty()) {
+                exceptionService.dataNotMatchedException("message.accountType.select");
+            } else {
+                List<AccountType> accountTypes = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypeIds());
+                if (accountTypes.size() != accessGroupDTO.getAccountTypeIds().size()) {
+                    exceptionService.actionNotPermittedException("message.accountType.notFound");
+                }
+                accessGrpToUpdate.get().setAccountType(accountTypes);
+            }
         }
-        accessGrpToUpdate.get().setAccountType(accountTypes);
+
         accessGrpToUpdate.get().setName(accessGroupDTO.getName());
         accessGrpToUpdate.get().setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.get().setRole(accessGroupDTO.getRole());
@@ -621,14 +625,15 @@ public class AccessGroupService extends UserBaseService {
 
     /**
      * @param accounttypeId
-     * @author vipul
-     * @Desc   This api is used to fetch all access group by account type id in country.
      * @return
+     * @author vipul
+     * @Desc This api is used to fetch all access group by account type id in country.
      */
-    public List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId,Long accountTypeId){
+    public List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId) {
 
         return accessGroupRepository.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId);
     }
+
     public List<AccessGroupQueryResult> getCountryAccessGroups(Long countryId, OrganizationCategory organizationCategory) {
 
         return accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, organizationCategory.toString());
