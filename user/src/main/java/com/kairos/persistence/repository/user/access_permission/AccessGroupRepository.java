@@ -205,8 +205,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     Boolean isOrganizationAccessGroupExistWithNameExceptId(Long orgId, String name, Long accessGroupId);
 
     @Query("MATCH (c:Country) WHERE id(c)={0}\n" +
-            "OPTIONAL MATCH (c)-[r:HAS_ACCESS_GROUP{organizationCategory:'HUB'}]-(a:AccessGroup{deleted:false})  WITH COUNT(r) as hubCount\n" +
-            "OPTIONAL MATCH (c)-[r:HAS_ACCESS_GROUP{organizationCategory:'UNION'}]-(a:AccessGroup{deleted:false})  WITH COUNT(r) as unionCount, hubCount\n" +
+            "OPTIONAL MATCH (c)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'HUB'}]->(a:AccessGroup{deleted:false})  WITH COUNT(r) as hubCount\n" +
+            "OPTIONAL MATCH (c)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'UNION'}]->(a:AccessGroup{deleted:false})  WITH COUNT(r) as unionCount, hubCount\n" +
             "RETURN hubCount, unionCount")
     AccessGroupCountQueryResult getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId);
 
