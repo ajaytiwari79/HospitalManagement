@@ -14,6 +14,8 @@ import com.kairos.util.ObjectMapperUtils;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.open_shift.PriorityGroupWrapper;
 import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -35,8 +37,9 @@ public class PriorityGroupService extends MongoBaseService {
     private PriorityGroupRulesDataGetterService priorityGroupRulesDataGetterService;
     @Inject
     private MailService mailService;
-    @Autowired
+    @Inject
     private ApplicationContext applicationContext;
+    private static final Logger logger = LoggerFactory.getLogger(PriorityGroupService.class);
 
     @Inject private GenericIntegrationService genericIntegrationService;
     @Inject private CounterRepository counterRepository;
@@ -193,11 +196,15 @@ public class PriorityGroupService extends MongoBaseService {
 
     public void notifyStaffByPriorityGroup(BigInteger priorityGroupId){
         if(Optional.ofNullable(priorityGroupId).isPresent()) {
+            logger.info("Excuting priority group----------->"+priorityGroupId);
             PriorityGroupDTO priorityGroup = priorityGroupRepository.findByIdAndDeletedFalse(priorityGroupId);
             PriorityGroupRuleDataDTO priorityGroupRuleDataDTO = priorityGroupRulesDataGetterService.getData(priorityGroup);
+            logger.info("Priority group data---------->filtering staffs from---------->"+priorityGroupRuleDataDTO.getOpenShiftStaffMap().toString());
             PriorityGroupRulesExecutorService priorityGroupRulesExecutorService = new PriorityGroupRulesExecutorService();
             ImpactWeight impactWeight = new ImpactWeight(7,4);
             priorityGroupRulesExecutorService.executeRules(priorityGroup,priorityGroupRuleDataDTO,impactWeight);
+            logger.info("Priority group data---------->filtering staffs from---------->"+priorityGroupRuleDataDTO.getOpenShiftStaffMap().toString());
+
             applicationContext.publishEvent(priorityGroupRuleDataDTO);
         }
 

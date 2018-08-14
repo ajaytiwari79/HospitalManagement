@@ -1,6 +1,5 @@
 package com.kairos.service.shift;
 
-import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.persistence.model.shift.ShiftTemplate;
@@ -12,8 +11,7 @@ import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.userContext.UserContext;
-import org.springframework.beans.BeanUtils;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,6 +1,6 @@
 package com.kairos.config.hystrix;
-import com.kairos.util.userContext.UserContext;
-import com.kairos.util.userContext.UserContextHolder;
+import com.kairos.util.user_context.UserContext;
+import com.kairos.util.user_context.UserContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -20,7 +20,7 @@ public final class DelegatingUserContextCallable<V> implements Callable<V> {
     public DelegatingUserContextCallable(Callable<V> delegate,
                                              UserContext userContext) {
         Assert.notNull(delegate, "delegate cannot be null");
-        Assert.notNull(userContext, "userContext cannot be null");
+        Assert.notNull(userContext, "user_context cannot be null");
         this.delegate = delegate;
         this.originalUserContext = userContext;
     }

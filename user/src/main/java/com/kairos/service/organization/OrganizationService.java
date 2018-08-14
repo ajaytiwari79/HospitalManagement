@@ -1,6 +1,5 @@
 package com.kairos.service.organization;
 
-import com.itextpdf.text.pdf.hyphenation.Hyphen;
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
@@ -98,10 +97,10 @@ import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.client.ContactAddressDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
 import com.kairos.util.*;
-import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
-import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
-import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.external_plateform_shift.GetAllWorkPlacesResponse;
+import com.kairos.util.external_plateform_shift.GetAllWorkPlacesResult;
+import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.util.user_context.UserContext;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
@@ -112,7 +111,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.swing.text.html.Option;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.time.ZoneId;
@@ -120,7 +118,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static org.apache.tomcat.util.http.fileupload.MultipartStream.DASH;
 
 
 /**
