@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL + "/staffing_level_template")
@@ -29,16 +30,19 @@ public class StaffingLevelTemplateController {
     @Autowired
     private StaffingLevelTemplateService staffingLevelTemplateService;
 
-    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @PostMapping(value = "/")
     @ApiOperation("Create staffing level template ")
     public ResponseEntity<Map<String, Object>> addStaffingLevelTemplate(
             @RequestBody @Valid StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelTemplateService.createStaffingTemplate(staffingLevelTemplateDTO));
+        StaffingLevelTemplateDTO levelTemplateDTO=staffingLevelTemplateService.createStaffingLevelTemplate(staffingLevelTemplateDTO);
+        if(!levelTemplateDTO.getErrors().isEmpty()){
+            return ResponseHandler.generateResponse(HttpStatus.UNPROCESSABLE_ENTITY, false, levelTemplateDTO.getErrors());
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, levelTemplateDTO);
     }
 
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @PutMapping(value = "/{id}")
     @ApiOperation("update staffing_level template ")
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(
             @RequestBody @Valid StaffingLevelTemplateDTO staffingLevelTemplateDTO, @PathVariable BigInteger id) {
@@ -46,11 +50,19 @@ public class StaffingLevelTemplateController {
                 staffingLevelTemplateService.updateStaffingTemplate(staffingLevelTemplateDTO,id));
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @GetMapping(value = "/")
     @ApiOperation("update staffing_level template ")
     public ResponseEntity<Map<String, Object>> getValidStaffingLevelTemplates(@PathVariable Long unitId,
       @RequestParam("selectedDate")@DateTimeFormat(pattern="yyyy-MM-dd")Date selectedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 staffingLevelTemplateService.getStaffingLevelTemplates(unitId,selectedDate));
+    }
+
+    @DeleteMapping(value = "/{id}")
+    @ApiOperation("update staffing_level template ")
+    public ResponseEntity<Map<String, Object>> deleteStaffingLevel(@PathVariable BigInteger id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                staffingLevelTemplateService.deleteStaffingLevelTemplate(id));
+
     }
 }

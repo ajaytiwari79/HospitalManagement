@@ -3,6 +3,9 @@ package com.kairos.activity.activity;/*
  *
  */
 
+import com.google.common.base.Strings;
+
+import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
@@ -59,7 +62,7 @@ public class ActivityResponse {
     }
 
     public String getMessage() {
-        return message;
+        return this.name+message;
     }
 
     public void setMessage(String message) {

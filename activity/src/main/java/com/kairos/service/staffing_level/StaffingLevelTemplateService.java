@@ -1,8 +1,6 @@
 package com.kairos.service.staffing_level;
 
-import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.ActivityResponse;
-import com.kairos.activity.shift.ShiftResponse;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.staffing_level.StaffingLevelTemplateDTO;
 import com.kairos.enums.Day;
@@ -23,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -50,10 +49,8 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      * @param staffingLevelTemplateDTO
      * @return
      */
-    public StaffingLevelTemplateDTO createStaffingTemplate(StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
+    public StaffingLevelTemplateDTO createStaffingLevelTemplate(StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
         logger.info("saving staffing level Template  {}", staffingLevelTemplateDTO);
-        Map<String, List<ActivityResponse>> response = new HashMap<>();
-        List<ActivityResponse> errorMessages = new ArrayList<>();
         Set<BigInteger> activityIds=new HashSet<>();
         staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
             staffingLevelInterval.getStaffingLevelActivities().forEach(staffingLevelActivity -> {
@@ -61,15 +58,13 @@ public class StaffingLevelTemplateService extends MongoBaseService {
                 });
         });
 
-        List<ActivityDTO> activitiesNotInRange=  staffingLevelTemplateDTO.getValidity().getEndDate()==null?activityMongoRepository.getInvalidActivitiesByStartDate(activityIds,staffingLevelTemplateDTO.getValidity().getStartDate()):
-                activityMongoRepository.getInvalidActivitiesBetweenDateRange(activityIds,staffingLevelTemplateDTO.getValidity().getStartDate(),staffingLevelTemplateDTO.getValidity().getEndDate());
 
-        if(!activitiesNotInRange.isEmpty()){
-            activitiesNotInRange.forEach(activityNotInRange->{
-                errorMessages.add(new ActivityResponse(activityNotInRange.getId(),activityNotInRange.getName(),activityNotInRange.getStartDate(),
-                        activityNotInRange.getEndDate(),localeService.getMessage("activity.out.of.range")));
-            });
-            exceptionService.actionNotPermittedException("activity.out.of.range",errorMessages);
+        List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
+        //validating Activities
+        List<String> errors= validateActivityRules(activities,staffingLevelTemplateDTO.getValidity().getStartDate(),staffingLevelTemplateDTO.getValidity().getEndDate(),staffingLevelTemplateDTO.getDayType());
+        if(!errors.isEmpty()){
+            staffingLevelTemplateDTO.setErrors(errors);
+            return staffingLevelTemplateDTO;
         }
 
         StaffingLevelTemplate staffingLevelTemplate = new StaffingLevelTemplate();
@@ -78,6 +73,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         BeanUtils.copyProperties(staffingLevelTemplate, staffingLevelTemplateDTO);
         staffingLevelTemplateDTO.setPresenceStaffingLevelInterval(staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelInterval::getSequence)).collect(Collectors.toList()));
+
         return staffingLevelTemplateDTO;
 
     }
@@ -106,7 +102,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
 
     }
 
-    public static StaffingLevelTemplate updateStaffingTemplate(BigInteger staffingTemplateId, StaffingLevelTemplateDTO staffingLevelTemplateDTO,
+    private StaffingLevelTemplate updateStaffingTemplate(BigInteger staffingTemplateId, StaffingLevelTemplateDTO staffingLevelTemplateDTO,
                                                                StaffingLevelTemplate staffingLevelTemplate) {
 
         BeanUtils.copyProperties(staffingLevelTemplateDTO, staffingLevelTemplate);
@@ -139,6 +135,61 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         Day dayEnum = holidayDayType.isPresent() ? Day.EVERYDAY : Day.valueOf(day);
         List<StaffingLevelTemplate> validStaffingLevelTemplates = staffingLevelTemplateRepository.findByUnitIdAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqualAndDayTypeInAndValidDaysIn(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
         return validStaffingLevelTemplates;
+    }
+
+    /**
+     * @Auther Pavan Kumar
+     * @param activities
+     * @param startDate
+     * @param endDate
+     */
+    private List<String> validateActivityRules(List<Activity> activities,LocalDate startDate,LocalDate endDate,List<Long> dayTypes){
+        List<String> errors=new ArrayList<>();
+        if(!Optional.ofNullable(endDate).isPresent()){
+            activities.forEach(activity -> {
+                if(!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
+                        activity.getGeneralActivityTab().getStartDate().isBefore(startDate)){
+                    errors.add(localeService.getMessage("activity.out.of.range"));
+                }
+                if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
+                    errors.add(localeService.getMessage("activity.not.eligible.for.staffing.level"));
+                }
+                if(activity.getRulesActivityTab().isEligibleForPresence()){
+                    errors.add(localeService.getMessage("activity.not.presenceType"));
+                }
+                if(!CollectionUtils.containsAny(dayTypes,activity.getRulesActivityTab().getDayTypes())){
+                    errors.add(localeService.getMessage("activity.not.eligible.dayType"));
+                }
+            });
+        } else {
+            activities.forEach(activity -> {
+                if(Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
+                        (activity.getGeneralActivityTab().getEndDate().isBefore(startDate) ||
+                                activity.getGeneralActivityTab().getStartDate().isAfter(endDate))){
+                    errors.add(localeService.getMessage("activity.out.of.range"));
+                } else if(!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
+                        activity.getGeneralActivityTab().getStartDate().isAfter(endDate)){
+                    errors.add(localeService.getMessage("activity.out.of.range"));
+                }
+
+                if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
+                    errors.add(localeService.getMessage("activity.not.eligible.for.staffing.level"));
+                }
+                if(activity.getRulesActivityTab().isEligibleForPresence()){
+                    errors.add(localeService.getMessage("activity.not.presenceType"));
+                }
+                if(!CollectionUtils.containsAny(dayTypes,activity.getRulesActivityTab().getDayTypes())){
+                    errors.add(localeService.getMessage("activity.not.eligible.dayType"));
+                }
+            });
+        }
+        return errors;
+
+    }
+
+    public boolean deleteStaffingLevelTemplate(BigInteger staffingLevelTemplateId){
+         staffingLevelTemplateRepository.deleteStaffingLevelTemplate(staffingLevelTemplateId);
+         return true;
     }
 
 }

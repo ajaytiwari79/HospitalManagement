@@ -8,6 +8,8 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffingLevelTemplateDTO {
     private BigInteger id;
@@ -22,6 +24,7 @@ public class StaffingLevelTemplateDTO {
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private boolean disabled;
     private boolean deleted ;
+    private List<String> errors;
 
     public StaffingLevelTemplateDTO() {
         //default constructor
@@ -106,7 +109,11 @@ public class StaffingLevelTemplateDTO {
         this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 
+    public List<String> getErrors() {
+        return Optional.ofNullable(errors).orElse(new ArrayList<>());
+    }
 
-
-
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
+    }
 }
