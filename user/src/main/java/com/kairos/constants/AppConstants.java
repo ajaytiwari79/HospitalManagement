@@ -32,15 +32,15 @@ public class AppConstants {
 
     public static final String API_TIME_CARE_SHIFTS = "/api/v1/time_care/getShifts";
     public static final String API_TIME_CARE_ACTIVITIES = "/api/v1/time_care/getWorkPlaces";
-    public static final String API_KMD_CARE_CITIZEN = "/api/v1/external_citizen_import/citizen/preferences/{unitId}";
-    public static final String KMD_CARE_CITIZEN_URL = "/api/v1/external_citizen_import/citizen/preferences/";
-    public static final String API_KMD_CARE_CITIZEN_GRANTS = "/api/v1/external_citizen_import/citizen/grants";
-    public static final String API_KMD_CARE_CITIZEN_RELATIVE_DATA = "/api/v1/external_citizen_import/citizen/nextToKin";
+    public static final String API_KMD_CARE_CITIZEN = "/api/v1/kmdNexux/citizen/preferences/{unitId}";
+    public static final String KMD_CARE_CITIZEN_URL = "/api/v1/kmdNexux/citizen/preferences/";
+    public static final String API_KMD_CARE_CITIZEN_GRANTS = "/api/v1/kmdNexux/citizen/grants";
+    public static final String API_KMD_CARE_CITIZEN_RELATIVE_DATA = "/api/v1/kmdNexux/citizen/nextToKin";
     public static final String FORWARD_SLASH = "/";
 
-    public static final String API_KMD_CARE_STAFF_SHIFTS = "/api/v1/external_citizen_import/citizen/unit/{unitId}/getShifts/{filterId}";
-    public static final String API_KMD_CARE_TIME_SLOTS = "/api/v1/external_citizen_import/citizen/unit/{unitId}/getTimeSlots";
-    public static final String API_KMD_CARE_URL = "/api/v1/external_citizen_import/citizen/unit/";
+    public static final String API_KMD_CARE_STAFF_SHIFTS = "/api/v1/kmdNexux/citizen/unit/{unitId}/getShifts/{filterId}";
+    public static final String API_KMD_CARE_TIME_SLOTS = "/api/v1/kmdNexux/citizen/unit/{unitId}/getTimeSlots";
+    public static final String API_KMD_CARE_URL = "/api/v1/kmdNexux/citizen/unit/";
     public static final String API_TIME_SLOTS_NAME = "/api/v1/organization/{organizationId}/unit/{unitId}/time_slot_name";
 
     public static final String API_CREDENTIAL_UPDATE_URL = "/api/v1/user/password";
@@ -105,22 +105,6 @@ public class AppConstants {
     //Transformation Paths
     //development and production
     public static final String IMPORT_TIMECARE_SHIFTS_PATH = "/opt/infra/data-integration/GetAllWorkShiftsByWorkPlaceId.ktr";
-
-    //Absence planner
-    public static final String TASK_TYPE_MISSING_MESSAGE = "Please update taskType details of task just imported from TimeCare";
-    public static final String STAFF_MISSING_MESSAGE = "Please update staff details of task just imported from TimeCare";
-    public static final String TASK_TYPE_MISSING_STATUS = "Task Type Missing";
-    public static final String STAFF_MISSING_STATUS = "Staff Missing";
-    public static final String LOCATION_MISSING_MESSAGE = "Please update location of task just imported from TimeCare";
-    public static final String LOCATION_MISSING_STATUS = "Location Missing";
-    public static final String PARTIAL_ABSENCE_TAB = "partialAbsence";
-    public static final String FULL_DAY_ABSENCE_TAB = "fullDayAbsence";
-    public static final String PRESENCE_TAB = "presence";
-    public static final String ALL_TAB = "all";
-    public static final String ABSENT = "Absent";
-    public static final String PRESENT = "Present";
-    public static final String FULL_DAY = "Full day";
-    public static final String PARTIALLY = "Partially";
 
     public static final String DAY = "Day";
     public static final String EVENING = "Evening";
