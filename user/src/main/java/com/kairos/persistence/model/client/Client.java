@@ -770,11 +770,11 @@ public class Client extends UserBaseEntity {
     // General Tab Constructor
     public Map<String, Object> retrieveClientGeneralDetails() {
         Map<String, Object> map = new HashMap<>();
+        map.put("id", this.id);
         map.put("cprNumber", this.getUser().getCprNumber());
         map.put("firstName", this.getUser().getFirstName());
         map.put("lastName", this.getUser().getLastName());
         map.put("nameAmongStaff", this.nameAmongStaff);
-        //    map.put("civilianStatus", this.civilianStatus);
         map.put("age", Period.between(CPRUtil.getDateOfBirthFromCPR(this.getUser().getCprNumber()), LocalDate.now()).getYears());
         map.put("gender", this.getUser().getGender());
         map.put("profilePic", this.profilePic);
@@ -798,7 +798,7 @@ public class Client extends UserBaseEntity {
     public Map<String, Object> retrieveTransportationDetails() {
         Map<String, Object> map = new HashMap<>();
         map.put("id", this.getId());
-        map.put("driverLicenseNumber", this.driverLicenseNumber != null ? this.driverLicenseNumber : "");
+        map.put("driverLicenseNumber", this.driverLicenseNumber != null ?  this.driverLicenseNumber : "");
         map.put("useWheelChair", this.useWheelChair);
         map.put("liftBus", this.liftBus);
         map.put("requiredEquipmentsList", this.requiredEquipmentsList != null ? this.requiredEquipmentsList : "");

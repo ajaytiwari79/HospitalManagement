@@ -17,7 +17,7 @@ public final class ApiConstants {
     public static final String API_ABSENCE_PLANNING_URL = API_ORGANIZATION_URL + UNIT_URL + "/absence_planning";
     public static final String API_INTEGRATION_URL = API_ORGANIZATION_URL + UNIT_URL + "/integration";
     public static final String API_NOTIFICATION_URL = API_ORGANIZATION_URL  + "/notification";
-    public static final String API_KMD_NEXUS_CITIZEN_URL = API_V1 + "/kmdNexus/citizen";
+    public static final String API_KMD_NEXUS_CITIZEN_URL = API_V1 + "/external_citizen_import/citizen";
     public static final String API_AGGREGATOR_CITIZEN_URL = API_V1 + "/aggregator/citizen";
     public static final String WS_URL="ws://localhost:8090"+API_V1+"/kairos/ws";
     public static final String API_REQUEST_COMPONENT_URL =  API_V1 + PARENT_ORGANIZATION_URL + "/resourceComponent";

@@ -32,7 +32,7 @@ import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.user.staff.permission.StaffPermissionDTO;
 import com.kairos.user.staff.permission.StaffTabPermission;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

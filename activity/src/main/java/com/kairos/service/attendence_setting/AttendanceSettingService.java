@@ -15,7 +15,7 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.user.organization.OrganizationCommonDTO;
 import com.kairos.user.reason_code.ReasonCodeDTO;
 import com.kairos.util.DateUtils;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalDate;
