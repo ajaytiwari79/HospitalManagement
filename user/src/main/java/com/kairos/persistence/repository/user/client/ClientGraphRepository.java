@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.user.client;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.queryResults.*;
+import com.kairos.persistence.model.client.query_results.*;
 import com.kairos.persistence.model.client.relationships.ClientContactPersonRelationship;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.team.Team;

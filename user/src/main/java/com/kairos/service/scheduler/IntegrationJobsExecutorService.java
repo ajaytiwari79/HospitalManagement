@@ -8,7 +8,7 @@ import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.util.DateUtils;
-import com.kairos.util.timeCareShift.Transstatus;
+import com.kairos.util.external_plateform_shift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;

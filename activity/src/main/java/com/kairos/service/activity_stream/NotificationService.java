@@ -7,7 +7,7 @@ import com.kairos.persistence.model.activity_stream.Notification;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.repository.activity_stream.NotificationMongoRepository;
 import com.kairos.service.mail.MailService;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

@@ -1,6 +1,6 @@
 package com.kairos.config.hystrix;
 
-import com.kairos.util.userContext.UserContextHolder;
+import com.kairos.util.user_context.UserContextHolder;
 import com.netflix.hystrix.HystrixThreadPoolKey;
 import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestVariable;
