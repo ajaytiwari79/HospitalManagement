@@ -1,6 +1,7 @@
 package com.kairos.persistance.model.master_data.questionnaire_template;
 
 
+import com.kairos.enums.QuestionType;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,7 +20,7 @@ public class MasterQuestion extends MongoBaseEntity {
     private Boolean isRequired=false;
 
     @NotNull
-    private String questionType;
+    private QuestionType questionType;
 
     private Boolean isNotSureAllowed=false;
 
@@ -75,15 +76,15 @@ public class MasterQuestion extends MongoBaseEntity {
         isNotSureAllowed = notSureAllowed;
     }
 
-    public String getQuestionType() {
+    public QuestionType getQuestionType() {
         return questionType;
     }
 
-    public void setQuestionType(String questionType) {
+    public void setQuestionType(QuestionType questionType) {
         this.questionType = questionType;
     }
 
-    public MasterQuestion(String question, String description, String questionType, Long countryId) {
+    public MasterQuestion(String question, String description, QuestionType questionType, Long countryId) {
         this.question = question;
         this.description = description;
         this.questionType = questionType;

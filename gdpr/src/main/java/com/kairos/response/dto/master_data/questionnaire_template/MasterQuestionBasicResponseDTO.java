@@ -17,7 +17,17 @@ public class MasterQuestionBasicResponseDTO {
 
     private String questionType;
 
+    private String attributeName;
+
     private Boolean isRequired;
+
+    public String getAttributeName() {
+        return attributeName;
+    }
+
+    public void setAttributeName(String attributeName) {
+        this.attributeName = attributeName;
+    }
 
     public Boolean getRequired() {
         return isRequired;

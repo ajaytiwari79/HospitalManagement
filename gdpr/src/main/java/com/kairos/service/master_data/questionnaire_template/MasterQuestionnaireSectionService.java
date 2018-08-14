@@ -1,6 +1,7 @@
 package com.kairos.service.master_data.questionnaire_template;
 
 
+import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.gdpr.master_data.MasterQuestionnaireSectionDTO;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireSection;
@@ -101,7 +102,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @description method create new question sections belong to questionnaire template and and questions which belong to section.
      * and rollback if exception occur in questionnaire section service to delete inserted questions
      */
-    public Map<String, Object> createQuestionnaireSectionAndCreateAndAddQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> masterQuestionnaireSectionDTOs, String templateType) {
+    public Map<String, Object> createQuestionnaireSectionAndCreateAndAddQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> masterQuestionnaireSectionDTOs, QuestionnaireTemplateType templateType) {
 
         Map<String, Object> result = new HashMap<>();
         List<MasterQuestionnaireSection> masterQuestionnaireSections = new ArrayList<>();
@@ -183,7 +184,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @description this method update existing sections (if contain id) and create new sections(if not contain id in request)
      * and update existing questions if contain id in request and create new question if not contain id in request which belongs to section
      **/
-    public Map<String, Object> updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> questionnaireSectionDto, String templateType) {
+    public Map<String, Object> updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> questionnaireSectionDto, QuestionnaireTemplateType templateType) {
 
         checkForDuplicacyInTitleOfSections(questionnaireSectionDto);
         List<MasterQuestionnaireSectionDTO> updateExistingSectionsList = new ArrayList<>();
@@ -229,7 +230,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @return map which contain list of sections ,section ids and questions.
      * @description this method update list of existing sections and update questions if exist already other wise create questions
      */
-    public Map<String, Object> updateQuestionnaireSectionAndQuestionList(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> updateSectionsAndQuestionsListDto, String templateType) {
+    public Map<String, Object> updateQuestionnaireSectionAndQuestionList(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> updateSectionsAndQuestionsListDto, QuestionnaireTemplateType templateType) {
 
         List<MasterQuestionnaireSection> updateSectionsList = new ArrayList<>();
         List<BigInteger> sectionsIds = new ArrayList<>();

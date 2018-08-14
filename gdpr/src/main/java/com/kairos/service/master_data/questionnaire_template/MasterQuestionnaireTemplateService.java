@@ -59,8 +59,8 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * @return Object of Questionnaire template with template type and asset type if template type is(ASSET_TYPE_KEY)
      */
     public MasterQuestionnaireTemplateDTO addQuestionnaireTemplate(Long countryId, Long organizationId, MasterQuestionnaireTemplateDTO templateDto) {
-        MasterQuestionnaireTemplate existing = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, organizationId, templateDto.getName());
-        if (Optional.ofNullable(existing).isPresent()) {
+        MasterQuestionnaireTemplate previousTemplate = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, organizationId, templateDto.getName());
+        if (Optional.ofNullable(previousTemplate).isPresent()) {
             throw new DuplicateDataException("Template Exists with same name");
         }
         MasterQuestionnaireTemplate questionnaireTemplate = new MasterQuestionnaireTemplate(templateDto.getName(), countryId, templateDto.getDescription());
@@ -98,26 +98,26 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
 
         switch (templateType) {
             case VENDOR:
-                questionnaireTemplate.setTemplateType(templateType.value);
+                questionnaireTemplate.setTemplateType(templateType);
                 break;
             case GENERAL:
-                questionnaireTemplate.setTemplateType(templateType.value);
+                questionnaireTemplate.setTemplateType(templateType);
                 break;
             case ASSET_TYPE:
                 if (assetTypeId == null) {
                     exceptionService.invalidRequestException("message.invalid.request", "asset type is null");
                 } else if (assetTypeMongoRepository.findByIdAndNonDeleted(UserContext.getCountryId(), assetTypeId) != null) {
-                    questionnaireTemplate.setTemplateType(templateType.value);
+                    questionnaireTemplate.setTemplateType(templateType);
                     questionnaireTemplate.setAssetType(assetTypeId);
                 } else {
                     exceptionService.dataNotFoundByIdException("message.dataNotFound", "asset type", assetTypeId);
                 }
                 break;
             case PROCESSING_ACTIVITY:
-                questionnaireTemplate.setTemplateType(templateType.value);
+                questionnaireTemplate.setTemplateType(templateType);
                 break;
             default:
-                throw new InvalidRequestException("invalid request template type not found for " + templateType.value);
+                throw new InvalidRequestException("invalid request template type not found for " + templateType);
         }
     }
 

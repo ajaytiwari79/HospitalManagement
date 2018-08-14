@@ -46,15 +46,16 @@ public class MasterQuestionService extends MongoBaseService {
      * @return map contain list of questions and question ids
      * @description
      */
-    public Map<String, Object> addQuestionsToQuestionSection(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs, String templateType) {
+    public Map<String, Object> addQuestionsToQuestionSection(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs, QuestionnaireTemplateType templateType) {
 
         List<BigInteger> questionSectionIds = new ArrayList<>();
         Map<String, Object> result = new HashMap<>();
         List<MasterQuestion> masterQuestions = new ArrayList<>();
         checkForDuplicacyInQuestion(masterQuestionDTOs);
         for (MasterQuestionDTO masterQuestion : masterQuestionDTOs) {
-            if (QuestionType.valueOf(masterQuestion.getQuestionType()) != null) {
-                MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), masterQuestion.getQuestionType(), countryId);
+            QuestionType questionType = QuestionType.valueOf(masterQuestion.getQuestionType());
+            if (Optional.ofNullable(questionType).isPresent()) {
+                MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), questionType, countryId);
                 question.setNotSureAllowed(masterQuestion.getNotSureAllowed());
                 question.setRequired(masterQuestion.getRequired());
                 question.setOrganizationId(organizationId);
@@ -91,13 +92,12 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-    public void addAttributeNameToQuestion(MasterQuestion masterQuestion, MasterQuestionDTO masterQuestionDTO, String templateType) {
+    public void addAttributeNameToQuestion(MasterQuestion masterQuestion, MasterQuestionDTO masterQuestionDTO, QuestionnaireTemplateType templateType) {
 
-        QuestionnaireTemplateType questionnaireTemplateType = QuestionnaireTemplateType.valueOf(templateType);
-        if (!Optional.ofNullable(questionnaireTemplateType).isPresent()) {
+        if (!Optional.ofNullable(templateType).isPresent()) {
             exceptionService.invalidRequestException("message.invalid.request", " Attribute name is incorrect");
         }
-        switch (questionnaireTemplateType) {
+        switch (templateType) {
             case ASSET_TYPE:
                 if (Optional.ofNullable(AssetAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
                     masterQuestion.setAttributeName(masterQuestionDTO.getAttributeName());
@@ -168,7 +168,7 @@ public class MasterQuestionService extends MongoBaseService {
      * @return map contain list of questions and question ids.
      * @description method update the existing question(if question contain id) and create new question questions(if not contain id)
      */
-    public Map<String, Object> updateExistingQuestionAndCreateNewQuestions(Long countryId, Long organizationId, List<MasterQuestionDTO> questionDTOs, String templateType) {
+    public Map<String, Object> updateExistingQuestionAndCreateNewQuestions(Long countryId, Long organizationId, List<MasterQuestionDTO> questionDTOs, QuestionnaireTemplateType templateType) {
 
         checkForDuplicacyInQuestion(questionDTOs);
         List<MasterQuestionDTO> updateExistingQuestions = new ArrayList<>();
@@ -205,7 +205,7 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-    public Map<String, Object> updateQuestionsList(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs, String templateType) {
+    public Map<String, Object> updateQuestionsList(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs, QuestionnaireTemplateType templateType) {
 
         List<BigInteger> questionIds = new ArrayList<>();
         masterQuestionDTOs.forEach(question -> questionIds.add(question.getId()));
@@ -219,11 +219,12 @@ public class MasterQuestionService extends MongoBaseService {
         for (MasterQuestion masterQuestion : existingMasterQuestions) {
 
             MasterQuestionDTO questionDto = (MasterQuestionDTO) masterQuestionDtoCorrespondingToId.get(masterQuestion.getId());
-            if (QuestionType.valueOf(questionDto.getQuestionType()) != null) {
+            QuestionType questionType = QuestionType.valueOf(questionDto.getQuestionType());
+            if (Optional.ofNullable(questionType).isPresent()) {
                 masterQuestion.setQuestion(questionDto.getQuestion());
                 masterQuestion.setNotSureAllowed(questionDto.getNotSureAllowed());
                 masterQuestion.setRequired(questionDto.getRequired());
-                masterQuestion.setQuestionType(questionDto.getQuestionType());
+                masterQuestion.setQuestionType(questionType);
                 addAttributeNameToQuestion(masterQuestion, questionDto, templateType);
                 masterQuestion.setDescription(questionDto.getDescription());
                 updatedQuestionsList.add(masterQuestion);
