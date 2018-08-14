@@ -1,5 +1,9 @@
 package com.kairos.service.master_data.questionnaire_template;
 
+import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.AssetAttributeName;
+import com.kairos.enums.ProcessingActivityAttributeName;
+import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.gdpr.master_data.MasterQuestionDTO;
 import com.kairos.enums.QuestionType;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestion;
@@ -42,7 +46,7 @@ public class MasterQuestionService extends MongoBaseService {
      * @return map contain list of questions and question ids
      * @description
      */
-    public Map<String, Object> addQuestionsToQuestionSection(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs) {
+    public Map<String, Object> addQuestionsToQuestionSection(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs, String templateType) {
 
         List<BigInteger> questionSectionIds = new ArrayList<>();
         Map<String, Object> result = new HashMap<>();
@@ -54,6 +58,7 @@ public class MasterQuestionService extends MongoBaseService {
                 question.setNotSureAllowed(masterQuestion.getNotSureAllowed());
                 question.setRequired(masterQuestion.getRequired());
                 question.setOrganizationId(organizationId);
+                addAttributeNameToQuestion(question, masterQuestion, templateType);
                 masterQuestions.add(question);
             } else {
                 exceptionService.invalidRequestException("message.invalid.request", masterQuestion.getQuestion() + " not exist");
@@ -85,13 +90,40 @@ public class MasterQuestionService extends MongoBaseService {
 
     }
 
+
+    public void addAttributeNameToQuestion(MasterQuestion masterQuestion, MasterQuestionDTO masterQuestionDTO, String templateType) {
+
+        QuestionnaireTemplateType questionnaireTemplateType = QuestionnaireTemplateType.valueOf(templateType);
+        if (!Optional.ofNullable(questionnaireTemplateType).isPresent()) {
+            exceptionService.invalidRequestException("message.invalid.request", " Attribute name is incorrect");
+        }
+        switch (questionnaireTemplateType) {
+            case ASSET_TYPE:
+                if (Optional.ofNullable(AssetAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
+                    masterQuestion.setAttributeName(masterQuestionDTO.getAttributeName());
+                } else {
+                    throw new InvalidRequestException("Attribute not found for Asset ");
+                }
+                break;
+            case PROCESSING_ACTIVITY:
+                if (Optional.ofNullable(ProcessingActivityAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
+                    masterQuestion.setAttributeName(masterQuestionDTO.getAttributeName());
+                } else {
+                    throw new InvalidRequestException("Attribute not found for Processing Activity");
+                }
+                break;
+        }
+
+    }
+
+
     /**
-     * @description   deleted question by id ,and also remove id of question from questionnaire section.
      * @param countryId
      * @param organizationId
-     * @param id  - id of question
-     * @param sectionId -sectionId id of questionnaire section
+     * @param id             - id of question
+     * @param sectionId      -sectionId id of questionnaire section
      * @return
+     * @description deleted question by id ,and also remove id of question from questionnaire section.
      */
     public Boolean deleteMasterQuestion(Long countryId, Long organizationId, BigInteger id, BigInteger sectionId) {
 
@@ -102,7 +134,7 @@ public class MasterQuestionService extends MongoBaseService {
         MasterQuestionnaireSection questionnaireSection = masterQuestionnaireSectionRepository.findByIdAndNonDeleted(countryId, organizationId, sectionId);
         List<BigInteger> questionsIdList = questionnaireSection.getQuestions();
         if (!questionsIdList.contains(id)) {
-            exceptionService.invalidRequestException("message.invalid", "question  not present in questionnaire section "+questionnaireSection.getTitle()+"");
+            exceptionService.invalidRequestException("message.invalid", "question  not present in questionnaire section " + questionnaireSection.getTitle() + "");
         }
         questionsIdList.remove(id);
         questionnaireSection.setQuestions(questionsIdList);
@@ -136,7 +168,7 @@ public class MasterQuestionService extends MongoBaseService {
      * @return map contain list of questions and question ids.
      * @description method update the existing question(if question contain id) and create new question questions(if not contain id)
      */
-    public Map<String, Object> updateExistingQuestionAndCreateNewQuestions(Long countryId, Long organizationId, List<MasterQuestionDTO> questionDTOs) {
+    public Map<String, Object> updateExistingQuestionAndCreateNewQuestions(Long countryId, Long organizationId, List<MasterQuestionDTO> questionDTOs, String templateType) {
 
         checkForDuplicacyInQuestion(questionDTOs);
         List<MasterQuestionDTO> updateExistingQuestions = new ArrayList<>();
@@ -155,13 +187,13 @@ public class MasterQuestionService extends MongoBaseService {
         List<MasterQuestion> masterQuestions = new ArrayList<>();
 
         if (createNewQuestions.size() != 0) {
-            newQuestions = addQuestionsToQuestionSection(countryId, organizationId, createNewQuestions);
+            newQuestions = addQuestionsToQuestionSection(countryId, organizationId, createNewQuestions, templateType);
             questionIds.addAll((List<BigInteger>) newQuestions.get(IDS_LIST));
             masterQuestions.addAll((List<MasterQuestion>) newQuestions.get(QUESTION_LIST));
         }
         if (updateExistingQuestions.size() != 0) {
 
-            updatedQuestions = updateQuestionsList(countryId, organizationId, updateExistingQuestions);
+            updatedQuestions = updateQuestionsList(countryId, organizationId, updateExistingQuestions, templateType);
             questionIds.addAll((List<BigInteger>) updatedQuestions.get(IDS_LIST));
             masterQuestions.addAll((List<MasterQuestion>) updatedQuestions.get(QUESTION_LIST));
         }
@@ -173,7 +205,7 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-    public Map<String, Object> updateQuestionsList(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs) {
+    public Map<String, Object> updateQuestionsList(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs, String templateType) {
 
         List<BigInteger> questionIds = new ArrayList<>();
         masterQuestionDTOs.forEach(question -> questionIds.add(question.getId()));
@@ -192,6 +224,7 @@ public class MasterQuestionService extends MongoBaseService {
                 masterQuestion.setNotSureAllowed(questionDto.getNotSureAllowed());
                 masterQuestion.setRequired(questionDto.getRequired());
                 masterQuestion.setQuestionType(questionDto.getQuestionType());
+                addAttributeNameToQuestion(masterQuestion, questionDto, templateType);
                 masterQuestion.setDescription(questionDto.getDescription());
                 updatedQuestionsList.add(masterQuestion);
             } else {

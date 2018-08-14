@@ -23,7 +23,17 @@ public class MasterQuestion extends MongoBaseEntity {
 
     private Boolean isNotSureAllowed=false;
 
+    private String attributeName;
+
     private Long countryId;
+
+    public String getAttributeName() {
+        return attributeName;
+    }
+
+    public void setAttributeName(String attributeName) {
+        this.attributeName = attributeName;
+    }
 
     public Long getCountryId() {
         return countryId;

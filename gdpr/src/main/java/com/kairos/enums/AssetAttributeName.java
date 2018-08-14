@@ -1,6 +1,6 @@
 package com.kairos.enums;
 
-public enum AssetTemplateAttributeName {
+public enum AssetAttributeName {
 
 
     NAME, DESCRIPTION, HOSTINGLOCATION, MANAGINGDEPARTMENT, ASSETOWNER, STORAGEFORMATS, ORGSECURITYMEASURES, TECHNICALSECURITYMEASURES,

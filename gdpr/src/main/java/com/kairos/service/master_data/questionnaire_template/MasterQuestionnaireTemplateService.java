@@ -3,6 +3,8 @@ package com.kairos.service.master_data.questionnaire_template;
 
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.AssetAttributeName;
+import com.kairos.enums.ProcessingActivityAttributeName;
 import com.kairos.gdpr.master_data.MasterQuestionnaireTemplateDTO;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireTemplate;
@@ -200,6 +202,26 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         });
         return templateResponseDTOs;
 
+    }
+
+
+    public Object[] getQuestionnaireTemplateAttributeNames(String templateType) {
+
+
+        if (QuestionnaireTemplateType.valueOf(templateType) == null) {
+            throw new InvalidRequestException("template type not found for" + templateType);
+        }
+        QuestionnaireTemplateType questionnaireTemplateType = QuestionnaireTemplateType.valueOf(templateType);
+        Object[] attributeNames = new Object[]{};
+        switch (questionnaireTemplateType) {
+            case ASSET_TYPE:
+                attributeNames = AssetAttributeName.values();
+                break;
+            case PROCESSING_ACTIVITY:
+                attributeNames = ProcessingActivityAttributeName.values();
+                break;
+        }
+        return attributeNames;
     }
 
 

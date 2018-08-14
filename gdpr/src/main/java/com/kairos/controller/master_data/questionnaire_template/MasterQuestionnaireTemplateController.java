@@ -131,6 +131,24 @@ public class MasterQuestionnaireTemplateController {
 
     }
 
+
+
+
+    @ApiOperation(value = "get Questionnaire template Attribute List Acc to Template type")
+    @GetMapping("/questionnaire_template/attributes")
+    public ResponseEntity<Object> getQuestionnaireTemplateAttributeNames(@PathVariable Long countryId, @RequestParam String templateType) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getQuestionnaireTemplateAttributeNames(templateType));
+    }
+
+
+
+
+
+
+
     @ApiOperation(value = "get all questionnaire template basic response of unit")
     @GetMapping(UNIT_URL+"/questionnaire_template/all")
     public ResponseEntity<Object> getAllMasterQuestionnaireTemplateWithSectionAndQuestionOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
