@@ -20,14 +20,14 @@ public class OrganizationResponseDTO {
     private  String externalId;
     private ContactAddressDTO contactAddress;
     private  Long levelId;
-
+    private String kairosId;
     private Boolean union;
     private String desiredUrl;
     private String shortCompanyName;
     private Long companyCategoryId;
     private Integer kairosCompanyId;
     private CompanyType companyType;
-
+    private Long accountTypeId;
     private String vatId;
     private boolean costCenter;
     private Integer costCenterId;
@@ -218,5 +218,21 @@ public class OrganizationResponseDTO {
 
     public void setUnitManager(UnitManagerDTO unitManager) {
         this.unitManager = unitManager;
+    }
+
+    public String getKairosId() {
+        return kairosId;
+    }
+
+    public void setKairosId(String kairosId) {
+        this.kairosId = kairosId;
+    }
+
+    public Long getAccountTypeId() {
+        return accountTypeId;
+    }
+
+    public void setAccountTypeId(Long accountTypeId) {
+        this.accountTypeId = accountTypeId;
     }
 }

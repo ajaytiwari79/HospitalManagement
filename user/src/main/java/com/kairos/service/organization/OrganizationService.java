@@ -102,6 +102,7 @@ import com.kairos.util.external_plateform_shift.GetAllWorkPlacesResult;
 import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.user_context.UserContext;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -380,9 +381,10 @@ public class OrganizationService extends UserBaseService {
         validateAccessGroupIdForUnitManager(countryId, orgDetails.getUnitManager().getAccessGroupId(), orgDetails.getCompanyType());
         String kairosId = organizationGraphRepository.getKairosId(orgDetails.getName().substring(0, 3));
         if (kairosId == null) {
-            kairosId = orgDetails.getName().substring(0, 3) + HYPHEN + ONE;
+            kairosId = StringUtils.upperCase(orgDetails.getName().substring(0, 3)) + HYPHEN + ONE;
         } else {
-            kairosId = orgDetails.getName().substring(0, 3) + HYPHEN + kairosId.charAt(kairosId.length() - 1);
+            int lastSuffix=new Integer(kairosId.substring(4,kairosId.length()));
+            kairosId = StringUtils.upperCase(orgDetails.getName().substring(0, 3)) + HYPHEN + (++lastSuffix);
         }
         Organization organization = new Organization(true, country, accountType, orgDetails.getCompanyType(), orgDetails.isBoardingCompleted(), kairosId);
         organization = saveOrganizationDetails(organization, orgDetails, false, countryId);
@@ -648,6 +650,7 @@ public class OrganizationService extends UserBaseService {
 
         OrganizationResponseDTO organizationResponseDTO = new OrganizationResponseDTO();
         organizationResponseDTO.setName(organization.getName());
+        organizationResponseDTO.setKairosId(organization.getKairosId());
         organizationResponseDTO.setId(organization.getId());
         organizationResponseDTO.setPrekairos(organization.isPrekairos());
         organizationResponseDTO.setKairosHub(organization.isKairosHub());
@@ -658,7 +661,7 @@ public class OrganizationService extends UserBaseService {
         organizationResponseDTO.setExternalId(organization.getExternalId());
         organizationResponseDTO.setContactAddress(filterContactAddressInfo(organization.getContactAddress()));
         organizationResponseDTO.setLevelId((organization.getLevel() == null) ? null : organization.getLevel().getId());
-
+        organizationResponseDTO.setAccountTypeId(organization.getAccountType() == null ? null : organization.getAccountType().getId());
         organizationResponseDTO.setUnion(organization.isUnion());
         organizationResponseDTO.setDesiredUrl(organization.getDesiredUrl());
         organizationResponseDTO.setShortCompanyName(organization.getShortCompanyName());
@@ -670,7 +673,6 @@ public class OrganizationService extends UserBaseService {
         organizationResponseDTO.setCostCenterId(organization.getCostCenterId());
         organizationResponseDTO.setCompanyUnitType(organization.getCompanyUnitType());
         organizationResponseDTO.setBoardingCompleted(organization.isBoardingCompleted());
-
         organizationResponseDTO.setUnitManager(unitManagerDTO);
         return organizationResponseDTO;
     }
