@@ -21,6 +21,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.constants.AppConstants.PRIORITY_GROUP1_NAME;
+
 @Service
 @Transactional
 public class OrderService extends MongoBaseService {
@@ -52,7 +54,7 @@ public class OrderService extends MongoBaseService {
        orderOpenshiftResponseDTO.setPriorityGroups(priorityGroupDTOS);
        BigInteger id = null;
        for(PriorityGroupDTO priorityGroupDTO:priorityGroupDTOS) {
-           if("PRIORITY_GROUP1".equals(priorityGroupDTO.getName())) {
+           if(PRIORITY_GROUP1_NAME.equals(priorityGroupDTO.getName().toString())) {
                id = priorityGroupDTO.getId();
                break;
            }

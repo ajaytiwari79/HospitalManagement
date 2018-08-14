@@ -10,8 +10,7 @@ import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
 
-import com.kairos.persistence.model.client.queryResults.ClientMinimumDTO;
-import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
@@ -86,7 +85,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.util.DateUtils.ONLY_DATE;

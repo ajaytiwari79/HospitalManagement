@@ -2,7 +2,7 @@ package com.kairos.interceptor;
 
 
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.utils.userContext.UserContext;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
