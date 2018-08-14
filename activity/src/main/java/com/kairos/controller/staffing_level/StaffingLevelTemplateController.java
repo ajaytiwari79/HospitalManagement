@@ -53,16 +53,16 @@ public class StaffingLevelTemplateController {
     @GetMapping(value = "/")
     @ApiOperation("update staffing_level template ")
     public ResponseEntity<Map<String, Object>> getValidStaffingLevelTemplates(@PathVariable Long unitId,
-      @RequestParam("selectedDate")@DateTimeFormat(pattern="yyyy-MM-dd")Date selectedDate) {
+      @RequestParam(value = "selectedDate",required = false)@DateTimeFormat(pattern="yyyy-MM-dd")Date selectedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 staffingLevelTemplateService.getStaffingLevelTemplates(unitId,selectedDate));
     }
 
-    @DeleteMapping(value = "/{id}")
-    @ApiOperation("update staffing_level template ")
-    public ResponseEntity<Map<String, Object>> deleteStaffingLevel(@PathVariable BigInteger id) {
+    @DeleteMapping(value = "/{staffingLevelTemplateId}")
+    @ApiOperation("delete staffing_level template ")
+    public ResponseEntity<Map<String, Object>> deleteStaffingLevelTemplate(@PathVariable BigInteger staffingLevelTemplateId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelTemplateService.deleteStaffingLevelTemplate(id));
+                staffingLevelTemplateService.deleteStaffingLevelTemplate(staffingLevelTemplateId));
 
     }
 }

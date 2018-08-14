@@ -64,6 +64,8 @@ public class StaffingLevelTemplateIT {
 
     }
 
+
+
     private PresenceStaffingLevelDto getStaffingLevelDTO(){
 
         Duration duration=new Duration(LocalTime.now(),LocalTime.now());
@@ -82,6 +84,15 @@ public class StaffingLevelTemplateIT {
         staffingLevelTimeSlots.add(timeSlotDTO3); staffingLevelTimeSlots.add(timeSlotDTO4);
         dto.setPresenceStaffingLevelInterval(staffingLevelTimeSlots);
         return dto;
+    }
+
+    @Test
+    public void deleteStaffingLevelTemplate() {
+        String baseUrl=getBaseUrl(24L,2567L);
+        ResponseEntity<String> response = restTemplate.exchange(
+                "http://xyz.example.com/kairos/activity/api/v1/organization/24/unit/2567/staffing_level_template/26",
+                HttpMethod.DELETE, null, String.class);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 
 

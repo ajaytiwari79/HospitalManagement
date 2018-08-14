@@ -61,7 +61,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
 
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         //validating Activities
-        List<String> errors= validateActivityRules(activities,staffingLevelTemplateDTO.getValidity().getStartDate(),staffingLevelTemplateDTO.getValidity().getEndDate(),staffingLevelTemplateDTO.getDayType());
+        List<ActivityResponse> errors= validateActivityRules(activities,staffingLevelTemplateDTO.getValidity().getStartDate(),staffingLevelTemplateDTO.getValidity().getEndDate(),staffingLevelTemplateDTO.getDayType());
         if(!errors.isEmpty()){
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
@@ -123,8 +123,10 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      *
      * </pre>
      */
-    public List<StaffingLevelTemplate> getStaffingLevelTemplates(Long unitId, Date proposedDate) {
-
+    public List<StaffingLevelTemplateDTO> getStaffingLevelTemplates(Long unitId, Date proposedDate) {
+        if(!Optional.ofNullable(proposedDate).isPresent()){
+            return staffingLevelTemplateRepository.findAllByUnitIdAndDeletedFalse(unitId);
+        }
         List<DayType> dayTypes = organizationRestClient.getDayType(proposedDate);
         List<Long> dayTypeIds = dayTypes.stream().map(DayType::getId).collect(Collectors.toList());
 
@@ -133,9 +135,8 @@ public class StaffingLevelTemplateService extends MongoBaseService {
 
         String day = localDate.getDayOfWeek().name();
         Day dayEnum = holidayDayType.isPresent() ? Day.EVERYDAY : Day.valueOf(day);
-        List<StaffingLevelTemplate> validStaffingLevelTemplates = staffingLevelTemplateRepository.findByUnitIdAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqualAndDayTypeInAndValidDaysIn(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
-        return validStaffingLevelTemplates;
-    }
+        return staffingLevelTemplateRepository.findByUnitIdAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqualAndDayTypeInAndValidDaysIn(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+        }
 
     /**
      * @Auther Pavan Kumar
@@ -143,10 +144,13 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      * @param startDate
      * @param endDate
      */
-    private List<String> validateActivityRules(List<Activity> activities,LocalDate startDate,LocalDate endDate,List<Long> dayTypes){
-        List<String> errors=new ArrayList<>();
+    private List<ActivityResponse> validateActivityRules(List<Activity> activities,LocalDate startDate,LocalDate endDate,List<Long> dayTypes){
+
+        List<ActivityResponse> activityResponse=new ArrayList<>();
+
         if(!Optional.ofNullable(endDate).isPresent()){
             activities.forEach(activity -> {
+                List<String> errors=new ArrayList<>();
                 if(!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
                         activity.getGeneralActivityTab().getStartDate().isBefore(startDate)){
                     errors.add(localeService.getMessage("activity.out.of.range"));
@@ -160,9 +164,15 @@ public class StaffingLevelTemplateService extends MongoBaseService {
                 if(!CollectionUtils.containsAny(dayTypes,activity.getRulesActivityTab().getDayTypes())){
                     errors.add(localeService.getMessage("activity.not.eligible.dayType"));
                 }
+                if(!errors.isEmpty()){
+                    activityResponse.add(new ActivityResponse(activity.getId(),activity.getName(),activity.getGeneralActivityTab().getStartDate(),
+                            activity.getGeneralActivityTab().getEndDate(),errors));
+                }
+
             });
         } else {
             activities.forEach(activity -> {
+                List<String> errors=new ArrayList<>();
                 if(Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
                         (activity.getGeneralActivityTab().getEndDate().isBefore(startDate) ||
                                 activity.getGeneralActivityTab().getStartDate().isAfter(endDate))){
@@ -181,9 +191,14 @@ public class StaffingLevelTemplateService extends MongoBaseService {
                 if(!CollectionUtils.containsAny(dayTypes,activity.getRulesActivityTab().getDayTypes())){
                     errors.add(localeService.getMessage("activity.not.eligible.dayType"));
                 }
+
+                if(!errors.isEmpty()){
+                    activityResponse.add(new ActivityResponse(activity.getId(),activity.getName(),activity.getGeneralActivityTab().getStartDate(),
+                            activity.getGeneralActivityTab().getEndDate(),errors));
+                }
             });
         }
-        return errors;
+        return activityResponse;
 
     }
 

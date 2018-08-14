@@ -15,13 +15,15 @@ public class ActivityResponse {
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
-    private String message;
+    private List<String> message;
 
     public ActivityResponse() {
         //Default Constructor
     }
 
-    public ActivityResponse(BigInteger id, String name, LocalDate startDate, LocalDate endDate, String message) {
+
+
+    public ActivityResponse(BigInteger id, String name, LocalDate startDate, LocalDate endDate, List<String> message) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
@@ -61,11 +63,11 @@ public class ActivityResponse {
         this.endDate = endDate;
     }
 
-    public String getMessage() {
-        return this.name+message;
+    public List<String> getMessage() {
+        return this.message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(List<String> message) {
         this.message = message;
     }
 }
