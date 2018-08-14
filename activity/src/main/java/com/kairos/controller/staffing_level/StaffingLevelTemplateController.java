@@ -36,7 +36,7 @@ public class StaffingLevelTemplateController {
             @RequestBody @Valid StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
         StaffingLevelTemplateDTO levelTemplateDTO=staffingLevelTemplateService.createStaffingLevelTemplate(staffingLevelTemplateDTO);
         if(!levelTemplateDTO.getErrors().isEmpty()){
-            return ResponseHandler.generateResponse(HttpStatus.UNPROCESSABLE_ENTITY, false, levelTemplateDTO.getErrors());
+            return ResponseHandler.invalidResponse(HttpStatus.PRECONDITION_REQUIRED, false, levelTemplateDTO.getErrors());
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, levelTemplateDTO);
     }

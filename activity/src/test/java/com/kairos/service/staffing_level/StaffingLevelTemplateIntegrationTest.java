@@ -28,7 +28,7 @@ import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StaffingLevelTemplateIT {
+public class StaffingLevelTemplateIntegrationTest {
     @Value("${server.host.http.url}")
     private String url ;
     @Autowired
@@ -90,7 +90,7 @@ public class StaffingLevelTemplateIT {
     public void deleteStaffingLevelTemplate() {
         String baseUrl=getBaseUrl(24L,2567L);
         ResponseEntity<String> response = restTemplate.exchange(
-                "http://xyz.example.com/kairos/activity/api/v1/organization/24/unit/2567/staffing_level_template/26",
+                baseUrl+"staffing_level_template/26",
                 HttpMethod.DELETE, null, String.class);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }

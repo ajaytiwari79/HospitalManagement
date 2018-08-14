@@ -29,6 +29,20 @@ public final class ResponseHandler {
 
     }
 
+    public static ResponseEntity<Map<String, Object>> invalidResponse(HttpStatus status, boolean isSuccess, Object errors) {
+        // Get Time as per UTC format
+        long dateTime = new DateTime( DateTimeZone.UTC).getMillis();
+
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("status", status.value());
+        map.put("isSuccess", isSuccess);
+        map.put("errors", errors);
+        map.put("message", status.name());
+        map.put("time_stamp", dateTime);
+        return new ResponseEntity<Map<String, Object>>(map, status);
+
+    }
+
     public static ResponseEntity<String> generateResponse(JSONObject jsonObject){
         return new ResponseEntity<String>(jsonObject.toString(), HttpStatus.UNAUTHORIZED);
     }

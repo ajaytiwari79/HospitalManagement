@@ -63,6 +63,5 @@ public interface CustomActivityMongoRepository {
     List<TimeTypeAndActivityIdDTO> findAllTimeTypeByActivityIds(Set<BigInteger> activityIds);
 
     StaffActivitySettingDTO findStaffPersonalizedSettings(Long unitId,BigInteger activityId);
-    List<ActivityDTO> getAllInvalidActivitys(Set<BigInteger> activityIds, LocalDate startDate,LocalDate endDate);
 
 }

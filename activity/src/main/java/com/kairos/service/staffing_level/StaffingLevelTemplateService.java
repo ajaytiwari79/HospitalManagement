@@ -147,22 +147,21 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     private List<ActivityResponse> validateActivityRules(List<Activity> activities,LocalDate startDate,LocalDate endDate,List<Long> dayTypes){
 
         List<ActivityResponse> activityResponse=new ArrayList<>();
-
         if(!Optional.ofNullable(endDate).isPresent()){
             activities.forEach(activity -> {
                 List<String> errors=new ArrayList<>();
                 if(!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
                         activity.getGeneralActivityTab().getStartDate().isBefore(startDate)){
-                    errors.add(localeService.getMessage("activity.out.of.range"));
+                    errors.add(exceptionService.getLanguageSpecificText("activity.out.of.range",activity.getName()));
                 }
                 if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
-                    errors.add(localeService.getMessage("activity.not.eligible.for.staffing.level"));
+                    errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.for.staffing.level",activity.getName()));
                 }
                 if(activity.getRulesActivityTab().isEligibleForPresence()){
-                    errors.add(localeService.getMessage("activity.not.presenceType"));
+                    errors.add(exceptionService.getLanguageSpecificText("activity.not.presenceType",activity.getName()));
                 }
                 if(!CollectionUtils.containsAny(dayTypes,activity.getRulesActivityTab().getDayTypes())){
-                    errors.add(localeService.getMessage("activity.not.eligible.dayType"));
+                    errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.dayType",activity.getName()));
                 }
                 if(!errors.isEmpty()){
                     activityResponse.add(new ActivityResponse(activity.getId(),activity.getName(),activity.getGeneralActivityTab().getStartDate(),
@@ -176,20 +175,20 @@ public class StaffingLevelTemplateService extends MongoBaseService {
                 if(Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
                         (activity.getGeneralActivityTab().getEndDate().isBefore(startDate) ||
                                 activity.getGeneralActivityTab().getStartDate().isAfter(endDate))){
-                    errors.add(localeService.getMessage("activity.out.of.range"));
+                    errors.add(exceptionService.getLanguageSpecificText("activity.out.of.range",activity.getName()));
                 } else if(!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
                         activity.getGeneralActivityTab().getStartDate().isAfter(endDate)){
-                    errors.add(localeService.getMessage("activity.out.of.range"));
+                    errors.add(exceptionService.getLanguageSpecificText("activity.out.of.range",activity.getName()));
                 }
 
                 if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
-                    errors.add(localeService.getMessage("activity.not.eligible.for.staffing.level"));
+                    errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.for.staffing.level",activity.getName()));
                 }
                 if(activity.getRulesActivityTab().isEligibleForPresence()){
-                    errors.add(localeService.getMessage("activity.not.presenceType"));
+                    errors.add(exceptionService.getLanguageSpecificText("activity.not.presenceType",activity.getName()));
                 }
                 if(!CollectionUtils.containsAny(dayTypes,activity.getRulesActivityTab().getDayTypes())){
-                    errors.add(localeService.getMessage("activity.not.eligible.dayType"));
+                    errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.dayType",activity.getName()));
                 }
 
                 if(!errors.isEmpty()){

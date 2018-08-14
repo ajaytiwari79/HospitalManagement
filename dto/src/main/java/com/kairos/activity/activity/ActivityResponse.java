@@ -15,7 +15,7 @@ public class ActivityResponse {
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
-    private List<String> message;
+    private List<String> messages;
 
     public ActivityResponse() {
         //Default Constructor
@@ -23,12 +23,12 @@ public class ActivityResponse {
 
 
 
-    public ActivityResponse(BigInteger id, String name, LocalDate startDate, LocalDate endDate, List<String> message) {
+    public ActivityResponse(BigInteger id, String name, LocalDate startDate, LocalDate endDate, List<String> messages) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.message = message;
+        this.messages = messages;
     }
 
     public BigInteger getId() {
@@ -63,11 +63,11 @@ public class ActivityResponse {
         this.endDate = endDate;
     }
 
-    public List<String> getMessage() {
-        return this.message;
+    public List<String> getMessages() {
+        return messages;
     }
 
-    public void setMessage(List<String> message) {
-        this.message = message;
+    public void setMessages(List<String> messages) {
+        this.messages = messages;
     }
 }

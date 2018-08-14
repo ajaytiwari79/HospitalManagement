@@ -416,20 +416,4 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<StaffActivitySettingDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, StaffActivitySettingDTO.class);
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
     }
-
-    @Override
-    public List<ActivityDTO> getAllInvalidActivitys(Set<BigInteger> activityIds, LocalDate startDate, LocalDate endDate) {
-        Criteria criteria = Criteria.where("id").in(activityIds);
-        criteria = endDate==null ? criteria.and("generalActivityTab.startDate").lt(startDate) : criteria.and("generalActivityTab.startDate").lt(startDate).gt(endDate).and("generalActivityTab.endDate").exists(false);
-
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria),
-                project("id","name")
-        );
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
-        return result.getMappedResults();
-    }
-
-
 }
