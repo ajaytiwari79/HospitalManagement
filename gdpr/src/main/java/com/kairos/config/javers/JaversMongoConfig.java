@@ -52,7 +52,6 @@ public class JaversMongoConfig {
     public MongoClient mongo() {
 
         BSON.addEncodingHook(BigInteger.class, new BigIntegerTransformer());
-
         CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
                 CodecRegistries.fromProviders(new BigIntegerCodecProvider()),
                 MongoClient.getDefaultCodecRegistry()

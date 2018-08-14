@@ -44,14 +44,24 @@ public class AppConstant {
 
 
     //metaData reference key for asset and processing activity
-    public static final String ASSET_TYPE = "assetType";
-    public static final String ASSET_SUB_TYPE = "assetSubTypes";
-    public static final String STORAGE_FORMAT = "storageFormats";
-    public static final String ORG_SECURITY_MEASURE = "orgSecurityMeasures";
-    public static final String TECHNICAL_SECURITY_MEASURE = "technicalSecurityMeasures";
-    public static final String HOSTING_PROVIDER = "hostingProvider";
-    public static final String HOSTING_TYPE = "hostingType";
-    public static final String DATA_DISPOSAL = "dataDisposal";
+    public static final String ASSET_TYPE_KEY = "assetType";
+    public static final String ASSET_SUB_TYPE_KEY = "assetSubTypes";
+    public static final String STORAGE_FORMAT_KEY = "storageFormats";
+    public static final String ORG_SECURITY_MEASURE_KEY = "orgSecurityMeasures";
+    public static final String TECHNICAL_SECURITY_MEASURE_KEY = "technicalSecurityMeasures";
+    public static final String HOSTING_PROVIDER_KEY = "hostingProvider";
+    public static final String HOSTING_TYPE_KEY = "hostingType";
+    public static final String DATA_DISPOSAL_KEY = "dataDisposal";
+    public static final String PROCESSING_PURPOSE_KEY = "processingPurposes";
+    public static final String DATA_SOURCE_KEY = "dataSources";
+    public static final String TRANSFER_METHOD_KEY = "transferMethods";
+    public static final String ACCESSOR_PARTY_KEY = "accessorParties";
+    public static final String PROCESSING_LEGALBASIS_KEY = "processingLegalBasis";
+    public static final String RESPONSIBILITY_TYPE_KEY ="responsibilityType" ;
+    public static final String SUB_PROCESSING_ACTIVITY_KEY = "subProcessingActivities";
+
+
+
 
 
 

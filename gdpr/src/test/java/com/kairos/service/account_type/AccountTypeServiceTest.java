@@ -21,8 +21,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 
-import static org.junit.Assert.*;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosGdprApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

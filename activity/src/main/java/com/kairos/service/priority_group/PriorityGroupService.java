@@ -1,5 +1,8 @@
 package com.kairos.service.priority_group;
 
+import com.kairos.ApplicableFor;
+import com.kairos.activity.counter.CounterDTO;
+import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.persistence.model.priority_group.*;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
@@ -11,6 +14,8 @@ import com.kairos.util.ObjectMapperUtils;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.open_shift.PriorityGroupWrapper;
 import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -32,10 +37,12 @@ public class PriorityGroupService extends MongoBaseService {
     private PriorityGroupRulesDataGetterService priorityGroupRulesDataGetterService;
     @Inject
     private MailService mailService;
-    @Autowired
+    @Inject
     private ApplicationContext applicationContext;
+    private static final Logger logger = LoggerFactory.getLogger(PriorityGroupService.class);
 
     @Inject private GenericIntegrationService genericIntegrationService;
+    @Inject private CounterRepository counterRepository;
 
 
     public boolean createPriorityGroupForCountry(long countryId,List<PriorityGroupDTO> priorityGroupDTO) {
@@ -50,10 +57,10 @@ public class PriorityGroupService extends MongoBaseService {
 
     public PriorityGroupWrapper findAllPriorityGroups(long countryId) {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByCountryIdAndDeletedFalseAndRuleTemplateIdIsNull(countryId);
-        PriorityGroupDefaultData priorityGroupDefaultData1=genericIntegrationService.getExpertiseAndEmployment(countryId);
-        PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises());
-        PriorityGroupWrapper priorityGroupWrapper=new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
-        return priorityGroupWrapper;
+        PriorityGroupDefaultData priorityGroupDefaultData=genericIntegrationService.getExpertiseAndEmployment(countryId);
+        List<CounterDTO> counters=counterRepository.getAllCounterApplicableFor(ApplicableFor.OPEN_SHIFT);
+        return new PriorityGroupWrapper(new PriorityGroupDefaultData(priorityGroupDefaultData.getEmploymentTypes(),priorityGroupDefaultData.getExpertises(),counters)
+                                        ,priorityGroupDTOS);
     }
 
     public PriorityGroupDTO updatePriorityGroup(long countryId, BigInteger priorityGroupId, PriorityGroupDTO priorityGroupDTO) {
@@ -104,11 +111,9 @@ public class PriorityGroupService extends MongoBaseService {
 
     public PriorityGroupWrapper getPriorityGroupsOfUnit(long unitId) {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByUnitIdAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(unitId);
-
-        PriorityGroupDefaultData priorityGroupDefaultData1=genericIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
-        PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises());
-        PriorityGroupWrapper priorityGroupWrapper=new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
-        return priorityGroupWrapper;
+        PriorityGroupDefaultData priorityGroupDefaultData=genericIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
+        List<CounterDTO> counters=counterRepository.getAllCounterApplicableFor(ApplicableFor.OPEN_SHIFT);
+        return new PriorityGroupWrapper(new PriorityGroupDefaultData(priorityGroupDefaultData.getEmploymentTypes(),priorityGroupDefaultData.getExpertises(),counters),priorityGroupDTOS);
 
     }
 
@@ -183,8 +188,7 @@ public class PriorityGroupService extends MongoBaseService {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByUnitIdAndRuleTemplateIdAndOrderIdIsNullAndDeletedFalse(unitId,ruleTemplateId);
         PriorityGroupDefaultData priorityGroupDefaultData1=genericIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
         PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises());
-        PriorityGroupWrapper priorityGroupWrapper=new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
-        return priorityGroupWrapper;
+        return new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
     }
     public List<PriorityGroupDTO> getPriorityGroupsByOrderId(long unitId,BigInteger orderId) {
         return priorityGroupRepository.findByUnitIdAndOrderIdAndDeletedFalse(unitId,orderId);
@@ -192,11 +196,15 @@ public class PriorityGroupService extends MongoBaseService {
 
     public void notifyStaffByPriorityGroup(BigInteger priorityGroupId){
         if(Optional.ofNullable(priorityGroupId).isPresent()) {
+            logger.info("Excuting priority group----------->"+priorityGroupId);
             PriorityGroupDTO priorityGroup = priorityGroupRepository.findByIdAndDeletedFalse(priorityGroupId);
             PriorityGroupRuleDataDTO priorityGroupRuleDataDTO = priorityGroupRulesDataGetterService.getData(priorityGroup);
+            logger.info("Priority group data---------->filtering staffs from---------->"+priorityGroupRuleDataDTO.getOpenShiftStaffMap().toString());
             PriorityGroupRulesExecutorService priorityGroupRulesExecutorService = new PriorityGroupRulesExecutorService();
             ImpactWeight impactWeight = new ImpactWeight(7,4);
             priorityGroupRulesExecutorService.executeRules(priorityGroup,priorityGroupRuleDataDTO,impactWeight);
+            logger.info("Priority group data---------->filtering staffs from---------->"+priorityGroupRuleDataDTO.getOpenShiftStaffMap().toString());
+
             applicationContext.publishEvent(priorityGroupRuleDataDTO);
         }
 
@@ -206,8 +214,8 @@ public class PriorityGroupService extends MongoBaseService {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.findByUnitIdAndOrderIdAndDeletedFalse(unitId,orderId);
         PriorityGroupDefaultData priorityGroupDefaultData1=genericIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
         PriorityGroupDefaultData priorityGroupDefaultData=new PriorityGroupDefaultData(priorityGroupDefaultData1.getEmploymentTypes(),priorityGroupDefaultData1.getExpertises());
-        PriorityGroupWrapper priorityGroupWrapper=new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
-        return priorityGroupWrapper;
+        return new PriorityGroupWrapper(priorityGroupDefaultData,priorityGroupDTOS);
+
     }
 
 }

@@ -23,8 +23,8 @@ public interface DataSourceMongoRepository extends MongoBaseRepository<DataSourc
     @Query("{countryId:?0,name:?1,deleted:false}")
     DataSource findByNameAndCountryId(Long countryId,String name);
 
-    @Query("{_id:{$in:?0}}")
-    List<DataSource> dataSourceList(List<BigInteger> ids);
+    @Query("{_id:{$in:?0},deleted:false}")
+    List<DataSourceResponseDTO> findDataSourceByIds(List<BigInteger> dataSourceIds);
 
     DataSource findByid(BigInteger id);
 
@@ -32,10 +32,7 @@ public interface DataSourceMongoRepository extends MongoBaseRepository<DataSourc
     @Query("{countryId:?0,deleted:false}")
     List<DataSourceResponseDTO> findAllDataSources(Long countryId);
 
-    @Query("{countryId:?0,name:{$in:?1},deleted:false}")
-    List<DataSource>  findByCountryAndNameList(Long countryId,Set<String> name);
-
-    @Query("{organizationId:?0,deleted:false}")
+      @Query("{organizationId:?0,deleted:false}")
     List<DataSourceResponseDTO> findAllOrganizationDataSources(Long organizationId);
 
     @Query("{organizationId:?0,_id:?2,deleted:false}")

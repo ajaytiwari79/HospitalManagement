@@ -37,8 +37,8 @@ public interface AccessorPartyMongoRepository extends MongoBaseRepository<Access
     @Query("{countryId:?0,deleted:false}")
     List<AccessorPartyResponseDTO> findAllAccessorParty(Long countryId);
 
-    @Query("{countryId:?0,name:{$in:?2},deleted:false}")
-    List<AccessorParty>  findByCountryAndNameList(Long countryId,Set<String> name);
+    @Query("{_id:{$in:?0},deleted:false}")
+    List<AccessorPartyResponseDTO> findAccessorPartyByIds(List<BigInteger> accessorPartyIds);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     AccessorParty findOrganizationIdAndIdAndNonDeleted(Long organizationId, BigInteger id);

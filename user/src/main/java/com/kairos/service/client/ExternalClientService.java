@@ -4,7 +4,7 @@ import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
-import com.kairos.persistence.model.country.common.CitizenStatus;
+import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;

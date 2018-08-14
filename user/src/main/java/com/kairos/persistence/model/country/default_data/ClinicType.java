@@ -1,7 +1,6 @@
-package com.kairos.persistence.model.country.common;
+package com.kairos.persistence.model.country.default_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -14,43 +13,31 @@ import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
-
 /**
  * Created by oodles on 9/1/17.
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-public class BusinessType extends UserBaseEntity {
-
-    @NotEmpty(message = "error.BusinessType.name.notEmpty") @NotNull(message = "error.BusinessType.name.notnull")
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ClinicType extends UserBaseEntity {
+    @NotEmpty(message = "error.ClinicType.name.notEmpty") @NotNull(message = "error.ClinicType.name.notnull")
     private String name;
 
 
-
-    //@NotEmpty(message = "error.BusinessType.description.notEmpty") @NotNull(message = "error.BusinessType.description.notnull")
+    //@NotEmpty(message = "error.ClinicType.description.notEmpty") @NotNull(message = "error.ClinicType.description.notnull")
     private String description;
 
+
     @Relationship(type = BELONGS_TO)
-    private Country country;
+    Country country;
 
     private boolean isEnabled = true;
 
-    public String getName() {
-        return name;
+    public boolean isEnabled() {
+        return isEnabled;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
     }
 
     public Country getCountry() {
@@ -61,16 +48,25 @@ public class BusinessType extends UserBaseEntity {
         this.country = country;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
+    public String getName() {
+        return name;
     }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public BusinessType() {
+    public String getDescription() {
+        return description;
     }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public ClinicType() {
+    }
+
 
 
     public Map<String, Object> retrieveDetails() {
