@@ -338,6 +338,7 @@ public class CounterManagementService extends MongoBaseService {
         save(tabKPIConfKPIEntries);
         save(accessGroupKPIEntries);
     }
+
     public void setDefaultDateFromParentUnitTounit(DefalutKPISettingDTO defalutKPISettingDTO,Long unitId){
         List<CategoryKPIConf> categoryKPIConfToSave=new ArrayList<>();
         List<AccessGroupKPIEntry> accessGroupKPIEntries = new ArrayList<>();

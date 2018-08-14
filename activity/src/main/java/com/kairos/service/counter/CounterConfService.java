@@ -8,14 +8,18 @@ import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
+import com.kairos.response.dto.web.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -96,14 +100,14 @@ public class CounterConfService extends MongoBaseService {
         return assignmentDTOs;
     }
 
-    private void modifyCategories(List<KPICategoryDTO> changedCategories, List<CategoryAssignmentDTO> existingAssignmentDTOs, ConfLevel level, Long refId){
+    private List<KPICategory> modifyCategories(List<KPICategoryDTO> changedCategories, List<CategoryAssignmentDTO> existingAssignmentDTOs, ConfLevel level, Long refId){
         Map<BigInteger, CategoryAssignmentDTO> categoryDTOMapById = existingAssignmentDTOs.parallelStream().collect(Collectors.toMap(assignmentDTO -> assignmentDTO.getCategory().getId(), assignmentDTO -> assignmentDTO));
         Map<String, BigInteger>  categoryNameAssignemtIdMap = new HashMap<>();
         List<KPICategory> updatableCategories = new ArrayList<>();
         for( KPICategoryDTO kpiCategoryDTO: changedCategories){
             CategoryAssignmentDTO assignmentDTO = categoryDTOMapById.get(kpiCategoryDTO.getId());
             if(!assignmentDTO.getCategory().getName().equals(kpiCategoryDTO.getName())){
-                KPICategory category = new KPICategory(kpiCategoryDTO.getName(), refId);
+                KPICategory category = new KPICategory(kpiCategoryDTO.getName(), refId,assignmentDTO.getCategory().getId());
                 if(assignmentDTO.getCategory().getLevelId().equals(refId) && !ConfLevel.COUNTRY.equals(level)){
                     category.setId(assignmentDTO.getCategory().getId());
                 }
@@ -112,7 +116,9 @@ public class CounterConfService extends MongoBaseService {
             }
         }
         List<CategoryAssignment> categoryAssignments = new ArrayList<>();
-        updatableCategories = save(updatableCategories);
+        if(!updatableCategories.isEmpty()) {
+            updatableCategories = save(updatableCategories);
+        }
         updatableCategories.forEach(kpiCategory -> {
             Long countryId = null;
             Long unitId = null;
@@ -125,15 +131,18 @@ public class CounterConfService extends MongoBaseService {
             assignment.setId(categoryNameAssignemtIdMap.get(kpiCategory.getName()));
             categoryAssignments.add(assignment);
         });
-        save(categoryAssignments);
+        if(!categoryAssignments.isEmpty()) {
+            save(categoryAssignments);
+        }
+        return  updatableCategories;
     }
 
-    public void updateCategories(KPICategoryUpdationDTO categories, ConfLevel level, Long refId){
+    public List<KPICategoryDTO> updateCategories(KPICategoryUpdationDTO categories, ConfLevel level, Long refId){
         Set<String> categoriesNames = categories.getUpdatedCategories().stream().map(category -> category.getName().trim().toLowerCase()).collect(Collectors.toSet());
         if(categoriesNames.size() != categories.getUpdatedCategories().size())  exceptionService.duplicateDataException("error.kpi_category.duplicate");
         List<CategoryAssignmentDTO> deletableAssignments = getExistingAssignments(categories.getDeletedCategories(), level, refId);
         List<CategoryAssignmentDTO> existingAssignments = getExistingAssignments(categories.getUpdatedCategories(), level, refId);
-        modifyCategories(categories.getUpdatedCategories(), existingAssignments, level, refId);
+        List<KPICategory> kpiCategories=modifyCategories(categories.getUpdatedCategories(), existingAssignments, level, refId);
         List<BigInteger> deletableCategoryAssignmentIds = deletableAssignments.stream().map(CategoryAssignmentDTO::getId).collect(Collectors.toList());
         List<BigInteger> ownedDeletableCategoryIds  = new ArrayList<>();
         if(ConfLevel.UNIT.equals(level)){
@@ -142,6 +151,7 @@ public class CounterConfService extends MongoBaseService {
         counterRepository.removeAll("categoryAssignmentId", deletableCategoryAssignmentIds, CategoryKPIConf.class);
         counterRepository.removeAll("id", deletableCategoryAssignmentIds, CategoryAssignment.class);
         counterRepository.removeAll("id", ownedDeletableCategoryIds, KPICategory.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiCategories, KPICategoryDTO.class);
     }
 
     public void addEntries(Long countryId){

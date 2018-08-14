@@ -113,6 +113,10 @@ public class AccessPageService extends UserBaseService {
         return accessPageRepository.getMainTabs(countryId);
     }
 
+    public List<AccessPageDTO> getMainTabsForUnit(Long unitId){
+        return accessPageRepository.getMainTabsForUnit(unitId);
+    }
+
     public List<AccessPageDTO> getChildTabs(Long tabId, Long countryId){
         if( !Optional.ofNullable(tabId).isPresent() ){
             return Collections.emptyList();

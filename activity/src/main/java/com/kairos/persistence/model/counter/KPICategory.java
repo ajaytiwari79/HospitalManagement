@@ -1,7 +1,8 @@
 package com.kairos.persistence.model.counter;
 
-import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+
+import java.math.BigInteger;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -12,12 +13,14 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 public class KPICategory extends MongoBaseEntity {
     private String name;
     private Long levelId;   //levelId is country/unit id
+    private BigInteger parentCategoryId;
 
     public KPICategory(){}
 
-    public KPICategory(String name, Long levelId){
+    public KPICategory(String name, Long levelId,BigInteger parentCategoryId){
         this.name = name;
         this.levelId = levelId;
+        this.parentCategoryId=parentCategoryId;
     }
 
     public String getName() {
@@ -34,5 +37,13 @@ public class KPICategory extends MongoBaseEntity {
 
     public void setLevelId(Long levelId) {
         this.levelId = levelId;
+    }
+
+    public BigInteger getParentCategoryId() {
+        return parentCategoryId;
+    }
+
+    public void setParentCategoryId(BigInteger parentCategoryId) {
+        this.parentCategoryId = parentCategoryId;
     }
 }
