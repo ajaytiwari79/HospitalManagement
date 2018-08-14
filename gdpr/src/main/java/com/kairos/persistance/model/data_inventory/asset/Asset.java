@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Document(collection = "asset")
 public class Asset extends MongoBaseEntity {
@@ -52,6 +53,10 @@ public class Asset extends MongoBaseEntity {
 
     private List<BigInteger> assetSubTypes;
 
+    private Set<BigInteger> processingActivities;
+
+    private Set<BigInteger> subProcessingActivities;
+
     private Integer dataRetentionPeriod;
 
     private Long minDataSubjectVolume;
@@ -66,6 +71,14 @@ public class Asset extends MongoBaseEntity {
     public Boolean getActive() { return isActive; }
 
     public void setActive(Boolean active) { isActive = active; }
+
+    public Set<BigInteger> getProcessingActivities() { return processingActivities; }
+
+    public void setProcessingActivities(Set<BigInteger> processingActivities) { this.processingActivities = processingActivities; }
+
+    public Set<BigInteger> getSubProcessingActivities() { return subProcessingActivities; }
+
+    public void setSubProcessingActivities(Set<BigInteger> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 
     public String getName() { return name; }
 

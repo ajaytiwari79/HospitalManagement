@@ -1,6 +1,7 @@
 package com.kairos.service.data_inventory.asset;
 
 import com.kairos.gdpr.data_inventory.AssetDTO;
+import com.kairos.gdpr.data_inventory.AssetRelateProcessingActivityDTO;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
@@ -117,7 +118,7 @@ public class AssetService extends MongoBaseService {
      * @description method return audit history of asset , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId,int size,int skip)   {
+    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId, int size, int skip) {
 
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class).limit(size).skip(skip);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
@@ -159,6 +160,18 @@ public class AssetService extends MongoBaseService {
         ObjectMapperUtils.copyProperties(assetDTO, asset);
         assetMongoRepository.save(asset);
         return assetDTO;
+    }
+
+
+    public Asset addRelatedProcessingActivitiesAndSubProcess(Long unitId, BigInteger assetId, AssetRelateProcessingActivityDTO assetRelateProcessingActivityDTO) {
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset ", assetId);
+        }
+        asset.setProcessingActivities(assetRelateProcessingActivityDTO.getProcessingActivities());
+        asset.setSubProcessingActivities(assetRelateProcessingActivityDTO.getSubProcessingActivities());
+        assetMongoRepository.save(asset);
+        return asset;
     }
 
 
