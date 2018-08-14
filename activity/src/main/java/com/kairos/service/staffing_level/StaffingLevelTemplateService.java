@@ -86,6 +86,22 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     public StaffingLevelTemplateDTO updateStaffingTemplate(StaffingLevelTemplateDTO staffingLevelTemplateDTO,
                                                            BigInteger staffingTemplateId) {
         logger.info("updating staffing level Template ID={}", staffingTemplateId);
+        Set<BigInteger> activityIds=new HashSet<>();
+        staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+            staffingLevelInterval.getStaffingLevelActivities().forEach(staffingLevelActivity -> {
+                activityIds.add(staffingLevelActivity.getActivityId());
+            });
+        });
+
+
+        List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
+        //validating Activities
+        List<ActivityResponse> errors= validateActivityRules(activities,staffingLevelTemplateDTO.getValidity().getStartDate(),staffingLevelTemplateDTO.getValidity().getEndDate(),staffingLevelTemplateDTO.getDayType());
+        if(!errors.isEmpty()){
+            staffingLevelTemplateDTO.setErrors(errors);
+            return staffingLevelTemplateDTO;
+        }
+
         StaffingLevelTemplate staffingLevelTemplate = staffingLevelTemplateRepository.findOne(staffingTemplateId);
         if (Optional.ofNullable(staffingLevelTemplate).isPresent()) {
             staffingLevelTemplate = updateStaffingTemplate(staffingTemplateId, staffingLevelTemplateDTO, staffingLevelTemplate);
