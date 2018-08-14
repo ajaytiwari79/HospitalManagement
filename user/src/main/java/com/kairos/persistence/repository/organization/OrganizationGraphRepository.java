@@ -656,4 +656,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "MATCH (superParent)-[:BELONGS_TO]-(country:Country)\n" +
             "return id(child) as unitId, CASE WHEN parent IS NULL THEN id(child) ELSE id(parent) END as parentOrganizationId, id(country) as countryId")
     List<Map<String, Object>> getUnitAndParentOrganizationAndCountryIds();
+
+    @Query("match(org:Organization) where org.kairosId STARTS WITH {0}\n" +
+            "return org.kairosId  ORDER BY org.kairosId DESC LIMIT 1")
+    String getKairosId(String first3Char);
 }

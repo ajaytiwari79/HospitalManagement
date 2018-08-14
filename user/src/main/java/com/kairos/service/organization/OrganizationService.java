@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.itextpdf.text.pdf.hyphenation.Hyphen;
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
@@ -119,6 +120,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static org.apache.tomcat.util.http.fileupload.MultipartStream.DASH;
 
 
 /**
@@ -273,7 +275,8 @@ public class OrganizationService extends UserBaseService {
     private EmploymentTypeService employmentTypeService;
     @Inject
     private VRPClientService vrpClientService;
-    @Inject private AccountTypeGraphRepository accountTypeGraphRepository;
+    @Inject
+    private AccountTypeGraphRepository accountTypeGraphRepository;
 
 
     public Organization getOrganizationById(long id) {
@@ -316,13 +319,13 @@ public class OrganizationService extends UserBaseService {
             logger.info("Parent Organization: " + o.getName());
         } else {
             organization = save(organization);
-            if (!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)){
+            if (!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)) {
                 int count = organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
             }
         }
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
-        if(!baseOrganization){
+        if (!baseOrganization) {
             accessGroupService.createDefaultAccessGroups(organization);
             organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         }
@@ -369,17 +372,22 @@ public class OrganizationService extends UserBaseService {
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
-        AccountType accountType=null;
-        if (CompanyType.COMPANY.equals(orgDetails.getCompanyType())){
-                accountType= accountTypeGraphRepository.findOne(orgDetails.getAccountTypeId());
-                if (!Optional.ofNullable(accountType).isPresent()){
-                    exceptionService.dataNotFoundByIdException("message.accountType.notFound");
-                }
+        AccountType accountType = null;
+        if (CompanyType.COMPANY.equals(orgDetails.getCompanyType())) {
+            accountType = accountTypeGraphRepository.findOne(orgDetails.getAccountTypeId());
+            if (!Optional.ofNullable(accountType).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.accountType.notFound");
+            }
         }
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
         validateAccessGroupIdForUnitManager(countryId, orgDetails.getUnitManager().getAccessGroupId(), orgDetails.getCompanyType());
-        Organization organization = new Organization(true,country,accountType,orgDetails.getCompanyType(),orgDetails.isBoardingCompleted());
-
+        String kairosId = organizationGraphRepository.getKairosId(orgDetails.getName().substring(0, 3));
+        if (kairosId == null) {
+            kairosId = orgDetails.getName().substring(0, 3) + HYPHEN + ONE;
+        } else {
+            kairosId = orgDetails.getName().substring(0, 3) + HYPHEN + kairosId.charAt(kairosId.length() - 1);
+        }
+        Organization organization = new Organization(true, country, accountType, orgDetails.getCompanyType(), orgDetails.isBoardingCompleted(), kairosId);
         organization = saveOrganizationDetails(organization, orgDetails, false, countryId);
 
 
@@ -389,6 +397,7 @@ public class OrganizationService extends UserBaseService {
         organization.setTimeZone(ZoneId.of(TIMEZONE_UTC));
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
+
         save(organization);
 //        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
         vrpClientService.createPreferedTimeWindow(organization.getId());
@@ -691,7 +700,7 @@ public class OrganizationService extends UserBaseService {
     }
 
     private Organization saveOrganizationDetails(Organization organization, OrganizationBasicDTO orgDetails, boolean isUpdateOperation, long countryId) {
-        organization.setName(WordUtils.capitalize(orgDetails.getName().trim()));
+        organization.setName(WordUtils.capitalize(orgDetails.getName()));
         if (!Optional.ofNullable(orgDetails.getUnion()).isPresent()) {
             exceptionService.actionNotPermittedException("message.organization.union.specify");
 
@@ -773,7 +782,7 @@ public class OrganizationService extends UserBaseService {
         organization.setOrganizationSubTypes(organizationSubTypes);
         organization.setBusinessTypes(businessTypes);
 
-        CompanyCategory companyCategory = companyCategoryGraphRepository.findOne(orgDetails.getCompanyCategoryId(),0);
+        CompanyCategory companyCategory = companyCategoryGraphRepository.findOne(orgDetails.getCompanyCategoryId(), 0);
         if (!Optional.ofNullable(companyCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.companyCategory.id.notFound", orgDetails.getCompanyCategoryId());
 
@@ -1282,7 +1291,7 @@ public class OrganizationService extends UserBaseService {
                         logger.info("Sending Parent ID: " + workPlace.getParentWorkPlaceID());
                         Organization parentOrganization = getOrganizationByExternalId(workPlace.getParentWorkPlaceID().toString());
                         logger.info("parentOrganization  ID: " + parentOrganization.getId());
-                        createOrganization(organization, parentOrganization.getId(),false);
+                        createOrganization(organization, parentOrganization.getId(), false);
                     }
                 }
             }

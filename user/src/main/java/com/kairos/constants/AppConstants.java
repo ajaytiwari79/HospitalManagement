@@ -7,7 +7,8 @@ public class AppConstants {
     private AppConstants() {
     }
     public static final String TIMEZONE_UTC = "UTC";
-
+    public static final String HYPHEN = "-";
+    public static final String ONE = "1";
     // Request methods
     public static final String GET = "GET";
     public static final String POST = "POST";
