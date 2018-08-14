@@ -182,4 +182,5 @@ public class OrganizationBuilder {
         return new  Organization( name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
                 vatId, businessTypes,organizationTypes, organizationSubTypes,  companyUnitType, companyCategory, timeZone);
     }
+
 }

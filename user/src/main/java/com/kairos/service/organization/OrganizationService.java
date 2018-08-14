@@ -385,7 +385,16 @@ public class OrganizationService extends UserBaseService {
             int lastSuffix = new Integer(kairosId.substring(4, kairosId.length()));
             kairosId = StringUtils.upperCase(orgDetails.getName().substring(0, 3)) + HYPHEN + (++lastSuffix);
         }
-        Organization organization = new OrganizationBuilder().setIsParentOrganization(true).setCountry(country).setAccountType(accountType).setCompanyType(orgDetails.getCompanyType()).setBoardingCompleted(orgDetails.isBoardingCompleted()).setKairosId(kairosId).createOrganization();
+    // TODO CHECK
+        Organization organization = new OrganizationBuilder()
+                .setIsParentOrganization(true)
+                .setCountry(country)
+                .setAccountType(accountType)
+                .setCompanyType(orgDetails.getCompanyType())
+                .setBoardingCompleted(orgDetails.isBoardingCompleted())
+                .setKairosId(kairosId)
+                .createOrganization();
+
         organization = saveOrganizationDetails(organization, orgDetails, false, countryId);
 
 
@@ -398,33 +407,7 @@ public class OrganizationService extends UserBaseService {
 
         save(organization);
 
-
-//        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
-        vrpClientService.createPreferedTimeWindow(organization.getId());
-        organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
-//        accessGroupService.createDefaultAccessGroups(organization);
-        countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
-        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
-        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
-        long creationDate = DateUtils.getCurrentDayStartMillis();
-        organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
-
-        organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-
-        activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), organization.getCountry().getId());
-
-        activityIntegrationService.createDefaultPriorityGroupsFromCountry(organization.getCountry().getId(), organization.getId());
-
-        //Copying OpenShift RuleTemplates to Unit from Country
-        //OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO=new OrgTypeAndSubTypeDTO(organization.getOorganization.getCountry().getId());
-
-        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationTypes().get(0).getId(), organization.getOrganizationSubTypes().get(0).getId(), organization.getCountry().getId());
-        activityIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId());
-
-        //create T&A gracePeriod default setting
-        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
-        activityIntegrationService.createDefaultGracePeriodSetting(tAndAGracePeriodSettingDTO, organization.getId());
-
+        createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap);
         Set<Long> unitTypeIds = organizationRequestWrapper.getUnits().stream().map(u -> u.getUnitTypeId()).collect(Collectors.toSet());
         List<UnitType> unitTypes = unitTypeGraphRepository.getUnitTypeByIds(unitTypeIds);
         organizationRequestWrapper.getUnits().forEach(org -> {
@@ -492,6 +475,25 @@ public class OrganizationService extends UserBaseService {
 
 
         return organizationResponseMap;
+    }
+
+    private void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap) {
+        vrpClientService.createPreferedTimeWindow(organization.getId());
+        organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
+        countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
+        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
+        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
+        long creationDate = DateUtils.getCurrentDayStartMillis();
+        organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
+        organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
+        activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), organization.getCountry().getId());
+        activityIntegrationService.createDefaultPriorityGroupsFromCountry(organization.getCountry().getId(), organization.getId());
+        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationTypes().get(0).getId(), organization.getOrganizationSubTypes().get(0).getId(), organization.getCountry().getId());
+        activityIntegrationService.createDefaultOpenShiftRuleTemplate(orgTypeAndSubTypeDTO, organization.getId());
+        //create T&A gracePeriod default setting
+        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
+        activityIntegrationService.createDefaultGracePeriodSetting(tAndAGracePeriodSettingDTO, organization.getId());
+
     }
 
     public OrganizationResponseWrapper createUnion(OrganizationBasicDTO orgDetails, long countryId, Long organizationId) {
@@ -814,21 +816,21 @@ public class OrganizationService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.companyCategory.id.notFound", organizationBasicDTO.getCompanyCategoryId());
 
         }
-            Organization unit = new OrganizationBuilder()
-                    .setName(WordUtils.capitalize(organizationBasicDTO.getName()))
-                    .setDescription(organizationBasicDTO.getDescription())
-                    .setIsPrekairos(organizationBasicDTO.isPreKairos())
-                    .setDesiredUrl(organizationBasicDTO.getDesiredUrl())
-                    .setShortCompanyName(organizationBasicDTO.getShortCompanyName())
-                    .setKairosCompanyId(organizationBasicDTO.getKairosCompanyId())
-                    .setCompanyType(organizationBasicDTO.getCompanyType())
-                    .setVatId(organizationBasicDTO.getVatId())
-                    .setBusinessTypes(businessTypes)
-                    .setOrganizationTypes(organizationTypes)
-                    .setOrganizationSubTypes(organizationSubTypes)
-                    .setCompanyUnitType(organizationBasicDTO.getCompanyUnitType())
-                    .setTimeZone(ZoneId.of(TIMEZONE_UTC))
-                    .createOrganization();
+        Organization unit = new OrganizationBuilder()
+                .setName(WordUtils.capitalize(organizationBasicDTO.getName()))
+                .setDescription(organizationBasicDTO.getDescription())
+                .setIsPrekairos(organizationBasicDTO.isPreKairos())
+                .setDesiredUrl(organizationBasicDTO.getDesiredUrl())
+                .setShortCompanyName(organizationBasicDTO.getShortCompanyName())
+                .setKairosCompanyId(organizationBasicDTO.getKairosCompanyId())
+                .setCompanyType(organizationBasicDTO.getCompanyType())
+                .setVatId(organizationBasicDTO.getVatId())
+                .setBusinessTypes(businessTypes)
+                .setOrganizationTypes(organizationTypes)
+                .setOrganizationSubTypes(organizationSubTypes)
+                .setCompanyUnitType(organizationBasicDTO.getCompanyUnitType())
+                .setTimeZone(ZoneId.of(TIMEZONE_UTC))
+                .createOrganization();
 
         AddressDTO addressDTO = organizationBasicDTO.getContactAddress();
 
@@ -911,23 +913,19 @@ public class OrganizationService extends UserBaseService {
     public Map<String, Object> createNewUnit(OrganizationBasicDTO organizationBasicDTO, long unitId, boolean workCenterUnit, boolean gdprUnit) {
 
         Organization parent = organizationGraphRepository.findOne(unitId);
-
-        Organization unit = new OrganizationBuilder().createOrganization();
-        ContactAddress contactAddress = new ContactAddress();
-
         if (!Optional.ofNullable(parent).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
 
         }
-        unit.setTimeZone(ZoneId.of(TIMEZONE_UTC));
-        unit.setName(WordUtils.capitalize(organizationBasicDTO.getName()));
-        unit.setDescription(organizationBasicDTO.getDescription());
-        unit.setPrekairos(organizationBasicDTO.isPreKairos());
-        unit.setWorkCenterUnit(workCenterUnit);
-        unit.setGdprUnit(gdprUnit);
+
+        Organization unit = new OrganizationBuilder()
+                .setTimeZone(ZoneId.of(TIMEZONE_UTC))
+                .setName(WordUtils.capitalize(organizationBasicDTO.getName()))
+                .setDescription(organizationBasicDTO.getDescription())
+                .createOrganization();
+        ContactAddress contactAddress = new ContactAddress();
 
         AddressDTO addressDTO = organizationBasicDTO.getContactAddress();
-
 
         // Verify Address here
         addressDTO.setVerifiedByGoogleMap(true);
