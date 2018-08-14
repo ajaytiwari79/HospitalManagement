@@ -3,8 +3,10 @@ package com.kairos.service.data_inventory.processing_activity;
 
 import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
+import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponsDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -15,6 +17,8 @@ import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
+
+import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -55,6 +59,9 @@ public class ProcessingActivityService extends MongoBaseService {
     @Inject
     private JaversCommonService javersCommonService;
 
+    @Inject
+    private AssetMongoRepository assetMongoRepository;
+
 
     public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
@@ -70,31 +77,6 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivityMongoRepository.save(processingActivity);
         processingActivityDTO.setId(processingActivity.getId());
         return processingActivityDTO;
-    }
-
-
-    public Boolean deleteProcessingActivity(Long organizationId, BigInteger id) {
-        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(organizationId, id);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", id);
-        }
-        delete(processingActivity);
-        return true;
-
-    }
-
-
-    public ProcessingActivityResponseDTO getProcessingActivityWithMetaDataById(Long orgId, BigInteger id) {
-        ProcessingActivityResponseDTO processingActivity = processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", id);
-        }
-        return processingActivity;
-    }
-
-
-    public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long orgId) {
-        return processingActivityMongoRepository.getAllProcessingActivityAndMetaData(orgId);
     }
 
 
@@ -212,6 +194,59 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
 
     }
+
+
+    /**
+     * @param unitId
+     * @param processingActivityId
+     * @return
+     * @description method delete processing activity and Sub processing activity is activity is associated with asset then method simply return  without deleting activities
+     */
+    public Map<String, Object> deleteProcessingActivity(Long unitId, BigInteger processingActivityId) {
+
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", processingActivityId);
+        }
+        Map<String, Object> result = new HashMap<>();
+        if (!processingActivity.isSubProcess()) {
+            List<AssetResponseDTO> assetRelatedToProcessingActivities = assetMongoRepository.getAllAssetRelatedToProcessingActivityById(unitId, processingActivityId);
+            if (!assetRelatedToProcessingActivities.isEmpty()) {
+                result.put(IS_SUCCESS, false);
+                result.put("data", assetRelatedToProcessingActivities);
+            } else {
+                delete(processingActivity);
+                result.put(IS_SUCCESS, true);
+            }
+        } else {
+            List<AssetResponseDTO> assetRelatedToSubProcessingActivities = assetMongoRepository.getAllAssetRelatedToSubProcessingActivityById(unitId, processingActivityId);
+            if (!assetRelatedToSubProcessingActivities.isEmpty()) {
+                result.put(IS_SUCCESS, false);
+                result.put("data", assetRelatedToSubProcessingActivities);
+            } else {
+                delete(processingActivity);
+                result.put(IS_SUCCESS, true);
+            }
+
+        }
+        return result;
+
+    }
+
+
+    public ProcessingActivityResponseDTO getProcessingActivityWithMetaDataById(Long orgId, BigInteger id) {
+        ProcessingActivityResponseDTO processingActivity = processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", id);
+        }
+        return processingActivity;
+    }
+
+
+    public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long orgId) {
+        return processingActivityMongoRepository.getAllProcessingActivityAndMetaData(orgId);
+    }
+
 
     /**
      * @param processingActivityId

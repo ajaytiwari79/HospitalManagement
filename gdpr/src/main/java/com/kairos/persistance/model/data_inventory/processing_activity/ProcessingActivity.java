@@ -64,7 +64,9 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setActive(boolean active) { this.active = active; }
 
-    public boolean isSubProcess() { return subProcess; }
+    public boolean isSubProcess() {
+        return subProcess;
+    }
 
     public void setSubProcess(boolean subProcess) { this.subProcess = subProcess; }
 
@@ -133,6 +135,7 @@ public class ProcessingActivity extends MongoBaseEntity {
     public List<BigInteger> getProcessingLegalBasis() { return processingLegalBasis; }
 
     public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
+
 
 
     public ProcessingActivity(String name, String description, ManagingOrganization managingDepartment, Staff processOwner) {
