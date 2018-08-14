@@ -211,6 +211,21 @@ public class CustomAggregationQuery {
     }
 
 
+    public static String addNondeletedSubProcessingActivityToProcessingActivity() {
+
+        return "  {'$addFields':" +
+                "                {'subProcessingActivities':         " +
+                "                    {" +
+                "                '$filter' : { " +
+                "                'input': '$subProcessingActivities'," +
+                "                'as': 'activity', " +
+                "                'cond': {'$eq': ['$$activity.deleted', false ]}" +
+                "                }}}}";
+
+
+    }
+
+
     public static String metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata() {
         return "{ $group: {" +
                 "    '_id': { 'name': '$name' },  " +

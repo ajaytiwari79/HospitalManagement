@@ -5,6 +5,7 @@ import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponsDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -66,9 +67,9 @@ public class ProcessingActivityService extends MongoBaseService {
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
             processingActivity.setSubProcessingActivities(createSubProcessingActivity(organizationId, processingActivityDTO.getSubProcessingActivities()));
         }
-         processingActivityMongoRepository.save(processingActivity);
-         processingActivityDTO.setId(processingActivity.getId());
-         return processingActivityDTO;
+        processingActivityMongoRepository.save(processingActivity);
+        processingActivityDTO.setId(processingActivity.getId());
+        return processingActivityDTO;
     }
 
 
@@ -97,7 +98,6 @@ public class ProcessingActivityService extends MongoBaseService {
     }
 
 
-
     public ProcessingActivityDTO updateProcessingActivity(Long organizationId, BigInteger id, ProcessingActivityDTO processingActivityDTO) {
 
 
@@ -121,7 +121,7 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivity.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
         processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
-         processingActivityMongoRepository.save(processingActivity);
+        processingActivityMongoRepository.save(processingActivity);
         return processingActivityDTO;
 
     }
@@ -219,7 +219,7 @@ public class ProcessingActivityService extends MongoBaseService {
      * @description method return audit history of Processing Activity , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getProcessingActivityActivitiesHistory(BigInteger processingActivityId,int size,int skip)   {
+    public List<Map<String, Object>> getProcessingActivityActivitiesHistory(BigInteger processingActivityId, int size, int skip) {
 
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingActivityId, ProcessingActivity.class).limit(size).skip(skip);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
@@ -229,15 +229,14 @@ public class ProcessingActivityService extends MongoBaseService {
     }
 
 
-
-
-
-
-
-
-
-
-
+    /**
+     * @param unitId
+     * @return
+     * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
+     */
+    public List<ProcessingActivityBasicResponsDTO> getAllProcessingActivityBasicDetailsWithSubProcess(Long unitId) {
+        return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubprocessingActivities(unitId);
+    }
 
 
 }

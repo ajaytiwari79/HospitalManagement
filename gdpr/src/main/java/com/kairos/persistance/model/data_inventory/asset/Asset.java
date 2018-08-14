@@ -40,8 +40,6 @@ public class Asset extends MongoBaseEntity {
 
     private List<BigInteger> technicalSecurityMeasures;
 
-    private BigInteger processingActivity;
-
     private BigInteger hostingProvider;
 
     private BigInteger hostingType;
@@ -137,11 +135,6 @@ public class Asset extends MongoBaseEntity {
     public RiskSeverity getRisk() { return risk; }
 
     public void setRisk(RiskSeverity risk) { this.risk = risk; }
-
-    public BigInteger getProcessingActivity() { return processingActivity; }
-
-    public void setProcessingActivity(BigInteger processingActivity) { this.processingActivity = processingActivity; }
-
 
     public String getHostingLocation() { return hostingLocation; }
 

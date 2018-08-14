@@ -5,8 +5,11 @@ import com.kairos.gdpr.data_inventory.AssetRelateProcessingActivityDTO;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponsDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
@@ -21,6 +24,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -42,6 +46,9 @@ public class AssetService extends MongoBaseService {
 
     @Inject
     private AssetTypeMongoRepository assetTypeMongoRepository;
+
+    @Inject
+    private ProcessingActivityMongoRepository processingActivityMongoRepository;
 
 
     public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
@@ -172,6 +179,33 @@ public class AssetService extends MongoBaseService {
         asset.setSubProcessingActivities(assetRelateProcessingActivityDTO.getSubProcessingActivities());
         assetMongoRepository.save(asset);
         return asset;
+    }
+
+
+    public List<ProcessingActivityBasicResponsDTO> getAllRelatedProcessingActivityAndSubProcessingActivities(Long unitId, BigInteger assetId) {
+
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset ", assetId);
+        }
+
+        Set<BigInteger> subProcessingActivitiesIdsList = asset.getSubProcessingActivities();
+        List<ProcessingActivityBasicResponsDTO> processingActivityResponseDTOList = processingActivityMongoRepository
+                .getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(unitId, asset.getProcessingActivities());
+
+        for (ProcessingActivityBasicResponsDTO processingActivityBasicResponsDTO : processingActivityResponseDTOList) {
+            List<ProcessingActivityBasicResponsDTO> subProcessingActivites = processingActivityBasicResponsDTO.getSubProcessingActivities();
+            for (ProcessingActivityBasicResponsDTO subProcessingActivity : subProcessingActivites) {
+                if (subProcessingActivitiesIdsList.contains(subProcessingActivity.getId())) {
+                    subProcessingActivity.setSelected(true);
+                } else {
+                    subProcessingActivity.setSelected(false);
+                }
+            }
+        }
+        return processingActivityResponseDTOList;
+
+
     }
 
 
