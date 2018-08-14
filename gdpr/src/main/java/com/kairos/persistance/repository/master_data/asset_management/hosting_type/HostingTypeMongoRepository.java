@@ -34,7 +34,7 @@ public interface HostingTypeMongoRepository extends MongoBaseRepository<HostingT
     @Query("{organizationId:?0,name:?1,deleted:false}")
     HostingType findByOrganizationIdAndName(Long organizationId,String name);
 
-    @Query("{organizationId:?1,deleted:false}")
+    @Query("{organizationId:?0,deleted:false}")
     List<HostingTypeResponseDTO> findAllOrganizationHostingTypes(Long organizationId);
 
 }
