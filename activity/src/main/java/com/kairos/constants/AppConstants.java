@@ -276,6 +276,8 @@ public class AppConstants {
     public static final String TENTATIVE="TENTATIVE";
     public static final String PAYROLL="PAYROLL";
 
+    public static final String PRIORITY_GROUP1_NAME = "PRIORITY_GROUP1";
+
 
 
 }

@@ -14,6 +14,9 @@ import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RelationshipEntity(type = RelationshipConstants.HAS_ACCESS_GROUP)
 public class CountryAccessGroupRelationship extends UserBaseEntity{
 
@@ -36,6 +39,7 @@ public class CountryAccessGroupRelationship extends UserBaseEntity{
         this.accessGroup = accessGroup;
         this.organizationCategory = category;
     }
+
 
     public Country getCountry() {
         return country;
@@ -60,4 +64,5 @@ public class CountryAccessGroupRelationship extends UserBaseEntity{
     public void setOrganizationCategory(OrganizationCategory organizationCategory) {
         this.organizationCategory = organizationCategory;
     }
+
 }

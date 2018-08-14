@@ -5,6 +5,7 @@ import com.kairos.gdpr.OrganizationSubType;
 import com.kairos.gdpr.OrganizationType;
 import com.kairos.gdpr.ServiceCategory;
 import com.kairos.gdpr.SubServiceCategory;
+import com.kairos.user.country.system_setting.AccountTypeDTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -54,7 +55,7 @@ public class ClauseDTO {
 
     @NotNull(message = "Account Type cannot be null")
     @NotEmpty
-    private Set<BigInteger> accountTypes;
+    private Set<AccountTypeDTO> accountTypes;
 
 
     @NotNull(message = "Template Type cannot be null")
@@ -135,11 +136,11 @@ public class ClauseDTO {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public Set<BigInteger> getAccountTypes() {
+    public Set<AccountTypeDTO> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(Set<BigInteger> accountTypes) {
+    public void setAccountTypes(Set<AccountTypeDTO> accountTypes) {
         this.accountTypes = accountTypes;
     }
 }

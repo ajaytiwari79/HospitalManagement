@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.data_inventory.processing_activity;
 
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
+import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -23,5 +24,9 @@ public interface ProcessingActivityMongoRepository extends MongoBaseRepository<P
 
     @Query("{organizationId:?0,_id:{$in:?1},deleted:false,subProcess:false}")
     List<ProcessingActivity> findSubProcessingActivitiesByIds(Long organizationId, List<BigInteger> ids);
+
+
+    @Query("{_id:{$in:?1},deleted:false,subProcess:false}")
+    List<ProcessingActivityResponseDTO> findAllSubProcessingActivitiesByIds(List<BigInteger> ids);
 
 }

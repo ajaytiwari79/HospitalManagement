@@ -4,6 +4,7 @@ package com.kairos.gdpr;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.gdpr.master_data.AgreementSectionDTO;
+import com.kairos.user.country.system_setting.AccountTypeDTO;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -43,7 +44,7 @@ public class PolicyAgreementTemplateDTO {
 
     @NotNull(message = "Account Type cannot be null")
     @NotEmpty(message = "Account Type cannot be empty")
-    private Set<BigInteger> accountTypes;
+    private Set<AccountTypeDTO> accountTypes;
 
     private List<AgreementSectionDTO> agreementSections=new ArrayList<>();
 
@@ -114,13 +115,11 @@ public class PolicyAgreementTemplateDTO {
         this.organizationSubServices = organizationSubServices;
     }
 
-    public Set<BigInteger> getAccountTypes() {
+    public Set<AccountTypeDTO> getAccountTypes() {
         return accountTypes;
     }
 
-    public void setAccountTypes(Set<BigInteger> accountTypes) {
+    public void setAccountTypes(Set<AccountTypeDTO> accountTypes) {
         this.accountTypes = accountTypes;
     }
-
-
 }

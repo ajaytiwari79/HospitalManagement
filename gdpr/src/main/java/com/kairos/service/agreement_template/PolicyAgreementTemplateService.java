@@ -2,12 +2,10 @@ package com.kairos.service.agreement_template;
 
 
 import com.kairos.gdpr.PolicyAgreementTemplateDTO;
-import com.kairos.persistance.model.account_type.AccountType;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
-import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
 import com.mongodb.MongoException;
@@ -28,9 +26,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     @Inject
     private PolicyAgreementTemplateRepository policyAgreementTemplateRepository;
 
-
-    @Inject
-    private AccountTypeService accountTypeService;
 
     @Inject
     private AgreementSectionService agreementSectionService;
@@ -57,7 +52,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
             exceptionService.duplicateDataException("message.duplicate", "Policy Agreement Template ", policyAgreementTemplateDto.getName());
         }
         templateTypeService.getTemplateById(policyAgreementTemplateDto.getTemplateTypeId(), countryId);
-        List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, policyAgreementTemplateDto.getAccountTypes());
         PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(
                 policyAgreementTemplateDto.getName(),
                 policyAgreementTemplateDto.getDescription(),
@@ -66,7 +60,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 policyAgreementTemplateDto.getOrganizationSubTypes(),
                 policyAgreementTemplateDto.getOrganizationServices(),
                 policyAgreementTemplateDto.getOrganizationSubServices());
-        policyAgreementTemplate.setAccountTypes(accountTypes);
+        policyAgreementTemplate.setAccountTypes(policyAgreementTemplateDto.getAccountTypes());
         policyAgreementTemplate.setTemplateType(policyAgreementTemplateDto.getTemplateTypeId());
         policyAgreementTemplate.setOrganizationId(organizationId);
         try {

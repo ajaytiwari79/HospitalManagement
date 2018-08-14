@@ -24,8 +24,8 @@ public interface ProcessingLegalBasisMongoRepository extends MongoBaseRepository
 
     ProcessingLegalBasis findByid(BigInteger id);
 
-    @Query("{_id:{$in:?0}}")
-    List<ProcessingLegalBasis> getProcessingLegalBasisList(List<BigInteger> ids);
+    @Query("{_id:{$in:?0},deleted:false}")
+    List<ProcessingLegalBasis> findProcessingLegalBasisByIds(List<BigInteger> legalBasisIds);
 
     @Query("{countryId:?0,deleted:false}")
     List<ProcessingLegalBasisResponseDTO> findAllProcessingLegalBases(Long countryId);
