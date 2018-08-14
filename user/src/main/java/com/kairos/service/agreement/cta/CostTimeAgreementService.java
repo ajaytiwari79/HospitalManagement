@@ -356,8 +356,8 @@ public class CostTimeAgreementService extends UserBaseService {
         costTimeAgreementToBeCreated.setRuleTemplates(ctaRuleTemplatesFuture.get());
         costTimeAgreementToBeCreated.setOrganizationType(organizationTypesFuture.get().get());
         costTimeAgreementToBeCreated.setOrganizationSubType(organizationSubTypesFuture.get().get());
-        costTimeAgreementToBeCreated.setStartDateMillis(oldCTA.getStartDateMillis());
-        costTimeAgreementToBeCreated.setEndDateMillis(oldCTA.getEndDateMillis());
+        costTimeAgreementToBeCreated.setStartDate(oldCTA.getStartDate());
+        costTimeAgreementToBeCreated.setEndDate(oldCTA.getEndDate());
 
         return CompletableFuture.completedFuture(true);
     }
@@ -451,8 +451,8 @@ public class CostTimeAgreementService extends UserBaseService {
 //        if(organizationSubTypesFuture.get().isPresent())
 //            costTimeAgreement.setOrganizationSubType(organizationSubTypesFuture.get().get());
         costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
-        costTimeAgreement.setStartDateMillis(collectiveTimeAgreementDTO.getStartDateMillis());
-        costTimeAgreement.setEndDateMillis(collectiveTimeAgreementDTO.getEndDateMillis());
+        costTimeAgreement.setStartDate(collectiveTimeAgreementDTO.getStartDate());
+        costTimeAgreement.setEndDate(collectiveTimeAgreementDTO.getEndDate());
 
         return CompletableFuture.completedFuture(true);
     }
@@ -588,13 +588,13 @@ public class CostTimeAgreementService extends UserBaseService {
             copyRules(costTimeAgreement, ctaDTO, null);
             collectiveTimeAgreementGraphRepository.detachOldCTAFromUnitPosition(unitPositionId);
             oldCTA.setDisabled(true);
-            oldCTA.setEndDateMillis(ctaDTO.getStartDateMillis() - ONE_DAY);
+            oldCTA.setEndDate(ctaDTO.getStartDate() - ONE_DAY);
             costTimeAgreement.setDisabled(false);
             costTimeAgreement.setParent(oldCTA);
             costTimeAgreement.setExpertise(unitPosition.getExpertise());
             unitPosition.setCta(costTimeAgreement);
             unitPositionService.save(unitPosition);
-            responseCTA = new CostTimeAgreement(costTimeAgreement.getId(), costTimeAgreement.getName(), oldCTA.getExpertise(), costTimeAgreement.getRuleTemplates(), costTimeAgreement.getStartDateMillis(), costTimeAgreement.getEndDateMillis(), false);
+            responseCTA = new CostTimeAgreement(costTimeAgreement.getId(), costTimeAgreement.getName(), oldCTA.getExpertise(), costTimeAgreement.getRuleTemplates(), costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false);
         } else {
             List<Long> ruleTemplateIds = null;
             if (Optional.ofNullable(oldCTA.getRuleTemplates()).isPresent() && !oldCTA.getRuleTemplates().isEmpty()) {
@@ -602,7 +602,7 @@ public class CostTimeAgreementService extends UserBaseService {
             }
             copyRules(oldCTA, ctaDTO, ruleTemplateIds);
             this.save(oldCTA);
-            responseCTA = new CostTimeAgreement(oldCTA.getId(), oldCTA.getName(), oldCTA.getExpertise(), oldCTA.getRuleTemplates(), oldCTA.getStartDateMillis(), oldCTA.getEndDateMillis(), false);
+            responseCTA = new CostTimeAgreement(oldCTA.getId(), oldCTA.getName(), oldCTA.getExpertise(), oldCTA.getRuleTemplates(), oldCTA.getStartDate(), oldCTA.getEndDate(), false);
 
         }
 
@@ -722,8 +722,8 @@ public class CostTimeAgreementService extends UserBaseService {
             ruleTemplates.add(ctaRuleTemplate);
         }
         costTimeAgreement.setRuleTemplates(ruleTemplates);
-        costTimeAgreement.setStartDateMillis(collectiveTimeAgreementDTO.getStartDateMillis());
-        costTimeAgreement.setEndDateMillis(collectiveTimeAgreementDTO.getEndDateMillis());
+        costTimeAgreement.setStartDate(collectiveTimeAgreementDTO.getStartDate());
+        costTimeAgreement.setEndDate(collectiveTimeAgreementDTO.getEndDate());
 
         return true;
     }*/

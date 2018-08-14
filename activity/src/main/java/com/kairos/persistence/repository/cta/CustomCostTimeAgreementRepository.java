@@ -26,4 +26,7 @@ public interface CustomCostTimeAgreementRepository {
 
     List<CTAResponseDTO> getDefaultCTA(Long unitId,Long expertiseId);
 
+    List<CTAResponseDTO> getVersionsCTA(List<Long> upIds);
+    List<CTAResponseDTO> getCTAByUpIds(List<Long> unitPositionIds);
+
 }

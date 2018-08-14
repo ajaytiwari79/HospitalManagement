@@ -4,7 +4,9 @@ import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
+import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.util.ObjectMapperUtils;
+import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -68,4 +70,48 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         Query query = new Query(Criteria.where("organization._id").is(unitId).and("expertise._id").is(expertiseId).and("deleted").is(false));
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
+
+    @Override
+    public List<CTAResponseDTO> getCTAByUpIds(List<Long> unitPositionIds) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds));
+        query.fields().include("name").include("description").include("unitPositionId");
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
+    }
+
+
+    @Override
+    public List<CTAResponseDTO> getVersionsCTA(List<Long> upIds){
+        String query = "{\n" +
+                "      $graphLookup: {\n" +
+                "         from: \"costTimeAgreement\",\n" +
+                "         startWith: \"$parentId\",\n" +
+                "         connectFromField: \"parentId\",\n" +
+                "         connectToField: \"_id\",\n" +
+                "         maxDepth: 10000,\n" +
+                "         depthField: \"numConnections\",\n" +
+                "         as: \"versions\"\n" +
+                "      }\n" +
+                "   },{\n" +
+                "       $unwind:\"$versions\"\n" +
+                "       },\n" +
+                "       { $project:{\"versions\":1,\"_id\":0}},\n" +
+                "       {\n" +
+                "     $replaceRoot: { newRoot: \"$versions\" }\n" +
+                "   },{\n" +
+                "       $lookup:{\n" +
+                "           from:\"cTARuleTemplate\",\n" +
+                "           localField:\"ruleTemplateIds\",\n" +
+                "           foreignField:\"_id\",\n" +
+                "           as:\"ruleTemplates\"\n" +
+                "           }\n" +
+                "       }";
+        Document document = Document.parse(query);
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitPositionId").in(upIds).and("deleted").is(false).and("disabled").is(false)),
+                new CustomAggregationOperation(document)
+        );
+        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation,CostTimeAgreement.class,CTAResponseDTO.class);
+        return result.getMappedResults();
+    }
+
 }

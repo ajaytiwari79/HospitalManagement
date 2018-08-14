@@ -29,10 +29,6 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
 
-    private BigInteger costTimeAgreementId;
-
-    //  @Relationship(type = HAS_WTA)
-    private BigInteger workingTimeAgreementId;
 
     @Relationship(type = HAS_POSITION_CODE)
     private PositionCode positionCode;
@@ -78,13 +74,6 @@ public class UnitPosition extends UserBaseEntity {
     }
 
 
-    public BigInteger getCostTimeAgreementId() {
-        return costTimeAgreementId;
-    }
-
-    public void setCostTimeAgreementId(BigInteger costTimeAgreementId) {
-        this.costTimeAgreementId = costTimeAgreementId;
-    }
 
     public int getFullTimeWeeklyMinutes() {
         return fullTimeWeeklyMinutes;
@@ -151,14 +140,6 @@ public class UnitPosition extends UserBaseEntity {
     }
 
 
-
-    public BigInteger getWorkingTimeAgreementId() {
-        return workingTimeAgreementId;
-    }
-
-    public void setWorkingTimeAgreementId(BigInteger workingTimeAgreementId) {
-        this.workingTimeAgreementId = workingTimeAgreementId;
-    }
 
     public Long getStartDateMillis() {
         return startDateMillis;
@@ -290,7 +271,6 @@ public class UnitPosition extends UserBaseEntity {
     public String toString() {
         return "UnitPosition{" +
                 "expertise=" + expertise +
-                ", workingTimeAgreementId=" + workingTimeAgreementId +
                 ", positionCode=" + positionCode +
                 ", staff=" + staff +
                 ", union=" + union +

@@ -23,4 +23,7 @@ public interface CTARuleTemplateRepository extends MongoBaseRepository<CTARuleTe
     List<CTARuleTemplateDTO> findByRuleTemplateCategoryIdInAndCountryAndDeletedFalse(Long countryId);
 
 
+    @Query("{ruleTemplateCategoryId:?0,deleted:false}")
+    List<CTARuleTemplate> findAllByCategoryId(BigInteger ruleTemplateCategoryId);
+
 }

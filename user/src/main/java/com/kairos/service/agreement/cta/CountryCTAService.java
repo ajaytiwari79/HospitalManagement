@@ -176,8 +176,8 @@ public class CountryCTAService extends UserBaseService {
             costTimeAgreement.setOrganizationSubType(ctaDetailsWrapper.getOrganizationSubType());
         }
         costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
-        costTimeAgreement.setStartDateMillis(collectiveTimeAgreementDTO.getStartDateMillis());
-        costTimeAgreement.setEndDateMillis(collectiveTimeAgreementDTO.getEndDateMillis());
+        costTimeAgreement.setStartDate(collectiveTimeAgreementDTO.getStartDate());
+        costTimeAgreement.setEndDate(collectiveTimeAgreementDTO.getEndDate());
 
         return CompletableFuture.completedFuture(true);
     }

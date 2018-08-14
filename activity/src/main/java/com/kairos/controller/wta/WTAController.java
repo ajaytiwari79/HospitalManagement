@@ -188,16 +188,24 @@ public class WTAController {
     }
 
     @ApiOperation(value = "get Wta By Ids")
-    @GetMapping(value = UNIT_URL + "/wta/getWTAByIds")
-    public ResponseEntity<Map<String, Object>> getWTAByIds(@RequestParam List<BigInteger> wtaIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAByIds(wtaIds));
+    @GetMapping(value = UNIT_URL + "/unitposition-cta-wta")
+    public ResponseEntity<Map<String, Object>> getWTAByIds(@RequestParam List<Long> upIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByUpIds(upIds));
     }
 
     @ApiOperation(value = "assing wta to unitPosition")
-    @PostMapping(value = UNIT_URL + "/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> assignWTAToUnitPosition(@PathVariable BigInteger wtaId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignWTAToUnitPosition(wtaId));
+    @PostMapping(value = UNIT_URL + "/unitPosition/{unitPositionId}/wta/{wtaId}/cta/{ctaId}")
+    public ResponseEntity<Map<String, Object>> assignWTAToUnitPosition(@PathVariable Long unitPositionId,@PathVariable BigInteger wtaId,@PathVariable BigInteger ctaId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToUnitPosition(unitPositionId,wtaId,ctaId));
     }
+
+    @ApiOperation(value = "get wta of unitPosition")
+    @GetMapping(value = UNIT_URL + "/wta/unitPosition/{unitPositionId}")
+    public ResponseEntity<Map<String, Object>> getWTAOfUnitPosition(@PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAOfUnitPosition(unitPositionId));
+    }
+
+
 
 
     @ApiOperation(value = "get Wta By Id")
@@ -214,8 +222,8 @@ public class WTAController {
 
     @ApiOperation(value = "get Wta with versions By Ids")
     @GetMapping(value = UNIT_URL + "/wta/versions")
-    public ResponseEntity<Map<String, Object>> getWTAWithVersionIds(@PathVariable Long unitId, @RequestParam List<BigInteger> wtaIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAWithVersionIds(unitId, wtaIds));
+    public ResponseEntity<Map<String, Object>> getWTAWithVersionIds(@PathVariable Long unitId, @RequestParam List<Long> upIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAWithVersionIds(unitId, upIds));
     }
 
 

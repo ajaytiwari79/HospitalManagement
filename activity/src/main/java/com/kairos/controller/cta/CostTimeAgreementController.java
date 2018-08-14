@@ -252,9 +252,9 @@ public class CostTimeAgreementController {
 
 
     @ApiOperation(value = "get versions cta")
-    @PostMapping(value = UNIT_URL + "/get_versions_cta")
-    public ResponseEntity<Map<String, Object>> getVersionsCTA(@PathVariable Long unitId,@RequestParam List<BigInteger> ctaIds)  {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getVersionsCTA(unitId,ctaIds));
+    @GetMapping(value = UNIT_URL + "/get_versions_cta")
+    public ResponseEntity<Map<String, Object>> getVersionsCTA(@PathVariable Long unitId,@RequestParam List<Long> upIds)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getVersionsCTA(unitId,upIds));
     }
 
     @ApiOperation(value = "get default cta")

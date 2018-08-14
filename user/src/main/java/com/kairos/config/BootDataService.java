@@ -7,8 +7,6 @@ import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.user.access_permission.AccessGroupRole;
-import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
-import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
@@ -66,7 +64,6 @@ import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
-import com.kairos.service.agreement.RuleTemplateCategoryService;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.auth.RoleServiceUser;
 import com.kairos.service.auth.UserRoleServiceUser;
@@ -181,9 +178,6 @@ public class BootDataService {
     private AccessPageService accessPageService;
     @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
-    @Inject
-
-    private RuleTemplateCategoryService ruleTemplateCategoryService;
     @Inject
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
     @Inject

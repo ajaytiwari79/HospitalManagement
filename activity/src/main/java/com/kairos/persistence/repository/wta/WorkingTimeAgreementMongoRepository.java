@@ -32,5 +32,6 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
 
     @Query("{_id:{$in:?0}, deleted:false}")
     List<WorkingTimeAgreement> findAllByIdsInAndDeletedFalse(Set<BigInteger> ids);
+    
 
 }

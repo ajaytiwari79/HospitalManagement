@@ -1,23 +1,8 @@
 package com.kairos.controller.agreement;
 
-import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
-import com.kairos.user.country.agreement.RuleTemplateCategoryCTADTO;
-import com.kairos.user.country.agreement.UpdateRuleTemplateCategoryDTO;
-import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
-import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.service.agreement.RuleTemplateCategoryService;
-import com.kairos.service.country.CountryService;
-import com.kairos.util.response.ResponseHandler;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import java.util.Map;
-
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 /**
  * Created by vipul on 2/8/17.

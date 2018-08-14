@@ -35,6 +35,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     private OrganizationType organizationSubType;
 
+    private Long unitPositionId;
 
     private Long countryId;
 
@@ -58,6 +59,15 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     public List<BigInteger> getRuleTemplateIds() {
         return ruleTemplateIds=Optional.ofNullable(ruleTemplateIds).orElse(new ArrayList<>());
+    }
+
+
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
+
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
     }
 
     public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {

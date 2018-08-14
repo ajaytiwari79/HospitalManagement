@@ -2,6 +2,7 @@ package com.kairos.activity.cta;
 
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,8 +12,8 @@ import java.util.List;
 
 public class CTAWTAWrapper {
 
-    private List<CTAResponseDTO> cta;
-    private List<WTAResponseDTO> wta;
+    private List<CTAResponseDTO> cta = new ArrayList<>();
+    private List<WTAResponseDTO> wta = new ArrayList<>();
 
 
     public CTAWTAWrapper(List<CTAResponseDTO> cta, List<WTAResponseDTO> wta) {

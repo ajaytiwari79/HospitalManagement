@@ -1,6 +1,8 @@
 package com.kairos.service.wta;
 
 import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.cta.CTAResponseDTO;
+import com.kairos.activity.cta.CTAWTAWrapper;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.activity.wta.basic_details.WTADTO;
@@ -23,6 +25,7 @@ import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.WTADetailRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.solver_config.SolverConfigService;
@@ -86,6 +89,7 @@ public class WTAService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private TableSettingService tableSettingService;
+    @Inject private CostTimeAgreementService costTimeAgreementService;
 
 
     private final Logger logger = LoggerFactory.getLogger(WTAService.class);
@@ -408,19 +412,17 @@ public class WTAService extends MongoBaseService {
         return wtaDefaultDataInfoDTO;
     }
 
-    public List<WTAResponseDTO> getWTAByIds(List<BigInteger> wtaIds) {
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByIds(wtaIds);
-        List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta -> {
-            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta, WTAResponseDTO.class));
-        });
-        return wtaResponseDTOS;
+    public CTAWTAWrapper getWTACTAByUpIds(List<Long> unitPositionIds) {
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByUpIds(unitPositionIds,new Date());
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementService.getCTAByUpIds(unitPositionIds);
+        return new CTAWTAWrapper(ctaResponseDTOS,wtaResponseDTOS);
     }
 
 
-    public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<BigInteger> wtaIds) {
-        List<WTAVersionDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(wtaIds);
-        List<WTAVersionDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(wtaIds);
+    public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<Long> upIds) {
+        List<WTAVersionDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(upIds);
+        List<WTAVersionDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(upIds);
         currentWTAList.forEach(currentWTA -> {
             Optional<WTAVersionDTO> currentObject = versionsOfWTAs.parallelStream().filter(wtaVersionDTO -> currentWTA.getId().equals(wtaVersionDTO.getId())).findFirst();
             if (currentObject.isPresent()) {
@@ -433,7 +435,20 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    public WTAResponseDTO assignWTAToUnitPosition(BigInteger wtaId) {
+    public CTAWTAWrapper assignCTAWTAToUnitPosition(Long unitPositionId,BigInteger wtaId,BigInteger ctaId) {
+        WTAResponseDTO  wtaResponseDTO = assignWTATOUnitPosition(unitPositionId,wtaId);
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementService.assignCTATOUnitPosition(unitPositionId,ctaId);
+        return new CTAWTAWrapper(Arrays.asList(ctaResponseDTO),Arrays.asList(wtaResponseDTO));
+
+    }
+
+    public WTAResponseDTO getWTAOfUnitPosition(Long unitPositionId){
+        WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getWTAByUnitPosition(unitPositionId,new Date());
+        return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
+    }
+
+
+    private WTAResponseDTO assignWTATOUnitPosition(Long unitPositionId,BigInteger wtaId){
         WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wtaId);
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
         if (!Optional.ofNullable(wtaResponseDTO).isPresent()) {
@@ -447,6 +462,8 @@ public class WTAService extends MongoBaseService {
             List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
             workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
         }
+        workingTimeAgreement.setUnitPositionId(unitPositionId);
+        workingTimeAgreement.setStartDate(new Date());
         workingTimeAgreement.setId(null);
         workingTimeAgreement.setOrganization(null);
         workingTimeAgreement.setOrganizationParentWTA(wtaResponseDTO.getId());
@@ -454,7 +471,6 @@ public class WTAService extends MongoBaseService {
         wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
         return wtaResponseDTO;
-
     }
 
     public Boolean assignWTAToNewOrganization(List<Long> subTypeIds, Long organisationId, Long countryId) {
@@ -535,7 +551,6 @@ public class WTAService extends MongoBaseService {
     }
 
     private WTAResponseDTO updateWTAOfPublishedUnitPosition(WorkingTimeAgreement oldWta, WTADTO wtadto) {
-        WTAResponseDTO wtaResponseDTO = new WTAResponseDTO();
         WorkingTimeAgreement newWta = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WorkingTimeAgreement.class);
         newWta.setDescription(wtadto.getDescription());
         newWta.setName(wtadto.getName());
@@ -555,7 +570,7 @@ public class WTAService extends MongoBaseService {
         newWta.setDisabled(false);
         newWta.setParentWTA(oldWta.getId());
         save(newWta);
-        wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(newWta, WTAResponseDTO.class);
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(newWta, WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates));
         wtaResponseDTO.setParentWTA(oldWta.getId());
         return wtaResponseDTO;

@@ -7,6 +7,7 @@ import com.kairos.user.organization.position_code.PositionCodeDTO;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,8 @@ public class CTAResponseDTO {
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
-    private Long startDateMillis;
-    private Long endDateMillis;
+    private LocalDate startDate;
+    private LocalDate endDate;
     // Added for version of CTA
     private List<CTAResponseDTO> versions = new ArrayList<>();
     private Map<String, Object> unitInfo;
@@ -38,13 +39,13 @@ public class CTAResponseDTO {
         //Default constructor
     }
 
-    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, Long startDateMillis, Long endDateMillis, Boolean disabled) {
+    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled) {
         this.id = id;
         this.name = name;
         this.expertise = expertise;
         this.ruleTemplates = ruleTemplates;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.disabled = disabled;
     }
 
@@ -122,20 +123,20 @@ public class CTAResponseDTO {
 
 
 
-    public Long getStartDateMillis() {
-        return startDateMillis;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    public Long getEndDateMillis() {
-        return endDateMillis;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public List<CTAResponseDTO> getVersions() {

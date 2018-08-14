@@ -7,6 +7,7 @@ import com.kairos.user.organization.OrganizationTypeDTO;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +28,8 @@ public class CollectiveTimeAgreementDTO {
     private OrganizationTypeDTO organizationSubType;
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
     @NotNull(message = "error.cta.startDate.notNull")
-    private Long startDateMillis;
-    private Long endDateMillis;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     public CollectiveTimeAgreementDTO() {
 
@@ -82,20 +83,20 @@ public class CollectiveTimeAgreementDTO {
         this.organizationSubType = organizationSubType;
     }
 
-    public Long getStartDateMillis() {
-        return startDateMillis;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    public Long getEndDateMillis() {
-        return endDateMillis;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public List<CTARuleTemplateDTO> getRuleTemplates() {

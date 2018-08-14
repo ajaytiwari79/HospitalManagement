@@ -146,8 +146,8 @@ public class DynamicCronScheduler implements  DisposableBean  {
                 String importShiftStatusXMLURI = envConfig.getCarteServerHost()+KETTLE_TRANS_STATUS;
                 //   String startDate = DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy-MM-dd");
                 //     String endDate = DateFormatUtils.format(DateUtil.addWeeksInDate(DateUtil.getCurrentDate(), 5), "yyyy-MM-dd");
-                //  String startDate = DateFormatUtils.format(controlPanel.getStartDateMillis(), "yyyy-MM-dd");
-                //  String endDate = DateFormatUtils.format(controlPanel.getEndDateMillis(), "yyyy-MM-dd");
+                //  String startDate = DateFormatUtils.format(controlPanel.getStartDate(), "yyyy-MM-dd");
+                //  String endDate = DateFormatUtils.format(controlPanel.getEndDate(), "yyyy-MM-dd");
                 Long workplaceId = Long.valueOf(String.valueOf("15"));
                 if(controlPanel.getUnitId() != null){
                     Organization organization = organizationGraphRepository.findOne(controlPanel.getUnitId());

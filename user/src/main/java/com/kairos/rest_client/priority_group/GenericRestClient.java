@@ -71,16 +71,15 @@ public class GenericRestClient {
     }
 
 
-    public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, Class responseType, Object... pathParams) {
-        final String baseUrl = getURIWithParam(getBaseUrl(isUnit,id),queryParam);
+    public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+        final String baseUrl = getBaseUrl(isUnit,id)+uri;
 
         try {
-
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl,
+                            baseUrl+getURIWithParam(queryParam),
                             getHttpMethod(integrationOperation),
-                            new HttpEntity<>(t), responseType,pathParams);
+                            new HttpEntity<>(t), typeReference,pathParams);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 exceptionService.internalServerError(response.getMessage());
@@ -94,13 +93,13 @@ public class GenericRestClient {
 
     }
 
-    public String getURIWithParam(String uri,List<NameValuePair> queryParam){
+    public String getURIWithParam(List<NameValuePair> queryParam){
         try {
-            URIBuilder builder = new URIBuilder(uri);
-            if(!queryParam.isEmpty()) {
+            URIBuilder builder = new URIBuilder();
+            if(queryParam!=null && !queryParam.isEmpty()) {
                 builder.setParameters(queryParam);
             }
-            return uri+builder.build().toString();
+            return builder.build().toString();
         } catch (URISyntaxException e) {
             exceptionService.internalServerError(e.getMessage());
         }

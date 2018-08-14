@@ -10,7 +10,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,17 +33,24 @@ public class CostTimeAgreement extends MongoBaseEntity {
     private BigInteger parentId;
     private BigInteger parentCountryCTAId;
     private List<BigInteger> ruleTemplateIds =new ArrayList<>();
-    private Long startDateMillis;
-    private Long endDateMillis;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private boolean disabled;
     private Long createdBy;
     private Long lastModifiedBy;
+    private Long unitPositionId;
 
     public CostTimeAgreement() {
     }
 
 
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
 
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
+    }
 
     public Organization getOrganization() {
         return organization;
@@ -114,20 +123,20 @@ public class CostTimeAgreement extends MongoBaseEntity {
         return true;
     }
 
-    public Long getStartDateMillis() {
-        return startDateMillis;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    public Long getEndDateMillis() {
-        return endDateMillis;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public BigInteger getParentCountryCTAId() {
@@ -191,8 +200,8 @@ public class CostTimeAgreement extends MongoBaseEntity {
                 .append(countryId, that.countryId)
                 .append(parentId, that.parentId)
                 .append(ruleTemplateIds, that.ruleTemplateIds)
-                .append(startDateMillis, that.startDateMillis)
-                .append(endDateMillis, that.endDateMillis)
+                .append(startDate, that.startDate)
+                .append(endDate, that.endDate)
                 .isEquals();
     }
 
@@ -207,8 +216,8 @@ public class CostTimeAgreement extends MongoBaseEntity {
                 .append(countryId)
                 .append(parentId)
                 .append(ruleTemplateIds)
-                .append(startDateMillis)
-                .append(endDateMillis)
+                .append(startDate)
+                .append(endDate)
                 .append(disabled)
                 .toHashCode();
     }

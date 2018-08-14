@@ -1,5 +1,6 @@
 package com.kairos.rest_client;
 
+import com.kairos.activity.cta.CTAWTAWrapper;
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.activity.wta.version.WTATableSettingWrapper;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
@@ -59,7 +61,7 @@ public class WorkingTimeAgreementRestClient {
         }
     }
 
-    public WTAResponseDTO getWTAById(BigInteger wtaId) {
+    public WTAResponseDTO getWTAById(Long unitPositionId) {
         String baseUrl = getBaseUrl(true);
         try {
             // HttpEntity<BigInteger> request = new HttpEntity<>(wtaId);
@@ -67,8 +69,8 @@ public class WorkingTimeAgreementRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<WTAResponseDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/wta/{wtaId}",
-                            HttpMethod.GET, null, typeReference, wtaId);
+                            baseUrl + "/wta/unitPosition/{unitPositionId}",
+                            HttpMethod.GET, null, typeReference, unitPositionId);
 
             RestTemplateResponseEnvelope<WTAResponseDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
@@ -85,16 +87,16 @@ public class WorkingTimeAgreementRestClient {
 
     }
 
-    public List<WTAResponseDTO> getWTAByIds(List<BigInteger> wtaIds) {
+    public List<WTAResponseDTO> getWTAByIds(List<Long> upIds) {
         String baseUrl = getBaseUrl(true);
-        String param = wtaIds.toString().replace("[", "").replace("]", "");
+        String param = upIds.toString().replace("[", "").replace("]", "");
         try {
             //HttpEntity<List<BigInteger>> request = new HttpEntity<>(wtaIds);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/wta/getWTAByIds?wtaIds=" + param,
+                            baseUrl + "/wta/getWTAByIds?upIds=" + param,
                             HttpMethod.GET, null, typeReference);
 
             RestTemplateResponseEnvelope<List<WTAResponseDTO>> response = restExchange.getBody();
@@ -112,18 +114,17 @@ public class WorkingTimeAgreementRestClient {
 
     }
 
-    public WTAResponseDTO assignWTAToUnitPosition(BigInteger wtaId) {
+    public CTAWTAWrapper assignWTAToUnitPosition(Long unitPositionId,BigInteger wtaId,BigInteger ctaId) {
         String baseUrl = getBaseUrl(true);
         try {
-            HttpEntity<BigInteger> request = new HttpEntity<>(wtaId);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<WTAResponseDTO>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<CTAWTAWrapper>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/wta/{wtaId}",
-                            HttpMethod.POST, null, typeReference, wtaId);
+                            baseUrl + "/unitPosition/{unitPositionId}/wta/{wtaId}/cta/{ctaId}",
+                            HttpMethod.POST, null, typeReference, unitPositionId,wtaId,ctaId);
 
-            RestTemplateResponseEnvelope<WTAResponseDTO> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<CTAWTAWrapper> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {

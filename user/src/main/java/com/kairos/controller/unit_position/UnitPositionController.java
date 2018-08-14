@@ -72,11 +72,11 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.updateUnitPositionWTA(unitId, unitPositionId, wtaId, wtadto));
     }
 
-    @ApiOperation(value = "get unit_position's WTA")
+   /* @ApiOperation(value = "get unit_position's WTA")
     @GetMapping(value = "/unit_position/{unitPositionId}/wta")
     public ResponseEntity<Map<String, Object>> getUnitPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionWTA(unitId, unitPositionId));
-    }
+    }*/
 
     /*@ApiOperation(value = "Update Unit Position's CTA")
     @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta/{ctaId}")
@@ -130,7 +130,7 @@ public class UnitPositionController {
     @ApiOperation(value = "get all wta version for a staff")
     @RequestMapping(value = "/staff/{staffId}/wta", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllWTAOfStaff(@PathVariable Long unitId, @PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllWTAOfStaff(staffId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllWTAOfStaff(unitId,staffId));
     }
 
     @ApiOperation(value = "get all cta version for a staff")
