@@ -22,19 +22,15 @@ public class MasterQuestion extends MongoBaseEntity {
     @NotNull
     private QuestionType questionType;
 
-    private Boolean isNotSureAllowed=false;
+    private boolean isNotSureAllowed=false;
 
     private String attributeName;
 
     private Long countryId;
 
-    public String getAttributeName() {
-        return attributeName;
-    }
+    public String getAttributeName() { return attributeName; }
 
-    public void setAttributeName(String attributeName) {
-        this.attributeName = attributeName;
-    }
+    public void setAttributeName(String attributeName) { this.attributeName = attributeName; }
 
     public Long getCountryId() {
         return countryId;
@@ -64,25 +60,21 @@ public class MasterQuestion extends MongoBaseEntity {
         return isRequired;
     }
 
-    public void setRequired(Boolean required) {
-        isRequired = required;
-    }
-
-    public Boolean getNotSureAllowed() {
-        return isNotSureAllowed;
-    }
+    public void setRequired(Boolean required) { isRequired = required; }
 
     public void setNotSureAllowed(Boolean notSureAllowed) {
         isNotSureAllowed = notSureAllowed;
     }
 
-    public QuestionType getQuestionType() {
-        return questionType;
-    }
+    public QuestionType getQuestionType() { return questionType; }
 
     public void setQuestionType(QuestionType questionType) {
         this.questionType = questionType;
     }
+
+    public boolean isNotSureAllowed() { return isNotSureAllowed; }
+
+    public void setNotSureAllowed(boolean notSureAllowed) { isNotSureAllowed = notSureAllowed; }
 
     public MasterQuestion(String question, String description, QuestionType questionType, Long countryId) {
         this.question = question;

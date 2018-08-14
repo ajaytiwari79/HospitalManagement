@@ -19,23 +19,15 @@ public class MasterQuestionBasicResponseDTO {
 
     private String attributeName;
 
-    private Boolean isRequired;
+    private boolean isRequired;
 
-    public String getAttributeName() {
-        return attributeName;
-    }
+    public String getAttributeName() { return attributeName; }
 
-    public void setAttributeName(String attributeName) {
-        this.attributeName = attributeName;
-    }
+    public void setAttributeName(String attributeName) { this.attributeName = attributeName; }
 
-    public Boolean getRequired() {
-        return isRequired;
-    }
+    public boolean isRequired() { return isRequired; }
 
-    public void setRequired(Boolean required) {
-        isRequired = required;
-    }
+    public void setRequired(boolean required) { isRequired = required; }
 
     public BigInteger getId() {
         return id;
