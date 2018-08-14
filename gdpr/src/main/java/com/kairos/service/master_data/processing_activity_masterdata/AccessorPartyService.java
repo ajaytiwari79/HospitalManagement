@@ -4,6 +4,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
@@ -34,9 +35,6 @@ public class AccessorPartyService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
 
     /**
      * @param countryId
@@ -46,19 +44,16 @@ public class AccessorPartyService extends MongoBaseService {
      * and if exist then simply add  AccessorParty to existing list and return list ;
      * findByNamesList()  return list of existing AccessorParty using collation ,used for case insensitive result
      */
-    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, List<AccessorParty> accessorParties) {
+    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, List<AccessorPartyDTO> accessorParties) {
 
         Map<String, List<AccessorParty>> result = new HashMap<>();
         Set<String> accessorPartyNames = new HashSet<>();
         if (!accessorParties.isEmpty()) {
-            for (AccessorParty accessorParty : accessorParties) {
-                if (!StringUtils.isBlank(accessorParty.getName())) {
-                    accessorPartyNames.add(accessorParty.getName());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
+            for (AccessorPartyDTO accessorParty : accessorParties) {
+                accessorPartyNames.add(accessorParty.getName());
             }
             List<AccessorParty> existing = findByNamesAndCountryId(countryId, accessorPartyNames, AccessorParty.class);
-            accessorPartyNames = comparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
+            accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();
             if (!accessorPartyNames.isEmpty()) {
@@ -114,34 +109,38 @@ public class AccessorPartyService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param id id of AccessorParty
-     * @param accessorParty
+     * @param id               id of AccessorParty
+     * @param accessorPartyDTO
      * @return AccessorParty updated object
      * @throws DuplicateDataException throw exception if AccessorParty data not exist for given id
      */
-    public AccessorParty updateAccessorParty(Long countryId,  BigInteger id, AccessorParty accessorParty) {
+    public AccessorPartyDTO updateAccessorParty(Long countryId, BigInteger id, AccessorPartyDTO accessorPartyDTO) {
 
-        AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, accessorParty.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            if (id.equals(exist.getId())) {
-                return exist;
+        AccessorParty accessorParty = accessorPartyMongoRepository.findByName(countryId, accessorPartyDTO.getName());
+        if (Optional.ofNullable(accessorParty).isPresent()) {
+            if (id.equals(accessorParty.getId())) {
+                return accessorPartyDTO;
             }
             throw new DuplicateDataException("Name Already Exist");
-        } else {
-            exist = accessorPartyMongoRepository.findByid(id);
-            exist.setName(accessorParty.getName());
-            return accessorPartyMongoRepository.save(getNextSequence(exist));
-
         }
+        accessorParty = accessorPartyMongoRepository.findByid(id);
+        if (!Optional.ofNullable(accessorParty).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.datanotFound", "Accessor party", id);
+        }
+        accessorParty.setName(accessorPartyDTO.getName());
+        accessorPartyMongoRepository.save(accessorParty);
+        return accessorPartyDTO;
+
+
     }
 
     /**
      * @param countryId
-     * @param name name of AccessorParty
+     * @param name      name of AccessorParty
      * @return AccessorParty object fetch on basis of  name
      * @throws DataNotExists throw exception if AccessorParty exist for given name
      */
-    public AccessorParty getAccessorPartyByName(Long countryId,String name) {
+    public AccessorParty getAccessorPartyByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
@@ -157,14 +156,13 @@ public class AccessorPartyService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param organizationId - id of current organization
-     * @return     method return list of Organization Accessor party with non Inherited Accessor party from  parent
+     * @return method return list of Organization Accessor party with non Inherited Accessor party from  parent
      */
     public List<AccessorPartyResponseDTO> getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(Long countryId, Long parentOrgId, Long organizationId) {
 
-      return accessorPartyMongoRepository.getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(countryId,parentOrgId,organizationId);
+        return accessorPartyMongoRepository.getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(countryId, parentOrgId, organizationId);
     }
 
 

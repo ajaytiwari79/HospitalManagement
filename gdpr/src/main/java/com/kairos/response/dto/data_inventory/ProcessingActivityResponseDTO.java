@@ -2,14 +2,13 @@ package com.kairos.response.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistance.model.data_inventory.ManagingOrganization;
-import com.kairos.persistance.model.data_inventory.Staff;
+import com.kairos.gdpr.ManagingOrganization;
+import com.kairos.gdpr.Staff;
 import com.kairos.response.dto.common.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

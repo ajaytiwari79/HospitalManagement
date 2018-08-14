@@ -1,7 +1,7 @@
 package com.kairos.service.master_data.questionnaire_template;
 
 
-import com.kairos.dto.master_data.MasterQuestionnaireSectionDTO;
+import com.kairos.gdpr.master_data.MasterQuestionnaireSectionDTO;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireSection;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireTemplate;
@@ -83,7 +83,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
         questionnaireTemplate.setSections((List<BigInteger>) questionnaireSection.get(IDS_LIST));
         try {
-            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(getNextSequence(questionnaireTemplate));
+            questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.save(questionnaireTemplate);
         } catch (Exception e) {
             masterQuestionnaireSectionRepository.deleteAll((Set<MasterQuestionnaireSection>) questionnaireSection.get(QUESTIONNAIRE_SECTIONS));
             masterQuestionMongoRepository.deleteAll((Set<MasterQuestion>) questionnaireSection.get(QUESTION_LIST));
@@ -150,6 +150,14 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param orgId
+     * @param id
+     * @param templateId
+     * @return
+     */
     public Boolean deleteQuestionnaireSection(Long countryId, Long orgId, BigInteger id, BigInteger templateId) {
         MasterQuestionnaireSection questionnaireSection = masterQuestionnaireSectionRepository.findByIdAndNonDeleted(countryId, orgId, id);
         if (!Optional.ofNullable(questionnaireSection).isPresent()) {

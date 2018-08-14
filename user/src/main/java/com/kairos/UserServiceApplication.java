@@ -7,8 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
-import com.kairos.util.userContext.SchedulerUserContextInterceptor;
-import com.kairos.util.userContext.UserContextInterceptor;
+import com.kairos.util.user_context.SchedulerUserContextInterceptor;
+import com.kairos.util.user_context.UserContextInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -139,7 +139,19 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
                 .build();
         return template;
     }
+	@Profile({"local", "test"})
+	@Bean(name="schedulerServiceRestTemplate")
+	public RestTemplate getRestTemplateWithoutUserContextLocal(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
 
+		RestTemplate template =restTemplateBuilder
+				.interceptors(new SchedulerUserContextInterceptor(authorization))
+				.messageConverters(mappingJackson2HttpMessageConverter())
+				.build();
+		return template;
+	}
+
+	@Profile({"development","qa","production"})
+	@LoadBalanced
 	@Bean(name="schedulerServiceRestTemplate")
 	public RestTemplate getRestTemplateWithoutUserContext(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
 
@@ -149,6 +161,5 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 				.build();
 		return template;
 	}
-
 }
 

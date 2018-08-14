@@ -1,5 +1,5 @@
 package com.kairos.service.country;
-import com.kairos.persistence.model.country.common.BusinessType;
+import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

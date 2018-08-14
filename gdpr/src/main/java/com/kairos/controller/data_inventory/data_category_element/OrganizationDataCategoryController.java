@@ -1,10 +1,10 @@
 package com.kairos.controller.data_inventory.data_category_element;
 
 
-import com.kairos.dto.master_data.DataCategoryDTO;
+import com.kairos.gdpr.master_data.DataCategoryDTO;
 import com.kairos.service.data_inventory.data_category_element.OrganizationDataCategoryService;
 import com.kairos.utils.ResponseHandler;
-import com.kairos.utils.validate_list.ValidateListOfRequestBody;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,7 @@ public class OrganizationDataCategoryController {
 
     @ApiOperation(value = "create Multiple data category with  data Elements")
     @PostMapping("/data_category")
-    ResponseEntity<Object> createDataCategoryAndDataElements(@PathVariable Long unitId, @RequestBody @Valid ValidateListOfRequestBody<DataCategoryDTO> dataCategoryDTOs) {
+    ResponseEntity<Object> createDataCategoryAndDataElements(@PathVariable Long unitId, @RequestBody @Valid ValidateRequestBodyList<DataCategoryDTO> dataCategoryDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }

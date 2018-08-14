@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.user.client;
-import com.kairos.persistence.model.client.ClientLanguageRelation;
+import com.kairos.persistence.model.client.relationships.ClientLanguageRelation;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 

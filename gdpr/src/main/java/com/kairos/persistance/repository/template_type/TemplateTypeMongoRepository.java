@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.template_type;
 
 import com.kairos.persistance.model.template_type.TemplateType;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -16,7 +17,7 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface TemplateTypeMongoRepository extends MongoRepository<TemplateType,BigInteger> {
+public interface TemplateTypeMongoRepository extends MongoBaseRepository<TemplateType,BigInteger> {
 
 
     @Query("{name:?0,deleted:false}")

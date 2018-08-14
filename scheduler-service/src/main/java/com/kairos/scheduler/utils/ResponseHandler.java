@@ -21,13 +21,13 @@ public final class ResponseHandler {
 
     public static ResponseEntity<Map<String, Object>> generateResponse(HttpStatus status, boolean isSuccess, Object responseObj) {
         // Get Time as per UTC format
-        long dateTime = DateUtils.getCurrentMillis();
+
 
         Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("status", status.value());
         map.put("isSuccess", isSuccess);
         map.put("data", responseObj);
-        map.put("time_stamp", dateTime);
+        map.put("time_stamp", DateUtils.getCurrentDate());
         return new ResponseEntity<Map<String, Object>>(map, status);
 
     }

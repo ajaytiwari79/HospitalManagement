@@ -2,8 +2,6 @@ package com.kairos.controller.exception_handler;
 
 
 import com.kairos.custom_exception.*;
-import com.kairos.dto.exception.FieldErrorDTO;
-import com.kairos.dto.exception.ResponseEnvelope;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -41,8 +39,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error("error in gdpr service ",ex);
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
         List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
-        List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
-        //  String error;
+        List<FieldErrorDTO> errors = new ArrayList<>(fieldErrors.size() + globalErrors.size());
         for (FieldError fieldError : fieldErrors) {
             FieldErrorDTO error=new FieldErrorDTO(fieldError.getField(),fieldError.getDefaultMessage());
             errors.add(error);
@@ -55,11 +52,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         errorMessage.setErrors(errors);
         errorMessage.setSuccess(false);
 
-        return new ResponseEntity<Object>(errorMessage, HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<>(errorMessage, HttpStatus.UNPROCESSABLE_ENTITY);
 
     }
 
-    @ExceptionHandler(value = {DuplicateDataException.class,DataNotExists.class,DataNotFoundByIdException.class})
+    @ExceptionHandler(value = {DuplicateDataException.class,DataNotExists.class,DataNotFoundByIdException.class,InvalidRequestException.class})
     @ResponseBody
     protected ResponseEntity<Object> exceptionHandler(RuntimeException ex , HttpServletRequest request)
     {

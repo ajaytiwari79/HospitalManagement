@@ -1,6 +1,6 @@
 package com.kairos.service.master_data.questionnaire_template;
 
-import com.kairos.dto.master_data.MasterQuestionDTO;
+import com.kairos.gdpr.master_data.MasterQuestionDTO;
 import com.kairos.enums.QuestionType;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireSection;
@@ -106,7 +106,7 @@ public class MasterQuestionService extends MongoBaseService {
         }
         questionsIdList.remove(id);
         questionnaireSection.setQuestions(questionsIdList);
-        masterQuestionnaireSectionRepository.save(getNextSequence(questionnaireSection));
+        masterQuestionnaireSectionRepository.save(questionnaireSection);
         delete(exist);
         return true;
 

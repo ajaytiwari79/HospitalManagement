@@ -253,7 +253,7 @@ public class StaffAddressService extends UserBaseService {
 
         Map<String, Object> response = new HashMap<>();
         response.put("primaryStaffAddress", getContactAddress(staff.getContactAddress()));
-        response.put("secondaryStaffAddress", (staff.getSecondaryContactAddress() == null) ? initializeSecondaryAddress() : getContactAddress(staff.getSecondaryContactAddress()));
+        response.put("secondaryStaffAddress", getContactAddress(staff.getSecondaryContactAddress()));
         response.put("distanceFromWork", distance);
 
         if (countryId != null) {
@@ -265,32 +265,17 @@ public class StaffAddressService extends UserBaseService {
     }
 
     public ContactAddressDTO getContactAddress(ContactAddress contactAddress) {
-        ContactAddressDTO contactAddressDTO = new ContactAddressDTO(contactAddress.getHouseNumber(),contactAddress.getFloorNumber(),contactAddress.getStreet1(),contactAddress.getCity(),
-                contactAddress.getRegionName(),contactAddress.getCountry(),contactAddress.getLatitude(),contactAddress.getLongitude(),contactAddress.getProvince(),contactAddress.getCountry(),
-                contactAddress.isAddressProtected(),contactAddress.isVerifiedByVisitour());
-        contactAddressDTO.setZipCodeId(contactAddress.getZipCode()!=null ? contactAddress.getZipCode().getId(): null);
-        contactAddressDTO.setMunicipalityId((contactAddress.getMunicipality()==null) ?null :contactAddress.getMunicipality().getId());
-
+        ContactAddressDTO contactAddressDTO;
+        if(Optional.ofNullable(contactAddress).isPresent()){
+            contactAddressDTO = new ContactAddressDTO(contactAddress.getHouseNumber(),contactAddress.getFloorNumber(),contactAddress.getStreet1(),contactAddress.getCity(),
+                    contactAddress.getRegionName(),contactAddress.getCountry(),contactAddress.getLatitude(),contactAddress.getLongitude(),contactAddress.getProvince(),contactAddress.getCountry(),
+                    contactAddress.isAddressProtected(),contactAddress.isVerifiedByVisitour());
+            contactAddressDTO.setZipCodeId(contactAddress.getZipCode()!=null ? contactAddress.getZipCode().getId(): null);
+            contactAddressDTO.setMunicipalityId((contactAddress.getMunicipality()==null) ?null :contactAddress.getMunicipality().getId());
+        }else{
+            contactAddressDTO = new ContactAddressDTO();
+        }
         return contactAddressDTO;
-    }
-
-    public Map<String, Object> initializeSecondaryAddress() {
-        Map map = new HashMap<>();
-        map.put("houseNumber", null);
-        map.put("floorNumber", null);
-        map.put("street1", null);
-        map.put("zipCodeId", null);
-        map.put("city", null);
-        map.put("municipalityId", null);
-        map.put("regionName",null);
-        map.put("country", null);
-        map.put("latitude", null);
-        map.put("longitude", null);
-        map.put("province", null);
-        map.put("streetUrl", null);
-        map.put("addressProtected",null);
-        map.put("verifiedByVisitour", null);
-        return map;
     }
 
     public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {

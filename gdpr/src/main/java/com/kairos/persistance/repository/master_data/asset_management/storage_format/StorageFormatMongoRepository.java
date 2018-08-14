@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management.storage_format;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -13,7 +14,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface StorageFormatMongoRepository extends MongoRepository<StorageFormat,BigInteger>,CustomStorageFormatRepository {
+public interface StorageFormatMongoRepository extends MongoBaseRepository<StorageFormat,BigInteger>,CustomStorageFormatRepository {
 
 
 
@@ -29,7 +30,7 @@ public interface StorageFormatMongoRepository extends MongoRepository<StorageFor
     List<StorageFormat> findAllStorageFormats(Long countryId);
 
     @Query("{_id:{$in:?0},deleted:false}")
-    List<StorageFormatResponseDTO> findAllStorageFormatByIds(List<BigInteger> ids);
+    List<StorageFormatResponseDTO> findStorageFormatByIds(List<BigInteger> ids);
 
     @Query("{organizationId:?0,deleted:false}")
     List<StorageFormatResponseDTO> findAllOrganizationStorageFormats(Long organizationId);

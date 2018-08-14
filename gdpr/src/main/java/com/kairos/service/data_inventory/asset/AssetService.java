@@ -1,6 +1,6 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.kairos.dto.data_inventory.AssetDTO;
+import com.kairos.gdpr.data_inventory.AssetDTO;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
@@ -44,13 +44,13 @@ public class AssetService extends MongoBaseService {
 
 
     public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
-        Asset existingAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
-        if (Optional.ofNullable(existingAsset).isPresent()) {
+        Asset previousAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
+        if (Optional.ofNullable(previousAsset).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
         }
         AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset ", assetDTO.getAssetType());
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset  type", assetDTO.getAssetType());
         } else {
             if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent()) {
                 if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
@@ -58,20 +58,20 @@ public class AssetService extends MongoBaseService {
                 }
             }
         }
-        Asset newAsset = new Asset(assetDTO.getName(), assetDTO.getDescription(), assetDTO.getHostingLocation(),
+        Asset asset = new Asset(assetDTO.getName(), assetDTO.getDescription(), assetDTO.getHostingLocation(),
                 assetDTO.getAssetType(), assetDTO.getAssetSubTypes(), assetDTO.getManagingDepartment(), assetDTO.getAssetOwner(), true);
-        newAsset.setOrganizationId(organizationId);
-        newAsset.setHostingProvider(assetDTO.getHostingProvider());
-        newAsset.setHostingType(assetDTO.getHostingType());
-        newAsset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
-        newAsset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
-        newAsset.setStorageFormats(assetDTO.getStorageFormats());
-        newAsset.setDataDisposal(assetDTO.getDataDisposal());
-        newAsset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
-        newAsset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
-        newAsset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
-        newAsset = assetMongoRepository.save(getNextSequence(newAsset));
-        assetDTO.setId(newAsset.getId());
+        asset.setOrganizationId(organizationId);
+        asset.setHostingProvider(assetDTO.getHostingProvider());
+        asset.setHostingType(assetDTO.getHostingType());
+        asset.setOrgSecurityMeasures(assetDTO.getOrgSecurityMeasures());
+        asset.setTechnicalSecurityMeasures(assetDTO.getTechnicalSecurityMeasures());
+        asset.setStorageFormats(assetDTO.getStorageFormats());
+        asset.setDataDisposal(assetDTO.getDataDisposal());
+        asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
+        asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
+        asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
+        asset = assetMongoRepository.save(asset);
+        assetDTO.setId(asset.getId());
         return assetDTO;
     }
 
@@ -117,9 +117,9 @@ public class AssetService extends MongoBaseService {
      * @description method return audit history of asset , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getAssetActivities(BigInteger assetId) throws ClassNotFoundException {
+    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId,int size,int skip)   {
 
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class).limit(size).skip(skip);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
         return javersCommonService.getHistoryMap(changes, assetId, Asset.class);
@@ -157,7 +157,7 @@ public class AssetService extends MongoBaseService {
             }
         }
         ObjectMapperUtils.copyProperties(assetDTO, asset);
-        assetMongoRepository.save(getNextSequence(asset));
+        assetMongoRepository.save(asset);
         return assetDTO;
     }
 

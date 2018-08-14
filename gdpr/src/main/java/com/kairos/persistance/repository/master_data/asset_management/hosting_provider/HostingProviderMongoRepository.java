@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management.hosting_provider;
 
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -13,7 +14,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface HostingProviderMongoRepository extends MongoRepository<HostingProvider,BigInteger> ,CustomHostingProviderRepository{
+public interface HostingProviderMongoRepository extends MongoBaseRepository<HostingProvider,BigInteger>,CustomHostingProviderRepository{
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
     HostingProvider findByIdAndNonDeleted(Long countryId,BigInteger id);

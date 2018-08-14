@@ -1,7 +1,7 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
 
-import com.kairos.dto.data_inventory.ProcessingActivityDTO;
+import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.service.data_inventory.processing_activity.ProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -79,6 +79,16 @@ public class ProcessingActivityController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.updateProcessingActivity(unitId, id, processingActivityDTO));
+    }
+
+    @ApiOperation(value = "get history of asset or changes done in Asset")
+    @GetMapping("/processing_activity/{processingActivityId}/history")
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger processingActivityId,@RequestParam(defaultValue = "5") int size,@RequestParam(defaultValue = "0") int skip) {
+
+        if (processingActivityId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityActivitiesHistory(processingActivityId,size,skip));
     }
 
 

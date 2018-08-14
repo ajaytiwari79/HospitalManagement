@@ -1,6 +1,6 @@
 package com.kairos.config;
 
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -22,10 +22,9 @@ public class IntegrationTestConfig {
     @Value("${spring.test.authorization}")
     private String authorization ;
 
-
+    @Profile({"test","local"})
     @Bean
     @Primary
-    @Profile("local")
     public TestRestTemplate getTestRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         RestTemplate template =restTemplateBuilder
                 .interceptors(new TestUserContextInterceptor())

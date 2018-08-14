@@ -2,24 +2,20 @@ package com.kairos.service.clause;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.dto.master_data.ClauseBasicDTO;
+import com.kairos.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistance.repository.account_type.AccountTypeMongoRepository;
 import com.kairos.persistance.model.clause.Clause;
-import com.kairos.dto.master_data.ClauseDTO;
+import com.kairos.gdpr.master_data.ClauseDTO;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
-import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
-import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -34,18 +30,6 @@ public class ClauseService extends MongoBaseService {
 
     @Inject
     private ClauseMongoRepository clauseMongoRepository;
-
-    @Inject
-    private AccountTypeService accountTypeService;
-    @Inject
-    private MongoTemplate mongoTemplate;
-
-
-    @Inject
-    private AccountTypeMongoRepository accountTypeMongoRepository;
-
-    @Inject
-    private ComparisonUtils comparisonUtils;
 
 
     @Inject
@@ -82,13 +66,13 @@ public class ClauseService extends MongoBaseService {
         Clause newClause = new Clause(clauseDto.getTitle(), clauseDto.getDescription(), countryId, clauseDto.getOrganizationTypes(), clauseDto.getOrganizationSubTypes()
                 , clauseDto.getOrganizationServices(), clauseDto.getOrganizationSubServices());
         newClause.setOrganizationId(organizationId);
-        newClause.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
+        newClause.setAccountTypes(clauseDto.getAccountTypes());
         newClause.setTemplateTypes(clauseDto.getTemplateTypes());
 
         try {
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
             newClause.setTags(tagList);
-            newClause = clauseMongoRepository.save(getNextSequence(newClause));
+            newClause = clauseMongoRepository.save(newClause);
             return newClause;
         } catch (DuplicateDataException e) {
             clauseTagMongoRepository.deleteAll(tagList);
@@ -114,36 +98,36 @@ public class ClauseService extends MongoBaseService {
      */
     public Clause updateClause(Long countryId, Long organizationId, BigInteger clauseId, ClauseDTO clauseDto) {
 
-        Clause exists = clauseMongoRepository.findByTitle(countryId, organizationId, clauseDto.getTitle());
-        if (Optional.ofNullable(exists).isPresent() && !exists.getId().equals(clauseId)) {
+        Clause clause = clauseMongoRepository.findByTitle(countryId, organizationId, clauseDto.getTitle());
+        if (Optional.ofNullable(clause).isPresent() && !clause.getId().equals(clauseId)) {
             exceptionService.duplicateDataException("message.duplicate", "message.clause", clauseDto.getTitle());
         }
-        exists = clauseMongoRepository.findByIdAndNonDeleted(countryId, organizationId, clauseId);
-        if (!Optional.ofNullable(exists).isPresent()) {
+        clause = clauseMongoRepository.findByIdAndNonDeleted(countryId, organizationId, clauseId);
+        if (!Optional.ofNullable(clause).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + clauseId);
         }
         List<ClauseTag> tagList = new ArrayList<>();
-        exists.setAccountTypes(accountTypeService.getAccountTypeList(countryId, clauseDto.getAccountTypes()));
+        clause.setAccountTypes(clauseDto.getAccountTypes());
         List<BigInteger> templateTypesIds=clauseDto.getTemplateTypes();
         //templateTypeService.getTemplateByIdsList(templateTypesIds, countryId);
         try {
             tagList = clauseTagService.addClauseTagAndGetClauseTagList(countryId, organizationId, clauseDto.getTags());
-            exists.setOrganizationTypes(clauseDto.getOrganizationTypes());
-            exists.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
-            exists.setOrganizationServices(clauseDto.getOrganizationServices());
-            exists.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
-            exists.setTitle(clauseDto.getTitle());
-            exists.setDescription(clauseDto.getDescription());
-            exists.setTags(tagList);
-            exists.setTemplateTypes(clauseDto.getTemplateTypes());
+            clause.setOrganizationTypes(clauseDto.getOrganizationTypes());
+            clause.setOrganizationSubTypes(clauseDto.getOrganizationSubTypes());
+            clause.setOrganizationServices(clauseDto.getOrganizationServices());
+            clause.setOrganizationSubServices(clauseDto.getOrganizationSubServices());
+            clause.setTitle(clauseDto.getTitle());
+            clause.setDescription(clauseDto.getDescription());
+            clause.setTags(tagList);
+            clause.setTemplateTypes(clauseDto.getTemplateTypes());
             // exists.setOrganizationList(clauseDto.getOrganizationList());
-            exists = clauseMongoRepository.save(getNextSequence(exists));
+            clause = clauseMongoRepository.save(clause);
         } catch (Exception e) {
             clauseTagMongoRepository.deleteAll(tagList);
             LOGGER.warn(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
-        return exists;
+        return clause;
     }
 
 

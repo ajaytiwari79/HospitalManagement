@@ -1,7 +1,6 @@
 package com.kairos.controller.organization;
 
 import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
-
 import com.kairos.persistence.model.client.ClientStaffDTO;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Organization;
@@ -35,8 +34,8 @@ import com.kairos.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.user.organization.*;
 import com.kairos.user.staff.client.ClientFilterDTO;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.util.user_context.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -55,6 +54,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
@@ -466,7 +466,7 @@ public class OrganizationController {
     @ApiOperation(value = "Get Organization Clients with min details")
     @RequestMapping(value = "/unit/{unitId}/client", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long organizationId, @PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long organizationId, @PathVariable Long unitId)  throws InterruptedException, ExecutionException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 clientService.getOrganizationClients(unitId));
     }

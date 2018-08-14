@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.clause;
 
 import com.kairos.persistance.model.clause.Clause;
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -14,23 +15,16 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>,CustomClauseRepository{
+public interface ClauseMongoRepository extends MongoBaseRepository<Clause, BigInteger>, CustomClauseRepository {
 
-
-    //@Query("{deleted:false,countryId:?0,organizationId:?1,title:?2}")
-    //Clause findByTitleAndCountry(Long countryId,Long organizationId,String title);
 
     Clause findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0,organizationId:?1,_id:?2}")
-    Clause findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
-
-    @Query("{deleted:false,countryId:?0,organizationId:?1}")
-    List<ClauseResponseDTO>  findAllClause(Long countryId,Long organizationId);
+    Clause findByIdAndNonDeleted(Long countryId, Long organizationId, BigInteger id);
 
     @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2}}")
-    List<Clause>  getClauseListByIds(Long countryId,Long organizationId, List<BigInteger> ClauseIds);
-
+    List<Clause> getClauseListByIds(Long countryId, Long organizationId, List<BigInteger> ClauseIds);
 
 
 }

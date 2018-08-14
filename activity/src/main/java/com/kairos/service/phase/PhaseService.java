@@ -149,14 +149,12 @@ public class PhaseService extends MongoBaseService {
     }
 
     private Phase buildPhaseForCountry(PhaseDTO phaseDTO) {
-        Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(),
+        return new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(),
                 phaseDTO.getCountryId(), phaseDTO.getOrganizationId(), phaseDTO.getParentCountryPhaseId(), phaseDTO.getPhaseType(), phaseDTO.getStatus());
-        return phase;
     }
 
     public List<PhaseDTO> getPhasesByCountryId(Long countryId) {
-        List<PhaseDTO> phases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
-        return phases;
+        return phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
     }
 
     public Map<String, List<PhaseDTO>> getPhasesWithCategoryByCountryId(Long countryId) {
@@ -168,14 +166,12 @@ public class PhaseService extends MongoBaseService {
     }
 
     public List<PhaseDTO> getApplicablePlanningPhasesByOrganizationId(Long orgId, Sort.Direction direction) {
-        List<PhaseDTO> phases = phaseMongoRepository.getApplicablePlanningPhasesByUnit(orgId, direction);
-        return phases;
-    }
+           return  phaseMongoRepository.getApplicablePlanningPhasesByUnit(orgId, direction);
+        }
 
     public List<PhaseDTO> getActualPhasesByOrganizationId(Long orgId) {
-        List<PhaseDTO> phases = phaseMongoRepository.getActualPhasesByUnit(orgId);
-        return phases;
-    }
+        return phaseMongoRepository.getActualPhasesByUnit(orgId);
+        }
 
 
     public boolean deletePhase(Long countryId, BigInteger phaseId) {
@@ -218,7 +214,7 @@ public class PhaseService extends MongoBaseService {
             else
                 return -1;
         });
-        if (weekDifference < 0) {
+        if (weekDifference <= 0) {
             Optional<Phase> phaseOptional = phases.stream().findFirst();
             phase = phaseOptional.get();
             return phase;
@@ -355,6 +351,9 @@ public class PhaseService extends MongoBaseService {
      * @param upcomingMondayDate
      */
     private void addPlanningPhase(List<Phase> phases, LocalDate proposedDate, Map<LocalDate,List<ShiftStatus>> localDatePhaseStatusMap, LocalDate upcomingMondayDate) {
+        if(!Optional.ofNullable(phases).isPresent() || phases.isEmpty()){
+            exceptionService.actionNotPermittedException("phases.absent");
+        }
         Phase phase = null;
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
 
@@ -364,11 +363,11 @@ public class PhaseService extends MongoBaseService {
         int weekDifference = proposedWeekNumber-startWeekNumber;
 
         weekDifference++; // 34-30  its 4 but actually we need 5 including currently
-        if (weekDifference < 0) {
+        if (weekDifference <= 0) {
             Optional<Phase> phaseOptional = phases.stream().findFirst();
             if(phaseOptional.isPresent()){
                 phase = phaseOptional.get();
-                localDatePhaseStatusMap.put(proposedDate,phase.getStatus());
+
             }
 
         }
@@ -378,7 +377,7 @@ public class PhaseService extends MongoBaseService {
             if (DurationType.WEEKS .equals(phaseObject.getDurationType()) && phaseObject.getDuration() > 0) {    // Only considering Week based phases
                 for (int i = 0; i < phaseObject.getDuration(); i++) {
                     if (weekDifference == weekCount) {
-                        localDatePhaseStatusMap.put(proposedDate,phaseObject.getStatus());
+                        phase=phaseObject;
                         break outerLoop;
                     }
                     weekCount++;
@@ -387,9 +386,8 @@ public class PhaseService extends MongoBaseService {
         }
         if (!Optional.ofNullable(phase).isPresent()) {
             phase = phases.get(phases.size() - 1);
-            localDatePhaseStatusMap.put(proposedDate,phase.getStatus());
-
-        }
+            }
+        localDatePhaseStatusMap.put(proposedDate,phase.getStatus());
     }
 
 }

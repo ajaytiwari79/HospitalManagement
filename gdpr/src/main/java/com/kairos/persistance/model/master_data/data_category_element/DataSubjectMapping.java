@@ -1,12 +1,12 @@
 package com.kairos.persistance.model.master_data.data_category_element;
 
 
-import com.kairos.dto.OrganizationSubTypeDTO;
-import com.kairos.dto.OrganizationTypeDTO;
+import com.kairos.gdpr.OrganizationSubType;
+import com.kairos.gdpr.OrganizationType;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -18,20 +18,20 @@ import java.util.Set;
 public class DataSubjectMapping extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "Name can't be null or empty")
+    @NotBlank(message = "Name can't be null or empty")
     @Pattern(message = "Numbers and Special characters are not allowed in Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotNullOrEmpty(message = "Description Cannot be empty")
+    @NotBlank(message = "Description Cannot be empty")
     private String description;
 
     @NotEmpty(message = "ManagingOrganization Type cannot be empty")
     @NotNull(message = "ManagingOrganization Type cannot null")
-    private List<OrganizationTypeDTO> organizationTypes;
+    private List<OrganizationType> organizationTypes;
 
     @NotEmpty(message = "ManagingOrganization Type cannot be empty")
     @NotNull(message = "ManagingOrganization Sub Type cannot be empty")
-    private List<OrganizationSubTypeDTO> organizationSubTypes;
+    private List<OrganizationSubType> organizationSubTypes;
 
     @NotNull(message = "Data category cannot null")
     @NotEmpty(message = "Data Category cannot be empty")
@@ -71,23 +71,23 @@ public class DataSubjectMapping extends MongoBaseEntity {
         this.description = description;
     }
 
-    public List<OrganizationTypeDTO> getOrganizationTypes() {
+    public List<OrganizationType> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
+    public List<OrganizationSubType> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public DataSubjectMapping(String name, String description,  List<OrganizationTypeDTO> organizationTypes, List<OrganizationSubTypeDTO> organizationSubTypes,
+    public DataSubjectMapping(String name, String description, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes,
                               Set<BigInteger> dataCategories) {
         this.name = name;
         this.description = description;

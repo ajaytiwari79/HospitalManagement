@@ -24,8 +24,8 @@ import com.kairos.service.tag.TagService;
 import com.kairos.user.country.basic_details.CountryDTO;
 import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.userContext.CurrentUserDetails;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.CurrentUserDetails;
+import com.kairos.util.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -237,10 +237,6 @@ public class RuleTemplateService extends MongoBaseService {
     }
 
     public RuleTemplateWrapper getRuleTemplate(long countryId) {
-//        CountryDTO country = countryRestClient.getCountryById(countryId);
-//        if (country == null) {
-//            exceptionService.dataNotFoundByIdException("message.country.id", countryId);
-//        }
 
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(countryId);
 

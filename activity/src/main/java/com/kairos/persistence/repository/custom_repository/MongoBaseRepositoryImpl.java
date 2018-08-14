@@ -6,8 +6,7 @@ import org.springframework.util.Assert;
 
 import java.io.Serializable;
 
-public class MongoBaseRepositoryImpl<T, ID extends Serializable>
-extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
+public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
 	private final MongoOperations mongoOperations;
 	private final MongoEntityInformation<T, ID> entityInformation;
 	public MongoBaseRepositoryImpl(MongoEntityInformation<T, ID>  entityInformation,
@@ -23,4 +22,6 @@ extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
 
 		return mongoOperations.findById(id, entityInformation.getJavaType(), entityInformation.getCollectionName());
 	}
+
+
 }
