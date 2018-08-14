@@ -75,7 +75,6 @@ public class AccountTypeServiceTest {
         if (organizationId != null && unitId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId)
                     .append("/unit/").append(unitId).toString();
-            ;
             return baseUrl;
         } else if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId).toString();
