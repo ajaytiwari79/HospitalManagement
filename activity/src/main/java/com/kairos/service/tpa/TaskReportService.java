@@ -4,7 +4,7 @@ import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.task_type.TaskReportMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.mail.MailService;
-import com.kairos.util.timeCareShift.TaskReportWrapper;
+import com.kairos.util.external_plateform_shift.TaskReportWrapper;
 import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +16,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional

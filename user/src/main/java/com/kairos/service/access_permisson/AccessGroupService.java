@@ -27,7 +27,7 @@ import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.util.DateUtil;
 import com.kairos.util.DateUtils;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

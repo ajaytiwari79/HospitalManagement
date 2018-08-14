@@ -92,7 +92,7 @@ import com.kairos.user.staff.staff.StaffPreferencesDTO;
 import com.kairos.user.user.password.PasswordUpdateDTO;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.util.*;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;

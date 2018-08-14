@@ -1,14 +1,11 @@
 package com.kairos.service.locale;
 
-import com.kairos.config.security.CurrentUserDetails;
-import com.kairos.util.userContext.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
-import java.util.Optional;
 
 /**
  * Created by vipul on 10/5/18.
