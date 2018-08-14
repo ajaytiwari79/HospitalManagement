@@ -7,6 +7,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.IN_COUNTRY;
 
@@ -20,4 +21,8 @@ public interface UnitTypeGraphRepository extends Neo4jBaseRepository<UnitType,Lo
     @Query("match(country:Country)<-[:"+IN_COUNTRY+"]-(unitType:UnitType{deleted:false}) where id(country)={0} " +
             "RETURN id(unitType) as id,unitType.name as name,unitType.description as description" )
     List<UnitTypeQueryResult> getAllUnitTypeOfCountry(Long countryId);
+
+    @Query("(unitType:UnitType{deleted:false}) where id(unitTypeIn)={0} " +
+            "RETURN unitType" )
+    List<UnitType> getUnitTypeByIds(Set<Long> unitTypeIds);
 }

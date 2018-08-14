@@ -613,7 +613,7 @@ public class BootDataService {
     }
 */    private void createCountryLevelOrganization() {
 
-        kairosCountryLevel = new Organization();
+        kairosCountryLevel = new OrganizationBuilder().createOrganization();
         kairosCountryLevel.setKairosHub(true);
         kairosCountryLevel.setBoardingCompleted(true);
         kairosCountryLevel.setFormalName("Kairos (HUB)");
@@ -773,7 +773,7 @@ public class BootDataService {
     private void createRegionLevelOrganization() {
 
 
-        kairosRegionLevel = new Organization();
+        kairosRegionLevel = new OrganizationBuilder().createOrganization();
         kairosRegionLevel.setFormalName("Kairos");
         kairosRegionLevel.setName("Kairos");
         kairosRegionLevel.setEanNumber("501234567890");

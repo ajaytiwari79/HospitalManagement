@@ -52,7 +52,7 @@ public class OrganizationBasicDTO {
     private Long levelId;
     private  Boolean union;
     private boolean boardingCompleted;
-
+    private Long unitTypeId;
     // properties to create unit manager
     private UnitManagerDTO unitManager;
 
@@ -319,5 +319,13 @@ public class OrganizationBasicDTO {
 
     public void setAccountTypeId(Long accountTypeId) {
         this.accountTypeId = accountTypeId;
+    }
+
+    public Long getUnitTypeId() {
+        return unitTypeId;
+    }
+
+    public void setUnitTypeId(Long unitTypeId) {
+        this.unitTypeId = unitTypeId;
     }
 }

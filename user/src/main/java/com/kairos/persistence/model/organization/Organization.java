@@ -246,6 +246,21 @@ public class Organization extends UserBaseEntity {
         this.boardingCompleted=boardingCompleted;
         this.kairosId=kairosId;
     }
+
+
+    public Organization(String name,String description,boolean isPrekairos,String desiredUrl,String shortCompanyName,Integer kairosCompanyId,CompanyType companyType,
+          String vatId,List<BusinessType> businessTypes,List<OrganizationType> organizationTypes,List<OrganizationType> organizationSubTypes,   CompanyUnitType companyUnitType,
+            CompanyCategory companyCategory,ZoneId timeZone) {
+        this.name=name;this.description=description;this.isKairosHub=isPrekairos;
+        this.desiredUrl=desiredUrl;this.shortCompanyName=shortCompanyName;this.kairosCompanyId=kairosCompanyId;this.vatId=vatId;
+        this.businessTypes=businessTypes;this.organizationSubTypes=organizationSubTypes;this.organizationTypes=organizationTypes;
+        this.companyType =companyType;this.companyCategory=companyCategory;
+        this.companyUnitType=companyUnitType;
+        this.timeZone=timeZone;
+
+    }
+
+
     public void setOneTimeSyncPerformed(boolean oneTimeSyncPerformed) {
         isOneTimeSyncPerformed = oneTimeSyncPerformed;
     }
