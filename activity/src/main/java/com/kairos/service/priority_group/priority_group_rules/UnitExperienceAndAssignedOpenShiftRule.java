@@ -27,7 +27,7 @@ public class UnitExperienceAndAssignedOpenShiftRule implements PriorityGroupRule
             entry.getValue().removeIf(staffUnitPosition-> (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned()).isPresent()&&
                     assignedOpenShiftMap.containsKey(staffUnitPosition.getUnitPositionId())
                     &&(assignedOpenShiftMap.get(staffUnitPosition.getUnitPositionId())>thresholdShiftCount))||
-                    (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getUnitExperienceInWeek()).isPresent()&&staffUnitPosition.getStartDate()>startDate));
+                    (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getUnitExperienceInWeek()).isPresent()&&staffUnitPosition.getStartDate()<=startDate));
         }
     }
 
