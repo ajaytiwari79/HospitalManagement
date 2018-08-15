@@ -7,23 +7,17 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface PriorityGroupRepository extends MongoBaseRepository<PriorityGroup,BigInteger>,CustomPriorityGroupRepository {
 
-    List<PriorityGroupDTO> findByCountryIdAndDeletedFalse(long countryId);
 
     PriorityGroup findByIdAndCountryIdAndDeletedFalse(BigInteger priorityGroupId,long countryId);
-
-    List<PriorityGroup> findAllByCountryIdAndDeActivatedFalseAndDeletedFalse(long countryId);
-
-    List<PriorityGroupDTO> findByUnitIdAndDeletedFalse(long unitId);
 
     PriorityGroup findByIdAndUnitIdAndDeletedFalse(BigInteger priorityGroupId,long unitId);
 
     boolean existsByCountryId(long countryId);
-
-    List<PriorityGroup> findAllByUnitIdAndDeActivatedFalseAndDeletedFalse(long unitId);
 
     PriorityGroupDTO findByIdAndDeletedFalse(BigInteger priorityGroupId);
 
@@ -39,7 +33,7 @@ public interface PriorityGroupRepository extends MongoBaseRepository<PriorityGro
 
     List<PriorityGroupDTO> getAllByCountryIdAndDeletedFalseAndRuleTemplateIdIsNull(Long countryId);
 
-    List<PriorityGroupDTO> getAllByUnitIdAndDeActivatedFalseAndDeletedFalseAndRuleTemplateIdIsNull(long unitId);
-
     List<PriorityGroupDTO> getAllByUnitIdAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(long unitId);
+
+    List<PriorityGroup> findAllByRuleTemplateIdInAndCountryIdAndDeletedFalse(Set<BigInteger> ruleTemplateIds,Long countryId);
 }

@@ -2,11 +2,11 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 
 import com.kairos.KairosGdprApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.dto.OrganizationSubTypeDTO;
-import com.kairos.dto.OrganizationTypeDTO;
-import com.kairos.dto.ServiceCategoryDTO;
-import com.kairos.dto.SubServiceCategoryDTO;
-import com.kairos.dto.master_data.MasterProcessingActivityDTO;
+import com.kairos.gdpr.OrganizationSubType;
+import com.kairos.gdpr.OrganizationType;
+import com.kairos.gdpr.ServiceCategory;
+import com.kairos.gdpr.SubServiceCategory;
+import com.kairos.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.service.master_data.asset_management.MasterAssetServiceTest;
 import org.junit.Assert;
@@ -28,8 +28,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-
-import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosGdprApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -58,10 +56,10 @@ public class MasterProcessingActivityServiceTest {
         MasterProcessingActivityDTO processingActivity = new MasterProcessingActivityDTO();
         processingActivity.setName("processing Activity");
         processingActivity.setDescription("Activity  description ");
-        processingActivity.setOrganizationSubTypes(new ArrayList<>(Arrays.asList(new OrganizationSubTypeDTO(32l, "xsyz"))));
-        processingActivity.setOrganizationTypes(new ArrayList<>(Arrays.asList(new OrganizationTypeDTO(32l, "xyz"))));
-        processingActivity.setOrganizationSubServices(new ArrayList<>(Arrays.asList(new SubServiceCategoryDTO(35l, "poiuy"))));
-        processingActivity.setOrganizationServices(new ArrayList<>(Arrays.asList(new ServiceCategoryDTO(34l, "abc"))));
+        processingActivity.setOrganizationSubTypes(new ArrayList<>(Arrays.asList(new OrganizationSubType(32l, "xsyz"))));
+        processingActivity.setOrganizationTypes(new ArrayList<>(Arrays.asList(new OrganizationType(32l, "xyz"))));
+        processingActivity.setOrganizationSubServices(new ArrayList<>(Arrays.asList(new SubServiceCategory(35l, "poiuy"))));
+        processingActivity.setOrganizationServices(new ArrayList<>(Arrays.asList(new ServiceCategory(34l, "abc"))));
 
         HttpEntity<MasterProcessingActivityDTO> entity = new HttpEntity<>(processingActivity);
         ResponseEntity<Map> response = restTemplate.exchange(
@@ -127,7 +125,7 @@ public class MasterProcessingActivityServiceTest {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("ogranization ID must not be null");
+            throw new UnsupportedOperationException("organization ID must not be null");
         }
 
     }

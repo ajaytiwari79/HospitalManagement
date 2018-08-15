@@ -4,7 +4,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
-import com.kairos.dto.master_data.ClauseTagDTO;
+import com.kairos.gdpr.master_data.ClauseTagDTO;
 import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import org.slf4j.Logger;
@@ -32,11 +32,11 @@ public class ClauseTagService extends MongoBaseService {
     MessageSource messageSource;
 
     /**
-     * @description method create tag and if tag already exist with same name then throw exception
      * @param countryId
      * @param organizationId
-     * @param clauseTag tag name
+     * @param clauseTag      tag name
      * @return tag object
+     * @description method create tag and if tag already exist with same name then throw exception
      */
     public ClauseTag createClauseTag(Long countryId, Long organizationId, String clauseTag) {
         if (StringUtils.isEmpty(clauseTag)) {
@@ -50,7 +50,7 @@ public class ClauseTagService extends MongoBaseService {
             newClauseTag.setName(clauseTag);
             newClauseTag.setCountryId(countryId);
             newClauseTag.setOrganizationId(organizationId);
-            return clauseTagMongoRepository.save(getNextSequence(newClauseTag));
+            return clauseTagMongoRepository.save(newClauseTag);
         }
     }
 
@@ -78,33 +78,34 @@ public class ClauseTagService extends MongoBaseService {
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
-           delete(exist);
+            delete(exist);
             return true;
 
         }
     }
 
 
-    public ClauseTag updateClauseTag(Long countryId,Long organizationId,BigInteger id, String clauseTag) {
+    public ClauseTag updateClauseTag(Long countryId, Long organizationId, BigInteger id, String clauseTag) {
         if (StringUtils.isBlank(clauseTag)) {
             throw new InvalidRequestException("requested param name is null or empty");
         }
-        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId,organizationId,id);
+        ClauseTag exist = clauseTagMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         }
         clauseTagMongoRepository.save(exist);
-return exist;
+        return exist;
 
 
     }
 
-    /**@description method new create tags and if tag already exist with same name then simply add tag id to  existClauseTagIds which later add to clause ,
+    /**
      * @param countryId
      * @param organizationId
-     * @param tagList list of clause tags
+     * @param tagList        list of clause tags
      * @return list of clause Tags
-     * @exception DuplicateDataException if tag with same name is present in tagList
+     * @throws DuplicateDataException if tag with same name is present in tagList
+     * @description method new create tags and if tag already exist with same name then simply add tag id to  existClauseTagIds which later add to clause ,
      */
     public List<ClauseTag> addClauseTagAndGetClauseTagList(Long countryId, Long organizationId, List<ClauseTagDTO> tagList) {
 

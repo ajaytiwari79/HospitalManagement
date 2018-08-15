@@ -5,18 +5,22 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistance.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
 import com.kairos.service.common.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
@@ -28,36 +32,32 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     @Inject
     private TechnicalSecurityMeasureMongoRepository technicalSecurityMeasureMongoRepository;
 
-
     @Inject
-    private ComparisonUtils comparisonUtils;
+    private ExceptionService exceptionService;
+
 
     /**
+     * @param countryId
+     * @param
+     * @param technicalSecurityMeasureDTOS
+     * @return return map which contain list of new TechnicalSecurityMeasure and list of existing TechnicalSecurityMeasure if TechnicalSecurityMeasure already exist
      * @description this method create new TechnicalSecurityMeasure if TechnicalSecurityMeasure not exist with same name ,
      * and if exist then simply add  TechnicalSecurityMeasure to existing list and return list ;
      * findByNamesAndCountryId()  return list of existing TechnicalSecurityMeasure using collation ,used for case insensitive result
-     * @param countryId
-     * @param 
-     * @param techSecurityMeasures
-     * @return return map which contain list of new TechnicalSecurityMeasure and list of existing TechnicalSecurityMeasure if TechnicalSecurityMeasure already exist
-     *
      */
-    public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasure> techSecurityMeasures) {
+    public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
 
         Map<String, List<TechnicalSecurityMeasure>> result = new HashMap<>();
         Set<String> techSecurityMeasureNames = new HashSet<>();
-        if (techSecurityMeasures.size() != 0) {
-            for (TechnicalSecurityMeasure technicalSecurityMeasure : techSecurityMeasures) {
-                if (!StringUtils.isBlank(technicalSecurityMeasure.getName())) {
-                    techSecurityMeasureNames.add(technicalSecurityMeasure.getName());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
+        if (!technicalSecurityMeasureDTOS.isEmpty()) {
+            for (TechnicalSecurityMeasureDTO technicalSecurityMeasure : technicalSecurityMeasureDTOS) {
+                techSecurityMeasureNames.add(technicalSecurityMeasure.getName());
             }
-            List<TechnicalSecurityMeasure> existing =  findByNamesAndCountryId(countryId,techSecurityMeasureNames,TechnicalSecurityMeasure.class);
-            techSecurityMeasureNames = comparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
+            List<TechnicalSecurityMeasure> existing = findByNamesAndCountryId(countryId, techSecurityMeasureNames, TechnicalSecurityMeasure.class);
+            techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
 
             List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
-            if (techSecurityMeasureNames.size() != 0) {
+            if (!techSecurityMeasureNames.isEmpty()) {
                 for (String name : techSecurityMeasureNames) {
                     TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure(name);
                     newTechnicalSecurityMeasure.setCountryId(countryId);
@@ -77,9 +77,8 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
-     * @param 
+     * @param
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long countryId) {
@@ -87,14 +86,12 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     }
 
 
-
-
     /**
-     * @throws DataNotFoundByIdException throw exception if TechnicalSecurityMeasure not exist for given id
      * @param countryId
-     * @param 
-     * @param id id of TechnicalSecurityMeasure
+     * @param
+     * @param id        id of TechnicalSecurityMeasure
      * @return object of TechnicalSecurityMeasure
+     * @throws DataNotFoundByIdException throw exception if TechnicalSecurityMeasure not exist for given id
      */
     public TechnicalSecurityMeasure getTechnicalSecurityMeasure(Long countryId, BigInteger id) {
 
@@ -110,45 +107,49 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
     public Boolean deleteTechnicalSecurityMeasure(Long countryId, BigInteger id) {
 
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId,id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByIdAndNonDeleted(countryId, id);
+        if (!Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
-        } else {
-            delete(exist);
-            return true;
-
         }
+        delete(technicalSecurityMeasure);
+        return true;
+
     }
 
     /**
-     * @throws  DuplicateDataException throw exception if TechnicalSecurityMeasure data not exist for given id
      * @param countryId
-     * @param 
-     * @param id id of TechnicalSecurityMeasure
-     * @param techSecurityMeasure
+     * @param
+     * @param id                          id of TechnicalSecurityMeasure
+     * @param technicalSecurityMeasureDTO
      * @return TechnicalSecurityMeasure updated object
+     * @throws DuplicateDataException throw exception if TechnicalSecurityMeasure data not exist for given id
      */
-    public TechnicalSecurityMeasure updateTechnicalSecurityMeasure(Long countryId, BigInteger id, TechnicalSecurityMeasure techSecurityMeasure) {
-        TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByNameAndCountryId(countryId, techSecurityMeasure.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            if (id.equals(exist.getId())) {
-                return exist;
-            }
-            throw new DuplicateDataException("data  exist for  " + techSecurityMeasure.getName());
-        } else {
-            exist = technicalSecurityMeasureMongoRepository.findByid(id);
-            exist.setName(techSecurityMeasure.getName());
-            return technicalSecurityMeasureMongoRepository.save(getNextSequence(exist));
+    public TechnicalSecurityMeasureDTO updateTechnicalSecurityMeasure(Long countryId, BigInteger id, TechnicalSecurityMeasureDTO technicalSecurityMeasureDTO) {
 
+        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByNameAndCountryId(countryId, technicalSecurityMeasureDTO.getName());
+        if (Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
+            if (id.equals(technicalSecurityMeasure.getId())) {
+                return technicalSecurityMeasureDTO;
+            }
+            throw new DuplicateDataException("data  exist for  " + technicalSecurityMeasureDTO.getName());
         }
+        technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByid(id);
+        if (!Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.datanotFound", "Technical Security Measure", id);
+        }
+        technicalSecurityMeasure.setName(technicalSecurityMeasureDTO.getName());
+        technicalSecurityMeasureMongoRepository.save(technicalSecurityMeasure);
+        return technicalSecurityMeasureDTO;
+
+
     }
 
     /**
-     * @throws DataNotExists throw exception if TechnicalSecurityMeasure exist for given name
      * @param countryId
-     * @param 
-     * @param name name of TechnicalSecurityMeasure
+     * @param
+     * @param name      name of TechnicalSecurityMeasure
      * @return TechnicalSecurityMeasure object fetch on basis of  name
+     * @throws DataNotExists throw exception if TechnicalSecurityMeasure exist for given name
      */
     public TechnicalSecurityMeasure getTechnicalSecurityMeasureByName(Long countryId, String name) {
 
@@ -161,12 +162,6 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
-    }
-
-
-    public List<TechnicalSecurityMeasureResponseDTO> getAllNotInheritedTechnicalSecurityMeasureFromParentOrgAndUnitSecurityMeasure(Long countryId, Long parentOrganizationId, Long unitId){
-
-        return technicalSecurityMeasureMongoRepository.getAllNotInheritedTechnicalSecurityMeasureFromParentOrgAndUnitSecurityMeasure(countryId,parentOrganizationId,unitId);
     }
 
 

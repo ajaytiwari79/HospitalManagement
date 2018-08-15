@@ -2,17 +2,18 @@ package com.kairos.persistance.model.master_data.questionnaire_template;
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Document(collection = "question")
 public class MasterQuestion extends MongoBaseEntity {
 
-    @NotNullOrEmpty(message = "Question cant'be empty")
+    @NotBlank(message = "Question cant'be empty")
     private String question;
 
-    @NotNullOrEmpty(message = "Description can't be empty")
+    @NotBlank(message = "Description can't be empty")
     private String description;
 
     private Boolean isRequired=false;

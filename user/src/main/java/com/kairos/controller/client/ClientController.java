@@ -3,6 +3,8 @@ package com.kairos.controller.client;
 import com.kairos.client.dto.ClientExceptionDTO;
 import com.kairos.client.dto.TaskDemandRequestWrapper;
 import com.kairos.persistence.model.client.*;
+import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
+import com.kairos.persistence.model.client.relationships.ClientRelativeRelation;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.StaffClientData;
 import com.kairos.service.client.ClientAddressService;
@@ -31,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -111,7 +114,7 @@ public class ClientController {
     @ApiOperation("Add People In HouseHold")
     @RequestMapping(value = "/{clientId}/household", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> updateClientHouseholdList(@RequestBody ClientMinimumDTO client, @PathVariable long unitId, @PathVariable long clientId) throws CloneNotSupportedException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.addHouseholdToClient(client, unitId, clientId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.addHouseholdMemberOfClient(client, unitId, clientId));
     }
 
     @ApiOperation("Get People In HouseHold")
@@ -615,7 +618,7 @@ public class ClientController {
     @ApiOperation(value = "Get Organization Clients with min details")
     @RequestMapping(value = "/unit/{unitId}/client", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long organizationId, @PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long organizationId, @PathVariable Long unitId) throws InterruptedException, ExecutionException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 clientService.getOrganizationClients(unitId));
     }

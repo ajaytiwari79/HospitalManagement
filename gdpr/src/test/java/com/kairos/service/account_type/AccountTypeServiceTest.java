@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +20,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-
-import static org.junit.Assert.*;
 
 
 @RunWith(SpringRunner.class)
@@ -82,7 +79,7 @@ public class AccountTypeServiceTest {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("ogranization ID must not be null");
+            throw new UnsupportedOperationException("organization ID must not be null");
         }
 
     }

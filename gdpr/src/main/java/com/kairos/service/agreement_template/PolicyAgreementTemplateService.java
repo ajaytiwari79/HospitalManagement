@@ -1,17 +1,13 @@
 package com.kairos.service.agreement_template;
 
 
-import com.kairos.dto.PolicyAgreementTemplateDTO;
-import com.kairos.persistance.model.account_type.AccountType;
+import com.kairos.gdpr.PolicyAgreementTemplateDTO;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
-import com.kairos.persistance.repository.common.MongoSequenceRepository;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
-import com.kairos.service.account_type.AccountTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
-import com.kairos.utils.ComparisonUtils;
 import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,16 +28,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
     @Inject
-    private ComparisonUtils comparisonUtils;
-
-    @Inject
-    private AccountTypeService accountTypeService;
-
-    @Inject
     private AgreementSectionService agreementSectionService;
-
-    @Inject
-    private MongoSequenceRepository mongoSequenceRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -60,13 +47,12 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      */
     public PolicyAgreementTemplate createBasicPolicyAgreementTemplate(Long countryId, Long organizationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
 
-        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByName(countryId, organizationId, policyAgreementTemplateDto.getName());
-        if (Optional.ofNullable(policyAgreementTemplate).isPresent()) {
+        PolicyAgreementTemplate previousTemplate = policyAgreementTemplateRepository.findByName(countryId, organizationId, policyAgreementTemplateDto.getName());
+        if (Optional.ofNullable(previousTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Policy Agreement Template ", policyAgreementTemplateDto.getName());
         }
         templateTypeService.getTemplateById(policyAgreementTemplateDto.getTemplateTypeId(), countryId);
-        List<AccountType> accountTypes = accountTypeService.getAccountTypeList(countryId, policyAgreementTemplateDto.getAccountTypes());
-        PolicyAgreementTemplate newPolicyAgreementTemplate = new PolicyAgreementTemplate(
+        PolicyAgreementTemplate policyAgreementTemplate = new PolicyAgreementTemplate(
                 policyAgreementTemplateDto.getName(),
                 policyAgreementTemplateDto.getDescription(),
                 countryId,
@@ -74,16 +60,16 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                 policyAgreementTemplateDto.getOrganizationSubTypes(),
                 policyAgreementTemplateDto.getOrganizationServices(),
                 policyAgreementTemplateDto.getOrganizationSubServices());
-        newPolicyAgreementTemplate.setAccountTypes(accountTypes);
-        newPolicyAgreementTemplate.setTemplateType(policyAgreementTemplateDto.getTemplateTypeId());
-        newPolicyAgreementTemplate.setOrganizationId(organizationId);
+        policyAgreementTemplate.setAccountTypes(policyAgreementTemplateDto.getAccountTypes());
+        policyAgreementTemplate.setTemplateType(policyAgreementTemplateDto.getTemplateTypeId());
+        policyAgreementTemplate.setOrganizationId(organizationId);
         try {
-            newPolicyAgreementTemplate = policyAgreementTemplateRepository.save(getNextSequence(newPolicyAgreementTemplate));
+            policyAgreementTemplate = policyAgreementTemplateRepository.save(policyAgreementTemplate);
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e);
         }
-        return newPolicyAgreementTemplate;
+        return policyAgreementTemplate;
 
     }
 
@@ -93,8 +79,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param organizationId
      * @param id
      * @return
-     * @description -method getPolicyAgreementWithSectionsAndClausesById()  uses Mongo QUuery which  return agreement template with sections and clauses if agreementSections is  present ,if not agreementSections present then
-     * it return agreementSections as agreementSections[ {} ] from data base ,which is converted into AgreementSectionResponseDTO[{id=null ,name=null}], thats  why we are checking if id is null present then simply add new agreementSections[]
+     * @description -method getPolicyAgreementWithSectionsAndClausesById()  uses Mongo Query which  return agreement template with sections and clauses if agreementSections is  present ,if not agreementSections present then
+     * it return agreementSections as agreementSections[ {} ] from data base ,which is converted into AgreementSectionResponseDTO[{id=null ,name=null}], that's  why we are checking if id is null present then simply add new agreementSections[]
      * instead of agreementSections[ {} ] .
      */
     public PolicyAgreementTemplateResponseDTO getPolicyAgreementTemplateWithAgreementSectionAndClausesById(Long countryId, Long organizationId, BigInteger id) {
@@ -111,8 +97,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @param countryId
      * @param organizationId
      * @return -method return list all policy Agreement Template with sections and Clauses
-     * @description -method getAllPolicyAgreementWithSectionsAndClauses()  uses Mongo QUuery which  return agreement template with sections and clauses if agreementSections is  present ,if not agreementSections present then
-     * it return agreementSections as agreementSections[ {} ] from data base ,which is converted into AgreementSectionResponseDTO[{id=null ,name=null}], thats  why we are checking if id is null present then simply add new agreementSections[]
+     * @description -method getAllPolicyAgreementWithSectionsAndClauses()  uses Mongo Query which  return agreement template with sections and clauses if agreementSections is  present ,if not agreementSections present then
+     * it return agreementSections as agreementSections[ {} ] from data base ,which is converted into AgreementSectionResponseDTO[{id=null ,name=null}], that's  why we are checking if id is null present then simply add new agreementSections[]
      * instead of agreementSections[ {} ] .
      */
     public List<PolicyAgreementTemplateResponseDTO> getAllPolicyAgreementTemplateWithAgreementSectionAndClauses(Long countryId, Long organizationId) {

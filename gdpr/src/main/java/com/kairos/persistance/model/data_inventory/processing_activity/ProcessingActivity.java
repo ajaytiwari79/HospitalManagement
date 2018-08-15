@@ -2,8 +2,8 @@ package com.kairos.persistance.model.data_inventory.processing_activity;
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.persistance.model.data_inventory.ManagingOrganization;
-import com.kairos.persistance.model.data_inventory.Staff;
+import com.kairos.gdpr.ManagingOrganization;
+import com.kairos.gdpr.Staff;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -20,7 +20,7 @@ public class ProcessingActivity extends MongoBaseEntity {
     @NotBlank(message = "Description can't be empty")
     private String description;
 
-    @NotNull(message = "Mangaing department can't be null")
+    @NotNull(message = "Managing department can't be null")
     private ManagingOrganization managingDepartment;
 
     @NotNull(message = "Process Owner can't be null")

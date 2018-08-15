@@ -2,9 +2,7 @@ package com.kairos.service.master_data.asset_management;
 
 import com.kairos.KairosGdprApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.dto.data_inventory.AssetDTO;
-import com.kairos.dto.master_data.AssetTypeDTO;
-import com.kairos.dto.master_data.MasterAssetDTO;
+import com.kairos.gdpr.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import org.junit.Assert;
@@ -120,7 +118,7 @@ public class AssetTypeServiceTest {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId).toString();
             return baseUrl;
         } else {
-            throw new UnsupportedOperationException("ogranization ID must not be null");
+            throw new UnsupportedOperationException("organization ID must not be null");
         }
 
     }

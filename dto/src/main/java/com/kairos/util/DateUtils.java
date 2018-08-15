@@ -624,6 +624,9 @@ public class DateUtils {
     public static Long getCurrentDayStartMillis() {
         return LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
+    public static Long getCurrentMillis() {
+        return System.currentTimeMillis();
+    }
     public static LocalDateTime getStartOfDayFromLocalDate(LocalDate localDate) {
 
         return localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toLocalDateTime();

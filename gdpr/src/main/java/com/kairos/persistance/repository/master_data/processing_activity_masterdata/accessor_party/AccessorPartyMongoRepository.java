@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.master_data.processing_activity_master
 
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 
+import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -15,7 +16,7 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface AccessorPartyMongoRepository extends MongoRepository<AccessorParty,BigInteger> ,CustomAccessorPartyRepository {
+public interface AccessorPartyMongoRepository extends MongoBaseRepository<AccessorParty,BigInteger>,CustomAccessorPartyRepository {
 
 
 
@@ -36,8 +37,8 @@ public interface AccessorPartyMongoRepository extends MongoRepository<AccessorPa
     @Query("{countryId:?0,deleted:false}")
     List<AccessorPartyResponseDTO> findAllAccessorParty(Long countryId);
 
-    @Query("{countryId:?0,name:{$in:?2},deleted:false}")
-    List<AccessorParty>  findByCountryAndNameList(Long countryId,Set<String> name);
+    @Query("{_id:{$in:?0},deleted:false}")
+    List<AccessorPartyResponseDTO> findAccessorPartyByIds(List<BigInteger> accessorPartyIds);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     AccessorParty findOrganizationIdAndIdAndNonDeleted(Long organizationId, BigInteger id);

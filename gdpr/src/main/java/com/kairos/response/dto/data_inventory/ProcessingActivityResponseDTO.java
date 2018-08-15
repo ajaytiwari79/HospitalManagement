@@ -2,14 +2,13 @@ package com.kairos.response.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistance.model.data_inventory.ManagingOrganization;
-import com.kairos.persistance.model.data_inventory.Staff;
+import com.kairos.gdpr.ManagingOrganization;
+import com.kairos.gdpr.Staff;
 import com.kairos.response.dto.common.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -20,10 +19,10 @@ public class ProcessingActivityResponseDTO {
     @NotBlank(message = "Name can't be empty")
     private String name;
 
-    @NotBlank(message = "Discription can't be empty")
+    @NotBlank(message = "Description can't be empty")
     private String description;
 
-    @NotNull(message = "Mangaing department can't be null")
+    @NotNull(message = "Managing department can't be null")
     private ManagingOrganization managingDepartment;
 
     @NotNull(message = "Process Owner can't be null")

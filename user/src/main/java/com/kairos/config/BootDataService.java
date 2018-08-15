@@ -2,7 +2,6 @@ package com.kairos.config;
 
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.constants.AppConstants;
-import com.kairos.enums.ClientEnum;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
@@ -12,7 +11,7 @@ import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.*;
-import com.kairos.persistence.model.country.common.CitizenStatus;
+import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.organization.*;
@@ -83,7 +82,6 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -509,10 +507,10 @@ public class BootDataService {
 
         citizenStatusGraphRepository.saveAll(Arrays.asList(registeredStatus, livingPartnerStatus, disvorcedStatus, marriedStatus, singleStatus, deadStatus));
     }
-
+/*
     private void createCitizen() {
         johnOliver = new Client();
-        johnOliver.setClientType(ClientEnum.CITIZEN);
+        johnOliver.setClientType(ClientEnum.INDIVIDUAL);
         johnOliver.setFirstName("John");
         johnOliver.setLastName("Oliver");
         johnOliver.setNickName("Johnny");
@@ -560,7 +558,7 @@ public class BootDataService {
 //        secondHousehold.setLastName("Laursen");
 //        secondHousehold .setCprNumber("310849-4742");
 //
-//        johnOliver.setPeopleInHouseholdList(Arrays.asList(firstHousehold,secondHousehold));
+/        johnOliver.setPeopleInHouseholdList(Arrays.asList(firstHousehold,secondHousehold))
 
 
         johnOliver.setWheelChair(false);
@@ -613,8 +611,7 @@ public class BootDataService {
         clientLanguageRelationGraphRepository.save(clientLanguageRelation);
 
     }
-
-    private void createCountryLevelOrganization() {
+*/    private void createCountryLevelOrganization() {
 
         kairosCountryLevel = new Organization();
         kairosCountryLevel.setKairosHub(true);

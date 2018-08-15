@@ -1,9 +1,9 @@
 package com.kairos.persistance.repository.master_data.processing_activity_masterdata;
 
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.dto.FilterSelection;
-import com.kairos.dto.FilterSelectionDTO;
-import com.kairos.dto.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.gdpr.FilterSelection;
+import com.kairos.gdpr.FilterSelectionDTO;
+import com.kairos.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
@@ -81,15 +81,15 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
 
         Criteria criteria = Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false).and(ORGANIZATION_ID).is(organizationId);
-        List<Criteria> processingActivityCriterias = new ArrayList<>(filterSelectionDto.getFiltersData().size());
+        List<Criteria> processingActivityCriteriaList = new ArrayList<>(filterSelectionDto.getFiltersData().size());
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
             if (filterSelection.getValue().size() != 0) {
-                processingActivityCriterias.add(buildMatchCriteria(filterSelection, filterSelection.getName()));
+                processingActivityCriteriaList.add(buildMatchCriteria(filterSelection, filterSelection.getName()));
             }
         });
 
-        if (!processingActivityCriterias.isEmpty()) {
-            criteria = criteria.andOperator(processingActivityCriterias.toArray(new Criteria[processingActivityCriterias.size()]));
+        if (!processingActivityCriteriaList.isEmpty()) {
+            criteria = criteria.andOperator(processingActivityCriteriaList.toArray(new Criteria[processingActivityCriteriaList.size()]));
 
         }
         Aggregation aggregation = Aggregation.newAggregation(
@@ -108,17 +108,17 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     public Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType) {
         switch (filterType) {
             case ACCOUNT_TYPES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("accountTypes" + ID).in(filterSelection.getValue());
             case ORGANIZATION_TYPES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationTypes" + ID).in(filterSelection.getValue());
 
             case ORGANIZATION_SUB_TYPES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationSubTypes" + ID).in(filterSelection.getValue());
             case ORGANIZATION_SERVICES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationServices" + ID).in(filterSelection.getValue());
 
             case ORGANIZATION_SUB_SERVICES:
-                return Criteria.where(filterType.value + ID).in(filterSelection.getValue());
+                return Criteria.where("organizationSubServices" + ID).in(filterSelection.getValue());
             default:
                 throw new InvalidRequestException("data not found for FilterType " + filterType);
 

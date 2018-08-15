@@ -1,10 +1,10 @@
 package com.kairos.service.client;
 
 import com.kairos.persistence.model.client.Client;
-import com.kairos.persistence.model.client.ClientOrganizationRelation;
+import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
-import com.kairos.persistence.model.country.common.CitizenStatus;
+import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -23,7 +23,6 @@ import com.kairos.user.organization.AddressDTO;
 import com.kairos.user.patient.PatientRelative;
 import com.kairos.user.patient.PatientWrapper;
 import com.kairos.user.staff.CurrentAddress;
-import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.AppConstants.KAIROS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SECONDARY_ADDRESS;
 
@@ -85,7 +83,8 @@ public class ExternalClientService extends UserBaseService {
     private ExceptionService exceptionService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public void addClientRelativeDetailsFromKmd(PatientRelative patientRelative, Client client, long unitId) {
+    // ToDO FIX AND USE PENTHAO server to import
+    public void addClientRelativeDetailsFromExternalService(PatientRelative patientRelative, Client client, long unitId) {
         /*Client nextToKin = client.getNextToKin();
         if (nextToKin == null) {
             nextToKin = new Client();
@@ -101,23 +100,23 @@ public class ExternalClientService extends UserBaseService {
         }
 
         if (patientRelative.getRelatedPatient() == null) {
-            nextToKin.setFirstName(patientRelative.getContact().getFirstName());
-            nextToKin.setLastName(patientRelative.getContact().getLastName());
+       //     nextToKin.setFirstName(patientRelative.getContact().getFirstName());
+       //     nextToKin.setLastName(patientRelative.getContact().getLastName());
             // Contact details
             detail.setMobilePhone(patientRelative.getContact().getPhoneNumber());
             detail.setPrivatePhone(patientRelative.getContact().getSecondaryPhoneNumber());
 
         } else {
-            nextToKin.setFirstName(patientRelative.getRelatedPatient().getFirstName());
-            nextToKin.setLastName(patientRelative.getRelatedPatient().getLastName());
+       //     nextToKin.setFirstName(patientRelative.getRelatedPatient().getFirstName());
+        //    nextToKin.setLastName(patientRelative.getRelatedPatient().getLastName());
             // Contact details
             detail.setMobilePhone(patientRelative.getRelatedPatient().getMobilePhoneNumber());
             detail.setPrivatePhone(patientRelative.getRelatedPatient().getHomePhoneNumber());
             detail.setWorkPhone(patientRelative.getRelatedPatient().getWorkPhoneNumber());
 
-            nextToKin.setCprNumber(patientRelative.getRelatedPatient().getPatientIdentifier().getIdentifier().replace("-", ""));
-            nextToKin.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(nextToKin.getCprNumber()));
-            nextToKin = clientService.generateAgeAndGenderFromCPR(nextToKin);
+//            nextToKin.setCprNumber(patientRelative.getRelatedPatient().getPatientIdentifier().getIdentifier().replace("-", ""));
+  //          nextToKin.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(nextToKin.getCprNumber()));
+         //   nextToKin = clientService.generateAgeAndGenderFromCPR(nextToKin);
         }
 
         CitizenStatus citizenStatus = citizenStatusGraphRepository.findByName(patientRelative.getContact().getMaritalStatus());
@@ -251,8 +250,8 @@ public class ExternalClientService extends UserBaseService {
         return addressVerificationService.saveAndUpdateClientAddress(currentClient, contactAddress, type);
 
     }
-
-    public Client createCitizenFromKmd(PatientWrapper patientWrapper, Long unitId) {
+// TODO FIX the import
+    public Client createCitizenFromExternalService(PatientWrapper patientWrapper, Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
             exceptionService.dataNotFoundByIdException("message.organisation.notFound");
@@ -269,21 +268,22 @@ public class ExternalClientService extends UserBaseService {
 
 
             client.setCitizenState(patientWrapper.getPatientState().getName());
-            client.setEmail(patientWrapper.getPrimaryEmailAddress());
+            // Need to uncomment again
+            //client.setEmail(patientWrapper.getPrimaryEmailAddress());
             client.setSecondaryEmail(patientWrapper.getSecondaryEmailAddress());
             client.setImportFromKMD(true);
             client.setKmdNexusExternalId(patientWrapper.getId());
-            client.setFirstName(patientWrapper.getFirstName());
+            /*client.setFirstName(patientWrapper.getFirstName());
             client.setLastName(patientWrapper.getLastName());
             client.setCprNumber(cprNumber);
             client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(client.getCprNumber()));
-            CitizenStatus citizenStatus = citizenStatusGraphRepository.findByDescription(countryGraphRepository.getCountryIdByUnitId(unitId), patientWrapper.getMaritalStatus());
+            */CitizenStatus citizenStatus = citizenStatusGraphRepository.findByDescription(countryGraphRepository.getCountryIdByUnitId(unitId), patientWrapper.getMaritalStatus());
 
             if (citizenStatus != null) {
                 client.setCivilianStatus(citizenStatusGraphRepository.findOne(citizenStatus.getId()));
             }
-
-            if (client.getEmail() == null) {
+    // TODO UNCOMMENT AFTER FIX
+         /*   if (client.getEmail() == null) {
                 logger.debug("Creating email with CPR");
                 String cpr = client.getCprNumber();
                 String email = cpr + KAIROS;
@@ -293,7 +293,7 @@ public class ExternalClientService extends UserBaseService {
             }
 
             client = clientService.generateAgeAndGenderFromCPR(client);
-            save(client);
+*/            save(client);
             int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
             if (count == 0) {
                 logger.debug("Creating Existing Client relationship from KMD : " + client.getId());

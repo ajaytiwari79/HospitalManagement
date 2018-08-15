@@ -7,8 +7,17 @@ import com.kairos.client.dto.OrganizationClientWrapper;
 import com.kairos.client.dto.TaskDemandRequestWrapper;
 import com.kairos.client.dto.TaskTypeAggregateResult;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.enums.Gender;
+import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.*;
+import com.kairos.persistence.model.client.query_results.ClientHomeAddressQueryResult;
+import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
+import com.kairos.persistence.model.client.query_results.ClientOrganizationIdsDTO;
+import com.kairos.persistence.model.client.query_results.ClientStaffQueryResult;
+import com.kairos.persistence.model.client.relationships.ClientContactPersonRelationship;
+import com.kairos.persistence.model.client.relationships.ClientLanguageRelation;
+import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
@@ -42,6 +51,7 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.*;
+import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;
@@ -56,14 +66,16 @@ import com.kairos.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.util.CPRUtil;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import com.kairos.vrp.TaskAddress;
+import com.kairos.wrapper.ClientPersonalCalenderPrerequisiteDTO;
 import com.kairos.wrapper.ContactPersonTabDataDTO;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,10 +84,13 @@ import javax.inject.Inject;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
-import static com.kairos.constants.AppConstants.KAIROS;
 import static com.kairos.enums.CitizenHealthStatus.DECEASED;
 import static com.kairos.enums.CitizenHealthStatus.TERMINATED;
 import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
@@ -157,116 +172,101 @@ public class ClientService extends UserBaseService {
     private ClientExceptionRestClient clientExceptionRestClient;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private AsynchronousService asynchronousService;
 
-    public Client createCitizen(Client client) {
-
-        Client createClient = null;
-        if (client.getEmail() == null) {
+    /*
+        public Client createCitizen(Client client) {
+                  User user = new User();
+            Client createClient = null;
+            //if (client.getEmail() == null) {
             logger.debug("Creating email with CPR");
-            String cpr = client.getCprNumber();
+            String cpr = user.getCprNumber();
             String email = cpr + KAIROS;
             client.setEmail(email);
             client.setUserName(email);
+            //}
+            if (checkCitizenCPRConstraint(client)) {
+                logger.debug("Creating Client..........");
+                createClient = clientGraphRepository.save(generateAgeAndGenderFromCPR(client));
+                //createClient.setNextToKin(new Client());
+                save(createClient);
+            }
+            return createClient;
+
         }
-        if (checkCitizenCPRConstraint(client)) {
-            logger.debug("Creating Client..........");
-            createClient = clientGraphRepository.save(generateAgeAndGenderFromCPR(client));
-            //createClient.setNextToKin(new Client());
-            save(createClient);
-        }
-        return createClient;
 
-    }
-
-
+    */
     public Client createCitizen(ClientMinimumDTO clientMinimumDTO, Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null) {
-            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound",unitId);
-
+        Organization organization = organizationGraphRepository.findOne(unitId, 0);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound", unitId);
         }
 
-        if (clientMinimumDTO != null) {
+        if (!invalidCPRNumber(clientMinimumDTO.getCprnumber())) {
+            exceptionService.dataNotFoundByIdException("message.client.CRPNumber.notFound");
+        }
 
-            if (!invalidCPRNumber(clientMinimumDTO.getCprnumber())) {
-                exceptionService.dataNotFoundByIdException("message.client.CRPNumber.notFound");
+        User user = userGraphRepository.findUserByCprNumber(clientMinimumDTO.getCprnumber());
 
-            }
-
-
-            Client client = clientGraphRepository.findByCprNumber(clientMinimumDTO.getCprnumber());
-            if (Optional.ofNullable(client).isPresent() && client.isCitizenDead()) {
-                exceptionService.duplicateDataException("message.client.CRPNumber.deadcitizen",clientMinimumDTO.getCprnumber());
-
-            }
-
-            if (client != null) {
-                logger.debug("Using Existing Client..........");
-
+        Client client;
+        if (user != null) {
+            client = clientGraphRepository.getClientByUserId(user.getId());
+            if (Optional.ofNullable(client).isPresent()) {
                 if (client.isCitizenDead()) {
-                    exceptionService.duplicateDataException("message.client.CRPNumber.deadcitizen",clientMinimumDTO.getCprnumber());
-
+                    exceptionService.duplicateDataException("message.client.CRPNumber.deadcitizen", clientMinimumDTO.getCprnumber());
                 }
-
                 int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
-
                 if (count != 0) {
                     exceptionService.duplicateDataException("message.client.CRPNumber.duplicate");
-
                 }
                 logger.debug("Creating Existing Client relationship : " + client.getId());
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDate().getTime());
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDateMillis());
                 relationService.createRelation(relation);
-                return client;
+
             } else {
-                logger.debug("Creating New Client..........");
-
                 client = new Client();
-                client.setFirstName(clientMinimumDTO.getFirstName());
-                client.setLastName(clientMinimumDTO.getLastName());
-                client.setCprNumber(clientMinimumDTO.getCprnumber());
-                client.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(client.getCprNumber()));
-
-                if (client.getEmail() == null) {
-                    logger.debug("Creating email with CPR");
-                    String cpr = client.getCprNumber();
-                    String email = cpr + KAIROS;
-                    client.setEmail(email);
-                    client.setUserName(email);
-                    Client nextToKin = new Client();
-                    //client.setNextToKin(nextToKin);
-                }
-
-                Client createdClient = generateAgeAndGenderFromCPR(client);
-                //client.setNextToKin(new Client());
-                if (createdClient != null) {
-                    save(createdClient);
-                    ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(createdClient, organization, new DateTime().getMillis());
-                    logger.debug("Creating Relation with Organization: " + organization.getName());
-                    relationGraphRepository.save(clientOrganizationRelation);
-                    return createdClient;
-                }
+                user.setFirstName(clientMinimumDTO.getFirstName());
+                user.setLastName(clientMinimumDTO.getLastName());
+                user.setCprNumber(clientMinimumDTO.getCprnumber());
+                user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()));
+                client.setProfilePic(generateAgeAndGenderFromCPR(user));
+                client.setUser(user);
+                client.setClientType(clientMinimumDTO.getClientType());
+                save(client);
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDateMillis());
+                relationService.createRelation(relation);
             }
+        } else {
+            logger.debug("Creating New Client & user..........");
+            user = new User(clientMinimumDTO.getFirstName().trim(), clientMinimumDTO.getLastName(), clientMinimumDTO.getCprnumber(), CPRUtil.fetchDateOfBirthFromCPR(clientMinimumDTO.getCprnumber()));
+            client = new Client();
+            client.setProfilePic(generateAgeAndGenderFromCPR(user));
+            client.setUser(user);
+            client.setClientType(clientMinimumDTO.getClientType());
+            save(client);
+            ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(client, organization, new DateTime().getMillis());
+            logger.debug("Creating Relation with Organization: " + organization.getName());
+            relationGraphRepository.save(clientOrganizationRelation);
+
         }
-        return null;
+        return client;
     }
 
-    public boolean checkCitizenCPRConstraint(Client client) {
+    public boolean checkCitizenCPRConstraint(User client) {
         logger.debug("Checking CRP Constraints...");
         boolean cprExists = true;
-        if (client.getCprNumber() != null && clientGraphRepository.findByCprNumber(client.getCprNumber()) != null) {
+        if (client.getCprNumber() != null && userGraphRepository.findUserByCprNumber(client.getCprNumber()) != null) {
             logger.debug("CPR number matched !");
-            //return false;
             cprExists = false;
         }
-        //return true;
         return cprExists;
     }
 
 
-    public Client generateAgeAndGenderFromCPR(Client client) {
+    public String generateAgeAndGenderFromCPR(User user) {
         logger.debug("Generating Gender and Age from CPR....");
-        String cpr = client.getCprNumber();
+        String cpr = user.getCprNumber();
         String defaultPicUrl;
         if (cpr == null || cpr == "") {
             logger.debug("CPR number not found");
@@ -275,18 +275,17 @@ public class ClientService extends UserBaseService {
         Integer ageVariable = Integer.valueOf(cpr.substring(cpr.length() - 1));
         if (ageVariable % 2 == 0) {
             logger.debug("Gender detected for Client: Female");
-            client.setGender(Gender.FEMALE);
+            user.setGender(Gender.FEMALE);
             defaultPicUrl = "default_female_icon.png";
 
         } else {
             logger.debug("Gender detected for Client: Male");
-            client.setGender(Gender.MALE);
+            user.setGender(Gender.MALE);
             defaultPicUrl = "default_male_icon.png";
         }
-        client.setProfilePic(defaultPicUrl);
-        return client;
-    }
 
+        return defaultPicUrl;
+    }
 
     public Client getCitizenById(Long id) {
         return clientGraphRepository.findOne(id);
@@ -300,151 +299,150 @@ public class ClientService extends UserBaseService {
 
     public Map<String, Object> setGeneralDetails(ClientPersonalDto client) {
         Client currentClient = clientGraphRepository.findOne(client.getId());
-        if (currentClient != null) {
-            currentClient.setCprNumber(client.getCprNumber());
-            currentClient.setFirstName(client.getFirstName());
-            currentClient.setLastName(client.getLastName());
-            currentClient.setNameAmongStaff(client.getNameAmongStaff());
-            if (client.getCivilianStatus().getId() != null) {
-                currentClient.setCivilianStatus(citizenStatusGraphRepository.findOne(client.getCivilianStatus().getId()));
-            }
-            currentClient.setGender(client.getGender());
-            currentClient.setOccupation(client.getOccupation());
-            currentClient.setDoHaveFreeChoiceServices(client.isDoHaveFreeChoiceServices());
-            // Language Translation
-            currentClient.setDoRequireTranslationAssistance(client.isDoRequireTranslationAssistance());
-
-            currentClient.setVisitourTeamId(client.getVisitourTeamId());
-
-            currentClient.setNationalityType(client.getNationalityType());
-            currentClient.setCitizenship(client.getCitizenship());
-
-            currentClient.setPeopleInHousehold(client.isPeopleInHousehold());
-
-            currentClient.setLivesAlone(client.isLivesAlone());
-            // Save Client
-            Client updatedClient = clientGraphRepository.save(currentClient);
-
-            logger.debug("Saved Client and Now Updating language preferences...");
-
-            // Update LanguageDetails
-            List<Language> languageList = client.getLanguageUnderstands();
-            logger.debug("Languages found: " + languageList.size());
-            ClientLanguageRelation clientLanguageRelation;
-            languageGraphRepository.removeAllLanguagesFromClient(currentClient.getId());
-
-            for (Language language : languageList) {
-                // Get All Level Id
-                long readId = language.getReadLevel();
-                long speakId = language.getSpeakLevel();
-                long writeId = language.getWriteLevel();
-                logger.debug("Languages List Size: " + languageList.size());
-                logger.debug("ReadId: " + readId);
-                logger.debug("speakId: " + speakId);
-                logger.debug("writeId: " + writeId);
-
-                // Check if Relation Exists
-                clientLanguageRelation = clientLanguageRelationGraphRepository.checkRelationExist(client.getId(), language.getId());
-                if (clientLanguageRelation == null) {
-                    logger.debug("Creating New Relationship-----------");
-                    clientLanguageRelation = new ClientLanguageRelation();
-                }
-
-                Language currentLanguage = languageGraphRepository.findOne(language.getId());
-                if (currentLanguage != null) {
-                    clientLanguageRelation.setLanguage(currentLanguage);
-                    clientLanguageRelation.setClient(currentClient);
-
-                    // Setting Levels
-                    clientLanguageRelation.setReadLevel(readId);
-                    clientLanguageRelation.setWriteLevel(writeId);
-                    clientLanguageRelation.setSpeakLevel(speakId);
-                    logger.debug("Saving Language : " + language.getName() + "levelId: " + language.getReadLevel());
-                    clientLanguageRelationGraphRepository.save(clientLanguageRelation);
-                } else {
-                    logger.debug("Current Language is Null ");
-                }
-            }
-
-            Map<String, Object> data = updatedClient.retrieveClientGeneralDetails();
-
-            // Profile Picture
-            String image = (String) data.get("profilePic");
-            String imageUrl = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + image;
-            data.put("profilePic", imageUrl);
-
-
-            List<Map<String, Object>> languageUnderstands = languagesKnownToCitizen(updatedClient.getId());
-            if (languageUnderstands != null) {
-                data.put("languageUnderstands", languageUnderstands);
-
-            }
-            return data;
+        if (currentClient == null || currentClient.getUser() == null) {
+            exceptionService.dataNotFoundByIdException("message.client.citizen.notFound", client.getId());
         }
-        return null;
+        currentClient.getUser().setCprNumber(client.getCprNumber());
+        currentClient.getUser().setFirstName(client.getFirstName());
+        currentClient.getUser().setLastName(client.getLastName());
+        currentClient.setNameAmongStaff(client.getNameAmongStaff());
+        if (client.getCivilianStatus().getId() != null) {
+            currentClient.setCivilianStatus(citizenStatusGraphRepository.findOne(client.getCivilianStatus().getId()));
+        }
+        currentClient.getUser().setGender(client.getGender());
+        currentClient.setOccupation(client.getOccupation());
+        currentClient.setDoHaveFreeChoiceServices(client.isDoHaveFreeChoiceServices());
+        // Language Translation
+        currentClient.setDoRequireTranslationAssistance(client.isDoRequireTranslationAssistance());
+
+        currentClient.setVisitourTeamId(client.getVisitourTeamId());
+
+        currentClient.setNationalityType(client.getNationalityType());
+        currentClient.setCitizenship(client.getCitizenship());
+
+        currentClient.setPeopleInHousehold(client.isPeopleInHousehold());
+
+        currentClient.setLivesAlone(client.isLivesAlone());
+        // Save Client
+        Client updatedClient = clientGraphRepository.save(currentClient);
+
+        logger.debug("Saved Client and Now Updating language preferences...");
+
+        // Update LanguageDetails
+        List<Language> languageList = client.getLanguageUnderstands();
+        logger.debug("Languages found: " + languageList.size());
+        ClientLanguageRelation clientLanguageRelation;
+        languageGraphRepository.removeAllLanguagesFromClient(currentClient.getId());
+
+        for (Language language : languageList) {
+            // Get All Level Id
+            long readId = language.getReadLevel();
+            long speakId = language.getSpeakLevel();
+            long writeId = language.getWriteLevel();
+            logger.debug("Languages List Size: " + languageList.size());
+            logger.debug("ReadId: " + readId);
+            logger.debug("speakId: " + speakId);
+            logger.debug("writeId: " + writeId);
+
+            // Check if Relation Exists
+            clientLanguageRelation = clientLanguageRelationGraphRepository.checkRelationExist(client.getId(), language.getId());
+            if (clientLanguageRelation == null) {
+                logger.debug("Creating New Relationship-----------");
+                clientLanguageRelation = new ClientLanguageRelation();
+            }
+
+            Language currentLanguage = languageGraphRepository.findOne(language.getId());
+            if (currentLanguage != null) {
+                clientLanguageRelation.setLanguage(currentLanguage);
+                clientLanguageRelation.setClient(currentClient);
+
+                // Setting Levels
+                clientLanguageRelation.setReadLevel(readId);
+                clientLanguageRelation.setWriteLevel(writeId);
+                clientLanguageRelation.setSpeakLevel(speakId);
+                logger.debug("Saving Language : " + language.getName() + "levelId: " + language.getReadLevel());
+                clientLanguageRelationGraphRepository.save(clientLanguageRelation);
+            } else {
+                logger.debug("Current Language is Null ");
+            }
+        }
+
+        Map<String, Object> data = updatedClient.retrieveClientGeneralDetails();
+
+        // Profile Picture
+        String image = (String) data.get("profilePic");
+        String imageUrl = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + image;
+        data.put("profilePic", imageUrl);
+
+
+        List<Map<String, Object>> languageUnderstands = languagesKnownToCitizen(updatedClient.getId());
+        if (languageUnderstands != null) {
+            data.put("languageUnderstands", languageUnderstands);
+
+        }
+        return data;
+
     }
 
 
     public Map<String, Object> retrieveCompleteDetails(long clientId, long unitId) {
         Map<String, Object> response = new HashMap<>();
-        //Client currentClient = clientGraphRepository.findOne(clientId);
-        Client currentClient = clientGraphRepository.getClientByClientIdAndUnitId(clientId, unitId);
+        Client currentClient = clientGraphRepository.findOne(clientId);
+        //Client currentClient = clientGraphRepository.getClientByClientIdAndUnitId(clientId, unitId);
+        if (!Optional.ofNullable(currentClient).isPresent() || !Optional.ofNullable(currentClient.getUser()).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
+        }
+        // Client General Information
+        Map<String, Object> clientGeneralDetails = currentClient.retrieveClientGeneralDetails();
 
-        // Client Data
-        if (currentClient != null) {
-            // Client General Information
-            Map<String, Object> clientGeneralDetails = currentClient.retrieveClientGeneralDetails();
+        // Client Profile Picture
+        String url = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath();
+        clientGeneralDetails.put("profilePic", url + (String) clientGeneralDetails.get("profilePic"));
+        clientGeneralDetails.put("civilianStatus", clientGraphRepository.findCitizenCivilianStatus(clientId));
 
-            // Client Profile Picture
-            String url = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath();
-            clientGeneralDetails.put("profilePic", url + (String) clientGeneralDetails.get("profilePic"));
-            clientGeneralDetails.put("civilianStatus", clientGraphRepository.findCitizenCivilianStatus(clientId));
+        // Client Language Data
+        clientGeneralDetails.put("languageUnderstands", languagesKnownToCitizen(clientId));
+        // If
+        clientGeneralDetails.put("hasHomeAddress", clientGraphRepository.isHomeAddressExists(clientId));
+        clientGeneralDetails.put("languageUnderstandsIds", clientLanguageRelationGraphRepository.findClientLanguagesId(clientId).toArray());
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 
-            // Client Language Data
-            clientGeneralDetails.put("languageUnderstands", languagesKnownToCitizen(clientId));
-            // If
-            clientGeneralDetails.put("hasHomeAddress", clientGraphRepository.isHomeAddressExists(clientId));
-            clientGeneralDetails.put("languageUnderstandsIds", clientLanguageRelationGraphRepository.findClientLanguagesId(clientId).toArray());
-            Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
+        if (countryId != null) {
+            logger.debug("Country Found");
 
-            if (countryId != null) {
-                logger.debug("Country Found");
-
-                List<Map<String, Object>> languageLevelData = languageLevelGraphRepository.getLanguageLevelByCountryId(countryId);
-                if (languageLevelData != null) {
-                    clientGeneralDetails.put("languageLevelData", FormatUtil.formatNeoResponse(languageLevelData));
-                }
-
-                List<Map<String, Object>> zipCodeMapList = zipCodeGraphRepository.getAllZipCodeByCountryIdAnotherFormat(countryId);
-                if (zipCodeMapList != null) {
-                    response.put("zipCodeData", FormatUtil.formatNeoResponse(zipCodeMapList));
-                }
-
-                List<Map<String, Object>> languageData = languageGraphRepository.getLanguageByCountryIdAnotherFormat(countryId);
-                if (languageData != null) {
-                    response.put("languageData", FormatUtil.formatNeoResponse(languageData));
-                }
-                response.put("relationTypes", countryGraphRepository.getRelationTypesByCountry(countryId));
-            } else {
-                logger.debug("Country not found");
+            List<Map<String, Object>> languageLevelData = languageLevelGraphRepository.getLanguageLevelByCountryId(countryId);
+            if (languageLevelData != null) {
+                clientGeneralDetails.put("languageLevelData", FormatUtil.formatNeoResponse(languageLevelData));
             }
 
-            // NextToKin
-            List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-            response.put("nextToKin", nextToKinDetails);
-            // Social Media Details
-            Map<String, Object> socialMediaDetails = getSocialMediaDetails(clientId);
-            response.put("socialMediaDetails", socialMediaDetails != null ? socialMediaDetails : Collections.EMPTY_MAP);
+            List<Map<String, Object>> zipCodeMapList = zipCodeGraphRepository.getAllZipCodeByCountryIdAnotherFormat(countryId);
+            if (zipCodeMapList != null) {
+                response.put("zipCodeData", FormatUtil.formatNeoResponse(zipCodeMapList));
+            }
+
+            List<Map<String, Object>> languageData = languageGraphRepository.getLanguageByCountryIdAnotherFormat(countryId);
+            if (languageData != null) {
+                response.put("languageData", FormatUtil.formatNeoResponse(languageData));
+            }
+            response.put("relationTypes", countryGraphRepository.getRelationTypesByCountry(countryId));
             response.put("civilianStatus", citizenStatusService.getCitizenStatusByCountryIdAnotherFormat(countryId));
-
-            // client General
-            response.put("clientGeneral", clientGeneralDetails);
-            return response;
         } else {
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound",clientId);
-
+            logger.debug("Country not found");
         }
-        return null;
+
+        // NextToKin
+        List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        response.put("nextToKin", nextToKinDetails);
+        // Social Media Details
+        Map<String, Object> socialMediaDetails = getSocialMediaDetails(clientId);
+        response.put("socialMediaDetails", socialMediaDetails != null ? socialMediaDetails : Collections.EMPTY_MAP);
+
+
+        // client General
+        response.put("clientGeneral", clientGeneralDetails);
+        return response;
+
+
     }
 
 
@@ -631,13 +629,13 @@ public class ClientService extends UserBaseService {
         return response;
     }
 
-    /*public ClientMinimumDTO addHouseholdToClient(ClientMinimumDTO minimumDTO, long unitId, long clientId) {
+    /*public ClientMinimumDTO addHouseholdMemberOfClient(ClientMinimumDTO minimumDTO, long unitId, long clientId) {
         Client client = clientGraphRepository.findOne(clientId);
         if (!Optional.ofNullable(client).isPresent()) {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
-        Client houseHold = saveDetailsOfHouseHold(minimumDTO);
+        Client houseHold = getDetailsOfHouseHold(minimumDTO);
         if(Optional.ofNullable(houseHold.getId()).isPresent()){
             clientGraphRepository.deleteHouseHoldWhoseAddressNotSame(client.getId(),houseHold.getId());
         }
@@ -658,41 +656,40 @@ public class ClientService extends UserBaseService {
     }*/
 
 
-
-    public ClientMinimumDTO addHouseholdToClient(ClientMinimumDTO minimumDTO, long unitId, long clientId) {
+    public ClientMinimumDTO addHouseholdMemberOfClient(ClientMinimumDTO minimumDTO, long unitId, long clientId) {
         Client client = clientGraphRepository.findOne(clientId);
-        if (!Optional.ofNullable(client).isPresent()) {
+        if (!Optional.ofNullable(client).isPresent() || !Optional.ofNullable(client.getUser()).isPresent()) {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound",clientId);
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
 
         }
 
         // Check if assigning household member as himself
-        if(minimumDTO.getCprnumber().equals(client.getCprNumber())){
+        if (minimumDTO.getCprnumber().equals(client.getUser().getCprNumber())) {
             exceptionService.dataNotMatchedException("message.client.anotherHouseHold");
 
         }
 
-        Client houseHold = saveDetailsOfHouseHold(minimumDTO);
+        Client houseHold = getDetailsOfHouseHold(minimumDTO);
 
         Long addressIdOfHouseHold = null;
         Boolean addHouseHoldInCitizenList = false;
-        if(houseHold.getId() == null ){
+        if (houseHold.getId() == null) {
             addHouseHoldInCitizenList = true;
         }
-        if(houseHold.getId() != null && houseHold.getHomeAddress() !=null){
+        if (houseHold.getId() != null && houseHold.getHomeAddress() != null) {
             addressIdOfHouseHold = houseHold.getHomeAddress().getId();
         }
 
         saveAddressOfHouseHold(client, houseHold);
         save(houseHold);
 
-        if ( addHouseHoldInCitizenList ) {
+        if (addHouseHoldInCitizenList) {
             addHouseHoldInOrganization(houseHold, unitId);
         }
 
         // Check and Update Address of all household members
-        if( addressIdOfHouseHold !=null && minimumDTO.getUpdateAddressOfAllHouseholdMembers()){
+        if (addressIdOfHouseHold != null && minimumDTO.getUpdateAddressOfAllHouseholdMembers()) {
 //            //  && minimumDTO.getUpdateAddressOfAllHouseholdMembers() == true
             clientAddressService.updateAddressOfAllHouseHoldMembers(client.getHomeAddress().getId(), addressIdOfHouseHold);
         }
@@ -701,23 +698,13 @@ public class ClientService extends UserBaseService {
         return minimumDTO;
     }
 
-    private Client saveDetailsOfHouseHold(ClientMinimumDTO clientMinimumDTO) {
-
-        Client houseHoldPeople = clientGraphRepository.findByCprNumber(clientMinimumDTO.getCprnumber());
-        if (Optional.ofNullable(houseHoldPeople).isPresent()) {
-            if (houseHoldPeople.isCitizenDead()) {
-                exceptionService.duplicateDataException("message.client.CRPNumber.deadcitizen",clientMinimumDTO.getCprnumber());
-                            }
-        } else {
-            houseHoldPeople = new Client();
-            houseHoldPeople.setFirstName(clientMinimumDTO.getFirstName());
-            houseHoldPeople.setLastName(clientMinimumDTO.getLastName());
-            houseHoldPeople.setCprNumber(clientMinimumDTO.getCprnumber().trim());
-            houseHoldPeople.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(houseHoldPeople.getCprNumber()));
-            generateAgeAndGenderFromCPR(houseHoldPeople);
-            final String email = houseHoldPeople.getCprNumber() + KAIROS;
-            houseHoldPeople.setEmail(email);
-            houseHoldPeople.setUserName(email);
+    private Client getDetailsOfHouseHold(ClientMinimumDTO clientMinimumDTO) {
+        Client houseHoldPeople = clientGraphRepository.getClientByCPR(clientMinimumDTO.getCprnumber());
+        if (!Optional.ofNullable(houseHoldPeople).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientMinimumDTO.getCprnumber());
+        }
+        if (houseHoldPeople.isCitizenDead()) {
+            exceptionService.duplicateDataException("message.client.CRPNumber.deadcitizen", clientMinimumDTO.getCprnumber());
         }
         return houseHoldPeople;
     }
@@ -725,7 +712,7 @@ public class ClientService extends UserBaseService {
     private void addHouseHoldInOrganization(Client houseHold, long organizationId) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
         if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound",organizationId);
+            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound", organizationId);
 
         }
         ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(houseHold, organization, new DateTime().getMillis());
@@ -742,7 +729,6 @@ public class ClientService extends UserBaseService {
             houseHold.setHomeAddress(client.getHomeAddress());
         }
     }
-
 
 
     public List<ClientMinimumDTO> getPeopleInHousehold(long clientId) {
@@ -785,20 +771,20 @@ public class ClientService extends UserBaseService {
     public boolean markClientAsDead(Long clientId, String deathDate) throws ParseException {
         Client citizen = clientGraphRepository.findOne(clientId);
         if (!Optional.ofNullable(citizen).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound",clientId);
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
 
         }
         Date deathDateInDateFormat = DateUtil.convertToOnlyDate(deathDate, MONGODB_QUERY_DATE_FORMAT);
-        switch (citizen.getHealthStatus()){
+        switch (citizen.getHealthStatus()) {
             case ALIVE:
                 citizen.setHealthStatus(DECEASED);
                 citizen.setDeceasedDate(deathDateInDateFormat.getTime());
-                plannerRestClient.deleteTaskForCitizen(clientId,DECEASED,deathDate);
+                plannerRestClient.deleteTaskForCitizen(clientId, DECEASED, deathDate);
                 break;
             case DECEASED:
                 citizen.setHealthStatus(TERMINATED);
                 citizen.setTerminatedDate(deathDateInDateFormat.getTime());
-                plannerRestClient.deleteTaskForCitizen(clientId,TERMINATED,deathDate);
+                plannerRestClient.deleteTaskForCitizen(clientId, TERMINATED, deathDate);
                 break;
         }
         clientGraphRepository.save(citizen);
@@ -1001,13 +987,13 @@ public class ClientService extends UserBaseService {
         Map<String, Object> response = new HashMap<>();
 
         logger.debug("Finding citizen with Id: " + organizationId);
-     //   List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-     //   logger.debug("CitizenList Size: " + mapList.size());
+        //   List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        //   logger.debug("CitizenList Size: " + mapList.size());
 
-     //   Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
+        //   Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
         //anil maurya move some business logic in task demand service (task micro service )
-    //    Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), organizationId, mapList);
-       // response.putAll(responseFromTask);
+        //    Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), organizationId, mapList);
+        // response.putAll(responseFromTask);
 
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
 
@@ -1018,35 +1004,72 @@ public class ClientService extends UserBaseService {
         return response;
     }
 
+    @Async
+    public CompletableFuture<Boolean> getPreRequisiteData(Long organizationId, Map<String, Object> clientData, List<Map<String, Object>> clientList) throws InterruptedException, ExecutionException {
 
-    public Map<String, Object> getOrganizationClients(Long organizationId) {
+        Callable<Map<String, Object>> callableTaskDemand = () -> {
+            Map<String, Object> clientInfo = taskDemandRestClient.getOrganizationClientsInfo(organizationId, clientList);
+            return clientInfo;
+        };
+        Future<Map<String, Object>> futureTaskDemand = asynchronousService.executeAsynchronously(callableTaskDemand);
+        if (futureTaskDemand.get() != null) {
+            clientData.putAll(futureTaskDemand.get());
+        }
+
+        // Time slot
+        Callable<Map<String, Object>> callableTimeSlotData = () -> {
+            Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
+            return timeSlotData;
+        };
+        Future<Map<String, Object>> futureTimeSlotData = asynchronousService.executeAsynchronously(callableTimeSlotData);
+        if (futureTimeSlotData.get() != null) {
+            clientData.put("timeSlotList", futureTimeSlotData.get());
+        }
+
+        // service Types
+
+        Callable<List<OrganizationServiceQueryResult>> callableOrganizationServices = () -> {
+            List<OrganizationServiceQueryResult> organizationServiceQueryResults = organizationServiceRepository.getOrganizationServiceByOrgId(organizationId);
+            return organizationServiceQueryResults;
+        };
+        Future<List<OrganizationServiceQueryResult>> futureOrganizationServices = asynchronousService.executeAsynchronously(callableOrganizationServices);
+        if (futureOrganizationServices.get() != null) {
+            clientData.put("serviceTypes", futureOrganizationServices.get());
+        }
+
+        // Local area tags
+
+        Callable<List<Map<String, Object>>> callableTagLists = () -> {
+            List<Map<String, Object>> tagList = organizationMetadataRepository.findAllByIsDeletedAndUnitId(organizationId);
+            return tagList;
+        };
+        Future<List<Map<String, Object>>> futureTagLists = asynchronousService.executeAsynchronously(callableTagLists);
+        if (futureTagLists.get() != null) {
+            List<Object> localAreaTagsList = new ArrayList<>();
+            for (Map<String, Object> map : futureTagLists.get()) {
+                localAreaTagsList.add(map.get("tags"));
+            }
+            clientData.put("localAreaTags", localAreaTagsList);
+        }
+
+        return CompletableFuture.completedFuture(true);
+    }
+
+    public Map<String, Object> getOrganizationClients(Long organizationId) throws InterruptedException, ExecutionException {
 
         Map<String, Object> clientData = new HashMap<String, Object>();
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        List<Map<String, Object>> clientList = organizationGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
 
-        if (mapList.isEmpty()) {
+        if (clientList.isEmpty()) {
             return null;
         }
-
-        //anilm2 replace it with rest template
-        Map<String, Object> clientInfo = taskDemandRestClient.getOrganizationClientsInfo(organizationId, mapList);
         Long countryId = countryGraphRepository.getCountryIdByUnitId(organizationId);
         List<Map<String, Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
-
-        clientData.putAll(clientInfo);
-
         clientData.put("clientStatusList", clientStatusList);
-        List<Object> localAreaTagsList = new ArrayList<>();
-        List<Map<String, Object>> tagList = organizationMetadataRepository.findAllByIsDeletedAndUnitId(organizationId);
-        for (Map<String, Object> map : tagList) {
-            localAreaTagsList.add(map.get("tags"));
-        }
-        clientData.put("localAreaTags", localAreaTagsList);
-        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
-        if (timeSlotData != null) {
-            clientData.put("timeSlotList", timeSlotData);
-        }
-        clientData.put("serviceTypes", organizationServiceRepository.getOrganizationServiceByOrgId(organizationId));
+
+        CompletableFuture<Boolean> allBasicDetails = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(ClientService.class)
+                .getPreRequisiteData(organizationId, clientData, clientList);
+        CompletableFuture.allOf(allBasicDetails).join();
 
         return clientData;
 
@@ -1062,7 +1085,7 @@ public class ClientService extends UserBaseService {
 
         HashMap<String, Object> response = new HashMap<>();
         response.put("clients", clientList);
-      response.put("tableSetting", Arrays.asList(tableConfigRestClient.getTableConfiguration(organizationId, unitId, staffId)));
+        response.put("tableSetting", Arrays.asList(tableConfigRestClient.getTableConfiguration(organizationId, unitId, staffId)));
         return response;
     }
 
@@ -1102,8 +1125,8 @@ public class ClientService extends UserBaseService {
      */
     public Map<String, Object> getStaffAndCitizenHouseholds(Long citizenId, Long staffId) {
         Map<String, Object> staffAndCitizenHouseholdsInfo = new HashMap<>();
-        Staff staff = (Optional.ofNullable(staffId).isPresent())?staffGraphRepository.findOne(staffId):null;
-        staffAndCitizenHouseholdsInfo.put("lastModifiedBy",(Optional.ofNullable(staff).isPresent())?staff.getFirstName():"anonymous user");
+        Staff staff = (Optional.ofNullable(staffId).isPresent()) ? staffGraphRepository.findOne(staffId) : null;
+        staffAndCitizenHouseholdsInfo.put("lastModifiedBy", (Optional.ofNullable(staff).isPresent()) ? staff.getFirstName() : "anonymous user");
         staffAndCitizenHouseholdsInfo.put("citizenHouseholds", getPeopleInHousehold(citizenId));
         return staffAndCitizenHouseholdsInfo;
     }
@@ -1117,21 +1140,21 @@ public class ClientService extends UserBaseService {
         Map<String, Object> citizenDetails = new HashMap<>();
 
         Client citizen = clientGraphRepository.findOne(citizenId);
-        if (citizen == null) {
+        if (!Optional.ofNullable(citizen).isPresent() || !Optional.ofNullable(citizen.getUser()).isPresent()) {
             logger.debug("Searching client in database by id " + citizenId);
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound",citizenId);
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound", citizenId);
 
         }
         citizenDetails.put("id", citizen.getId());
-        citizenDetails.put("name", citizen.getFirstName() + " " + citizen.getLastName());
-        citizenDetails.put("age", citizen.getAge());
+        citizenDetails.put("name", citizen.getUser().getFirstName() + " " + citizen.getUser().getLastName());
+        citizenDetails.put("age", citizen.getUser().getAge());
         citizenDetails.put("profilePic", citizen.getProfilePic() != null ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + citizen.getProfilePic() : "");
         citizenDetails.put("phone", citizen.getContactDetail() != null ? citizen.getContactDetail().retreiveContactNumbers() : "");
         citizenDetails.put("address", citizen.getHomeAddress());
-        citizenDetails.put("cprNumber", citizen.getCprNumber());
+        citizenDetails.put("cprNumber", citizen.getUser().getCprNumber());
         citizenDetails.put("privateNumber", citizen.getContactDetail() != null ? citizen.getContactDetail().getPrivatePhone() : "NA");
         citizenDetails.put("privateAddress", citizen.getHomeAddress());
-        citizenDetails.put("gender", citizen.getGender());
+        citizenDetails.put("gender", citizen.getUser().getGender());
         citizenDetails.put("status", citizen.getCivilianStatus());
         return citizenDetails;
     }
@@ -1146,8 +1169,7 @@ public class ClientService extends UserBaseService {
 
         Client citizen = clientGraphRepository.findOne(citizenId, 1);
         if (citizen.getHomeAddress() == null) {
-            exceptionService.dataNotFoundByIdException("message.client.homeAddress.notAvailabe",citizen.getFirstName() );
-
+            exceptionService.dataNotFoundByIdException("message.client.homeAddress.notAvailabe");
         }
         Map<String, Object> citizenPlanningMap = new HashMap<>();
         List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(citizenId);
@@ -1178,7 +1200,7 @@ public class ClientService extends UserBaseService {
         if (clientExceptionDto.getTemporaryAddress() != null) {
             clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
         }
-        for(Client citizen : citizens ){
+        for (Client citizen : citizens) {
             List<ClientTemporaryAddress> temporaryAddress = citizen.getTemporaryAddress();
             temporaryAddress.add(clientTemporaryAddress);
             citizen.setTemporaryAddress(temporaryAddress);
@@ -1206,7 +1228,7 @@ public class ClientService extends UserBaseService {
             clientTemporaryAddress.setVerifiedByVisitour(false);
             clientTemporaryAddress.setCountry("Denmark");
             //clientTemporaryAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
-           // clientTemporaryAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
+            // clientTemporaryAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
             clientTemporaryAddress.setLongitude(clientTemporaryAddress.getLongitude());
             clientTemporaryAddress.setLatitude(clientTemporaryAddress.getLatitude());
             zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
@@ -1226,7 +1248,7 @@ public class ClientService extends UserBaseService {
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
             logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-            exceptionService.dataNotFoundByIdException("message.geographyData.notFound",municipality.getId());
+            exceptionService.dataNotFoundByIdException("message.geographyData.notFound", municipality.getId());
 
         }
         logger.info("Geography Data: " + geographyData);
@@ -1265,7 +1287,7 @@ public class ClientService extends UserBaseService {
         taskAddress.setStreet(homeAddress.getStreet1());
         taskAddress.setHouseNumber(homeAddress.getHouseNumber());
 
-        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId(),new Date());
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId(), new Date());
         Long countryId = countryGraphRepository.getCountryIdByUnitId(taskDemandWrapper.getUnitId());
 
         List<Long> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(), taskDemandWrapper.getEndDate().getTime());
@@ -1374,8 +1396,11 @@ public class ClientService extends UserBaseService {
             Client client = clientGraphRepository.findOne(escalatedTasksWrapper.getId());
             for (EscalateTaskWrapper escalateTaskWrapper : escalatedTasksWrapper.getTasks()) {
                 escalateTaskWrapper.setCitizenName(client.getFullName());
-                if (client.getGender() != null) escalateTaskWrapper.setGender(client.getGender().name());
-                escalateTaskWrapper.setAge(client.getAge());
+                if (Optional.ofNullable(client.getUser()).isPresent()) {
+                    if (client.getUser().getGender() != null)
+                        escalateTaskWrapper.setGender(client.getUser().getGender().name());
+                    escalateTaskWrapper.setAge(client.getUser().getAge());
+                }
                 escalateTaskWrapper.setCitizenId(client.getId());
                 escalatedTaskData.add(escalateTaskWrapper);
             }
@@ -1389,32 +1414,27 @@ public class ClientService extends UserBaseService {
     }
 
     public ClientMinimumDTO findByCPRNumber(long clientId, long unitId, String cprNumber) {
-
         Client client = clientGraphRepository.findOne(clientId, unitId);
         if (!Optional.ofNullable(client).isPresent()) {
             logger.debug("Finding client by id " + client.getId());
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound",clientId);
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
 
         }
-
-        Client houseHoldPerson = clientGraphRepository.findByCprNumber(cprNumber);
+        Client houseHoldPerson = clientGraphRepository.getClientByCPR(cprNumber);
+        ClientMinimumDTO clientMinimumDTO = null;
         if (Optional.ofNullable(houseHoldPerson).isPresent()) {
             if (houseHoldPerson.isCitizenDead()) {
-                exceptionService.dataNotFoundByIdException("message.client.CRPNumber.deadcitizen",cprNumber);
+                exceptionService.dataNotFoundByIdException("message.client.CRPNumber.deadcitizen", cprNumber);
 
             } else {
-                ClientMinimumDTO clientMinimumDTO = new ClientMinimumDTO();
-                clientMinimumDTO.setId(houseHoldPerson.getId());
-                clientMinimumDTO.setFirstName(houseHoldPerson.getFirstName());
-                clientMinimumDTO.setLastName(houseHoldPerson.getLastName());
-                clientMinimumDTO.setHasSameAddress(hasSameAddress(client, houseHoldPerson));
-                return clientMinimumDTO;
+                User user = clientGraphRepository.getUserByClientId(clientId);
+                clientMinimumDTO = new ClientMinimumDTO(houseHoldPerson.getId(), user.getFirstName()
+                        , user.getLastName(), hasSameAddress(client, houseHoldPerson));
             }
-        } else {
-            return null;
         }
-        return null;
+        return clientMinimumDTO;
     }
+
 
     private boolean hasSameAddress(Client client, Client houseHoldPeople) {
         ClientHomeAddressQueryResult addressOfClient = clientGraphRepository.getHomeAddress(client.getId());
@@ -1490,14 +1510,14 @@ public class ClientService extends UserBaseService {
         return false;
     }
 
-    public ContactPersonTabDataDTO getDetailsForContactPersonTab(Long unitId, Long clientId){
+    public ContactPersonTabDataDTO getDetailsForContactPersonTab(Long unitId, Long clientId) {
         List<OrganizationServiceQueryResult> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
         // TODO Fetch list of staff according to employment type ( According to dynamic value of employmnet type )
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllMainEmploymentStaffDetailByUnitId(unitId);
-        List<ClientMinimumDTO> clientMinimumDTOs =  getPeopleInHousehold(clientId);
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllMainEmploymentStaffDetailByUnitId(unitId);
+        List<ClientMinimumDTO> clientMinimumDTOs = getPeopleInHousehold(clientId);
         List<Long> houseHoldIds = clientGraphRepository.getPeopleInHouseholdIdList(clientId);
         houseHoldIds.add(clientId);
-List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refactorContactPersonList(clientId, clientGraphRepository.getClientContactPersonDataList(clientId));
+        List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refactorContactPersonList(clientId, clientGraphRepository.getClientContactPersonDataList(clientId));
         ContactPersonTabDataDTO contactPersonTabDataDTO = new ContactPersonTabDataDTO();
         contactPersonTabDataDTO.setOrganizationServices(organizationServices);
         contactPersonTabDataDTO.setStaffPersonalDetailDTOS(staffPersonalDetailDTOS);
@@ -1507,9 +1527,9 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
     }
 
-    public ClientContactPersonStructuredData saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO){
+    public ClientContactPersonStructuredData saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO) {
         ClientContactPersonStructuredData clientContactPersonStructuredData = new ClientContactPersonStructuredData();
-        try{
+        try {
 
             clientContactPersonStructuredData.setHouseHolds(contactPersonDTO.getHouseHoldMembers());
             clientContactPersonStructuredData.setPrimaryStaffId(contactPersonDTO.getPrimaryStaffId());
@@ -1517,31 +1537,31 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
             clientContactPersonStructuredData.setSecondaryTwoStaffId(contactPersonDTO.getSecondaryStaffId2());
             clientContactPersonStructuredData.setSecondaryThreeStaffId(contactPersonDTO.getSecondaryStaffId3());
             clientContactPersonStructuredData.setServiceId(contactPersonDTO.getServiceTypeId());
-            if(Optional.ofNullable(contactPersonDTO.getPrimaryStaffId()).isPresent()){
+            if (Optional.ofNullable(contactPersonDTO.getPrimaryStaffId()).isPresent()) {
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getPrimaryStaffId(), ClientContactPersonRelationship.ContactPersonRelationType.PRIMARY, contactPersonDTO.getHouseHoldMembers());
             }
 
-            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId1()).isPresent()) {
+            if (Optional.ofNullable(contactPersonDTO.getSecondaryStaffId1()).isPresent()) {
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId1(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_ONE, contactPersonDTO.getHouseHoldMembers());
             }
 
-            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId2()).isPresent()) {
+            if (Optional.ofNullable(contactPersonDTO.getSecondaryStaffId2()).isPresent()) {
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId2(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_TWO, contactPersonDTO.getHouseHoldMembers());
             }
 
-            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId3()).isPresent()){
+            if (Optional.ofNullable(contactPersonDTO.getSecondaryStaffId3()).isPresent()) {
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId3(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_THREE, contactPersonDTO.getHouseHoldMembers());
             }
 
-        }catch (Exception exception){
-            logger.error("Error occurs while save contact person for client : "+clientId, exception);
+        } catch (Exception exception) {
+            logger.error("Error occurs while save contact person for client : " + clientId, exception);
             clientContactPersonStructuredData = null;
         }
 
         return clientContactPersonStructuredData;
     }
 
-    public void saveContactPersonWithGivenRelation(Long clientId, Long serviceId, Long staffId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, List<Long> households){
+    public void saveContactPersonWithGivenRelation(Long clientId, Long serviceId, Long staffId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, List<Long> households) {
         ClientContactPerson clientContactPerson = clientGraphRepository.getClientContactPerson(clientId, contactPersonRelationType, serviceId);
         OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -1549,33 +1569,33 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
      /*   if(Optional.ofNullable(clientContactPerson).isPresent()){
             clientGraphRepository.removeClientContactPersonRelationship(households, contactPersonRelationType, serviceId);
         }*/
-       if(!Optional.ofNullable(clientContactPerson).isPresent()){
-           households.add(clientId);
-           clientContactPerson  = new ClientContactPerson();
-           clientContactPerson.setOrganizationService(organizationService);
-           clientContactPerson.setStaff(staff);
-           addClientContactPersonRelationShip(households, contactPersonRelationType, clientContactPerson);
+        if (!Optional.ofNullable(clientContactPerson).isPresent()) {
+            households.add(clientId);
+            clientContactPerson = new ClientContactPerson();
+            clientContactPerson.setOrganizationService(organizationService);
+            clientContactPerson.setStaff(staff);
+            addClientContactPersonRelationShip(households, contactPersonRelationType, clientContactPerson);
 
-           households.remove(clientId);
-       }else{
-           clientGraphRepository.removeClientContactPersonStaffRelation(clientContactPerson.getId());
-           clientContactPerson.setOrganizationService(organizationService);
-           clientContactPerson.setStaff(staff);
-           save(clientContactPerson);
-           if(households.isEmpty()){
-               //when household is  empty then we need to check existing housholds who may connected with contact person
-               clientGraphRepository.removeClientContactPersonRelationship(clientGraphRepository.getPeopleInHouseholdIdList(clientId),clientContactPerson.getId());
-           }else{
-               clientGraphRepository.removeClientContactPersonRelationship(households,clientContactPerson.getId());
-               addClientContactPersonRelationShip(households, contactPersonRelationType, clientContactPerson);
-           }
+            households.remove(clientId);
+        } else {
+            clientGraphRepository.removeClientContactPersonStaffRelation(clientContactPerson.getId());
+            clientContactPerson.setOrganizationService(organizationService);
+            clientContactPerson.setStaff(staff);
+            save(clientContactPerson);
+            if (households.isEmpty()) {
+                //when household is  empty then we need to check existing housholds who may connected with contact person
+                clientGraphRepository.removeClientContactPersonRelationship(clientGraphRepository.getPeopleInHouseholdIdList(clientId), clientContactPerson.getId());
+            } else {
+                clientGraphRepository.removeClientContactPersonRelationship(households, clientContactPerson.getId());
+                addClientContactPersonRelationShip(households, contactPersonRelationType, clientContactPerson);
+            }
 
-       }
+        }
 
     }
 
-    public void addClientContactPersonRelationShip(List<Long> households, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, ClientContactPerson clientContactPerson){
-        for(Client client : clientGraphRepository.findAllById(households) ) {
+    public void addClientContactPersonRelationShip(List<Long> households, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, ClientContactPerson clientContactPerson) {
+        for (Client client : clientGraphRepository.findAllById(households)) {
             ClientContactPersonRelationship clientContactPersonRelationship = new ClientContactPersonRelationship();
             clientContactPersonRelationship.setClient(client);
             clientContactPersonRelationship.setClientContactPerson(clientContactPerson);
@@ -1584,22 +1604,26 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
         }
     }
 
-    public List<ClientContactPersonStructuredData> refactorContactPersonList(Long clientId, List<ClientContactPersonQueryResultByService> clientContactPersonQueryResultByServices){
+    public List<ClientContactPersonStructuredData> refactorContactPersonList(Long clientId, List<ClientContactPersonQueryResultByService> clientContactPersonQueryResultByServices) {
 
         List<ClientContactPersonStructuredData> clientContactPersonStructuredDataList = new ArrayList<>();
-        for(ClientContactPersonQueryResultByService clientContactPersonQueryResultByService : clientContactPersonQueryResultByServices){
+        for (ClientContactPersonQueryResultByService clientContactPersonQueryResultByService : clientContactPersonQueryResultByServices) {
             ClientContactPersonStructuredData clientContactPersonStructuredData = new ClientContactPersonStructuredData();
             clientContactPersonStructuredData.setServiceId(clientContactPersonQueryResultByService.getServiceId());
             List<Long> houseHolds = new ArrayList();
-            for(Map<String, Object> clientContactPersonQueryResult : clientContactPersonQueryResultByService.getClientContactPersonQueryResults()){
-                if(Optional.ofNullable(clientContactPersonQueryResult.get("primaryStaffId")).isPresent()) clientContactPersonStructuredData.setPrimaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("primaryStaffId").toString()));
-                if(Optional.ofNullable(clientContactPersonQueryResult.get("secondaryStaffId")).isPresent()) clientContactPersonStructuredData.setSecondaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryStaffId").toString()));
-                if(Optional.ofNullable(clientContactPersonQueryResult.get("secondaryTwoStaffId")).isPresent()) clientContactPersonStructuredData.setSecondaryTwoStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryTwoStaffId").toString()));
-                if(Optional.ofNullable(clientContactPersonQueryResult.get("secondaryThreeStaffId")).isPresent()) clientContactPersonStructuredData.setSecondaryThreeStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryThreeStaffId").toString()));
-                if(Optional.ofNullable(clientContactPersonQueryResult.get("houseHold")).isPresent()) {
+            for (Map<String, Object> clientContactPersonQueryResult : clientContactPersonQueryResultByService.getClientContactPersonQueryResults()) {
+                if (Optional.ofNullable(clientContactPersonQueryResult.get("primaryStaffId")).isPresent())
+                    clientContactPersonStructuredData.setPrimaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("primaryStaffId").toString()));
+                if (Optional.ofNullable(clientContactPersonQueryResult.get("secondaryStaffId")).isPresent())
+                    clientContactPersonStructuredData.setSecondaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryStaffId").toString()));
+                if (Optional.ofNullable(clientContactPersonQueryResult.get("secondaryTwoStaffId")).isPresent())
+                    clientContactPersonStructuredData.setSecondaryTwoStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryTwoStaffId").toString()));
+                if (Optional.ofNullable(clientContactPersonQueryResult.get("secondaryThreeStaffId")).isPresent())
+                    clientContactPersonStructuredData.setSecondaryThreeStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryThreeStaffId").toString()));
+                if (Optional.ofNullable(clientContactPersonQueryResult.get("houseHold")).isPresent()) {
                     Long houseHoldId = Long.valueOf(clientContactPersonQueryResult.get("houseHold").toString());
-                    if(!houseHoldId.equals(clientId) && !houseHolds.contains(houseHoldId))
-                    houseHolds.add(houseHoldId);
+                    if (!houseHoldId.equals(clientId) && !houseHolds.contains(houseHoldId))
+                        houseHolds.add(houseHoldId);
                 }
             }
             clientContactPersonStructuredData.setHouseHolds(houseHolds);
@@ -1609,10 +1633,10 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
     }
 
-    public void removeClientContactPerson(Long clientId, Long serviceId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, List<Long> households){
+    public void removeClientContactPerson(Long clientId, Long serviceId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, List<Long> households) {
         ClientContactPerson clientContactPerson = clientGraphRepository.getClientContactPerson(clientId, contactPersonRelationType, serviceId);
         //TODO Need to find best practice instead of remove nodes
-        if(Optional.ofNullable(clientContactPerson).isPresent()) {
+        if (Optional.ofNullable(clientContactPerson).isPresent()) {
             households.add(clientId);
             clientGraphRepository.removeClientContactPersonRelationship(households, clientContactPerson.getId());
             clientGraphRepository.removeClientContactPersonStaffRelation(clientContactPerson.getId());
@@ -1631,10 +1655,10 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
     public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip, String moduleId, long parentOrganizationId) {
         Map<String, Object> response = new HashMap<>();
         List<Long> citizenIds = new ArrayList<>();
-        if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()){
+        if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()) {
             List<TaskTypeAggregateResult> taskTypeAggregateResults = taskDemandRestClient.getCitizensByFilters(organizationId, clientFilterDTO);
-        citizenIds.addAll(taskTypeAggregateResults.stream().map(taskTypeAggregateResult -> taskTypeAggregateResult.getId()).collect(Collectors.toList()));
-    }
+            citizenIds.addAll(taskTypeAggregateResults.stream().map(taskTypeAggregateResult -> taskTypeAggregateResult.getId()).collect(Collectors.toList()));
+        }
         logger.debug("Finding citizen with Id: " + organizationId);
         List<Map> mapList = new ArrayList<>();
 
@@ -1654,9 +1678,9 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
         String imagePath = envConfig.getServerHost() + FORWARD_SLASH;
 
-      mapList.addAll( organizationGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, organizationId, imagePath, skip,moduleId));
+        mapList.addAll(organizationGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, organizationId, imagePath, skip, moduleId));
 
-        Staff staff = staffGraphRepository.getStaffByUserId(UserContext.getUserDetails().getId(),parentOrganizationId);
+        Staff staff = staffGraphRepository.getStaffByUserId(UserContext.getUserDetails().getId(), parentOrganizationId);
         //anil maurya move some business logic in task demand service (task micro service )
         Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), organizationId, mapList);
         response.putAll(responseFromTask);
@@ -1665,34 +1689,34 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
         return response;
     }
 
-    public ClientContactPersonStructuredData updateContactPerson(Long clientId,ContactPersonDTO contactPersonDTO){
+    public ClientContactPersonStructuredData updateContactPerson(Long clientId, ContactPersonDTO contactPersonDTO) {
         Client client = clientGraphRepository.findOne(clientId);
-        if(!Optional.ofNullable(client).isPresent()){
-            exceptionService.dataNotFoundByIdException("message.client.id.notFound",clientId);
+        if (!Optional.ofNullable(client).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.client.id.notFound", clientId);
 
         }
-        deleteContactPersonForService(contactPersonDTO.getServiceTypeId(),clientId);
-        return saveContactPerson(clientId,contactPersonDTO);
+        deleteContactPersonForService(contactPersonDTO.getServiceTypeId(), clientId);
+        return saveContactPerson(clientId, contactPersonDTO);
     }
 
-    private void deleteContactPersonForService(Long organizationServiceId,Long clientId){
-        clientGraphRepository.deleteContactPersonForService(organizationServiceId,clientId);
+    private void deleteContactPersonForService(Long organizationServiceId, Long clientId) {
+        clientGraphRepository.deleteContactPersonForService(organizationServiceId, clientId);
     }
 
-    public ClientPersonalCalenderPrerequisiteDTO getPrerequisiteForPersonalCalender(Long unitId,Long clientId){
+    public ClientPersonalCalenderPrerequisiteDTO getPrerequisiteForPersonalCalender(Long unitId, Long clientId) {
 
-        Organization organization = organizationGraphRepository.findOne(unitId,0);
-        if(!Optional.ofNullable(organization).isPresent()){
-            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound",unitId);
+        Organization organization = organizationGraphRepository.findOne(unitId, 0);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.client.organisation.notFound", unitId);
 
         }
 
         List<Map<String, Object>> temporaryAddressList = FormatUtil.formatNeoResponse(clientGraphRepository.getClientTemporaryAddressById(clientId));
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(organization.getId(),organization.getTimeSlotMode(),
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(organization.getId(), organization.getTimeSlotMode(),
                 new Date());
         List<ClientExceptionTypesDTO> clientExceptionTypesDTOS = clientExceptionRestClient.getClientExceptionTypes();
         ClientPersonalCalenderPrerequisiteDTO clientPersonalCalenderPrerequisiteDTO = new ClientPersonalCalenderPrerequisiteDTO(clientExceptionTypesDTOS,
-                temporaryAddressList,timeSlotWrappers);
+                temporaryAddressList, timeSlotWrappers);
         return clientPersonalCalenderPrerequisiteDTO;
     }
 

@@ -1,6 +1,8 @@
 package com.kairos.service.client;
 
 import com.kairos.config.env.EnvConfig;
+import com.kairos.persistence.model.client.query_results.ClientAddressQueryResult;
+import com.kairos.persistence.model.client.query_results.ClientTempAddressQueryResult;
 import com.kairos.user.organization.AddressDTO;
 import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.country.HousingType;

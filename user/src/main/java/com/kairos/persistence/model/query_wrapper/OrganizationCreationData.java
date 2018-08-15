@@ -3,8 +3,8 @@ package com.kairos.persistence.model.query_wrapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
-import com.kairos.persistence.model.country.common.BusinessType;
-import com.kairos.persistence.model.country.common.CompanyCategory;
+import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.organization.Level;
 import org.springframework.data.neo4j.annotation.QueryResult;
 

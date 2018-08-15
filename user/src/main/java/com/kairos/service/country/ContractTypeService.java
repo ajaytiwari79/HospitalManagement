@@ -1,5 +1,5 @@
 package com.kairos.service.country;
-import com.kairos.persistence.model.country.common.ContractType;
+import com.kairos.persistence.model.country.default_data.ContractType;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.repository.user.country.ContractTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

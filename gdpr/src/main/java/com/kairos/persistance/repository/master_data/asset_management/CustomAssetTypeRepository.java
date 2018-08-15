@@ -14,8 +14,7 @@ public interface CustomAssetTypeRepository {
 
     AssetTypeResponseDTO getCountryAssetTypesWithSubAssetTypes(Long countryId, BigInteger id);
 
-    AssetType findByNameAndOrganziationId(Long organizationId,String name);
-
+    AssetType findByNameAndOrganizationId(Long organizationId,String name);
 
     List<AssetTypeResponseDTO> getAllOrganizationAssetTypesWithSubAssetTypes(Long organizationId);
 

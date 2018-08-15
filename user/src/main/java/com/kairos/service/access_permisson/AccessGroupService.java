@@ -26,7 +26,8 @@ import com.kairos.user.access_permission.AccessPermissionDTO;
 import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.util.DateUtil;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.DateUtils;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -516,6 +517,10 @@ public class AccessGroupService extends UserBaseService {
 
 
     public AccessGroup createCountryAccessGroup(long countryId, CountryAccessGroupDTO accessGroupDTO) {
+
+        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory()) && accessGroupDTO.getAccountTypes().isEmpty()) {
+            exceptionService.actionNotPermittedException("message.accountType.select");
+        }
         Country country = countryGraphRepository.findOne(countryId);
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName().trim(), accessGroupDTO.getOrganizationCategory().toString());
         if ( isAccessGroupExistWithSameName ) {
@@ -523,8 +528,8 @@ public class AccessGroupService extends UserBaseService {
 
         }
         AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole());
-        accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
-        accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+        accessGroup.setCreationDate(DateUtils.getCurrentDayStartMillis());
+        accessGroup.setLastModificationDate(DateUtils.getCurrentDayStartMillis());
 
         CountryAccessGroupRelationship accessGroupRelationship = new CountryAccessGroupRelationship(country, accessGroup, accessGroupDTO.getOrganizationCategory());
         accessGroupRelationship.setCreationDate(DateUtil.getCurrentDate().getTime());

@@ -204,9 +204,10 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     @Query("MATCH (o:Organization)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(a:AccessGroup{deleted:false}) WHERE id(o)={0} AND LOWER(a.name) = LOWER({1}) AND NOT(id(a) = {2}) return COUNT(a)>0 ")
     Boolean isOrganizationAccessGroupExistWithNameExceptId(Long orgId, String name, Long accessGroupId);
 
-    @Query("OPTIONAL MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'HUB'}]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} WITH COUNT(r) as hubCount\n" +
-            "OPTIONAL MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'UNION'}]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} WITH COUNT(r) as unionCount, hubCount\n" +
-            "OPTIONAL MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'ORGANIZATION'}]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} RETURN  COUNT(r) as organizationCount, hubCount, unionCount")
+    @Query("MATCH (c:Country) WHERE id(c)={0}\n" +
+            "OPTIONAL MATCH (c)-[r:HAS_ACCESS_GROUP{organizationCategory:'HUB'}]-(a:AccessGroup{deleted:false})  WITH COUNT(r) as HUB\n" +
+            "OPTIONAL MATCH (c)-[r:HAS_ACCESS_GROUP{organizationCategory:'UNION'}]-(a:AccessGroup{deleted:false})  WITH COUNT(r) as UNION, HUB\n" +
+            "OPTIONAL MATCH (c)-[orgRel:HAS_ACCESS_GROUP{organizationCategory:'ORGANIZATION'}]-(a:AccessGroup{deleted:false})  RETURN  COUNT(orgRel) as ORGANIZATION, HUB, UNION")
     AccessGroupCountQueryResult getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId);
 
     @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1} \n" +
