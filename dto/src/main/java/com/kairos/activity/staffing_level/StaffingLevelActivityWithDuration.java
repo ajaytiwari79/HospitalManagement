@@ -81,6 +81,6 @@ public class StaffingLevelActivityWithDuration {
         this.maxNoOfStaff = staffingLevelActivityWithDuration.maxNoOfStaff;
         this.underStaffingOverStaffingCount = staffingLevelActivityWithDuration.underStaffingOverStaffingCount;
         this.name = staffingLevelActivityWithDuration.getName();
-        this.staffingLevelDuration.setFrom(staffingLevelActivityWithDuration.getStaffingLevelDuration().getFrom()) ;
+        this.staffingLevelDuration = new Duration(staffingLevelActivityWithDuration.getStaffingLevelDuration().getFrom(),null) ;
     }
 }

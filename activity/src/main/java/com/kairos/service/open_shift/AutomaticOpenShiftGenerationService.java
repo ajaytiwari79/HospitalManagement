@@ -14,6 +14,7 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
+import java.util.Collections;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -45,12 +46,12 @@ public class AutomaticOpenShiftGenerationService {
     public void findUnderStaffingByActivityId(Long unitId) {
 
         List<OpenShiftRuleTemplateDTO> openShiftRuleTemplates = openShiftRuleTemplateRepository.findOpenShiftRuleTemplatesWithInterval(unitId);
-        Map<LocalDate,Set<BigInteger>> dateActivityIdsMap = new HashMap<LocalDate,Set<BigInteger>>();
+        Map<LocalDate,Set<Long>> dateActivityIdsMap = new HashMap<>();
 
         Map<LocalDate,Set<Shift>> shiftsLocalDateMap = new HashMap<LocalDate, Set<Shift>>();
         for(OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO: openShiftRuleTemplates) {
             List<LocalDate> localDates = getDate(openShiftRuleTemplateDTO.getOpenShiftInterval(),"Asia/Kolkata");
-            Set<BigInteger> activityIds = openShiftRuleTemplateDTO.getActivitiesPerTimeTypes().stream().map(activitiesPerTimeType -> activitiesPerTimeType.getSelectedActivities()).flatMap(selectedActivities->selectedActivities.stream()).collect(Collectors.toSet());
+            Set<Long> activityIds = openShiftRuleTemplateDTO.getActivitiesPerTimeTypes().stream().map(activitiesPerTimeType -> activitiesPerTimeType.getSelectedActivities()).flatMap(selectedActivities->selectedActivities.stream().map(BigInteger::longValue)).collect(Collectors.toSet());
 
             for(LocalDate localDate: localDates) {
                 if(!dateActivityIdsMap.containsKey(localDate)) {
@@ -87,7 +88,11 @@ public class AutomaticOpenShiftGenerationService {
         for(StaffingLevel staffingLevel:staffingLevels) {
 
             staffingLevelIntervalActivityIdMap = new HashMap<Long,List<StaffingLevelActivityWithDuration>>();
-            Set<BigInteger> activityIds = dateActivityIdsMap.get(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()));
+            Set<Long> activityIds = dateActivityIdsMap.get(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()));
+            List<StaffingLevelActivityWithDuration> activityWithDurationsList = staffingLevel.getPresenceStaffingLevelInterval().stream().flatMap((StaffingLevelInterval currentInterval) -> currentInterval.getStaffingLevelActivities().stream()
+                    .map((StaffingLevelActivity currentActivity) -> new StaffingLevelActivityWithDuration(currentActivity.getActivityId(), currentActivity.getMinNoOfStaff(), currentActivity.getMaxNoOfStaff(), currentInterval.getStaffingLevelDuration()))
+            ).collect(Collectors.toList());
+
             Map<Long, List<StaffingLevelActivityWithDuration>> activityWithDuration =
                     staffingLevel.getPresenceStaffingLevelInterval().stream().
                             flatMap((StaffingLevelInterval currentInterval) -> currentInterval.getStaffingLevelActivities().stream()
@@ -97,7 +102,12 @@ public class AutomaticOpenShiftGenerationService {
 
             for(Map.Entry<Long,List<StaffingLevelActivityWithDuration>>entry:activityWithDuration.entrySet()) {
                Set<Shift> shiftsLocal =  shiftsLocalDateMap.get(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()));
-               shiftsLocal.stream().filter(shift -> shift.getActivityId().equals(BigInteger.valueOf(entry.getKey())));
+               if(Optional.ofNullable(shiftsLocal).isPresent()){
+                   shiftsLocal.stream().filter(shift -> shift.getActivityId().equals(BigInteger.valueOf(entry.getKey())));
+               }
+               else {
+                   shiftsLocal = Collections.emptySet();
+               }
 
                List<StaffingLevelActivityWithDuration> filteredActivityWithDurations = new ArrayList<>();
                int currentCount = 0;
@@ -127,7 +137,7 @@ public class AutomaticOpenShiftGenerationService {
                             staffingLevelActivityWithDuration.setUnderStaffingOverStaffingCount(min - count);
                         }
 
-                        if(filteredActivityWithDurations.isEmpty()) {
+                        if(filteredActivityWithDurations.isEmpty()&&!Optional.ofNullable(filteredActivityWithDuration).isPresent()) {
                             filteredActivityWithDuration = new StaffingLevelActivityWithDuration(staffingLevelActivityWithDuration);
                             currentCount = staffingLevelActivityWithDuration.getUnderStaffingOverStaffingCount();
 
@@ -169,13 +179,13 @@ public class AutomaticOpenShiftGenerationService {
     public List<LocalDate> getDate(OpenShiftInterval openShiftInterval,String timezone) {
 
         List<LocalDate> localDates = new ArrayList<LocalDate>();
-        if (openShiftInterval.getType().equals("DAYS")) {
+        if (openShiftInterval.getType().toString().equals("DAYS")) {
             for (int i = openShiftInterval.getFrom(); i <= openShiftInterval.getTo(); i++) {
-                localDates.add(LocalDate.now().atStartOfDay(ZoneId.of(timezone)).plusDays(i).toLocalDate());
+                localDates.add(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).plusDays(i).toLocalDate());
             }
         } else {
-            LocalDate localDate1 = LocalDateTime.now().plusHours(openShiftInterval.getFrom()).atZone(ZoneId.of(timezone)).toLocalDate();
-            LocalDate localDate2 = LocalDateTime.now().plusHours(openShiftInterval.getTo()).atZone(ZoneId.of(timezone)).toLocalDate();
+            LocalDate localDate1 = LocalDateTime.now().plusHours(openShiftInterval.getFrom()).atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate localDate2 = LocalDateTime.now().plusHours(openShiftInterval.getTo()).atZone(ZoneId.systemDefault()).toLocalDate();
             if (localDate1.equals(localDate2)) {
                 localDates.add(localDate1);
             } else {

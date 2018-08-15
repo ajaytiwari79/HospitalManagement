@@ -21,6 +21,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -33,6 +34,7 @@ import java.util.regex.Pattern;
 
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+
 
 public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepository {
     @Inject

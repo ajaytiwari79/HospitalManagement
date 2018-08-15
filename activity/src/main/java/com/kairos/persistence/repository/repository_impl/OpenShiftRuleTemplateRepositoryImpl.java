@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -15,6 +16,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.look
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
+@Repository
 public class OpenShiftRuleTemplateRepositoryImpl implements CustomOpenShiftRuleTemplateRepository {
 
     @Inject
