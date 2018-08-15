@@ -1,5 +1,6 @@
 package com.kairos.controller.staffing_level;
 
+import com.kairos.activity.staffing_level.StaffingLevelFromTemplateDTO;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
@@ -161,8 +162,8 @@ public class StaffingLevelController {
 
     @RequestMapping(value = "/from_staffing_level_template/{staffingLevelTemplateId}", method = RequestMethod.POST)
     @ApiOperation("Create staffing_level from StaffingLevelTemplate")
-    public ResponseEntity<Map<String, Object>> addStaffingLevelFromStaffingLevelTemplate(@PathVariable Long unitId,@PathVariable BigInteger staffingLevelTemplateId,) {
+    public ResponseEntity<Map<String, Object>> addStaffingLevelFromStaffingLevelTemplate(@PathVariable Long unitId, @PathVariable BigInteger staffingLevelTemplateId, @RequestBody StaffingLevelFromTemplateDTO staffingLevelFromTemplateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                staffingLevelService.addStaffingLevelFromStaffingLevelTemplate(unitId,staffingLevelTemplateId));
+                staffingLevelService.addStaffingLevelFromStaffingLevelTemplate(unitId,staffingLevelTemplateId, staffingLevelFromTemplateDTO));
     }
 }

@@ -27,6 +27,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.user.country.day_type.DayType;
 import com.kairos.user.organization.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.util.DateUtils;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.event.ShiftNotificationEvent;
 import com.kairos.util.serviceutil.StaffingLevelUtil;
 import com.kairos.util.timeCareShift.Transstatus;
@@ -905,43 +906,34 @@ public class StaffingLevelService extends MongoBaseService {
 
     }
 
-    public PresenceStaffingLevelDto addStaffingLevelFromStaffingLevelTemplate(Long unitId,BigInteger staffingLevelTemplateId) {
+    public List<StaffingLevel> addStaffingLevelFromStaffingLevelTemplate(Long unitId,BigInteger staffingLevelTemplateId,StaffingLevelFromTemplateDTO staffingLevelFromTemplateDTO) {
         logger.debug("saving staffing level organizationId {}", unitId);
+
+        List<StaffingLevel> staffingLevels=new ArrayList<>();
+        Set<BigInteger> activityIds=new HashSet<>();
 
         StaffingLevelTemplate staffingLevelTemplate=staffingLevelTemplateRepository.findByIdAndUnitIdAndDeletedFalse(staffingLevelTemplateId,unitId);
         if(!Optional.ofNullable(staffingLevelTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("data.Not.found",staffingLevelTemplateId);
         }
-        StaffingLevel staffingLevel = null;
-        staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalseCustom(unitId, DateUtils.onlyDate(presenceStaffingLevelDTO.getCurrentDate()));
+        staffingLevelTemplate.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> staffingLevelInterval.getStaffingLevelActivities().forEach(activity->{
+            activityIds.add(activity.getActivityId());
+        }));
 
-        if (Optional.ofNullable(staffingLevel).isPresent()) {
-            if (staffingLevel.getPresenceStaffingLevelInterval().isEmpty()) {
-                List<StaffingLevelInterval> presenceStaffingLevelIntervals = new ArrayList<StaffingLevelInterval>();
-                for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
-                    StaffingLevelInterval presenceStaffingLevelInterval = new StaffingLevelInterval(staffingLevelTimeSlotDTO.getSequence(), staffingLevelTimeSlotDTO.getMinNoOfStaff(),
-                            staffingLevelTimeSlotDTO.getMaxNoOfStaff(), staffingLevelTimeSlotDTO.getStaffingLevelDuration()
-                    );
-                    presenceStaffingLevelInterval.addStaffLevelActivity(staffingLevelTimeSlotDTO.getStaffingLevelActivities());
-                    presenceStaffingLevelInterval.addStaffLevelSkill(staffingLevelTimeSlotDTO.getStaffingLevelSkills());
-                    presenceStaffingLevelIntervals.add(presenceStaffingLevelInterval);
-                }
-                staffingLevel.setPresenceStaffingLevelInterval(presenceStaffingLevelIntervals);
-            } else {
-                exceptionService.duplicateDataException("message.stafflevel.currentdate",presenceStaffingLevelDTO.getCurrentDate());
-            }
-        } else {
-            staffingLevel = StaffingLevelUtil.buildPresenceStaffingLevels(presenceStaffingLevelDTO, unitId);
+        if(!activityIds.containsAll(staffingLevelFromTemplateDTO.getSelectedActivityIds())){
 
         }
-        this.save(staffingLevel);
-        BeanUtils.copyProperties(staffingLevel, presenceStaffingLevelDTO, new String[]{"presenceStaffingLevelInterval", "absenceStaffingLevelInterval"});
-        presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().stream()
-                .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
-        StaffingLevelPlanningDTO staffingLevelPlanningDTO = new StaffingLevelPlanningDTO(staffingLevel.getId(),staffingLevel.getPhaseId(),staffingLevel.getCurrentDate(),staffingLevel.getWeekCount(),staffingLevel.getStaffingLevelSetting(),staffingLevel.getPresenceStaffingLevelInterval(),null);
-        plannerSyncService.publishStaffingLevel(unitId, staffingLevelPlanningDTO, IntegrationOperation.CREATE);
 
-        return presenceStaffingLevelDTO;
+        staffingLevelTemplate.setId(null);
+
+        List<LocalDate> localDates=staffingLevelFromTemplateDTO.getDatesForCreatingStaffingLevel();
+        localDates.forEach(date -> {
+            staffingLevels.add(ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate,StaffingLevel.class));
+        });
+        if(!staffingLevels.isEmpty()){
+            save(staffingLevels);
+        }
+        return staffingLevels;
     }
 
 }

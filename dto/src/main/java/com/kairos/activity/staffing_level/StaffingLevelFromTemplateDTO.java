@@ -3,8 +3,11 @@ package com.kairos.activity.staffing_level;/*
  *
  */
 
+import com.kairos.util.DateUtils;
+
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 public class StaffingLevelFromTemplateDTO {
@@ -77,7 +80,9 @@ public class StaffingLevelFromTemplateDTO {
         this.selectedActivityIds = selectedActivityIds;
     }
 
-    public Set<LocalDate> getDatesForCreatingStaffingLevel(){
-
+    public List<LocalDate> getDatesForCreatingStaffingLevel(){
+        List<LocalDate> dates= DateUtils.getDates(this.fromDate,this.toDate);
+        dates.removeAll(this.excludedDates);
+        return dates;
     }
 }
