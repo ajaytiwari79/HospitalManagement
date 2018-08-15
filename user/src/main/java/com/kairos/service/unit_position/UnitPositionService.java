@@ -355,15 +355,11 @@ public class UnitPositionService extends UserBaseService {
         }
 
         UnitPosition oldUnitPosition = unitPositionGraphRepository.findOne(unitPositionId);
-        if (!Optional.ofNullable(oldUnitPosition).isPresent()) {
+         if (!Optional.ofNullable(oldUnitPosition).isPresent()) {
 
             exceptionService.dataNotFoundByIdException("message.positionid.notfound", unitPositionId);
 
         }
-        activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId,oldUnitPosition.getEndDateMillis(),oldUnitPosition.getStaff().getId());
-
-
-
         UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(unitPositionId);
         EmploymentQueryResult employmentQueryResult;
         UnitPositionQueryResult unitPositionQueryResult;
@@ -421,6 +417,7 @@ public class UnitPositionService extends UserBaseService {
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
 
         }
+        activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId,unitPositionDTO.getEndLocalDate(),unitPositionDTO.getStaffId());
         Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO.getStaffId(),
                 unitPositionDTO.getEndLocalDate() != null ? DateUtil.getDateFromEpoch(unitPositionDTO.getEndLocalDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupIdOnEmploymentEnd());
         Long reasonCodeId = Optional.ofNullable(employment.getReasonCode()).isPresent() ? employment.getReasonCode().getId() : null;
