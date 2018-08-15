@@ -3,7 +3,6 @@ package com.kairos.service.open_shift;
 import com.kairos.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.staffing_level.StaffingLevelActivityWithDuration;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.open_shift.OpenShiftInterval;
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
@@ -15,10 +14,9 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
-import org.bouncycastle.util.test.FixedSecureRandom;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -28,6 +26,7 @@ import java.util.stream.Collectors;
 import java.math.BigInteger;
 import java.util.stream.Stream;
 
+@Component
 public class AutomaticOpenShiftGenerationService {
 
     @Inject
@@ -45,7 +44,7 @@ public class AutomaticOpenShiftGenerationService {
 
     public void findUnderStaffingByActivityId(Long unitId) {
 
-        List<OpenShiftRuleTemplateDTO> openShiftRuleTemplates = openShiftRuleTemplateRepository.findOpenShiftRuleTemplatesWithIntervalByUnitID(unitId);
+        List<OpenShiftRuleTemplateDTO> openShiftRuleTemplates = openShiftRuleTemplateRepository.findOpenShiftRuleTemplatesWithInterval(unitId);
         Map<LocalDate,Set<BigInteger>> dateActivityIdsMap = new HashMap<LocalDate,Set<BigInteger>>();
 
         Map<LocalDate,Set<Shift>> shiftsLocalDateMap = new HashMap<LocalDate, Set<Shift>>();
@@ -63,6 +62,7 @@ public class AutomaticOpenShiftGenerationService {
                 }
             }
         }
+        //TODO compile list of localdates in the previous loop itself
         List<LocalDate> localDates =  openShiftRuleTemplates.stream().map(openShiftRuleTemplateDTO -> getDate(openShiftRuleTemplateDTO.getOpenShiftInterval(),
                 "")).flatMap(localDatesStream -> localDatesStream.stream()).collect(Collectors.toList());
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDate(unitId,localDates);
@@ -78,15 +78,18 @@ public class AutomaticOpenShiftGenerationService {
                 insertInShiftsLocalDateMap(shiftsLocalDateMap, localDate2, shift);
             }
         }
+        Map<Long,List<StaffingLevelActivityWithDuration>> staffingLevelIntervalActivityIdMap = new HashMap<Long,List<StaffingLevelActivityWithDuration>>();
+        Map<LocalDate,Map<Long,List<StaffingLevelActivityWithDuration>>> dateFilteredActivityWithDurationsMap = new HashMap<>();
+
 
 
 
         for(StaffingLevel staffingLevel:staffingLevels) {
 
+            staffingLevelIntervalActivityIdMap = new HashMap<Long,List<StaffingLevelActivityWithDuration>>();
             Set<BigInteger> activityIds = dateActivityIdsMap.get(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()));
             Map<Long, List<StaffingLevelActivityWithDuration>> activityWithDuration =
-                    staffingLevel.getPresenceStaffingLevelInterval().stream().filter(staffingLevelInterval ->
-                            (staffingLevelInterval.getMaxNoOfStaff() > 0)).
+                    staffingLevel.getPresenceStaffingLevelInterval().stream().
                             flatMap((StaffingLevelInterval currentInterval) -> currentInterval.getStaffingLevelActivities().stream()
                                     .filter((staffingLevelActivity -> activityIds.contains(staffingLevelActivity.getActivityId())))
                                     .map((StaffingLevelActivity currentActivity) -> new StaffingLevelActivityWithDuration(currentActivity.getActivityId(), currentActivity.getMinNoOfStaff(), currentActivity.getMaxNoOfStaff(), currentInterval.getStaffingLevelDuration()))
@@ -98,6 +101,8 @@ public class AutomaticOpenShiftGenerationService {
 
                List<StaffingLevelActivityWithDuration> filteredActivityWithDurations = new ArrayList<>();
                int currentCount = 0;
+                StaffingLevelActivityWithDuration filteredActivityWithDuration =  null;
+                StaffingLevelActivityWithDuration lastStaffingLevelActivityWithDuration = null;
 
                for(StaffingLevelActivityWithDuration staffingLevelActivityWithDuration : entry.getValue()) {
                     ZonedDateTime startDate = ZonedDateTime.ofInstant(staffingLevel.getCurrentDate().toInstant(), ZoneId.systemDefault()).with(staffingLevelActivityWithDuration.getStaffingLevelDuration().getFrom());
@@ -122,7 +127,6 @@ public class AutomaticOpenShiftGenerationService {
                             staffingLevelActivityWithDuration.setUnderStaffingOverStaffingCount(min - count);
                         }
 
-                   StaffingLevelActivityWithDuration filteredActivityWithDuration =  null;
                         if(filteredActivityWithDurations.isEmpty()) {
                             filteredActivityWithDuration = new StaffingLevelActivityWithDuration(staffingLevelActivityWithDuration);
                             currentCount = staffingLevelActivityWithDuration.getUnderStaffingOverStaffingCount();
@@ -134,10 +138,15 @@ public class AutomaticOpenShiftGenerationService {
                                 filteredActivityWithDurations.add(filteredActivityWithDuration);
                                 filteredActivityWithDuration = new StaffingLevelActivityWithDuration(staffingLevelActivityWithDuration);
                                 currentCount = staffingLevelActivityWithDuration.getUnderStaffingOverStaffingCount();
-
                             }
+
                         }
+                        lastStaffingLevelActivityWithDuration = staffingLevelActivityWithDuration;
                 }
+                filteredActivityWithDuration.getStaffingLevelDuration().setTo(lastStaffingLevelActivityWithDuration.getStaffingLevelDuration().getTo());
+                filteredActivityWithDurations.add(filteredActivityWithDuration);
+                staffingLevelIntervalActivityIdMap.put(entry.getKey(),filteredActivityWithDurations);
+                dateFilteredActivityWithDurationsMap.put(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()), staffingLevelIntervalActivityIdMap);
 
             }
 

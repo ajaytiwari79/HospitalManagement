@@ -1,5 +1,6 @@
 package com.kairos.controller.open_shift;
 
+import com.kairos.service.open_shift.AutomaticOpenShiftGenerationService;
 import com.kairos.service.open_shift.OpenShiftService;
 import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.util.response.ResponseHandler;
@@ -25,6 +26,8 @@ public class OpenShiftController {
 
     @Inject
     OpenShiftService openShiftService;
+    @Inject
+    AutomaticOpenShiftGenerationService automaticOpenShiftGenerationService;
 
 
     @RequestMapping(value = "/order/{orderId}/openshifts", method = RequestMethod.POST)
@@ -78,5 +81,13 @@ public class OpenShiftController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> notifyStaff(@PathVariable Long unitId, @PathVariable BigInteger openShiftId, @RequestBody List<Long> staffIds,@RequestParam("action") String action) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftService.notifyStaff(unitId,openShiftId,staffIds,action));
+    }
+
+    @ApiOperation(value = "Automatic openshift genration")
+    @RequestMapping(value = "open_shift/automatic_openshift_genration", method = RequestMethod.POST)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> automaticOpenShiftGenration(@PathVariable Long unitId) {
+        automaticOpenShiftGenerationService.findUnderStaffingByActivityId(unitId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 }

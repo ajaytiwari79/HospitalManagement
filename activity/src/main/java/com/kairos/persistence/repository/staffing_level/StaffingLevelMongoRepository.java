@@ -20,7 +20,7 @@ public interface StaffingLevelMongoRepository extends MongoBaseRepository<Staffi
     List<StaffingLevel> findByUnitIdAndCurrentDateBetweenAndDeletedFalse(Long unitId, Date startDate, Date endDate);
     @Query("{deleted:false,unitId:?0,currentDate:{$gte:?1,$lte:?2}}")
     List<StaffingLevel> findByUnitIdAndCurrentDate(Long unitId, Date startDate, Date endDate);
-    @Query("{deleted:false,unitId:?0,currentDate:{$in:localDates}}")
+    @Query("{deleted:false,unitId:?0,currentDate:{$in:?1}}")
     List<StaffingLevel>findByUnitIdAndCurrentDate(Long unitId, List<LocalDate>localDates);
 
 }

@@ -24,10 +24,10 @@ public class OpenShiftIntervalService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     public OpenShiftIntervalDTO createInterval(Long countryId, OpenShiftIntervalDTO openShiftIntervalDTO) {
-        boolean isIntervalInValid= openShiftIntervalRepository.isIntervalInValid(openShiftIntervalDTO.getFrom(),openShiftIntervalDTO.getTo(),null);
+        /*boolean isIntervalInValid= openShiftIntervalRepository.isIntervalInValid(openShiftIntervalDTO.getFrom(),openShiftIntervalDTO.getTo(),null);
         if(isIntervalInValid){
             exceptionService.actionNotPermittedException("exception.overlap.interval");
-        }
+        }*/
         OpenShiftInterval openShiftInterval = new OpenShiftInterval();
         ObjectMapperUtils.copyProperties(openShiftIntervalDTO, openShiftInterval);
         save(openShiftInterval);
