@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.counter;
 
-import com.kairos.activity.enums.counter.Module;
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.activity.counter.FilterCriteria;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -23,7 +23,7 @@ public class Counter extends MongoBaseEntity {
     private BigInteger primaryCounter;
     private BigInteger categoryId;
     private List<FilterCriteria> criteriaList;
-    private Set<Module> supportedModules =Collections.singleton(Module.OPEN_SHIFT);
+    private Set<ModuleType> supportedModuleTypes =Collections.singleton(ModuleType.OPEN_SHIFT);
 
     public Counter() {
         //Default Constructor
@@ -40,12 +40,12 @@ public class Counter extends MongoBaseEntity {
         this.title = title;
     }
 
-    public Counter(String title, CounterType type,boolean treatAsCounter, BigInteger primaryCounter, Set<Module> supportedModules) {
+    public Counter(String title, CounterType type,boolean treatAsCounter, BigInteger primaryCounter, Set<ModuleType> supportedModuleTypes) {
         this.type = type;
         this.title = title;
         this.treatAsCounter = treatAsCounter;
         this.primaryCounter = primaryCounter;
-        this.supportedModules = supportedModules;
+        this.supportedModuleTypes = supportedModuleTypes;
     }
 
     public Counter(CounterType restingHoursPerPresenceDay, List<FilterCriteria> criteriaList) {
@@ -100,11 +100,11 @@ public class Counter extends MongoBaseEntity {
         this.categoryId = categoryId;
     }
 
-    public Set<Module> getSupportedModules() {
-        return supportedModules;
+    public Set<ModuleType> getSupportedModuleTypes() {
+        return supportedModuleTypes;
     }
 
-    public void setSupportedModules(Set<Module> supportedModules) {
-        this.supportedModules = supportedModules;
+    public void setSupportedModuleTypes(Set<ModuleType> supportedModuleTypes) {
+        this.supportedModuleTypes = supportedModuleTypes;
     }
 }

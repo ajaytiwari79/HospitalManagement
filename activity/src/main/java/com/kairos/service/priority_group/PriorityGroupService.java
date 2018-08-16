@@ -1,6 +1,6 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.activity.enums.counter.Module;
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.activity.counter.CounterDTO;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
@@ -57,7 +57,7 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroupWrapper findAllPriorityGroups(long countryId) {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByCountryIdAndDeletedFalseAndRuleTemplateIdIsNull(countryId);
         PriorityGroupDefaultData priorityGroupDefaultData=genericIntegrationService.getExpertiseAndEmployment(countryId);
-        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(Module.OPEN_SHIFT);
+        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new PriorityGroupWrapper(new PriorityGroupDefaultData(priorityGroupDefaultData.getEmploymentTypes(),priorityGroupDefaultData.getExpertises(),counters)
                                         ,priorityGroupDTOS);
     }
@@ -111,7 +111,7 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroupWrapper getPriorityGroupsOfUnit(long unitId) {
         List<PriorityGroupDTO> priorityGroupDTOS=priorityGroupRepository.getAllByUnitIdAndDeletedFalseAndRuleTemplateIdIsNullAndOrderIdIsNull(unitId);
         PriorityGroupDefaultData priorityGroupDefaultData=genericIntegrationService.getExpertiseAndEmploymentForUnit(unitId);
-        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(Module.OPEN_SHIFT);
+        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new PriorityGroupWrapper(new PriorityGroupDefaultData(priorityGroupDefaultData.getEmploymentTypes(),priorityGroupDefaultData.getExpertises(),counters),priorityGroupDTOS);
 
     }
