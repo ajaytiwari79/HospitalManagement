@@ -47,8 +47,6 @@ public class MasterAssetServiceTest {
 
     private BigInteger createdId;
 
-    private BigInteger assetTypeId;
-
 
     @Test
     public void test_createMasterAsset() throws Exception {
@@ -58,7 +56,7 @@ public class MasterAssetServiceTest {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<List<AssetTypeResponseDTO>>> assetResponse = restTemplate.exchange(
                 baseUrl + "/asset_type/all", HttpMethod.GET, null, assetTypeReference);
-        assetTypeId = assetResponse.getBody().getData().get(0).getId();
+        BigInteger assetTypeId = assetResponse.getBody().getData().get(0).getId();
         MasterAssetDTO assetDTO = new MasterAssetDTO();
         assetDTO.setName("Unique name Asset");
         assetDTO.setDescription("asset abc description ");
@@ -128,7 +126,6 @@ public class MasterAssetServiceTest {
         if (organizationId != null && unitId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId)
                     .append("/unit/").append(unitId).toString();
-            ;
             return baseUrl;
         } else if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId).toString();

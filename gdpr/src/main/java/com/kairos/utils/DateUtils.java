@@ -149,6 +149,7 @@ public class DateUtils {
         return date;
     }
 
+    @SuppressWarnings("deprecation")
     public static Date convertToOnlyDateTimeWithDateProvided(String receivedDate, long timestampedDate) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(MONGODB_QUERY_DATE_FORMAT);
 
