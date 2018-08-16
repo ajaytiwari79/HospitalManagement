@@ -1,6 +1,6 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.Module;
+import com.kairos.activity.enums.counter.Module;
 import com.kairos.activity.counter.CounterDTO;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
