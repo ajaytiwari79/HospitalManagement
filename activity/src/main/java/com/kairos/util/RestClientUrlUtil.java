@@ -1,6 +1,6 @@
 package com.kairos.util;
 
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
