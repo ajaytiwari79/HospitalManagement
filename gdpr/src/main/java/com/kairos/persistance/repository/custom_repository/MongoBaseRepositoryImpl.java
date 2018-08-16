@@ -20,7 +20,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 
     private final Logger LOGGER = LoggerFactory.getLogger(MongoBaseRepositoryImpl.class);
     private final MongoSequenceRepository mongoSequenceRepository;
-
+    private final MongoEntityInformation<T, ID> entityInformation;
     private final MongoOperations mongoOperations;
 
     public MongoBaseRepositoryImpl(MongoEntityInformation<T, ID> entityInformation,
@@ -28,7 +28,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
         super(entityInformation, mongoOperations);
         // Keep the EntityManager around to used from the newly introduced methods.
         this.mongoOperations = mongoOperations;
-        MongoEntityInformation<T, ID> entityInformation1 = entityInformation;
+        this.entityInformation = entityInformation;
         this.mongoSequenceRepository = new MongoSequenceRepository(mongoOperations);
     }
 
