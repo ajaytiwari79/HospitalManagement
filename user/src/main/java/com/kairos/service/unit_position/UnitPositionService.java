@@ -417,11 +417,13 @@ public class UnitPositionService extends UserBaseService {
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
 
         }
-        activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId,unitPositionDTO.getEndLocalDate(),unitPositionDTO.getStaffId());
+
         Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO.getStaffId(),
                 unitPositionDTO.getEndLocalDate() != null ? DateUtil.getDateFromEpoch(unitPositionDTO.getEndLocalDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupIdOnEmploymentEnd());
         Long reasonCodeId = Optional.ofNullable(employment.getReasonCode()).isPresent() ? employment.getReasonCode().getId() : null;
         employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd());
+        // Deleting All shifts after employment end date
+        activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId,unitPositionDTO.getEndLocalDate(),unitPositionDTO.getStaffId());
         //TODO might remove -- FOR FE compactibility
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.getWTAById(oldUnitPosition.getWorkingTimeAgreementId());
         unitPositionQueryResult.setWorkingTimeAgreement(wtaResponseDTO);
