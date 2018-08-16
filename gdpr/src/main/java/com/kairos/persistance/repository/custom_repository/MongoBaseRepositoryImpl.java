@@ -5,10 +5,14 @@ import com.kairos.persistance.repository.common.MongoSequenceRepository;
 import com.kairos.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
 import org.springframework.util.Assert;
+
+import javax.inject.Inject;
 import java.io.Serializable;
 
 
@@ -50,7 +54,6 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
         if (entity.getCreatedAt() == null) {
             entity.setCreatedAt(DateUtils.getDate());
         }
-
         // Set updatedAt time as current time
         entity.setUpdatedAt(DateUtils.getDate());
         mongoOperations.save(entity);

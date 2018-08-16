@@ -1,11 +1,14 @@
 package com.kairos.service.data_inventory.asset;
 
 import com.kairos.gdpr.data_inventory.AssetDTO;
+import com.kairos.gdpr.data_inventory.AssetRelateProcessingActivityDTO;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
@@ -17,9 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -41,6 +42,9 @@ public class AssetService extends MongoBaseService {
 
     @Inject
     private AssetTypeMongoRepository assetTypeMongoRepository;
+
+    @Inject
+    private ProcessingActivityMongoRepository processingActivityMongoRepository;
 
 
     public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
@@ -117,7 +121,7 @@ public class AssetService extends MongoBaseService {
      * @description method return audit history of asset , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId,int size,int skip)   {
+    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId, int size, int skip) {
 
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class).limit(size).skip(skip);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
@@ -139,15 +143,15 @@ public class AssetService extends MongoBaseService {
 
         Asset asset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
         if (Optional.ofNullable(asset).isPresent() && !assetId.equals(asset.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Asset", assetDTO.getName());
         }
         asset = assetMongoRepository.findByIdAndNonDeleted(organizationId, assetId);
         if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset ", assetId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
         }
         AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset Type", assetDTO.getAssetType());
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetDTO.getAssetType());
 
         } else {
             if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent()) {
@@ -159,6 +163,59 @@ public class AssetService extends MongoBaseService {
         ObjectMapperUtils.copyProperties(assetDTO, asset);
         assetMongoRepository.save(asset);
         return assetDTO;
+    }
+
+
+    public Asset addProcessingActivitiesAndSubProcessingActivitiesToAsset(Long unitId, BigInteger assetId, AssetRelateProcessingActivityDTO assetRelateProcessingActivityDTO) {
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+        }
+        asset.setProcessingActivities(assetRelateProcessingActivityDTO.getProcessingActivities());
+        asset.setSubProcessingActivities(assetRelateProcessingActivityDTO.getSubProcessingActivities());
+        assetMongoRepository.save(asset);
+        return asset;
+    }
+
+
+    public List<ProcessingActivityBasicResponseDTO> getAllRelatedProcessingActivityAndSubProcessingActivities(Long unitId, BigInteger assetId) {
+
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+        }
+
+        Set<BigInteger> processingActivitiesIdList = asset.getProcessingActivities();
+        List<ProcessingActivityBasicResponseDTO> processingActivityResponseDTOList = new ArrayList<>();
+        if (!processingActivitiesIdList.isEmpty()) {
+            processingActivityResponseDTOList = processingActivityMongoRepository.getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(unitId, processingActivitiesIdList);
+            Set<BigInteger> subProcessingActivitiesIdsList = asset.getSubProcessingActivities();
+
+            for (ProcessingActivityBasicResponseDTO processingActivityBasicResponsDTO : processingActivityResponseDTOList) {
+
+                List<ProcessingActivityBasicResponseDTO> subProcessingActivites = processingActivityBasicResponsDTO.getSubProcessingActivities();
+                boolean defaultSelected = true;
+                List<ProcessingActivityBasicResponseDTO> defaultSubProcessingActivityList = new ArrayList<>();
+
+                for (ProcessingActivityBasicResponseDTO subProcessingActivity : subProcessingActivites) {
+                    if (subProcessingActivitiesIdsList.contains(subProcessingActivity.getId())) {
+                        subProcessingActivity.setSelected(true);
+                        defaultSelected = false;
+                    } else if (defaultSelected) {
+                        ProcessingActivityBasicResponseDTO defaultSubProcessingActivity = subProcessingActivity;
+                        defaultSubProcessingActivity.setSelected(true);
+                        defaultSubProcessingActivityList.add(defaultSubProcessingActivity);
+                    }
+                }
+
+                if (defaultSelected) {
+                    processingActivityBasicResponsDTO.setSubProcessingActivities(defaultSubProcessingActivityList);
+                }
+            }
+        }
+        return processingActivityResponseDTOList;
+
+
     }
 
 
