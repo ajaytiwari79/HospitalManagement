@@ -14,7 +14,9 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 
 import java.math.BigInteger;
+import java.util.Map;
 
+import static com.kairos.constants.AppConstant.IS_SUCCESS;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
 
 
@@ -42,10 +44,12 @@ public class ProcessingActivityController {
     @DeleteMapping("/processing_activity/delete/{id}")
     public ResponseEntity<Object> deleteAssetById(@PathVariable Long unitId, @PathVariable BigInteger id) {
 
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization  id can't be Null");
+
+        Map<String, Object> result = processingActivityService.deleteProcessingActivity(unitId, id);
+        if ((boolean) result.get(IS_SUCCESS)) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, result.get("data"));
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.deleteProcessingActivity(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
 
@@ -83,12 +87,19 @@ public class ProcessingActivityController {
 
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/processing_activity/{processingActivityId}/history")
-    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger processingActivityId,@RequestParam(defaultValue = "5") int size,@RequestParam(defaultValue = "0") int skip) {
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger processingActivityId, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int skip) {
 
         if (processingActivityId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityActivitiesHistory(processingActivityId,size,skip));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityActivitiesHistory(processingActivityId, size, skip));
+    }
+
+
+    @ApiOperation(value = "get history of asset or changes done in Asset")
+    @GetMapping("/processing_activity/related")
+    public ResponseEntity<Object> getAllRelatedProcessingActivitiesAndSubProcessingActivities(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityBasicDetailsWithSubProcess(unitId));
     }
 
 
