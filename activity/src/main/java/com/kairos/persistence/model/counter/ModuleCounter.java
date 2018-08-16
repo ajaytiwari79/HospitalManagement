@@ -14,11 +14,11 @@ public class ModuleCounter extends MongoBaseEntity {
     private BigInteger counterId;
     private BigInteger countryId;
 
-    public ModuleCounter(){
+    public ModuleCounter() {
 
     }
 
-    public ModuleCounter(BigInteger countryId, String moduleId, BigInteger counterId){
+    public ModuleCounter(BigInteger countryId, String moduleId, BigInteger counterId) {
         this.counterId = counterId;
         this.moduleId = moduleId;
         this.countryId = countryId;

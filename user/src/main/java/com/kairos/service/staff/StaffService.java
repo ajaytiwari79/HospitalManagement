@@ -10,7 +10,6 @@ import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.TimeSlotType;
-import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.auth.User;
@@ -19,6 +18,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
@@ -85,10 +85,7 @@ import com.kairos.user.employment.employment_dto.EmploymentOverlapDTO;
 import com.kairos.user.employment.employment_dto.MainEmploymentResultDTO;
 import com.kairos.user.staff.StaffWithSkillDTO;
 import com.kairos.user.staff.client.ClientStaffInfoDTO;
-import com.kairos.user.staff.staff.StaffChatDetails;
-import com.kairos.user.staff.staff.StaffCreationDTO;
-import com.kairos.user.staff.staff.StaffDTO;
-import com.kairos.user.staff.staff.StaffPreferencesDTO;
+import com.kairos.user.staff.staff.*;
 import com.kairos.user.user.password.PasswordUpdateDTO;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.util.*;
@@ -2135,7 +2132,6 @@ public class StaffService extends UserBaseService {
 
     public List<StaffPersonalDetail> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
         return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds, DateUtil.getCurrentDateMillis());
-
     }
 
 

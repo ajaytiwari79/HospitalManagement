@@ -1,17 +1,11 @@
-package com.kairos.persistence.model.counter;
-
-import com.kairos.persistence.model.common.MongoBaseEntity;
+package com.kairos.activity.counter.distribution.tab;
 
 import java.math.BigInteger;
 
-public class TabKPIEntry extends MongoBaseEntity {
+public class TabKPIConfDTO {
     private String tabId;
+    private BigInteger kpiAssignmentId;
     private BigInteger kpiId;
-
-    public TabKPIEntry(String tabId, BigInteger kpiId) {
-        this.kpiId = kpiId;
-        this.tabId = tabId;
-    }
 
     public String getTabId() {
         return tabId;
@@ -19,6 +13,14 @@ public class TabKPIEntry extends MongoBaseEntity {
 
     public void setTabId(String tabId) {
         this.tabId = tabId;
+    }
+
+    public BigInteger getKpiAssignmentId() {
+        return kpiAssignmentId;
+    }
+
+    public void setKpiAssignmentId(BigInteger kpiAssignmentId) {
+        this.kpiAssignmentId = kpiAssignmentId;
     }
 
     public BigInteger getKpiId() {
