@@ -15,6 +15,7 @@ import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.persistence.model.time_bank.ShiftTimeBank;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutTransaction;
@@ -198,7 +199,6 @@ public class TimeBankCalculationService {
             Interval shiftInterval = new Interval(new DateTime(shift.getStartDate().getTime()), new DateTime(shift.getEndDate().getTime()));
             if (interval.overlaps(shiftInterval)) {
                 shiftInterval = interval.overlap(shiftInterval);
-                //totalDailyTimebank += dailyScheduledMin;
                 for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
                     if (ruleTemplate.getAccountType() == null) continue;
                     if (ruleTemplate.getAccountType().equals(TIMEBANK_ACCOUNT)) {
