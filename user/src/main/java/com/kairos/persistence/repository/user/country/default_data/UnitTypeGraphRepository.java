@@ -22,7 +22,7 @@ public interface UnitTypeGraphRepository extends Neo4jBaseRepository<UnitType,Lo
             "RETURN id(unitType) as id,unitType.name as name,unitType.description as description" )
     List<UnitTypeQueryResult> getAllUnitTypeOfCountry(Long countryId);
 
-    @Query("(unitType:UnitType{deleted:false}) where id(unitTypeIn)={0} " +
+    @Query("MATCH(unitType:UnitType{deleted:false}) where id(unitType) IN {0} " +
             "RETURN unitType" )
     List<UnitType> getUnitTypeByIds(Set<Long> unitTypeIds);
 }

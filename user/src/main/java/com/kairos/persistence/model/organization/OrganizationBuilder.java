@@ -1,11 +1,13 @@
 package com.kairos.persistence.model.organization;
 
 import com.kairos.enums.OrganizationLevel;
+import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
+import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.user.organization.CompanyType;
@@ -31,7 +33,7 @@ public class OrganizationBuilder {
     private Integer kairosCompanyId;
     private String vatId;
     private List<BusinessType> businessTypes;
-    private List<OrganizationType> organizationTypes;
+    private OrganizationType organizationType;
     private List<OrganizationType> organizationSubTypes;
     private CompanyUnitType companyUnitType;
     private CompanyCategory companyCategory;
@@ -42,6 +44,8 @@ public class OrganizationBuilder {
     private ContactDetail contact;
     private ContactAddress contactAddress;
     private String childLevel;
+    private UnitType unitType;
+    private List<CostTimeAgreement> costTimeAgreements;
 
     public OrganizationBuilder setName(String name) {
         this.name = name;
@@ -123,8 +127,8 @@ public class OrganizationBuilder {
         return this;
     }
 
-    public OrganizationBuilder setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
+    public OrganizationBuilder setOrganizationType(OrganizationType organizationType) {
+        this.organizationType = organizationType;
         return this;
     }
 
@@ -178,9 +182,20 @@ public class OrganizationBuilder {
         return this;
     }
 
+    public OrganizationBuilder setUnitType(UnitType unitType) {
+        this.unitType = unitType;
+        return this;
+    }
+    public OrganizationBuilder setCostTimeAgreements(List<CostTimeAgreement> costTimeAggrements) {
+        this.costTimeAgreements = costTimeAggrements;
+        return this;
+    }
+
+
     public Organization createOrganization() {
         return new  Organization( name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
-                vatId, businessTypes,organizationTypes, organizationSubTypes,  companyUnitType, companyCategory, timeZone);
+                vatId, businessTypes,organizationType, organizationSubTypes,  companyUnitType, companyCategory, timeZone,childLevel,
+        isParentOrganization, country,accountType,boardingCompleted,kairosId,groupList,children,unitType,costTimeAgreements);
     }
 
 }

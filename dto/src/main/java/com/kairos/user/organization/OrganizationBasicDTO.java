@@ -20,7 +20,7 @@ public class OrganizationBasicDTO {
     private String name;
     private String description;
     private boolean preKairos;
-    private List<Long> typeId;
+    private Long typeId;
     private List<Long> subTypeId;
     private List<Long> businessTypeId;
     private AddressDTO contactAddress;
@@ -30,9 +30,7 @@ public class OrganizationBasicDTO {
     private boolean isOneTimeSyncPerformed;
     private LocalTime nightStartTime;
     private LocalTime nightEndTime;
-    private String externalId;
-
-    private String desiredUrl;
+        private String desiredUrl;
     private String shortCompanyName;
     private Long companyCategoryId;
     private Integer kairosCompanyId;
@@ -89,7 +87,7 @@ public class OrganizationBasicDTO {
         this.contactAddress = contactAddress;
     }
 
-    public List<Long> getTypeId() {
+    public Long getTypeId() {
         return typeId;
     }
 
@@ -101,7 +99,7 @@ public class OrganizationBasicDTO {
         return businessTypeId;
     }
 
-    public void setTypeId(List<Long> typeId) {
+    public void setTypeId(Long typeId) {
         this.typeId = typeId;
     }
 
@@ -162,7 +160,7 @@ public class OrganizationBasicDTO {
     }
 
     public String getDesiredUrl() {
-        return desiredUrl;
+        return desiredUrl.trim();
     }
 
     public void setDesiredUrl(String desiredUrl) {
@@ -287,14 +285,6 @@ public class OrganizationBasicDTO {
 
     public void setBoardingCompleted(boolean boardingCompleted) {
         this.boardingCompleted = boardingCompleted;
-    }
-
-    public String getExternalId() {
-        return externalId;
-    }
-
-    public void setExternalId(String externalId) {
-        this.externalId = externalId;
     }
 
     public boolean isPreKairos() {

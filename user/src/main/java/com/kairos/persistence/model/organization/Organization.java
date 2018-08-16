@@ -15,6 +15,7 @@
     import com.kairos.persistence.model.country.default_data.BusinessType;
     import com.kairos.persistence.model.country.default_data.CompanyCategory;
     import com.kairos.persistence.model.country.default_data.ContractType;
+    import com.kairos.persistence.model.country.default_data.UnitType;
     import com.kairos.persistence.model.country.default_data.account_type.AccountType;
     import com.kairos.persistence.model.country.tag.Tag;
     import com.kairos.persistence.model.organization.group.Group;
@@ -102,7 +103,7 @@ public class Organization extends UserBaseEntity {
 
 
     @Relationship(type = TYPE_OF)
-    private List<OrganizationType> organizationTypes;
+    private OrganizationType organizationType;
 
     @Relationship(type = SUB_TYPE_OF)
     private List<OrganizationType> organizationSubTypes;
@@ -227,36 +228,37 @@ public class Organization extends UserBaseEntity {
     private boolean gdprUnit;
     @Relationship(type = HAS_ACCOUNT_TYPE)
     private AccountType accountType;
+
+    @Relationship(type = HAS_UNIT_TYPE)
+    private UnitType unitType;
+
     private String kairosId;
     //set o.nightStartTimeFrom="22:15",o.nightEndTimeTo="07:15"
-    public Organization(String name, List<Group> groupList, List<Organization> children) {
-        this.name = name;
-        this.groupList = groupList;
-        this.children = children;
-    }
 
     public Organization() {
     }
 
-    public Organization(boolean isParentOrganization, Country country,AccountType accountType,CompanyType companyType,boolean boardingCompleted,String kairosId) {
+
+    public Organization(String name,String description,boolean isPrekairos,String desiredUrl,String shortCompanyName,Integer kairosCompanyId,CompanyType companyType,
+          String vatId,List<BusinessType> businessTypes,OrganizationType organizationType,List<OrganizationType> organizationSubTypes,   CompanyUnitType companyUnitType,
+            CompanyCategory companyCategory,ZoneId timeZone,String childLevel,boolean isParentOrganization, Country country,AccountType accountType,boolean boardingCompleted,String kairosId,
+                        List<Group> groupList, List<Organization> children,UnitType unitType,List<CostTimeAgreement> costTimeAgreements) {
+        this.name=name;this.description=description;this.isKairosHub=isPrekairos;
+        this.desiredUrl=desiredUrl;this.shortCompanyName=shortCompanyName;this.kairosCompanyId=kairosCompanyId;this.vatId=vatId;
+        this.businessTypes=businessTypes;this.organizationSubTypes=organizationSubTypes;this.organizationType =organizationType;
+        this.companyType =companyType;this.companyCategory=companyCategory;
+        this.companyUnitType=companyUnitType;
+        this.timeZone=timeZone;this.costTimeAgreements=costTimeAgreements;
+        this.childLevel=childLevel;
         this.isParentOrganization = isParentOrganization;
         this.country = country;
         this.accountType=accountType;
         this.companyType =companyType;
         this.boardingCompleted=boardingCompleted;
         this.kairosId=kairosId;
-    }
-
-
-    public Organization(String name,String description,boolean isPrekairos,String desiredUrl,String shortCompanyName,Integer kairosCompanyId,CompanyType companyType,
-          String vatId,List<BusinessType> businessTypes,List<OrganizationType> organizationTypes,List<OrganizationType> organizationSubTypes,   CompanyUnitType companyUnitType,
-            CompanyCategory companyCategory,ZoneId timeZone) {
-        this.name=name;this.description=description;this.isKairosHub=isPrekairos;
-        this.desiredUrl=desiredUrl;this.shortCompanyName=shortCompanyName;this.kairosCompanyId=kairosCompanyId;this.vatId=vatId;
-        this.businessTypes=businessTypes;this.organizationSubTypes=organizationSubTypes;this.organizationTypes=organizationTypes;
-        this.companyType =companyType;this.companyCategory=companyCategory;
-        this.companyUnitType=companyUnitType;
-        this.timeZone=timeZone;
+            this.groupList = groupList;
+            this.children = children;
+            this.unitType=unitType;
 
     }
 
@@ -300,7 +302,6 @@ public class Organization extends UserBaseEntity {
 
     public Organization(String name, OrganizationSetting organizationSetting, OrganizationLevel organizationLevel, List<Group> groupList) {
         this.name = name;
-
         this.organizationSetting = organizationSetting;
         this.organizationLevel = organizationLevel;
         this.groupList = groupList;
@@ -686,16 +687,16 @@ public class Organization extends UserBaseEntity {
         this.showPersonNames = showPersonNames;
     }
 
-    public List<OrganizationType> getOrganizationTypes() {
-        return Optional.fromNullable(organizationTypes).or(Lists.newArrayList());
+    public OrganizationType getOrganizationType() {
+        return organizationType;
     }
 
     public List<BusinessType> getBusinessTypes() {
         return Optional.fromNullable(businessTypes).or(Lists.newArrayList());
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
+    public void setOrganizationType(OrganizationType organizationType) {
+        this.organizationType = organizationType;
     }
 
     public void setBusinessTypes(List<BusinessType> businessTypes) {
@@ -957,5 +958,13 @@ public class Organization extends UserBaseEntity {
 
     public void setKairosId(String kairosId) {
         this.kairosId = kairosId;
+    }
+
+    public UnitType getUnitType() {
+        return unitType;
+    }
+
+    public void setUnitType(UnitType unitType) {
+        this.unitType = unitType;
     }
 }

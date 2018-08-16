@@ -6,6 +6,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
@@ -637,11 +638,17 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (union:Organization{isEnable:true,union:true})-[:" + BELONGS_TO + "]->(country:Country)  where id(country)={0} return id(union) as id, union.name as name")
     List<UnionQueryResult> findAllUnionsByCountryId(Long countryId);
 
-    @Query("MATCH (org:Organization) where org.desiredUrl={0}\n" +
+    @Query("OPTIONAL MATCH (org:Organization{isEnable:true}) where org.desiredUrl=~{0} with  case when count(org)>0 THEN  true ELSE false END as desiredUrl\n" +
+            "OPTIONAL MATCH (org:Organization{isEnable:true}) where org.name =~{1} with desiredUrl, case when count(org)>0 THEN  true ELSE false END as name\n" +
+            "OPTIONAL match(org:Organization) where org.kairosId STARTS WITH {2}" +
+            "return name,desiredUrl,org.kairosId as kairosId  ORDER BY org.kairosId DESC LIMIT 1")
+    CompanyValidationQueryResult checkOrgExistWithUrlOrUrl(String desiredUrl, String name, String first3Char);
+
+    @Query("MATCH (org:Organization{isEnable:true}) where org.desiredUrl={0}\n" +
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
     Boolean checkOrgExistWithUrl(String desiredUrl);
 
-    @Query("MATCH (org:Organization) where org.name={0}\n" +
+    @Query("MATCH (org:Organization{isEnable:true}) where org.name={0}\n" +
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
     Boolean checkOrgExistWithName(String name);
 
@@ -659,5 +666,5 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("match(org:Organization) where org.kairosId STARTS WITH {0}\n" +
             "return org.kairosId  ORDER BY org.kairosId DESC LIMIT 1")
-    String getKairosId(String first3Char);
+    String getKairosId();
 }

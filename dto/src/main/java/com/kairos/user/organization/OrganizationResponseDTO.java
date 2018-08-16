@@ -15,7 +15,7 @@ public class OrganizationResponseDTO {
     private  boolean kairosHub;
     private  String description;
     private  List<Long> businessTypeIds;
-    private  List<Long> typeId;
+    private  Long typeId;
     private  List<Long> subTypeId;
     private  String externalId;
     private ContactAddressDTO contactAddress;
@@ -84,11 +84,11 @@ public class OrganizationResponseDTO {
         this.businessTypeIds = businessTypeIds;
     }
 
-    public List<Long> getTypeId() {
+    public Long getTypeId() {
         return typeId;
     }
 
-    public void setTypeId(List<Long> typeId) {
+    public void setTypeId(Long typeId) {
         this.typeId = typeId;
     }
 
