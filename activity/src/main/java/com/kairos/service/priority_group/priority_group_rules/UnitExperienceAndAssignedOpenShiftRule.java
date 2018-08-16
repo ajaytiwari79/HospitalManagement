@@ -28,7 +28,7 @@ public class UnitExperienceAndAssignedOpenShiftRule implements PriorityGroupRule
             thresholdShiftCount.set(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned());
 
         }
-        if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned()).isPresent()) {
+        if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getUnitExperienceInWeek()).isPresent()) {
             experienceInDays = priorityGroupDTO.getStaffExcludeFilter().getUnitExperienceInWeek()*7;
         }
         Long startDate = DateUtils.getLongFromLocalDate(LocalDate.now().minusDays(experienceInDays));
