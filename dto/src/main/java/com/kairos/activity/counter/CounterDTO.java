@@ -2,7 +2,7 @@ package com.kairos.activity.counter;
 
 //Created By Pavan on 3/8/18
 
-import com.kairos.ApplicableFor;
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.enums.CounterType;
 
 import java.math.BigInteger;
@@ -17,7 +17,7 @@ public class CounterDTO {
     private BigInteger primaryCounter;
     private BigInteger categoryId;
     private List<FilterCriteria> criteriaList;
-    private Set<ApplicableFor> applicableFor;
+    private Set<ModuleType> supportedModuleTypes;
 
     public CounterDTO() {
         //Default Constructor
@@ -79,11 +79,11 @@ public class CounterDTO {
         this.criteriaList = criteriaList;
     }
 
-    public Set<ApplicableFor> getApplicableFor() {
-        return applicableFor;
+    public Set<ModuleType> getSupportedModuleTypes() {
+        return supportedModuleTypes;
     }
 
-    public void setApplicableFor(Set<ApplicableFor> applicableFor) {
-        this.applicableFor = applicableFor;
+    public void setSupportedModuleTypes(Set<ModuleType> supportedModuleTypes) {
+        this.supportedModuleTypes = supportedModuleTypes;
     }
 }

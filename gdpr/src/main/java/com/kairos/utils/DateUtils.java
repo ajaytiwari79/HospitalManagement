@@ -71,18 +71,16 @@ public class DateUtils {
         DateFormat timeFormat = new SimpleDateFormat("hh:mm:ss Z");
         String timeString = timeFormat.format(time);
         DateFormat f = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss Z");
-        Date completeDate = f.parse(dateString + " " + timeString);
-        return completeDate;
+        return f.parse(dateString + " " + timeString);
     }
 
 
     public static LocalDateTime getMondayFromWeek(int week, int year) {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        LocalDateTime ldt = LocalDateTime.now()
+        return LocalDateTime.now()
                 .withYear(year)
                 .with(weekFields.weekOfYear(), week)
                 .with(weekFields.dayOfWeek(), 2);
-        return ldt;
     }
 
     public static LocalDateTime getSundayFromWeek(int week, int year) {
