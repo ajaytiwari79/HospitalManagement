@@ -35,7 +35,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param organizationId
      * @param masterProcessingActivityDto
@@ -72,7 +71,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param organizationId
      * @param subProcessingActivities
@@ -114,12 +112,13 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *updateExistingAndCreateNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto)
+     * updateExistingAndCreateNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto)
      * is used for updating and creating new sub processing activity
+     *
      * @param countryId
      * @param organizationId
      * @param id
-     * @param masterProcessingActivityDto  contain list of existing(which need to be update) and new(for creating new sub process) Sub processing activities
+     * @param masterProcessingActivityDto contain list of existing(which need to be update) and new(for creating new sub process) Sub processing activities
      * @return master processing activity with sub processing activities list ids
      */
     public MasterProcessingActivityDTO updateMasterProcessingActivityAndSubProcessingActivities(Long countryId, Long organizationId, BigInteger id, MasterProcessingActivityDTO masterProcessingActivityDto) {
@@ -158,7 +157,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param organizationId
      * @param subProcessingActivities
@@ -199,10 +197,9 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param organizationId
-     * @param subProcessingActivities list of existing Sub processing activities
+     * @param subProcessingActivities  list of existing Sub processing activities
      * @param parentProcessingActivity for inheriting organization types,sub types,Service category and Sub service category for sub processing activities
      * @return map which contain list of ids and list of sub processing activities
      */
@@ -251,12 +248,40 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     public Boolean deleteMasterProcessingActivity(Long countryId, Long organizationId, BigInteger id) {
-        MasterProcessingActivity exists = masterProcessingActivityRepository.findByIdAndCountryIdAndNonDeleted(countryId, organizationId, id);
-        if (exists == null) {
+        MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByIdAndCountryIdAndNonDeleted(countryId, organizationId, id);
+        if (processingActivity == null) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
 
         }
-        delete(exists);
+        delete(processingActivity);
+        return true;
+
+    }
+
+
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param processingActivityId
+     * @param subProcessingActivityId
+     * @return
+     */
+    public boolean deleteSubProcessingActivity(Long countryId, Long organizationId, BigInteger processingActivityId, BigInteger subProcessingActivityId) {
+        MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByIdAndCountryIdAndNonDeleted(countryId, organizationId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+        }
+        List<BigInteger> subProcessingActviityIdList = processingActivity.getSubProcessingActivityIds();
+        MasterProcessingActivity subProcessingActivity = masterProcessingActivityRepository.findByIdAndCountryIdAndNonDeleted(countryId, organizationId, subProcessingActivityId);
+        if (!Optional.ofNullable(subProcessingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Processing Activity", subProcessingActivityId);
+
+        } else {
+            subProcessingActviityIdList.remove(subProcessingActivityId);
+            processingActivity.setSubProcessingActivityIds(subProcessingActviityIdList);
+            masterProcessingActivityRepository.save(processingActivity);
+            delete(subProcessingActivity);
+        }
         return true;
 
     }
