@@ -26,7 +26,7 @@ import com.kairos.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.user.organization.OrganizationTypeDTO;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import com.kairos.wrapper.cta.CTATableSettingWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
