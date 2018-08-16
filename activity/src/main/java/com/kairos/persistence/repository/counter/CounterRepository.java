@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.counter;
 
-import com.kairos.activity.enums.counter.Module;
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.activity.counter.*;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.activity.Activity;
@@ -233,8 +233,8 @@ public class CounterRepository {
         mongoTemplate.remove(query, OrgTypeKPIEntry.class);
     }
 
-    public List<CounterDTO> getAllCounterBySupportedModule(Module supportedModule){
-        Query query = new Query(Criteria.where("supportedModules").in(supportedModule).and("deleted").is(false));
+    public List<CounterDTO> getAllCounterBySupportedModule(ModuleType supportedModuleType){
+        Query query = new Query(Criteria.where("supportedModuleTypes").in(supportedModuleType).and("deleted").is(false));
         query.fields().include("id").include("title");
         return ObjectMapperUtils.copyProperties(mongoTemplate.find(query,Counter.class),CounterDTO.class);
     }
