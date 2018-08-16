@@ -289,7 +289,7 @@ public class ProcessingActivityService extends MongoBaseService {
      * @param activityRelatedDataSubjects list of data subject which contain list of data category and data Element list
      * @return
      */
-    public ProcessingActivity mapDataSubjectDataCategoryAndDataElementToProcessingActivity(Long unitId, BigInteger processingActivityId, List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects) {
+    public boolean mapDataSubjectDataCategoryAndDataElementToProcessingActivity(Long unitId, BigInteger processingActivityId, List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects) {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
@@ -298,10 +298,33 @@ public class ProcessingActivityService extends MongoBaseService {
 
         processingActivity.setDataSubjects(activityRelatedDataSubjects);
         processingActivityMongoRepository.save(processingActivity);
-        return processingActivity;
+        return true;
     }
 
+    /**
+     * @param unitId
+     * @param processingActivityId
+     * @param assetId
+     * @return
+     * @description map asset with processing activity (related tab processing activity)
+     */
+    public boolean mapAssetWithProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+        }
+        processingActivity.setAssetId(assetId);
+        processingActivityMongoRepository.save(processingActivity);
+        return true;
 
+    }
+
+    /**
+     * @param unitId
+     * @param processingActivityId
+     * @return
+     * @description map Data Subject ,Data category and Data Element with processing activity(related tab processing activity)
+     */
     public List<DataSubjectMappingResponseDTO> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, BigInteger processingActivityId) {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
@@ -345,7 +368,7 @@ public class ProcessingActivityService extends MongoBaseService {
             dataSubjectMappingResponseDTO.getDataCategories().forEach(dataCategoryResponseDTO -> {
 
                 if (dataElementsCoresspondingToDataCategory.containsKey(dataCategoryResponseDTO.getId())) {
-                    List<DataElementBasicResponseDTO> dataElementBasicResponseDTOS =new ArrayList<>();
+                    List<DataElementBasicResponseDTO> dataElementBasicResponseDTOS = new ArrayList<>();
                     Set<BigInteger> dataELementIdList = dataElementsCoresspondingToDataCategory.get(dataCategoryResponseDTO.getId());
                     dataCategoryResponseDTO.getDataElements().forEach(dataElementBasicResponseDTO -> {
                         if (dataELementIdList.contains(dataElementBasicResponseDTO.getId())) {

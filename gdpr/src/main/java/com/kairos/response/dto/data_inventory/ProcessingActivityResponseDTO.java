@@ -28,6 +28,8 @@ public class ProcessingActivityResponseDTO {
     @NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
 
+    private AssetBasicResponseDTO asset;
+
     private List<ProcessingPurposeResponseDTO> processingPurposes;
 
     private List<DataSourceResponseDTO> dataSources;
@@ -51,6 +53,10 @@ public class ProcessingActivityResponseDTO {
     private Long maxDataSubjectVolume;
 
     private Integer dataRetentionPeriod;
+
+    public AssetBasicResponseDTO getAsset() { return asset; }
+
+    public void setAsset(AssetBasicResponseDTO asset) { this.asset = asset; }
 
     public List<ResponsibilityTypeResponseDTO> getResponsibilityType() { return responsibilityType; }
 

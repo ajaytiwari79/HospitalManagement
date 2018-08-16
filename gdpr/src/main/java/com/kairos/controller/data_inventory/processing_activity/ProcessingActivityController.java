@@ -107,7 +107,7 @@ public class ProcessingActivityController {
 
 
     @ApiOperation(value = "Map Data Subject ,Data Category and data element to  Processing activity ")
-    @PostMapping("/processing_activity/{processingActivityId}/data_subject")
+    @PutMapping("/processing_activity/{processingActivityId}/data_subject")
     public ResponseEntity<Object>  mapDataSubjectToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId,@Valid @RequestBody ValidateRequestBodyList<ProcessingActivityRelatedDataSubject> dataSubjectList) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
@@ -125,4 +125,13 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(unitId, processingActivityId));
     }
 
+
+    @ApiOperation(value = "get all Mapped Data Subject ,Data Category and data element of Processing Activity")
+    @PutMapping("/processing_activity/{processingActivityId}/asset/{assetId}")
+    public ResponseEntity<Object>  linkAssetToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId,@PathVariable BigInteger assetId){
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.mapAssetWithProcessingActivity(unitId, processingActivityId,assetId));
+    }
 }

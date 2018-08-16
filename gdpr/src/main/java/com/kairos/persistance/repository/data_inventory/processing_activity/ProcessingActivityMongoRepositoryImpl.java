@@ -53,8 +53,8 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 lookup("accessor_party", "accessorParties", "_id", "accessorParties"),
                 lookup("dataSource", "dataSources", "_id", "dataSources"),
                 lookup("responsibility_type", "responsibilityType", "_id", "responsibilityType"),
-                lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis")
-
+                lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis"),
+                lookup("asset", "assetId", "_id", "asset")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
@@ -116,23 +116,23 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     @Override
     public List<DataSubjectMappingResponseDTO> getAllMappedDataSubjectWithDataCategoryAndDataElement(Long unitId, List<BigInteger> dataSubjectIds) {
 
-            String addNonDeletedDataElements=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
-            Document addToFieldOperationFilter=Document.parse(addNonDeletedDataElements);
-            Aggregation aggregation = Aggregation.newAggregation(
-                    match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("_id").in(dataSubjectIds)),
-                    lookup("data_category", "dataCategories", "_id", "dataCategories"),
-                    unwind("dataCategories"),
-                    lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
-                    new CustomAggregationOperation(addToFieldOperationFilter),
-                    match(Criteria.where("dataCategories.deleted").is(false)),
-                    group("$id")
-                            .first("name").as("name")
-                            .first("description").as("description")
-                            .first(COUNTRY_ID).as(COUNTRY_ID)
-                            .addToSet("dataCategories").as("dataCategories")
-            );
-            AggregationResults<DataSubjectMappingResponseDTO> result = mongoTemplate.aggregate(aggregation, DataSubjectMapping.class, DataSubjectMappingResponseDTO.class);
-            return result.getMappedResults();
+        String addNonDeletedDataElements = CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
+        Document addToFieldOperationFilter = Document.parse(addNonDeletedDataElements);
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("_id").in(dataSubjectIds)),
+                lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                unwind("dataCategories"),
+                lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                new CustomAggregationOperation(addToFieldOperationFilter),
+                match(Criteria.where("dataCategories.deleted").is(false)),
+                group("$id")
+                        .first("name").as("name")
+                        .first("description").as("description")
+                        .first(COUNTRY_ID).as(COUNTRY_ID)
+                        .addToSet("dataCategories").as("dataCategories")
+        );
+        AggregationResults<DataSubjectMappingResponseDTO> result = mongoTemplate.aggregate(aggregation, DataSubjectMapping.class, DataSubjectMappingResponseDTO.class);
+        return result.getMappedResults();
 
 
     }
