@@ -5,6 +5,9 @@ import com.kairos.activity.shift.ShiftDTO;
 import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
+import com.kairos.activity.shift.CopyShiftDTO;
+import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.util.DateUtils;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,6 +20,8 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -142,4 +147,23 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> createShiftUsingTemplate(@PathVariable Long unitId, @RequestBody ShiftDTO shiftDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShiftUsingTemplate(unitId,shiftDTO));
     }
+    @ApiOperation("delete shifts and update openshifts")
+    @PutMapping(value = "/staff/{staffId}/shifts_and_openshifts")
+    public ResponseEntity<Map<String, Object>> deleteShiftsAndOpenShiftsOnEmploymentEnd(@RequestParam(value = "employmentEndDate")
+                                                                                                    Long employmentEndDate,@PathVariable Long staffId,
+                                                                                        @PathVariable Long unitId) {
+
+        shiftService.deleteShiftsAndOpenShiftsOnEmploymentEnd(staffId, DateUtils.getLocalDatetimeFromLong(employmentEndDate),unitId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null );
+
+    }
+    @ApiOperation("delete all shifts of staff after employment end")
+    @DeleteMapping(value = "/delete_shifts/staff/{staffId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteShiftsAfterEmploymentEndDate(@PathVariable Long unitId,@PathVariable Long staffId,@RequestParam("endDate")String endDate) {
+        shiftService.deleteShiftsAfterEmploymentEndDate(staffId,unitId,DateUtils.asLocalDate(endDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+
 }

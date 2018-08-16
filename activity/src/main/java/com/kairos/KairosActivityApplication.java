@@ -9,7 +9,7 @@ import com.kairos.config.LocalDateSerializer;
 import com.kairos.interceptor.ExtractOrganizationAndUnitInfoInterceptor;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
 
-import com.kairos.util.userContext.UserContextInterceptor;
+import com.kairos.util.user_context.UserContextInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -75,6 +75,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 		JavaTimeModule javaTimeModule = new JavaTimeModule();
 		javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer());
 		javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer());
+
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		objectMapper.registerModule(javaTimeModule);
@@ -145,6 +146,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
                 .build();
         return template;
     }
+
 
 /*
 	private static final String ALLOWED_HEADERS = "X-Requested-With,access-control-allow-origin,Authorization,authorization,Origin,Content-Type,Version";

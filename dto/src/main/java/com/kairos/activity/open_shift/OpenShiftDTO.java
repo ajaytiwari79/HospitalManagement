@@ -16,7 +16,6 @@ public class OpenShiftDTO {
     private Long unitId;
     private BigInteger orderId;
     private BigInteger activityId;
-    private BigInteger parentOpenShiftId;
     private List<Long> assignedStaff;
 
     public OpenShiftDTO() {
@@ -33,7 +32,6 @@ public class OpenShiftDTO {
         this.unitId = unitId;
         this.orderId = orderId;
         this.activityId = activityId;
-        this.parentOpenShiftId = parentOpenShiftId;
     }
 
     public BigInteger getId() {
@@ -106,14 +104,6 @@ public class OpenShiftDTO {
 
     public void setActivityId(BigInteger activityId) {
         this.activityId = activityId;
-    }
-
-    public BigInteger getParentOpenShiftId() {
-        return parentOpenShiftId;
-    }
-
-    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
-        this.parentOpenShiftId = parentOpenShiftId;
     }
 
     public List<Long> getAssignedStaff() {

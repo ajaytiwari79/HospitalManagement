@@ -57,7 +57,7 @@ public class ShiftDTO {
     private LocalTime startTime;
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
-    Long allowedBreakDurationInMinute;
+    private Long allowedBreakDurationInMinute;
     private List<ShiftDTO> subShifts = new ArrayList<>();
     private BigInteger templateId;
     private String timeType;

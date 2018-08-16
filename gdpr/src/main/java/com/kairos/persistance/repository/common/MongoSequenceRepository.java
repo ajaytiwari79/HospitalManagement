@@ -2,8 +2,9 @@ package com.kairos.persistance.repository.common;
 import com.kairos.persistance.model.common.MongoSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.BasicUpdate;
 import org.springframework.stereotype.Repository;
@@ -18,7 +19,7 @@ import java.math.BigInteger;
 public class MongoSequenceRepository {
 
     @Inject
-    MongoTemplate mongoTemplate;
+    MongoOperations mongoOperations;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -48,8 +49,12 @@ public class MongoSequenceRepository {
 
         // create new if not exists
         findAndModifyOptions.upsert(true);
-        MongoSequence mongoSequence = mongoTemplate.findAndModify(new BasicQuery(findQuery), new BasicUpdate(updateQuery), findAndModifyOptions, MongoSequence.class);
+        MongoSequence mongoSequence = mongoOperations.findAndModify(new BasicQuery(findQuery), new BasicUpdate(updateQuery), findAndModifyOptions, MongoSequence.class);
         return new BigInteger(mongoSequence.getSequenceNumber()+"");
     }
 
+
+    public MongoSequenceRepository(MongoOperations mongoOperations) {
+        this.mongoOperations = mongoOperations;
+    }
 }

@@ -1,20 +1,18 @@
 package com.kairos.persistence.repository.counter;
 
 import com.kairos.activity.counter.ApplicableKPIDTO;
+import com.kairos.activity.counter.CounterDTO;
 import com.kairos.activity.counter.KPICategoryDTO;
-import com.kairos.activity.counter.KPIDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
-import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
-import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.activity.counter.enums.CounterType;
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.util.ObjectMapperUtils;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -25,10 +23,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -262,5 +257,11 @@ public class CounterRepository {
         String refQueryField = getRefQueryField(level);
         Query query=new Query(Criteria.where(refQueryField).is(refid).and("KpiId").in(kpiIds));
         return mongoTemplate.find(query,TabKPIConf.class);
+    }
+
+    public List<CounterDTO> getAllCounterBySupportedModule(ModuleType supportedModuleType){
+        Query query = new Query(Criteria.where("supportedModuleTypes").in(supportedModuleType).and("deleted").is(false));
+        query.fields().include("id").include("title");
+        return ObjectMapperUtils.copyProperties(mongoTemplate.find(query,Counter.class),CounterDTO.class);
     }
 }

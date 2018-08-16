@@ -1,11 +1,12 @@
 package com.kairos.persistence.model.counter;
 
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.activity.counter.FilterCriteria;
 import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
-import java.util.List;
+import java.util.*;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -21,7 +22,7 @@ public class Counter extends MongoBaseEntity {
     private BigInteger parentCounter;  //to identify parent counter
     private BigInteger categoryId;
     private List<FilterCriteria> criteriaList;
-
+    private Set<ModuleType> supportedModuleTypes;
 
     public Counter() {
     }
@@ -36,6 +37,7 @@ public class Counter extends MongoBaseEntity {
         this.type = type;
         this.title = title;
     }
+
 
     public Counter(CounterType restingHoursPerPresenceDay, List<FilterCriteria> criteriaList) {
         super();
@@ -87,6 +89,14 @@ public class Counter extends MongoBaseEntity {
 
     public void setCategoryId(BigInteger categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public Set<ModuleType> getSupportedModuleTypes() {
+        return supportedModuleTypes;
+    }
+
+    public void setSupportedModuleTypes(Set<ModuleType> supportedModuleTypes) {
+        this.supportedModuleTypes = supportedModuleTypes;
     }
 
     public BigInteger getParentCounter() {

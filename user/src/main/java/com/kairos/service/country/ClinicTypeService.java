@@ -1,5 +1,5 @@
 package com.kairos.service.country;
-import com.kairos.persistence.model.country.common.ClinicType;
+import com.kairos.persistence.model.country.default_data.ClinicType;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.repository.user.country.ClinicTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

@@ -2,8 +2,15 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
+import com.kairos.dto.KairosScheduleJobDTO;
+import com.kairos.dto.KairosSchedulerLogsDTO;
 import com.kairos.enums.EmploymentStatus;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
+import com.kairos.enums.scheduler.Result;
+import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.auth.User;
@@ -31,7 +38,10 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.IntegrationService;
+import com.kairos.service.kafka.UserToSchedulerQueueService;
+import com.kairos.service.scheduler.IntegrationJobsExecutorService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
@@ -42,8 +52,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -100,10 +112,24 @@ public class EmploymentService extends UserBaseService {
     private ExceptionService exceptionService;
     @Inject
     private UserGraphRepository userGraphRepository;
+    @Inject
+    private KafkaProducer kafkaProducer;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private UserToSchedulerQueueService userToSchedulerQueueService;
+
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
+
+        if (!Optional.ofNullable(objectToUpdate).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+        } else if (objectToUpdate.getExternalId()!=null && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
+            exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
+        }
+
         EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());
         Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         if(Optional.ofNullable(employmentUnitPosition).isPresent()) {
@@ -115,14 +141,6 @@ public class EmploymentService extends UserBaseService {
 
         }
 
-        if (objectToUpdate == null) {
-            logger.info("Staff does not found by id {}", staffId);
-            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
-
-        } else if (!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
-           exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
-
-        }
         EngineerType engineerType = engineerTypeGraphRepository.findOne(staffEmploymentDetail.getEngineerTypeId());
         objectToUpdate.setEmail(staffEmploymentDetail.getEmail());
         objectToUpdate.setCardNumber(staffEmploymentDetail.getCardNumber());
@@ -148,7 +166,7 @@ public class EmploymentService extends UserBaseService {
         map.put("cardNumber", staff.getCardNumber());
         map.put("sendNotificationBy", staff.getSendNotificationBy());
         map.put("copyKariosMailToLogin", staff.isCopyKariosMailToLogin());
-        map.put("email", staff.getEmail());
+        map.put("email", user.getEmail());
         map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic());
         map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));
@@ -757,7 +775,7 @@ public class EmploymentService extends UserBaseService {
     }
 
     
-    public void moveToReadOnlyAccessGroup(List<Long> employmentIds) {
+    public boolean moveToReadOnlyAccessGroup(List<Long> employmentIds) {
         Long curDateMillisStart = DateUtil.getStartOfDay(DateUtil.getCurrentDate()).getTime();
         Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
         List<UnitPermission> unitPermissions;
@@ -769,13 +787,6 @@ public class EmploymentService extends UserBaseService {
         List<Employment>  employments = expiredEmploymentsQueryResults.isEmpty() ? null : new ArrayList<Employment>();
         int currentElement;
         Employment employment;
-        //List<Organization> organizationsNew = expiredEmploymentsQueryResults.stream().flatMap(e->e.getOrganizations().stream()).collect(Collectors.toList());
-       /*
-        List<Organization> organizationsNew = new ArrayList<Organization>();
-        for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult :expiredEmploymentsQueryResults) {
-            organizationsNew.addAll(expiredEmploymentsQueryResult.getOrganizations());
-        }*/
-       //List<Long> orgIds =  organizationsNew.stream().map(organization -> organization.getId()).collect(Collectors.toList());
 
         for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult: expiredEmploymentsQueryResults) {
             organizations = expiredEmploymentsQueryResult.getOrganizations();
@@ -799,11 +810,13 @@ public class EmploymentService extends UserBaseService {
                 employment.getUnitPermissions().add(unitPermission);
                 currentElement++;
             }
+            employment.setEmploymentStatus(EmploymentStatus.FORMER);
             employments.add(employment);
         }
         if(expiredEmploymentsQueryResults.size()>0) {
             employmentGraphRepository.saveAll(employments);
         }
+        return true;
     }
 
     public Employment updateEmploymentEndDate(Organization unit, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) {
@@ -812,7 +825,7 @@ public class EmploymentService extends UserBaseService {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
         }
 
-        // Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDate()).isPresent()) ? null : (maxEndDate>unitPositionDTO.getEndDate()?maxEndDate:unitPositionDTO.getEndDate());
+
         return saveEmploymentEndDate(unit,employmentEndDate,staffId,reasonCodeId,endDateMillis,accessGroupId);
     }
 
@@ -848,6 +861,8 @@ public class EmploymentService extends UserBaseService {
         }
 
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),staffId);
+       userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate,employment.getEndDateMillis(),parentOrganization.getId(),employment.getId(),
+               parentOrganization.getTimeZone());
         employment.setEndDateMillis(employmentEndDate);
         if(!Optional.ofNullable(employmentEndDate).isPresent()) {
             employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
@@ -863,15 +878,35 @@ public class EmploymentService extends UserBaseService {
         }
         employmentGraphRepository.save(employment);
 
-        if(Optional.ofNullable(employmentEndDate).isPresent()&&(DateUtil.getDateFromEpoch(employmentEndDate).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0)) {
-            //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-            List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
-            moveToReadOnlyAccessGroup(employmentIds);
-        }
         EmploymentReasonCodeQueryResult employmentReasonCode = employmentGraphRepository.findEmploymentreasonCodeByStaff(staffId);
         employment.setReasonCode(employmentReasonCode.getReasonCode());
 
         return employment;
 
+    }
+
+    public void endEmploymentProcess(BigInteger schedulerPanelId,Long unitId, Long employmentId,LocalDateTime employmentEndDate) {
+       LocalDateTime started = LocalDateTime.now();
+        KairosSchedulerLogsDTO schedulerLogsDTO;
+        LocalDateTime stopped ;
+        String log = null;
+        Result result = Result.SUCCESS;
+
+
+        try{
+            List<Long> employmentIds = Stream.of(employmentId).collect(Collectors.toList());
+
+            moveToReadOnlyAccessGroup(employmentIds);
+            Long staffId = employmentGraphRepository.findStaffByEmployment(employmentId);
+            activityIntegrationService.deleteShiftsAndOpenShift(unitId,staffId,employmentEndDate);
+        }
+        catch(Exception ex) {
+            log = ex.getMessage();
+            result = Result.ERROR;
+        }
+        stopped = LocalDateTime.now();
+        schedulerLogsDTO = new KairosSchedulerLogsDTO(result,log,schedulerPanelId,unitId,DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),JobSubType.EMPLOYMENT_END);
+
+        kafkaProducer.pushToSchedulerLogsQueue(schedulerLogsDTO);
     }
 }

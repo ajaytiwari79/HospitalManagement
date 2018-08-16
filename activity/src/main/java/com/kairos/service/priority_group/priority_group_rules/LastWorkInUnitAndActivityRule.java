@@ -29,8 +29,8 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
 
             Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
             LocalDate openShiftDate = DateUtils.asLocalDate(openShiftMap.get(entry.getKey()).getStartDate());
-            Date filterStartDate = DateUtils.asDate(openShiftDate.minusDays(lastWorkingDaysWithUnit));
-            Date filterEndDate = DateUtils.asDate(openShiftDate);
+            Date filterStartDate = DateUtils.getDateFromLocalDate(openShiftDate.minusDays(lastWorkingDaysWithUnit));
+            Date filterEndDate = DateUtils.getDateFromLocalDate(openShiftDate);
             DateTimeInterval dateTimeInterval = new DateTimeInterval(filterStartDate.getTime(),filterEndDate.getTime());
             if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysInUnit()).isPresent()) {
                 activityId = null;

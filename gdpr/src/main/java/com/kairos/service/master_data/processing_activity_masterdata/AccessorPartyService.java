@@ -4,8 +4,10 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.AccessorPartyMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
+import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
@@ -13,9 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
@@ -31,45 +35,34 @@ public class AccessorPartyService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    @Inject
-    private ComparisonUtils comparisonUtils;
-
-
 
     /**
+     * @param countryId
+     * @param accessorParties
+     * @return return map which contain list of new AccessorParty and list of existing AccessorParty if AccessorParty already exist
      * @description this method create new AccessorParty if AccessorParty not exist with same name ,
      * and if exist then simply add  AccessorParty to existing list and return list ;
      * findByNamesList()  return list of existing AccessorParty using collation ,used for case insensitive result
-     * @param countryId
-     * @param organizationId
-     * @param accessorParties
-     * @return return map which contain list of new AccessorParty and list of existing AccessorParty if AccessorParty already exist
-     *
      */
-    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, Long organizationId, List<AccessorParty> accessorParties) {
+    public Map<String, List<AccessorParty>> createAccessorParty(Long countryId, List<AccessorPartyDTO> accessorParties) {
 
         Map<String, List<AccessorParty>> result = new HashMap<>();
         Set<String> accessorPartyNames = new HashSet<>();
         if (!accessorParties.isEmpty()) {
-            for (AccessorParty accessorParty : accessorParties) {
-                if (!StringUtils.isBlank(accessorParty.getName())) {
-                    accessorPartyNames.add(accessorParty.getName());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
+            for (AccessorPartyDTO accessorParty : accessorParties) {
+                accessorPartyNames.add(accessorParty.getName());
             }
-            List<AccessorParty> existing = findByNamesList(countryId, organizationId, accessorPartyNames, AccessorParty.class);
-            accessorPartyNames = comparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
+            List<AccessorParty> existing = findByNamesAndCountryId(countryId, accessorPartyNames, AccessorParty.class);
+            accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();
             if (!accessorPartyNames.isEmpty()) {
                 for (String name : accessorPartyNames) {
-                    AccessorParty newAccessorParty = new AccessorParty();
-                    newAccessorParty.setName(name);
+                    AccessorParty newAccessorParty = new AccessorParty(name);
                     newAccessorParty.setCountryId(countryId);
-                    newAccessorParty.setOrganizationId(organizationId);
                     newAccessorPartyList.add(newAccessorParty);
                 }
-                newAccessorPartyList = accessorPartyMongoRepository.saveAll(sequenceGenerator(newAccessorPartyList));
+                newAccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(newAccessorPartyList));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newAccessorPartyList);
@@ -80,20 +73,19 @@ public class AccessorPartyService extends MongoBaseService {
 
     }
 
-    public List<AccessorParty> getAllAccessorParty(Long countryId, Long organizationId) {
-        return accessorPartyMongoRepository.findAllAccessorParty(countryId, organizationId);
+
+    public List<AccessorPartyResponseDTO> getAllAccessorParty(Long countryId) {
+        return accessorPartyMongoRepository.findAllAccessorParty(countryId);
     }
 
     /**
-     * @throws DataNotFoundByIdException throw exception if AccessorParty not found for given id
-     * @param countryId
-     * @param organizationId
      * @param id id of AccessorParty
      * @return AccessorParty object fetch by given id
+     * @throws DataNotFoundByIdException throw exception if AccessorParty not found for given id
      */
-    public AccessorParty getAccessorParty(Long countryId, Long organizationId, BigInteger id) {
+    public AccessorParty getAccessorParty(Long countryId, BigInteger id) {
 
-        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -103,9 +95,9 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
 
-    public Boolean deleteAccessorParty(Long countryId, Long organizationId, BigInteger id) {
+    public Boolean deleteAccessorParty(Long countryId, BigInteger id) {
 
-        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        AccessorParty exist = accessorPartyMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -116,40 +108,43 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
     /**
-     * @throws  DuplicateDataException throw exception if AccessorParty data not exist for given id
      * @param countryId
-     * @param organizationId
-     * @param id id of AccessorParty
-     * @param accessorParty
+     * @param id               id of AccessorParty
+     * @param accessorPartyDTO
      * @return AccessorParty updated object
+     * @throws DuplicateDataException throw exception if AccessorParty data not exist for given id
      */
-    public AccessorParty updateAccessorParty(Long countryId, Long organizationId, BigInteger id, AccessorParty accessorParty) {
+    public AccessorPartyDTO updateAccessorParty(Long countryId, BigInteger id, AccessorPartyDTO accessorPartyDTO) {
 
-        AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, organizationId, accessorParty.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            if (id.equals(exist.getId())) {
-                return exist;
+        AccessorParty accessorParty = accessorPartyMongoRepository.findByName(countryId, accessorPartyDTO.getName());
+        if (Optional.ofNullable(accessorParty).isPresent()) {
+            if (id.equals(accessorParty.getId())) {
+                return accessorPartyDTO;
             }
             throw new DuplicateDataException("Name Already Exist");
-        } else {
-            exist = accessorPartyMongoRepository.findByid(id);
-            exist.setName(accessorParty.getName());
-            return accessorPartyMongoRepository.save(sequenceGenerator(exist));
-
         }
+        accessorParty = accessorPartyMongoRepository.findByid(id);
+        if (!Optional.ofNullable(accessorParty).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor party", id);
+        }
+        accessorParty.setName(accessorPartyDTO.getName());
+        accessorPartyMongoRepository.save(accessorParty);
+        return accessorPartyDTO;
+
+
     }
 
- /** @throws DataNotExists throw exception if AccessorParty exist for given name
+    /**
      * @param countryId
-     * @param organizationId
-     * @param name name of AccessorParty
+     * @param name      name of AccessorParty
      * @return AccessorParty object fetch on basis of  name
+     * @throws DataNotExists throw exception if AccessorParty exist for given name
      */
-    public AccessorParty getAccessorPartyByName(Long countryId, Long organizationId, String name) {
+    public AccessorParty getAccessorPartyByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, organizationId, name);
+            AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }
@@ -157,6 +152,17 @@ public class AccessorPartyService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+    /**
+     * @param countryId
+     * @param organizationId - id of current organization
+     * @return method return list of Organization Accessor party with non Inherited Accessor party from  parent
+     */
+    public List<AccessorPartyResponseDTO> getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(Long countryId, Long parentOrgId, Long organizationId) {
+
+        return accessorPartyMongoRepository.getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(countryId, parentOrgId, organizationId);
     }
 
 

@@ -47,8 +47,8 @@ public class OpenShiftRuleTemplateController {
     @ApiOperation("delete Rule template based on countryId")
     @DeleteMapping(value = COUNTRY_URL+"/open_shift/rule_template/{ruleTemplateId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteRuleTemplateForOpenShift(@PathVariable Long countryId, @PathVariable BigInteger ruleTemplateId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.deleteRuleTemplateForOpenShift(countryId,ruleTemplateId));
+    public ResponseEntity<Map<String, Object>> deleteOpenShiftRuleTemplate(@PathVariable Long countryId, @PathVariable BigInteger ruleTemplateId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.deleteOpenShiftRuleTemplate(countryId,ruleTemplateId));
     }
 
     @ApiOperation("Get  Rule template based on ruleTemplateId")
@@ -68,8 +68,8 @@ public class OpenShiftRuleTemplateController {
     @ApiOperation("Copy Rule templates for Unit")
     @PostMapping(value = UNIT_URL+"/open_shift/copy_rule_template")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> copyRuleTemplateForUnit(@PathVariable Long unitId, @RequestBody OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.copyRuleTemplateForUnit(unitId,orgTypeAndSubTypeDTO));
+    public ResponseEntity<Map<String, Object>> copyOpenShiftRuleTemplateInUnit(@PathVariable Long unitId, @RequestBody OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId,orgTypeAndSubTypeDTO));
     }
 
     @ApiOperation("Get all Rule templates based on unitId")

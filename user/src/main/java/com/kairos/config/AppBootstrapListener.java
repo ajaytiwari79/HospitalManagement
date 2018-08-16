@@ -32,7 +32,7 @@ import java.util.List;
  * 4. Units
  */
 @Component
-@PropertySource("classpath:page-id.properties")
+
 public class AppBootstrapListener implements ApplicationListener<ApplicationReadyEvent> {
     private final Logger logger = LoggerFactory.getLogger(AppBootstrapListener.class);
 

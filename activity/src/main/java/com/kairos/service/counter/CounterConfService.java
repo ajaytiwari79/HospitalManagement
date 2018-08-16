@@ -1,5 +1,6 @@
 package com.kairos.service.counter;
 
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.activity.counter.FilterCriteria;
 import com.kairos.activity.counter.KPICategoryDTO;
 import com.kairos.activity.counter.distribution.category.KPICategoryUpdationDTO;

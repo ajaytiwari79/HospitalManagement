@@ -1,0 +1,2 @@
+// To change the key name in existing counters
+db.counter.updateMany({},{$rename:{"applicableFor":"supportedModuleTypes"}});

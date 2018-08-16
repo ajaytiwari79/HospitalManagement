@@ -72,7 +72,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
             ObjectMapperUtils.copyProperties(ruleTemplateCategoryDTO, ruleTemplateCategory);
             ruleTemplateCategory.setCountryId(country.getId());
             save(ruleTemplateCategory);
-            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>)wtaBaseRuleTemplateMongoRepository.findAllById(ruleTemplateCategoryDTO.getRuleTemplateIds());
+            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>) wtaBaseRuleTemplateMongoRepository.findAllById(ruleTemplateCategoryDTO.getRuleTemplateIds());
             for (WTABaseRuleTemplate wtaBaseRuleTemplate : wtaBaseRuleTemplates) {
                 wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
             }
@@ -159,7 +159,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         if(ruleTemplateCategoryDTO.getRuleTemplateIds()!=null && !ruleTemplateCategoryDTO.getRuleTemplateIds().isEmpty()){
             RuleTemplateCategory defaultCategory = ruleTemplateCategoryMongoRepository
                     .findByName(countryId, "NONE", WTA);
-            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>)wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(ruleTemplateCategoryObj.getId());
+            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>) wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(ruleTemplateCategoryObj.getId());
             wtaBaseRuleTemplates.forEach(wtaBaseRuleTemplate -> {
                 if(!ruleTemplateCategoryDTO.getRuleTemplateIds().contains(wtaBaseRuleTemplate.getId())){
                     wtaBaseRuleTemplate.setRuleTemplateCategoryId(defaultCategory.getId());
@@ -168,7 +168,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
             if (!wtaBaseRuleTemplates.isEmpty()){
                 save(wtaBaseRuleTemplates);
             }
-            wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>)wtaBaseRuleTemplateMongoRepository.findAllById(ruleTemplateCategoryDTO.getRuleTemplateIds());
+            wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>) wtaBaseRuleTemplateMongoRepository.findAllById(ruleTemplateCategoryDTO.getRuleTemplateIds());
             for (WTABaseRuleTemplate wtaBaseRuleTemplate : wtaBaseRuleTemplates) {
                 wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategoryObj.getId());
             }

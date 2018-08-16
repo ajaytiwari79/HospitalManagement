@@ -12,6 +12,7 @@ import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
+import com.kairos.util.DateUtils;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -35,7 +36,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigInteger;
+import java.util.*;
 import java.util.ArrayList;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +59,7 @@ public class ShiftIntegrationServiceTest {
     @Value("${server.host.http.url}")
     private String url;
     @Autowired
-    TestRestTemplate restTemplate;
+    TestRestTemplate testRestTemplate;
     @Mock
     private OrganizationRestClient organizationRestClient;
 
@@ -98,7 +102,7 @@ public class ShiftIntegrationServiceTest {
         ParameterizedTypeReference<RestTemplateResponseEnvelope<ActivityTagDTO>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<ActivityTagDTO>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<ActivityTagDTO>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<ActivityTagDTO>> response = testRestTemplate.exchange(
                 baseUrlForCountry + "/activity", HttpMethod.POST, requestBodyData, typeReference);
 
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
@@ -141,28 +145,42 @@ public class ShiftIntegrationServiceTest {
 
     }
 
-//    @Test
-//    public void publishShifts() throws Exception {
-//
-//        List<BigInteger> shifts = new ArrayList<>();
-//        shifts.add(new BigInteger("110"));
-//        shifts.add(new BigInteger("109"));
-//        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, ShiftStatus.FIXED);
-//
-//        HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
-//
-//        ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> typeReference =
-//                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>>() {
-//                };
-//        ResponseEntity<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> response = restTemplate.exchange(
-//                baseUrlForUnit + "/publish_shifts", HttpMethod.PUT, requestBodyData, typeReference);
-//        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
-//    }
+    @Test
+    public void publishShifts() throws Exception {
+
+        List<BigInteger> shifts = new ArrayList<>();
+        shifts.add(new BigInteger("110"));
+        shifts.add(new BigInteger("109"));
+        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, Arrays.asList(ShiftStatus.FIXED));
+
+        HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> response = testRestTemplate.exchange(
+                baseUrlForUnit + "/publish_shifts", HttpMethod.PUT, requestBodyData, typeReference);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
 
     @Test
-    public void deleteShifts() throws Exception {
+    public void deleteShiftAndOpenShiftsOnEmploymentEnd() {
+
+
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<Map<String, Object>>> response = testRestTemplate.exchange(
+                baseUrlForUnit + "/staff/8771/shifts_and_openshifts?employmentEndDate="+ DateUtils.getCurrentDayStartMillis(), HttpMethod.PUT, null, typeReference);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+
+    @Test
+    public void deleteShifts() {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrlForUnit + "/shift/" + 109).queryParam("type", "organization");
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<String> response = testRestTemplate.exchange(
                 builder.toUriString(),
                 HttpMethod.DELETE, null, String.class);
         logger.info("response", response);

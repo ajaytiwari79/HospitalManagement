@@ -1,6 +1,7 @@
 package com.kairos.service.control_panel;
 import com.kairos.client.dto.ControlPanelDTO;
 import com.kairos.config.scheduler.DynamicCronScheduler;
+import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.model.user.control_panel.jobDetails.JobDetails;
@@ -11,7 +12,7 @@ import com.kairos.persistence.repository.user.control_panel.jobDetails.JobDetail
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.integration.IntegrationService;
-import com.kairos.util.timeCareShift.Transstatus;
+import com.kairos.util.external_plateform_shift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -28,6 +29,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
+import static com.kairos.enums.scheduler.Result.SUCCESS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.CONTROL_PANEL_INTERVAL_STRING;
 import static com.kairos.persistence.model.constants.RelationshipConstants.CONTROL_PANEL_RUN_ONCE_STRING;
 
@@ -51,6 +53,8 @@ public class ControlPanelService extends UserBaseService {
     JobDetailsRepository jobDetailsRepository;
     @Inject
     IntegrationService integrationService;
+    @Inject
+    private KafkaProducer kafkaProducer;
 
 
     private static final Logger logger = LoggerFactory.getLogger(ControlPanelService.class);
@@ -217,7 +221,7 @@ public class ControlPanelService extends UserBaseService {
         jobDetails.setProcessName(controlPanel.getProcessType());
         String result = "Success";
         if(transstatus.getResult().getNr_errors() > 0) result = "Error";
-        jobDetails.setResult(result);
+        jobDetails.setResult(SUCCESS);
         logger.info("============>>Job logs get saved<<============");
         jobDetailsRepository.save(jobDetails);
 
@@ -230,10 +234,6 @@ public class ControlPanelService extends UserBaseService {
     public Boolean deleteJob(long controlPanelId){
         try {
             ControlPanel panel = controlPanelGraphRepository.findOne(controlPanelId);
-           /* List<JobDetails> jobDetailsList = jobDetailsRepository.findByControlPanelId(controlPanelId);
-            for (JobDetails jobDetails : jobDetailsList) {
-                jobDetailsRepository.delete(jobDetails);
-            }*/
             dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
             panel.setActive(false);
             controlPanelGraphRepository.save(panel);
@@ -289,7 +289,6 @@ public class ControlPanelService extends UserBaseService {
         controlPanelDTO.setUnitId(unitId);
         return controlPanelDTO;
     }
-
 
 
 }

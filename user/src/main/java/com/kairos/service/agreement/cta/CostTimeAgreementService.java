@@ -34,7 +34,7 @@ import com.kairos.service.country.CurrencyService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -314,7 +314,7 @@ public class CostTimeAgreementService extends UserBaseService {
             throws InterruptedException, ExecutionException {
 
         /*Callable<List<TimeType>> timeTypesTask = () -> {
-            Iterable<TimeType> timeTypes = timeTypeGraphRepository.findAllById(ctaRuleTemplateDTO.getTimeTypes(), 0);
+            Iterable<TimeType> timeTypes = timeTypeGraphRepository.findAllByIds(ctaRuleTemplateDTO.getTimeTypes(), 0);
             return StreamSupport.stream(timeTypes.spliterator(), true).collect(Collectors.toList());
         };
 
@@ -328,7 +328,7 @@ public class CostTimeAgreementService extends UserBaseService {
         Future<List<EmploymentType>> employmentTypesFuture = asynchronousService.executeAsynchronously(employmentTypesTask);
 
         /*Callable<List<AccessGroup>> accessGroupsTask = () -> {
-            Iterable<AccessGroup> accessGroups = accessGroupRepository.findAllById(ctaRuleTemplateDTO.getCalculateValueIfPlanned(), 0);
+            Iterable<AccessGroup> accessGroups = accessGroupRepository.findAllByIds(ctaRuleTemplateDTO.getCalculateValueIfPlanned(), 0);
             return StreamSupport.stream(accessGroups.spliterator(), true).collect(Collectors.toList());
 
         };
@@ -535,7 +535,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, newCostTimeAgreement);
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, true, null, null);
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, true, null,null);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
@@ -685,10 +685,10 @@ public class CostTimeAgreementService extends UserBaseService {
         CostTimeAgreement costTimeAgreement = new CostTimeAgreement();
         collectiveTimeAgreementDTO.setId(null);
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
-        Optional<Expertise> expertise = expertiseGraphRepository.findById(collectiveTimeAgreementDTO.getExpertise(), 0);
+        Optional<Expertise> expertise= expertiseGraphRepository.findById(collectiveTimeAgreementDTO.getExpertise(),0);
 
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, false, null, expertise.get());
+                .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, false, null,expertise.get());
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();

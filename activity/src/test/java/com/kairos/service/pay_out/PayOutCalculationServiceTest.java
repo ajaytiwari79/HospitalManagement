@@ -9,7 +9,6 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.util.DateUtils;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.DateTime;
-import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,6 +25,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import com.kairos.util.DateTimeInterval;
 
 import static org.mockito.Mockito.when;
 
@@ -46,10 +46,10 @@ public class PayOutCalculationServiceTest {
     ActivityMongoRepository activityMongoRepository;
 
     List<ShiftWithActivityDTO> shifts = new ArrayList<>(3);
-    Interval interval = null;
+    DateTimeInterval interval = null;
     Activity activity = null;
 
-    @Before
+  /*  @Before
     public void getMockShifts(){
         activity = new Activity(new BalanceSettingsActivityTab(new BigInteger("123")));
         activity.setId(new BigInteger("125"));
@@ -66,16 +66,16 @@ public class PayOutCalculationServiceTest {
         shifts.add(shift);
     }
 
-//    @Test
-//    public void calculatePayOut(){
-//        when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId())));
-//        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = payOutService.getCostTimeAgreement(1225l);
-//        PayOut payOut = new PayOut(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
-//        payOutCalculationService.calculateAndUpdatePayOut(interval, unitPositionWithCtaDetailsDTO,shifts, payOut);
-//        Assert.assertEquals(payOut.getTotalPayOutMin(),1130);
-//        Assert.assertEquals(payOut.getScheduledMin(),1020);
-//        Assert.assertEquals(payOut.getContractualMin(),300);
-//    }
+    @Test
+    public void calculatePayOut(){
+        when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId(), activity.getName(), activity.getParentId())));
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = payOutService.getCostTimeAgreement(1225l);
+        PayOut payOut = new PayOut(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
+        payOutCalculationService.calculateAndUpdatePayOut(interval, unitPositionWithCtaDetailsDTO,shifts, payOut);
+        Assert.assertEquals(payOut.getTotalPayOutMin(),1130);
+        Assert.assertEquals(payOut.getScheduledMin(),1020);
+        Assert.assertEquals(payOut.getContractualMin(),300);
+    }*/
 
 
 

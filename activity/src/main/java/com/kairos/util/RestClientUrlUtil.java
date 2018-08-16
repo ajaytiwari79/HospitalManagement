@@ -1,6 +1,6 @@
 package com.kairos.util;
 
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -60,7 +60,7 @@ public class RestClientUrlUtil {
         return baseUrl;
     }
     public static final String getPlannerBaseUrl(){
-        String baseUrl=new StringBuilder(plannerServiceUrl+"unit/").toString();
+        String baseUrl=new StringBuilder(plannerServiceUrl).toString();
         return baseUrl;
 
     }

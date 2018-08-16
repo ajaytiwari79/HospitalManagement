@@ -137,4 +137,5 @@ public class Employment extends UserBaseEntity {
     public void setMainEmployment(boolean mainEmployment) {
         this.mainEmployment = mainEmployment;
     }
+
 }

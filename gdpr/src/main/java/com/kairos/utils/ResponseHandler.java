@@ -22,7 +22,7 @@ public class ResponseHandler {
         result.put("message", httpStatus.value());
         result.put("dateTime", dateTime);
 
-        return new ResponseEntity<Object>(result, httpStatus);
+        return new ResponseEntity<>(result, httpStatus);
 
     }
 
@@ -37,7 +37,7 @@ public class ResponseHandler {
         result.put("status", httpStatus.value());
         result.put("dateTime", dateTime);
 
-        return new ResponseEntity<Object>(result, httpStatus);
+        return new ResponseEntity<>(result, httpStatus);
 
     }
 

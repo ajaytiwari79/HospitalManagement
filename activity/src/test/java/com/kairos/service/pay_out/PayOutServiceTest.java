@@ -36,21 +36,21 @@ public class PayOutServiceTest {
     Interval interval = null;
 
 
-//    @Test
-//    public void getPayOut(){
-//
-//        DateTime startDateTime = new DateTime().withTimeAtStartOfDay();
-//        DateTime endDateTime = new DateTime().plusDays(7).withTimeAtStartOfDay();
-//        int days = (int)new Duration(startDateTime,endDateTime).getStandardDays()+1;
-//        Long startMillis = new Date().getTime();
-//
-//        //payOutService.setPayOutCalculationService(new PayOutCalculationService());
-//        List<CalculatedPayOutByDateDTO> payOuts = payOutService.getPayOutFromCurrentDateByUEP(145l);
-//        payOuts.forEach(ct->{
-//            logger.info("date "+ct.getDate()+" - "+ct.getPayOutMin());
-//        });
-//        logger.info("endTime "+(new Date().getTime()-startMillis));
-//    }
+    /*@Test
+    public void getPayOut(){
+
+        DateTime startDateTime = new DateTime().withTimeAtStartOfDay();
+        DateTime endDateTime = new DateTime().plusDays(7).withTimeAtStartOfDay();
+        int days = (int)new Duration(startDateTime,endDateTime).getStandardDays()+1;
+        Long startMillis = new Date().getTime();
+
+        //payOutService.setPayOutCalculationService(new PayOutCalculationService());
+        List<CalculatedPayOutByDateDTO> payOuts = payOutService.getPayOutFromCurrentDateByUEP(145l);
+        payOuts.forEach(ct->{
+            logger.info("date "+ct.getDate()+" - "+ct.getPayOutMin());
+        });
+        logger.info("endTime "+(new Date().getTime()-startMillis));
+    }*/
 
     @Test
     public void getIntervals(){

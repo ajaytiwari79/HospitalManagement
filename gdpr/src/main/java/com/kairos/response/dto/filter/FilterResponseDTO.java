@@ -12,8 +12,6 @@ public class FilterResponseDTO {
 
     private FilterType name;
 
-    private String title;
-
     private List<FilterAttributes> filterData;
 
     private String displayName;
@@ -34,14 +32,6 @@ public class FilterResponseDTO {
         this.name = name;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public List<FilterAttributes> getFilterData() {
         return filterData;
     }
@@ -56,10 +46,9 @@ public class FilterResponseDTO {
 
     }
 
-    public FilterResponseDTO(FilterType name, String title, String displayName, List<FilterAttributes> filterAttributes) {
+    public FilterResponseDTO(FilterType name, String displayName, List<FilterAttributes> filterAttributes) {
         this.name = name;
-        this.title = title;
-        this.displayName=displayName;
+        this.displayName = displayName;
         this.filterData = filterAttributes;
     }
 
