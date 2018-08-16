@@ -2,7 +2,6 @@ package com.kairos.persistance.repository.master_data.questionnaire_template;
 
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
