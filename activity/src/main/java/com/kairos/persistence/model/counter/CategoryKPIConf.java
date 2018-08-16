@@ -6,13 +6,13 @@ import java.math.BigInteger;
 
 public class CategoryKPIConf extends MongoBaseEntity {
     private BigInteger kpiId;
-    private BigInteger categoryAssignmentId;
+    private BigInteger categoryId;
 
     public CategoryKPIConf() {
     }
 
     public CategoryKPIConf(BigInteger kpiAssignmentId, BigInteger categoryAssignmentId){
-        this.categoryAssignmentId = categoryAssignmentId;
+        this.categoryId = categoryAssignmentId;
         this.kpiId = kpiAssignmentId;
     }
 
@@ -24,12 +24,12 @@ public class CategoryKPIConf extends MongoBaseEntity {
         this.kpiId = kpiId;
     }
 
-    public BigInteger getCategoryAssignmentId() {
-        return categoryAssignmentId;
+    public BigInteger getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategoryAssignmentId(BigInteger categoryAssignmentId) {
-        this.categoryAssignmentId = categoryAssignmentId;
+    public void setCategoryId(BigInteger categoryId) {
+        this.categoryId = categoryId;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.kairos.controller.counters;
 
 import com.kairos.activity.counter.FilterCriteria;
+import com.kairos.activity.counter.KPICategoryDTO;
 import com.kairos.activity.counter.distribution.category.KPICategoryUpdationDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.counter.Counter;
@@ -61,24 +62,22 @@ public class CounterConfController {
     }
 
     @PostMapping(value=COUNTRY_URL+"/counter/conf/category")
-    public ResponseEntity<Map<String, Object>> addCategoriesAtCountryLevel(@PathVariable Long countryId, @RequestBody List<KPICategory> categories){
+    public ResponseEntity<Map<String, Object>> addCategoriesAtCountryLevel(@PathVariable Long countryId, @RequestBody List<KPICategoryDTO> categories){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.addCategories(categories, ConfLevel.COUNTRY, countryId));
     }
 
     @PostMapping(value=UNIT_URL+"/counter/conf/category")
-    public ResponseEntity<Map<String, Object>> addCategoriesAtUnitLevel(@PathVariable Long unitId, @RequestBody List<KPICategory> categories){
+    public ResponseEntity<Map<String, Object>> addCategoriesAtUnitLevel(@PathVariable Long unitId, @RequestBody List<KPICategoryDTO> categories){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.addCategories(categories, ConfLevel.UNIT, unitId));
     }
 
     @PutMapping(value = COUNTRY_URL+"/counter/conf/category")
     public ResponseEntity<Map<String, Object>> updateCategoriesForCountry(@RequestBody @Valid KPICategoryUpdationDTO categories, @PathVariable Long countryId){
-        counterConfService.updateCategories(categories, ConfLevel.COUNTRY, countryId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.updateCategories(categories, ConfLevel.COUNTRY, countryId));
     }
 
     @PutMapping(value =UNIT_URL+"/counter/conf/category")
     public ResponseEntity<Map<String, Object>> updateCategoriesForUnit(@RequestBody @Valid KPICategoryUpdationDTO categories, @PathVariable Long unitId){
-        counterConfService.updateCategories(categories, ConfLevel.UNIT, unitId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.updateCategories(categories, ConfLevel.UNIT, unitId));
     }
 }
