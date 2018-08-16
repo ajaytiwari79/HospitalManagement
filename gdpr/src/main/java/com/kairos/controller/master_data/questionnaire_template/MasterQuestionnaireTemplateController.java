@@ -9,9 +9,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstant.UNIT_URL;
 
@@ -45,10 +47,10 @@ public class MasterQuestionnaireTemplateController {
     }
 
     /**
-     * @description method fetch all MasterQuestionnaireTemplate with MasterQuestionnaireSections list (which contain MasterQuestion list)
      * @param countryId
      * @param organizationId
-     * @return  return List MasterQuestionnaireTemplate With MasterQuestionnaireSection list(which contain List of MasterQuestions)
+     * @return return List MasterQuestionnaireTemplate With MasterQuestionnaireSection list(which contain List of MasterQuestions)
+     * @description method fetch all MasterQuestionnaireTemplate with MasterQuestionnaireSections list (which contain MasterQuestion list)
      */
     @ApiOperation(value = "get all questionnaire template basic response ")
     @GetMapping("/questionnaire_template/all")
@@ -63,11 +65,10 @@ public class MasterQuestionnaireTemplateController {
 
 
     /**
-     *
      * @param countryId
      * @param organizationId
-     * @param id id of MasterQuestionnaireTemplate
-     * @return  return MasterQuestionnaireTemplate With MasterQuestionnaireSection list(which contain List of MasterQuestions)
+     * @param id             id of MasterQuestionnaireTemplate
+     * @return return MasterQuestionnaireTemplate With MasterQuestionnaireSection list(which contain List of MasterQuestions)
      */
     @ApiOperation(value = "get questionnaire template With Sections by Id ")
     @GetMapping("/questionnaire_template/{id}")
@@ -85,10 +86,9 @@ public class MasterQuestionnaireTemplateController {
     }
 
     /**
-     *
      * @param countryId
      * @param organizationId
-     * @param id id of MasterQuestionnaireTemplate
+     * @param id             id of MasterQuestionnaireTemplate
      * @return true on deletion of MasterQuestionnaire template
      */
     @ApiOperation(value = "delete questionnaire template by id ")
@@ -108,10 +108,9 @@ public class MasterQuestionnaireTemplateController {
     }
 
     /**
-     *
      * @param countryId
      * @param organizationId
-     * @param id id of MasterQuestionnaireTemplate
+     * @param id             id of MasterQuestionnaireTemplate
      * @param templateDto
      * @return return update masterQuestionnaireTemplate object
      */
@@ -131,8 +130,19 @@ public class MasterQuestionnaireTemplateController {
 
     }
 
+
+    @ApiOperation(value = "get Questionnaire template Attribute List Acc to Template type")
+    @GetMapping("/questionnaire_template/attributes")
+    public ResponseEntity<Object> getQuestionnaireTemplateAttributeNames(@PathVariable Long countryId, @RequestParam String templateType) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getQuestionnaireTemplateAttributeNames(templateType));
+    }
+
+
     @ApiOperation(value = "get all questionnaire template basic response of unit")
-    @GetMapping(UNIT_URL+"/questionnaire_template/all")
+    @GetMapping(UNIT_URL + "/questionnaire_template/all")
     public ResponseEntity<Object> getAllMasterQuestionnaireTemplateWithSectionAndQuestionOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -143,7 +153,7 @@ public class MasterQuestionnaireTemplateController {
     }
 
     @ApiOperation(value = "get all questionnaire template  ")
-    @GetMapping(UNIT_URL+"/questionnaire_template/{id}")
+    @GetMapping(UNIT_URL + "/questionnaire_template/{id}")
     public ResponseEntity<Object> getMasterQuestionnaireTemplateWithSectionAndQuestionOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
