@@ -7,7 +7,7 @@ import com.kairos.persistance.repository.data_inventory.asset.AssetMongoReposito
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponsDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -68,7 +68,7 @@ public class ProcessingActivityService extends MongoBaseService {
 
         ProcessingActivity exist = processingActivityMongoRepository.findByName(organizationId, processingActivityDTO.getName());
         if (Optional.ofNullable(exist).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", " Processing Activity ", processingActivityDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
         ProcessingActivity processingActivity = buildProcessingActivity(organizationId, processingActivityDTO);
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
@@ -85,11 +85,11 @@ public class ProcessingActivityService extends MongoBaseService {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByName(organizationId, processingActivityDTO.getName());
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", " Processing Activity ", processingActivityDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
         processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(organizationId, id);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", id);
         }
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
             processingActivity.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(organizationId, processingActivityDTO.getSubProcessingActivities()));
@@ -206,7 +206,7 @@ public class ProcessingActivityService extends MongoBaseService {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", processingActivityId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
         Map<String, Object> result = new HashMap<>();
         if (!processingActivity.isSubProcess()) {
@@ -237,7 +237,7 @@ public class ProcessingActivityService extends MongoBaseService {
     public ProcessingActivityResponseDTO getProcessingActivityWithMetaDataById(Long orgId, BigInteger id) {
         ProcessingActivityResponseDTO processingActivity = processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", id);
         }
         return processingActivity;
     }
@@ -269,7 +269,7 @@ public class ProcessingActivityService extends MongoBaseService {
      * @return
      * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
      */
-    public List<ProcessingActivityBasicResponsDTO> getAllProcessingActivityBasicDetailsWithSubProcess(Long unitId) {
+    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsWithSubProcess(Long unitId) {
         return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubprocessingActivities(unitId);
     }
 

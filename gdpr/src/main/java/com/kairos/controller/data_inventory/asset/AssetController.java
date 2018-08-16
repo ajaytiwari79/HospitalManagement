@@ -98,7 +98,7 @@ public class AssetController {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.addRelatedProcessingActivitiesAndSubProcess(unitId, assetId, relateProcessingActivityDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.addProcessingActivitiesAndSubProcessingActivitiesToAsset(unitId, assetId, relateProcessingActivityDTO));
     }
 
 

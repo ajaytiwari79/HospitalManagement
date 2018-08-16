@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProcessingActivityBasicResponsDTO {
+public class ProcessingActivityBasicResponseDTO {
 
     private BigInteger id;
 
@@ -19,9 +19,9 @@ public class ProcessingActivityBasicResponsDTO {
     @NotBlank(message = "Description can't be empty")
     private String description;
 
-    private boolean selected;
+    private boolean selected=false;
 
-    List<ProcessingActivityBasicResponsDTO> subProcessingActivities=new ArrayList<>();
+    List<ProcessingActivityBasicResponseDTO> subProcessingActivities=new ArrayList<>();
 
     public boolean isSelected() { return selected; }
 
@@ -39,7 +39,7 @@ public class ProcessingActivityBasicResponsDTO {
 
     public void setDescription(String description) { this.description = description; }
 
-    public List<ProcessingActivityBasicResponsDTO> getSubProcessingActivities() { return subProcessingActivities; }
+    public List<ProcessingActivityBasicResponseDTO> getSubProcessingActivities() { return subProcessingActivities; }
 
-    public void setSubProcessingActivities(List<ProcessingActivityBasicResponsDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
+    public void setSubProcessingActivities(List<ProcessingActivityBasicResponseDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 }

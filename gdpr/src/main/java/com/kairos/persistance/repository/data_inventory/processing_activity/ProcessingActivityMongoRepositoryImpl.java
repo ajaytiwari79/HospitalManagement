@@ -3,7 +3,7 @@ package com.kairos.persistance.repository.data_inventory.processing_activity;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponsDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import org.bson.Document;
 import org.springframework.data.domain.Sort;
@@ -31,7 +31,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     private MongoTemplate mongoTemplate;
 
 
-    private Document addNonDeletedSubProcessingActivityOperation = Document.parse(CustomAggregationQuery.addNondeletedSubProcessingActivityToProcessingActivity());
+    private Document addNonDeletedSubProcessingActivityOperation = Document.parse(CustomAggregationQuery.addNonDeletedSubProcessingActivityToProcessingActivity());
 
     @Override
     public ProcessingActivity findByName(Long organizationId, String name) {
@@ -84,7 +84,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
 
 
     @Override
-    public List<ProcessingActivityBasicResponsDTO> getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(Long unitId, Set<BigInteger> processingActivityIds) {
+    public List<ProcessingActivityBasicResponseDTO> getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(Long unitId, Set<BigInteger> processingActivityIds) {
 
         Aggregation aggregation = Aggregation.newAggregation(
 
@@ -92,13 +92,13 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
                 new CustomAggregationOperation(addNonDeletedSubProcessingActivityOperation)
         );
-        AggregationResults<ProcessingActivityBasicResponsDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityBasicResponsDTO.class);
+        AggregationResults<ProcessingActivityBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityBasicResponseDTO.class);
         return result.getMappedResults();
     }
 
 
     @Override
-    public List<ProcessingActivityBasicResponsDTO> getAllProcessingActivityBasicDetailWithSubprocessingActivities(Long unitId) {
+    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubprocessingActivities(Long unitId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
 
@@ -106,7 +106,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
                 new CustomAggregationOperation(addNonDeletedSubProcessingActivityOperation)
         );
-        AggregationResults<ProcessingActivityBasicResponsDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityBasicResponsDTO.class);
+        AggregationResults<ProcessingActivityBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityBasicResponseDTO.class);
         return result.getMappedResults();
     }
 }

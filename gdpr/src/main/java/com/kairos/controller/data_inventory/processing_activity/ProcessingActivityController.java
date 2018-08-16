@@ -97,8 +97,8 @@ public class ProcessingActivityController {
 
 
     @ApiOperation(value = "get history of asset or changes done in Asset")
-    @GetMapping("/processing_activity/basic")
-    public ResponseEntity<Object> getAllProcessingActivitiesBasicDetailWithSubProcessingActivity(@PathVariable Long unitId) {
+    @GetMapping("/processing_activity/related")
+    public ResponseEntity<Object> getAllRelatedProcessingActivitiesAndSubProcessingActivities(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityBasicDetailsWithSubProcess(unitId));
     }
 

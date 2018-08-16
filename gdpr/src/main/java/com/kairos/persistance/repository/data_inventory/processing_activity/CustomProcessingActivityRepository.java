@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.data_inventory.processing_activity;
 
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
-import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponsDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 
 import java.math.BigInteger;
@@ -16,9 +16,9 @@ public interface CustomProcessingActivityRepository {
 
     ProcessingActivityResponseDTO  getAllSubProcessingActivitiesOfProcessingActivity( Long unidId, BigInteger processingActivityId);
 
-    List<ProcessingActivityBasicResponsDTO>  getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(Long unitId, Set<BigInteger> processingActivityIds);
+    List<ProcessingActivityBasicResponseDTO>  getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(Long unitId, Set<BigInteger> processingActivityIds);
 
-    List<ProcessingActivityBasicResponsDTO> getAllProcessingActivityBasicDetailWithSubprocessingActivities(Long unitId);
+    List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubprocessingActivities(Long unitId);
 
 
 

@@ -211,7 +211,7 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String addNondeletedSubProcessingActivityToProcessingActivity() {
+    public static String addNonDeletedSubProcessingActivityToProcessingActivity() {
 
         return "  {'$addFields':" +
                 "                {'subProcessingActivities':         " +
