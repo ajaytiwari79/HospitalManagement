@@ -36,9 +36,9 @@ public class StaffingLevelTemplateController {
             @RequestBody @Valid StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
          staffingLevelTemplateDTO=staffingLevelTemplateService.createStaffingLevelTemplate(staffingLevelTemplateDTO);
         if(!staffingLevelTemplateDTO.getErrors().isEmpty()){
-            return ResponseHandler.invalidResponse(HttpStatus.PRECONDITION_REQUIRED, false, levelTemplateDTO.getErrors());
+            return ResponseHandler.invalidResponse(HttpStatus.PRECONDITION_REQUIRED, false, staffingLevelTemplateDTO.getErrors());
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, levelTemplateDTO);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffingLevelTemplateDTO);
     }
 
 
