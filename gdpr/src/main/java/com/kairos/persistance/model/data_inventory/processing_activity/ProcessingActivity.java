@@ -26,6 +26,8 @@ public class ProcessingActivity extends MongoBaseEntity {
     @NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
 
+    private List<ProcessingActivityRelatedDataSubject> dataSubjects;
+
     private List<BigInteger> processingPurposes;
 
     private List<BigInteger> dataSources;
@@ -55,6 +57,10 @@ public class ProcessingActivity extends MongoBaseEntity {
     private boolean active;
 
     private boolean subProcess=false;
+
+    public List<ProcessingActivityRelatedDataSubject> getDataSubjects() { return dataSubjects; }
+
+    public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) { this.dataSubjects = dataSubjects; }
 
     public List<BigInteger> getSubProcessingActivities() { return subProcessingActivities; }
 

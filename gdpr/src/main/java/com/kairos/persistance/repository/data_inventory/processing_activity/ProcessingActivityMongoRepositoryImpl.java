@@ -1,10 +1,12 @@
 package com.kairos.persistance.repository.data_inventory.processing_activity;
 
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistance.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -108,5 +110,30 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
         );
         AggregationResults<ProcessingActivityBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityBasicResponseDTO.class);
         return result.getMappedResults();
+    }
+
+
+    @Override
+    public List<DataSubjectMappingResponseDTO> getAllMappedDataSubjectWithDataCategoryAndDataElement(Long unitId, List<BigInteger> dataSubjectIds) {
+
+            String addNonDeletedDataElements=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
+            Document addToFieldOperationFilter=Document.parse(addNonDeletedDataElements);
+            Aggregation aggregation = Aggregation.newAggregation(
+                    match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("_id").in(dataSubjectIds)),
+                    lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                    unwind("dataCategories"),
+                    lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                    new CustomAggregationOperation(addToFieldOperationFilter),
+                    match(Criteria.where("dataCategories.deleted").is(false)),
+                    group("$id")
+                            .first("name").as("name")
+                            .first("description").as("description")
+                            .first(COUNTRY_ID).as(COUNTRY_ID)
+                            .addToSet("dataCategories").as("dataCategories")
+            );
+            AggregationResults<DataSubjectMappingResponseDTO> result = mongoTemplate.aggregate(aggregation, DataSubjectMapping.class, DataSubjectMappingResponseDTO.class);
+            return result.getMappedResults();
+
+
     }
 }

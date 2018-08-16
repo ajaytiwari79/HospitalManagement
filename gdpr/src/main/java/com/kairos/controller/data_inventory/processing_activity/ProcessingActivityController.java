@@ -2,8 +2,10 @@ package com.kairos.controller.data_inventory.processing_activity;
 
 
 import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
+import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
 import com.kairos.service.data_inventory.processing_activity.ProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
+import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -31,7 +33,7 @@ public class ProcessingActivityController {
 
 
     @ApiOperation(value = "create Processing activity ")
-    @PostMapping("/processing_activity/add")
+    @PostMapping("/processing_activity")
     public ResponseEntity<Object> createProcessingActivity(@PathVariable Long unitId, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "ManagingOrganization id can't be Null");
@@ -65,7 +67,7 @@ public class ProcessingActivityController {
 
 
     @ApiOperation(value = "Get All Processing activity With meta data ")
-    @GetMapping("/processing_activity/all")
+    @GetMapping("/processing_activity")
     public ResponseEntity<Object> getAllProcessingActivityWithMetaData(@PathVariable Long unitId) {
 
         if (unitId == null) {
@@ -102,5 +104,25 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityBasicDetailsWithSubProcess(unitId));
     }
 
+
+
+    @ApiOperation(value = "Map Data Subject ,Data Category and data element to  Processing activity ")
+    @PostMapping("/processing_activity/{processingActivityId}/data_subject")
+    public ResponseEntity<Object>  mapDataSubjectToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId,@Valid @RequestBody ValidateRequestBodyList<ProcessingActivityRelatedDataSubject> dataSubjectList) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.mapDataSubjectDataCategoryAndDataElementToProcessingActivity(unitId,processingActivityId, dataSubjectList.getRequestBody()));
+    }
+
+
+    @ApiOperation(value = "get all Mapped Data Subject ,Data Category and data element of Processing Activity")
+    @GetMapping("/processing_activity/{processingActivityId}/data_subject")
+    public ResponseEntity<Object>  getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId){
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, "");
+    }
 
 }

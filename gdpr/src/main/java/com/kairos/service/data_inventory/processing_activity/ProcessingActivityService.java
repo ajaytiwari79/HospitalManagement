@@ -3,12 +3,16 @@ package com.kairos.service.data_inventory.processing_activity;
 
 import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
+import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
@@ -61,6 +65,9 @@ public class ProcessingActivityService extends MongoBaseService {
 
     @Inject
     private AssetMongoRepository assetMongoRepository;
+
+    @Inject
+    private DataSubjectMappingRepository dataSubjectMappingRepository;
 
 
     public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
@@ -263,7 +270,6 @@ public class ProcessingActivityService extends MongoBaseService {
 
     }
 
-
     /**
      * @param unitId
      * @return
@@ -271,6 +277,49 @@ public class ProcessingActivityService extends MongoBaseService {
      */
     public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsWithSubProcess(Long unitId) {
         return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubprocessingActivities(unitId);
+    }
+
+
+    /**
+     * @param unitId
+     * @param processingActivityId
+     * @param activityRelatedDataSubjects list of data subject which contain list of data category and data Element list
+     * @return
+     */
+    public ProcessingActivity mapDataSubjectDataCategoryAndDataElementToProcessingActivity(Long unitId, BigInteger processingActivityId, List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects) {
+
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+        }
+
+        processingActivity.setDataSubjects(activityRelatedDataSubjects);
+        processingActivityMongoRepository.save(processingActivity);
+        return processingActivity;
+    }
+
+
+    public void getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, BigInteger processingActivityId) {
+
+
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+        }
+        List<ProcessingActivityRelatedDataSubject> mappedDataSubjectList = processingActivity.getDataSubjects();
+        if (!mappedDataSubjectList.isEmpty()) {
+            List<BigInteger> dataSubjectIdList = new ArrayList<>();
+            for (ProcessingActivityRelatedDataSubject processingActivityRelatedDataSubject : mappedDataSubjectList) {
+                dataSubjectIdList.add(processingActivityRelatedDataSubject.getId());
+            }
+            List<DataSubjectMappingResponseDTO> dataSubjectList = processingActivityMongoRepository.getAllMappedDataSubjectWithDataCategoryAndDataElement(unitId, dataSubjectIdList);
+
+
+        } else {
+
+        }
+
+
     }
 
 
