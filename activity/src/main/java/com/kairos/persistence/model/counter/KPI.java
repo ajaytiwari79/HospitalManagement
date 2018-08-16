@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.counter;
 
-import com.kairos.activity.enums.counter.Module;
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.chart.BaseChart;
@@ -29,11 +29,6 @@ public class KPI extends Counter {
         this.size = size;
     }
 
-    public KPI(String title, BaseChart chart, CounterSize size, CounterType type, boolean treatAsCounter, BigInteger primaryCounter, Set<Module> supportedModules){
-        super(title, type, treatAsCounter, primaryCounter, supportedModules);
-        this.chart = chart;
-        this.size = size;
-    }
 
     public BaseChart getChart() {
         return chart;
