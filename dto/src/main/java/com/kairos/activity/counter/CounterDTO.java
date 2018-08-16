@@ -2,7 +2,7 @@ package com.kairos.activity.counter;
 
 //Created By Pavan on 3/8/18
 
-import com.kairos.activity.enums.counter.ApplicableFor;
+import com.kairos.ApplicableFor;
 import com.kairos.enums.CounterType;
 
 import java.math.BigInteger;

@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.counter;
 
-import com.kairos.activity.enums.counter.ApplicableFor;
+import com.kairos.ApplicableFor;
 import com.kairos.activity.counter.*;
 import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.activity.Activity;
@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
