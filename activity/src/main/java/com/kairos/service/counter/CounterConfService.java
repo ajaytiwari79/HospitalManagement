@@ -90,7 +90,7 @@ public class CounterConfService extends MongoBaseService {
         return kpiCategories;
     }
 
-    private List<KPICategoryDTO> getExistingAssignments(List<KPICategoryDTO> categories, ConfLevel level, Long refId){
+    private List<KPICategoryDTO> getExistingCategories(List<KPICategoryDTO> categories, ConfLevel level, Long refId){
         if(categories.isEmpty()) return new ArrayList<>();
         List<BigInteger> categoryIds = categories.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
         List<KPICategoryDTO> categoryDTOs = counterRepository.getKPICategory(categoryIds, level, refId);
@@ -117,9 +117,9 @@ public class CounterConfService extends MongoBaseService {
     public List<KPICategoryDTO> updateCategories(KPICategoryUpdationDTO categories, ConfLevel level, Long refId){
         Set<String> categoriesNames = categories.getUpdatedCategories().stream().map(category -> category.getName().trim().toLowerCase()).collect(Collectors.toSet());
         if(categoriesNames.size() != categories.getUpdatedCategories().size())  exceptionService.duplicateDataException("error.kpi_category.duplicate");
-        List<KPICategoryDTO> deletableCategories = getExistingAssignments(categories.getDeletedCategories(), level, refId);
-        List<KPICategoryDTO> existingAssignments = getExistingAssignments(categories.getUpdatedCategories(), level, refId);
-        List<KPICategory> kpiCategories=modifyCategories(categories.getUpdatedCategories(), existingAssignments, level, refId);
+        List<KPICategoryDTO> deletableCategories = getExistingCategories(categories.getDeletedCategories(), level, refId);
+        List<KPICategoryDTO> existingCategories = getExistingCategories(categories.getUpdatedCategories(), level, refId);
+        List<KPICategory> kpiCategories=modifyCategories(categories.getUpdatedCategories(), existingCategories, level, refId);
         List<BigInteger> deletableCategoryIds = deletableCategories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
         counterRepository.removeAll("categoryId", deletableCategoryIds, CategoryKPIConf.class);
         counterRepository.removeAll("id", deletableCategoryIds, KPICategory.class);

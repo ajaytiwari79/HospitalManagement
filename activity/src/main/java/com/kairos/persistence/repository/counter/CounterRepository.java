@@ -52,19 +52,6 @@ public class CounterRepository {
         return mongoTemplate.find(query, Counter.class);
     }
 
-    //get role and moduleCounterId mapping for unit
-    public List<RoleCounterDTO> getRoleAndModuleCounterIdMapping(BigInteger unitId) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("unitId").is(unitId)),
-                Aggregation.group("roleId").addToSet("moduleCounterId").as("moduleCounterIds"),
-                Aggregation.project("moduleCounterIds")
-
-        );
-
-        AggregationResults<RoleCounterDTO> results = mongoTemplate.aggregate(aggregation, UnitRoleCounter.class, RoleCounterDTO.class);
-        return results.getMappedResults();
-    }
-
     //removal of counters
     public void removeAll(String fieldName, List values, Class claz){
         Query query = new Query(Criteria.where(fieldName).in(values));
@@ -114,7 +101,7 @@ public class CounterRepository {
         }
     }
 
-    //KPI assignment CRUD
+    //KPI  CRUD
     public List<ApplicableKPI> getApplicableKPI(List<BigInteger> kpiIds, ConfLevel level, Long refId){
         String refQueryField = getRefQueryField(level);
         Query query = new Query(Criteria.where("activeKpiId").in(kpiIds).and(refQueryField).is(refId));
@@ -137,27 +124,9 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPICategory.class),KPICategoryDTO.class);
     }
 
-    public List<CategoryAssignment> getCategoryAssignment(BigInteger categoryId, ConfLevel level, Long refId){
-        String queryField = (ConfLevel.COUNTRY.equals(level))? "countryId":"unitId";
-        Query query = new Query(Criteria.where(queryField).is(refId).and("categoryId").is(categoryId));
-        return mongoTemplate.find(query, CategoryAssignment.class);
-    }
 
-    public List<CategoryAssignment> findCategoryAssignment(List<BigInteger> kpiIds, ConfLevel level, Long refId){
-        String queryField = (ConfLevel.COUNTRY.equals(level))? "countryId":"unitId";
-        Aggregation aggregation=Aggregation.newAggregation(
-          Aggregation.match(Criteria.where("kpiId").in(kpiIds)),
-          Aggregation.lookup("categoryAssignment","categoryAssignmentId","_id","categoryAssignment"),
-          Aggregation.match(Criteria.where("categoryAssignment."+queryField).is(refId)),
-          Aggregation.project().and("categoryAssignment.categoryId").as("categoryId").and("categoryAssignment."+queryField).as(queryField)
-                .and("categoryAssignment._id").as("_id")
-        );
-        AggregationResults<CategoryAssignment> results=mongoTemplate.aggregate(aggregation,CategoryKPIConf.class,CategoryAssignment.class);
-        return results.getMappedResults();
-    }
-
-    public void removeCategoryKPIEntries(List<BigInteger> categoryAssignmentIds,List<BigInteger> kpiIds){
-        Query query=new Query(Criteria.where("categoryId").in(categoryAssignmentIds).and("kpiId").in(kpiIds));
+    public void removeCategoryKPIEntries(List<BigInteger> categoryIds,List<BigInteger> kpiIds){
+        Query query=new Query(Criteria.where("categoryId").in(categoryIds).and("kpiId").in(kpiIds));
         mongoTemplate.remove(query, CategoryKPIConf.class);
     }
 
@@ -217,39 +186,35 @@ public class CounterRepository {
        return mongoTemplate.findOne(query, AccessGroupKPIEntry.class);
     }
 
-    public List<OrgTypeKPIEntry> getOrgTypeKPIConfigurationByOrgTypeId(List<Long> accessGroupIds){
-        Query query = new Query(Criteria.where("orgTypeId").in(accessGroupIds));
-        return mongoTemplate.find(query, OrgTypeKPIEntry.class);
-    }
-
-    public boolean removeAccessGroupKPIEntry(List<Long> unitIds,BigInteger kpiId){
+    public void removeAccessGroupKPIEntry(List<Long> unitIds,BigInteger kpiId){
         Query query = new Query(Criteria.where("unitId").in(unitIds).and("kpiId").is(kpiId));
         mongoTemplate.remove(query, AccessGroupKPIEntry.class);
-        return true;
     }
 
-    public boolean removeAccessGroupKPIEntryForCountry(AccessGroupMappingDTO entry,Long refId){
+    public void removeCategoryKPIEntry(List<Long> unitIds,BigInteger kpiId){
+        Query query = new Query(Criteria.where("unitId").in(unitIds).and("kpiId").is(kpiId));
+        mongoTemplate.remove(query, CategoryKPIConf.class);
+    }
+
+    public void removeAccessGroupKPIEntryForCountry(AccessGroupMappingDTO entry,Long refId){
         Query query = new Query(Criteria.where("accessGroupId").is(entry.getAccessGroupId()).and("kpiId").is(entry.getKpiId()).and("countryId").is(refId));
         mongoTemplate.remove(query, AccessGroupKPIEntry.class);
-        return true;
     }
 
-    public boolean removeApplicableKPI(List<Long> refIds,BigInteger kpiId,ConfLevel level){
+    public void removeApplicableKPI(List<Long> refIds,BigInteger kpiId,ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Query query = new Query(Criteria.where(refQueryField).in(refIds).and("activeKpiId").is(kpiId));
         mongoTemplate.remove(query, ApplicableKPI.class);
-        return true;
     }
 
-    public boolean removeTabKPIEntry(List<Long> refIds,BigInteger kpiId,ConfLevel level){
+    public void removeTabKPIEntry(List<Long> refIds,BigInteger kpiId,ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Query query = new Query(Criteria.where(refQueryField).in(refIds).and("kpiId").is(kpiId));
         mongoTemplate.remove(query, TabKPIConf.class);
-        return true;
     }
 
 
-    public List<ApplicableKPI> getKPIAssignmentsByKPIId(List<BigInteger> kpiIds,Long refId,ConfLevel level){
+    public List<ApplicableKPI> getKPIByKPIId(List<BigInteger> kpiIds, Long refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Query query=new Query(Criteria.where(refQueryField).is(refId).and("activeKpiId").in(kpiIds));
         return mongoTemplate.find(query,ApplicableKPI.class);
@@ -282,11 +247,14 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,AccessGroupKPIEntry.class),AccessGroupMappingDTO.class);
     }
 
-
-
-    public List<ApplicableKPI> getApplicableKPIByUnitOrCountryOrStaffId(Long refId, ConfLevel level){
+    public List<ApplicableKPI> getApplicableKPIByReferenceId(List<BigInteger> kpiIds,Long refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
-        Query query=new Query(Criteria.where(refQueryField).is(refId));
+        Query query=null;
+        if(kpiIds.isEmpty()){
+            query=new Query(Criteria.where(refQueryField).is(refId));
+        }else{
+            query=new Query(Criteria.where(refQueryField).is(refId).and("activeKpiId").in(kpiIds));
+        }
         return mongoTemplate.find(query,ApplicableKPI.class);
     }
 

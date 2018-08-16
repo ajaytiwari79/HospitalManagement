@@ -7,7 +7,6 @@ import com.kairos.activity.counter.KPICategoryDTO;
 import com.kairos.activity.counter.KPIDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
-import com.kairos.activity.counter.distribution.access_group.RoleCounterDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
@@ -39,7 +38,7 @@ import static java.util.stream.Collectors.toList;
  */
 
 @Service
-public class CounterManagementService extends MongoBaseService {
+public class CounterDistService extends MongoBaseService {
     @Inject
     private CounterRepository counterRepository;
     @Inject
@@ -47,25 +46,22 @@ public class CounterManagementService extends MongoBaseService {
     @Inject
     private GenericIntegrationService genericIntegrationService;
 
-    private final static Logger logger = LoggerFactory.getLogger(CounterManagementService.class);
+    private final static Logger logger = LoggerFactory.getLogger(CounterDistService.class);
 
     private void overrideOldObject(MongoBaseEntity newEntity, MongoBaseEntity oldEntity) {
         BeanUtils.copyProperties(oldEntity, newEntity);
     }
 
-    //get role wise moduleCounterId mapping
-    public List<RoleCounterDTO> getRoleCounterMapping(BigInteger unitId) {
-        return counterRepository.getRoleAndModuleCounterIdMapping(unitId);
-    }
 
     public List<KPIDTO> getKPIsList(Long refId, ConfLevel level) {
         List<ApplicableKPIDTO> applicableKPIList=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
         if(applicableKPIList.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
-        List<KPIDTO> kpiIds=applicableKPIList.stream().map(applicableKPIDTO -> applicableKPIDTO.getKpiIds()).collect(Collectors.toList());
-        return kpiIds;
+        List<KPIDTO> kpidtos=applicableKPIList.stream().map(applicableKPIDTO -> applicableKPIDTO.getKpi()).collect(Collectors.toList());
+        return kpidtos;
     }
+
 
     public InitialKPICategoryDistDataDTO getInitialCategoryKPIDistData(Long refId, ConfLevel level) {
         List<KPICategoryDTO> categories = counterRepository.getKPICategory(null, level, refId);
@@ -75,6 +71,8 @@ public class CounterManagementService extends MongoBaseService {
     }
 
     public void addCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {
+        Long countryId = ConfLevel.COUNTRY.equals(level)? refId: null;
+        Long unitId=ConfLevel.UNIT.equals(level)? refId: null;
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(categoryKPIsDetails.getKpiIds(), level, refId);
         if(applicableKPIS.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
@@ -85,16 +83,16 @@ public class CounterManagementService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("error.kpi_category.availability");
         }
         List<CategoryKPIConf> categoryKPIConfs = counterRepository.getCategoryKPIConfs(categoryKPIsDetails.getKpiIds(),categoryIds);
-        List<BigInteger>  availableCategoryAssignmentIds=categoryKPIConfs.stream().map(categoryKPIConf -> categoryKPIConf.getCategoryId()).collect(toList());
-        if(availableCategoryAssignmentIds.contains(categoryKPIsDetails.getCategoryId())){
+        List<BigInteger>  availableCategoryIds=categoryKPIConfs.stream().map(categoryKPIConf -> categoryKPIConf.getCategoryId()).collect(toList());
+        if(availableCategoryIds.contains(categoryKPIsDetails.getCategoryId())){
             exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
         }
         List<CategoryKPIConf> newCategoryKPIConfs = new ArrayList<>();
-        applicableKPIS.parallelStream().forEach(applicableKPI -> newCategoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(),categoryKPIsDetails.getCategoryId())));
+        applicableKPIS.parallelStream().forEach(applicableKPI -> newCategoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(),categoryKPIsDetails.getCategoryId(),countryId,unitId,level)));
         if(!newCategoryKPIConfs.isEmpty())
         {
         save(newCategoryKPIConfs);
-        counterRepository.removeCategoryKPIEntries(availableCategoryAssignmentIds,categoryKPIsDetails.getKpiIds());
+        counterRepository.removeCategoryKPIEntries(availableCategoryIds,categoryKPIsDetails.getKpiIds());
         }
 
     }
@@ -114,7 +112,7 @@ public class CounterManagementService extends MongoBaseService {
             refId=staffId;
         }
         List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),refId,level);
-       List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignmentsByKPIId(tabKPIEntries.getKpiIds(),refId,level);
+       List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(tabKPIEntries.getKpiIds(),refId,level);
 //        if (tabKPIEntries.getKpiIds().size() != applicableKPIS.size()) {
 //            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
 //        }
@@ -132,7 +130,7 @@ public class CounterManagementService extends MongoBaseService {
           }
       });});
         if (entriesToSave.isEmpty()) {
-            exceptionService.duplicateDataException("message.tab.kpi.notfound");
+            exceptionService.invalidRequestException("error.kpi.invalidData");
         }
         save(entriesToSave);
     }
@@ -170,7 +168,7 @@ public class CounterManagementService extends MongoBaseService {
         Long countryId = ConfLevel.COUNTRY.equals(level)? refId: null;
         Long unitId=ConfLevel.UNIT.equals(level)? refId: null;
         List<AccessGroupKPIEntry> entriesToSave = new ArrayList<>();
-//        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignmentsByKPIId(accessGroupKPIConf.getKpiIds(),refId,level);
+//        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(accessGroupKPIConf.getKpiIds(),refId,level);
 //        if (accessGroupKPIConf.getKpiIds().size() != applicableKPIS.size()) {
 //            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
 //        }
@@ -188,7 +186,7 @@ public class CounterManagementService extends MongoBaseService {
             }
         });});
         if(entriesToSave.isEmpty()) {
-            exceptionService.dataNotFoundByIdException("message.accessgroup.kpi.notfound");
+            exceptionService.invalidRequestException("error.kpi.invalidData");
         }
         save(entriesToSave);
 
@@ -219,7 +217,7 @@ public class CounterManagementService extends MongoBaseService {
     }
 
     public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf, Long countryId) {
-//        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIAssignmentsByKPIId(orgTypeKPIConf.getKpiIds(),countryId,ConfLevel.COUNTRY);
+//        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(orgTypeKPIConf.getKpiIds(),countryId,ConfLevel.COUNTRY);
 //        if (orgTypeKPIConf.getKpiIds().size() != applicableKPIS.size()) {
 //            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
 //        }
@@ -238,7 +236,7 @@ public class CounterManagementService extends MongoBaseService {
               }
           }); });
         if(entriesToSave.isEmpty()){
-            exceptionService.dataNotFoundByIdException("Organization Type KPI not found");
+            exceptionService.invalidRequestException("error.kpi.invalidData");
         }
             save(entriesToSave);
     }
@@ -249,6 +247,7 @@ public class CounterManagementService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.orgtype.kpi.notfound");
         }
          List<Long> unitIds=genericIntegrationService.getOrganizationIdsBySubOrgId(orgTypeKPIEntry.getOrgTypeId());
+        counterRepository.removeCategoryKPIEntry(unitIds,orgTypeKPIEntry.getKpiId());
         counterRepository.removeAccessGroupKPIEntry(unitIds,orgTypeKPIEntry.getKpiId());
         counterRepository.removeTabKPIEntry(unitIds,orgTypeKPIEntry.getKpiId(),ConfLevel.UNIT);
         counterRepository.removeApplicableKPI(unitIds,orgTypeKPIEntry.getKpiId(),ConfLevel.UNIT);
@@ -256,7 +255,7 @@ public class CounterManagementService extends MongoBaseService {
     }
 
     public void createDefalutStaffKPISetting(Long unitId,DefalutKPISettingDTO defalutKPISettingDTO) {
-        List<ApplicableKPI> applicableKPISForUnit = counterRepository.getApplicableKPIByUnitOrCountryOrStaffId(unitId, ConfLevel.UNIT);
+        List<ApplicableKPI> applicableKPISForUnit = counterRepository.getApplicableKPIByReferenceId(null,unitId, ConfLevel.UNIT);
         if(applicableKPISForUnit.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.applicable.kpi.notfound");
         }
@@ -285,35 +284,31 @@ public class CounterManagementService extends MongoBaseService {
         if(orgTypeMappingDTOS.isEmpty()){
                 exceptionService.dataNotFoundByIdException("message.orgtype.kpi.notfound");
         }
-        List<BigInteger> kpiIds = orgTypeMappingDTOS.stream().map(orgTypeMappingDTO -> orgTypeMappingDTO.getKpiId()).collect(Collectors.toList());
-        List<ApplicableKPI> applicableKPIS = new ArrayList<>();
-        kpiIds.forEach(kpiId -> {
-            applicableKPIS.add(new ApplicableKPI(kpiId,kpiId,null, unitId, null, ConfLevel.UNIT));
-        });
+        List<BigInteger> applicableKpiIds = orgTypeMappingDTOS.stream().map(orgTypeMappingDTO -> orgTypeMappingDTO.getKpiId()).collect(Collectors.toList());
         if(Optional.ofNullable(defalutKPISettingDTO.getParentUnitId()).isPresent()) {
-            setDefaultDateFromParentUnitTounit(defalutKPISettingDTO,unitId);
+            setDefaultSettingUnit(defalutKPISettingDTO,applicableKpiIds,unitId,ConfLevel.UNIT);
         }else{
-            setDefaultDateFromCountryToUnit(defalutKPISettingDTO,unitId);
+            setDefaultSettingUnit(defalutKPISettingDTO,applicableKpiIds,unitId,ConfLevel.COUNTRY);
         }
-        save(applicableKPIS);
     }
 
-    public void setDefaultDateFromCountryToUnit(DefalutKPISettingDTO defalutKPISettingDTO,Long unitId) {
+    public void setDefaultSettingUnit(DefalutKPISettingDTO defalutKPISettingDTO,List<BigInteger> kpiIds, Long unitId,ConfLevel level) {
+        Long refId = ConfLevel.COUNTRY.equals(level)? defalutKPISettingDTO.getCountryId(): defalutKPISettingDTO.getParentUnitId();
         List<CategoryKPIConf> categoryKPIConfToSave=new ArrayList<>();
         List<AccessGroupKPIEntry> accessGroupKPIEntries = new ArrayList<>();
         List<TabKPIConf> tabKPIConfKPIEntries=new ArrayList<>();
-        List<ApplicableKPI> applicableKPISForUnitOrCountry=counterRepository.getApplicableKPIByUnitOrCountryOrStaffId(defalutKPISettingDTO.getCountryId(),ConfLevel.COUNTRY);
-        List<BigInteger> applicableKpiIds=applicableKPISForUnitOrCountry.stream().map(applicableKPI -> applicableKPI.getBaseKpiId()).collect(Collectors.toList());
+        List<ApplicableKPI> applicableKPIS=counterRepository.getApplicableKPIByReferenceId(kpiIds,refId,level);
+        List<BigInteger> applicableKpiIds=applicableKPIS.stream().map(applicableKPI -> applicableKPI.getActiveKpiId()).collect(Collectors.toList());
         List<Long> countryAccessGroupIds = defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().keySet().stream().collect(Collectors.toList());
-        List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, new ArrayList<>(), ConfLevel.COUNTRY, defalutKPISettingDTO.getCountryId());
+        List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(countryAccessGroupIds, applicableKpiIds, level, refId);
         accessGroupMappingDTOS.forEach(accessGroupMappingDTO -> {
             accessGroupKPIEntries.add(new AccessGroupKPIEntry(defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().get(accessGroupMappingDTO.getAccessGroupId()), accessGroupMappingDTO.getKpiId(), null, unitId, ConfLevel.UNIT));
         });
-        List<TabKPIConf> tabKPIConf=counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds,defalutKPISettingDTO.getCountryId(),ConfLevel.COUNTRY);
+        List<TabKPIConf> tabKPIConf=counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds,refId,level);
         tabKPIConf.stream().forEach(tabKPIConfKPI->{
             tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(),tabKPIConfKPI.getKpiId(),null,unitId,null,ConfLevel.UNIT));
         });
-          List<KPICategoryDTO> kpiCategoryDTOS = counterRepository.getKPICategory(null, ConfLevel.COUNTRY, defalutKPISettingDTO.getCountryId());
+          List<KPICategoryDTO> kpiCategoryDTOS = counterRepository.getKPICategory(null, level, refId);
            Map<String,BigInteger> categoriesNameMap=new HashMap<>();
            Map<BigInteger,BigInteger> categoriesOldAndNewIds=new HashMap<>();
            kpiCategoryDTOS.stream().forEach(kpiCategoryDTO -> {
@@ -327,52 +322,25 @@ public class CounterManagementService extends MongoBaseService {
            List<BigInteger> oldCategoriesIds=kpiCategoryDTOS.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
         List<CategoryKPIConf> categoryKPIConfList = counterRepository.getCategoryKPIConfs(applicableKpiIds,oldCategoriesIds);
         categoryKPIConfList.stream().forEach(categoryKPIConf -> {
-                    categoryKPIConfToSave.add(new CategoryKPIConf(categoryKPIConf.getKpiId(),categoriesOldAndNewIds.get(categoryKPIConf.getCategoryId())));
+                    categoryKPIConfToSave.add(new CategoryKPIConf(categoryKPIConf.getKpiId(),categoriesOldAndNewIds.get(categoryKPIConf.getCategoryId()),null,unitId,ConfLevel.UNIT));
         });
-        save(categoryKPIConfToSave);
-        save(tabKPIConfKPIEntries);
-        save(accessGroupKPIEntries);
-    }
-
-    public void setDefaultDateFromParentUnitTounit(DefalutKPISettingDTO defalutKPISettingDTO,Long unitId){
-        List<CategoryKPIConf> categoryKPIConfToSave=new ArrayList<>();
-        List<AccessGroupKPIEntry> accessGroupKPIEntries = new ArrayList<>();
-        List<TabKPIConf> tabKPIConfKPIEntries=new ArrayList<>();
-        List<ApplicableKPI> applicableKPISForUnit=counterRepository.getApplicableKPIByUnitOrCountryOrStaffId(defalutKPISettingDTO.getParentUnitId(),ConfLevel.UNIT);
-        if(applicableKPISForUnit.isEmpty()){
-            exceptionService.dataNotFoundByIdException("message.applicable.kpi.notfound");
+        List<ApplicableKPI> applicableKPISToSave = new ArrayList<>();
+        applicableKpiIds.forEach(kpiId -> {
+            applicableKPIS.add(new ApplicableKPI(kpiId,kpiId,null, unitId, null, ConfLevel.UNIT));
+        });
+        //due to avoid exception and entity may be blank here so I using multiple conditional statements harish
+        if(!applicableKPISToSave.isEmpty()){
+            save(applicableKPISToSave);
         }
-        List<BigInteger> applicableKpiIds=applicableKPISForUnit.stream().map(applicableKPI -> applicableKPI.getBaseKpiId()).collect(Collectors.toList());
-        List<AccessGroupKPIEntry> accessGroupMappingDTOSForunit=counterRepository.getAccessGroupKPIByUnitIdAndKpiIds(applicableKpiIds,defalutKPISettingDTO.getParentUnitId());
-        if(accessGroupMappingDTOSForunit.isEmpty()){
-            exceptionService.dataNotFoundByIdException("message.accessgroup.kpi.notfound");
+        if(!accessGroupKPIEntries.isEmpty()) {
+            save(accessGroupKPIEntries);
         }
-        accessGroupMappingDTOSForunit.stream().forEach(accessGroupKPIEntry -> {
-            accessGroupKPIEntries.add(new AccessGroupKPIEntry(accessGroupKPIEntry.getAccessGroupId(),accessGroupKPIEntry.getKpiId(),null,unitId,ConfLevel.UNIT));
-        });
-        List<TabKPIConf> tabKPIConf=counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds,defalutKPISettingDTO.getParentUnitId(),ConfLevel.UNIT);
-        tabKPIConf.stream().forEach(tabKPIConfKPI->{
-            tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(),tabKPIConfKPI.getKpiId(),null,unitId,null,ConfLevel.UNIT));
-        });
-        List<KPICategoryDTO> kpiCategoryDTOS = counterRepository.getKPICategory(null, ConfLevel.COUNTRY, defalutKPISettingDTO.getCountryId());
-        Map<String,BigInteger> categoriesNameMap=new HashMap<>();
-        Map<BigInteger,BigInteger> categoriesOldAndNewIds=new HashMap<>();
-        kpiCategoryDTOS.stream().forEach(kpiCategoryDTO -> {
-            categoriesNameMap.put(kpiCategoryDTO.getName(),kpiCategoryDTO.getId());
-        });
-        List<KPICategory> kpiCategories = kpiCategoryDTOS.stream().map(category -> new KPICategory(category.getName(),null,unitId,ConfLevel.UNIT)).collect(Collectors.toList());
-        save(kpiCategories);
-        kpiCategories.stream().forEach(kpiCategory -> {
-            categoriesOldAndNewIds.put(categoriesNameMap.get(kpiCategory.getName()),kpiCategory.getId());
-        });
-        List<BigInteger> oldCategoriesIds=kpiCategoryDTOS.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
-        List<CategoryKPIConf> categoryKPIConfList = counterRepository.getCategoryKPIConfs(applicableKpiIds,oldCategoriesIds);
-        categoryKPIConfList.stream().forEach(categoryKPIConf -> {
-            categoryKPIConfToSave.add(new CategoryKPIConf(categoryKPIConf.getKpiId(),categoriesOldAndNewIds.get(categoryKPIConf.getCategoryId())));
-        });
-        save(categoryKPIConfToSave);
-        save(tabKPIConfKPIEntries);
-        save(accessGroupKPIEntries);
+        if(!categoryKPIConfToSave.isEmpty()) {
+            save(categoryKPIConfToSave);
+        }
+        if(!tabKPIConfKPIEntries.isEmpty()) {
+            save(tabKPIConfKPIEntries);
+        }
     }
 
 }

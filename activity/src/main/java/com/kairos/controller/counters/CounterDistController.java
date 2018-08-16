@@ -9,7 +9,7 @@ import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
-import com.kairos.service.counter.CounterManagementService;
+import com.kairos.service.counter.CounterDistService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ import static com.kairos.constants.ApiConstants.*;
 public class CounterDistController {
 
     @Inject
-    private CounterManagementService counterManagementService;
+    private CounterDistService counterManagementService;
 
     private final static Logger logger = LoggerFactory.getLogger(CounterDistController.class);
 

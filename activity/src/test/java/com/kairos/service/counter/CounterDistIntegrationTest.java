@@ -31,14 +31,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class CounterDistIntegrationTest {
-    private Logger logger = LoggerFactory.getLogger(CounterManagementService.class);
+    private Logger logger = LoggerFactory.getLogger(CounterDistService.class);
     @Autowired
     ExceptionService exceptionService;
     @org.springframework.beans.factory.annotation.Value("${server.host.http.url}")
