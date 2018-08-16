@@ -254,7 +254,7 @@ public class CounterDistService extends MongoBaseService {
         counterRepository.removeEntityById(orgTypeKPIEntry.getId(),OrgTypeKPIEntry.class);
     }
 
-    public void createDefalutStaffKPISetting(Long unitId,DefalutKPISettingDTO defalutKPISettingDTO) {
+    public void createDefaultStaffKPISetting(Long unitId, DefalutKPISettingDTO defalutKPISettingDTO) {
         List<ApplicableKPI> applicableKPISForUnit = counterRepository.getApplicableKPIByReferenceId(null,unitId, ConfLevel.UNIT);
         if(applicableKPISForUnit.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.applicable.kpi.notfound");
@@ -275,8 +275,8 @@ public class CounterDistService extends MongoBaseService {
            applicableKPIS.add(new ApplicableKPI(kpiId,kpiId,null,unitId,staffId,ConfLevel.STAFF));
        });
        });
-       save(applicableKPIS);
-       save(tabKPIConfKPIEntries);
+       if(!applicableKpiIds.isEmpty()) save(applicableKPIS);
+       if(!tabKPIConfKPIEntries.isEmpty()) save(tabKPIConfKPIEntries);
     }
 
     public void createDefaultKpiSetting(Long unitId, DefalutKPISettingDTO defalutKPISettingDTO) {

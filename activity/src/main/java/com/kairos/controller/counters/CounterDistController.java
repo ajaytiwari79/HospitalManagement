@@ -215,7 +215,7 @@ public class CounterDistController {
 
     @PostMapping(UNIT_URL+"/counter/dist/staff_default_kpi_setting")
     public ResponseEntity<Map<String, Object>> createDefaluSettingForStaff(@PathVariable Long unitId, @RequestBody DefalutKPISettingDTO defalutKPISettingDTO){
-        counterManagementService.createDefalutStaffKPISetting(unitId,defalutKPISettingDTO);
+        counterManagementService.createDefaultStaffKPISetting(unitId,defalutKPISettingDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 }
