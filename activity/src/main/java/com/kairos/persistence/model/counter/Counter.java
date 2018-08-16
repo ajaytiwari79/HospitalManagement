@@ -21,7 +21,7 @@ public class Counter extends MongoBaseEntity {
     private BigInteger primaryCounter;
     private BigInteger categoryId;
     private List<FilterCriteria> criteriaList;
-    private Set<ModuleType> supportedModuleTypes =new HashSet<>(Arrays.asList(ModuleType.OPEN_SHIFT));
+    private Set<ModuleType> supportedModuleTypes;
 
     public Counter() {
         //Default Constructor
@@ -38,13 +38,6 @@ public class Counter extends MongoBaseEntity {
         this.title = title;
     }
 
-    public Counter(String title, CounterType type,boolean treatAsCounter, BigInteger primaryCounter, Set<ModuleType> supportedModuleTypes) {
-        this.type = type;
-        this.title = title;
-        this.treatAsCounter = treatAsCounter;
-        this.primaryCounter = primaryCounter;
-        this.supportedModuleTypes = supportedModuleTypes;
-    }
 
     public Counter(CounterType restingHoursPerPresenceDay, List<FilterCriteria> criteriaList) {
         super();

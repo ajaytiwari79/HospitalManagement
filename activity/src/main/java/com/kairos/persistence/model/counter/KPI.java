@@ -29,11 +29,6 @@ public class KPI extends Counter {
         this.size = size;
     }
 
-    public KPI(String title, BaseChart chart, CounterSize size, CounterType type, boolean treatAsCounter, BigInteger primaryCounter, Set<ModuleType> supportedModuleTypes){
-        super(title, type, treatAsCounter, primaryCounter, supportedModuleTypes);
-        this.chart = chart;
-        this.size = size;
-    }
 
     public BaseChart getChart() {
         return chart;
