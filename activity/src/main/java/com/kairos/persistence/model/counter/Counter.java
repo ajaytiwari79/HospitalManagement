@@ -6,9 +6,7 @@ import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -23,7 +21,7 @@ public class Counter extends MongoBaseEntity {
     private BigInteger primaryCounter;
     private BigInteger categoryId;
     private List<FilterCriteria> criteriaList;
-    private Set<ModuleType> supportedModuleTypes =Collections.singleton(ModuleType.OPEN_SHIFT);
+    private Set<ModuleType> supportedModuleTypes =new HashSet<>(Arrays.asList(ModuleType.OPEN_SHIFT));
 
     public Counter() {
         //Default Constructor
