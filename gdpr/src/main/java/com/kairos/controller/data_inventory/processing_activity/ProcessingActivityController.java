@@ -122,7 +122,7 @@ public class ProcessingActivityController {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, "");
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(unitId, processingActivityId));
     }
 
 }
