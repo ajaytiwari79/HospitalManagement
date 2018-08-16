@@ -194,11 +194,6 @@ public class StaffingLevelTemplateService extends MongoBaseService {
 
     }
 
-    public boolean deleteStaffingLevelTemplate(BigInteger staffingLevelTemplateId){
-         staffingLevelTemplateRepository.deleteStaffingLevelTemplate(staffingLevelTemplateId);
-         return true;
-    }
-
     private void addErrorsOfCurrentActivity(Activity activity, List<String> errors, List<ActivityResponse> activityResponse, List<Long> dayTypes){
         if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
             errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.for.staffing.level",activity.getName()));
@@ -213,6 +208,11 @@ public class StaffingLevelTemplateService extends MongoBaseService {
             activityResponse.add(new ActivityResponse(activity.getId(),activity.getName(),activity.getGeneralActivityTab().getStartDate(),
                     activity.getGeneralActivityTab().getEndDate(),errors));
         }
+    }
+
+    public boolean deleteStaffingLevelTemplate(BigInteger staffingLevelTemplateId){
+        staffingLevelTemplateRepository.deleteStaffingLevelTemplate(staffingLevelTemplateId);
+        return true;
     }
 
 }
