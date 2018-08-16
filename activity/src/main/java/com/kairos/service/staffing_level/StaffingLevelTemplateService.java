@@ -170,19 +170,9 @@ public class StaffingLevelTemplateService extends MongoBaseService {
                         activity.getGeneralActivityTab().getStartDate().isBefore(startDate)){
                     errors.add(exceptionService.getLanguageSpecificText("activity.out.of.range",activity.getName()));
                 }
-                if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
-                    errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.for.staffing.level",activity.getName()));
-                }
-                if(activity.getRulesActivityTab().isEligibleForPresence()){
-                    errors.add(exceptionService.getLanguageSpecificText("activity.not.presenceType",activity.getName()));
-                }
-                if(!CollectionUtils.containsAny(dayTypes,activity.getRulesActivityTab().getDayTypes())){
-                    errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.dayType",activity.getName()));
-                }
-                if(!errors.isEmpty()){
-                    activityResponse.add(new ActivityResponse(activity.getId(),activity.getName(),activity.getGeneralActivityTab().getStartDate(),
-                            activity.getGeneralActivityTab().getEndDate(),errors));
-                }
+
+                addErrorsOfCurrentActivity(activity,errors,activityResponse,dayTypes);
+
 
             });
         } else {
@@ -197,20 +187,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
                     errors.add(exceptionService.getLanguageSpecificText("activity.out.of.range",activity.getName()));
                 }
 
-                if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
-                    errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.for.staffing.level",activity.getName()));
-                }
-                if(activity.getRulesActivityTab().isEligibleForPresence()){
-                    errors.add(exceptionService.getLanguageSpecificText("activity.not.presenceType",activity.getName()));
-                }
-                if(!CollectionUtils.containsAny(dayTypes,activity.getRulesActivityTab().getDayTypes())){
-                    errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.dayType",activity.getName()));
-                }
-
-                if(!errors.isEmpty()){
-                    activityResponse.add(new ActivityResponse(activity.getId(),activity.getName(),activity.getGeneralActivityTab().getStartDate(),
-                            activity.getGeneralActivityTab().getEndDate(),errors));
-                }
+                addErrorsOfCurrentActivity(activity,errors,activityResponse,dayTypes);
             });
         }
         return activityResponse;
@@ -220,6 +197,22 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     public boolean deleteStaffingLevelTemplate(BigInteger staffingLevelTemplateId){
          staffingLevelTemplateRepository.deleteStaffingLevelTemplate(staffingLevelTemplateId);
          return true;
+    }
+
+    private void addErrorsOfCurrentActivity(Activity activity, List<String> errors, List<ActivityResponse> activityResponse, List<Long> dayTypes){
+        if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
+            errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.for.staffing.level",activity.getName()));
+        }
+        if(activity.getRulesActivityTab().isEligibleForPresence()){
+            errors.add(exceptionService.getLanguageSpecificText("activity.not.presenceType",activity.getName()));
+        }
+        if(!CollectionUtils.containsAny(dayTypes,activity.getRulesActivityTab().getDayTypes())){
+            errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.dayType",activity.getName()));
+        }
+        if(!errors.isEmpty()){
+            activityResponse.add(new ActivityResponse(activity.getId(),activity.getName(),activity.getGeneralActivityTab().getStartDate(),
+                    activity.getGeneralActivityTab().getEndDate(),errors));
+        }
     }
 
 }
