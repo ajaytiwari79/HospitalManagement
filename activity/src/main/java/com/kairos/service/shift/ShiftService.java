@@ -102,6 +102,7 @@ public class ShiftService extends MongoBaseService {
     private final Logger logger = LoggerFactory.getLogger(ShiftService.class);
 
     @Inject
+    private
     ShiftMongoRepository shiftMongoRepository;
     @Inject
     private ActivityMongoRepository activityRepository;
@@ -434,7 +435,7 @@ public class ShiftService extends MongoBaseService {
         save(shifts);
         timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shifts);
         payOutService.savePayOuts(staffAdditionalInfoDTO, shifts,Arrays.asList(activity));
-        shifts.stream().forEach(s -> shiftQueryResults.add(s.getShiftQueryResult()));
+        shifts.forEach(s -> shiftQueryResults.add(s.getShiftQueryResult()));
         return shiftQueryResults;
     }
 
@@ -509,7 +510,7 @@ public class ShiftService extends MongoBaseService {
         }
         List<ShiftQueryResult> shifts = (Optional.ofNullable(unitPositionId).isPresent()) ? shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId()) :
                 shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
-        shifts.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
+        shifts.stream().map(ShiftQueryResult::sortShifts).collect(Collectors.toList());
         setShiftTimeType(shifts);
         List<AppliedFunctionDTO> appliedFunctionDTOs = null;
         if (Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
@@ -567,7 +568,7 @@ public class ShiftService extends MongoBaseService {
         return shiftMongoRepository.countByActivityId(activityId);
     }
 
-    public void validateShiftWithActivity(Phase phase,WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    private void validateShiftWithActivity(Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.unit.position");
         }
