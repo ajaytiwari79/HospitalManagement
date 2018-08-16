@@ -912,13 +912,29 @@ public class StaffingLevelService extends MongoBaseService {
         List<StaffingLevel> staffingLevels=new ArrayList<>();
         Set<BigInteger> activityIds=new HashSet<>();
 
+
         StaffingLevelTemplate staffingLevelTemplate=staffingLevelTemplateRepository.findByIdAndUnitIdAndDeletedFalse(staffingLevelTemplateId,unitId);
         if(!Optional.ofNullable(staffingLevelTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("data.Not.found",staffingLevelTemplateId);
         }
-        staffingLevelTemplate.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> staffingLevelInterval.getStaffingLevelActivities().forEach(activity->{
-            activityIds.add(activity.getActivityId());
-        }));
+
+        staffingLevelTemplate.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+            Set<BigInteger> activitiesOfCurrentInterval=new HashSet<>();
+            staffingLevelInterval.getStaffingLevelActivities().forEach(activity->{
+                activitiesOfCurrentInterval.add(activity.getActivityId());
+                activityIds.add(activity.getActivityId());
+            });
+            if(!activitiesOfCurrentInterval.containsAll(staffingLevelFromTemplateDTO.getSelectedActivityIds())){
+                exceptionService.actionNotPermittedException("All activities are not present in interval",staffingLevelInterval.getStaffingLevelDuration().getFrom(),staffingLevelInterval.getStaffingLevelDuration().getTo());
+            }
+        });
+        staffingLevelTemplate.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval ->
+                staffingLevelInterval.getStaffingLevelActivities().forEach(activity->{
+
+
+            })
+
+        );
 
         if(!activityIds.containsAll(staffingLevelFromTemplateDTO.getSelectedActivityIds())){
 
