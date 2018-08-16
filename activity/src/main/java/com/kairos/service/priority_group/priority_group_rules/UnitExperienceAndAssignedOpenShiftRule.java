@@ -21,17 +21,17 @@ public class UnitExperienceAndAssignedOpenShiftRule implements PriorityGroupRule
     @Override
     public void filter(Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
 
-        final AtomicInteger thresholdShiftCount = new AtomicInteger() ;
-        final AtomicInteger experienceInDays = new AtomicInteger();
+        final AtomicInteger thresholdShiftCount = new AtomicInteger();
+        int experienceInDays = 0;
 
         if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned()).isPresent()) {
-            thresholdShiftCount.set(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned()) ;
+            thresholdShiftCount.set(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned());
 
         }
         if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned()).isPresent()) {
-            experienceInDays.set(priorityGroupDTO.getStaffExcludeFilter().getUnitExperienceInWeek()*7);
+            experienceInDays = priorityGroupDTO.getStaffExcludeFilter().getUnitExperienceInWeek()*7;
         }
-        Long startDate = DateUtils.getLongFromLocalDate(LocalDate.now().minusDays(experienceInDays.get()));
+        Long startDate = DateUtils.getLongFromLocalDate(LocalDate.now().minusDays(experienceInDays));
         for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry: openShiftStaffMap.entrySet()) {
             entry.getValue().removeIf(staffUnitPosition-> (Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getNumberOfShiftAssigned()).isPresent()&&
                     assignedOpenShiftMap.containsKey(staffUnitPosition.getUnitPositionId())
