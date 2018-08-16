@@ -9,14 +9,10 @@ import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.client.dto.TableConfiguration;
-import com.kairos.dto.KairosScheduleJobDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
-import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.agreement.cta.*;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.queryResults.ClientMinimumDTO;
+import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.Function;
@@ -91,7 +87,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.kairos.util.DateUtils.ONLY_DATE;
 import static com.kairos.util.table_constants.TableSettingsConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
@@ -355,12 +350,11 @@ public class UnitPositionService extends UserBaseService {
         }
 
         UnitPosition oldUnitPosition = unitPositionGraphRepository.findOne(unitPositionId);
-        if (!Optional.ofNullable(oldUnitPosition).isPresent()) {
+         if (!Optional.ofNullable(oldUnitPosition).isPresent()) {
 
             exceptionService.dataNotFoundByIdException("message.positionid.notfound", unitPositionId);
 
         }
-
         UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(unitPositionId);
         EmploymentQueryResult employmentQueryResult;
         UnitPositionQueryResult unitPositionQueryResult;
@@ -418,10 +412,13 @@ public class UnitPositionService extends UserBaseService {
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
 
         }
+
         Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO.getStaffId(),
                 unitPositionDTO.getEndLocalDate() != null ? DateUtil.getDateFromEpoch(unitPositionDTO.getEndLocalDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupIdOnEmploymentEnd());
         Long reasonCodeId = Optional.ofNullable(employment.getReasonCode()).isPresent() ? employment.getReasonCode().getId() : null;
         employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd());
+        // Deleting All shifts after employment end date
+        activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId,unitPositionDTO.getEndLocalDate(),unitPositionDTO.getStaffId());
         //TODO might remove -- FOR FE compactibility
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.getWTAById(oldUnitPosition.getWorkingTimeAgreementId());
         unitPositionQueryResult.setWorkingTimeAgreement(wtaResponseDTO);

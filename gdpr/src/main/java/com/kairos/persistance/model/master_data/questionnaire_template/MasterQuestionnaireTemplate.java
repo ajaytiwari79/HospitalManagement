@@ -1,6 +1,7 @@
 package com.kairos.persistance.model.master_data.questionnaire_template;
 
 
+import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,7 +22,7 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
     private String description;
 
     @NotBlank(message = "Template type cannot be empty ")
-    private String templateType;
+    private QuestionnaireTemplateType templateType;
 
     private BigInteger assetType;
 
@@ -29,43 +30,25 @@ public class MasterQuestionnaireTemplate extends MongoBaseEntity {
 
     private List<BigInteger> sections=new ArrayList<>();
 
-    public BigInteger getAssetType() {
-        return assetType;
-    }
+    public BigInteger getAssetType() { return assetType; }
 
-    public void setAssetType(BigInteger assetType) {
-        this.assetType = assetType;
-    }
+    public void setAssetType(BigInteger assetType) { this.assetType = assetType; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getDescription() { return description; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public void setDescription(String description) { this.description = description; }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setName(String name) { this.name = name; }
 
-    public List<BigInteger> getSections() {
-        return sections;
-    }
+    public List<BigInteger> getSections() { return sections; }
 
-    public void setSections(List<BigInteger> sections) {
-        this.sections = sections;
-    }
+    public void setSections(List<BigInteger> sections) { this.sections = sections; }
 
-    public String getTemplateType() {
-        return templateType;
-    }
+    public QuestionnaireTemplateType getTemplateType() { return templateType; }
 
-    public void setTemplateType(String templateType) {
+    public void setTemplateType(QuestionnaireTemplateType templateType) {
         this.templateType = templateType;
     }
 
