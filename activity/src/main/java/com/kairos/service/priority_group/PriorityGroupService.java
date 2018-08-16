@@ -1,6 +1,6 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.ApplicableFor;
+import com.kairos.activity.enums.counter.ApplicableFor;
 import com.kairos.activity.counter.CounterDTO;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
@@ -16,7 +16,6 @@ import com.kairos.activity.open_shift.PriorityGroupWrapper;
 import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
