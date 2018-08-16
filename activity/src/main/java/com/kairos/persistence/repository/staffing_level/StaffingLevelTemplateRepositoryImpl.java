@@ -15,11 +15,12 @@ import java.math.BigInteger;
 public class StaffingLevelTemplateRepositoryImpl implements CustomStaffingLevelTemplateRepository {
     @Inject
     private MongoTemplate mongoTemplate;
+
     @Override
     public void deleteStaffingLevelTemplate(BigInteger staffingLevelTemplateId) {
         Query query=new Query(Criteria.where("_id").is(staffingLevelTemplateId));
         Update update=new Update();
         update.set("deleted",true);
-        mongoTemplate.upsert(query,update,StaffingLevelTemplate.class);
+        mongoTemplate.updateFirst(query,update,StaffingLevelTemplate.class);
     }
 }
