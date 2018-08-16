@@ -34,8 +34,8 @@ public class StaffingLevelTemplateController {
     @ApiOperation("Create staffing level template ")
     public ResponseEntity<Map<String, Object>> addStaffingLevelTemplate(
             @RequestBody @Valid StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
-        StaffingLevelTemplateDTO levelTemplateDTO=staffingLevelTemplateService.createStaffingLevelTemplate(staffingLevelTemplateDTO);
-        if(!levelTemplateDTO.getErrors().isEmpty()){
+         staffingLevelTemplateDTO=staffingLevelTemplateService.createStaffingLevelTemplate(staffingLevelTemplateDTO);
+        if(!staffingLevelTemplateDTO.getErrors().isEmpty()){
             return ResponseHandler.invalidResponse(HttpStatus.PRECONDITION_REQUIRED, false, levelTemplateDTO.getErrors());
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, levelTemplateDTO);
