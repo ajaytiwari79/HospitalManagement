@@ -87,7 +87,7 @@ public class OpenShiftController {
     @RequestMapping(value = "open_shift/automatic_openshift_genration", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> automaticOpenShiftGenration(@PathVariable Long unitId) {
-        automaticOpenShiftGenerationService.findUnderStaffingByActivityId(unitId);
+        automaticOpenShiftGenerationService.findUnderStaffingByActivityIdAndDate(unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 }

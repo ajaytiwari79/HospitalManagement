@@ -36,7 +36,7 @@ public class PriorityGroupService extends MongoBaseService {
     private PriorityGroupRulesDataGetterService priorityGroupRulesDataGetterService;
     @Inject
     private MailService mailService;
-    @Autowired
+    @Inject
     private ApplicationContext applicationContext;
     private static final Logger logger = LoggerFactory.getLogger(PriorityGroupService.class);
 

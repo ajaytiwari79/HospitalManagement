@@ -48,13 +48,13 @@ public class AutomaticOpenShiftGenerationService {
         List<OpenShiftRuleTemplateDTO> openShiftRuleTemplates = openShiftRuleTemplateRepository.findOpenShiftRuleTemplatesWithInterval(unitId);
         Map<LocalDate,Set<Long>> dateActivityIdsMap = new HashMap<>();
 
-        Map<LocalDate,Set<Shift>> shiftsLocalDateMap = new HashMap<LocalDate, Set<Shift>>();
-        List<LocalDate> localDates
+        List<LocalDate> allOpenShiftRuleTemplateLocalDates = new ArrayList<>();
         for(OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO: openShiftRuleTemplates) {
-            List<LocalDate> localDates = getDate(openShiftRuleTemplateDTO.getOpenShiftInterval(),"Asia/Kolkata");
+            List<LocalDate> localDates = getOpenShiftRuleTemplateDates(openShiftRuleTemplateDTO.getOpenShiftInterval(),"Asia/Kolkata");
             Set<Long> activityIds = openShiftRuleTemplateDTO.getActivitiesPerTimeTypes().stream().map(activitiesPerTimeType ->
                     activitiesPerTimeType.getSelectedActivities()).flatMap(selectedActivities->selectedActivities.stream().map(BigInteger::longValue)).
                     collect(Collectors.toSet());
+            allOpenShiftRuleTemplateLocalDates.addAll(localDates);
 
             for(LocalDate localDate: localDates) {
                 if(!dateActivityIdsMap.containsKey(localDate)) {
@@ -66,22 +66,14 @@ public class AutomaticOpenShiftGenerationService {
                 }
             }
         }
-        //TODO compile list of localdates in the previous loop itself
-        List<LocalDate> localDates =  openShiftRuleTemplates.stream().map(openShiftRuleTemplateDTO -> getDate(openShiftRuleTemplateDTO.getOpenShiftInterval(),
-                "")).flatMap(localDatesStream -> localDatesStream.stream()).collect(Collectors.toList());
-        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDate(unitId,localDates);
-        LocalDateTime minLocalDateTime = DateUtils.getStartOfDayFromLocalDate(localDates.stream().min(LocalDate::compareTo).get());
-        LocalDateTime maxLocalDateTime = DateUtils.getEndOfDayFromLocalDate(localDates.stream().min(LocalDate::compareTo).get());
+
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDate(unitId,allOpenShiftRuleTemplateLocalDates);
+        LocalDateTime minLocalDateTime = DateUtils.getStartOfDayFromLocalDate(allOpenShiftRuleTemplateLocalDates.stream().min(LocalDate::compareTo).get());
+        LocalDateTime maxLocalDateTime = DateUtils.getEndOfDayFromLocalDate(allOpenShiftRuleTemplateLocalDates.stream().min(LocalDate::compareTo).get());
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDuration(minLocalDateTime,maxLocalDateTime,unitId);
 
-        for(Shift shift: shifts) {
-            LocalDate startLocalDate = DateUtils.asLocalDate(shift.getStartDate());
-            LocalDate endLocalDate = DateUtils.asLocalDate(shift.getEndDate());
-            insertInShiftsLocalDateMap(shiftsLocalDateMap,startLocalDate,shift);
-            if(!startLocalDate.equals(endLocalDate)) {
-                insertInShiftsLocalDateMap(shiftsLocalDateMap, endLocalDate, shift);
-            }
-        }
+        Map<LocalDate,Set<Shift>> shiftsLocalDateMap = getShiftsLocalDateMap(shifts);
+
         Map<Long,List<StaffingLevelActivityWithDuration>> staffingLevelIntervalActivityIdMap = new HashMap<Long,List<StaffingLevelActivityWithDuration>>();
         Map<LocalDate,Map<Long,List<StaffingLevelActivityWithDuration>>> dateFilteredActivityWithDurationsMap = new HashMap<>();
 
@@ -159,6 +151,7 @@ public class AutomaticOpenShiftGenerationService {
                 dateFilteredActivityWithDurationsMap.put(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()), staffingLevelIntervalActivityIdMap);
             }
         }
+        return dateFilteredActivityWithDurationsMap;
     }
     public void insertInShiftsLocalDateMap(Map<LocalDate,Set<Shift>> shiftsLocalDateMap,LocalDate localDate,Shift shift) {
         if(!shiftsLocalDateMap.containsKey(localDate)) {
@@ -169,7 +162,22 @@ public class AutomaticOpenShiftGenerationService {
 
         }
     }
-    public List<LocalDate> getDate(OpenShiftInterval openShiftInterval,String timezone) {
+
+    public Map<LocalDate,Set<Shift>> getShiftsLocalDateMap(List<Shift> shifts) {
+
+        Map<LocalDate,Set<Shift>> shiftsLocalDateMap = new HashMap<LocalDate, Set<Shift>>();
+
+        for(Shift shift: shifts) {
+            LocalDate startLocalDate = DateUtils.asLocalDate(shift.getStartDate());
+            LocalDate endLocalDate = DateUtils.asLocalDate(shift.getEndDate());
+            insertInShiftsLocalDateMap(shiftsLocalDateMap,startLocalDate,shift);
+            if(!startLocalDate.equals(endLocalDate)) {
+                insertInShiftsLocalDateMap(shiftsLocalDateMap, endLocalDate, shift);
+            }
+        }
+        return shiftsLocalDateMap;
+    }
+    public List<LocalDate> getOpenShiftRuleTemplateDates(OpenShiftInterval openShiftInterval, String timezone) {
 
         List<LocalDate> localDates = new ArrayList<LocalDate>();
         if (openShiftInterval.getType().toString().equals("DAYS")) {
