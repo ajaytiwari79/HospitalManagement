@@ -486,14 +486,13 @@ public class AgreementSectionService extends MongoBaseService {
 
     public AgreementSectionResponseDTO getAgreementSectionWithDataById(Long countryId, BigInteger id) {
 
-        AgreementSectionResponseDTO exist = agreementSectionMongoRepository.getAgreementSectionWithDataById(id);
+        AgreementSectionResponseDTO exist = agreementSectionMongoRepository.getAgreementSectionWithDataById(countryId,id);
         if (Optional.ofNullable(exist).isPresent()) {
             return exist;
         }
         throw new DataNotFoundByIdException("agreement section for id " + id + " not exist");
 
     }
-
 
     public void checkForDuplicacyInTitleOfAgreementSectionAndSubSection(List<AgreementSectionDTO> agreementSectionDTOS) {
         List<String> titles = new ArrayList<>();

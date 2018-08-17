@@ -8,10 +8,8 @@ import java.util.Set;
 
 public interface CustomAgreementSectionRepository {
 
-    AgreementSectionResponseDTO getAgreementSectionWithDataById(BigInteger id);
+    AgreementSectionResponseDTO getAgreementSectionWithDataById(Long countryId,BigInteger id);
 
-    List<AgreementSectionResponseDTO> getAllAgreementSectionWithData(Long countryId);
 
-    List<AgreementSectionResponseDTO> getAgreementSectionWithDataList(Long countryId, Set<BigInteger> ids);
 
 }

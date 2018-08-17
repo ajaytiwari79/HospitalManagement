@@ -30,7 +30,7 @@ public class PolicyAgreementTemplateResponseDTO {
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
 
-    private List<AgreementSectionResponseDTO> agreementSections=new ArrayList<>();
+    private List<BigInteger> agreementSections=new ArrayList<>();
 
     private TemplateTypeResponseDTO templateType;
 
@@ -74,14 +74,9 @@ public class PolicyAgreementTemplateResponseDTO {
         this.accountTypes = accountTypes;
     }
 
-    public List<AgreementSectionResponseDTO> getAgreementSections() {
-        return agreementSections;
-    }
+    public List<BigInteger> getAgreementSections() { return agreementSections; }
 
-    public void setAgreementSections(List<AgreementSectionResponseDTO> agreementSections) {
-        this.agreementSections = agreementSections;
-    }
-
+    public void setAgreementSections(List<BigInteger> agreementSections) { this.agreementSections = agreementSections; }
 
     public List<OrganizationType> getOrganizationTypes() {
         return organizationTypes;

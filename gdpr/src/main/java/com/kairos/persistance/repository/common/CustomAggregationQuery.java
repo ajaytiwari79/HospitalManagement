@@ -112,19 +112,6 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String addNonDeletedAgreementSectionToAgreementTemplate() {
-        return "{  '$addFields':" +
-                "        {'agreementSections':" +
-                "       {'$filter' : { " +
-                "       'input': '$agreementSections'," +
-                "       'as': 'agreementSections', " +
-                "      'cond': {'$eq': ['$$agreementSections.deleted', false ]}" +
-                "     }}}}";
-
-
-    }
-
-
     public static String agreementTemplateProjectionBeforeGroupOperationForTemplateTypeAtIndexZero() {
         return "{'$project':{" +
                 "      'templateType':{'$arrayElemAt':['$templateType',0]}," +
@@ -137,22 +124,6 @@ public class CustomAggregationQuery {
                 "             'organizationServices':1," +
                 "              'organizationSubServices':1," +
                 "         }}";
-
-
-    }
-
-    public static String agreementTemplateGroupOperation() {
-        return "{'$group':{" +
-                "   '_id':'$_id'," +
-                "   'agreementSections':{'$push':{ '$cond': [ { '$eq': [ '$agreementSections.deleted',false ] }, '$agreementSections', {} ] }}," +
-                "   'templateType':{'$first':'$templateType'}," +
-                "    'name':{'$first':'$name'}," +
-                "    'description':{'$first':'$description'}," +
-                "     'accountTypes':{'$first':'$accountTypes'}, " +
-                "    'organizationTypes':{'$first':'$organizationTypes'}," +
-                "    'organizationSubTypes':{'$first':'$organizationSubTypes'}," +
-                "    'organizationServices':{'$first':'$organizationServices'}," +
-                "    'organizationSubServices':{'$first':'$organizationSubServices'}} } ";
 
 
     }
