@@ -125,7 +125,7 @@ public class AccessorPartyService extends MongoBaseService {
         }
         accessorParty = accessorPartyMongoRepository.findByid(id);
         if (!Optional.ofNullable(accessorParty).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.datanotFound", "Accessor party", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor party", id);
         }
         accessorParty.setName(accessorPartyDTO.getName());
         accessorPartyMongoRepository.save(accessorParty);

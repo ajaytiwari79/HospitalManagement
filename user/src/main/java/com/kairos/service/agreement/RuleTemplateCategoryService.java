@@ -11,7 +11,6 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ArrayUtil;
@@ -29,7 +28,7 @@ import static com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryTyp
  * Created by vipul on 2/8/17.
  */
 @Service
-public class RuleTemplateCategoryService extends UserBaseService {
+public class RuleTemplateCategoryService {
     @Inject
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
     @Inject
@@ -62,7 +61,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
         Country country = countryService.getCountryById(countryId);
         country.addRuleTemplateCategory(ruleTemplateCategory);
-        save(country);
+        countryGraphRepository.save(country);
         return ruleTemplateCategory;
 
     }
@@ -131,7 +130,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
         }
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategory.getDescription());
-        save(ruleTemplateCategoryObj);
+        ruleTemplateCategoryGraphRepository.save(ruleTemplateCategoryObj);
         return ruleTemplateCategoryObj.printRuleTemp();
 
     }
@@ -164,7 +163,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
             ruleTemplateCategory.setDeleted(false);
             ruleTemplateCategory.setRuleTemplateCategoryType(CTA);
             country.addRuleTemplateCategory(ruleTemplateCategory);
-            save(country);
+            countryGraphRepository.save(country);
             ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateDTO.getRuleTemplateIds(), ruleTemplateCategory.getName());
             response.put("category", ruleTemplateCategory);
         } else {
@@ -180,7 +179,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     // creating default rule template category NONE
     public void createDefaultRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
-        save(ruleTemplateCategory);
+        ruleTemplateCategoryGraphRepository.save(ruleTemplateCategory);
 
     }
 
@@ -201,7 +200,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
             country.addRuleTemplateCategory(ruleTemplateCategory);
         }
 
-        save(country);
+        countryGraphRepository.save(country);
         ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateCategoryDTO.getRuleTemplateIds(), ruleTemplateCategory.getName());
         // TODO fix need with Front end harish Modi
         Map<String, Object> response = new HashMap();

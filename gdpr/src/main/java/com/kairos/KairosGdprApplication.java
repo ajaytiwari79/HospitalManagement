@@ -90,11 +90,10 @@ public class KairosGdprApplication {
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template = restTemplateBuilder
+        return restTemplateBuilder
                 .interceptors(new UserContextInterceptor())
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 
 

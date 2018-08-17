@@ -261,6 +261,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_SYSTEM_LANGUAGE="HAS_SYSTEM_LANGUAGE";
     public final static String SELECTED_LANGUAGE ="SELECTED_LANGUAGE";
     public final static String IN_COUNTRY = "IN_COUNTRY";
+    public final static String HAS_ACCOUNT_TYPE = "HAS_ACCOUNT_TYPE";
 
     /**
      * Default constructor

@@ -4,12 +4,10 @@ import com.kairos.persistance.model.master_data.default_asset_setting.HostingTyp
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 @JaversSpringDataAuditable
 public interface HostingTypeMongoRepository extends MongoBaseRepository<HostingType,BigInteger>,CustomHostingTypeRepository {

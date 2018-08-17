@@ -16,7 +16,6 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DistanceCalculator;
@@ -37,7 +36,7 @@ import static com.kairos.constants.AppConstants.ORGANIZATION;
  */
 @Transactional
 @Service
-public class StaffAddressService extends UserBaseService {
+public class StaffAddressService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

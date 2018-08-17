@@ -147,11 +147,12 @@ public class ShiftIntegrationServiceTest {
 
     @Test
     public void publishShifts() throws Exception {
+
         List<BigInteger> shifts = new ArrayList<>();
         shifts.add(new BigInteger("110"));
         shifts.add(new BigInteger("109"));
+        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, Arrays.asList(ShiftStatus.FIXED));
 
-        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, Collections.singletonList(ShiftStatus.FIXED));
         HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> typeReference =
