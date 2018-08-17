@@ -2,6 +2,7 @@ package com.kairos.service.staffing_level;
 
 
 import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.activity.ActivityResponse;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.staffing_level.*;
 import com.kairos.activity.staffing_level.absence.AbsenceStaffingLevelDto;
@@ -118,6 +119,8 @@ public class StaffingLevelService extends MongoBaseService {
     @Autowired
     private ExceptionService exceptionService;
     @Inject private StaffingLevelTemplateRepository staffingLevelTemplateRepository;
+    @Inject
+    private StaffingLevelTemplateService staffingLevelTemplateService;
 
 
     /**
@@ -912,7 +915,7 @@ public class StaffingLevelService extends MongoBaseService {
         List<StaffingLevel> staffingLevels=new ArrayList<>();
         Set<BigInteger> activityIds=new HashSet<>();
 
-
+        Map<BigInteger,BigInteger> activityIdMap=staffingLevelFromTemplateDTO.getSelectedActivityIds().stream().collect(Collectors.toMap(k->k,v->v));
         StaffingLevelTemplate staffingLevelTemplate=staffingLevelTemplateRepository.findByIdAndUnitIdAndDeletedFalse(staffingLevelTemplateId,unitId);
         if(!Optional.ofNullable(staffingLevelTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("data.Not.found",staffingLevelTemplateId);
@@ -920,27 +923,29 @@ public class StaffingLevelService extends MongoBaseService {
 
         staffingLevelTemplate.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
             Set<BigInteger> activitiesOfCurrentInterval=new HashSet<>();
+            Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
             staffingLevelInterval.getStaffingLevelActivities().forEach(activity->{
                 activitiesOfCurrentInterval.add(activity.getActivityId());
                 activityIds.add(activity.getActivityId());
+                if(activityIdMap.get(activity.getActivityId())!=null){
+                    staffingLevelActivities.add(activity);
+                }
+
             });
             if(!activitiesOfCurrentInterval.containsAll(staffingLevelFromTemplateDTO.getSelectedActivityIds())){
                 exceptionService.actionNotPermittedException("All activities are not present in interval",staffingLevelInterval.getStaffingLevelDuration().getFrom(),staffingLevelInterval.getStaffingLevelDuration().getTo());
             }
+            staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
         });
-        staffingLevelTemplate.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval ->
-                staffingLevelInterval.getStaffingLevelActivities().forEach(activity->{
+
+        List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
+        List<ActivityResponse> activityResponses=staffingLevelTemplateService.validateActivityRules(activities,staffingLevelTemplate.getValidity().getStartDate(),staffingLevelTemplate.getValidity().getEndDate(),staffingLevelTemplate.getDayType());
 
 
-            })
-
-        );
-
-        if(!activityIds.containsAll(staffingLevelFromTemplateDTO.getSelectedActivityIds())){
-
-        }
 
         staffingLevelTemplate.setId(null);
+        staffingLevelTemplate.setDayType(staffingLevelFromTemplateDTO.getSelectedDayTypeIds());
+
 
         List<LocalDate> localDates=staffingLevelFromTemplateDTO.getDatesForCreatingStaffingLevel();
         localDates.forEach(date -> {

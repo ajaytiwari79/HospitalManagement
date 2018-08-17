@@ -205,9 +205,9 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     Boolean isOrganizationAccessGroupExistWithNameExceptId(Long orgId, String name, Long accessGroupId);
 
     @Query("MATCH (c:Country) WHERE id(c)={0}\n" +
-            "OPTIONAL MATCH (c)-[r:HAS_ACCESS_GROUP{organizationCategory:'HUB'}]-(a:AccessGroup{deleted:false})  WITH COUNT(r) as HUB\n" +
-            "OPTIONAL MATCH (c)-[r:HAS_ACCESS_GROUP{organizationCategory:'UNION'}]-(a:AccessGroup{deleted:false})  WITH COUNT(r) as UNION, HUB\n" +
-            "OPTIONAL MATCH (c)-[orgRel:HAS_ACCESS_GROUP{organizationCategory:'ORGANIZATION'}]-(a:AccessGroup{deleted:false})  RETURN  COUNT(orgRel) as ORGANIZATION, HUB, UNION")
+            "OPTIONAL MATCH (c)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'HUB'}]->(a:AccessGroup{deleted:false})  WITH COUNT(r) as hubCount\n" +
+            "OPTIONAL MATCH (c)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'UNION'}]->(a:AccessGroup{deleted:false})  WITH COUNT(r) as unionCount, hubCount\n" +
+            "RETURN hubCount, unionCount")
     AccessGroupCountQueryResult getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId);
 
     @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1} \n" +
@@ -270,6 +270,11 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     //for test cases
     @Query("Match(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup) where id(emp)=8767 return id(ag)")
     Long findAccessGroupByEmploymentId(Long employmentId);
+
+
+    @Query("MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"]->(ag:AccessGroup{deleted:false})-[:"+HAS_ACCOUNT_TYPE+"]->(accountType:AccountType) WHERE id(c)={0} AND id(accountType)={1} \n" +
+            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.role as role, ag.enabled as enabled ")
+    List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId);
 
 }
 

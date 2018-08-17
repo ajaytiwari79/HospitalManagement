@@ -2,9 +2,7 @@ package com.kairos.service.country.default_data;
 
 
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.country.default_data.account_type.AccountTypeQueryResult;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.service.UserBaseService;
@@ -16,8 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountTypeService extends UserBaseService {

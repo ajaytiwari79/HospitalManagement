@@ -230,4 +230,12 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupsForOrganizationCreation(countryId));
     }
 
+
+
+    @ApiOperation("Get country Access Groups by account type")
+    @GetMapping(value = COUNTRY_URL + "/access_group/account_type/{accountTypeId}" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountryAccessGroupByAccountTypeId (@PathVariable Long countryId, @PathVariable Long accountTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId));
+    }
 }
