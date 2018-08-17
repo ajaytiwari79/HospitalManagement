@@ -22,7 +22,6 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.organization.AddressDTO;
 import com.kairos.util.DateUtil;
@@ -49,7 +48,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_H
  */
 @Service
 @Transactional
-public class ClientExtendedService extends UserBaseService {
+public class ClientExtendedService{
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
@@ -103,7 +102,8 @@ public class ClientExtendedService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private ExceptionService exceptionService;
-
+    @Inject private ClientNextToKinRelationshipRepository clientNextToKinRelationshipRepository;
+    @Inject private ClientRelativeRelationshipRepository clientRelativeRelationshipRepository;
 
     public NextToKinDTO saveNextToKin(Long unitId, Long clientId, NextToKinDTO nextToKinDTO) {
         Client client = clientGraphRepository.findOne(clientId);
@@ -192,7 +192,7 @@ public class ClientExtendedService extends UserBaseService {
         ClientNextToKinRelationship clientNextToKinRelationship = new ClientNextToKinRelationship();
         clientNextToKinRelationship.setClient(client);
         clientNextToKinRelationship.setNextToKin(nextToKin);
-        save(clientNextToKinRelationship);
+        clientNextToKinRelationshipRepository.save(clientNextToKinRelationship);
     }
 
     private void assignOrganizationToNextToKin(Client nextToKin, long unitId) {
@@ -280,7 +280,7 @@ public class ClientExtendedService extends UserBaseService {
             clientRelationTypeRelationship.setRelationType(relationType);
             clientRelationTypeRelationship.setNextToKin(nextToKin);
             client.addClientRelations(clientRelationTypeRelationship);
-            save(client);
+            clientGraphRepository.save(client);
         } else {
             exceptionService.dataNotFoundByIdException("error.client.relationtype.notEmpty");
 
@@ -386,7 +386,7 @@ public class ClientExtendedService extends UserBaseService {
             currentClient.setDoRequireTranslationAssistance(client.isDoRequireTranslationAssistance());
             currentClient.setRequire2peopleForTransport(client.isRequire2peopleForTransport());
             currentClient.setRequireOxygenUnderTransport(client.isRequireOxygenUnderTransport());
-            save(currentClient);
+            clientGraphRepository.save(currentClient);
             return getTransportationDetails(currentClient.getId());
         }
         return null;
@@ -461,7 +461,7 @@ public class ClientExtendedService extends UserBaseService {
             clientRelativeRelation.setRemarks((String) relativeProperties.get("remarks"));
             clientRelativeRelation.setRelation((String) relativeProperties.get("relation"));
             clientRelativeRelation.setPriority((String) relativeProperties.get("priority"));
-            return save(clientRelativeRelation);
+            return clientRelativeRelationshipRepository.save(clientRelativeRelation);
         }
         return null;
     }
@@ -516,7 +516,7 @@ public class ClientExtendedService extends UserBaseService {
         clientRelativeRelation.setRemarks((String) relativeProperties.get("remarks"));
         clientRelativeRelation.setRelation((String) relativeProperties.get("relation"));
         clientRelativeRelation.setPriority((String) relativeProperties.get("priority"));
-        return save(clientRelativeRelation);
+        return clientRelativeRelationshipRepository.save(clientRelativeRelation);
     }
 
     public ClientDoctor setMedicalDetails(Long clientId, ClientDoctor clientDoctor) {

@@ -12,7 +12,6 @@ import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRe
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.user.country.pay_group_area.PayGroupAreaDTO;
 import com.kairos.persistence.model.country.pay_group_area.PayGroupAreaResponse;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -29,7 +28,7 @@ import java.util.Optional;
  */
 @Transactional
 @Service
-public class PayGroupAreaService extends UserBaseService {
+public class PayGroupAreaService {
 
     @Inject
     private PayGroupAreaGraphRepository payGroupAreaGraphRepository;
@@ -189,7 +188,7 @@ public class PayGroupAreaService extends UserBaseService {
 
         }
         payGroupArea.setDeleted(true);
-        save(payGroupArea);
+        payGroupAreaGraphRepository.save(payGroupArea);
         return true;
     }
 

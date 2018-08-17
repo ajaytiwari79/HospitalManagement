@@ -3,7 +3,6 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.payment_type.PaymentType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +17,7 @@ import java.util.Map;
  */
 @Transactional
 @Service
-public class PaymentTypeService extends UserBaseService {
+public class PaymentTypeService{
 
     @Inject
     PaymentTypeGraphRepository paymentTypeGraphRepository;
@@ -33,7 +32,7 @@ public class PaymentTypeService extends UserBaseService {
             return null;
         }
         paymentType.setCountry(country);
-        save(paymentType);
+        paymentTypeGraphRepository.save(paymentType);
         return preparePaymentTypeResponse(paymentType);
 
     }
@@ -63,7 +62,7 @@ public class PaymentTypeService extends UserBaseService {
             return false;
         }
         paymentType.setEnabled(false);
-        save(paymentType);
+        paymentTypeGraphRepository.save(paymentType);
         return true;
     }
 

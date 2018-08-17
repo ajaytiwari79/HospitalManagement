@@ -9,10 +9,9 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FeatureGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.country.feature.FeatureDTO;
 import com.kairos.user.country.feature.VehicleFeaturesDTO;
-import com.kairos.service.UserBaseService;
-import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,7 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class FeatureService extends UserBaseService{
+public class FeatureService{
 
     @Autowired
     CountryGraphRepository countryGraphRepository;
@@ -94,7 +93,7 @@ public class FeatureService extends UserBaseService{
 
         }
         feature.setDeleted(true);
-        save(feature);
+        featureGraphRepository.save(feature);
         return true;
     }
 

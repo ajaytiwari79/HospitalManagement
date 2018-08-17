@@ -5,7 +5,6 @@ import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.UnitTypeQueryResult;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.country.system_setting.UnitTypeDTO;
 import org.slf4j.Logger;
@@ -20,7 +19,7 @@ import java.util.Optional;
 //  Created By vipul   On 9/8/18
 @Service
 @Transactional
-public class UnitTypeService extends UserBaseService {
+public class UnitTypeService{
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
@@ -39,7 +38,7 @@ public class UnitTypeService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.unitType.alreadyExist",unitTypeDTO.getName());
         }
         UnitType unitType = new UnitType(unitTypeDTO.getName(), unitTypeDTO.getDescription(), country.get());
-        save(unitType);
+        unitTypeGraphRepository.save(unitType);
         unitTypeDTO.setId(unitType.getId());
         return unitTypeDTO;
     }
@@ -60,7 +59,7 @@ public class UnitTypeService extends UserBaseService {
         }
         unitType.get().setName(unitTypeDTO.getName());
         unitType.get().setDescription(unitTypeDTO.getDescription());
-        save(unitType.get());
+        unitTypeGraphRepository.save(unitType.get());
         return unitTypeDTO;
     }
 

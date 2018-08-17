@@ -25,7 +25,6 @@ import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGr
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.SkillServiceTemplateClient;
 import com.kairos.rest_client.TaskDemandRestClient;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
@@ -56,7 +55,7 @@ import static com.kairos.constants.AppConstants.*;
  */
 @Service
 @Transactional
-public class SkillService extends UserBaseService {
+public class SkillService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -167,9 +166,6 @@ public class SkillService extends UserBaseService {
         return null;
     }
 
-    public void deleteSkill(Long id) {
-        super.delete(id);
-    }
 
     public SkillCategory safeDeleteSkill(Long categoryId, Long skillId) {
         return skillGraphRepository.safeDelete(categoryId, skillId);
@@ -337,7 +333,7 @@ public class SkillService extends UserBaseService {
             return false;
         }
         skill.setEnabled(false);
-        save(skill);
+        skillGraphRepository.save(skill);
         return true;
     }
 
@@ -392,7 +388,7 @@ public class SkillService extends UserBaseService {
         }
         skill.setEnabled(false);
         skill.setSkillStatus(Skill.SkillStatus.PENDING);
-        save(skill);
+        skillGraphRepository.save(skill);
         mailService.sendPlainMail(ADMIN_EMAIL, "Request for create new skill", "Skill creation request");
         return true;
     }
@@ -619,7 +615,7 @@ public class SkillService extends UserBaseService {
         return skillGraphRepository.getSkillsByCountryForTaskType(countryId);
     }
 
-    public List<Skill> importSkillsFromTimeCare(List<TimeCareSkill> timeCareSkills, Long countryId) {
+    public Iterable<Skill> importSkillsFromTimeCare(List<TimeCareSkill> timeCareSkills, Long countryId) {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -649,7 +645,7 @@ public class SkillService extends UserBaseService {
             skill.setExternalId(String.valueOf(timeCareSkill.getId()));
             skillsToCreate.add(skill);
         }
-        return save(skillsToCreate);
+        return skillGraphRepository.saveAll(skillsToCreate);
     }
 
     public List<Skill> getSkillsByName(Set<String> skillNames) {

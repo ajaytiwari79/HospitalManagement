@@ -2,8 +2,6 @@ package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.enums.TimeSlotType;
-import com.kairos.user.country.time_slot.TimeSlotDTO;
-import com.kairos.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
@@ -11,9 +9,11 @@ import com.kairos.persistence.model.organization.time_slot.TimeSlotSetTimeSlotRe
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotRelationshipGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotSetRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.country.time_slot.TimeSlotDTO;
+import com.kairos.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.util.DateUtil;
 import com.kairos.util.ObjectMapperUtils;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
  */
 @Transactional
 @Service
-public class TimeSlotService extends UserBaseService {
+public class TimeSlotService {
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
@@ -43,6 +43,7 @@ public class TimeSlotService extends UserBaseService {
     private TimeSlotSetRepository timeSlotSetRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private TimeSlotRelationshipGraphRepository timeSlotRelationshipGraphRepository;
     private static final Logger logger = LoggerFactory.getLogger(TimeSlotService.class);
 
     public Map<String, Object> getTimeSlots(long unitId) {
@@ -83,7 +84,7 @@ public class TimeSlotService extends UserBaseService {
         List<TimeSlotSet> timeSlotSets = unit.getTimeSlotSets();
         timeSlotSets.add(timeSlotSet);
         unit.setTimeSlotSets(timeSlotSets);
-        save(unit);
+        organizationGraphRepository.save(unit);
         return timeSlotSet;
     }
 
@@ -98,7 +99,7 @@ public class TimeSlotService extends UserBaseService {
         TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue(timeSlotDTO,TimeSlotSetTimeSlotRelationship.class);
         timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
         timeSlotSetTimeSlotRelationship.setTimeSlotSet(timeSlotSet);
-        save(timeSlotSetTimeSlotRelationship);
+        timeSlotRelationshipGraphRepository.save(timeSlotSetTimeSlotRelationship);
         timeSlotDTO.setId(timeSlot.getId());
         return timeSlotDTO;
     }
@@ -122,7 +123,7 @@ public class TimeSlotService extends UserBaseService {
             timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
             timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
         }
-        save(timeSlotSetTimeSlotRelationships);
+        timeSlotRelationshipGraphRepository.saveAll(timeSlotSetTimeSlotRelationships);
     }
 
     public List<TimeSlotSet> updateTimeSlotSet(Long unitId, Long timeSlotSetId, TimeSlotSetDTO timeSlotSetDTO) {
@@ -208,7 +209,7 @@ public class TimeSlotService extends UserBaseService {
             timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
             timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
         }
-        save(timeSlotSetTimeSlotRelationships);
+        timeSlotRelationshipGraphRepository.saveAll(timeSlotSetTimeSlotRelationships);
 
         List<TimeSlotDTO> newCreatedTimeSlots = new ArrayList<>();
         for(TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship : timeSlotSetTimeSlotRelationships){
@@ -234,10 +235,10 @@ public class TimeSlotService extends UserBaseService {
         TimeSlotSet timeSlotSet = timeSlotSetRepository.findOneByStartDateAfter(unitId, timeSlotSetToDelete.getEndDate());
         if (Optional.ofNullable(timeSlotSet).isPresent()) {
             timeSlotSet.setStartDate(timeSlotSetToDelete.getEndDate());
-            save(timeSlotSet);
+            timeSlotSetRepository.save(timeSlotSet);
         }
         timeSlotSetToDelete.setDeleted(true);
-        save(timeSlotSetToDelete);
+        timeSlotSetRepository.save(timeSlotSetToDelete);
         return true;
     }
 
@@ -278,11 +279,11 @@ public class TimeSlotService extends UserBaseService {
             timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
             timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
         }
-        save(timeSlotSetTimeSlotRelationships);
+        timeSlotRelationshipGraphRepository.saveAll(timeSlotSetTimeSlotRelationships);
         List<TimeSlotSet> timeSlotSets = organization.getTimeSlotSets();
         timeSlotSets.add(timeSlotSet);
         organization.setTimeSlotSets(timeSlotSets);
-        save(organization);
+        organizationGraphRepository.save(organization);
     }
 
     /*private void validateTimeSlot(long unitId,OrganizationTimeSlotRelationship objToCreate,TimeSlot.TimeSlotMode timeSlotMode){

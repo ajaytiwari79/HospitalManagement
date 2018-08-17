@@ -5,7 +5,6 @@ import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.FormatUtil;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class MunicipalityService extends UserBaseService {
+public class MunicipalityService {
     @Inject
     private MunicipalityGraphRepository municipalityGraphRepository;
     @Inject
@@ -31,7 +30,7 @@ public class MunicipalityService extends UserBaseService {
     private ExceptionService exceptionService;
 
     public Municipality createMunicipality(Municipality municipality){
-        return save(municipality);
+        return municipalityGraphRepository.save(municipality);
     }
 
 
@@ -54,7 +53,7 @@ public class MunicipalityService extends UserBaseService {
             currentMunicipality.setLongitude(municipality.getLongitude());
             currentMunicipality.setCode(municipality.getCode());
 
-            save(currentMunicipality);
+            municipalityGraphRepository.save(currentMunicipality);
             return  currentMunicipality.retrieveDetails();
 
 
@@ -66,7 +65,7 @@ public class MunicipalityService extends UserBaseService {
         Municipality municipality = municipalityGraphRepository.findOne(municipalityId);
         if (municipality!=null){
             municipality.setEnable(false);
-            save(municipality);
+            municipalityGraphRepository.save(municipality);
             return true;
         }
         return false;
@@ -83,7 +82,7 @@ public class MunicipalityService extends UserBaseService {
         List<Municipality> municipalities = zipCode.getMunicipalities();
         municipalities.add(municipality);
         zipCode.setMunicipalities(municipalities);
-        save(zipCode);
+        zipCodeGraphRepository.save(zipCode);
         return  zipCode.retrieveDetails();
     }
 
@@ -94,7 +93,7 @@ public class MunicipalityService extends UserBaseService {
             currentZip.setName(zipCode.getName());
             currentZip.setGeoFence(zipCode.getGeoFence());
             currentZip.setZipCode(zipCode.getZipCode());
-            save(currentZip);
+            zipCodeGraphRepository.save(currentZip);
             return currentZip.retrieveDetails();
         }
         return null;
@@ -121,7 +120,7 @@ public class MunicipalityService extends UserBaseService {
         Province province = provinceGraphRepository.findOne(provinceId);
         if (province!=null){
             municipality.setProvince(province);
-             municipality = save(municipality);
+             municipality = municipalityGraphRepository.save(municipality);
             return municipality.retrieveDetails();
         }
         return null;
