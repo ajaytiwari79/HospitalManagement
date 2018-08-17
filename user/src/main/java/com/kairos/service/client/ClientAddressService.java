@@ -1,10 +1,12 @@
 package com.kairos.service.client;
 
 import com.kairos.config.env.EnvConfig;
+import com.kairos.persistence.model.client.AccessToLocation;
+import com.kairos.persistence.model.client.Client;
+import com.kairos.persistence.model.client.ClientTemporaryAddress;
+import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.query_results.ClientAddressQueryResult;
 import com.kairos.persistence.model.client.query_results.ClientTempAddressQueryResult;
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.country.HousingType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -17,9 +19,9 @@ import com.kairos.persistence.repository.user.country.HousingTypeGraphRepository
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.country.HousingTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.organization.AddressDTO;
 import com.kairos.util.DateConverter;
 import com.kairos.util.FormatUtil;
 import org.slf4j.Logger;
@@ -40,7 +42,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_T
  */
 @Service
 @Transactional
-public class ClientAddressService extends UserBaseService {
+public class ClientAddressService{
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 

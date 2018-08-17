@@ -3,7 +3,6 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.OwnershipType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.OwnershipTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class OwnershipTypeService extends UserBaseService {
+public class OwnershipTypeService {
 
     @Inject
     private OwnershipTypeGraphRepository ownershipTypeGraphRepository;
@@ -29,7 +28,7 @@ public class OwnershipTypeService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             ownershipType.setCountry(country);
-            save(ownershipType);
+            ownershipTypeGraphRepository.save(ownershipType);
             return ownershipType.retrieveDetails();
         }
         return null;
@@ -53,7 +52,7 @@ public class OwnershipTypeService extends UserBaseService {
         if (currentOwnershipType!=null){
             currentOwnershipType.setName(ownershipType.getName());
             currentOwnershipType.setDescription(ownershipType.getDescription());
-            save(currentOwnershipType);
+            ownershipTypeGraphRepository.save(currentOwnershipType);
             return currentOwnershipType.retrieveDetails();
         }
         return null;
@@ -63,7 +62,7 @@ public class OwnershipTypeService extends UserBaseService {
         OwnershipType ownershipType = ownershipTypeGraphRepository.findOne(ownershipTypeId);
         if (ownershipType!=null){
             ownershipType.setEnabled(false);
-            save(ownershipType);
+            ownershipTypeGraphRepository.save(ownershipType);
             return true;
         }
         return false;

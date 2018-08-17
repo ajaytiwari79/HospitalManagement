@@ -3,7 +3,6 @@ import com.kairos.persistence.model.user.region.Province;
 import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.FormatUtil;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class ProvinceService extends UserBaseService {
+public class ProvinceService {
 
     @Inject
     private ProvinceGraphRepository provinceGraphRepository;
@@ -61,7 +60,7 @@ public class ProvinceService extends UserBaseService {
             
         }
         province.setRegion(region);
-        save(province);
+        provinceGraphRepository.save(province);
         return province.retrieveDetails();
     }
 

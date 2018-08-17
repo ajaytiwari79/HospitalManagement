@@ -21,7 +21,7 @@ import java.util.Optional;
  */
 @Service
 @Transactional
-public class ReasonCodeService extends UserBaseEntity {
+public class ReasonCodeService {
 
    @Inject
    ReasonCodeGraphRepository reasonCodeGraphRepository;

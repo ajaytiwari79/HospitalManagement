@@ -5,7 +5,6 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.country.system_setting.AccountTypeDTO;
 import com.kairos.util.ObjectMapperUtils;
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AccountTypeService extends UserBaseService {
+public class AccountTypeService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountTypeService.class);
 
@@ -92,7 +91,7 @@ public class AccountTypeService extends UserBaseService {
             exceptionService.duplicateDataException("message.duplicate", "message.accountType", accountTypeDTO.getName());
         }
         accountType.get().setName(accountTypeDTO.getName());
-        save(accountType.get());
+        accountTypeRepository.save(accountType.get());
         return accountTypeDTO;
     }
 
@@ -103,7 +102,7 @@ public class AccountTypeService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.unitType.notFound", id);
         }
         accountType.get().setDeleted(true);
-        save(accountType.get());
+        accountTypeRepository.save(accountType.get());
         return true;
     }
 
