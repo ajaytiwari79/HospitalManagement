@@ -30,7 +30,7 @@ public class PlanningPeriodDTO {
     private List<PeriodPhaseFlippingDateDTO> phaseFlippingDate;
     private String periodDuration;
     private boolean active=true;
-
+    private String color;
     public PlanningPeriodDTO(){
         // default constructor
     }
@@ -169,6 +169,14 @@ public class PlanningPeriodDTO {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }
 

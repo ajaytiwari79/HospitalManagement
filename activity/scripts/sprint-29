@@ -1,2 +1,51 @@
 // To change the key name in existing counters
 db.counter.updateMany({},{$rename:{"applicableFor":"supportedModuleTypes"}});
+
+db.wtaBaseRuleTemplate.updateMany({},{$push:{"phaseTemplateValues" :{$each:[ {
+            "phaseId" : NumberLong(5),
+            "phaseName" : "REALTIME",
+            "staffValue" : NumberLong(0),
+            "managementValue" : NumberLong(0),
+            "disabled" : false,
+            "optionalFrequency" : NumberLong(0),
+            "optional" : false,
+            "sequence" : NumberLong(0),
+            "staffCanBeIgnore" : false,
+            "managementCanBeIgnore" : false
+        },
+        {
+            "phaseId" :NumberLong(6),
+            "phaseName" : "TIME & ATTENDANCE",
+            "staffValue" : NumberLong(0),
+            "managementValue" : NumberLong(0),
+            "disabled" : false,
+            "optionalFrequency" :NumberLong(0),
+            "optional" : false,
+            "sequence" : NumberLong(0),
+            "staffCanBeIgnore" : false,
+            "managementCanBeIgnore" : false
+        },
+        {
+            "phaseId" : NumberLong(7),
+            "phaseName" : "TENTATIVE",
+            "staffValue" : NumberLong(0),
+            "managementValue" : NumberLong(0),
+            "disabled" : false,
+            "optionalFrequency" : NumberLong(0),
+            "optional" : false,
+            "sequence" : NumberLong(0),
+            "staffCanBeIgnore" : false,
+            "managementCanBeIgnore" : false
+        },
+        {
+            "phaseId" : NumberLong(8),
+            "phaseName" : "PAYROLL",
+            "staffValue" : NumberLong(0),
+            "managementValue" :NumberLong(0),
+            "disabled" : false,
+            "optionalFrequency" : NumberLong(0),
+            "optional" : false,
+            "sequence" : NumberLong(0),
+            "staffCanBeIgnore" : false,
+            "managementCanBeIgnore" : false
+        }]}}});

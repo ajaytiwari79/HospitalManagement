@@ -29,7 +29,7 @@ public class PhaseDTO {
     private int durationInDays;
     private PhaseType phaseType;
     private List<String> status;
-
+    private String color;
 
     public Long getOrganizationId() {
         return organizationId;
@@ -43,6 +43,14 @@ public class PhaseDTO {
         //default cons
     }
 
+    public PhaseDTO(@NotNull(message = "error.phase.name.notnull") String name, String description, @Range(min = 0) int duration, DurationType durationType, int sequence, Long countryId) {
+        this.name = name;
+        this.description = description;
+        this.duration = duration;
+        this.durationType = durationType;
+        this.sequence = sequence;
+        this.countryId = countryId;
+    }
 
     public String getDescription() {
         return description;
@@ -129,21 +137,19 @@ public class PhaseDTO {
         this.status = status;
     }
 
-    public PhaseDTO(@NotNull(message = "error.phase.name.notnull") String name, String description, @Range(min = 0) int duration, DurationType durationType, int sequence, Long countryId) {
-        this.name = name;
-        this.description = description;
-        this.duration = duration;
-        this.durationType = durationType;
-        this.sequence = sequence;
-        this.countryId = countryId;
-    }
 
     public PhaseWeeklyDTO buildWeekDTO() {
         PhaseWeeklyDTO phaseWeeklyDTO = new PhaseWeeklyDTO(id, name, description, duration, sequence, organizationId);
         return phaseWeeklyDTO;
     }
 
+    public String getColor() {
+        return color;
+    }
 
+    public void setColor(String color) {
+        this.color = color;
+    }
 
     public int getDurationInDays() {
         return durationInDays;

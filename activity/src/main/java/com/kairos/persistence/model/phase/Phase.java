@@ -32,9 +32,22 @@ public class Phase extends MongoBaseEntity {
     private BigInteger parentCountryPhaseId;
     private PhaseType phaseType;
     private List<ShiftStatus> status;
-
+    private String color;
     public Phase() {
         //default constructor
+    }
+    public Phase(String name, String description, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status,String color) {
+        this.name = name;
+        this.description = description;
+        this.duration = duration;
+        this.durationType = durationType;
+        this.sequence = sequence;
+        this.countryId = countryId;
+        this.organizationId = organizationId;
+        this.parentCountryPhaseId = parentCountryPhaseId;
+        this.phaseType = phaseType;
+        this.status = ShiftStatus.getListByValue(status);
+        this.color=color;
     }
 
     public Long getOrganizationId() {
@@ -117,18 +130,14 @@ public class Phase extends MongoBaseEntity {
         this.status = status;
     }
 
-    public Phase(String name, String description, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status) {
-        this.name = name;
-        this.description = description;
-        this.duration = duration;
-        this.durationType = durationType;
-        this.sequence = sequence;
-        this.countryId = countryId;
-        this.organizationId = organizationId;
-        this.parentCountryPhaseId = parentCountryPhaseId;
-        this.phaseType = phaseType;
-        this.status = ShiftStatus.getListByValue(status);
+    public String getColor() {
+        return color;
     }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
 
     @Override
     public boolean equals(Object o) {
