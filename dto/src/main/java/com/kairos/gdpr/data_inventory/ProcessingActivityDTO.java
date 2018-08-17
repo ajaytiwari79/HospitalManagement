@@ -100,4 +100,7 @@ public class ProcessingActivityDTO {
     public Long getMaxDataSubjectVolume() { return maxDataSubjectVolume; }
 
     public Integer getDataRetentionPeriod() { return dataRetentionPeriod; }
+
+    public ProcessingActivityDTO() {
+    }
 }

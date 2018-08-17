@@ -63,7 +63,6 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRep
 import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.rest_client.ChatRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
@@ -92,7 +91,7 @@ import com.kairos.user.staff.staff.StaffPreferencesDTO;
 import com.kairos.user.user.password.PasswordUpdateDTO;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.util.*;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -127,7 +126,7 @@ import static com.kairos.util.FileUtil.createDirectory;
  */
 @Transactional
 @Service
-public class StaffService extends UserBaseService {
+public class StaffService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -208,6 +207,7 @@ public class StaffService extends UserBaseService {
     @Inject
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
 
+    @Inject StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
@@ -218,7 +218,7 @@ public class StaffService extends UserBaseService {
         final String path = IMAGES_PATH + File.separator + fileName;
         FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
-        save(staff);
+        staffGraphRepository.save(staff);
         return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + fileName;
 
     }
@@ -229,7 +229,7 @@ public class StaffService extends UserBaseService {
             return false;
         }
         staff.setProfilePic(null);
-        save(staff);
+        staffGraphRepository.save(staff);
         return true;
     }
 
@@ -246,7 +246,7 @@ public class StaffService extends UserBaseService {
         if (new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
-            save(user);
+            userGraphRepository.save(user);
         } else {
             logger.error("Password not matched ");
             exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
@@ -320,7 +320,7 @@ public class StaffService extends UserBaseService {
         }
         staffToUpdate.setSignature(staffPersonalDetail.getSignature());
         staffToUpdate.setContactDetail(staffPersonalDetail.getContactDetail());
-        save(staffToUpdate);
+        staffGraphRepository.save(staffToUpdate);
 
         if (oldExpertise != null) {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
@@ -339,7 +339,7 @@ public class StaffService extends UserBaseService {
 //        staffToUpdate.setCprNumber(staffPersonalDetail.getCprNumber());
         user.setGender(staffPersonalDetail.getGender());
         user.setPregnant(user.getGender().equals(Gender.FEMALE) ? staffPersonalDetail.isPregnant() : false);
-        save(user);
+        userGraphRepository.save(user);
         staffPersonalDetail.setPregnant(user.isPregnant());
         return staffPersonalDetail;
     }
@@ -441,7 +441,7 @@ public class StaffService extends UserBaseService {
         if (staff != null) {
             logger.info("General note: " + generalNote + "\nPerson: " + requestFromPerson);
             staff.saveNotes(generalNote, requestFromPerson);
-            save(staff);
+            staffGraphRepository.save(staff);
             return staff.retrieveNotes();
         }
         return null;
@@ -915,7 +915,7 @@ public class StaffService extends UserBaseService {
             user.setEmail(staff.getEmail());
             user.setUserLanguage(systemLanguage);
             staff.setUser(userGraphRepository.save(user));
-            save(staff);
+            staffGraphRepository.save(staff);
             return staff;
         }
         logger.info("Not Creating Staff.......... " + staff.getFirstName() + " " + staff.getLastName());
@@ -1209,7 +1209,7 @@ public class StaffService extends UserBaseService {
 //        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
 //        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
         employment.getUnitPermissions().add(unitPermission);
-        save(employment);
+        employmentGraphRepository.save(employment);
 
         if (Optional.ofNullable(organization).isPresent()) {
             if (Optional.ofNullable(organization.getEmployments()).isPresent()) {
@@ -1270,7 +1270,7 @@ public class StaffService extends UserBaseService {
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
 
         parent.getEmployments().add(employment);
-        save(parent);
+        organizationGraphRepository.save(parent);
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
@@ -1279,7 +1279,7 @@ public class StaffService extends UserBaseService {
         }
 
         employment.getUnitPermissions().add(unitPermission);
-        save(employment);
+        employmentGraphRepository.save(employment);
     }
 
     public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
@@ -1709,9 +1709,9 @@ public class StaffService extends UserBaseService {
 //        staffFavouriteFilter.setAccessPage(accessPage);
 //        staffFavouriteFilter.setFilterJson(staffFilterDTO.getFilterJson());
         staffFavouriteFilter.setName(staffFilterDTO.getName());
-        save(staffFavouriteFilter);
+         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         staff.addFavouriteFilters(staffFavouriteFilter);
-        save(staff);
+        staffGraphRepository.save(staff);
 //        staffFilterDTO.setFilterJson(staffFavouriteFilter.getFilterJson());
         staffFilterDTO.setModuleId(accessPage.getModuleId());
         staffFilterDTO.setName(staffFavouriteFilter.getName());
@@ -1734,7 +1734,7 @@ public class StaffService extends UserBaseService {
 //        staffFavouriteFilter.setFilterJson(staffFilterDTO.getFilterJson());
         staffFavouriteFilter.setName(staffFilterDTO.getName());
 //        staffFavouriteFilter.setEnabled(true);
-        save(staffFavouriteFilter);
+        staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
 //        staffFilterDTO.setFilterJson(staffFavouriteFilter.getFilterJson());
         // staffFilterDTO.setModuleId(accessPage.getModuleId());
         return staffFilterDTO;
@@ -1751,7 +1751,7 @@ public class StaffService extends UserBaseService {
         }
 
 //        staffFavouriteFilter.setEnabled(false);
-        save(staffFavouriteFilter);
+        staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         return true;
 
     }
@@ -1930,7 +1930,7 @@ public class StaffService extends UserBaseService {
         StaffSettings staffSettings = staffSettingsQueryResult.getStaffSettings();
         staffSettings.setStaffPreferences(staffSettingsQueryResult.getStaffPreferences());
         staff.setStaffSettings(staffSettings);
-        save(staff);
+        staffGraphRepository.save(staff);
         return true;
     }
 
@@ -1946,7 +1946,7 @@ public class StaffService extends UserBaseService {
         employment.setMainEmploymentStartDate(null);
         employment.setMainEmploymentEndDate(null);
         employment.setMainEmployment(false);
-        save(employment);
+        employmentGraphRepository.save(employment);
         return true;
     }
 
@@ -2045,11 +2045,11 @@ public class StaffService extends UserBaseService {
             } else {
                 Employment employment = getEmployment(staffId, employmentDTO);
                 employments.add(employment);
-                save(employments);
+                employmentGraphRepository.saveAll(employments);
             }
         } else {
             Employment employment = getEmployment(staffId, employmentDTO);
-            save(employment);
+            employmentGraphRepository.save(employment);
         }
         mainEmploymentResultDTO.setEmploymentOverlapList(null);
         mainEmploymentResultDTO.setUpdatedMainEmployment(employmentDTO);
@@ -2107,7 +2107,7 @@ public class StaffService extends UserBaseService {
         List<Staff> staffList = staffGraphRepository.findAll();
         staffList.forEach(staff -> {
             addStaffInChatServer(staff);
-            save(staff);
+            staffGraphRepository.save(staff);
         });
         return true;
     }

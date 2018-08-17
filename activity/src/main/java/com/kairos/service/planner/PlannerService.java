@@ -49,7 +49,7 @@ import com.kairos.user.country.day_type.DayType;
 import com.kairos.user.organization.OrganizationDTO;
 import com.kairos.user.organization.skill.Skill;
 import com.kairos.util.DateUtils;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import com.kairos.wrapper.TaskCountWithAssignedUnit;
 import com.kairos.wrapper.task.TaskGanttDTO;
 import com.kairos.wrapper.task.TaskUpdateDTO;

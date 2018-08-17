@@ -1,10 +1,8 @@
 package com.kairos.controller.table_settings;
 
 import com.kairos.service.table_settings.TableSettingService;
-import com.kairos.service.wta.WTAService;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.util.userContext.User;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

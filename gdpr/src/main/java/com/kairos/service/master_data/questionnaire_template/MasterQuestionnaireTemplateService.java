@@ -3,6 +3,8 @@ package com.kairos.service.master_data.questionnaire_template;
 
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.AssetAttributeName;
+import com.kairos.enums.ProcessingActivityAttributeName;
 import com.kairos.gdpr.master_data.MasterQuestionnaireTemplateDTO;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireTemplate;
@@ -13,7 +15,7 @@ import com.kairos.persistance.repository.master_data.questionnaire_template.Mast
 import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.userContext.UserContext;
+import com.kairos.utils.user_context.UserContext;
 import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +59,8 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * @return Object of Questionnaire template with template type and asset type if template type is(ASSET_TYPE_KEY)
      */
     public MasterQuestionnaireTemplateDTO addQuestionnaireTemplate(Long countryId, Long organizationId, MasterQuestionnaireTemplateDTO templateDto) {
-        MasterQuestionnaireTemplate existing = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, organizationId, templateDto.getName());
-        if (Optional.ofNullable(existing).isPresent()) {
+        MasterQuestionnaireTemplate previousTemplate = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, organizationId, templateDto.getName());
+        if (Optional.ofNullable(previousTemplate).isPresent()) {
             throw new DuplicateDataException("Template Exists with same name");
         }
         MasterQuestionnaireTemplate questionnaireTemplate = new MasterQuestionnaireTemplate(templateDto.getName(), countryId, templateDto.getDescription());
@@ -96,26 +98,26 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
 
         switch (templateType) {
             case VENDOR:
-                questionnaireTemplate.setTemplateType(templateType.value);
+                questionnaireTemplate.setTemplateType(templateType);
                 break;
             case GENERAL:
-                questionnaireTemplate.setTemplateType(templateType.value);
+                questionnaireTemplate.setTemplateType(templateType);
                 break;
             case ASSET_TYPE:
                 if (assetTypeId == null) {
                     exceptionService.invalidRequestException("message.invalid.request", "asset type is null");
                 } else if (assetTypeMongoRepository.findByIdAndNonDeleted(UserContext.getCountryId(), assetTypeId) != null) {
-                    questionnaireTemplate.setTemplateType(templateType.value);
+                    questionnaireTemplate.setTemplateType(templateType);
                     questionnaireTemplate.setAssetType(assetTypeId);
                 } else {
                     exceptionService.dataNotFoundByIdException("message.dataNotFound", "asset type", assetTypeId);
                 }
                 break;
             case PROCESSING_ACTIVITY:
-                questionnaireTemplate.setTemplateType(templateType.value);
+                questionnaireTemplate.setTemplateType(templateType);
                 break;
             default:
-                throw new InvalidRequestException("invalid request template type not found for " + templateType.value);
+                throw new InvalidRequestException("invalid request template type not found for " + templateType);
         }
     }
 
@@ -200,6 +202,26 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
         });
         return templateResponseDTOs;
 
+    }
+
+
+    public Object[] getQuestionnaireTemplateAttributeNames(String templateType) {
+
+
+        if (QuestionnaireTemplateType.valueOf(templateType) == null) {
+            throw new InvalidRequestException("template type not found for" + templateType);
+        }
+        QuestionnaireTemplateType questionnaireTemplateType = QuestionnaireTemplateType.valueOf(templateType);
+        Object[] attributeNames = new Object[]{};
+        switch (questionnaireTemplateType) {
+            case ASSET_TYPE:
+                attributeNames = AssetAttributeName.values();
+                break;
+            case PROCESSING_ACTIVITY:
+                attributeNames = ProcessingActivityAttributeName.values();
+                break;
+        }
+        return attributeNames;
     }
 
 

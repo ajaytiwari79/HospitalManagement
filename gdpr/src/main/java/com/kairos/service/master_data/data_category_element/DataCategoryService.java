@@ -46,20 +46,20 @@ public class DataCategoryService extends MongoBaseService {
      */
     public DataCategoryDTO addDataCategoryAndDataElement(Long countryId, Long organizationId, DataCategoryDTO dataCategoryDto) {
 
-        DataCategory dataCategory = dataCategoryMongoRepository.findByName(countryId, organizationId, dataCategoryDto.getName());
-        if (Optional.ofNullable(dataCategory).isPresent()) {
+        DataCategory previousDataCategory = dataCategoryMongoRepository.findByName(countryId, organizationId, dataCategoryDto.getName());
+        if (Optional.ofNullable(previousDataCategory).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "data category", dataCategoryDto.getName());
         }
         Map<String, Object> dataElementList = dataElementService.createDataElements(countryId, organizationId, dataCategoryDto.getDataElements());
         try {
-            DataCategory newDataCategory = new DataCategory(dataCategoryDto.getName(), (List<BigInteger>) dataElementList.get(IDS_LIST), countryId);
-            newDataCategory.setOrganizationId(organizationId);
-            dataCategoryMongoRepository.save(newDataCategory);
+            DataCategory dataCategory = new DataCategory(dataCategoryDto.getName(), (List<BigInteger>) dataElementList.get(IDS_LIST), countryId);
+            dataCategory.setOrganizationId(organizationId);
+            dataCategoryMongoRepository.save(dataCategory);
+            dataCategoryDto.setId(dataCategory.getId());
         } catch (Exception e) {
             LOGGER.warn(e.getMessage());
             dataElementMongoRepository.deleteAll((List<DataElement>) dataElementList.get(DATA_ELEMENTS_LIST));
         }
-        dataCategoryDto.setId(dataCategory.getId());
         return dataCategoryDto;
     }
 

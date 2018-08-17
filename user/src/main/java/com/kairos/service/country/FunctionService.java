@@ -1,7 +1,6 @@
 package com.kairos.service.country;
 
 import com.kairos.activity.shift.FunctionDTO;
-import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
@@ -23,7 +22,7 @@ import java.util.Optional;
  */
 @Service
 @Transactional
-public class FunctionService extends UserBaseEntity{
+public class FunctionService {
 
     @Inject CountryGraphRepository countryGraphRepository;
 
