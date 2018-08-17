@@ -570,13 +570,13 @@ public class AccessGroupService {
                 accessGrpToUpdate.get().setAccountType(accountTypes);
             }
         }
-        accessGrpToUpdate.setName(accessGroupDTO.getName());
-        accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
-        accessGrpToUpdate.setLastModificationDate(DateUtil.getCurrentDate().getTime());
-        accessGrpToUpdate.setRole(accessGroupDTO.getRole());
-        accessGrpToUpdate.setEnabled(accessGroupDTO.isEnabled());
-        accessGroupRepository.save(accessGrpToUpdate);
-        return accessGrpToUpdate;
+        accessGrpToUpdate.get().setName(accessGroupDTO.getName());
+        accessGrpToUpdate.get().setDescription(accessGroupDTO.getDescription());
+        accessGrpToUpdate.get().setLastModificationDate(DateUtil.getCurrentDate().getTime());
+        accessGrpToUpdate.get().setRole(accessGroupDTO.getRole());
+        accessGrpToUpdate.get().setEnabled(accessGroupDTO.isEnabled());
+        accessGroupRepository.save(accessGrpToUpdate.get());
+        return accessGrpToUpdate.get();
     }
 
     public boolean deleteCountryAccessGroup(long accessGroupId) {
