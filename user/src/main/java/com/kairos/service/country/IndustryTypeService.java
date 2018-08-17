@@ -1,9 +1,9 @@
 package com.kairos.service.country;
+
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.IndustryType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.IndustryTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class IndustryTypeService extends UserBaseService {
+public class IndustryTypeService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -32,7 +32,7 @@ public class IndustryTypeService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             industryType.setCountry(country);
-             save(industryType);
+            industryTypeGraphRepository.save(industryType);
             return industryType.retrieveDetails();
         }
         return null;
@@ -56,7 +56,7 @@ public class IndustryTypeService extends UserBaseService {
         if (currentIndustryType!=null){
             currentIndustryType.setName(industryType.getName());
             currentIndustryType.setDescription(industryType.getDescription());
-            save(currentIndustryType);
+            industryTypeGraphRepository.save(currentIndustryType);
             return currentIndustryType.retrieveDetails();
         }
         return null;
@@ -66,7 +66,7 @@ public class IndustryTypeService extends UserBaseService {
         IndustryType currentIndustryType = industryTypeGraphRepository.findOne(industryTypeId);
         if (currentIndustryType!=null){
             currentIndustryType.setEnabled(false);
-            save(currentIndustryType);
+            industryTypeGraphRepository.save(currentIndustryType);
             return true;
         }
         return false;

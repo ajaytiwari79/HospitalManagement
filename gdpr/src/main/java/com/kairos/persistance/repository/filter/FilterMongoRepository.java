@@ -3,7 +3,6 @@ package com.kairos.persistance.repository.filter;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

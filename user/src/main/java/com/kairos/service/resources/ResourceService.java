@@ -4,15 +4,13 @@ package com.kairos.service.resources;
  * Created by oodles on 17/10/16.
  */
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.resources.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
+import com.kairos.persistence.repository.user.resources.ResourceUnAvailabilityGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceUnavailabilityRelationshipRepository;
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
@@ -34,7 +32,7 @@ import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
  */
 @Service
 @Transactional
-public class ResourceService extends UserBaseService {
+public class ResourceService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -50,7 +48,7 @@ public class ResourceService extends UserBaseService {
     ResourceUnavailabilityRelationshipRepository unavailabilityRelationshipRepository;
     @Inject
     private ExceptionService exceptionService;
-
+@Inject private ResourceUnAvailabilityGraphRepository resourceUnAvailabilityGraphRepository;
     /**
      * Get the List of Resources in Organization
      *
@@ -175,7 +173,7 @@ public class ResourceService extends UserBaseService {
         }
         resource.setCreationDate(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         organization.addResource(resource);
-        save(organization);
+        organizationGraphRepository.save(organization);
         return resource;
     }
 
@@ -262,7 +260,7 @@ public class ResourceService extends UserBaseService {
                 resourceUnAvailability.setEndTime(timeTo.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
             }
         }
-        return save(resourceUnAvailability);
+        return resourceUnAvailabilityGraphRepository.save(resourceUnAvailability);
     }
 
     public void deleteUnavailability(Long resourceId, Long unavailableDateId) {

@@ -4,7 +4,6 @@ import com.kairos.persistance.model.master_data.data_category_element.DataElemen
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

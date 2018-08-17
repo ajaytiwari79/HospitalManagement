@@ -29,8 +29,7 @@ public class IntegrationTestConfig {
     public TestRestTemplate getTestRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         restTemplateBuilder = restTemplateBuilder
         .interceptors(new TestUserContextInterceptor());
-        TestRestTemplate restTemplate = new TestRestTemplate(restTemplateBuilder);
-        return restTemplate;
+        return new TestRestTemplate(restTemplateBuilder);
     }
 
     class TestUserContextInterceptor implements ClientHttpRequestInterceptor {

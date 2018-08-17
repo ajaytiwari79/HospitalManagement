@@ -1,21 +1,20 @@
 package com.kairos.service.country.equipment;
 
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.equipment.Equipment;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.country.equipment.EquipmentQueryResult;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
-import com.kairos.user.equipment.EquipmentDTO;
-import com.kairos.user.equipment.VehicleEquipmentDTO;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.user.equipment.EquipmentDTO;
+import com.kairos.user.equipment.VehicleEquipmentDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,7 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class EquipmentService extends UserBaseService {
+public class EquipmentService{
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -72,7 +71,7 @@ public class EquipmentService extends UserBaseService {
         equipment.setName(equipmentDTO.getName());
         equipment.setDescription(equipmentDTO.getDescription());
         equipment.setCategory(equipmentCategoryGraphRepository.findOne(equipmentDTO.getEquipmentCategory().getId(),0));
-        save(equipment);
+        equipmentGraphRepository.save(equipment);
         equipmentGraphRepository.addEquipmentInCountry(countryId,equipment.getId());
         return equipment;
     }
@@ -97,7 +96,7 @@ public class EquipmentService extends UserBaseService {
         equipment.setDescription(equipmentDTO.getDescription());
         equipmentGraphRepository.detachEquipmentCategory(equipmentId);
         equipment.setCategory(equipmentCategoryGraphRepository.findOne(equipmentDTO.getEquipmentCategory().getId(),0));
-        save(equipment);
+        equipmentGraphRepository.save(equipment);
         return equipment;
         //return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), new Date().getTime());
     }
@@ -114,7 +113,7 @@ public class EquipmentService extends UserBaseService {
 
         }
         equipment.setDeleted(true);
-        save(equipment);
+        equipmentGraphRepository.save(equipment);
         return true;
     }
 

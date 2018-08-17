@@ -2,7 +2,6 @@ package com.kairos.service.tpa_services;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class IntegrationConfigurationService extends UserBaseService {
+public class IntegrationConfigurationService {
 
     @Inject
     CountryGraphRepository countryGraphRepository;
@@ -26,7 +25,7 @@ public class IntegrationConfigurationService extends UserBaseService {
     IntegrationConfigurationGraphRepository integrationConfigurationGraphRepository;
 
     public HashMap<String, Object> addIntegrationConfiguration(IntegrationConfiguration integrationConfiguration){
-        save(integrationConfiguration);
+        integrationConfigurationGraphRepository.save(integrationConfiguration);
         return filterIntegrationServiceData(integrationConfiguration);
     }
 
@@ -45,7 +44,7 @@ public class IntegrationConfigurationService extends UserBaseService {
             return false;
         }
         objectToDelete.setEnabled(false);
-        save(objectToDelete);
+        integrationConfigurationGraphRepository.save(objectToDelete);
         return true;
     }
 
@@ -57,7 +56,7 @@ public class IntegrationConfigurationService extends UserBaseService {
         objectToUpdate.setDescription(integrationConfiguration.getDescription());
         objectToUpdate.setName(integrationConfiguration.getName());
         objectToUpdate.setUniqueKey(integrationConfiguration.getUniqueKey());
-        save(objectToUpdate);
+        integrationConfigurationGraphRepository.save(objectToUpdate);
         return filterIntegrationServiceData(objectToUpdate);
     }
 

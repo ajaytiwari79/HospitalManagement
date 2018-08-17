@@ -1,9 +1,9 @@
 package com.kairos.service.language;
+
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageLevelGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +17,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class LanguageLevelService extends UserBaseService {
+public class LanguageLevelService {
 
     @Inject
     private LanguageLevelGraphRepository languageLevelGraphRepository;
@@ -26,7 +26,7 @@ public class LanguageLevelService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
 
     public LanguageLevel addNewLanguageLevel(LanguageLevel languageLevel) {
-        save(languageLevel);
+        languageLevelGraphRepository.save(languageLevel);
         return languageLevel;
     }
 
@@ -53,7 +53,7 @@ public class LanguageLevelService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country != null) {
             languageLevel.setCountry(country);
-            save(languageLevel);
+            languageLevelGraphRepository.save(languageLevel);
             return languageLevel.retrieveDetails();
         }
         return null;
@@ -65,7 +65,7 @@ public class LanguageLevelService extends UserBaseService {
             LanguageLevel currentLanguageLevel = languageLevelGraphRepository.findOne(languageLevel.getId());
             currentLanguageLevel.setDescription(languageLevel.getDescription());
             currentLanguageLevel.setName(languageLevel.getName());
-            save(currentLanguageLevel);
+            languageLevelGraphRepository.save(currentLanguageLevel);
             return currentLanguageLevel.retrieveDetails();
         }
         return null;
@@ -75,7 +75,7 @@ public class LanguageLevelService extends UserBaseService {
         LanguageLevel languageLevel = languageLevelGraphRepository.findOne(languageLevelId);
         if (languageLevel != null) {
             languageLevel.setEnabled(false);
-            save(languageLevel);
+            languageLevelGraphRepository.save(languageLevel);
             return languageLevel;
         }
         return null;
