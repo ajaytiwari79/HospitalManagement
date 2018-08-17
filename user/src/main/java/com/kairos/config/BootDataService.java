@@ -40,7 +40,6 @@ import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.UserBaseRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
-import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientLanguageRelationGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientOrganizationRelationGraphRepository;
@@ -176,10 +175,6 @@ public class BootDataService {
     private AccessPageService accessPageService;
     @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
-    @Inject
-    private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
-    @Inject
-    private CostTimeAgreementService costTimeAgreementService;
     @Inject
     private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
     @Inject

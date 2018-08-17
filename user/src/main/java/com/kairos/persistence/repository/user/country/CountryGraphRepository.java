@@ -1,13 +1,12 @@
 package com.kairos.persistence.repository.user.country;
 
+import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.RelationType;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
-import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
-import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.persistence.model.country.RelationType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;

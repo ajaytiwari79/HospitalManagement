@@ -50,7 +50,6 @@ import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTyp
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
-import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
@@ -239,10 +238,7 @@ public class OrganizationService {
     //private WTAService wtaService;
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
-    @Inject
-    private
-    CollectiveTimeAgreementGraphRepository collectiveTimeAgreementGraphRepository;
-    @Inject
+   @Inject
     PeriodRestClient periodRestClient;
     @Inject
     private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;

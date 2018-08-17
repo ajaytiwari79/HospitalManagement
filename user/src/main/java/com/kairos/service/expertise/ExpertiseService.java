@@ -14,6 +14,7 @@ import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryR
 
 import com.kairos.persistence.model.country.experties.*;
 import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.user.expertise.Response.*;
 import com.kairos.user.country.experties.*;
 import com.kairos.user.country.time_slot.TimeSlot;
 import com.kairos.persistence.model.country.experties.UnionServiceWrapper;
@@ -25,10 +26,6 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseEmploymentTypeRelationship;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
-import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
