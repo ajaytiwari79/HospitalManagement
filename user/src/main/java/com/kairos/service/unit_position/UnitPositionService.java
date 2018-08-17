@@ -54,7 +54,6 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionFunction
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -98,7 +97,7 @@ import static com.kairos.util.table_constants.TableSettingsConstants.ORGANIZATIO
 @Transactional
 @Service
 
-public class UnitPositionService extends UserBaseService {
+public class UnitPositionService {
     private final Logger logger = LoggerFactory.getLogger(UnitPositionService.class);
     @Inject
     private StaffGraphRepository staffGraphRepository;
@@ -209,7 +208,7 @@ public class UnitPositionService extends UserBaseService {
             unitPosition.setPublished(true);
         }
         unitPosition.setUnit(organization);
-        save(unitPosition);
+        unitPositionGraphRepository.save(unitPosition);
         Employment employment1 = employmentService.updateEmploymentEndDate(organization, unitPositionDTO.getStaffId(), unitPositionDTO.getEndLocalDate() != null ? DateUtil.getDateFromEpoch(unitPositionDTO.getEndLocalDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupIdOnEmploymentEnd());
         Long reasonCodeId = Optional.ofNullable(employment.getReasonCode()).isPresent() ? employment1.getReasonCode().getId() : null;
 
@@ -373,7 +372,7 @@ public class UnitPositionService extends UserBaseService {
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             oldUnitPosition.setEndDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate().minusDays(1L)));
-            save(unitPosition);
+            unitPositionGraphRepository.save(unitPosition);
             linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         }
@@ -381,7 +380,7 @@ public class UnitPositionService extends UserBaseService {
         else if (oldUnitPosition.isPublished() && !calculativeValueChanged && saveAsDraft) {
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
-            save(unitPosition);
+            unitPositionGraphRepository.save(unitPosition);
             linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         }
@@ -389,14 +388,14 @@ public class UnitPositionService extends UserBaseService {
         else if (oldUnitPosition.isPublished() && !calculativeValueChanged && !saveAsDraft) {
             oldUnitPosition.setEndDateMillis(unitPositionDTO.getEndLocalDate() != null ? DateUtils.getLongFromLocalDate(unitPositionDTO.getEndLocalDate()) : null);
             oldUnitPosition.setLastWorkingDateMillis(unitPositionDTO.getLastWorkingLocalDate() != null ? DateUtils.getLongFromLocalDate(unitPositionDTO.getLastWorkingLocalDate()) : null);
-            save(oldUnitPosition);
+            unitPositionGraphRepository.save(oldUnitPosition);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         } //calculative value is changed user is saving this as draft.
         else if (oldUnitPosition.isPublished() && calculativeValueChanged && saveAsDraft) {
             //CREAte new UP
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
-            save(unitPosition);
+            unitPositionGraphRepository.save(unitPosition);
             linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         } else {
@@ -409,7 +408,7 @@ public class UnitPositionService extends UserBaseService {
                 validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
                 oldUnitPosition.setPublished(true);
             }
-            save(oldUnitPosition);
+            unitPositionGraphRepository.save(oldUnitPosition);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
 
         }
@@ -432,7 +431,7 @@ public class UnitPositionService extends UserBaseService {
 
         }
         unitPosition.setDeleted(true);
-        save(unitPosition);
+        unitPositionGraphRepository.save(unitPosition);
 
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(positionId);
@@ -753,7 +752,7 @@ public class UnitPositionService extends UserBaseService {
         updateDTO.setId(wtaId);
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
         unitPosition.setWorkingTimeAgreementId(wtaResponseDTO.getId());
-        save(unitPosition);
+        unitPositionGraphRepository.save(unitPosition);
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition, wtaResponseDTO);
         plannerSyncService.publishWTA(unitId, unitPositionId, wtaResponseDTO, IntegrationOperation.UPDATE);
         return unitPositionQueryResult;
@@ -1240,8 +1239,8 @@ public class UnitPositionService extends UserBaseService {
             unitPositions.add(unitPosition);
         }
 
-        save(unitPositions);
-        save(unitPositionEmploymentTypeRelationShips);
+        unitPositionGraphRepository.saveAll(unitPositions);
+        unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(unitPositionEmploymentTypeRelationShips);
 
 
     }

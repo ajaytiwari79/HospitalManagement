@@ -1,9 +1,9 @@
 package com.kairos.service.language;
+
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.util.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class LanguageService extends UserBaseService {
+public class LanguageService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -32,7 +32,10 @@ public class LanguageService extends UserBaseService {
     public List<Language> getAllLanguage(){
         return languageGraphRepository.findAll();
     }
-
+// TODO FIX LATER
+    public Language save( Language language){
+        return languageGraphRepository.save(language);
+    }
     public List<Language> getLanguageByCountryId(long countryId){
         return languageGraphRepository.getLanguageByCountryId(countryId);
     }
@@ -43,7 +46,7 @@ public class LanguageService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             language.setCountry(country);
-            save(language);
+            languageGraphRepository.save(language);
             return language.retrieveDetails();
         }
         return  null;
@@ -54,7 +57,7 @@ public class LanguageService extends UserBaseService {
             Language currentLanguage = languageGraphRepository.findOne(language.getId());
             currentLanguage.setDescription(language.getDescription());
             currentLanguage.setName(language.getName());
-            save(currentLanguage);
+            languageGraphRepository.save(currentLanguage);
             return currentLanguage.retrieveDetails();
         }
         return  null;
@@ -64,7 +67,7 @@ public class LanguageService extends UserBaseService {
         Language currentLanguage = languageGraphRepository.findOne(languageId);
         if (currentLanguage!=null){
             currentLanguage.setEnabled(false);
-            save(currentLanguage);
+            languageGraphRepository.save(currentLanguage);
             return currentLanguage;
         }
         return  null;

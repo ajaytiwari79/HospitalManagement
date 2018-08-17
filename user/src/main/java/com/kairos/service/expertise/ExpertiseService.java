@@ -21,7 +21,10 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseEmploymentTypeRelationship;
-import com.kairos.persistence.model.user.expertise.Response.*;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
+import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -36,13 +39,11 @@ import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.priority_group.GenericRestClient;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.user.country.experties.*;
 import com.kairos.user.country.time_slot.TimeSlot;
-
 import com.kairos.util.DateUtil;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
@@ -62,7 +63,7 @@ import static javax.management.timer.Timer.ONE_DAY;
  */
 @Service
 @Transactional
-public class ExpertiseService extends UserBaseService {
+public class ExpertiseService {
 
     @Inject
     private
@@ -144,7 +145,7 @@ public class ExpertiseService extends UserBaseService {
                 SeniorityLevel seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
                         expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
                 addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
-                save(expertise);
+                expertiseGraphRepository.save(expertise);
                 expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
                 expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
                 expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
@@ -254,14 +255,14 @@ public class ExpertiseService extends UserBaseService {
                 seniorityLevel.setPensionPercentage(seniorityLevelFromDB.getPensionPercentage());
                 seniorityLevel.setFreeChoicePercentage(seniorityLevelFromDB.getFreeChoicePercentage());
                 seniorityLevel.setFreeChoiceToPension(seniorityLevelFromDB.getFreeChoiceToPension());
-                save(seniorityLevel);
+                seniorityLevelGraphRepository.save(seniorityLevel);
                 expertise.getSeniorityLevel().add(seniorityLevel);
                 seniorityLevelResponse.add(getSeniorityLevelResponse(seniorityLevelFromDB, seniorityLevel));
 
             }
         }
 
-        save(expertise);
+        expertiseGraphRepository.save(expertise);
         // NOW linking this with functional table
 
         functionalPaymentGraphRepository.linkFunctionalPaymentExpertise(expertise.getParentExpertise().getId(), expertise.getId());
@@ -308,7 +309,7 @@ public class ExpertiseService extends UserBaseService {
 
         }
 
-        save(expertise);
+        expertiseGraphRepository.save(expertise);
         expertiseDTO.setId(expertise.getId());
         expertiseDTO.setPublished(expertise.isPublished());
         if (expertiseDTO.getSeniorityLevel() != null) {
@@ -325,7 +326,7 @@ public class ExpertiseService extends UserBaseService {
         }
         seniorityLevel.setPayGrade(payGrade);
         expertise.getSeniorityLevel().add(seniorityLevel);
-        save(seniorityLevel);
+        seniorityLevelGraphRepository.save(seniorityLevel);
         return seniorityLevel;
     }
 
@@ -411,7 +412,7 @@ public class ExpertiseService extends UserBaseService {
             // organization Level is changed so need to set new
 
 
-            save(currentExpertise);
+            expertiseGraphRepository.save(currentExpertise);
             expertiseDTO.setId(currentExpertise.getId());
             expertiseDTO.setPublished(currentExpertise.isPublished());
 
@@ -512,7 +513,7 @@ public class ExpertiseService extends UserBaseService {
             for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel())
                 seniorityLevel.setDeleted(true);
         }
-        save(expertise);
+        expertiseGraphRepository.save(expertise);
         return parentExpertise;
     }
 
@@ -535,7 +536,7 @@ public class ExpertiseService extends UserBaseService {
                     break;
                 }
         }
-        save(expertise);
+        expertiseGraphRepository.save(expertise);
         return true;
     }
 
@@ -646,7 +647,7 @@ public class ExpertiseService extends UserBaseService {
         expertise.setPublished(true);
         expertise.setStartDateMillis(new Date(publishedDateMillis));
 
-        save(expertise);
+        expertiseGraphRepository.save(expertise);
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if (Optional.ofNullable(parentExpertise).isPresent()) {
             expertiseGraphRepository.setEndDateToExpertise(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
@@ -700,7 +701,7 @@ public class ExpertiseService extends UserBaseService {
         } else if (wtaType.equalsIgnoreCase(CHILD_CARE)) {
             expertise.get().setChildCareDays(careDays);
         }
-        save(expertise.get());
+        expertiseGraphRepository.save(expertise.get());
         ageRangeDTO = ObjectMapperUtils.copyPropertiesOfListByMapper((wtaType.equals(CHILD_CARE) ? expertise.get().getChildCareDays() : expertise.get().getSeniorDays()), AgeRangeDTO.class);
         return ageRangeDTO;
     }
@@ -813,7 +814,7 @@ public class ExpertiseService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "union", expertiseDTO.getUnionId());
         }
         targetExpertise.setUnion(union);
-        save(targetExpertise);
+        expertiseGraphRepository.save(targetExpertise);
         createDefaultSettings(targetExpertise, sourceExpertise);
         expertiseDTO.setId(targetExpertise.getId());
         // small object so not creating map
