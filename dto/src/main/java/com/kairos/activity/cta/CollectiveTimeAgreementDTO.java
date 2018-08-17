@@ -25,9 +25,9 @@ public class CollectiveTimeAgreementDTO {
     private String description;
     @NotNull(message = "error.cta.parentExpertise.notNull")
     private ExpertiseResponseDTO expertise;
-    @NotNull(message = "error.cta.organizationType.notNull")
+    //@NotNull(message = "error.cta.organizationType.notNull")
     private OrganizationTypeDTO organizationType;
-    @NotNull(message = "error.cta.organizationSubType.notNull")
+    //@NotNull(message = "error.cta.organizationSubType.notNull")
     private OrganizationTypeDTO organizationSubType;
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
     @NotNull(message = "error.cta.startDate.notNull")

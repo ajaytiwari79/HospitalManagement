@@ -252,14 +252,14 @@ public class CostTimeAgreementService extends MongoBaseService {
         return costTimeAgreementRepository.getOneCtaById(unitPosition.getCostTimeAgreementId());
     }
 
-    public UnitPositionDTO updateCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, Long ctaId, CollectiveTimeAgreementDTO ctaDTO) {
+    public UnitPositionDTO updateCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, BigInteger ctaId, CollectiveTimeAgreementDTO ctaDTO) {
         UnitPositionDTO unitPosition = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_UNIT_POSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionDTO>>() {
-        });
+        },unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentPostionId", unitPositionId);
 
         }
-        CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(unitPosition.getCostTimeAgreementId());
+        CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         CTAResponseDTO responseCTA;
         if (unitPosition.isPublished()) {
             CostTimeAgreement costTimeAgreement = new CostTimeAgreement();
@@ -276,9 +276,14 @@ public class CostTimeAgreementService extends MongoBaseService {
             this.save(oldCTA);
             costTimeAgreement.setParentId(oldCTA.getId());
             costTimeAgreement.setExpertise(oldCTA.getExpertise());
+            costTimeAgreement.setOrganizationType(oldCTA.getOrganizationType());
+            costTimeAgreement.setOrganizationSubType(oldCTA.getOrganizationSubType());
+            costTimeAgreement.setOrganization(oldCTA.getOrganization());
+            costTimeAgreement.setUnitPositionId(unitPositionId);
             List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplates,CTARuleTemplateDTO.class);
             ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(),ExpertiseResponseDTO.class);
             responseCTA = new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false);
+            save(costTimeAgreement);
         } else {
             List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(),CTARuleTemplate.class);
             save(ctaRuleTemplates);

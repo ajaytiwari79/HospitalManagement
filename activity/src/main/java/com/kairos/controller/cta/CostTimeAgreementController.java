@@ -139,7 +139,7 @@ public class CostTimeAgreementController {
      */
     @ApiOperation(value = "Update Unit Position's CTA")
     @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta/{ctaId}")
-    public ResponseEntity<Map<String, Object>> updateCostTimeAgreementForUnitPosition(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable Long ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO ctaDTO){
+    public ResponseEntity<Map<String, Object>> updateCostTimeAgreementForUnitPosition(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable BigInteger ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO ctaDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.updateCostTimeAgreementForUnitPosition(unitId, unitPositionId, ctaId, ctaDTO));
     }
 

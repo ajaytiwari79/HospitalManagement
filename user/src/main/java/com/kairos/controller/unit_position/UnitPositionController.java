@@ -66,6 +66,12 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.updateUnitPosition(unitPositionId, position, unitId, type, saveAsDraft));
     }
 
+    @ApiOperation(value = "Get unit_position")
+    @GetMapping(value = "/unit_position/{unitPositionId}")
+    public ResponseEntity<Map<String, Object>> getUnitPosition(@PathVariable Long unitId, @PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPosition(unitPositionId));
+    }
+
     @ApiOperation(value = "Update unit_position's WTA")
     @PutMapping(value = "/unit_position/{unitPositionId}/wta/{wtaId}")
     public ResponseEntity<Map<String, Object>> updateUnitPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable BigInteger wtaId, @RequestBody @Valid WTADTO wtadto) {

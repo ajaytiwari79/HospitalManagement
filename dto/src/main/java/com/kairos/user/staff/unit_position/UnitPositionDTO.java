@@ -20,7 +20,7 @@ public class UnitPositionDTO {
     @NotNull(message = "expertise is required for position")
     @Range(min = 0, message = "expertise is required for position")
     private Long expertiseId;
-
+    private Long id;
     private LocalDate startLocalDate;
     private LocalDate endLocalDate;
     private LocalDate lastWorkingLocalDate;
@@ -34,7 +34,6 @@ public class UnitPositionDTO {
     private int workingDaysInWeek;
     private float hourlyWages;
     private Double salary;
-    @NotNull(message = "employmentTypeId can't be null")
     private Long employmentTypeId;
     @NotNull(message = "employmentTypeCategory can't be null")
     private EmploymentCategory employmentTypeCategory;
@@ -46,6 +45,15 @@ public class UnitPositionDTO {
     @Range(min = 0, message = "staffId is missing")
     private Long staffId;
     // private Long expiryDate;
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     private Long unionId;
     private Long parentUnitId;
@@ -76,6 +84,14 @@ public class UnitPositionDTO {
         //default cons
     }
 
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
 
     public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
                            float avgDailyWorkingHours, float hourlyWages, Double salary, Long employmentTypeId) {

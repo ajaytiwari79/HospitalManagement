@@ -439,6 +439,14 @@ public class UnitPositionService {
     }
 
 
+
+    public UnitPositionQueryResult getUnitPosition(Long unitPositionId){
+       UnitPosition unitPosition =  unitPositionGraphRepository.findOne(unitPositionId,0);
+        UnitPositionQueryResult unitPositionQueryResult = new UnitPositionQueryResult();
+        unitPositionQueryResult.setPublished(unitPosition.isPublished());
+        unitPositionQueryResult.setId(unitPosition.getId());
+       return unitPositionQueryResult;
+    }
     private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
         if (Optional.ofNullable(unitPositionDTO.getUnionId()).isPresent()) {
             Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unitPositionDTO.getUnionId());
