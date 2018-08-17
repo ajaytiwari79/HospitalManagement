@@ -113,9 +113,9 @@ public class CounterDistService extends MongoBaseService {
         }
         List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),refId,level);
        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(tabKPIEntries.getKpiIds(),refId,level);
-//        if (tabKPIEntries.getKpiIds().size() != applicableKPIS.size()) {
-//            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
-//        }
+        if (tabKPIEntries.getKpiIds().size() != applicableKPIS.size()) {
+            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
+        }
         Map<String, Map<BigInteger, BigInteger>> tabKpiMap = new HashMap<>();
         List<TabKPIConf> entriesToSave = new ArrayList<>();
         tabKPIEntries.getTabIds().forEach(tabKpiId -> {
@@ -168,10 +168,10 @@ public class CounterDistService extends MongoBaseService {
         Long countryId = ConfLevel.COUNTRY.equals(level)? refId: null;
         Long unitId=ConfLevel.UNIT.equals(level)? refId: null;
         List<AccessGroupKPIEntry> entriesToSave = new ArrayList<>();
-//        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(accessGroupKPIConf.getKpiIds(),refId,level);
-//        if (accessGroupKPIConf.getKpiIds().size() != applicableKPIS.size()) {
-//            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
-//        }
+        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(accessGroupKPIConf.getKpiIds(),refId,level);
+        if (accessGroupKPIConf.getKpiIds().size() != applicableKPIS.size()) {
+            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
+        }
         List<AccessGroupMappingDTO> AccessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(accessGroupKPIConf.getAccessGroupIds(),accessGroupKPIConf.getKpiIds(),level,refId);
         Map<Long, Map<BigInteger, BigInteger>> accessGroupKPIMap = new HashMap<>();
         accessGroupKPIConf.getAccessGroupIds().forEach(orgTypeId -> {
@@ -217,10 +217,10 @@ public class CounterDistService extends MongoBaseService {
     }
 
     public void addOrgTypeKPIEntries(OrgTypeKPIConfDTO orgTypeKPIConf, Long countryId) {
-//        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(orgTypeKPIConf.getKpiIds(),countryId,ConfLevel.COUNTRY);
-//        if (orgTypeKPIConf.getKpiIds().size() != applicableKPIS.size()) {
-//            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
-//        }
+        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(orgTypeKPIConf.getKpiIds(),countryId,ConfLevel.COUNTRY);
+        if (orgTypeKPIConf.getKpiIds().size() != applicableKPIS.size()) {
+            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
+        }
         List<OrgTypeKPIEntry> entriesToSave = new ArrayList<>();
         Map<Long, Map<BigInteger, BigInteger>> orgTypeKPIsMap = new HashMap<>();
         orgTypeKPIConf.getOrgTypeIds().forEach(orgTypeId->{
