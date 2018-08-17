@@ -1,10 +1,9 @@
 package com.kairos.service.skill;
-import com.kairos.custom_exception.DuplicateDataException;
+
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class SkillCategoryService extends UserBaseService {
+public class SkillCategoryService {
 
     @Inject
     SkillCategoryGraphRepository skillCategoryGraphRepository;
@@ -40,7 +39,7 @@ public class SkillCategoryService extends UserBaseService {
 
         }else {
             skillCategory.setCountry(country);
-            save(skillCategory);
+            skillCategoryGraphRepository.save(skillCategory);
             return skillCategory.retieveDetails();
         }
 

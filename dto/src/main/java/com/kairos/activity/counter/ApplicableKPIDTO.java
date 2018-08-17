@@ -8,7 +8,6 @@ public class ApplicableKPIDTO {
     private KPIDTO kpi;
     private ConfLevel level;
 
-
     public KPIDTO getKpi() {
         return kpi;
     }

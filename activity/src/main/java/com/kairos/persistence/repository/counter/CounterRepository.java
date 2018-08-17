@@ -80,7 +80,7 @@ public class CounterRepository {
         Aggregation aggregation=Aggregation.newAggregation(
           Aggregation.match(Criteria.where(refQueryField).is(refId)),
           Aggregation.lookup("counter","activeKpiId","_id","kpiIds"),
-           Aggregation.project("level").and("kpiIds").arrayElementAt(0).as("kpiIds")
+           Aggregation.project("level").and("kpiIds").arrayElementAt(0).as("kpi")
         );
         AggregationResults<ApplicableKPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,ApplicableKPIDTO.class);
         return results.getMappedResults();
