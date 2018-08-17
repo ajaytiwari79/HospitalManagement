@@ -1,7 +1,6 @@
 package com.kairos.service.auth;
 import com.kairos.persistence.model.auth.UserRole;
 import com.kairos.persistence.repository.user.auth.UserRoleGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +13,7 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class UserRoleServiceUser extends UserBaseService {
+public class UserRoleServiceUser {
 
     @Inject
     UserRoleGraphRepository userRoleGraphRepository;
@@ -30,7 +29,9 @@ public class UserRoleServiceUser extends UserBaseService {
         return  userRoleGraphRepository.save(userRole);
     }
 
-
+    public UserRole save(UserRole userRole){
+        return  userRoleGraphRepository.save(userRole);
+    }
 
 
 

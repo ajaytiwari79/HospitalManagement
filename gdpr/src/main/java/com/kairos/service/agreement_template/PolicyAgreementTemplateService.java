@@ -8,7 +8,6 @@ import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseD
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
-import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @description this method creates a basic policy Agreement template with basic detail about organization type,
      * organizationSubTypes ,service Category and sub service Category.
      */
-    public PolicyAgreementTemplate createBasicPolicyAgreementTemplate(Long countryId, Long organizationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
+    public PolicyAgreementTemplateDTO createBasicPolicyAgreementTemplate(Long countryId, Long organizationId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
 
         PolicyAgreementTemplate previousTemplate = policyAgreementTemplateRepository.findByName(countryId, organizationId, policyAgreementTemplateDto.getName());
         if (Optional.ofNullable(previousTemplate).isPresent()) {
@@ -63,13 +62,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         policyAgreementTemplate.setAccountTypes(policyAgreementTemplateDto.getAccountTypes());
         policyAgreementTemplate.setTemplateType(policyAgreementTemplateDto.getTemplateTypeId());
         policyAgreementTemplate.setOrganizationId(organizationId);
-        try {
-            policyAgreementTemplate = policyAgreementTemplateRepository.save(policyAgreementTemplate);
-        } catch (MongoException e) {
-            LOGGER.info(e.getMessage());
-            throw new RuntimeException(e);
-        }
-        return policyAgreementTemplate;
+        policyAgreementTemplateRepository.save(policyAgreementTemplate);
+        policyAgreementTemplateDto.setId(policyAgreementTemplate.getId());
+        return policyAgreementTemplateDto;
 
     }
 
@@ -124,9 +119,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         return true;
 
     }
-
-
-
 
 
 }

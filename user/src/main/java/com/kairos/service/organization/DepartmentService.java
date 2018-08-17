@@ -1,8 +1,8 @@
 package com.kairos.service.organization;
+
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @Transactional
 @Service
-public class DepartmentService extends UserBaseService {
+public class DepartmentService{
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

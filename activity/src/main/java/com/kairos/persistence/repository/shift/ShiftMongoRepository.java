@@ -35,14 +35,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     List<Shift> findAllByIdInAndDeletedFalseOrderByStartDateAsc(List<BigInteger> shiftIds);
 
-    @Query("{'unitPositionId':{'$in':?0},'deleted':false,'isMainShift':true,'startDate':{$gte:?1},'parentOpenShiftId':{exists:true}}")
-    public List<Shift> findShiftBetweenDurationByUnitPositionIdsAfterDate(List<Long> unitPositionIds, Date startDate);
-
     @Query("{'unitPositionId':{'$in':?0},'deleted':false,'isMainShift':true, '$or':[{'startDate':{$gte:?1,$lte:?2}},{'endDate':{$gte:?1,$lte:?2}}]}")
-    public List<Shift> findShiftBetweenDurationByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
-
-    @Query("{'deleted':false,'staffId':?0, 'isMainShift':true, 'activityId':?1, '$or':[{'startDate':{$gte:?2,$lte:?3}},{'endDate':{$gte:?2,$lte:?3}}]}")
-    List<ShiftQueryResult> findAllShiftsByActivityIdAndBetweenDuration(Long staffId,BigInteger activityId,Date startDate, Date endDate);
+    List<Shift> findShiftBetweenDurationByUnitPositions(List<Long> unitPositionIds, Date startDate, Date endDate);
 
     @Query("{deleted:false,staffId:{$in:?0}, isMainShift:true,startDate:{$gte:?1,$lte:?2}}")
     List<Shift> findAllShiftsByStaffIds(List<Long> staffIds,Date startDate,Date endDate);
@@ -52,7 +46,6 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query("{'deleted':false,'staffId':{'$in':?0},'startDate':{$lte:?1},'endDate':{'$gte':?1}}")
     ShiftQueryResult findShiftByStaffIdsAndDate(List<Long> staffids,Date date);
-
     @Query("{'deleted':false,'unitId':?2, 'isMainShift':true, 'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
     List<Shift> findShiftBetweenDuration(LocalDateTime startDate, LocalDateTime endDate, Long unitId);
 

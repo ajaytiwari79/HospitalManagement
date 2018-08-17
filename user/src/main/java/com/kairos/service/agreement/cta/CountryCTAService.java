@@ -1,7 +1,10 @@
 package com.kairos.service.agreement.cta;
 
 import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
-import com.kairos.persistence.model.agreement.cta.*;
+import com.kairos.persistence.model.agreement.cta.CTARuleTemplate;
+import com.kairos.persistence.model.agreement.cta.CTARuleTemplateDTO;
+import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
+import com.kairos.persistence.model.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTADetailsWrapper;
 import com.kairos.persistence.model.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
 import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
@@ -17,13 +20,12 @@ import com.kairos.persistence.repository.user.agreement.cta.CTARuleTemplateGraph
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.country.*;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
 import com.kairos.service.AsynchronousService;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
-import com.kairos.service.country.CurrencyService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
@@ -44,7 +46,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class CountryCTAService extends UserBaseService {
+public class CountryCTAService {
     private Logger logger = LoggerFactory.getLogger(CountryCTAService.class);
     private @Inject
     UserService userService;
@@ -107,7 +109,7 @@ public class CountryCTAService extends UserBaseService {
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
         costTimeAgreement.setCountry(ctaDetailsWrapper.getCountry());
-        this.save(costTimeAgreement);
+        collectiveTimeAgreementGraphRepository.save(costTimeAgreement);
 
         // TO create CTA for organizations too which are linked with same sub type
         publishNewCountryCTAToOrganizationByOrgSubType(countryId, costTimeAgreement, collectiveTimeAgreementDTO, costTimeAgreement.getOrganizationSubType().getId(), ctaDetailsWrapper);
@@ -247,7 +249,7 @@ public class CountryCTAService extends UserBaseService {
             }
 
         });
-        save(organizations);
+        organizationGraphRepository.saveAll(organizations);
         return true;
     }
 
@@ -274,7 +276,7 @@ public class CountryCTAService extends UserBaseService {
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
 
-        this.save(costTimeAgreement);
+        collectiveTimeAgreementGraphRepository.save(costTimeAgreement);
         return costTimeAgreement;
     }
 
@@ -307,7 +309,7 @@ public class CountryCTAService extends UserBaseService {
                 .buildCTA(costTimeAgreement, collectiveTimeAgreementDTO, ctaDetailsWrapper, true, countryId != null);
         CompletableFuture.allOf(hasUpdated).join();
 
-        this.save(costTimeAgreement);
+        collectiveTimeAgreementGraphRepository.save(costTimeAgreement);
         return collectiveTimeAgreementDTO;
     }
 

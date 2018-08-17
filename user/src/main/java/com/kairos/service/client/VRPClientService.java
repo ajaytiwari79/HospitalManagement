@@ -8,7 +8,6 @@ import com.kairos.persistence.repository.user.client.PreferedTimeWindowRepositor
 import com.kairos.persistence.repository.user.client.VRPClientGraphRepository;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.rest_client.TomTomRestClient;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.excel.ExcelService;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.ObjectUtils;
@@ -31,7 +30,7 @@ import java.util.stream.Collectors;
  * @date - 11/6/18
  */
 @Service
-public class VRPClientService  extends UserBaseService {
+public class VRPClientService {
 
 
     @Inject private VRPClientGraphRepository vrpClientGraphRepository;
@@ -103,7 +102,7 @@ public class VRPClientService  extends UserBaseService {
             vrpClientList.add(vrpClient);
 
         });
-        save(vrpClientList);
+        vrpClientGraphRepository.saveAll(vrpClientList);
         createTask((List<VRPTaskDTO>)objects[1],unitId);
 
         return ObjectMapperUtils.copyPropertiesOfListByMapper(vrpClientList, VRPClientDTO.class);
@@ -136,7 +135,7 @@ public class VRPClientService  extends UserBaseService {
     public boolean deleteClient(Long clientId){
         VRPClient vrpClient = vrpClientGraphRepository.findOne(clientId);
         vrpClient.setDeleted(true);
-        save(vrpClient);
+        vrpClientGraphRepository.save(vrpClient);
         return true;
     }
 
@@ -146,7 +145,7 @@ public class VRPClientService  extends UserBaseService {
         VRPClient vrpClient = vrpClientGraphRepository.findOne(clientId,0);
         PreferedTimeWindow preferedTimeWindow = preferedTimeWindowRepository.findOne(preferedTimeWindowId);
         vrpClient.setPreferedTimeWindow(preferedTimeWindow);
-        save(vrpClient);
+        vrpClientGraphRepository.save(vrpClient);
         return true;
     }
 
@@ -156,7 +155,7 @@ public class VRPClientService  extends UserBaseService {
         List<PreferedTimeWindow> preferedTimeWindows = preferedTimeWindowRepository.getAllByUnitId(unitId);
         if(preferedTimeWindows.isEmpty() && organization.isPresent()){
             preferedTimeWindows = Arrays.asList(new PreferedTimeWindow(LocalTime.of(07,00),LocalTime.of(11,30),organization.get(),"Time window 1"),new PreferedTimeWindow(LocalTime.of(12,00),LocalTime.of(16,00),organization.get(),"Time window 2"));
-            save(preferedTimeWindows);
+            preferedTimeWindowRepository.saveAll(preferedTimeWindows);
             preferedTimeWindowDTOS =  ObjectMapperUtils.copyPropertiesOfListByMapper(preferedTimeWindows, PreferedTimeWindowDTO.class);
         }
         return preferedTimeWindowDTOS;

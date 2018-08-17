@@ -2,12 +2,9 @@ package com.kairos.service.country.default_data;
 
 
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.country.default_data.account_type.AccountTypeQueryResult;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.country.system_setting.AccountTypeDTO;
 import com.kairos.util.ObjectMapperUtils;
@@ -16,11 +13,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
-public class AccountTypeService extends UserBaseService {
+public class AccountTypeService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountTypeService.class);
 
@@ -94,7 +91,7 @@ public class AccountTypeService extends UserBaseService {
             exceptionService.duplicateDataException("message.duplicate", "message.accountType", accountTypeDTO.getName());
         }
         accountType.get().setName(accountTypeDTO.getName());
-        save(accountType.get());
+        accountTypeRepository.save(accountType.get());
         return accountTypeDTO;
     }
 
@@ -105,7 +102,7 @@ public class AccountTypeService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.unitType.notFound", id);
         }
         accountType.get().setDeleted(true);
-        save(accountType.get());
+        accountTypeRepository.save(accountType.get());
         return true;
     }
 
