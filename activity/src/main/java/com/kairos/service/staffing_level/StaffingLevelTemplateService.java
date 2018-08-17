@@ -160,7 +160,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      * @param startDate
      * @param endDate
      */
-    public List<ActivityResponse> validateActivityRules(List<Activity> activities,LocalDate startDate,LocalDate endDate,List<Long> dayTypes){
+    public List<ActivityResponse> validateActivityRules(List<Activity> activities,LocalDate startDate,LocalDate endDate,Set<Long> dayTypes){
 
         List<ActivityResponse> activityResponse=new ArrayList<>();
         if(!Optional.ofNullable(endDate).isPresent()){

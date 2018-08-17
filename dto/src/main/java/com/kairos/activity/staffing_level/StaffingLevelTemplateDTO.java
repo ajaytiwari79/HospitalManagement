@@ -7,9 +7,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffingLevelTemplateDTO {
@@ -19,7 +17,7 @@ public class StaffingLevelTemplateDTO {
     private Long unitId;
     private StaffingLevelTemplatePeriod validity;
     @NotNull
-    private List<Long> dayType=new ArrayList<>();
+    private Set<Long> dayType=new HashSet<>();
     private List<Day> validDays =new ArrayList<>();
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
@@ -65,10 +63,12 @@ public class StaffingLevelTemplateDTO {
     public void setValidity(StaffingLevelTemplatePeriod validity) {
         this.validity = validity;
     }
-    public List<Long> getDayType() {
+
+    public Set<Long> getDayType() {
         return dayType;
     }
-    public void setDayType(List<Long> dayType) {
+
+    public void setDayType(Set<Long> dayType) {
         this.dayType = dayType;
     }
 

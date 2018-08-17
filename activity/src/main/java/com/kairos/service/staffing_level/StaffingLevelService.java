@@ -930,7 +930,6 @@ public class StaffingLevelService extends MongoBaseService {
                 if(activityIdMap.get(activity.getActivityId())!=null){
                     staffingLevelActivities.add(activity);
                 }
-
             });
             if(!activitiesOfCurrentInterval.containsAll(staffingLevelFromTemplateDTO.getSelectedActivityIds())){
                 exceptionService.actionNotPermittedException("All activities are not present in interval",staffingLevelInterval.getStaffingLevelDuration().getFrom(),staffingLevelInterval.getStaffingLevelDuration().getTo());
@@ -939,6 +938,7 @@ public class StaffingLevelService extends MongoBaseService {
         });
 
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
+
         List<ActivityResponse> activityResponses=staffingLevelTemplateService.validateActivityRules(activities,staffingLevelTemplate.getValidity().getStartDate(),staffingLevelTemplate.getValidity().getEndDate(),staffingLevelTemplate.getDayType());
 
 
