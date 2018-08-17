@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.enums.OrganizationLevel;
+import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
@@ -13,6 +14,7 @@ import com.kairos.persistence.model.organization.services.OrganizationServiceQue
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -667,4 +669,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("match(org:Organization) where org.kairosId STARTS WITH {0}\n" +
             "return org.kairosId  ORDER BY org.kairosId DESC LIMIT 1")
     String getKairosId();
+
+
 }

@@ -802,13 +802,13 @@ public class TaskService extends MongoBaseService {
                         engineerMetaData.put("scountry", "DK");
                         engineerMetaData.put("szip", officeZipCode.getZipCode());
                         engineerMetaData.put("scity", officeAddress.getCity());
-                        engineerMetaData.put("sstreet", officeAddress.getStreet1() + " " + officeAddress.getHouseNumber());
+                        engineerMetaData.put("sstreet", officeAddress.getStreet() + " " + officeAddress.getHouseNumber());
 
                         //Address2 (Office)
                         engineerMetaData.put("ecountry", "DK");
                         engineerMetaData.put("ezip", officeZipCode.getZipCode());
                         engineerMetaData.put("ecity", officeAddress.getCity());
-                        engineerMetaData.put("estreet", officeAddress.getStreet1() + " " + officeAddress.getHouseNumber());
+                        engineerMetaData.put("estreet", officeAddress.getStreet() + " " + officeAddress.getHouseNumber());
 
                         //Contact Data
                         engineerMetaData.put("email", staff.getEmail());

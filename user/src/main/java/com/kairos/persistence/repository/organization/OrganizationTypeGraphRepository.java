@@ -65,11 +65,12 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "return id(organizationType) as id, organizationType.name as name , CASE WHEN organizationSubType IS NOT NULL THEN collect({id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as children \n")
     List<OrganizationTypeAndSubType> getAllOrganizationTypeAndSubType(long countryId);
 
-    @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
-            "Match (organization)-[:TYPE_OF]->(organizationType:OrganizationType) with organizationType,organization\n" +
-            "optional match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType)<-[:SUB_TYPE_OF]-(organization) with subType,organizationType,organization\n" +
-            "return {id:id(organizationType),name:organizationType.name,children:case when subType is null then [] else collect({id:id(subType),name:subType.name}) end} as data")
-    List<Map<String, Object>> getOrganizationTypesForUnit(long organizationId);
+    @Query("Match (organization:Organization) where id(organization)={0} \n" +
+            "OPTIONAL Match (organization)-[:"+TYPE_OF+"]->(organizationType:OrganizationType) with organizationType,organization\n" +
+            "OPTIONAL match (subType:OrganizationType)<-[:"+SUB_TYPE_OF+"]-(organization) with subType,organizationType,organization" +
+            "OPTIONAL Match (organization)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false}) with subType,organizationType,organization ,level\n" +
+            "return {id:id(organizationType),name:organizationType.name,children:case when subType is null then [] else collect({id:id(subType),name:subType.name}) end} as organizationType,level as level,")
+    Map<String, Object> getOrganizationTypesForUnit(long organizationId);
 
     @Query("Match (organizationType:OrganizationType{isEnable:true})-[:BELONGS_TO]->(country:Country) where id(country)={0}\n" +
             "optional Match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType{isEnable:true}) with {subTypes:case when subType is null then [] else collect({id:id(subType),name:subType.name,isSelected:id(subType) IN {1}}) end} as subTypes,organizationType\n" +

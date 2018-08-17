@@ -859,7 +859,7 @@ public class StaffService {
                         }
                     }
                     contactAddress.setHouseNumber(houseNumber);
-                    contactAddress.setStreet1(fullStreetName.toString());
+                    contactAddress.setStreet(fullStreetName.toString());
                     contactAddress.setCity(row.getCell(25).toString());
                 }
                 return contactAddress;
@@ -1112,16 +1112,16 @@ public class StaffService {
         return staffDTO;
     }
 
-    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData) {
-        User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
+    public User createUnitManagerForNewOrganization(Organization organization, StaffCreationDTO staffCreationData) {
+        User user = userGraphRepository.findByEmail(staffCreationData.getPrivateEmail().trim());
         if (!Optional.ofNullable(user).isPresent()) {
-            SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organizationId);
+            SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organization.getId());
             user = new User();
             user.setUserLanguage(systemLanguage);
-            setBasicDetailsOfUser(user, staffCreationPOJOData);
+            setBasicDetailsOfUser(user, staffCreationData);
             userGraphRepository.save(user);
         }
-        createUnitManagerAndEmployment(organizationId, user, staffCreationPOJOData.getAccessGroupId());
+        setUnitManagerAndEmployment(organization, user, staffCreationData.getAccessGroupId());
         return user;
     }
 
@@ -1242,42 +1242,24 @@ public class StaffService {
 //        }
     }
 
-    public void createUnitManagerAndEmployment(Long organizationId, User user, Long accessGroupId) {
 
-        Organization organization = organizationGraphRepository.findOne(organizationId);
-        boolean parentOrganization = false;
-        Organization parent;
-        if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organizationId);
-
-        } else {
-            parent = organizationGraphRepository.getParentOfOrganization(organizationId);
-        }
-        if (!Optional.ofNullable(parent).isPresent()) {
-            parentOrganization = true;
-            parent = organization;
-        }
-
+    public void setUnitManagerAndEmployment(Organization organization , User user, Long accessGroupId) {
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
                 user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
-
         Employment employment = new Employment();
         employment.setStaff(staff);
         staff.setUser(user);
-
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
-
-        parent.getEmployments().add(employment);
-        organizationGraphRepository.save(parent);
+        organization.getEmployments().add(employment);
+        organizationGraphRepository.save(organization);
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (Optional.ofNullable(accessGroup).isPresent()) {
             unitPermission.setAccessGroup(accessGroup);
         }
-
         employment.getUnitPermissions().add(unitPermission);
         employmentGraphRepository.save(employment);
     }
@@ -1836,7 +1818,7 @@ public class StaffService {
             }
         } else {
             contactAddress = new ContactAddress();
-            contactAddress.setStreet1(timeCareStaffDTO.getAddress());
+            contactAddress.setStreet(timeCareStaffDTO.getAddress());
             Pattern pattern = Pattern.compile("(\\d+)");
             Matcher matcher = pattern.matcher(timeCareStaffDTO.getZipCode());
             if (matcher.find()) {

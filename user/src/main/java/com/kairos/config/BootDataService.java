@@ -632,7 +632,7 @@ public class BootDataService {
         contactAddress.setZipCode(allegade);
         contactAddress.setFloorNumber(10);
         contactAddress.setHouseNumber("403");
-        contactAddress.setStreet1("Kastanievej 1");
+        contactAddress.setStreet("Kastanievej 1");
         contactAddress.setLongitude(77.026638f);
         contactAddress.setLatitude(28.459497f);
         contactAddress.setMunicipality(frederiksberg);
@@ -791,7 +791,7 @@ public class BootDataService {
         contactAddress.setZipCode(allegade);
         contactAddress.setFloorNumber(10);
         contactAddress.setHouseNumber("403");
-        contactAddress.setStreet1("Kastanievej 1");
+        contactAddress.setStreet("Kastanievej 1");
         contactAddress.setLongitude(77.026638f);
         contactAddress.setLatitude(28.459497f);
         contactAddress.setMunicipality(frederiksberg);

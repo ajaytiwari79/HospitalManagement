@@ -546,7 +546,7 @@ public class Organization extends UserBaseEntity {
         map.put("kairosStatus", this.kairosStatus);
 
         if (this.contactAddress != null) {
-            map.put("type", this.contactAddress.getStreet1());
+            map.put("type", this.contactAddress.getStreet());
             map.put("type", this.contactAddress.getHouseNumber());
             //        map.put("zipCode", this.zipCode.getZipCode());
 //        map.put("zipCodeName", this.zipCode.getZipCode());

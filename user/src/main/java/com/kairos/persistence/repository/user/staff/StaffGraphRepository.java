@@ -195,20 +195,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "return {skills:case when skills[0].id is null then [] else skills end,id:id(staff),name:staff.firstName+\" \" +staff.lastName,cprNumber:user.cprNumber, profilePic: staff.profilePic} as data")
     List<Map<String, Object>> getSkillsOfStaffs(List<Long> staffIds);
 
-    @Query("MATCH (organization:Organization),(unit:Organization) where id(organization)={0} AND id(unit)={1} with organization,unit\n" +
-            "match (organization)-[:" + HAS_EMPLOYMENTS + "]->(employment:Employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(unit) with employment,unitPermission\n" +
-            "MATCH (employment)-[:" + BELONGS_TO + "]->(staff:Staff) with staff,unitPermission\n" +
-            "Match (unitPermission)-[:" + HAS_ACCESS_PERMISSION + "]->(accessPermission)-[:" + HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup{typeOfTaskGiver:true}) with accessGroup,staff\n" +
-            "optional Match (staff)-[:" + CONTACT_DETAIL + "]->(contactDetail:ContactDetail)\n" +
-            "return {id:id(staff),accessGroupId:id(accessGroup),email:staff.email,firstName:staff.firstName,lastName:staff.lastName,fmVTID:staff.visitourId,contactDetail:{landLinePhone:staff.landLinePhone,mobilePhone:staff.mobilePhone}} as data")
-    List<Map<String, Object>> getFieldStaff(long organizationId, long unitId);
-
-    @Query("Match (unit:Organization),(staff:Staff) where id(unit)={0} AND id(staff)={1}\n" +
-            "Match (unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill)<-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]-(staff) where r.visitourId is not null\n" +
-            "return CASE staffSkillRel.skillLevel WHEN 'BASIC' THEN r.visitourId + '(1)' WHEN 'ADVANCE' THEN r.visitourId + '(2)' WHEN 'EXPERT' THEN r.visitourId + '(3)' ELSE r.visitourId +'(2)' END AS result")
-    List<String> getStaffVisitourIdWithLevel(long unitId, long staffId);
-
-    List<Staff> findByUserName(String userName);
 
     @Query("Match (emp:Employment)-[:" + BELONGS_TO + "]->(s:Staff) where id(s)={0} with emp\n" +
             "Match (emp)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(unit:Organization) where id(unit)={1} with unitPermission\n" +

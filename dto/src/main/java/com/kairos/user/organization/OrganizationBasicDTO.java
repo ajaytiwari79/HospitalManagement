@@ -7,7 +7,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by prabjot on 20/1/17.
@@ -26,6 +28,8 @@ public class OrganizationBasicDTO {
     private String vatId;
     private Long accountTypeId;
     private Long levelId;
+    private Long typeId;
+    private List<Long> subTypeId;
 
     public Long getId() {
         return id;
@@ -36,7 +40,7 @@ public class OrganizationBasicDTO {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
@@ -76,7 +80,7 @@ public class OrganizationBasicDTO {
     }
 
     public List<Long> getBusinessTypeIds() {
-        return businessTypeIds;
+        return Optional.ofNullable(businessTypeIds).orElse(new ArrayList<>());
     }
 
     public void setBusinessTypeIds(List<Long> businessTypeIds) {
@@ -113,5 +117,21 @@ public class OrganizationBasicDTO {
 
     public void setLevelId(Long levelId) {
         this.levelId = levelId;
+    }
+
+    public Long getTypeId() {
+        return typeId;
+    }
+
+    public void setTypeId(Long typeId) {
+        this.typeId = typeId;
+    }
+
+    public List<Long> getSubTypeId() {
+        return subTypeId;
+    }
+
+    public void setSubTypeId(List<Long> subTypeId) {
+        this.subTypeId = subTypeId;
     }
 }

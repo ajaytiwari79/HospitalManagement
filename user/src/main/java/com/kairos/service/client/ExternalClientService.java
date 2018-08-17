@@ -172,7 +172,7 @@ public class ExternalClientService {
         String addressLine1 = addressDTO.getAddressLine1();
         String street = addressLine1.substring(0, addressLine1.indexOf(" "));
         String hnr = addressLine1.substring(addressLine1.indexOf(" "));
-        addressDTO1.setStreet1(street);
+        addressDTO1.setStreet(street);
         addressDTO1.setHouseNumber(hnr);
         addressDTO1.setCity(addressDTO.getPostalDistrict());
         addressDTO1.setMunicipalityName(addressDTO.getPostalDistrict());
@@ -242,7 +242,7 @@ public class ExternalClientService {
         contactAddress.setCity(addressDTO.getPostalDistrict());
 
         // Native Details
-        contactAddress.setStreet1(addressDTO1.getStreet1());
+        contactAddress.setStreet(addressDTO1.getStreet());
         contactAddress.setHouseNumber(addressDTO1.getHouseNumber());
         // contactAddress.setFloorNumber(addressDTO1.getFloorNumber());
         contactAddressGraphRepository.save(contactAddress);

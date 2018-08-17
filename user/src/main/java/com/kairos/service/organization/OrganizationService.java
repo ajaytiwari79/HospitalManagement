@@ -19,13 +19,11 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.*;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.default_data.*;
-import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.AbsenceTypes;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
-import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
@@ -100,7 +98,6 @@ import com.kairos.util.external_plateform_shift.GetAllWorkPlacesResult;
 import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.user_context.UserContext;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -569,7 +566,7 @@ public class OrganizationService {
         contactAddressDTO.setRegionName(contactAddress.getRegionName());
         contactAddressDTO.setProvince(contactAddress.getProvince());
         contactAddressDTO.setAddressProtected(contactAddress.isAddressProtected());
-        contactAddressDTO.setStreet1(contactAddress.getStreet1());
+        contactAddressDTO.setStreet1(contactAddress.getStreet());
         contactAddressDTO.setLatitude(contactAddress.getLatitude());
         contactAddressDTO.setLongitude(contactAddress.getLongitude());
         contactAddressDTO.setZipCodeValue(contactAddress.getZipCode().getZipCode());
@@ -592,7 +589,7 @@ public class OrganizationService {
 
 
         // BusinessType
-        List<BusinessType> businessTypes = businessTypeGraphRepository.findByIdIn(orgDetails.getBusinessTypeIds());
+
 
         ContactAddress contactAddress;
         if (isUpdateOperation) {
@@ -652,7 +649,7 @@ public class OrganizationService {
         contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
         contactAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
         contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-        contactAddress.setStreet1(addressDTO.getStreet1());
+        contactAddress.setStreet(addressDTO.getStreet());
         contactAddress.setHouseNumber(addressDTO.getHouseNumber());
         contactAddress.setFloorNumber(addressDTO.getFloorNumber());
         contactAddress.setCity(zipCode.getName());
@@ -743,7 +740,7 @@ public class OrganizationService {
             contactAddress.setLatitude(addressDTO.getLatitude());
             contactAddress.setVerifiedByVisitour(false);
             // Native Details
-            contactAddress.setStreet1(addressDTO.getStreet1());
+            contactAddress.setStreet(addressDTO.getStreet());
             contactAddress.setHouseNumber(addressDTO.getHouseNumber());
             contactAddress.setFloorNumber(addressDTO.getFloorNumber());
             contactAddress.setCity(zipCode.getName());
@@ -835,7 +832,7 @@ public class OrganizationService {
             contactAddress.setLatitude(addressDTO.getLatitude());
             contactAddress.setVerifiedByVisitour(false);
             // Native Details
-            contactAddress.setStreet1(addressDTO.getStreet1());
+            contactAddress.setStreet(addressDTO.getStreet());
             contactAddress.setHouseNumber(addressDTO.getHouseNumber());
             contactAddress.setFloorNumber(addressDTO.getFloorNumber());
             contactAddress.setCity(zipCode.getName());
@@ -1131,14 +1128,10 @@ public class OrganizationService {
             response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         }
 
-        List<Map<String, Object>> organizationTypes = organizationTypeGraphRepository.getOrganizationTypesForUnit(unitId);
-        List<Map<String, Object>> organizationTypesForUnit = new ArrayList<>();
-        for (Map<String, Object> organizationType : organizationTypes) {
-            organizationTypesForUnit.add((Map<String, Object>) organizationType.get("data"));
-        }
+        Map<String, Object> organizationTypes = organizationTypeGraphRepository.getOrganizationTypesForUnit(unitId);
 
         List<BusinessType> businessTypes = businessTypeGraphRepository.findBusinesTypesByCountry(countryId);
-        response.put("organizationTypes", organizationTypesForUnit);
+        response.put("organizationTypes", organizationTypes);
         response.put("businessTypes", businessTypes);
         response.put("level", organization.getLevel());
         response.put("companyTypes", CompanyType.getListOfCompanyType());
