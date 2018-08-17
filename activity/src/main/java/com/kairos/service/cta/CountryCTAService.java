@@ -182,22 +182,24 @@ public class CountryCTAService extends MongoBaseService {
         CostTimeAgreement costTimeAgreement = costTimeAgreementRepository.findOne(ctaId);
 
         List<NameValuePair> requestParam = new ArrayList<>();
-        requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().toString()));
-        requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().toString()));
-        CTABasicDetailsDTO ctaBasicDetailsDTO = genericRestClient.publishRequest(null, null, false, IntegrationOperation.GET, CTA_BASIC_INFO, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTABasicDetailsDTO>>() {});
+        requestParam.add(new BasicNameValuePair("organizationSubTypeId", collectiveTimeAgreementDTO.getOrganizationSubType().getId().toString()));
+        requestParam.add(new BasicNameValuePair("expertiseId", collectiveTimeAgreementDTO.getExpertise().getId().toString()));
+        CTABasicDetailsDTO ctaBasicDetailsDTO = genericRestClient.publishRequest(null, null, false, IntegrationOperation.GET, CTA_BASIC_INFO, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTABasicDetailsDTO>>() {},countryId);
 
         logger.info("costTimeAgreement.getRuleTemplateIds() : {}", costTimeAgreement.getRuleTemplateIds().size());
 
         CostTimeAgreement updateCostTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         updateCostTimeAgreement.setId(costTimeAgreement.getId());
+        costTimeAgreement.setId(null);
         costTimeAgreement.setDisabled(true);
         this.save(costTimeAgreement);
+        updateCostTimeAgreement.setCountryId(costTimeAgreement.getCountryId());
         updateCostTimeAgreement.setParentId(costTimeAgreement.getId());
         updateCostTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         updateCostTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         buildCTA(updateCostTimeAgreement, collectiveTimeAgreementDTO,  true, true,ctaBasicDetailsDTO);
         this.save(updateCostTimeAgreement);
-        return collectiveTimeAgreementDTO;
+        return ObjectMapperUtils.copyPropertiesByMapper(updateCostTimeAgreement, CollectiveTimeAgreementDTO.class);
     }
 
 

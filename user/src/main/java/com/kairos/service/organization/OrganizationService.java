@@ -1885,11 +1885,13 @@ public class OrganizationService extends UserBaseService {
                 ctaBasicDetailsDTO.setCountryDTO(countryDTO);
             }
         }
-        OrganizationType organizationType = organizationTypeGraphRepository.findOrganizationTypeBySubTypeId(organizationSubTypeId);
-        if (Optional.ofNullable(organizationType).isPresent()) {
-            OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO();
-            BeanUtils.copyProperties(organizationType, organizationTypeDTO);
-            ctaBasicDetailsDTO.setOrganizationType(organizationTypeDTO);
+        if(organizationSubTypeId!=null){
+            OrganizationType organizationType = organizationTypeGraphRepository.findOrganizationTypeBySubTypeId(organizationSubTypeId);
+            if (Optional.ofNullable(organizationType).isPresent()) {
+                OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO();
+                BeanUtils.copyProperties(organizationType, organizationTypeDTO);
+                ctaBasicDetailsDTO.setOrganizationType(organizationTypeDTO);
+            }
         }
         OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
         List<Organization> organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);

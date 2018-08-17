@@ -19,10 +19,10 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
 
 
 
-    @Query("{countryId:?0,_id:?1,deleted:false}")
+    @Query("{countryId:?0,_id:?1,deleted:false,disabled:false}")
     CostTimeAgreement findCTAByCountryAndIdAndDeleted(Long countryId, BigInteger ctaId, Boolean deleted);
 
-    @Query("{countryId:?0,deleted:false}")
+    @Query("{countryId:?0,deleted:false,disabled:false}")
     List<CTAResponseDTO> findCTAByCountryId(Long countryId);
 
 
@@ -48,10 +48,10 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
     @Query("")
     List<CostTimeAgreement> getListOfOrganizationCTAByParentCountryCTA(BigInteger countryCTAId);*/
 
-    @Query(value = "{countryId:?0,name:?1,deleted:false}",exists = true)
+    @Query(value = "{countryId:?0,name:?1,deleted:false,disabled:false}",exists = true)
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name);
 
-    @Query("{countryId:?0,name:?1,_id:{$ne:?2},deleted:false}")
+    @Query(value = "{countryId:?0,name:?1,_id:{$ne:?2},deleted:false,disabled:false}",exists = true)
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name, BigInteger ctaId);
 
        
