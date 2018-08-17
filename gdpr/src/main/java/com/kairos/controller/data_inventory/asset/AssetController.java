@@ -2,6 +2,7 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.gdpr.data_inventory.AssetDTO;
+import com.kairos.gdpr.data_inventory.AssetRelateProcessingActivityDTO;
 import com.kairos.service.data_inventory.asset.AssetService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -81,7 +82,7 @@ public class AssetController {
 
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/asset/{assetId}/history")
-    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger assetId,@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int skip) {
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger assetId, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int skip) {
 
         if (assetId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Asset  id can't be Null");
@@ -90,4 +91,24 @@ public class AssetController {
     }
 
 
+    @ApiOperation(value = "Add processing Activity to Asset ")
+    @PutMapping("/asset/{assetId}/processing_activity")
+    public ResponseEntity<Object> relateProcessingActivitiesAndSubProcessingActivitiesToAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @Valid @RequestBody AssetRelateProcessingActivityDTO relateProcessingActivityDTO) {
+
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.addProcessingActivitiesAndSubProcessingActivitiesToAsset(unitId, assetId, relateProcessingActivityDTO));
+    }
+
+
+    @ApiOperation(value = "get Processing activity and Sub processing Activity  related with asset")
+    @GetMapping("/asset/{assetId}/processing_activity")
+    public ResponseEntity<Object> getRelatedSubProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
+
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllRelatedProcessingActivityAndSubProcessingActivities(unitId, assetId));
+    }
 }

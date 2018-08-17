@@ -159,9 +159,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public void deleteShiftsAfterDate(Long staffId, LocalDateTime employmentEndDate) {
 
         Query query = new Query();
-        query.addCriteria(Criteria.where("staffId").is(staffId).and("startDate").gte(employmentEndDate));
+        query.addCriteria(Criteria.where("staffId").is(staffId).and("startDate").gt(employmentEndDate));
         Update update = new Update();
-        update.set("deleted", "true");
+        update.set("deleted", true);
 
         mongoTemplate.updateMulti(query, update, Shift.class);
 

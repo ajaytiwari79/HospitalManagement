@@ -1,6 +1,7 @@
 package com.kairos.service.integration;
 
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
+import com.kairos.activity.counter.DefalutKPISettingDTO;
 import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.client.dto.TableConfiguration;
 import com.kairos.enums.IntegrationOperation;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -73,11 +75,26 @@ public class ActivityIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/table_settings/" + tableSettingsId, null), TableConfiguration.class);
     }
 
+    public void createDefaultKPISetting(DefalutKPISettingDTO defalutKPISettingDTO ,Long unitId){
+        genericRestClient.publish(defalutKPISettingDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/default_kpi_setting", null);
+    }
+
+    public void createDefaultKPISettingForStaff(DefalutKPISettingDTO defalutKPISettingDTO ,Long unitId){
+        genericRestClient.publish(defalutKPISettingDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff_default_kpi_setting", null);
+    }
+
     public void deleteShiftsAndOpenShift(Long unitId, Long staffId, LocalDateTime employmentEndDate) {
         Map<String,Object> queryParams = new HashMap<String,Object>();
         DateUtils.asDate(employmentEndDate);
         queryParams.put("employmentEndDate", DateUtils.asDate(employmentEndDate).getTime());
         restClientForSchedulerMessages.publish(null,unitId,true,IntegrationOperation.UPDATE,"/staff/"+staffId+"/shifts_and_openshifts",queryParams);
     }
+
+    public void deleteShiftsAfterEmploymentEndDate(Long unitId, LocalDate endDate, Long staffId) {
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("endDate", endDate);
+        genericRestClient.publish(null, unitId, true, IntegrationOperation.DELETE, "/delete_shifts/staff/"+staffId, queryParams);
+    }
+
 }
 

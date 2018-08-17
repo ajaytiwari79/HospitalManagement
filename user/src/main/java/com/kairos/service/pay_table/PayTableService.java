@@ -1,12 +1,15 @@
 package com.kairos.service.pay_table;
 
 
-import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
+import com.kairos.persistence.model.country.pay_table.PayGradeDTO;
+import com.kairos.persistence.model.country.pay_table.PayGroupAreaDTO;
+import com.kairos.persistence.model.country.pay_table.PayTableResponseWrapper;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.pay_table.*;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
-import com.kairos.persistence.model.pay_table.*;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
@@ -15,8 +18,6 @@ import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRe
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGraphRepository;
-import com.kairos.persistence.model.country.pay_table.*;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.country.pay_table.PayTableDTO;
 import com.kairos.user.country.pay_table.PayTableUpdateDTO;
@@ -38,7 +39,7 @@ import static javax.management.timer.Timer.ONE_DAY;
  * Created by prabjot on 26/12/17.
  */
 @Service
-public class PayTableService extends UserBaseService {
+public class PayTableService {
 
     @Inject
     private PayTableGraphRepository payTableGraphRepository;
@@ -126,7 +127,7 @@ public class PayTableService extends UserBaseService {
         if (Optional.ofNullable(payTableToValidate).isPresent())
             validatePayLevel(payTableToValidate, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis());
         PayTable payTable = new PayTable(payTableDTO.getName().trim(), payTableDTO.getShortName(), payTableDTO.getDescription(), level, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis(), payTableDTO.getPaymentUnit(), true);
-        save(payTable);
+        payTableGraphRepository.save(payTable);
         PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), (payTable.getEndDateMillis() != null) ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         payTableResponse.setLevel(level);
@@ -213,7 +214,7 @@ public class PayTableService extends UserBaseService {
         payTable.setDescription(payTableDTO.getDescription());
         payTable.setPaymentUnit(payTableDTO.getPaymentUnit());
         prepareDates(payTable, payTableDTO);
-        save(payTable);
+        payTableGraphRepository.save(payTable);
         PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis() != null ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         return payTableResponse;
@@ -266,7 +267,7 @@ public class PayTableService extends UserBaseService {
         payGradeResponses.add(addPayGradeInCurrentPayTable(copiedPayTable, payGradeDTO));
         payTable.setHasTempCopy(true);
         copiedPayTable.setPublished(false);
-        save(copiedPayTable);
+        payTableGraphRepository.save(copiedPayTable);
         // copying all previous and then adding in pay Table as well.
         List<PayGrade> payGradesObjects = new ArrayList<>();
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
@@ -286,7 +287,7 @@ public class PayTableService extends UserBaseService {
         }
         // Adding new Grade in PayTable
         copiedPayTable.setPayGrades(payGradesObjects);
-        save(copiedPayTable);
+        payTableGraphRepository.save(copiedPayTable);
 
         return payGradeResponses;
     }
@@ -309,7 +310,7 @@ public class PayTableService extends UserBaseService {
             payGrades.add(payGrade);
             payTable.setPayGrades(payGrades);
         }
-        save(payTable);
+        payTableGraphRepository.save(payTable);
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
         // contains all
 
@@ -387,7 +388,7 @@ public class PayTableService extends UserBaseService {
         PayTableResponse parentPayTable = payTableGraphRepository.getParentPayTableByPayTableId(payTableId);
         payTable.setPayTable(null);
         payTable.setDeleted(true);
-        save(payTable);
+        payTableGraphRepository.save(payTable);
 
         return parentPayTable;
     }
@@ -452,7 +453,7 @@ public class PayTableService extends UserBaseService {
         payTable.setHasTempCopy(true);
         payTable.setEditable(false);
         payTableByMapper.setHasTempCopy(false);
-        save(payTableByMapper);
+        payTableGraphRepository.save(payTableByMapper);
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
             PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
             List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
@@ -485,7 +486,7 @@ public class PayTableService extends UserBaseService {
 
         }
         payTableByMapper.setPayGrades(payGradesObjects);
-        save(payTableByMapper);
+        payTableGraphRepository.save(payTableByMapper);
         return payGradeResponses;
     }
 
@@ -518,7 +519,7 @@ public class PayTableService extends UserBaseService {
         payTable.setPublished(true);
         payTable.setStartDateMillis(new Date(publishedDateMillis));
         payTable.getPayGrades().forEach(currentPayGrade -> currentPayGrade.setPublished(true));
-        save(payTable);
+        payTableGraphRepository.save(payTable);
         response.add(payTable);
         return response;
     }

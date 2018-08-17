@@ -3,7 +3,6 @@ package com.kairos.gdpr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.gdpr.master_data.AgreementSectionDTO;
 import com.kairos.user.country.system_setting.AccountTypeDTO;
 
 import javax.validation.constraints.NotBlank;
@@ -11,13 +10,15 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PolicyAgreementTemplateDTO {
+
+
+    private BigInteger id;
 
     @NotBlank(message = "error.agreement.name.cannot.be.empty.or.null")
     @Pattern(regexp = "^[a-zA-Z\\s]+$")
@@ -46,7 +47,6 @@ public class PolicyAgreementTemplateDTO {
     @NotEmpty(message = "Account Type cannot be empty")
     private Set<AccountTypeDTO> accountTypes;
 
-    private List<AgreementSectionDTO> agreementSections=new ArrayList<>();
 
     @NotNull
     private BigInteger templateTypeId;
@@ -55,16 +55,16 @@ public class PolicyAgreementTemplateDTO {
         return templateTypeId;
     }
 
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
+
     public void setTemplateTypeId(BigInteger templateTypeId) {
         this.templateTypeId = templateTypeId;
-    }
-
-    public List<AgreementSectionDTO> getAgreementSections() {
-        return agreementSections;
-    }
-
-    public void setAgreementSections(List<AgreementSectionDTO> agreementSections) {
-        this.agreementSections = agreementSections;
     }
 
     public String getName() {

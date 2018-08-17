@@ -11,8 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstant.UNIT_URL;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
@@ -70,6 +72,17 @@ public class MasterProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteMasterProcessingActivity(countryId, organizationId, id));
     }
 
+
+    @ApiOperation(value = "delete MasterProcessingActivity")
+    @DeleteMapping("/master_processing_activity/{id}/sub_processing_activity/{subProcessingActivityId}")
+    public ResponseEntity<Object> deleteSubProcessingActivity(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @PathVariable BigInteger subProcessingActivityId) {
+        if (id == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteSubProcessingActivity(countryId, organizationId, id, subProcessingActivityId));
+    }
+
+
     @ApiOperation(value = "get MasterProcessingActivity by id")
     @GetMapping("/master_processing_activity/{id}")
     public ResponseEntity<Object> getMasterProcessingActivity(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
@@ -97,7 +110,7 @@ public class MasterProcessingActivityController {
     }
 
     @ApiOperation(value = "get MasterProcessingActivity of unit by id")
-    @GetMapping(UNIT_URL+"/master_processing_activity/{id}")
+    @GetMapping(UNIT_URL + "/master_processing_activity/{id}")
     public ResponseEntity<Object> getMasterProcessingActivityOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
@@ -112,7 +125,7 @@ public class MasterProcessingActivityController {
     }
 
     @ApiOperation(value = "get MasterProcessingActivity list with SubProcessing Activity of unit ")
-    @GetMapping(UNIT_URL+"/master_processing_activity/all")
+    @GetMapping(UNIT_URL + "/master_processing_activity/all")
     public ResponseEntity<Object> getMasterProcessingActivityListWithSubProcessingActivityOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");

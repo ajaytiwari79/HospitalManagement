@@ -1428,6 +1428,7 @@ public class OrganizationController {
                 vrpClientService.getPreferedTimeWindow(unitId));
     }
 
+
     @ApiOperation(value = "get Cta basic info")
     @GetMapping(value = COUNTRY_URL+"/cta_basic_info")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -1436,4 +1437,11 @@ public class OrganizationController {
                 organizationService.getCTABasicDetailInfo(expertiseId,organizationSubTypeId,countryId));
     }
 
+    @ApiOperation(value = "get organization ids by orgSubType ids")
+    @GetMapping(value = "/orgtype/{orgTypeId}/get_organization_ids")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationIdsBySubOrgTypeId(@PathVariable Long orgTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationIdsBySubOrgTypeId(orgTypeId));
+    }
 }

@@ -14,7 +14,6 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
 import com.kairos.persistence.repository.organization.PaymentSettingRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ import static com.kairos.constants.AppConstants.FORWARD_SLASH;
  */
 @Service
 @Transactional
-public class OrganizationMetadataService extends UserBaseService {
+public class OrganizationMetadataService {
 
 
     @Inject
@@ -128,7 +127,7 @@ public class OrganizationMetadataService extends UserBaseService {
         }
         clientGraphRepository.saveAll(citizenList);
 
-        return save(existingLocalAreaTag);
+        return organizationMetadataRepository.save(existingLocalAreaTag);
     }
 
     /*public LocalAreaTagDTO updateBusiestTimeWindow(Long localAreaTagId, List<DayTimeWindowDTO> dayTimeWindowDTOS){
@@ -193,7 +192,7 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
     private Long savePaymentSettings(PaymentSettingsDTO paymentSettingsDTO, Organization organization) {
         PaymentSettings paymentSettings = updatePaymentSettingsWithDates(new PaymentSettings(), paymentSettingsDTO);
         organization.setPaymentSettings(paymentSettings);
-        save(organization);
+        organizationGraphRepository.save(organization);
         return paymentSettings.getId();
 
     }
@@ -219,7 +218,7 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
 
         }
         updatePaymentSettingsWithDates(paymentSettings, paymentSettingsDTO);
-        save(paymentSettings);
+        paymentSettingRepository.save(paymentSettings);
         return paymentSettingsDTO;
     }
 }

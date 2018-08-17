@@ -7,10 +7,13 @@ import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.user.access_permission.AccessGroupRole;
+
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.*;
-import com.kairos.persistence.model.country.default_data.CitizenStatus;
+import com.kairos.persistence.model.client.Client;
+import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.group.Group;
@@ -33,10 +36,7 @@ import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.persistence.repository.organization.OpeningHourGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
-import com.kairos.persistence.repository.organization.TeamGraphRepository;
+import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.UserBaseRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -58,13 +58,9 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
-import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
-import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
+import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
-import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.auth.RoleServiceUser;
 import com.kairos.service.auth.UserRoleServiceUser;
 import com.kairos.service.auth.UserService;
@@ -85,7 +81,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by kairosCountryLevel on 8/12/16.
@@ -186,7 +184,9 @@ public class BootDataService {
     private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
     @Inject
     private UserBaseRepository userBaseRepository;
-
+    @Inject
+    private OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    @Inject private StaffRelationshipGraphRespository staffRelationshipGraphRespository;
     private List<Long> skillList;
     private OrganizationService homeCareService;
 
@@ -450,9 +450,9 @@ public class BootDataService {
         ngoOrganization.setCountry(denmark);
 
 
-        organizationService.save(publicOrganization);
-        organizationService.save(privateOrganization);
-        organizationService.save(ngoOrganization);
+        organizationTypeGraphRepository.save(publicOrganization);
+        organizationTypeGraphRepository.save(privateOrganization);
+        organizationTypeGraphRepository.save(ngoOrganization);
 
 
     }
@@ -703,8 +703,9 @@ public class BootDataService {
         teamGraphRepository.saveAll(Arrays.asList(nestingTeam));
     }
 
+
     private void linkingOfStaffAndTeam() {
-        organizationService.save(new StaffRelationship(nestingTeam, adminAsStaff));
+        staffRelationshipGraphRespository.save(new StaffRelationship(nestingTeam, adminAsStaff));
     }
 
     private void createGroup() {
@@ -833,9 +834,9 @@ public class BootDataService {
     }
 
     private void linkingOfStaffAndTeamForCityLevel() {
-        organizationService.save(new StaffRelationship(nestingTeam, almaAsStaff));
-        organizationService.save(new StaffRelationship(nestingTeam, livaAsStaff));
-        organizationService.save(new StaffRelationship(nestingTeam, michalAsStaff));
+        staffRelationshipGraphRespository.save(new StaffRelationship(nestingTeam, almaAsStaff));
+        staffRelationshipGraphRespository.save(new StaffRelationship(nestingTeam, livaAsStaff));
+        staffRelationshipGraphRespository.save(new StaffRelationship(nestingTeam, michalAsStaff));
     }
 
     private void createEmploymentForCityLevel() {

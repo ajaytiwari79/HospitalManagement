@@ -17,7 +17,6 @@ import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGr
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.wrapper.PositionCodeUnionWrapper;
 import com.kairos.user.organization.position_code.PositionCodeDTO;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;
@@ -42,7 +41,7 @@ import static com.kairos.constants.AppConstants.TEAM;
 @Transactional
 @Service
 
-public class PositionCodeService extends UserBaseService {
+public class PositionCodeService {
     private final Logger logger = LoggerFactory.getLogger(PositionCodeService.class);
 
 
@@ -92,7 +91,7 @@ public class PositionCodeService extends UserBaseService {
         PositionCode positionCode = new PositionCode(positionCodeDTO.getName(), positionCodeDTO.getDescription(), positionCodeDTO.getTimeCareId());
         positionCodeList.add(positionCode);
         organization.setPositionCodeList(positionCodeList);
-        save(organization);
+        organizationGraphRepository.save(organization);
 
         return positionCode;
     }
@@ -120,7 +119,7 @@ public class PositionCodeService extends UserBaseService {
 
         oldPositionCode.setName(positionCode.getName());
         oldPositionCode.setDescription(positionCode.getDescription());
-        save(oldPositionCode);
+        positionCodeGraphRepository.save(oldPositionCode);
         return oldPositionCode;
     }
 
@@ -140,7 +139,7 @@ public class PositionCodeService extends UserBaseService {
 
 
         positionCode.setDeleted(true);
-        save(positionCode);
+        positionCodeGraphRepository.save(positionCode);
 
         return true;
     }
