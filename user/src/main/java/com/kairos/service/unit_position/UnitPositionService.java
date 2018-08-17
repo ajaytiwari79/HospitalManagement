@@ -202,6 +202,7 @@ public class UnitPositionService {
             unitPosition.setPublished(true);
         }
         unitPosition.setUnit(organization);
+        unitPositionGraphRepository.save(unitPosition);
         CTAWTAWrapper ctawtaWrapper = workingTimeAgreementRestClient.assignWTAToUnitPosition(unitPosition.getId(),unitPositionDTO.getWtaId(),unitPositionDTO.getCtaId());
         if (ctawtaWrapper.getWta().isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.wta.id");
@@ -209,7 +210,6 @@ public class UnitPositionService {
         if (ctawtaWrapper.getCta().isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.cta.id");
         }
-        unitPositionGraphRepository.save(unitPosition);
         Employment employment1 = employmentService.updateEmploymentEndDate(organization, unitPositionDTO.getStaffId(), unitPositionDTO.getEndLocalDate() != null ? DateUtil.getDateFromEpoch(unitPositionDTO.getEndLocalDate()) : null, unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupIdOnEmploymentEnd());
         Long reasonCodeId = Optional.ofNullable(employment.getReasonCode()).isPresent() ? employment1.getReasonCode().getId() : null;
 
@@ -733,6 +733,8 @@ public class UnitPositionService {
 
         }
         updateDTO.setId(wtaId);
+        updateDTO.setStartDateMillis(DateUtils.asDate(updateDTO.getStartDate()).getTime());
+        updateDTO.setEndDateMillis(DateUtils.asDate(updateDTO.getEndDate()).getTime());
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
         unitPositionGraphRepository.save(unitPosition);
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition, wtaResponseDTO);
@@ -1164,7 +1166,7 @@ public class UnitPositionService {
         List<NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("upIds", upIds.toString().replace("[", "").replace("]", "")));
         CTATableSettingWrapper ctaTableSettingWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_CTA, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTATableSettingWrapper>>() {});
         ctaTableSettingWrapper.getAgreements().forEach(currentCTA -> {
-            UnitPositionQueryResult currentActiveUnitPosition = unitPositionQueryResults.stream().filter(currentUnitPosition -> currentUnitPosition.getCostTimeAgreementId().equals(currentCTA.getId())
+            UnitPositionQueryResult currentActiveUnitPosition = unitPositionQueryResults.stream().filter(currentUnitPosition -> currentUnitPosition.getId().equals(currentCTA.getUnitPositionId())
                     && currentUnitPosition.getHistory().equals(false)).findFirst().get();
             currentCTA.setUnitInfo(currentActiveUnitPosition.getUnitInfo());
             currentCTA.setUnitPositionId(currentActiveUnitPosition.getId());

@@ -521,7 +521,7 @@ public class CostTimeAgreementService extends MongoBaseService {
 
     public CTATableSettingWrapper getVersionsCTA(Long unitId,List<Long> upIds){
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTableId(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
-        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUpIds(upIds);
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getParentCTAByUpIds(upIds);
         Map<Long,List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k->k.getUnitPositionId(),Collectors.toList()));
         ctaResponseDTOS.forEach(c->c.setVersions(ctaResponseMap.get(c.getUnitPositionId())));
         return new CTATableSettingWrapper(ctaResponseDTOS,tableConfiguration);

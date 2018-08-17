@@ -170,7 +170,7 @@ public class UnitPositionQueryResult {
         this.positionCode = positionCode;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

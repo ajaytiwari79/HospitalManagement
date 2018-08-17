@@ -13,4 +13,7 @@ db.tabKPIEntry.drop()
 db.accessGroupKPIEntry.drop()
 db.applicableKPI.drop()
 
+db.getCollection('tableSetting').remove({"tableConfigurations.tableId":{$in:["36","35"]}})
+
+
 
