@@ -20,11 +20,10 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.staff.StaffFavouriteFilterGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.user_filter.FilterGroupGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -38,7 +37,7 @@ import java.util.*;
  */
 @Transactional
 @Service
-public class StaffFilterService extends UserBaseService {
+public class StaffFilterService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -161,9 +160,9 @@ public class StaffFilterService extends UserBaseService {
 
         StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter(staffFilterDTO.getName(),
                 staffFilterDTO.getFiltersData(), filterGroup);
-        save(staffFavouriteFilter);
+        staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         staff.addFavouriteFilters(staffFavouriteFilter);
-        save(staff);
+        staffGraphRepository.save(staff);
         staffFilterDTO.setId(staffFavouriteFilter.getId());
         return staffFilterDTO;
     }
@@ -197,7 +196,7 @@ public class StaffFilterService extends UserBaseService {
         });
         staffFavouriteFilter.setFiltersData(filters);
         staffFavouriteFilter.setName(favouriteFilterDTO.getName());
-        save(staffFavouriteFilter);
+        staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         return favouriteFilterDTO;
     }
 
@@ -210,7 +209,7 @@ public class StaffFilterService extends UserBaseService {
 
         }
         staffFavouriteFilter.setDeleted(true);
-        save(staffFavouriteFilter);
+        staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         return true;
     }
 

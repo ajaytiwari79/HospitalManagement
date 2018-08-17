@@ -14,7 +14,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgreementSectionResponseDTO {
 
-    BigInteger id;
+    private BigInteger id;
 
     @NotBlank
     private String title;

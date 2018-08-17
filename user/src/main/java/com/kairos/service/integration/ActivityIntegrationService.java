@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -79,5 +80,12 @@ public class ActivityIntegrationService {
         queryParams.put("employmentEndDate", DateUtils.asDate(employmentEndDate).getTime());
         restClientForSchedulerMessages.publish(null,unitId,true,IntegrationOperation.UPDATE,"/staff/"+staffId+"/shifts_and_openshifts",queryParams);
     }
+
+    public void deleteShiftsAfterEmploymentEndDate(Long unitId, LocalDate endDate, Long staffId) {
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("endDate", endDate);
+        genericRestClient.publish(null, unitId, true, IntegrationOperation.DELETE, "/delete_shifts/staff/"+staffId, queryParams);
+    }
+
 }
 

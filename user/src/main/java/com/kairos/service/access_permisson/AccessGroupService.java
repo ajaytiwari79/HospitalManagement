@@ -17,7 +17,6 @@ import com.kairos.persistence.repository.user.access_permission.AccessPermission
 import com.kairos.persistence.repository.user.country.CountryAccessGroupRelationshipRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.tree_structure.TreeStructureService;
@@ -28,7 +27,8 @@ import com.kairos.user.access_permission.AccessPermissionDTO;
 import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.util.DateUtil;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.DateUtils;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +43,7 @@ import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
  */
 @Transactional
 @Service
-public class AccessGroupService extends UserBaseService {
+public class AccessGroupService {
     @Inject
     private AccessGroupRepository accessGroupRepository;
     @Inject
@@ -85,7 +85,7 @@ public class AccessGroupService extends UserBaseService {
 
         if (parent == null) {
             organization.getAccessGroups().add(accessGroup);
-            save(organization);
+            organizationGraphRepository.save(organization);
 
             //set default permission of access page while creating access group
             Long countryId = organizationService.getCountryIdOfOrganization(organization.getId());
@@ -112,7 +112,7 @@ public class AccessGroupService extends UserBaseService {
         accessGrpToUpdate.setRole(accessGroupDTO.getRole());
         accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.setEnabled(accessGroupDTO.isEnabled());
-        save(accessGrpToUpdate);
+        accessGroupRepository.save(accessGrpToUpdate);
         return accessGrpToUpdate;
     }
 
@@ -122,7 +122,7 @@ public class AccessGroupService extends UserBaseService {
             return false;
         }
         objectToDelete.setDeleted(true);
-        save(objectToDelete);
+        accessGroupRepository.save(objectToDelete);
         return true;
     }
 
@@ -153,7 +153,7 @@ public class AccessGroupService extends UserBaseService {
                 AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole());
                 accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
                 accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
-                save(accessGroup);
+                accessGroupRepository.save(accessGroup);
                 countryAndOrgAccessGroupIdsMap.put(countryAccessGroup.getId(), accessGroup.getId());
                 accessGroupRepository.setAccessPagePermissionForAccessGroup(countryAccessGroup.getId(), accessGroup.getId());
                 accessGroupList.add(accessGroup);
@@ -170,7 +170,7 @@ public class AccessGroupService extends UserBaseService {
             }
             organization.setAccessGroups(accessGroups);
         }
-        save(organization);
+        organizationGraphRepository.save(organization);
         return countryAndOrgAccessGroupIdsMap;
     }
 
@@ -201,12 +201,12 @@ public class AccessGroupService extends UserBaseService {
         List<AccessPage> accessPageList = new ArrayList<>();
         for (Map<String, Object> childAccessPage : childPage) {
             AccessPage accessPage = new AccessPage((String) childAccessPage.get("name"));
-            save(accessPage);
+            accessPageRepository.save(accessPage);
             accessPageList.add(accessPage);
         }
         parentAccessPage.setModule(isModule);
         parentAccessPage.setSubPages(accessPageList);
-        save(parentAccessPage);
+        accessPageRepository.save(parentAccessPage);
         return parentAccessPage;
     }
 
@@ -540,7 +540,8 @@ public class AccessGroupService extends UserBaseService {
         accessGroupRelationship.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
-      //  save(country);
+        countryGraphRepository.save(country);
+
 
         //set default permission of access page while creating access group
         setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), accessGroupDTO.getOrganizationCategory());
@@ -569,14 +570,13 @@ public class AccessGroupService extends UserBaseService {
                 accessGrpToUpdate.get().setAccountType(accountTypes);
             }
         }
-
         accessGrpToUpdate.get().setName(accessGroupDTO.getName());
         accessGrpToUpdate.get().setDescription(accessGroupDTO.getDescription());
+        accessGrpToUpdate.get().setLastModificationDate(DateUtil.getCurrentDate().getTime());
         accessGrpToUpdate.get().setRole(accessGroupDTO.getRole());
         accessGrpToUpdate.get().setEnabled(accessGroupDTO.isEnabled());
-        save(accessGrpToUpdate.get());
+        accessGroupRepository.save(accessGrpToUpdate.get());
         return accessGrpToUpdate.get();
-
     }
 
     public boolean deleteCountryAccessGroup(long accessGroupId) {
@@ -587,7 +587,7 @@ public class AccessGroupService extends UserBaseService {
         }
         accessGroupToDelete.setDeleted(true);
         accessGroupToDelete.setLastModificationDate(DateUtil.getCurrentDate().getTime());
-        save(accessGroupToDelete);
+        accessGroupRepository.save(accessGroupToDelete);
         return true;
     }
 
@@ -691,13 +691,13 @@ public class AccessGroupService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupDTO.getId());
 
         }
-        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole());
-        save(accessGroup);
 
+        AccessGroup accessGroup=new AccessGroup(accessGroupDTO.getName().trim(),accessGroupDTO.getDescription(),accessGroupDTO.getRole());
+        accessGroupRepository.save(accessGroup);
         organization.get().getAccessGroups().add(accessGroup);
-        save(organization.get());
-        accessPageRepository.copyAccessGroupPageRelationShips(accessGroupDTO.getId(), accessGroup.getId());
-        return new AccessGroupDTO(accessGroup.getId(), accessGroup.getName(), accessGroup.getDescription(), accessGroup.getRole());
+        organizationGraphRepository.save(organization.get());
+        accessPageRepository.copyAccessGroupPageRelationShips(accessGroupDTO.getId(),accessGroup.getId());
+        return new AccessGroupDTO(accessGroup.getId(),accessGroup.getName(),accessGroup.getDescription(),accessGroup.getRole());
 
     }
 
@@ -725,7 +725,7 @@ public class AccessGroupService extends UserBaseService {
         accessGroupRelationship.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
-        save(country.get());
+        countryGraphRepository.save(country.get());
         accessPageRepository.copyAccessGroupPageRelationShips(countryAccessGroupDTO.getId(), accessGroup.getId());
         countryAccessGroupDTO.setId(accessGroup.getId());
         return countryAccessGroupDTO;

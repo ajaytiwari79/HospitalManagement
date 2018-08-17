@@ -1,13 +1,12 @@
 package com.kairos.service.country;
 
 import com.kairos.enums.Day;
-import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,7 @@ import java.util.stream.Stream;
  */
 @Service
 @Transactional
-public class DayTypeService extends UserBaseService {
+public class DayTypeService{
 
     @Inject
     private DayTypeGraphRepository dayTypeGraphRepository;
@@ -45,7 +44,7 @@ public class DayTypeService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             dayType.setCountry(country);
-            save(dayType);
+            dayTypeGraphRepository.save(dayType);
             return dayType.retrieveDetails();
         }
         return null;
@@ -69,7 +68,7 @@ public class DayTypeService extends UserBaseService {
             currentDayType.setAllowTimeSettings(dayType.isAllowTimeSettings());
             currentDayType.setValidDays(dayType.getValidDays());
             currentDayType.setHolidayType(dayType.isHolidayType());
-            save(currentDayType);
+            dayTypeGraphRepository.save(currentDayType);
             return currentDayType.retrieveDetails();
         }
         return null;
@@ -79,7 +78,7 @@ public class DayTypeService extends UserBaseService {
         DayType dayType = dayTypeGraphRepository.findOne(dayTypeId);
         if (dayType!=null){
             dayType.setEnabled(false);
-            save(dayType);
+            dayTypeGraphRepository.save(dayType);
             return true;
         }
         return false;

@@ -28,13 +28,12 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
 import com.kairos.service.AsynchronousService;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -55,7 +54,7 @@ import static javax.management.timer.Timer.ONE_DAY;
 
 @Transactional
 @Service
-public class CostTimeAgreementService extends UserBaseService {
+public class CostTimeAgreementService {
     private final Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
 
 
@@ -125,7 +124,7 @@ public class CostTimeAgreementService extends UserBaseService {
             Country country = countryGraphRepository.findOne(countryId);
             country.setCtaRuleTemplates(ctaRuleTemplates);
             countryGraphRepository.save(country);
-            this.save(category);
+            ruleTemplateCategoryGraphRepository.save(category);
         } else {
             logger.info("default CTARuleTemplateCategory is not exist");
         }
@@ -146,7 +145,7 @@ public class CostTimeAgreementService extends UserBaseService {
         ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplateDTO.getName());
         this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, false);
         ctaRuleTemplate.setLastModifiedBy(user);
-        this.save(ctaRuleTemplate);
+        ctaRuleTemplateGraphRepository.save(ctaRuleTemplate);
         ctaRuleTemplateDTO.setId(ctaRuleTemplate.getId());
         ctaRuleTemplateGraphRepository.addCTARuleTemplateInCountry(countryId, ctaRuleTemplate.getId());
 
@@ -345,7 +344,7 @@ public class CostTimeAgreementService extends UserBaseService {
     public void saveInterval() {
         CompensationTableInterval tableInterval = new CompensationTableInterval();
         tableInterval.setValue(2.3F);
-        this.save(tableInterval);
+//        collectiveTimeAgreementGraphRepository.save(tableInterval);
     }
 
     public Boolean deleteCostTimeAgreement(Long countryId, Long ctaId) {
@@ -354,7 +353,7 @@ public class CostTimeAgreementService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.cta.id.notFound", ctaId);
         }
         costTimeAgreement.setDeleted(true);
-        this.save(costTimeAgreement);
+        collectiveTimeAgreementGraphRepository.save(costTimeAgreement);
         return true;
     }
 
@@ -422,7 +421,7 @@ public class CostTimeAgreementService extends UserBaseService {
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
 //        newCostTimeAgreement.setCountry(null);
-        this.save(newCostTimeAgreement);
+        collectiveTimeAgreementGraphRepository.save(newCostTimeAgreement);
         return newCostTimeAgreement;
     }
 
@@ -541,7 +540,7 @@ public class CostTimeAgreementService extends UserBaseService {
         CompletableFuture.allOf(hasUpdated).join();
         // Set Parent CTA in new CTA
         newCostTimeAgreement.setParent(costTimeAgreement);
-        this.save(newCostTimeAgreement);
+        collectiveTimeAgreementGraphRepository.save(newCostTimeAgreement);
         BeanUtils.copyProperties(costTimeAgreement, collectiveTimeAgreementDTO, "timeTypes");
         return collectiveTimeAgreementDTO;
     }
@@ -554,7 +553,7 @@ public class CostTimeAgreementService extends UserBaseService {
         ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplate.getRuleTemplateType());
         this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, true);
         ctaRuleTemplate.setLastModifiedBy(user);
-        this.save(ctaRuleTemplate);
+        ctaRuleTemplateGraphRepository.save(ctaRuleTemplate);
         return ctaRuleTemplateDTO;
     }
 
@@ -637,7 +636,7 @@ public class CostTimeAgreementService extends UserBaseService {
             costTimeAgreement.setParent(oldCTA);
             costTimeAgreement.setExpertise(unitPosition.getExpertise());
             unitPosition.setCta(costTimeAgreement);
-            unitPositionService.save(unitPosition);
+            unitPositionGraphRepository.save(unitPosition);
             responseCTA = new CostTimeAgreement(costTimeAgreement.getId(), costTimeAgreement.getName(), oldCTA.getExpertise(), costTimeAgreement.getRuleTemplates(), costTimeAgreement.getStartDateMillis(), costTimeAgreement.getEndDateMillis(), false);
         } else {
 
@@ -647,7 +646,7 @@ public class CostTimeAgreementService extends UserBaseService {
                 oldCTA.getRuleTemplates().stream().map(UserBaseEntity::getId).collect(Collectors.toList());
             }
             copyRules(oldCTA, ctaDTO, ruleTemplateIds);
-            this.save(oldCTA);
+            collectiveTimeAgreementGraphRepository.save(oldCTA);
             responseCTA = new CostTimeAgreement(oldCTA.getId(), oldCTA.getName(), oldCTA.getExpertise(), oldCTA.getRuleTemplates(), oldCTA.getStartDateMillis(), oldCTA.getEndDateMillis(), false);
 
         }
@@ -692,7 +691,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
-        this.save(costTimeAgreement);
+        collectiveTimeAgreementGraphRepository.save(costTimeAgreement);
         collectiveTimeAgreementGraphRepository.linkUnitCTAToOrganization(costTimeAgreement.getId(), unitId);
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         return collectiveTimeAgreementDTO;
@@ -724,7 +723,7 @@ public class CostTimeAgreementService extends UserBaseService {
             }
             CostTimeAgreement costTimeAgreement = cta.get();
             costTimeAgreement.setDeleted(true);
-            save(costTimeAgreement);
+            collectiveTimeAgreementGraphRepository.save(costTimeAgreement);
         }
         return null;
     }

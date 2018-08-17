@@ -1,7 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.user.organization.address.TimeCareOrganizationDTO;
-import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

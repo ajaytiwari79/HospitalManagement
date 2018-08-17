@@ -15,7 +15,7 @@ import java.util.Optional;
  * Created by yatharth on 1/5/18.
  */
 @Service
-public class UserPersonalizedSettingsService extends UserBaseService{
+public class UserPersonalizedSettingsService{
     @Inject
     private UserPersonalizedSettingsRepository userPersonalizedSettingsRepository;
 
@@ -46,14 +46,14 @@ public class UserPersonalizedSettingsService extends UserBaseService{
             userPersonalizedSettings = userPersonalizedSettingsQueryResult.getUserPersonalizedSettings();
             userPersonalizedSettings.setSelfRosteringView(userPersonalizedSettingsQueryResult.getSelfRosteringView());
            userPersonalizedSettings.getSelfRosteringView().setAbsenceViewSettings(userPersonalizedSettingsDto.getSelfRosteringView().getAbsenceViewSettings());
-            save(userPersonalizedSettings);
+            userPersonalizedSettingsRepository.save(userPersonalizedSettings);
 
         }
         else {
             userPersonalizedSettings = new UserPersonalizedSettings( new SelfRosteringView(userPersonalizedSettingsDto.getSelfRosteringView().getAbsenceViewSettings()));
             User user = userGraphRepository.findOne(userId);
             user.setUserPersonalizedSettings(userPersonalizedSettings);
-            save(user);
+            userGraphRepository.save(user);
         }
         return userPersonalizedSettings;
     }
