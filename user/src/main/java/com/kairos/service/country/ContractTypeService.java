@@ -1,9 +1,9 @@
 package com.kairos.service.country;
-import com.kairos.persistence.model.country.default_data.ContractType;
+
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.ContractType;
 import com.kairos.persistence.repository.user.country.ContractTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class ContractTypeService extends UserBaseService {
+public class ContractTypeService {
 
     @Inject
     private ContractTypeGraphRepository contractTypeGraphRepository;
@@ -30,7 +30,7 @@ public class ContractTypeService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             contractType.setCountry(country);
-            save(contractType);
+            contractTypeGraphRepository.save(contractType);
             return contractType.retrieveDetails();
         }
         return null;
@@ -55,7 +55,7 @@ public class ContractTypeService extends UserBaseService {
             currentContractType.setName(contractType.getName());
             currentContractType.setDescription(contractType.getDescription());
             currentContractType.setCode(contractType.getCode());
-            save(currentContractType);
+            contractTypeGraphRepository.save(currentContractType);
             return currentContractType.retrieveDetails();
         }
         return null;
@@ -65,7 +65,7 @@ public class ContractTypeService extends UserBaseService {
         ContractType contractType = contractTypeGraphRepository.findOne(contractTypeId);
         if (contractType!=null){
             contractType.setEnabled(false);
-            save(contractType);
+            contractTypeGraphRepository.save(contractType);
             return true;
         }
         return false;

@@ -1,6 +1,7 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.counter.DefalutKPISettingDTO;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.activity.task.StaffTaskDTO;
@@ -10,7 +11,6 @@ import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.TimeSlotType;
-import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.auth.User;
@@ -19,6 +19,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
@@ -63,11 +64,11 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRep
 import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.rest_client.ChatRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.mail.MailService;
@@ -85,10 +86,7 @@ import com.kairos.user.employment.employment_dto.EmploymentOverlapDTO;
 import com.kairos.user.employment.employment_dto.MainEmploymentResultDTO;
 import com.kairos.user.staff.StaffWithSkillDTO;
 import com.kairos.user.staff.client.ClientStaffInfoDTO;
-import com.kairos.user.staff.staff.StaffChatDetails;
-import com.kairos.user.staff.staff.StaffCreationDTO;
-import com.kairos.user.staff.staff.StaffDTO;
-import com.kairos.user.staff.staff.StaffPreferencesDTO;
+import com.kairos.user.staff.staff.*;
 import com.kairos.user.user.password.PasswordUpdateDTO;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.util.*;
@@ -127,7 +125,7 @@ import static com.kairos.util.FileUtil.createDirectory;
  */
 @Transactional
 @Service
-public class StaffService extends UserBaseService {
+public class StaffService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -207,7 +205,11 @@ public class StaffService extends UserBaseService {
     private SystemLanguageService systemLanguageService;
     @Inject
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
 
+
+    @Inject StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
@@ -218,7 +220,7 @@ public class StaffService extends UserBaseService {
         final String path = IMAGES_PATH + File.separator + fileName;
         FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
-        save(staff);
+        staffGraphRepository.save(staff);
         return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + fileName;
 
     }
@@ -229,7 +231,7 @@ public class StaffService extends UserBaseService {
             return false;
         }
         staff.setProfilePic(null);
-        save(staff);
+        staffGraphRepository.save(staff);
         return true;
     }
 
@@ -246,7 +248,7 @@ public class StaffService extends UserBaseService {
         if (new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
-            save(user);
+            userGraphRepository.save(user);
         } else {
             logger.error("Password not matched ");
             exceptionService.dataNotMatchedException("message.staff.user.password.notmatch");
@@ -320,7 +322,7 @@ public class StaffService extends UserBaseService {
         }
         staffToUpdate.setSignature(staffPersonalDetail.getSignature());
         staffToUpdate.setContactDetail(staffPersonalDetail.getContactDetail());
-        save(staffToUpdate);
+        staffGraphRepository.save(staffToUpdate);
 
         if (oldExpertise != null) {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
@@ -339,7 +341,7 @@ public class StaffService extends UserBaseService {
 //        staffToUpdate.setCprNumber(staffPersonalDetail.getCprNumber());
         user.setGender(staffPersonalDetail.getGender());
         user.setPregnant(user.getGender().equals(Gender.FEMALE) ? staffPersonalDetail.isPregnant() : false);
-        save(user);
+        userGraphRepository.save(user);
         staffPersonalDetail.setPregnant(user.isPregnant());
         return staffPersonalDetail;
     }
@@ -441,7 +443,7 @@ public class StaffService extends UserBaseService {
         if (staff != null) {
             logger.info("General note: " + generalNote + "\nPerson: " + requestFromPerson);
             staff.saveNotes(generalNote, requestFromPerson);
-            save(staff);
+            staffGraphRepository.save(staff);
             return staff.retrieveNotes();
         }
         return null;
@@ -825,6 +827,7 @@ public class StaffService extends UserBaseService {
 
                 }
             }
+            activityIntegrationService.createDefaultKPISettingForStaff(new DefalutKPISettingDTO(staffList.stream().map(staff -> staff.getId()).collect(Collectors.toList())),unitId);
             return staffUploadBySheetQueryResult;
         } catch (IOException e) {
             e.printStackTrace();
@@ -915,7 +918,7 @@ public class StaffService extends UserBaseService {
             user.setEmail(staff.getEmail());
             user.setUserLanguage(systemLanguage);
             staff.setUser(userGraphRepository.save(user));
-            save(staff);
+            staffGraphRepository.save(staff);
             return staff;
         }
         logger.info("Not Creating Staff.......... " + staff.getFirstName() + " " + staff.getLastName());
@@ -1106,6 +1109,7 @@ public class StaffService extends UserBaseService {
         addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getCurrentDateMillis(), isEmploymentExist);
+        activityIntegrationService.createDefaultKPISettingForStaff(new DefalutKPISettingDTO(Arrays.asList(staff.getId())),unitId);
 
         //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
         StaffDTO staffDTO = new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge());
@@ -1209,7 +1213,7 @@ public class StaffService extends UserBaseService {
 //        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
 //        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
         employment.getUnitPermissions().add(unitPermission);
-        save(employment);
+        employmentGraphRepository.save(employment);
 
         if (Optional.ofNullable(organization).isPresent()) {
             if (Optional.ofNullable(organization.getEmployments()).isPresent()) {
@@ -1268,9 +1272,8 @@ public class StaffService extends UserBaseService {
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
-
         parent.getEmployments().add(employment);
-        save(parent);
+        organizationGraphRepository.save(parent);
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
@@ -1279,7 +1282,10 @@ public class StaffService extends UserBaseService {
         }
 
         employment.getUnitPermissions().add(unitPermission);
-        save(employment);
+
+        employmentGraphRepository.save(employment);
+        activityIntegrationService.createDefaultKPISettingForStaff(new DefalutKPISettingDTO(Arrays.asList(employment.getStaff().getId())),organizationId);
+
     }
 
     public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
@@ -1709,9 +1715,9 @@ public class StaffService extends UserBaseService {
 //        staffFavouriteFilter.setAccessPage(accessPage);
 //        staffFavouriteFilter.setFilterJson(staffFilterDTO.getFilterJson());
         staffFavouriteFilter.setName(staffFilterDTO.getName());
-        save(staffFavouriteFilter);
+         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         staff.addFavouriteFilters(staffFavouriteFilter);
-        save(staff);
+        staffGraphRepository.save(staff);
 //        staffFilterDTO.setFilterJson(staffFavouriteFilter.getFilterJson());
         staffFilterDTO.setModuleId(accessPage.getModuleId());
         staffFilterDTO.setName(staffFavouriteFilter.getName());
@@ -1734,7 +1740,7 @@ public class StaffService extends UserBaseService {
 //        staffFavouriteFilter.setFilterJson(staffFilterDTO.getFilterJson());
         staffFavouriteFilter.setName(staffFilterDTO.getName());
 //        staffFavouriteFilter.setEnabled(true);
-        save(staffFavouriteFilter);
+        staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
 //        staffFilterDTO.setFilterJson(staffFavouriteFilter.getFilterJson());
         // staffFilterDTO.setModuleId(accessPage.getModuleId());
         return staffFilterDTO;
@@ -1751,7 +1757,7 @@ public class StaffService extends UserBaseService {
         }
 
 //        staffFavouriteFilter.setEnabled(false);
-        save(staffFavouriteFilter);
+        staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         return true;
 
     }
@@ -1930,7 +1936,7 @@ public class StaffService extends UserBaseService {
         StaffSettings staffSettings = staffSettingsQueryResult.getStaffSettings();
         staffSettings.setStaffPreferences(staffSettingsQueryResult.getStaffPreferences());
         staff.setStaffSettings(staffSettings);
-        save(staff);
+        staffGraphRepository.save(staff);
         return true;
     }
 
@@ -1946,7 +1952,7 @@ public class StaffService extends UserBaseService {
         employment.setMainEmploymentStartDate(null);
         employment.setMainEmploymentEndDate(null);
         employment.setMainEmployment(false);
-        save(employment);
+        employmentGraphRepository.save(employment);
         return true;
     }
 
@@ -2045,11 +2051,11 @@ public class StaffService extends UserBaseService {
             } else {
                 Employment employment = getEmployment(staffId, employmentDTO);
                 employments.add(employment);
-                save(employments);
+                employmentGraphRepository.saveAll(employments);
             }
         } else {
             Employment employment = getEmployment(staffId, employmentDTO);
-            save(employment);
+            employmentGraphRepository.save(employment);
         }
         mainEmploymentResultDTO.setEmploymentOverlapList(null);
         mainEmploymentResultDTO.setUpdatedMainEmployment(employmentDTO);
@@ -2107,7 +2113,7 @@ public class StaffService extends UserBaseService {
         List<Staff> staffList = staffGraphRepository.findAll();
         staffList.forEach(staff -> {
             addStaffInChatServer(staff);
-            save(staff);
+            staffGraphRepository.save(staff);
         });
         return true;
     }
@@ -2135,7 +2141,6 @@ public class StaffService extends UserBaseService {
 
     public List<StaffPersonalDetail> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
         return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds, DateUtil.getCurrentDateMillis());
-
     }
 
 

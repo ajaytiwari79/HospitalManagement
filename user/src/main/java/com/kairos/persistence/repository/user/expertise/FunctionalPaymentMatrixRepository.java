@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.expertise;
 
-import com.kairos.persistence.model.user.expertise.FunctionalPayment;
 import com.kairos.persistence.model.user.expertise.FunctionalPaymentMatrix;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;

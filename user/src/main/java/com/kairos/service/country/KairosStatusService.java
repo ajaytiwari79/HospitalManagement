@@ -1,9 +1,9 @@
 package com.kairos.service.country;
+
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.KairosStatus;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.KairosStatusGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +17,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class KairosStatusService extends UserBaseService {
+public class KairosStatusService {
 
     @Inject
     private KairosStatusGraphRepository kairosStatusGraphRepository;
@@ -29,7 +29,7 @@ public class KairosStatusService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             kairosStatus.setCountry(country);
-             save(kairosStatus);
+            kairosStatusGraphRepository.save(kairosStatus);
             return  kairosStatus.retrieveDetails();
         }
         return null;
@@ -53,7 +53,7 @@ public class KairosStatusService extends UserBaseService {
         if (currentKairosStatus!=null){
             currentKairosStatus.setName(kairosStatus.getName());
             currentKairosStatus.setDescription(kairosStatus.getDescription());
-            save(currentKairosStatus);
+            kairosStatusGraphRepository.save(currentKairosStatus);
             return currentKairosStatus.retrieveDetails();
         }
         return null;
@@ -63,7 +63,7 @@ public class KairosStatusService extends UserBaseService {
         KairosStatus kairosStatus = kairosStatusGraphRepository.findOne(kairosStatusId);
         if (kairosStatus !=null){
             kairosStatus.setEnabled(false);
-            save(kairosStatus);
+            kairosStatusGraphRepository.save(kairosStatus);
             return true;
         }
         return false;

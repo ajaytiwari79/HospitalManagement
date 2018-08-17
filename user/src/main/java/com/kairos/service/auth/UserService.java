@@ -16,7 +16,6 @@ import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.SmsService;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
@@ -50,7 +49,7 @@ import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 @Transactional
 @PropertySource("classpath:email-config.properties")
 @Service
-public class UserService extends UserBaseService {
+public class UserService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -157,7 +156,9 @@ public class UserService extends UserBaseService {
         return userGraphRepository.findByUserNameIgnoreCase(name);
     }
 
-
+    public User findOne(Long  id) {
+        return userGraphRepository.findOne(id,0);
+    }
     /**
      * Calls UserGraphRepository and Check if User with combination of username & password exists.
      *
@@ -418,7 +419,7 @@ public class UserService extends UserBaseService {
                 unitPermissionMap.put(permission.getModuleId(), permission);
             }
             permissionData.setHubPermissions(unitPermissionMap);
-            
+
         } else {
 
             List<UserPermissionQueryResult> unitWisePermissions = accessPageRepository.fetchStaffPermission(currentUserId);
@@ -636,7 +637,7 @@ public class UserService extends UserBaseService {
         if(Optional.ofNullable(organizationSelectionDTO.getLastSelectedChildOrgId()).isPresent()){
             currentUser.setLastSelectedChildOrgId(organizationSelectionDTO.getLastSelectedChildOrgId());
         }
-       save(currentUser);
+       userGraphRepository.save(currentUser);
         return true;
     }
 
@@ -650,7 +651,7 @@ public class UserService extends UserBaseService {
             user.setDateOfBirth( Optional.ofNullable(user.getCprNumber()).isPresent() ?
                     CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
         });
-        save(users);
+        userGraphRepository.saveAll(users);
         return true;
     }
 
@@ -658,7 +659,7 @@ public class UserService extends UserBaseService {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(userLanguageId);
         currentUser.setUserLanguage(systemLanguage);
-        save(currentUser);
+        userGraphRepository.save(currentUser);
         return true;
     }
 

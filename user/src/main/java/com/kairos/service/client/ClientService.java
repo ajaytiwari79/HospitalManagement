@@ -52,7 +52,6 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.*;
 import com.kairos.service.AsynchronousService;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.IntegrationService;
@@ -100,7 +99,7 @@ import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
  */
 @Service
 @Transactional
-public class ClientService extends UserBaseService {
+public class ClientService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject
     EnvConfig envConfig;
@@ -174,6 +173,9 @@ public class ClientService extends UserBaseService {
     private ExceptionService exceptionService;
     @Inject
     private AsynchronousService asynchronousService;
+    @Inject private ClientContactPersonRelationshipRepository clientContactPersonRelationshipRepository;
+    @Inject private ClientContactPersonGraphRepository clientContactPersonGraphRepository;
+
 
     /*
         public Client createCitizen(Client client) {
@@ -197,6 +199,9 @@ public class ClientService extends UserBaseService {
         }
 
     */
+    public void  delete(Long clientId){
+         clientGraphRepository.delete(clientId);;
+    }
     public Client createCitizen(ClientMinimumDTO clientMinimumDTO, Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(organization).isPresent()) {
@@ -233,7 +238,7 @@ public class ClientService extends UserBaseService {
                 client.setProfilePic(generateAgeAndGenderFromCPR(user));
                 client.setUser(user);
                 client.setClientType(clientMinimumDTO.getClientType());
-                save(client);
+                clientGraphRepository.save(client);
                 ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDateMillis());
                 relationService.createRelation(relation);
             }
@@ -244,7 +249,7 @@ public class ClientService extends UserBaseService {
             client.setProfilePic(generateAgeAndGenderFromCPR(user));
             client.setUser(user);
             client.setClientType(clientMinimumDTO.getClientType());
-            save(client);
+            clientGraphRepository.save(client);
             ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(client, organization, new DateTime().getMillis());
             logger.debug("Creating Relation with Organization: " + organization.getName());
             relationGraphRepository.save(clientOrganizationRelation);
@@ -289,11 +294,6 @@ public class ClientService extends UserBaseService {
 
     public Client getCitizenById(Long id) {
         return clientGraphRepository.findOne(id);
-    }
-
-
-    public void safeDeleteCitizen(Long id) {
-        super.safeDeleteEntity(id);
     }
 
 
@@ -496,7 +496,7 @@ public class ClientService extends UserBaseService {
             return false;
         }
         client.setContactPerson(staff);
-        save(client);
+        clientGraphRepository.save(client);
         return true;
     }
 
@@ -682,7 +682,7 @@ public class ClientService extends UserBaseService {
         }
 
         saveAddressOfHouseHold(client, houseHold);
-        save(houseHold);
+        clientGraphRepository.save(houseHold);
 
         if (addHouseHoldInCitizenList) {
             addHouseHoldInOrganization(houseHold, unitId);
@@ -1264,7 +1264,7 @@ public class ClientService extends UserBaseService {
         clientTemporaryAddress.setZipCode(zipCode);
         clientTemporaryAddress.setCity(zipCode.getName());
         clientTemporaryAddress.setLocationName(addressDTO.getLocationName());
-        return save(clientTemporaryAddress);
+        return contactAddressGraphRepository.save(clientTemporaryAddress);
     }
 
 
@@ -1581,7 +1581,7 @@ public class ClientService extends UserBaseService {
             clientGraphRepository.removeClientContactPersonStaffRelation(clientContactPerson.getId());
             clientContactPerson.setOrganizationService(organizationService);
             clientContactPerson.setStaff(staff);
-            save(clientContactPerson);
+            clientContactPersonGraphRepository.save(clientContactPerson);
             if (households.isEmpty()) {
                 //when household is  empty then we need to check existing housholds who may connected with contact person
                 clientGraphRepository.removeClientContactPersonRelationship(clientGraphRepository.getPeopleInHouseholdIdList(clientId), clientContactPerson.getId());
@@ -1600,7 +1600,7 @@ public class ClientService extends UserBaseService {
             clientContactPersonRelationship.setClient(client);
             clientContactPersonRelationship.setClientContactPerson(clientContactPerson);
             clientContactPersonRelationship.setContactPersonRelationType(contactPersonRelationType);
-            save(clientContactPersonRelationship);
+            clientContactPersonRelationshipRepository.save(clientContactPersonRelationship);
         }
     }
 

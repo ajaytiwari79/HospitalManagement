@@ -5,9 +5,9 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
+import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.activity.enums.counter.RepresentationUnit;
-import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.counter.chart.BaseChart;
@@ -60,8 +60,6 @@ public class CounterDataService {
         if(shiftIds == null || shiftIds.isEmpty()){
             exceptionService.dataNotFoundByIdException("error.kpi.vrp.shift.availability", shiftIds);
         }
-        logger.info("Shifts Count: "+shiftIds.size());
-        logger.info("Planned Shift Count: "+vrpTaskPlanningDTO.getShifts().size());
         List<Shift> shifts = shiftService.getAllShiftByIds(new ArrayList<>(shiftIds));
         ArrayList<KPI> kpiList = new ArrayList<>();
         //kpiList

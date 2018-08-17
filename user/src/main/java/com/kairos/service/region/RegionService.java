@@ -1,5 +1,5 @@
 package com.kairos.service.region;
-import com.kairos.custom_exception.DataNotFoundByIdException;
+
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.region.Municipality;
@@ -12,7 +12,6 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.FormatUtil;
 import org.apache.poi.ss.usermodel.Cell;
@@ -34,7 +33,7 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class RegionService extends UserBaseService {
+public class RegionService {
 
     @Inject
     RegionGraphRepository regionGraphRepository;
@@ -65,7 +64,7 @@ public class RegionService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             region.setCountry(country);
-            save(region);
+            regionGraphRepository.save(region);
             return region.retrieveDetails();
         }
         return null;
@@ -79,7 +78,7 @@ public class RegionService extends UserBaseService {
             currentRegion.setCode(region.getCode());
             currentRegion.setLatitude(region.getLatitude());
             currentRegion.setLongitude(region.getLongitude());
-            save(currentRegion);
+            regionGraphRepository.save(currentRegion);
             return currentRegion.retrieveDetails();
         }
         return null;
@@ -91,7 +90,7 @@ public class RegionService extends UserBaseService {
             return false;
         }
         region.setEnable(false);
-        save(region);
+        regionGraphRepository.save(region);
         return true;
     }
 
