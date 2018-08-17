@@ -230,4 +230,11 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupsForOrganizationCreation(countryId));
     }
 
+
+    @ApiOperation("get staff ids by unit id and accessgroup id")
+    @GetMapping(value = UNIT_URL+"/access_group/{accessGroupId}/get_Staff_Ids")
+    public ResponseEntity<Map<String, Object>> getStaffIdsByUnitIdAndAccessGroupId(@PathVariable Long unitId,@PathVariable Long accessGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId));
+    }
+
 }

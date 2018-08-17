@@ -1,9 +1,13 @@
-package com.kairos.activity.counter;
+package com.kairos.activity.counter.distribution.category;
 
+import com.kairos.activity.counter.KPICategoryDTO;
+
+import javax.validation.Valid;
 import java.util.List;
 
 public class KPICategoryUpdationDTO {
     private List<KPICategoryDTO> deletedCategories;
+    @Valid
     private List<KPICategoryDTO> updatedCategories;
 
     public KPICategoryUpdationDTO(){

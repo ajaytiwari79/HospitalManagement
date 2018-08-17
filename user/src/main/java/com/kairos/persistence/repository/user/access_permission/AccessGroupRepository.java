@@ -264,8 +264,10 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "RETURN ag")
     AccessGroup getOrganizationAccessGroupByName(Long organizationId, String name, String role);
 
-
-
+    @Query("MATCH (org:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup) where id(org)={0} and id(ag)={1} \n" +
+            "with ag,org  match(ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission) with up match(up)-[:"+HAS_UNIT_PERMISSIONS+"]-(emp:Employment) with emp\n" +
+            "match (emp)-[:"+BELONGS_TO+"]-(s:Staff) RETURN id(s)")
+    List<Long> getStaffIdsByUnitIdAndAccessGroupId(Long unitId,Long accessGroupId);
 
     //for test cases
     @Query("Match(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup) where id(emp)=8767 return id(ag)")

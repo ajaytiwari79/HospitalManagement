@@ -1,4 +1,4 @@
-package com.kairos.activity.counter;
+package com.kairos.activity.counter.distribution.category;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -14,6 +14,11 @@ public class CategoryKPIsDTO {
     private List<BigInteger> kpiIds;
 
     public CategoryKPIsDTO(){
+    }
+
+    public CategoryKPIsDTO(BigInteger categoryId, List<BigInteger> kpiIds) {
+        this.categoryId = categoryId;
+        this.kpiIds = kpiIds;
     }
 
     public BigInteger getCategoryId() {

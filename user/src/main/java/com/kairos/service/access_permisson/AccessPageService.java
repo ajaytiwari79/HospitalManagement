@@ -112,6 +112,10 @@ public class AccessPageService {
         return accessPageRepository.getMainTabs(countryId);
     }
 
+    public List<AccessPageDTO> getMainTabsForUnit(Long unitId){
+        return accessPageRepository.getMainTabsForUnit(unitId);
+    }
+
     public List<AccessPageDTO> getChildTabs(Long tabId, Long countryId){
         if( !Optional.ofNullable(tabId).isPresent() ){
             return Collections.emptyList();
@@ -409,7 +413,6 @@ public class AccessPageService {
 
     public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){
         List<AccessPage> accessPages = accessPageRepository.getKPITabsList(moduleId);
-        if(accessPages==null) return new ArrayList<>();
         List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
         return kpiTabs;
     }
