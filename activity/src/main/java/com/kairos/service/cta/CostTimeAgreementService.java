@@ -39,6 +39,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -519,11 +520,11 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
     public CTATableSettingWrapper getVersionsCTA(Long unitId,List<Long> upIds){
-
         TableConfiguration tableConfiguration = tableSettingService.getTableConfigurationByTableId(unitId, ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID);
-
-        costTimeAgreementRepository.getVersionsCTA(upIds);
-        return null;
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUpIds(upIds);
+        Map<Long,List<CTAResponseDTO>> ctaResponseMap = costTimeAgreementRepository.getVersionsCTA(upIds).stream().collect(Collectors.groupingBy(k->k.getUnitPositionId(),Collectors.toList()));
+        ctaResponseDTOS.forEach(c->c.setVersions(ctaResponseMap.get(c.getUnitPositionId())));
+        return new CTATableSettingWrapper(ctaResponseDTOS,tableConfiguration);
     }
 
     public CTAResponseDTO getDefaultCTA(Long unitId,Long expertiseId){

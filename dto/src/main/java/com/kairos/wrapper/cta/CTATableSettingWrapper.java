@@ -14,6 +14,10 @@ public class CTATableSettingWrapper {
         this.tableConfiguration = tableConfiguration;
     }
 
+
+    public CTATableSettingWrapper() {
+    }
+
     public List<CTAResponseDTO> getAgreements() {
         return agreements;
     }

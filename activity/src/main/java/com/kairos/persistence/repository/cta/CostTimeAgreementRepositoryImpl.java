@@ -73,7 +73,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public List<CTAResponseDTO> getCTAByUpIds(List<Long> unitPositionIds) {
-        Query query = new Query(Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds));
+        Query query = new Query(Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds).and("disabled").is(false));
         query.fields().include("name").include("description").include("unitPositionId");
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
@@ -107,7 +107,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
                 "       }";
         Document document = Document.parse(query);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitPositionId").in(upIds).and("deleted").is(false).and("disabled").is(false)),
+                match(Criteria.where("unitPositionId").in(upIds).and("deleted").is(false).and("disabled").is(true)),
                 new CustomAggregationOperation(document)
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation,CostTimeAgreement.class,CTAResponseDTO.class);
