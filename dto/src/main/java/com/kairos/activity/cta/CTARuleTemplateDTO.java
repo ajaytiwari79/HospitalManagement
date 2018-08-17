@@ -8,6 +8,7 @@ import com.kairos.user.country.agreement.cta.CalculationFor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
@@ -35,7 +36,9 @@ public class CTARuleTemplateDTO {
     private String ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
+    @NotNull(message = "error.cta.calculation.notNull")
     private CalculationUnit calculationUnit;
+    @Valid
     private CompensationTable compensationTable;
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
@@ -48,7 +51,6 @@ public class CTARuleTemplateDTO {
     private PlannedTimeWithFactor plannedTimeWithFactor;
     private boolean calculateScheduledHours;
     private CalculationFor calculationFor;
-
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
     private List<BigInteger> activityIds;
 

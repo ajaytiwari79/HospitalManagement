@@ -20,11 +20,14 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CollectiveTimeAgreementDTO {
     private BigInteger id;
+    @NotNull(message = "error.cta.expertise.notNull")
     private String name;
     private String description;
-    @NotNull(message = "error.cta.expertise.notNull")
+    @NotNull(message = "error.cta.parentExpertise.notNull")
     private ExpertiseResponseDTO expertise;
+    @NotNull(message = "error.cta.organizationType.notNull")
     private OrganizationTypeDTO organizationType;
+    @NotNull(message = "error.cta.organizationSubType.notNull")
     private OrganizationTypeDTO organizationSubType;
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
     @NotNull(message = "error.cta.startDate.notNull")
