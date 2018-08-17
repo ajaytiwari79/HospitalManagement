@@ -255,7 +255,7 @@ public class CounterDistService extends MongoBaseService {
     }
 
     public void createDefaultStaffKPISetting(Long unitId, DefalutKPISettingDTO defalutKPISettingDTO) {
-        List<ApplicableKPI> applicableKPISForUnit = counterRepository.getApplicableKPIByReferenceId(null,unitId, ConfLevel.UNIT);
+        List<ApplicableKPI> applicableKPISForUnit = counterRepository.getApplicableKPIByReferenceId(new ArrayList<>(),unitId, ConfLevel.UNIT);
         if(applicableKPISForUnit.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.applicable.kpi.notfound");
         }
@@ -326,7 +326,7 @@ public class CounterDistService extends MongoBaseService {
         });
         List<ApplicableKPI> applicableKPISToSave = new ArrayList<>();
         applicableKpiIds.forEach(kpiId -> {
-            applicableKPIS.add(new ApplicableKPI(kpiId,kpiId,null, unitId, null, ConfLevel.UNIT));
+            applicableKPISToSave.add(new ApplicableKPI(kpiId,kpiId,null, unitId, null, ConfLevel.UNIT));
         });
         //due to avoid exception and entity may be blank here so I using multiple conditional statements harish
         if(!applicableKPISToSave.isEmpty()){
