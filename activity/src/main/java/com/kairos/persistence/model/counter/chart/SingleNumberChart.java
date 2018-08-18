@@ -13,7 +13,7 @@ public class SingleNumberChart extends BaseChart {
     private RepresentationUnit unit;
     private String unitName;
 
-    public SingleNumberChart(double value, RepresentationUnit unit, String unitName){
+    public SingleNumberChart(double value, RepresentationUnit unit, String unitName) {
         super(ChartType.NUMBER_ONLY);
         this.value = value;
         this.unit = unit;

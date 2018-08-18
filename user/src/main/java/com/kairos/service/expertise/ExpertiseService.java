@@ -130,6 +130,11 @@ public class ExpertiseService {
             expertiseResponseDTO.setEditable(expertise.isHistory());
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
 
+            TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
+            ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
+                    null, null, null, null, countryId, expertise.getId());
+            genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
+                    "/expertise/" + expertise.getId() + "/night_worker_setting", null);
         } else {
             // Expertise is already created only need to add Sr level
             expertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
@@ -138,25 +143,14 @@ public class ExpertiseService {
             }
             validateSeniorityLevel(expertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), -1L);
 
-            if (expertise.isPublished()) {
-                expertiseResponseDTO = createCopyOfExpertise(expertise, expertiseDTO, countryId);
-                // Expertise is already published Now we need to maintain a tempCopy of it.
-            } else {
-                SeniorityLevel seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
-                        expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
-                addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
-                expertiseGraphRepository.save(expertise);
-                expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
-                expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
-                expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
-            }
+            SeniorityLevel seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
+                    expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
+            addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
+            expertiseGraphRepository.save(expertise);
+            expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
+            expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
+            expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
         }
-
-        TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
-        ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
-                null, null, null, null, countryId, expertise.getId());
-        genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
-                "/expertise/" + expertise.getId() + "/night_worker_setting", null);
         return expertiseResponseDTO;
     }
 
@@ -191,44 +185,6 @@ public class ExpertiseService {
             }
         }
 
-    }
-
-    public ExpertiseResponseDTO createCopyOfExpertise(Expertise expertise, CountryExpertiseDTO expertiseDTO, Long countryId) {
-
-        ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
-
-        Expertise copiedExpertise = new Expertise();
-        BeanUtils.copyProperties(expertise, copiedExpertise);
-        copiedExpertise.setId(null);
-        expertise.setHasDraftCopy(true);
-        expertise.setHistory(true);
-        copiedExpertise.setHistory(false);
-        copiedExpertise.setPublished(false);
-        copiedExpertise.setParentExpertise(expertise);
-        copiedExpertise.setSeniorityLevel(null);
-
-        List<SeniorityLevelDTO> seniorityLevelDTOList = new ArrayList<>();
-        //  Adding the currently added Sr level in expertise.
-
-
-        SeniorityLevel seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
-                expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
-        addNewSeniorityLevelInExpertise(copiedExpertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
-        expertiseDTO.getSeniorityLevel().setParentId(expertiseDTO.getSeniorityLevel().getId());
-        expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
-        seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
-
-
-        seniorityLevelDTOList.addAll(copyExistingSeniorityLevelInExpertise(copiedExpertise, expertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel().getParentId()));
-
-        expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
-        expertiseResponseDTO.setId(copiedExpertise.getId());
-        expertiseResponseDTO.setPublished(false);
-        expertiseResponseDTO.setEditable(true);
-        // setting previous Id as parent id
-        expertiseResponseDTO.setParentId(expertise.getId());
-        expertiseResponseDTO.setSeniorityLevels(seniorityLevelDTOList);
-        return expertiseResponseDTO;
     }
 
 

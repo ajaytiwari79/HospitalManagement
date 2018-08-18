@@ -1,6 +1,7 @@
 package com.kairos.service.integration;
 
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
+import com.kairos.activity.counter.DefalutKPISettingDTO;
 import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.client.dto.TableConfiguration;
 import com.kairos.enums.IntegrationOperation;
@@ -72,6 +73,14 @@ public class ActivityIntegrationService {
 
     public TableConfiguration getTableSettings(Long unitId, BigInteger tableSettingsId) {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/table_settings/" + tableSettingsId, null), TableConfiguration.class);
+    }
+
+    public void createDefaultKPISetting(DefalutKPISettingDTO defalutKPISettingDTO ,Long unitId){
+        genericRestClient.publish(defalutKPISettingDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/default_kpi_setting", null);
+    }
+
+    public void createDefaultKPISettingForStaff(DefalutKPISettingDTO defalutKPISettingDTO ,Long unitId){
+        genericRestClient.publish(defalutKPISettingDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff_default_kpi_setting", null);
     }
 
     public void deleteShiftsAndOpenShift(Long unitId, Long staffId, LocalDateTime employmentEndDate) {

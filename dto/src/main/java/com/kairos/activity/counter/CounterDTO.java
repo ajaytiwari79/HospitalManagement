@@ -2,9 +2,8 @@ package com.kairos.activity.counter;
 
 //Created By Pavan on 3/8/18
 
+import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.activity.enums.counter.ModuleType;
-import com.kairos.enums.CounterType;
-
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
