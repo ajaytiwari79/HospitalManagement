@@ -43,6 +43,37 @@ public class AutomaticOpenShiftGenerationService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
 
+    /*
+    This method returns map of localdate and (map of activity id and staffingLevelactivityobject containing
+    understaffingoverstafing and interval.
+    Suppose staffing level is defined as 00-00:15 - 5
+    00:15 - 00:30 - 5
+    00:30 - 00:45 - 5
+    00:45 - 1:00  - 5
+    1:00 - 1:15   - 5
+    1:15 - 1:30   - 5
+    1:30 - 1:45   - 5
+    1:45 - 2;00   - 5
+    2:00 - 2:15   - 5
+    2:15 - 2:30   - 5
+    2:30 - 2:45   - 5
+    2:45 - 3:00   - 5
+    3:00 - 3:15   - 5
+    3:15 - 3:30   - 5
+    3:30 - 3:45   - 5
+    3:45 - 4:00   - 7
+    4:00 - 4:15   - 7
+    4:30 - 4:45   - 7
+    4:45 - 5:00   - 7
+    5:00 - 5:15   - 7
+    5:15 - 5:30   - 7
+    5:30 - 5:45   - 7
+    5:45 - 6:00   - 7
+    Then the function would return List of intervals with staffinglevel activityid and unserstaffingoverstaffing value(it is calcualted by reducing the shift count
+    from min max value present in staffinglevelactivity) as below
+    00:15 - 03:45 - 5
+    03:45 - 06:00 - 7
+     */
     public  Map<LocalDate,Map<Long,List<StaffingLevelActivityWithDuration>>>  findUnderStaffingByActivityIdAndDate(Long unitId) {
 
         List<OpenShiftRuleTemplateDTO> openShiftRuleTemplates = openShiftRuleTemplateRepository.findOpenShiftRuleTemplatesWithInterval(unitId);
@@ -50,7 +81,7 @@ public class AutomaticOpenShiftGenerationService {
 
         List<LocalDate> allOpenShiftRuleTemplateLocalDates = new ArrayList<>();
         for(OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO: openShiftRuleTemplates) {
-            List<LocalDate> localDates = getOpenShiftRuleTemplateDates(openShiftRuleTemplateDTO.getOpenShiftInterval(),"Asia/Kolkata");
+            List<LocalDate> localDates = getOpenShiftRuleTemplateDates(openShiftRuleTemplateDTO.getOpenShiftInterval());
             Set<Long> activityIds = openShiftRuleTemplateDTO.getActivitiesPerTimeTypes().stream().map(activitiesPerTimeType ->
                     activitiesPerTimeType.getSelectedActivities()).flatMap(selectedActivities->selectedActivities.stream().map(BigInteger::longValue)).
                     collect(Collectors.toSet());
@@ -59,10 +90,8 @@ public class AutomaticOpenShiftGenerationService {
             for(LocalDate localDate: localDates) {
                 if(!dateActivityIdsMap.containsKey(localDate)) {
                     dateActivityIdsMap.put(localDate,activityIds);
-                }
-                else {
+                } else {
                     dateActivityIdsMap.get(localDate).addAll(activityIds);
-                   // dateActivityIdsMap.put(localDate,dateActivityIdsMap.get(localDate));
                 }
             }
         }
@@ -99,11 +128,9 @@ public class AutomaticOpenShiftGenerationService {
             if(count>max) {
                 staffingLevelActivityWithDuration.setUnderStaffingOverStaffingCount(max-count);
 
-            }
-            else if(count>min) {
+            } else if(count>min) {
                 staffingLevelActivityWithDuration.setUnderStaffingOverStaffingCount(0);
-            }
-            else {
+            } else {
                 staffingLevelActivityWithDuration.setUnderStaffingOverStaffingCount(min - count);
             }
 
@@ -111,8 +138,7 @@ public class AutomaticOpenShiftGenerationService {
                 filteredActivityWithDuration = new StaffingLevelActivityWithDuration(staffingLevelActivityWithDuration);
                 currentCount = staffingLevelActivityWithDuration.getUnderStaffingOverStaffingCount();
 
-            }
-            else {
+            } else {
                 if(currentCount!= staffingLevelActivityWithDuration.getUnderStaffingOverStaffingCount()) {
                     filteredActivityWithDuration.getStaffingLevelDuration().setTo(staffingLevelActivityWithDuration.getStaffingLevelDuration().getFrom());
                     filteredActivityWithDurations.add(filteredActivityWithDuration);
@@ -128,7 +154,7 @@ public class AutomaticOpenShiftGenerationService {
         return filteredActivityWithDurations;
     }
     private Map<LocalDate,Map<Long,List<StaffingLevelActivityWithDuration>>> getDateAndFilteredActivityWithDurationMap(List<StaffingLevel>staffingLevels,Map<LocalDate,Set<Long>> dateActivityIdsMap,Map<LocalDate,Set<Shift>> shiftsLocalDateMap) {
-        Map<Long,List<StaffingLevelActivityWithDuration>> staffingLevelIntervalActivityIdMap = new HashMap<Long,List<StaffingLevelActivityWithDuration>>();
+        Map<Long,List<StaffingLevelActivityWithDuration>> staffingLevelIntervalActivityIdMap ;
         Map<LocalDate,Map<Long,List<StaffingLevelActivityWithDuration>>> dateFilteredActivityWithDurationsMap = new HashMap<>();
 
         for(StaffingLevel staffingLevel:staffingLevels) {
@@ -149,8 +175,7 @@ public class AutomaticOpenShiftGenerationService {
                 Set<Shift> shiftsLocal =  shiftsLocalDateMap.get(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()));
                 if(Optional.ofNullable(shiftsLocal).isPresent()){
                     shiftsLocal.stream().filter(shift -> shift.getActivityId().equals(BigInteger.valueOf(entry.getKey())));
-                }
-                else {
+                } else {
                     shiftsLocal = Collections.emptySet();
                 }
 
@@ -164,8 +189,7 @@ public class AutomaticOpenShiftGenerationService {
     private void insertInShiftsLocalDateMap(Map<LocalDate,Set<Shift>> shiftsLocalDateMap,LocalDate localDate,Shift shift) {
         if(!shiftsLocalDateMap.containsKey(localDate)) {
             shiftsLocalDateMap.put(localDate, Stream.of(shift).collect(Collectors.toSet()));
-        }
-        else {
+        } else {
             shiftsLocalDateMap.get(localDate).add(shift);
 
         }
@@ -185,7 +209,7 @@ public class AutomaticOpenShiftGenerationService {
         }
         return shiftsLocalDateMap;
     }
-    private List<LocalDate> getOpenShiftRuleTemplateDates(OpenShiftInterval openShiftInterval, String timezone) {
+    private List<LocalDate> getOpenShiftRuleTemplateDates(OpenShiftInterval openShiftInterval) {
 
         List<LocalDate> localDates = new ArrayList<LocalDate>();
         if (openShiftInterval.getType().toString().equals("DAYS")) {
