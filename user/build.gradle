@@ -108,7 +108,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.spockframework/spock-core
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
     // https://mvnrepository.com/artifact/com.athaydes/spock-reports
-    testCompile group: 'com.athaydes', name: 'spock-reports', version: '1.6.0'{
+    testCompile ('com.athaydes:spock-reports:1.6.0'){
         transitive = false // this avoids affecting your version of Groovy/Spock
     }
 }
@@ -145,7 +145,7 @@ bootRun {
         classpath = files("$buildDir/classes/java/main", "$buildDir/resources/main", pathingJar.archivePath)
     }
 }*/
-spockReports {
+def spockReports() {
     // set all properties at once
     set( [ 'com.athaydes.spockframework.report.showCodeBlocks': true,
            'com.athaydes.spockframework.report.outputDir': 'target/spock-reports' ] )
