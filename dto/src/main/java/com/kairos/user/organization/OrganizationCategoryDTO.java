@@ -11,6 +11,7 @@ public class OrganizationCategoryDTO {
 
     private int count;
 
+
     public OrganizationCategoryDTO(){
         // default constructor
     }

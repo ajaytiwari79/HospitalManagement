@@ -1,8 +1,15 @@
 package com.kairos.persistence.repository.counter;
 
-import com.kairos.ApplicableFor;
-import com.kairos.activity.counter.*;
-import com.kairos.enums.CounterType;
+import com.kairos.activity.counter.ApplicableKPIDTO;
+import com.kairos.activity.counter.CounterDTO;
+import com.kairos.activity.counter.KPICategoryDTO;
+import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
+import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
+import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
+import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
+import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.activity.counter.enums.CounterType;
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.util.ObjectMapperUtils;
@@ -16,10 +23,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -43,135 +47,26 @@ public class CounterRepository {
         return mongoTemplate.find(query, Counter.class);
     }
 
-    //get ModuleWiseCounters List by country
-    public List<ModuleCounter> getModuleCountersForCountry(BigInteger countryId) {
-        Query query = new Query(Criteria.where("countryId").is(countryId));
-        return mongoTemplate.find(query, ModuleCounter.class);
-    }
-
-    //get modulewise countersIds for a country
-    public List<ModuleCounterGroupingDTO> getModuleCounterDTOsForCountry(BigInteger countryId) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("countryId").is(countryId)),
-                Aggregation.group("moduleId").addToSet("counterId").as("counterIds"),
-                Aggregation.project("counterIds")
-        );
-        AggregationResults<ModuleCounterGroupingDTO> results = mongoTemplate.aggregate(aggregation, ModuleCounter.class, ModuleCounterGroupingDTO.class);
-        return results.getMappedResults();
-    }
-
-    //get role and moduleCounterId mapping for unit
-    public List<RoleCounterDTO> getRoleAndModuleCounterIdMapping(BigInteger unitId) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("unitId").is(unitId)),
-                Aggregation.group("roleId").addToSet("moduleCounterId").as("moduleCounterIds"),
-                Aggregation.project("moduleCounterIds")
-
-        );
-
-        AggregationResults<RoleCounterDTO> results = mongoTemplate.aggregate(aggregation, UnitRoleCounter.class, RoleCounterDTO.class);
-        return results.getMappedResults();
-    }
-
-    public List<BigInteger> getModuleCountersIds(List<BigInteger> refCounterIds, String moduleId, BigInteger countryId){
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("countryId").is(countryId).and("moduleId").is(moduleId).and("counterId").in(refCounterIds)),
-                Aggregation.group("moduleId").addToSet("_id").as("ids"),
-                Aggregation.project("ids")
-        );
-        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, ModuleCounter.class, Map.class);
-        List<Map> resultData = results.getMappedResults();
-        List ids = new ArrayList();
-        if(!resultData.isEmpty() && ((Map)resultData.get(0)).get("ids") != null) {
-            ids = (List)((Map)resultData.get(0)).get("ids");
-        }
-        return ids;
-    }
-
     //removal of counters
-
     public void removeAll(String fieldName, List values, Class claz){
         Query query = new Query(Criteria.where(fieldName).in(values));
         mongoTemplate.remove(query, claz);
     }
 
-    public void removeRoleCounters(BigInteger roleId, List<BigInteger> refCounterIds){
-        Query query = new Query(Criteria.where("roleId").is(roleId).and("refCounterId").in(refCounterIds));
-        mongoTemplate.remove(query, UnitRoleCounter.class);
-    }
-
     //get item by Id
-    public Object getItemById(BigInteger id, Class claz){
+    public Object getEntityById(BigInteger id, Class claz){
         Query query = new Query(Criteria.where("_id").is(id));
         return mongoTemplate.findOne(query, claz);
     }
 
     //remove item by Id
-    public void removeItemById(BigInteger id, Class claz){
+    public void removeEntityById(BigInteger id, Class claz){
         Query query = new Query(Criteria.where("id").is(id));
         mongoTemplate.remove(query, claz);
     }
 
 
-    //counterRef and counter type mapping
-    public List<RefCounterDefDTO> getModuleCounterDetails(String moduleId, BigInteger countryId){
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("moduleId").is(moduleId).and("countryId").is(countryId)),
-                Aggregation.lookup("counter", "counterId","_id","counterType"),
-                Aggregation.project().and("counterType").arrayElementAt(0).as("counterType")
-        );
-
-        AggregationResults<RefCounterDefDTO> results = mongoTemplate.aggregate(aggregation, ModuleCounter.class, RefCounterDefDTO.class);
-        return results.getMappedResults();
-    }
-
-    public List<RefCounterDefDTO> getRoleCounterTypeDetails(BigInteger roleId, BigInteger unitId, String moduleId){
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("roleId").is(roleId).and("unitId").is(unitId)),
-                Aggregation.lookup("moduleCounter","refCounterId", "_id", "refCounter"),
-                Aggregation.project().and("refCounter").arrayElementAt(0).as("refCounter"),
-                Aggregation.match(Criteria.where("refCounter.moduleId").is(moduleId)),
-                Aggregation.lookup("counter", "refCounter.counterId", "_id","counterDef" ),
-                Aggregation.project().and("counterDef").arrayElementAt(0).as("counterDef"),
-                Aggregation.project().and("counterDef.type").as("counterType")
-        );
-
-        AggregationResults<RefCounterDefDTO> results = mongoTemplate.aggregate(aggregation, UnitRoleCounter.class, RefCounterDefDTO.class);
-        return results.getMappedResults();
-    }
-
-
     // order counters list for tab
-    public List<CounterOrderDTO> getOrderedCountersListForCountry(BigInteger countryId, String moduleId){
-        Criteria criteria = Criteria.where("countryId").is(countryId).and("moduleId").is(moduleId);
-        if(moduleId == null)
-            criteria = Criteria.where("countryId").is(countryId);
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(criteria)
-        );
-        AggregationResults<CounterOrderDTO> results = mongoTemplate.aggregate(aggregation, DefaultCounterOrder.class, CounterOrderDTO.class);
-        return results.getMappedResults();
-    }
-
-    public List<CounterOrderDTO> getOrderedCountersListForUnit(BigInteger unitId, String moduleId){
-        Criteria criteria = Criteria.where("unitId").is(unitId).and("moduleId").is(moduleId);
-        if(moduleId == null)
-            criteria = Criteria.where("unitId").is(unitId);
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("unitId").is(unitId).and("moduleId").is(moduleId))
-        );
-        AggregationResults<CounterOrderDTO> results = mongoTemplate.aggregate(aggregation, UnitCounterOrder.class, CounterOrderDTO.class);
-        return results.getMappedResults();
-    }
-
-    public List<CounterOrderDTO> getOrderedCountersListForUser(BigInteger unitId, BigInteger staffId, String moduleId){
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("unitId").is(unitId).and("staffId").is(staffId).and("moduleId").is(moduleId))
-        );
-        AggregationResults<CounterOrderDTO> results = mongoTemplate.aggregate(aggregation, UserCounterOrder.class, CounterOrderDTO.class);
-        return results.getMappedResults();
-    }
-
     public List getMappedValues(List<AggregationOperation> operations, Class fromClassType, Class toClassType ){
         Aggregation aggregation = Aggregation.newAggregation(operations);
         AggregationResults<Activity> results = mongoTemplate.aggregate(aggregation, fromClassType, toClassType);
@@ -180,62 +75,192 @@ public class CounterRepository {
 
     //test cases..
     //getCounterListByType for testcases
-    public List getEntityItemList(Class claz){
-        Query query = new Query(Criteria.where("deleted").is(false));
-        return mongoTemplate.find(query, claz);
+    public List<ApplicableKPIDTO> getCounterListForCountryOrUnitOrStaff(Long refId, ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Aggregation aggregation=Aggregation.newAggregation(
+          Aggregation.match(Criteria.where(refQueryField).is(refId)),
+          Aggregation.lookup("counter","activeKpiId","_id","kpiIds"),
+           Aggregation.project("level").and("kpiIds").arrayElementAt(0).as("kpi")
+        );
+        AggregationResults<ApplicableKPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,ApplicableKPIDTO.class);
+        return results.getMappedResults();
+        }
+
+    private String getRefQueryField(ConfLevel level){
+        switch(level){
+            case COUNTRY: return "countryId";
+            case UNIT: return "unitId";
+            case STAFF: return "staffId";
+            case DEFAULT: return "countryId";
+            default: return "countryId";
+        }
     }
 
-    //CounterCategories crud
-
-    public List<KPICategory> getCategoriesByNames(List<String> names){
-        Query query = new Query();
-        query.addCriteria(Criteria.where("name").in(names).and("deleted").is(false));
-        return mongoTemplate.find(query, KPICategory.class);
+    //KPI  CRUD
+    public List<ApplicableKPI> getApplicableKPI(List<BigInteger> kpiIds, ConfLevel level, Long refId){
+        String refQueryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("activeKpiId").in(kpiIds).and(refQueryField).is(refId));
+        return mongoTemplate.find(query, ApplicableKPI.class);
     }
 
-    //categoryKPI crud
+    //category CRUD
 
-    public List<KPI> getKPIsByCategory(List<BigInteger> categoryId){
-        Query query = new Query(Criteria.where("categoryId").in(categoryId).and("deleted").is(false));
-        return mongoTemplate.find(query, KPI.class);
+    public List<KPICategory> getKPICategoryByIds(List<BigInteger> categoryIds, ConfLevel level, Long refId){
+        String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
+        Query query=new Query(Criteria.where("_id").in(categoryIds).and(queryField).is(refId));
+        return mongoTemplate.find(query,KPICategory.class);
+
     }
+
+    public List<KPICategoryDTO> getKPICategory(List<BigInteger> categoryIds, ConfLevel level, Long refId){
+        String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
+        Criteria matchCriteria = categoryIds == null ? Criteria.where(queryField).is(refId) : Criteria.where("_id").in(categoryIds).and(queryField).is(refId);
+        Query query=new Query(matchCriteria);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPICategory.class),KPICategoryDTO.class);
+    }
+
+
+    public void removeCategoryKPIEntries(List<BigInteger> categoryIds,List<BigInteger> kpiIds){
+        Query query=new Query(Criteria.where("categoryId").in(categoryIds).and("kpiId").in(kpiIds));
+        mongoTemplate.remove(query, CategoryKPIConf.class);
+    }
+
+    //CategoryKPI distribution
+
+    public List<CategoryKPIConf> getCategoryKPIConfs(List<BigInteger> kpiIds,List<BigInteger> categoryIds){
+        Query query = new Query(Criteria.where("kpiId").in(kpiIds).and("categoryId").in(categoryIds));
+        return mongoTemplate.find(query, CategoryKPIConf.class);
+    }
+
+    public List<CategoryKPIMappingDTO> getKPIsMappingForCategories(List<BigInteger> categoryIds){
+        Aggregation ag = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("categoryId").in(categoryIds))
+                , Aggregation.group("categoryId").push("kpiId").as("kpiIds")
+                , Aggregation.project().and("_id").as("categoryId").and("kpiIds").as("kpiId")
+        );
+        AggregationResults<CategoryKPIMappingDTO> results = mongoTemplate.aggregate(ag, CategoryKPIConf.class, CategoryKPIMappingDTO.class);
+        return results.getMappedResults();
+    }
+
+
 
     //tabKPI distribution crud
 
-    public List<TabKPIEntry> getTabKPIConfgiurationByTabId(List<String> tabIds){
-        Query query = new Query(Criteria.where("tabId").in(tabIds));
-        return mongoTemplate.find(query, TabKPIEntry.class);
+    public List<TabKPIMappingDTO> getTabKPIConfigurationByTabIds(List<String> tabIds,List<BigInteger> kpiIds, Long refId, ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query=null;
+        if(kpiIds.isEmpty()) {
+            query=new Query(Criteria.where("tabId").in(tabIds).and(refQueryField).is(refId));
+        }else{
+           query=new Query(Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and(refQueryField).is(refId));
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,TabKPIConf.class),TabKPIMappingDTO.class);
     }
 
-    public void removeTabKPIConfiguration(TabKPIEntry entry){
-            Query query = new Query(Criteria.where("tabId").is(entry.getTabId()).and("kpiId").is(entry.getKpiId()));
-            mongoTemplate.remove(query, TabKPIEntry.class);
+    public List<TabKPIConf> findTabKPIConfigurationByTabIds(List<BigInteger> ids){
+        Query query=new Query(Criteria.where("_id").in(ids));
+        return mongoTemplate.find(query,TabKPIConf.class);
     }
+
+    public void removeTabKPIConfiguration(TabKPIMappingDTO entry,Long refId,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("tabId").is(entry.getTabId()).and("kpiId").is(entry.getKpiId()).and(refQueryField).is(refId));
+        mongoTemplate.remove(query, TabKPIConf.class);
+    }
+
 
     //accessGroupKPI distribution crud
 
-    public List<AccessGroupKPIEntry> getAccessGroupKPIConfigurationByAccessGroupId(List<Long> accessGroupIds){
-        Query query = new Query(Criteria.where("accessGroupId").in(accessGroupIds));
+    public List<AccessGroupKPIEntry> getAccessGroupKPIByUnitIdAndKpiIds(List<BigInteger> kpiIds,Long unitId){
+        Query query = new Query(Criteria.where("kpiId").in(kpiIds).and("unitId").is(unitId));
         return mongoTemplate.find(query, AccessGroupKPIEntry.class);
     }
 
-    public void removeAccessGroupKPIEntry(AccessGroupKPIEntry entry){
-        Query query = new Query(Criteria.where("accessGroupId").is(entry.getAccessGroupId()).and("kpiId").is(entry.getKpiId()));
+    public AccessGroupKPIEntry getAccessGroupKPIEntry(AccessGroupMappingDTO entry,Long unitId){
+        Query query = new Query(Criteria.where("accessGroupId").is(entry.getAccessGroupId()).and("kpiId").is(entry.getKpiId()).and("unitId").is(unitId));
+       return mongoTemplate.findOne(query, AccessGroupKPIEntry.class);
+    }
+
+    public void removeAccessGroupKPIEntry(List<Long> unitIds,BigInteger kpiId){
+        Query query = new Query(Criteria.where("unitId").in(unitIds).and("kpiId").is(kpiId));
         mongoTemplate.remove(query, AccessGroupKPIEntry.class);
     }
 
-    public List<OrgTypeKPIEntry> getOrgTypeKPIConfigurationByOrgTypeId(List<Long> accessGroupIds){
-        Query query = new Query(Criteria.where("orgTypeId").in(accessGroupIds));
-        return mongoTemplate.find(query, OrgTypeKPIEntry.class);
+    public void removeCategoryKPIEntry(List<Long> unitIds,BigInteger kpiId){
+        Query query = new Query(Criteria.where("unitId").in(unitIds).and("kpiId").is(kpiId));
+        mongoTemplate.remove(query, CategoryKPIConf.class);
     }
 
-    public void removeOrgTypeKPIEntry(OrgTypeKPIEntry entry){
-        Query query = new Query(Criteria.where("orgTypeId").is(entry.getOrgTypeId()).and("kpiId").is(entry.getKpiId()));
-        mongoTemplate.remove(query, OrgTypeKPIEntry.class);
+    public void removeAccessGroupKPIEntryForCountry(AccessGroupMappingDTO entry,Long refId){
+        Query query = new Query(Criteria.where("accessGroupId").is(entry.getAccessGroupId()).and("kpiId").is(entry.getKpiId()).and("countryId").is(refId));
+        mongoTemplate.remove(query, AccessGroupKPIEntry.class);
     }
 
-    public List<CounterDTO> getAllCounterApplicableFor(ApplicableFor applicableFor){
-        Query query = new Query(Criteria.where("applicableFor").in(applicableFor).and("deleted").is(false));
+    public void removeApplicableKPI(List<Long> refIds,BigInteger kpiId,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where(refQueryField).in(refIds).and("activeKpiId").is(kpiId));
+        mongoTemplate.remove(query, ApplicableKPI.class);
+    }
+
+    public void removeTabKPIEntry(List<Long> refIds,BigInteger kpiId,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where(refQueryField).in(refIds).and("kpiId").is(kpiId));
+        mongoTemplate.remove(query, TabKPIConf.class);
+    }
+
+
+    public List<ApplicableKPI> getKPIByKPIId(List<BigInteger> kpiIds, Long refId, ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query=new Query(Criteria.where(refQueryField).is(refId).and("activeKpiId").in(kpiIds));
+        return mongoTemplate.find(query,ApplicableKPI.class);
+    }
+
+    public OrgTypeKPIEntry getOrgTypeKPIEntry(OrgTypeMappingDTO entry,Long countryId){
+        Query query = new Query(Criteria.where("orgTypeId").is(entry.getOrgTypeId()).and("kpiId").is(entry.getKpiId()).and("countryId").is(countryId));
+        return mongoTemplate.findOne(query, OrgTypeKPIEntry.class);
+    }
+
+
+    public List<OrgTypeMappingDTO> getOrgTypeKPIEntryOrgTypeIds(List<Long> orgTypeIds,List<BigInteger> kpiIds ,Long countryId){
+        Query query=null;
+        if(kpiIds.isEmpty()){
+            query = new Query(Criteria.where("orgTypeId").in(orgTypeIds));
+        }else{
+            query = new Query(Criteria.where("orgTypeId").in(orgTypeIds).and("kpiId").in(kpiIds));
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,OrgTypeKPIEntry.class),OrgTypeMappingDTO.class);
+    }
+
+    public List<AccessGroupMappingDTO> getAccessGroupKPIEntryAccessGroupIds(List<Long> accessGroupIds ,List<BigInteger> kpiIds, ConfLevel level, Long refId){
+        String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
+        Query query=null;
+        if(kpiIds.isEmpty()){
+            query=new Query(Criteria.where("accessGroupId").in(accessGroupIds).and(queryField).is(refId));
+        }else{
+            query=new Query(Criteria.where("accessGroupId").in(accessGroupIds).and("kpiId").in(kpiIds).and(queryField).is(refId));
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,AccessGroupKPIEntry.class),AccessGroupMappingDTO.class);
+    }
+
+    public List<ApplicableKPI> getApplicableKPIByReferenceId(List<BigInteger> kpiIds,Long refId, ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query=null;
+        if(kpiIds.isEmpty()){
+            query=new Query(Criteria.where(refQueryField).is(refId));
+        }else{
+            query=new Query(Criteria.where(refQueryField).is(refId).and("activeKpiId").in(kpiIds));
+        }
+        return mongoTemplate.find(query,ApplicableKPI.class);
+    }
+
+    public List<TabKPIConf> findTabKPIIdsByKpiIdAndUnitOrCountry(List<BigInteger> kpiIds,Long refid,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query=new Query(Criteria.where(refQueryField).is(refid).and("KpiId").in(kpiIds));
+        return mongoTemplate.find(query,TabKPIConf.class);
+    }
+
+    public List<CounterDTO> getAllCounterBySupportedModule(ModuleType supportedModuleType){
+        Query query = new Query(Criteria.where("supportedModuleTypes").in(supportedModuleType).and("deleted").is(false));
         query.fields().include("id").include("title");
         return ObjectMapperUtils.copyProperties(mongoTemplate.find(query,Counter.class),CounterDTO.class);
     }

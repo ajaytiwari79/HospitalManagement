@@ -117,13 +117,10 @@ public class MasterProcessingActivityServiceTest {
 
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && unitId != null && countryId != null) {
-            String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId)
+            return new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId)
                     .append("/unit/").append(unitId).toString();
-            ;
-            return baseUrl;
         } else if (organizationId != null && countryId != null) {
-            String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId).toString();
-            return baseUrl;
+            return new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId).toString();
         } else {
             throw new UnsupportedOperationException("organization ID must not be null");
         }

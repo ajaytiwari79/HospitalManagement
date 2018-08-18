@@ -1,9 +1,9 @@
 package com.kairos.service.country;
+
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.EmployeeLimit;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmployeeLimitGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +17,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class EmployeeLimitService extends UserBaseService {
+public class EmployeeLimitService {
 
     @Inject
     private EmployeeLimitGraphRepository employeeLimitGraphRepository;
@@ -29,7 +29,7 @@ public class EmployeeLimitService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             employeeLimit.setCountry(country);
-             save(employeeLimit);
+            employeeLimitGraphRepository.save(employeeLimit);
             return employeeLimit.retrieveDetails();
         }
         return null;
@@ -66,7 +66,7 @@ public class EmployeeLimitService extends UserBaseService {
         EmployeeLimit employeeLimit = employeeLimitGraphRepository.findOne(contractTypeId);
         if (employeeLimit !=null){
             employeeLimit.setEnabled(false);
-            save(employeeLimit);
+            employeeLimitGraphRepository.save(employeeLimit);
             return true;
         }
         return false;

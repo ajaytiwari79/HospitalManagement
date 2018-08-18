@@ -30,7 +30,7 @@ import com.kairos.service.task_type.TaskService;
 import com.kairos.rule_validator.TaskSpecification;
 import com.kairos.rule_validator.task.TaskStaffTypeSpecification;
 import com.kairos.util.DateUtils;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import com.kairos.wrapper.task.TaskGanttDTO;
 import de.tourenserver.ArrayOfFixedCall;
 import de.tourenserver.CallInfoRec;

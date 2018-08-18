@@ -1,8 +1,6 @@
 package com.kairos.service.account_type;
 
 import com.kairos.KairosGdprApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistance.model.account_type.AccountType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,15 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
 
 
 @RunWith(SpringRunner.class)
@@ -71,13 +66,10 @@ public class AccountTypeServiceTest {
 
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && unitId != null && countryId != null) {
-            String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId)
+            return new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId)
                     .append("/unit/").append(unitId).toString();
-            ;
-            return baseUrl;
         } else if (organizationId != null && countryId != null) {
-            String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId).toString();
-            return baseUrl;
+            return new StringBuilder(url + "/api/v1/organization/").append(organizationId).append("/country/").append(countryId).toString();
         } else {
             throw new UnsupportedOperationException("organization ID must not be null");
         }

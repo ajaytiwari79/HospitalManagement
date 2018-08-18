@@ -144,8 +144,16 @@ public class SchedulerPanelService extends MongoBaseService {
             panel.setInterval(interval);
             if(schedulerPanelDTO.getRunOnce() == null) {
                 cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRepeat(), schedulerPanelDTO.getStartMinute(), schedulerPanelDTO.getSelectedHours());
-            } else
+                if(Optional.ofNullable(schedulerPanelDTO.getRepeat()).isPresent()) {
+                    panel.setRepeat(schedulerPanelDTO.getRepeat());
+                }
+                panel.setStartMinute(schedulerPanelDTO.getStartMinute());
+
+            } else{
                 cronExpression = cronExpressionRunOnceBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRunOnce());
+                panel.setRunOnce(schedulerPanelDTO.getRunOnce());
+
+            }
             panel.setCronExpression(cronExpression);
             panel.setDays(schedulerPanelDTO.getDays());
             panel.setSelectedHours(schedulerPanelDTO.getSelectedHours());

@@ -1,6 +1,7 @@
 package com.kairos.service.master_data.questionnaire_template;
 
 
+import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.gdpr.master_data.MasterQuestionnaireSectionDTO;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireSection;
@@ -14,7 +15,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -44,8 +44,6 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
     @Inject
     private MasterQuestionMongoRepository masterQuestionMongoRepository;
 
-    @Inject
-    private MongoTemplate mongoTemplate;
 
     @Inject
     private MasterQuestionnaireTemplateService masterQuestionnaireTemplateService;
@@ -76,9 +74,9 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
         Map<String, Object> questionnaireSection;
         if (flag) {
-            questionnaireSection = updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(countryId, orgId, masterQuestionnaireSectionDto);
+            questionnaireSection = updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(countryId, orgId, masterQuestionnaireSectionDto, questionnaireTemplate.getTemplateType());
         } else {
-            questionnaireSection = createQuestionnaireSectionAndCreateAndAddQuestions(countryId, orgId, masterQuestionnaireSectionDto);
+            questionnaireSection = createQuestionnaireSectionAndCreateAndAddQuestions(countryId, orgId, masterQuestionnaireSectionDto, questionnaireTemplate.getTemplateType());
 
         }
         questionnaireTemplate.setSections((List<BigInteger>) questionnaireSection.get(IDS_LIST));
@@ -103,7 +101,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @description method create new question sections belong to questionnaire template and and questions which belong to section.
      * and rollback if exception occur in questionnaire section service to delete inserted questions
      */
-    public Map<String, Object> createQuestionnaireSectionAndCreateAndAddQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> masterQuestionnaireSectionDTOs) {
+    public Map<String, Object> createQuestionnaireSectionAndCreateAndAddQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> masterQuestionnaireSectionDTOs, QuestionnaireTemplateType templateType) {
 
         Map<String, Object> result = new HashMap<>();
         List<MasterQuestionnaireSection> masterQuestionnaireSections = new ArrayList<>();
@@ -114,7 +112,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
             MasterQuestionnaireSection questionnaireSection = new MasterQuestionnaireSection(questionnaireSectionDto.getTitle(), countryId);
             questionnaireSection.setOrganizationId(orgId);
             if (Optional.ofNullable(questionnaireSectionDto.getQuestions()).isPresent() && !questionnaireSectionDto.getQuestions().isEmpty()) {
-                Map<String, Object> questions = masterQuestionService.addQuestionsToQuestionSection(countryId, orgId, questionnaireSectionDto.getQuestions());
+                Map<String, Object> questions = masterQuestionService.addQuestionsToQuestionSection(countryId, orgId, questionnaireSectionDto.getQuestions(), templateType);
                 questionList = (List<MasterQuestion>) questions.get(QUESTION_LIST);
                 questionnaireSection.setQuestions((List<BigInteger>) questions.get(IDS_LIST));
             }
@@ -151,7 +149,6 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param orgId
      * @param id
@@ -186,7 +183,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @description this method update existing sections (if contain id) and create new sections(if not contain id in request)
      * and update existing questions if contain id in request and create new question if not contain id in request which belongs to section
      **/
-    public Map<String, Object> updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> questionnaireSectionDto) {
+    public Map<String, Object> updateExistingQuestionnaireSectionsAndCreateNewSectionsWithQuestions(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> questionnaireSectionDto, QuestionnaireTemplateType templateType) {
 
         checkForDuplicacyInTitleOfSections(questionnaireSectionDto);
         List<MasterQuestionnaireSectionDTO> updateExistingSectionsList = new ArrayList<>();
@@ -205,14 +202,14 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         List<BigInteger> sectionsIds = new ArrayList<>();
         Map<String, Object> updatedSections = new HashMap<>(), newSections = new HashMap<>();
         if (updateExistingSectionsList.size() != 0) {
-            updatedSections = updateQuestionnaireSectionAndQuestionList(countryId, orgId, updateExistingSectionsList);
+            updatedSections = updateQuestionnaireSectionAndQuestionList(countryId, orgId, updateExistingSectionsList, templateType);
             sectionsIds.addAll((List<BigInteger>) updatedSections.get(IDS_LIST));
             questions.addAll((List<MasterQuestion>) updatedSections.get(QUESTION_LIST));
             sections.addAll((List<MasterQuestionnaireSection>) updatedSections.get(QUESTIONNAIRE_SECTIONS));
 
         }
         if (!createNewQuestionnaireSections.isEmpty()) {
-            newSections = createQuestionnaireSectionAndCreateAndAddQuestions(countryId, orgId, createNewQuestionnaireSections);
+            newSections = createQuestionnaireSectionAndCreateAndAddQuestions(countryId, orgId, createNewQuestionnaireSections, templateType);
             sectionsIds.addAll((List<BigInteger>) newSections.get(IDS_LIST));
             questions.addAll((List<MasterQuestion>) newSections.get(QUESTION_LIST));
             sections.addAll((List<MasterQuestionnaireSection>) newSections.get(QUESTIONNAIRE_SECTIONS));
@@ -232,7 +229,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
      * @return map which contain list of sections ,section ids and questions.
      * @description this method update list of existing sections and update questions if exist already other wise create questions
      */
-    public Map<String, Object> updateQuestionnaireSectionAndQuestionList(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> updateSectionsAndQuestionsListDto) {
+    public Map<String, Object> updateQuestionnaireSectionAndQuestionList(Long countryId, Long orgId, List<MasterQuestionnaireSectionDTO> updateSectionsAndQuestionsListDto, QuestionnaireTemplateType templateType) {
 
         List<MasterQuestionnaireSection> updateSectionsList = new ArrayList<>();
         List<BigInteger> sectionsIds = new ArrayList<>();
@@ -248,7 +245,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         for (MasterQuestionnaireSection section : sections) {
             MasterQuestionnaireSectionDTO sectionDto = (MasterQuestionnaireSectionDTO) sectionsDtoCorrespondingToId.get(section.getId());
             if (Optional.ofNullable(sectionDto.getQuestions()).isPresent() && !sectionDto.getQuestions().isEmpty()) {
-                Map<String, Object> questions = masterQuestionService.updateExistingQuestionAndCreateNewQuestions(countryId, orgId, sectionDto.getQuestions());
+                Map<String, Object> questions = masterQuestionService.updateExistingQuestionAndCreateNewQuestions(countryId, orgId, sectionDto.getQuestions(), templateType);
                 section.setTitle(sectionDto.getTitle());
                 section.setQuestions((List<BigInteger>) questions.get(IDS_LIST));
                 questionList.addAll((List<MasterQuestion>) questions.get(QUESTION_LIST));

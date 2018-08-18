@@ -1,7 +1,6 @@
 package com.kairos.service.control_panel;
 import com.kairos.client.dto.ControlPanelDTO;
 import com.kairos.config.scheduler.DynamicCronScheduler;
-import com.kairos.dto.KairosScheduleJobDTO;
 import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
@@ -11,10 +10,8 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.control_panel.ControlPanelGraphRepository;
 import com.kairos.persistence.repository.user.control_panel.jobDetails.JobDetailsRepository;
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.integration.IntegrationService;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.timeCareShift.Transstatus;
+import com.kairos.util.external_plateform_shift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -41,7 +38,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.CONTR
  */
 @Service
 @Transactional
-public class ControlPanelService extends UserBaseService {
+public class ControlPanelService{
 
     @Inject
     private ControlPanelGraphRepository controlPanelGraphRepository;
@@ -83,7 +80,7 @@ public class ControlPanelService extends UserBaseService {
             return null;
         }
         controlPanel.setOrganization(organization);
-        save(controlPanel);
+        controlPanelGraphRepository.save(controlPanel);
 
         dynamicCronScheduler.setCronScheduling( controlPanel);
         System.out.println("log-----> "+logger.toString());
@@ -109,7 +106,7 @@ public class ControlPanelService extends UserBaseService {
         } else
             cronExpression = cronExpressionRunOnceBuilder(controlPanel.getDays(), controlPanel.getRunOnce());
         panel.setCronExpression(cronExpression);
-        save(panel);
+        controlPanelGraphRepository.save(panel);
         dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
         dynamicCronScheduler.startCronJob(panel);
         return  panel;

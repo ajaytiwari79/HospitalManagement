@@ -1,7 +1,6 @@
 package com.kairos.interceptor;
-import com.kairos.custom_exception.DataNotFoundException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
