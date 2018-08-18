@@ -41,7 +41,7 @@ public class PayGroupAreaServiceUnitTest {
     @Test
     public void deletePayGroupArea(){
         payGroupArea.setDeleted(true);
-        when(payGroupAreaService.save(payGroupArea)).thenReturn(payGroupArea);
+        when(payGroupAreaGraphRepository.save(payGroupArea)).thenReturn(payGroupArea);
         assert payGroupAreaService.deletePayGroupArea(payGroupAreaId) == true;
         verify(payGroupAreaGraphRepository,times(1)).findOne(payGroupAreaId);
 
