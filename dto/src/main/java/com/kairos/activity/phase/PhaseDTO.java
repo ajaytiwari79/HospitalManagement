@@ -1,6 +1,7 @@
 package com.kairos.activity.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.phase.PhaseName;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.DurationType;
 import org.hibernate.validator.constraints.Range;
@@ -30,6 +31,7 @@ public class PhaseDTO {
     private PhaseType phaseType;
     private List<String> status;
     private String color;
+    private PhaseName phaseEnum;
 
     public Long getOrganizationId() {
         return organizationId;
@@ -43,13 +45,14 @@ public class PhaseDTO {
         //default cons
     }
 
-    public PhaseDTO(@NotNull(message = "error.phase.name.notnull") String name, String description, @Range(min = 0) int duration, DurationType durationType, int sequence, Long countryId) {
+    public PhaseDTO(@NotNull(message = "error.phase.name.notnull") String name, String description,PhaseName phaseEnum, @Range(min = 0) int duration, DurationType durationType, int sequence, Long countryId) {
         this.name = name;
         this.description = description;
         this.duration = duration;
         this.durationType = durationType;
         this.sequence = sequence;
         this.countryId = countryId;
+        this.phaseEnum=phaseEnum;
     }
 
     public String getDescription() {
@@ -157,5 +160,13 @@ public class PhaseDTO {
 
     public void setDurationInDays(int durationInDays) {
         this.durationInDays = durationInDays;
+    }
+
+    public PhaseName getPhaseEnum() {
+        return phaseEnum;
+    }
+
+    public void setPhaseEnum(PhaseName phaseEnum) {
+        this.phaseEnum = phaseEnum;
     }
 }

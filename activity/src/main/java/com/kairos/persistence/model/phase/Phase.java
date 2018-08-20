@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.phase.PhaseName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.DurationType;
@@ -33,12 +34,14 @@ public class Phase extends MongoBaseEntity {
     private PhaseType phaseType;
     private List<ShiftStatus> status;
     private String color;
+    private PhaseName phaseEnum;
     public Phase() {
         //default constructor
     }
-    public Phase(String name, String description, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status,String color) {
+    public Phase(String name, String description,PhaseName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status,String color) {
         this.name = name;
         this.description = description;
+        this.phaseEnum=phaseEnum;
         this.duration = duration;
         this.durationType = durationType;
         this.sequence = sequence;
@@ -138,6 +141,13 @@ public class Phase extends MongoBaseEntity {
         this.color = color;
     }
 
+    public PhaseName getPhaseEnum() {
+        return phaseEnum;
+    }
+
+    public void setPhaseEnum(PhaseName phaseEnum) {
+        this.phaseEnum = phaseEnum;
+    }
 
     @Override
     public boolean equals(Object o) {
