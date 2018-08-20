@@ -115,6 +115,7 @@ public class StaffingLevelActivity {
         return Objects.hash(name, minNoOfStaff,maxNoOfStaff);
     }
 
+    
     @Override
     public String toString() {
         return new ToStringBuilder(this)

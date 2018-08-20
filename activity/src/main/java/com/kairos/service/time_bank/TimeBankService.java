@@ -3,10 +3,12 @@ package com.kairos.service.time_bank;
 
 import com.kairos.activity.shift.StaffUnitPositionDetails;
 import com.kairos.activity.time_bank.TimeBankAndPayoutDTO;
+import com.kairos.enums.Day;
 import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
 import com.kairos.service.pay_out.PayOutTransaction;
+import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.time_bank.CalculatedTimeBankByDateDTO;
 import com.kairos.activity.time_bank.TimeBankDTO;
@@ -32,7 +34,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.DayOfWeek;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /*
 * Created By Pradeep singh rajawat

@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kairos.activity.shift.Expertise;
 import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.user.organization.position_code.PositionCodeDTO;
+import com.kairos.util.DateUtils;
 
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,8 +16,8 @@ import java.util.Map;
 
 public class WTAVersionDTO {
 
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     // TODO fix need to make constant fields for date
     private Long startDateMillis;
     private Long endDateMillis;
@@ -36,6 +38,8 @@ public class WTAVersionDTO {
         //dc
     }
 
+
+
     public Long getUnitPositionId() {
         return unitPositionId;
     }
@@ -52,19 +56,19 @@ public class WTAVersionDTO {
         this.disabled = disabled;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
@@ -149,18 +153,18 @@ public class WTAVersionDTO {
     }
 
     public Long getStartDateMillis() {
-        return startDate.getTime();
+        return DateUtils.asDate(startDate).getTime();
     }
 
     public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDate.getTime();
+        this.startDateMillis = DateUtils.asDate(startDate).getTime();
     }
 
     public Long getEndDateMillis() {
-        return (endDate!=null)?endDate.getTime():null;
+        return (endDate!=null)?DateUtils.asDate(endDate).getTime():null;
     }
 
     public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = (endDate!=null)?endDate.getTime():null;
+        this.endDateMillis = (endDate!=null)?DateUtils.asDate(endDate).getTime():null;
     }
 }
