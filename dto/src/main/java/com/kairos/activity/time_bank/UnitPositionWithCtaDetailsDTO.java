@@ -1,6 +1,7 @@
 package com.kairos.activity.time_bank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.activity.cta.CTARuleTemplateDTO;
 
 import java.time.LocalDate;
 import java.time.ZoneId;

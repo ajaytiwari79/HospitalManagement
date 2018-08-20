@@ -627,4 +627,12 @@ public class DateUtils {
     public static Long getCurrentMillis() {
         return System.currentTimeMillis();
     }
+    public static LocalDateTime getStartOfDayFromLocalDate(LocalDate localDate) {
+
+        return localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+    public static LocalDateTime getEndOfDayFromLocalDate(LocalDate localDate) {
+
+        return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
 }

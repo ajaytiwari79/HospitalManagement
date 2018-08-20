@@ -11,20 +11,21 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
+
+import com.kairos.persistence.model.country.experties.*;
+import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.user.expertise.Response.*;
+import com.kairos.user.country.experties.*;
+import com.kairos.user.country.time_slot.TimeSlot;
 import com.kairos.persistence.model.country.experties.UnionServiceWrapper;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseEmploymentTypeRelationship;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
-import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -104,6 +105,8 @@ public class ExpertiseService {
 
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
+
+    @Inject private com.kairos.service.organization.OrganizationService organizationService;
 
     public ExpertiseResponseDTO saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -725,6 +728,11 @@ public class ExpertiseService {
         countryDetail.put("employmentTypes", employmentTypes);
         countryDetail.put("presenceTypes", presenceTypes);
         return countryDetail;
+    }
+
+    public List<ExpertiseTagDTO> getExpertiseForOrgCTA(long unitId) {
+        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+        return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
     }
 
     public CopyExpertiseDTO copyExpertise(Long expertiseId, CopyExpertiseDTO copyExpertiseDTO) {

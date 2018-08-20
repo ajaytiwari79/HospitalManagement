@@ -15,6 +15,7 @@ public class SeniorityLevelFunctionDTO {
     private List<FunctionsDTO> functions;
 
 
+
     public SeniorityLevelFunctionDTO() {
     }
 

@@ -29,6 +29,7 @@ public class WTAResponseDTO {
     private Date endDate;
     private Long expiryDate;
     private String name;
+    private Long unitPositionId;
     private String description;
     private BigInteger id;
     private ExpertiseResponseDTO expertise;
@@ -36,6 +37,14 @@ public class WTAResponseDTO {
     private OrganizationTypeDTO organizationSubType;
     private WTAResponseDTO parentWTAResponse;
     private List<TagDTO> tags;
+
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
+
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
+    }
 
     public WTAResponseDTO getParentWTAResponse() {
         return parentWTAResponse;
