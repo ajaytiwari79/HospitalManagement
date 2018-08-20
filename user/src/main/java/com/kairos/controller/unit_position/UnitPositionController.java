@@ -96,11 +96,11 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitId, unitPositionId));
     }*/
 
-   /* @ApiOperation(value = "get unit_position's CTA")
+    @ApiOperation(value = "get unit_position's CTA")
     @GetMapping(value = "/getCTAbyUnitPosition/{unitPositionId}")
     public ResponseEntity<Map<String, Object>> getUnitPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitPositionId, unitId));
-    }*/
+    }
 
 
     @ApiOperation(value = "apply function to unit position")

@@ -1,9 +1,11 @@
 package com.kairos.activity.staffing_level;
 
+import java.math.BigInteger;
+
 public class StaffingLevelActivityWithDuration {
 
     private String name;
-    private Long activityId;
+    private BigInteger activityId;
     // private int noOfStaff;
     private boolean includeInMin;
     private int minNoOfStaff;
@@ -29,11 +31,11 @@ public class StaffingLevelActivityWithDuration {
         this.name = name;
     }
 
-    public Long getActivityId() {
+    public BigInteger getActivityId() {
         return activityId;
     }
 
-    public void setActivityId(Long activityId) {
+    public void setActivityId(BigInteger activityId) {
         this.activityId = activityId;
     }
 
@@ -69,7 +71,7 @@ public class StaffingLevelActivityWithDuration {
         this.staffingLevelDuration = staffingLevelDuration;
     }
 
-    public StaffingLevelActivityWithDuration(Long activityId, int minNoOfStaff, int maxNoOfStaff, Duration staffingLevelDuration) {
+    public StaffingLevelActivityWithDuration(BigInteger activityId, int minNoOfStaff, int maxNoOfStaff, Duration staffingLevelDuration) {
         this.activityId = activityId;
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;

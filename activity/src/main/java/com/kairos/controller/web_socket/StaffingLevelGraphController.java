@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class StaffingLevelGraphController {
             StaffingLevelTimeSlotDTO timeSlotDTO1=new StaffingLevelTimeSlotDTO(i,5,10,new Duration(LocalTime.of(0,0),
                     LocalTime.of(0,15)) );
             timeSlotDTO1.setAvailableNoOfStaff(Random);
-            StaffingLevelActivity activity=new StaffingLevelActivity(1L,6,6);
+            StaffingLevelActivity activity=new StaffingLevelActivity(new BigInteger("1"),6,6);
             timeSlotDTO1.getStaffingLevelActivities().add(activity);
             staffingLevelTimeSlots.add(timeSlotDTO1);
         }

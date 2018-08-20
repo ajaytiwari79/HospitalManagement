@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -18,27 +19,11 @@ import java.util.Set;
 public interface ActivityMongoRepository extends MongoBaseRepository<Activity, BigInteger>,
         CustomActivityMongoRepository {
 
-    Activity findByNameIgnoreCaseAndDeletedFalseAndUnitId(String name, Long unitId);
-
-    @Query("{'deleted' : false, 'unitId':?1, 'name':{$regex:?0, $options:'i'}}")
-    Activity findByNameAndOrgIDIgnoreCaseAndDeletedFalse(String name, int orgID);
-
-
-    @Query(value = "{'deleted' : false,'unitId':?2,'isParentActivity':false, 'name': {$regex : ?0, $options: 'i'},'_id':{'$ne':?1} }")
-    Activity findByNameExcludingCurrentInUnit(String name, BigInteger activityId, Long unitId);
-
-    @Query(value = "{'deleted' : false,'countryId':?2,'isParentActivity':true, 'name': {$regex : ?0, $options: 'i'},'_id':{'$ne':?1} }")
-    Activity findByNameExcludingCurrentInCountry(String name, BigInteger activityId, Long countryId);
-
     @CountQuery("{_id:{$in:?0}, deleted:false}")
     Integer countActivityByIds(Set<BigInteger> activityIds);
 
     @Query("{'deleted' : false,'_id':?0}")
     Activity findActivityByIdAndEnabled(BigInteger id);
-
-    Activity findByParentIdAndDeletedTrueAndUnitId(BigInteger parentId, Long unitId);
-
-    Activity findByParentIdAndUnitId(BigInteger parentId, Long unitId);
 
     Activity findByParentIdAndDeletedFalseAndUnitId(BigInteger parentId, Long unitId);
 
@@ -50,10 +35,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'compositeActivities':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1}")
     List<Activity> findAllActivitiesByUnitId(Long unitId);
-
-    Integer countByParentIdAndDeletedFalse(BigInteger parentId);
-
-    Integer countByparentIdAndDeletedFalseAndIsParentActivityFalse(BigInteger parentId);
 
     List<Activity> findByExternalIdIn(List<String> activityExternalIds);
 
@@ -68,4 +49,6 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Set<BigInteger> activityIds);
+
+
 }

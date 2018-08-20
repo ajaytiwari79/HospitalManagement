@@ -84,4 +84,8 @@ public class ExceptionService {
     public void dataNotFoundException(String message, Object... params) {
         throw new DataNotFoundException(convertMessage(message, params));
     }
+
+    public String getLanguageSpecificText(String message,Object... params){
+        return convertMessage(message,params);
+    }
 }
