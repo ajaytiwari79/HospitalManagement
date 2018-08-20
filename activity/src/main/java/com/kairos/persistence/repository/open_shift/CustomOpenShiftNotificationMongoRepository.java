@@ -9,5 +9,5 @@ import java.util.Date;
 import java.util.List;
 
 public interface CustomOpenShiftNotificationMongoRepository {
-    List<OpenShift> findAllApplicableOpenShiftsForStaff(Long staffId, Date startDate, Date endDate);
+    List<OpenShift> findValidOpenShiftsForStaff(Long staffId, Date startDate, Date endDate);
 }

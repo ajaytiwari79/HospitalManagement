@@ -19,7 +19,7 @@ import java.util.List;
 public class OpenShiftNotificationMongoRepositoryImpl implements CustomOpenShiftNotificationMongoRepository {
     @Inject private MongoTemplate mongoTemplate;
     @Override
-    public List<OpenShift> findAllApplicableOpenShiftsForStaff(Long staffId, Date startDate,Date endDate) {
+    public List<OpenShift> findValidOpenShiftsForStaff(Long staffId, Date startDate, Date endDate) {
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("staffId").is(staffId).and("deleted").is(false)),
                 Aggregation.lookup("openShift","openShiftId","_id","openShifts"),

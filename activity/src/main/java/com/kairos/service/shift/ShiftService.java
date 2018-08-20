@@ -1008,7 +1008,7 @@ public class ShiftService extends MongoBaseService {
         List<ShiftQueryResult> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, startDate, endDate);
         UserAccessRoleDTO userAccessRoleDTO = genericIntegrationService.getAccessRolesOfStaff(unitId);
         List<OpenShift> openShifts=userAccessRoleDTO.getManagement()?openShiftMongoRepository.getOpenShiftsByUnitIdAndDate(unitId, startDate, endDate):
-                openShiftNotificationMongoRepository.findAllApplicableOpenShiftsForStaff(userAccessRoleDTO.getStaffId(),startDate,endDate);
+                openShiftNotificationMongoRepository.findValidOpenShiftsForStaff(userAccessRoleDTO.getStaffId(),startDate,endDate);
 
         List<OpenShiftResponseDTO> openShiftResponseDTOS = new ArrayList<>();
         openShifts.forEach(openShift -> {

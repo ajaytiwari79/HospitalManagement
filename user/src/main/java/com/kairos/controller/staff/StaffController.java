@@ -22,7 +22,6 @@ import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.user.employment.EmploymentDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
 import com.kairos.user.staff.staff.StaffDTO;
-import com.kairos.user.staff.staff.StaffPreferencesDTO;
 import com.kairos.user.user.password.PasswordUpdateDTO;
 import com.kairos.util.DateConverter;
 import com.kairos.util.response.ResponseHandler;
@@ -683,10 +682,4 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffDetailByIds(unitId,staffIds));
     }
 
-    @GetMapping(value = "/staffId_by_userId")
-    @ApiOperation("get staffId by userId")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffIdByUserId(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdOfCurrentUser(unitId));
-    }
 }

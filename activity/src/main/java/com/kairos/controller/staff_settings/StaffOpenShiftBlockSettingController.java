@@ -26,7 +26,7 @@ public class StaffOpenShiftBlockSettingController {
     @Inject private StaffOpenShiftBlockSettingService staffOpenShiftBlockSettingService;
 
     @ApiOperation(value = "Staff personalized view in daily view")
-    @PutMapping(value = "/personal_view_settings/daily_view")
+    @PutMapping(value = "/open_shift_block_setting/daily_view")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> blockOpenShiftByStaff(@PathVariable Long unitId, @RequestBody StaffPreferencesDTO staffPreferencesDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffOpenShiftBlockSettingService.savePersonalizedSettings(unitId,staffPreferencesDTO));

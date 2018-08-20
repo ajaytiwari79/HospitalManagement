@@ -2083,7 +2083,7 @@ public class StaffService {
         return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds, DateUtil.getCurrentDateMillis());
         }
 
-    public Long getStaffIdOfCurrentUser(Long unitId) {
+    public Long getStaffIdOfLoggedInUser(Long unitId) {
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
         return staffGraphRepository.getStaffIdOfCurrentUser(UserContext.getUserDetails().getId(),parentOrganization.getId());
     }
