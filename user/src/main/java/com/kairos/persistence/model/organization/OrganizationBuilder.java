@@ -18,6 +18,7 @@ import java.util.List;
 
 public class OrganizationBuilder {
     private String name;
+    private Long id;
     private List<Group> groupList;
     private List<Organization> children;
     private boolean isParentOrganization;
@@ -191,9 +192,140 @@ public class OrganizationBuilder {
         return this;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<Group> getGroupList() {
+        return groupList;
+    }
+
+    public List<Organization> getChildren() {
+        return children;
+    }
+
+    public boolean isParentOrganization() {
+        return isParentOrganization;
+    }
+
+    public void setParentOrganization(boolean parentOrganization) {
+        isParentOrganization = parentOrganization;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public CompanyType getCompanyType() {
+        return companyType;
+    }
+
+    public boolean isBoardingCompleted() {
+        return boardingCompleted;
+    }
+
+    public String getKairosId() {
+        return kairosId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isPrekairos() {
+        return isPrekairos;
+    }
+
+    public void setPrekairos(boolean prekairos) {
+        isPrekairos = prekairos;
+    }
+
+    public String getDesiredUrl() {
+        return desiredUrl;
+    }
+
+    public String getShortCompanyName() {
+        return shortCompanyName;
+    }
+
+    public Integer getKairosCompanyId() {
+        return kairosCompanyId;
+    }
+
+    public String getVatId() {
+        return vatId;
+    }
+
+    public List<BusinessType> getBusinessTypes() {
+        return businessTypes;
+    }
+
+    public OrganizationType getOrganizationType() {
+        return organizationType;
+    }
+
+    public List<OrganizationType> getOrganizationSubTypes() {
+        return organizationSubTypes;
+    }
+
+    public CompanyUnitType getCompanyUnitType() {
+        return companyUnitType;
+    }
+
+    public CompanyCategory getCompanyCategory() {
+        return companyCategory;
+    }
+
+    public ZoneId getTimeZone() {
+        return timeZone;
+    }
+
+    public OrganizationSetting getOrganizationSetting() {
+        return organizationSetting;
+    }
+
+    public OrganizationLevel getOrganizationLevel() {
+        return organizationLevel;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public ContactDetail getContact() {
+        return contact;
+    }
+
+    public ContactAddress getContactAddress() {
+        return contactAddress;
+    }
+
+    public String getChildLevel() {
+        return childLevel;
+    }
+
+    public UnitType getUnitType() {
+        return unitType;
+    }
+
+    public List<CostTimeAgreement> getCostTimeAgreements() {
+        return costTimeAgreements;
+    }
 
     public Organization createOrganization() {
-        return new  Organization( name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
+        return new  Organization( id,name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
                 vatId, businessTypes,organizationType, organizationSubTypes,  companyUnitType, companyCategory, timeZone,childLevel,
         isParentOrganization, country,accountType,boardingCompleted,kairosId,groupList,children,unitType,costTimeAgreements);
     }

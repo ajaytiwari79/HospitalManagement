@@ -157,17 +157,17 @@ public class CompanyCreationService {
                 exceptionService.dataNotFoundByIdException("error.Organization.name.duplicate", orgDetails.getName());
             }
         }
-        organization = new OrganizationBuilder()
-                .setIsParentOrganization(true)
-                .setName(orgDetails.getName())
-                .setCompanyType(orgDetails.getCompanyType())
-                .setVatId(orgDetails.getVatId())
-                .setShortCompanyName(orgDetails.getShortCompanyName())
-                .setDesiredUrl(orgDetails.getDesiredUrl())
-                .setDescription(orgDetails.getDescription())
-                .createOrganization();
+        organization.setName(orgDetails.getName());
+        organization.setCompanyType(orgDetails.getCompanyType());
+        organization.setVatId(orgDetails.getVatId());
+        organization.setShortCompanyName(orgDetails.getShortCompanyName());
+        organization.setDesiredUrl(orgDetails.getDesiredUrl());
+        organization.setDescription(orgDetails.getDescription());
 
         if (CompanyType.COMPANY.equals(orgDetails.getCompanyType())) {
+            if (!Optional.ofNullable(orgDetails.getAccountTypeId()).isPresent()){
+                    exceptionService.dataNotFoundByIdException("message.accountType.select");
+            }
             AccountType accountType = accountTypeGraphRepository.findOne(orgDetails.getAccountTypeId(), 0);
             if (!Optional.ofNullable(accountType).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.accountType.notFound");

@@ -239,7 +239,7 @@ public class Organization extends UserBaseEntity {
     }
 
 
-    public Organization(String name,String description,boolean isPrekairos,String desiredUrl,String shortCompanyName,Integer kairosCompanyId,CompanyType companyType,
+    public Organization(Long id,String name,String description,boolean isPrekairos,String desiredUrl,String shortCompanyName,Integer kairosCompanyId,CompanyType companyType,
           String vatId,List<BusinessType> businessTypes,OrganizationType organizationType,List<OrganizationType> organizationSubTypes,   CompanyUnitType companyUnitType,
             CompanyCategory companyCategory,ZoneId timeZone,String childLevel,boolean isParentOrganization, Country country,AccountType accountType,boolean boardingCompleted,String kairosId,
                         List<Group> groupList, List<Organization> children,UnitType unitType,List<CostTimeAgreement> costTimeAgreements) {
@@ -251,7 +251,7 @@ public class Organization extends UserBaseEntity {
         this.timeZone=timeZone;this.costTimeAgreements=costTimeAgreements;
         this.childLevel=childLevel;
         this.isParentOrganization = isParentOrganization;
-        this.country = country;
+        this.country = country;this.id=id;
         this.accountType=accountType;
         this.companyType =companyType;
         this.boardingCompleted=boardingCompleted;
