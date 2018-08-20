@@ -51,6 +51,9 @@ db.wtaBaseRuleTemplate.updateMany({},{$push:{"phaseTemplateValues" :{$each:[ {
             "managementCanBeIgnore" : false
         }]}}});
 
+db.getCollection('tableSetting').remove({"tableConfigurations.tableId":{$in:["36","35"]}})
+
+
 
 //set phaseEnum in phase table
 

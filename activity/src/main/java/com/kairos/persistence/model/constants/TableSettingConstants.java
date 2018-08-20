@@ -55,4 +55,5 @@ public class TableSettingConstants {
     public static final String ORGANIZATION_STAFF_TASKS_TABLE_ID = "25";
     public static final String ORGANIZATION_CITIZEN_TABLE_ID = "34";
     public static final BigInteger ORGANIZATION_AGREEMENT_VERSION_TABLE_ID = new BigInteger("35");
+    public static final BigInteger ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID = new BigInteger("36");
 }

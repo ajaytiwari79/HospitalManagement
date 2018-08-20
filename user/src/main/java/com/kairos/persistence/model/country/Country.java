@@ -3,16 +3,14 @@ package com.kairos.persistence.model.country;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.services.OrganizationService;
-import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.model.agreement.cta.RuleTemplate;
-import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.equipment.Equipment;
 import com.kairos.persistence.model.country.feature.Feature;
+import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -22,7 +20,6 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
-import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
 
 
 /**
@@ -59,14 +56,7 @@ public class Country extends UserBaseEntity {
     @Relationship(type = HAS_HOLIDAY)
     private List<CountryHolidayCalender> countryHolidayCalenderList;
 
-    @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY, direction = UNDIRECTED)
-    private List<RuleTemplateCategory> ruleTemplateCategories = new ArrayList<>();
 
-    @Relationship(type = HAS_RULE_TEMPLATE)
-    private List<RuleTemplate> WTABaseRuleTemplate;
-
-    @Relationship(type = HAS_CTA_RULE_TEMPLATE)
-    private List<RuleTemplate> ctaRuleTemplates;
 
 
     @Relationship(type = COUNTRY_HAS_TAG)
@@ -109,21 +99,6 @@ public class Country extends UserBaseEntity {
         this.name = name;
     }
 
-    public List<RuleTemplate> getWTABaseRuleTemplate() {
-        return WTABaseRuleTemplate;
-    }
-
-    public void setWTABaseRuleTemplate(List<RuleTemplate> WTABaseRuleTemplate) {
-        this.WTABaseRuleTemplate = WTABaseRuleTemplate;
-    }
-
-    public List<RuleTemplate> getCtaRuleTemplates() {
-        return ctaRuleTemplates;
-    }
-
-    public void setCtaRuleTemplates(List<RuleTemplate> ctaRuleTemplates) {
-        this.ctaRuleTemplates = ctaRuleTemplates;
-    }
 
     public String getGoogleCalendarCode() {
         return googleCalendarCode;
@@ -190,10 +165,6 @@ public class Country extends UserBaseEntity {
         return employmentTypeList;
     }
 
-    public List<RuleTemplateCategory> getRuleTemplateCategories() {
-        return Optional.ofNullable(ruleTemplateCategories).orElse(new ArrayList<>());
-    }
-
 
     public void addLevel(Level level) {
         List<Level> levels = Optional.ofNullable(this.levels).orElse(new ArrayList<>());
@@ -207,26 +178,6 @@ public class Country extends UserBaseEntity {
         this.resources = resourceList;
     }
 
-
-       public void setRuleTemplateCategories(List<RuleTemplateCategory> ruleTemplateCategories) {
-        this.ruleTemplateCategories = ruleTemplateCategories;
-    }
-
-    public void addRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
-        if (ruleTemplateCategory == null)
-            throw new NullPointerException("Can't add null ruleTemplateCategory");
-        if (ruleTemplateCategory.getCountry() != null)
-            throw new IllegalStateException("country is already assigned to ruleTemplateCategory");
-        getRuleTemplateCategories().add(ruleTemplateCategory);
-        ruleTemplateCategory.setCountry(this);
-    }
-
-    public void removeRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
-        if (ruleTemplateCategory == null)
-            getRuleTemplateCategories().remove(ruleTemplateCategory);
-        ruleTemplateCategory.setCountry(null);
-
-    }
 
     public Map<String, Object> retrieveGeneralDetails() {
         Map<String, Object> map = new HashMap<>();

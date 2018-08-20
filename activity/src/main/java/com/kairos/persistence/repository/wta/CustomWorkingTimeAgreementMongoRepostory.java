@@ -5,6 +5,7 @@ import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,8 +39,11 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     boolean checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
 
-    List<WTAQueryResultDTO> getAllWTAByIds(List<BigInteger> wtaIds);
-    List<WTAVersionDTO> getAllParentWTAByIds(List<BigInteger> wtaIds);
+    List<WTAQueryResultDTO> getAllWTAByUpIds(List<Long> upIds, Date date);
+    List<WTAVersionDTO> getAllParentWTAByIds(List<Long> upIds);
 
-    List<WTAVersionDTO> getWTAWithVersionIds(List<BigInteger> wtaIds);
+    List<WTAVersionDTO> getWTAWithVersionIds(List<Long> upIds);
+
+    public WTAQueryResultDTO getWTAByUnitPosition(Long unitPositionId,Date date);
+
 }

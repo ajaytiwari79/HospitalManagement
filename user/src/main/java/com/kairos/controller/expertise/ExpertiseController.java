@@ -80,6 +80,11 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getUnpublishedExpertise(countryId));
     }
 
+    @RequestMapping(value = PARENT_ORGANIZATION_URL+"/unit/{unitId}/cta/expertise", method = RequestMethod.GET)
+    @ApiOperation("get expertise for cta_response rule template")
+    public ResponseEntity<Map<String, Object>> getExpertiseForCTA(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseForOrgCTA(unitId));
+    }
 
     @ApiOperation(value = "Get all expertise by orgSubType")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/expertise", method = RequestMethod.GET)

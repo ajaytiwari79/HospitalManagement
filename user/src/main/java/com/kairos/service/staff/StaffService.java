@@ -110,6 +110,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.CharBuffer;
 import java.text.ParseException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -1660,9 +1661,8 @@ public class StaffService {
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
 
-        // StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-        com.kairos.activity.shift.StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionWithCTA(unitPositionId, organization, countryId);
+        com.kairos.activity.shift.StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId, organization, countryId);
         staffAdditionalInfoDTO.setUnitId(organization.getId());
         staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
         staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.user.country.time_slot.TimeSlotWrapper.class));
@@ -1674,8 +1674,6 @@ public class StaffService {
         staffAdditionalInfoDTO.setUser(userAccessRole);
         if (Optional.ofNullable(unitPosition).isPresent()) {
             staffAdditionalInfoDTO.setUnitPosition(unitPosition);
-            //WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
-            //staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
         staffAdditionalInfoDTO.setUnitTimeZone(organization.getTimeZone());
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
