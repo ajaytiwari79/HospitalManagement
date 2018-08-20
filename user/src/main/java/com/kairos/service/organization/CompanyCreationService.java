@@ -299,6 +299,10 @@ public class CompanyCreationService {
         //Assign Parent Organization's level to unit
         unit.setLevel(parentOrganization.getLevel());
         organizationGraphRepository.save(unit);
+        organizationBasicDTO.setId(unit.getId());
+        if (organizationBasicDTO.getAddressDTO()!=null){
+            organizationBasicDTO.getAddressDTO().setId(unit.getContactAddress().getId());
+        }
         return organizationBasicDTO;
 
     }
