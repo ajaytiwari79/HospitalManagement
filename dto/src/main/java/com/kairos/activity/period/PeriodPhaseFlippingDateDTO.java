@@ -2,6 +2,7 @@ package com.kairos.activity.period;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 /**
  * Created by prerna on 6/4/18.
@@ -9,7 +10,7 @@ import java.time.LocalDate;
 public class PeriodPhaseFlippingDateDTO {
     private BigInteger phaseId;
     private LocalDate flippingDate;
-
+    private LocalTime flippingTime;
     public PeriodPhaseFlippingDateDTO(){
         // default constructor
     }
@@ -35,11 +36,11 @@ public class PeriodPhaseFlippingDateDTO {
         this.flippingDate = flippingDate;
     }
 
-    /*public Date getFlippingDate() {
-        return flippingDate;
+    public LocalTime getFlippingTime() {
+        return flippingTime;
     }
 
-    public void setFlippingDate(Date flippingDate) {
-        this.flippingDate = flippingDate;
-    }*/
+    public void setFlippingTime(LocalTime flippingTime) {
+        this.flippingTime = flippingTime;
+    }
 }

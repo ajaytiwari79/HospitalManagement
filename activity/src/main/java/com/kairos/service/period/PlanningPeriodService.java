@@ -195,7 +195,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 }
                 previousPhaseId = phase.getId();
                 // Calculate flipping date by duration
-                PeriodPhaseFlippingDate periodPhaseFlippingDate = new PeriodPhaseFlippingDate(phase.getId(), scopeToFlipNextPhase ? tempFlippingDate.toLocalDate() : null);
+                PeriodPhaseFlippingDate periodPhaseFlippingDate = new PeriodPhaseFlippingDate(phase.getId(), scopeToFlipNextPhase ? tempFlippingDate.toLocalDate() : null,scopeToFlipNextPhase?phase.getFlippingDefalutTime():null);
                 tempPhaseFlippingDate.add(periodPhaseFlippingDate);
                 index += 1;
             }
@@ -260,7 +260,7 @@ public class PlanningPeriodService extends MongoBaseService {
             } else if(planningPeriodDTO.getDurationType().equals(DurationType.WEEKS)){
                 endDate = startDate.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).minusDays(1);
             }else{
-                endDate = LocalDateTime.of(startDate.toLocalDate(),startDate.toLocalTime().plusHours(planningPeriodDTO.getDuration()));
+                endDate = startDate.plusHours(planningPeriodDTO.getDuration());
             }
         }
         return endDate;
@@ -281,9 +281,9 @@ public class PlanningPeriodService extends MongoBaseService {
     public List<PlanningPeriodDTO> addPlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO) {
 
         // Check monday if duration is in week and first day of month if duration is in month
-        if (!validateStartDateForPeriodCreation(LocalDateTime.of(planningPeriodDTO.getStartDate(),planningPeriodDTO.getStartTime()),planningPeriodDTO.getDurationType())) {
-            exceptionService.actionNotPermittedException("error.period.start.date.invalid");
-        }
+//        if (!validateStartDateForPeriodCreation(LocalDateTime.of(planningPeriodDTO.getStartDate(),planningPeriodDTO.getStartTime()),planningPeriodDTO.getDurationType())) {
+//            exceptionService.actionNotPermittedException("error.period.start.date.invalid");
+//        }
 
         List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);
         ;
@@ -300,12 +300,13 @@ public class PlanningPeriodService extends MongoBaseService {
         List<PlanningPeriod> planningPeriods = new ArrayList<PlanningPeriod>(planningPeriodDTO.getRecurringNumber());
         PlanningPeriod lastEndDate = planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
         if (Optional.ofNullable(lastEndDate).isPresent()) {
-            planningPeriodDTO.setStartDate(lastEndDate.getEndDate().toLocalDate().plusDays(1));
-            planningPeriodDTO.setStartTime(lastEndDate.getEndDate().toLocalTime().plusSeconds(1));
+            LocalDateTime startDateTime=lastEndDate.getStartDate().plusMinutes(1);
+            planningPeriodDTO.setStartDate(startDateTime.toLocalDate());
+            planningPeriodDTO.setStartTime(startDateTime.toLocalTime());
         }
         createPlanningPeriod(unitId, LocalDateTime.of(planningPeriodDTO.getStartDate(),planningPeriodDTO.getStartTime()), planningPeriods, phases, planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
         save(planningPeriods);
-        return getPlanningPeriods(unitId, LocalDateTime.of(planningPeriodDTO.getStartDate(),planningPeriodDTO.getStartTime()),LocalDateTime.of(planningPeriodDTO.getEndDate(),planningPeriodDTO.getEndTime()));
+        return getPlanningPeriods(unitId, LocalDateTime.of(planningPeriodDTO.getStartDate(),planningPeriodDTO.getStartTime()),(planningPeriodDTO.getEndDate()!=null)?LocalDateTime.of(planningPeriodDTO.getEndDate(),planningPeriodDTO.getEndTime()):null);
     }
 
     public boolean updateFlippingDate(BigInteger periodId, Long unitId, LocalDate date) {
