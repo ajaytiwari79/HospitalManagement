@@ -52,14 +52,8 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      */
     public StaffingLevelTemplateDTO createStaffingLevelTemplate(StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
         logger.info("saving staffing level Template  {}", staffingLevelTemplateDTO);
-        Set<BigInteger> activityIds=staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().stream().
-                flatMap(staffingLevelInterval -> staffingLevelInterval.getStaffingLevelActivities().stream().
-                map(StaffingLevelActivity::getActivityId)).collect(Collectors.toSet());
-
-
-        List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         //validating Activities
-        List<ActivityValidationError> errors= validateActivityRules(activities,staffingLevelTemplateDTO.getValidity().getStartDate(),staffingLevelTemplateDTO.getValidity().getEndDate(),staffingLevelTemplateDTO.getDayType());
+        List<ActivityValidationError> errors= validateActivityRules(staffingLevelTemplateDTO);
         if(!errors.isEmpty()){
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
@@ -84,17 +78,9 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     public StaffingLevelTemplateDTO updateStaffingLevelTemplte(StaffingLevelTemplateDTO staffingLevelTemplateDTO,
                                                            BigInteger staffingTemplateId) {
         logger.info("updating staffing level Template ID={}", staffingTemplateId);
-        Set<BigInteger> activityIds=new HashSet<>();
-        staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
-            staffingLevelInterval.getStaffingLevelActivities().forEach(staffingLevelActivity -> {
-                activityIds.add(staffingLevelActivity.getActivityId());
-            });
-        });
 
-
-        List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         //validating Activities
-        List<ActivityValidationError> errors= validateActivityRules(activities,staffingLevelTemplateDTO.getValidity().getStartDate(),staffingLevelTemplateDTO.getValidity().getEndDate(),staffingLevelTemplateDTO.getDayType());
+        List<ActivityValidationError> errors= validateActivityRules(staffingLevelTemplateDTO);
         if(!errors.isEmpty()){
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
@@ -142,28 +128,34 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         }
 
     /**
-     * @Auther Pavan Kumar
-     * @param activities
-     * @param startDate
-     * @param endDate
+     *
+     * @param staffingLevelTemplateDTO
+     * @return
      */
-    private List<ActivityValidationError> validateActivityRules(List<Activity> activities, LocalDate startDate, LocalDate endDate, List<Long> dayTypes){
+    private List<ActivityValidationError> validateActivityRules(StaffingLevelTemplateDTO staffingLevelTemplateDTO){
+        Set<BigInteger> activityIds=new HashSet<>();
+        staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+            staffingLevelInterval.getStaffingLevelActivities().forEach(staffingLevelActivity -> {
+                activityIds.add(staffingLevelActivity.getActivityId());
+            });
+        });
 
+        List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         List<ActivityValidationError> activityValidationErrors =new ArrayList<>();
         activities.forEach(activity -> {
                 List<String> errors=new ArrayList<>();
-                if(!Optional.ofNullable(endDate).isPresent()) {
+                if(!Optional.ofNullable(staffingLevelTemplateDTO.getValidity().getEndDate()).isPresent()) {
                     if (!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
-                            activity.getGeneralActivityTab().getEndDate().isBefore(startDate)) {
+                            activity.getGeneralActivityTab().getEndDate().isBefore(staffingLevelTemplateDTO.getValidity().getStartDate())) {
                         errors.add(exceptionService.getLanguageSpecificText("activity.out.of.range", activity.getName()));
                     }
                 }else {
                     if(Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
-                            (activity.getGeneralActivityTab().getEndDate().isBefore(startDate) ||
-                                    activity.getGeneralActivityTab().getStartDate().isAfter(endDate))){
+                            (activity.getGeneralActivityTab().getEndDate().isBefore(staffingLevelTemplateDTO.getValidity().getStartDate()) ||
+                                    activity.getGeneralActivityTab().getStartDate().isAfter(staffingLevelTemplateDTO.getValidity().getEndDate()))){
                         errors.add(exceptionService.getLanguageSpecificText("activity.out.of.range",activity.getName()));
                     } else if(!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
-                            activity.getGeneralActivityTab().getStartDate().isAfter(endDate)){
+                            activity.getGeneralActivityTab().getStartDate().isAfter(staffingLevelTemplateDTO.getValidity().getEndDate())){
                         errors.add(exceptionService.getLanguageSpecificText("activity.out.of.range",activity.getName()));
                     }
                 }
@@ -174,7 +166,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
                 if(activity.getRulesActivityTab().isEligibleForPresence()){
                     errors.add(exceptionService.getLanguageSpecificText("activity.not.presenceType",activity.getName()));
                 }
-                if(!CollectionUtils.containsAny(dayTypes,activity.getRulesActivityTab().getDayTypes())){
+                if(!CollectionUtils.containsAny(staffingLevelTemplateDTO.getDayType(),activity.getRulesActivityTab().getDayTypes())){
                     errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.dayType",activity.getName()));
                 }
 
