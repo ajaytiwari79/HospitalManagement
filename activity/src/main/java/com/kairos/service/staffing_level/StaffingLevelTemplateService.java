@@ -1,7 +1,6 @@
 package com.kairos.service.staffing_level;
 
 import com.kairos.activity.activity.ActivityValidationError;
-import com.kairos.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.staffing_level.StaffingLevelTemplateDTO;
 import com.kairos.enums.Day;
@@ -124,7 +123,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
 
         String day = localDate.getDayOfWeek().name();
         Day dayEnum = holidayDayType.isPresent() ? Day.EVERYDAY : Day.valueOf(day);
-        return staffingLevelTemplateRepository.findByUnitIdAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqualAndDayTypeInAndValidDaysIn(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+        return staffingLevelTemplateRepository.findByUnitIdDayTypeAndDate(unitId, proposedDate, proposedDate, dayTypeIds, Stream.of(dayEnum.toString()).collect(Collectors.toList()));
         }
 
     /**
