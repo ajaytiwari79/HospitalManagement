@@ -256,25 +256,23 @@ public class CounterDistService extends MongoBaseService {
 
     public void createDefaultStaffKPISetting(Long unitId, DefalutKPISettingDTO defalutKPISettingDTO) {
         List<ApplicableKPI> applicableKPISForUnit = counterRepository.getApplicableKPIByReferenceId(new ArrayList<>(),unitId, ConfLevel.UNIT);
-        if(applicableKPISForUnit.isEmpty()){
-            exceptionService.dataNotFoundByIdException("message.applicable.kpi.notfound");
-        }
+        List<ApplicableKPI> applicableKPIS = new ArrayList<>();
         List<BigInteger> applicableKpiIds = applicableKPISForUnit.stream().map(applicableKPI -> applicableKPI.getBaseKpiId()).collect(Collectors.toList());
+        if(!applicableKPISForUnit.isEmpty()){
+            applicableKpiIds.forEach(kpiId->{defalutKPISettingDTO.getStaffIds().forEach(staffId->{
+                applicableKPIS.add(new ApplicableKPI(kpiId,kpiId,null,unitId,staffId,ConfLevel.STAFF));
+            });
+            });
+        }
         List<TabKPIConf> tabKPIConfKPIEntries = new ArrayList<>();
         List<TabKPIConf> tabKPIConf = counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds, unitId, ConfLevel.UNIT);
-        if(tabKPIConf.isEmpty()){
-            exceptionService.dataNotFoundByIdException("message.tab.kpi.notfound");
-        }
-        defalutKPISettingDTO.getStaffIds().forEach(staffId -> {
-            tabKPIConf.stream().forEach(tabKPIConfKPI -> {
-                tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, null, staffId, ConfLevel.STAFF));
+        if(!tabKPIConf.isEmpty()){
+            defalutKPISettingDTO.getStaffIds().forEach(staffId -> {
+                tabKPIConf.stream().forEach(tabKPIConfKPI -> {
+                    tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, null, staffId, ConfLevel.STAFF));
+                });
             });
-        });
-        List<ApplicableKPI> applicableKPIS = new ArrayList<>();
-       applicableKpiIds.forEach(kpiId->{defalutKPISettingDTO.getStaffIds().forEach(staffId->{
-           applicableKPIS.add(new ApplicableKPI(kpiId,kpiId,null,unitId,staffId,ConfLevel.STAFF));
-       });
-       });
+        }
        if(!applicableKpiIds.isEmpty()) save(applicableKPIS);
        if(!tabKPIConfKPIEntries.isEmpty()) save(tabKPIConfKPIEntries);
     }
@@ -282,7 +280,7 @@ public class CounterDistService extends MongoBaseService {
     public void createDefaultKpiSetting(Long unitId, DefalutKPISettingDTO defalutKPISettingDTO) {
         List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(defalutKPISettingDTO.getOrgTypeIds(), new ArrayList<>(), unitId);
         if(orgTypeMappingDTOS.isEmpty()){
-                exceptionService.dataNotFoundByIdException("message.orgtype.kpi.notfound");
+               return;
         }
         List<BigInteger> applicableKpiIds = orgTypeMappingDTOS.stream().map(orgTypeMappingDTO -> orgTypeMappingDTO.getKpiId()).collect(Collectors.toList());
         if(Optional.ofNullable(defalutKPISettingDTO.getParentUnitId()).isPresent()) {
