@@ -8,6 +8,15 @@ import com.kairos.enums.AbsenceViewSettings;
 public class SelfRosteringViewDto {
     private AbsenceViewSettings absenceViewSettings;
 
+    public SelfRosteringViewDto() {
+        //Default Constructor
+    }
+
+    public SelfRosteringViewDto(AbsenceViewSettings absenceViewSettings) {
+        this.absenceViewSettings = absenceViewSettings;
+
+    }
+
     public AbsenceViewSettings getAbsenceViewSettings() {
         return absenceViewSettings;
     }
@@ -15,13 +24,6 @@ public class SelfRosteringViewDto {
     public void setAbsenceViewSettings(AbsenceViewSettings absenceViewSettings) {
         this.absenceViewSettings = absenceViewSettings;
     }
-    public SelfRosteringViewDto() {
 
-    }
-
-    public SelfRosteringViewDto(AbsenceViewSettings absenceViewSettings) {
-        this.absenceViewSettings = absenceViewSettings;
-
-    }
 
 }
