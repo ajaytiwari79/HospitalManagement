@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.staff.personal_details;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.Gender;
 import com.kairos.util.CPRUtil;
@@ -13,24 +14,25 @@ import java.time.Period;
  */
 @QueryResult
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffPersonalDetailDTO {
-    private long id;
+    private Long id;
     private String lastName;
-    private long employedSince;
+    private Long employedSince;
     private String badgeNumber;
     private String userName;
     private Long externalId;
     private String firstName;
-    private long organizationId;
-    private long visitourId;
+    private Long organizationId;
+    private Long visitourId;
     private String cprNumber;
     private String visitourTeamId;
-    private long roasteringTime;
-    private long freeDay;
-    private long mostOverStaffingHours;
-    private long mostUnderStaffingHours;
-    private long accumulatedTimeBank;
-    private long accumulatedPoints;
+    private Long roasteringTime;
+    private Long freeDay;
+    private Long mostOverStaffingHours;
+    private Long mostUnderStaffingHours;
+    private Long accumulatedTimeBank;
+    private Long accumulatedPoints;
     private String name;
     private String profilePic;
     protected Gender gender;
@@ -46,11 +48,11 @@ public class StaffPersonalDetailDTO {
         // default constructor
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -62,11 +64,11 @@ public class StaffPersonalDetailDTO {
         this.lastName = lastName;
     }
 
-    public long getEmployedSince() {
+    public Long getEmployedSince() {
         return employedSince;
     }
 
-    public void setEmployedSince(long employedSince) {
+    public void setEmployedSince(Long employedSince) {
         this.employedSince = employedSince;
     }
 
@@ -102,19 +104,19 @@ public class StaffPersonalDetailDTO {
         this.firstName = firstName;
     }
 
-    public long getOrganizationId() {
+    public Long getOrganizationId() {
         return organizationId;
     }
 
-    public void setOrganizationId(long organizationId) {
+    public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
     }
 
-    public long getVisitourId() {
+    public Long getVisitourId() {
         return visitourId;
     }
 
-    public void setVisitourId(long visitourId) {
+    public void setVisitourId(Long visitourId) {
         this.visitourId = visitourId;
     }
 
@@ -134,56 +136,56 @@ public class StaffPersonalDetailDTO {
         this.visitourTeamId = visitourTeamId;
     }
 
-    public long getRoasteringTime() {
+    public Long getRoasteringTime() {
         return roasteringTime;
     }
 
-    public void setRoasteringTime(long roasteringTime) {
+    public void setRoasteringTime(Long roasteringTime) {
         this.roasteringTime = roasteringTime;
     }
 
-    public long getFreeDay() {
+    public Long getFreeDay() {
         return freeDay;
     }
 
-    public void setFreeDay(long freeDay) {
+    public void setFreeDay(Long freeDay) {
         this.freeDay = freeDay;
     }
 
-    public long getMostOverStaffingHours() {
+    public Long getMostOverStaffingHours() {
         return mostOverStaffingHours;
     }
 
-    public void setMostOverStaffingHours(long mostOverStaffingHours) {
+    public void setMostOverStaffingHours(Long mostOverStaffingHours) {
         this.mostOverStaffingHours = mostOverStaffingHours;
     }
 
-    public long getMostUnderStaffingHours() {
+    public Long getMostUnderStaffingHours() {
         return mostUnderStaffingHours;
     }
 
-    public void setMostUnderStaffingHours(long mostUnderStaffingHours) {
+    public void setMostUnderStaffingHours(Long mostUnderStaffingHours) {
         this.mostUnderStaffingHours = mostUnderStaffingHours;
     }
 
-    public long getAccumulatedTimeBank() {
+    public Long getAccumulatedTimeBank() {
         return accumulatedTimeBank;
     }
 
-    public void setAccumulatedTimeBank(long accumulatedTimeBank) {
+    public void setAccumulatedTimeBank(Long accumulatedTimeBank) {
         this.accumulatedTimeBank = accumulatedTimeBank;
     }
 
-    public long getAccumulatedPoints() {
+    public Long getAccumulatedPoints() {
         return accumulatedPoints;
     }
 
-    public void setAccumulatedPoints(long accumulatedPoints) {
+    public void setAccumulatedPoints(Long accumulatedPoints) {
         this.accumulatedPoints = accumulatedPoints;
     }
 
     public String getName() {
-        return this.firstName + " " + this.lastName;
+        return name;
     }
 
     public void setName(String name) {
@@ -230,9 +232,8 @@ public class StaffPersonalDetailDTO {
         this.unitPosition = unitPosition;
     }
 
-    public Integer getAge() {
-        this.age=this.cprNumber!=null?Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears():null;
-        return age;
+    public void setAge(Integer age) {
+        this.age = age;
     }
 
     public String getPrivatePhone() {
@@ -241,10 +242,6 @@ public class StaffPersonalDetailDTO {
 
     public void setPrivatePhone(String privatePhone) {
         this.privatePhone = privatePhone;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
     }
 
     public LocalDate getDateOfBirth() {
@@ -262,4 +259,11 @@ public class StaffPersonalDetailDTO {
     public void setPregnant(Boolean pregnant) {
         this.pregnant = pregnant;
     }
+
+    public Integer getAge() {
+        this.age=this.cprNumber!=null?Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears():null;
+        return age;
+    }
+
+
 }

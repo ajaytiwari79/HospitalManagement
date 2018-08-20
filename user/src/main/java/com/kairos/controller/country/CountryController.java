@@ -20,10 +20,7 @@ import com.kairos.service.country.*;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.language.LanguageLevelService;
 import com.kairos.service.language.LanguageService;
-import com.kairos.service.organization.OrganizationService;
-import com.kairos.service.organization.OrganizationServiceService;
-import com.kairos.service.organization.OrganizationTypeService;
-import com.kairos.service.organization.TimeSlotService;
+import com.kairos.service.organization.*;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
@@ -125,6 +122,7 @@ public class CountryController {
     private AccessPageService accessPageService;
     @Inject
     private FunctionService functionService;
+    @Inject private CompanyCreationService companyCreationService;
 
     // Country
     @RequestMapping(value = "/country", method = RequestMethod.POST)
@@ -346,12 +344,11 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable Long organizationId,
                                                                         @PathVariable long countryId,
-                                                                        @RequestBody OrganizationRequestWrapper organizationRequestWrapper) {
+                                                                        @RequestBody OrganizationBasicDTO organizationRequestWrapper) {
         /*if (organization == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }*/
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, organizationService.
-                createParentOrganization(organizationRequestWrapper, countryId, organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, companyCreationService.createCompany(organizationRequestWrapper, countryId, organizationId));
     }
 
 

@@ -450,8 +450,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("match (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group)-[:" + HAS_TEAM + "]->(team:Team) where id(team)={0} return organization")
     Organization getOrganizationByTeamId(long groupId);
 
-    @Query("Match (organization:Organization) where id(organization)={0} with organization Match (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) with contactAddress \n" +
-            "Match (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) with zipCode,contactAddress \n" +
+    @Query("Match (organization:Organization) where id(organization)={0} with organization " +
+            "Optional Match (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) with contactAddress \n" +
+            "OPTIONAL Match (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) with zipCode,contactAddress \n" +
             "optional Match (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) with municipality,zipCode,contactAddress\n" +
             "return municipality as municipality,contactAddress as contactAddress,zipCode as zipCode")
     OrganizationContactAddress getContactAddressOfOrg(long unitId);
@@ -530,13 +531,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (country:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0}  return id(country) ")
     Long getCountryId(Long organizationId);
 
-    @Query("match(organization:Organization) where not exists (organization.phaseGenerated) OR organization.phaseGenerated=false\n" +
-            "return id(organization)")
-    List<Long> getAllOrganizationWithoutPhases();
-
-    @Query("match(organization:Organization) where Id(organization) IN {0}\n" +
-            "set organization.phaseGenerated=true")
-    void updateOrganizationWithoutPhases(List<Long> organizationIds);
 
 
     @Query("MATCH (organization:Organization) - [:" + BELONGS_TO + "] -> (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
@@ -670,5 +664,14 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "return org.kairosId  ORDER BY org.kairosId DESC LIMIT 1")
     String getKairosId();
 
+
+    @Query("MATCH (org:Organization) where id(org)={0} \n" +
+            "OPTIONAL Match (org)-[:"+HAS_COMPANY_CATEGORY+"]->(companyCategory:CompanyCategory) with companyCategory, org\n"+
+            "OPTIONAL Match (org)-[:"+HAS_ACCOUNT_TYPE+"]->(accountType:AccountType) with companyCategory,accountType, org\n"+
+            "OPTIONAL MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) with collect(id(businessType)) as businessTypes,org,companyCategory\n" +
+            "return id(org) as id,org.kairosId as kairosId,companyCategory as companyCategory,businessTypes as businessTypes,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,org.desiredUrl as desiredUrl," +
+            "org.shortCompanyName as shortCompanyName,org.kairosCompanyId as kairosCompanyId,org.companyType as companyType,org.vatId as vatId," +
+            "org.companyUnitType as companyUnitType")
+    OrganizationBasicResponse getOrganizationDetailsById(Long organizationId);
 
 }

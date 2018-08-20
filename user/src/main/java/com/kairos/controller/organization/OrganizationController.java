@@ -74,7 +74,7 @@ public class OrganizationController {
 
     @Inject
     private OrganizationService organizationService;
-
+    @Inject private CompanyCreationService companyCreationService;
     @Inject
     private SkillCategoryService skillCategoryService;
     @Inject
@@ -191,7 +191,7 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addOrganization(@Validated @RequestBody OrganizationBasicDTO organizationBasicDTO, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.createNewUnit(organizationBasicDTO, unitId,false,false));
+                companyCreationService.addNewUnit(organizationBasicDTO, unitId));
     }
 
 

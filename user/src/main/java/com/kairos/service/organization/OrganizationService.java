@@ -533,7 +533,7 @@ public class OrganizationService {
 
 
         // Verify Address here
-        AddressDTO addressDTO = orgDetails.getContactAddress();
+        AddressDTO addressDTO = orgDetails.getAddressDTO();
         ZipCode zipCode;
         addressDTO.setVerifiedByGoogleMap(true);
         if (addressDTO.isVerifiedByGoogleMap()) {
@@ -588,7 +588,8 @@ public class OrganizationService {
         organization.setContactAddress(contactAddress);
         organization.setOrganizationType(organizationType.get());
         organization.setOrganizationSubTypes(organizationSubTypes);
-        organization.setBusinessTypes(businessTypes);
+        //TODO FIX VIPUL CURENT
+        organization.setBusinessTypes(null);
 
         CompanyCategory companyCategory = companyCategoryGraphRepository.findOne(orgDetails.getCompanyCategoryId(), 0);
         if (!Optional.ofNullable(companyCategory).isPresent()) {
@@ -598,11 +599,11 @@ public class OrganizationService {
 
         organization.setDesiredUrl(orgDetails.getDesiredUrl().trim());
         organization.setShortCompanyName(orgDetails.getShortCompanyName());
-        organization.setKairosCompanyId(orgDetails.getKairosCompanyId());
+
         organization.setCompanyCategory(companyCategory);
         organization.setCompanyType(orgDetails.getCompanyType());
         organization.setVatId(orgDetails.getVatId());
-        organization.setBoardingCompleted(orgDetails.isBoardingCompleted());
+        organization.setBoardingCompleted(true);
 
         return organization;
     }
@@ -963,7 +964,7 @@ public class OrganizationService {
             response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         }
 
-        Map<String, Object> organizationTypes = organizationTypeGraphRepository.getOrganizationTypesForUnit(unitId);
+        OrganizationTypeAndSubType organizationTypes = organizationTypeGraphRepository.getOrganizationTypesForUnit(unitId);
 
         List<BusinessType> businessTypes = businessTypeGraphRepository.findBusinesTypesByCountry(countryId);
         response.put("organizationTypes", organizationTypes);
@@ -1292,9 +1293,6 @@ public class OrganizationService {
         return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }
 
-    public List<Long> getAllOrganizationWithoutPhases() {
-        return organizationGraphRepository.getAllOrganizationWithoutPhases();
-    }
 
     public Long getOrganization(Long id, String type) {
         Organization organization = null;
@@ -1340,11 +1338,6 @@ public class OrganizationService {
 
         }
         return organization;
-    }
-
-    public void updateOrganizationWithoutPhases(List<Long> organizationIds) {
-
-        organizationGraphRepository.updateOrganizationWithoutPhases(organizationIds);
     }
 
 

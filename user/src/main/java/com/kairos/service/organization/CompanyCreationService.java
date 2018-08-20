@@ -13,6 +13,7 @@ import com.kairos.persistence.model.country.default_data.account_type.AccountTyp
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -36,6 +37,7 @@ import com.kairos.user.organization.CompanyType;
 import com.kairos.user.organization.OrganizationBasicDTO;
 import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
+import com.kairos.util.FormatUtil;
 import com.kairos.util.user_context.UserContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
@@ -99,15 +101,7 @@ public class CompanyCreationService {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
-
-        CompanyValidationQueryResult orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrlOrUrl("(?i)" + orgDetails.getDesiredUrl(), "(?i)" + orgDetails.getName(), orgDetails.getName().substring(0, 3));
-
-        if (orgExistWithUrl.getName()) {
-            exceptionService.invalidRequestException("error.Organization.name.duplicate", orgDetails.getName());
-        }
-        if (orgDetails.getDesiredUrl() != null && orgExistWithUrl.getDesiredUrl()) {
-            exceptionService.invalidRequestException("error.Organization.desiredUrl.duplicate", orgDetails.getDesiredUrl());
-        }
+        CompanyValidationQueryResult orgExistWithUrl = validateNameAndDesiredUrlOfOrganization(orgDetails);
 
         String kairosId;
         if (orgExistWithUrl.getKairosId() == null) {
@@ -147,6 +141,22 @@ public class CompanyCreationService {
         return orgDetails;
     }
 
+    private CompanyValidationQueryResult validateNameAndDesiredUrlOfOrganization(OrganizationBasicDTO orgDetails) {
+        CompanyValidationQueryResult orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrlOrUrl("(?i)" + orgDetails.getDesiredUrl(), "(?i)" + orgDetails.getName(), orgDetails.getName().substring(0, 3));
+        if (orgExistWithUrl.getName()) {
+            exceptionService.invalidRequestException("error.Organization.name.duplicate", orgDetails.getName());
+        }
+        if (orgDetails.getDesiredUrl() != null && orgExistWithUrl.getDesiredUrl()) {
+            exceptionService.invalidRequestException("error.Organization.desiredUrl.duplicate", orgDetails.getDesiredUrl());
+        }
+        return orgExistWithUrl;
+    }
+
+    public OrganizationBasicResponse getOrganizationDetailsById(Long unitId) {
+            return organizationGraphRepository.getOrganizationDetailsById(unitId);
+
+    }
+
     public AddressDTO setAddressInCompany(Long unitId, AddressDTO addressDTO) {
         ContactAddress contactAddress;
         if (addressDTO.getId() != null) {
@@ -167,15 +177,15 @@ public class CompanyCreationService {
         return addressDTO;
     }
 
-    public ContactAddress getAddressOfCompany(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
-        }
-        return organization.getContactAddress();
+    public HashMap<String, Object>  getAddressOfCompany(Long unitId) {
+        HashMap<String, Object> orgBasicData = new HashMap<>();
+        OrganizationContactAddress organizationContactAddress= organizationGraphRepository.getContactAddressOfOrg(unitId);
+        orgBasicData.put("address",organizationContactAddress);
+        orgBasicData.put("municipalities", (organizationContactAddress.getZipCode() == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(organizationContactAddress.getZipCode().getId())));
+        return orgBasicData;
     }
 
-    public UnitManagerDTO setUserInfoInOrganization(Long unitId, Organization organization ,UnitManagerDTO unitManagerDTO) {
+    public UnitManagerDTO setUserInfoInOrganization(Long unitId, Organization organization, UnitManagerDTO unitManagerDTO) {
         if (organization == null)
             organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
@@ -221,7 +231,7 @@ public class CompanyCreationService {
 
     }
 
-    Map<String, Object> getOrganizationTypeAndSubTypeByUnitId(Long unitId) {
+    public OrganizationTypeAndSubType getOrganizationTypeAndSubTypeByUnitId(Long unitId) {
         return organizationTypeGraphRepository.getOrganizationTypesForUnit(unitId);
     }
 
@@ -245,7 +255,7 @@ public class CompanyCreationService {
         setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO);
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getAddressDTO());
-        setUserInfoInOrganization(null,unit, organizationBasicDTO.getUnitManagerDTO());
+        setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManagerDTO());
         //Assign Parent Organization's level to unit
         unit.setLevel(parentOrganization.getLevel());
         organizationGraphRepository.save(unit);
