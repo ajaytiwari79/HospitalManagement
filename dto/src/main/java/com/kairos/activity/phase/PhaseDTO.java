@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -32,6 +33,7 @@ public class PhaseDTO {
     private List<String> status;
     private String color;
     private PhaseDefaultName phaseEnum;
+    private LocalTime flippingDefalutTime;
 
     public Long getOrganizationId() {
         return organizationId;
@@ -168,5 +170,13 @@ public class PhaseDTO {
 
     public void setPhaseEnum(PhaseDefaultName phaseEnum) {
         this.phaseEnum = phaseEnum;
+    }
+
+    public LocalTime getFlippingDefalutTime() {
+        return flippingDefalutTime;
+    }
+
+    public void setFlippingDefalutTime(LocalTime flippingDefalutTime) {
+        this.flippingDefalutTime = flippingDefalutTime;
     }
 }

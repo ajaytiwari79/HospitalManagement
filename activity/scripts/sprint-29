@@ -57,11 +57,11 @@ db.getCollection('tableSetting').remove({"tableConfigurations.tableId":{$in:["36
 
 //set phaseEnum in phase table
 
-db.getCollection('phases').updateMany({"name":"REQUEST"},{$set:{"phaseEnum":"REQUEST"}})
-db.getCollection('phases').updateMany({"name":"PUZZLE"},{$set:{"phaseEnum":"PUZZLE"}})
-db.getCollection('phases').updateMany({"name":"CONSTRUCTION"},{$set:{"phaseEnum":"CONSTRUCTION"}})
-db.getCollection('phases').updateMany({"name":"DRAFT"},{$set:{"phaseEnum":"DRAFT"}})
-db.getCollection('phases').updateMany({"name":"REALTIME"},{$set:{"phaseEnum":"REALTIME"}})
-db.getCollection('phases').updateMany({"name":"TIME & ATTENDANCE"},{$set:{"phaseEnum":"TIME_ATTENDANCE"}})
-db.getCollection('phases').updateMany({"name":"TENTATIVE"},{$set:{"phaseEnum":"TENTATIVE"}})
-db.getCollection('phases').updateMany({"name":"PAYROLL"},{$set:{"phaseEnum":"PAYROLL"}})
+db.getCollection('phases').updateMany({"name":"REQUEST"},{$set:{"phaseEnum":"REQUEST","flippingDefalutTime":"23:59:59"}})
+db.getCollection('phases').updateMany({"name":"PUZZLE"},{$set:{"phaseEnum":"PUZZLE","flippingDefalutTime":"23:59:59"}})
+db.getCollection('phases').updateMany({"name":"CONSTRUCTION"},{$set:{"phaseEnum":"CONSTRUCTION","flippingDefalutTime":"23:59:59"}})
+db.getCollection('phases').updateMany({"name":"DRAFT"},{$set:{"phaseEnum":"DRAFT","flippingDefalutTime":"23:59:59"}})
+db.getCollection('phases').updateMany({"name":"REALTIME"},{$set:{"phaseEnum":"REALTIME","flippingDefalutTime":"23:59:59"}})
+db.getCollection('phases').updateMany({"name":"TIME & ATTENDANCE"},{$set:{"phaseEnum":"TIME_ATTENDANCE","flippingDefalutTime":"23:59:59"}})
+db.getCollection('phases').updateMany({"name":"TENTATIVE"},{$set:{"phaseEnum":"TENTATIVE","flippingDefalutTime":"23:59:59"}})
+db.getCollection('phases').updateMany({"name":"PAYROLL"},{$set:{"phaseEnum":"PAYROLL","flippingDefalutTime":"23:59:59"}})

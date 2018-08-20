@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -35,10 +36,11 @@ public class Phase extends MongoBaseEntity {
     private List<ShiftStatus> status;
     private String color;
     private PhaseDefaultName phaseEnum;
+    private LocalTime flippingDefalutTime;
     public Phase() {
         //default constructor
     }
-    public Phase(String name, String description, PhaseDefaultName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status, String color) {
+    public Phase(String name, String description, PhaseDefaultName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status, String color,LocalTime flippingDefalutTime) {
         this.name = name;
         this.description = description;
         this.phaseEnum=phaseEnum;
@@ -51,6 +53,7 @@ public class Phase extends MongoBaseEntity {
         this.phaseType = phaseType;
         this.status = ShiftStatus.getListByValue(status);
         this.color=color;
+        this.flippingDefalutTime=flippingDefalutTime;
     }
 
     public Long getOrganizationId() {
@@ -147,6 +150,14 @@ public class Phase extends MongoBaseEntity {
 
     public void setPhaseEnum(PhaseDefaultName phaseEnum) {
         this.phaseEnum = phaseEnum;
+    }
+
+    public LocalTime getFlippingDefalutTime() {
+        return flippingDefalutTime;
+    }
+
+    public void setFlippingDefalutTime(LocalTime flippingDefalutTime) {
+        this.flippingDefalutTime = flippingDefalutTime;
     }
 
     @Override
