@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.List;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstants.OPEN_SHIFT_URL;
 
 
 @RestController
@@ -87,7 +86,7 @@ public class OpenShiftController {
     @RequestMapping(value = "open_shift/automatic_openshift_genration", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> automaticOpenShiftGenration(@PathVariable Long unitId) {
-        automaticOpenShiftGenerationService.findUnderStaffingByActivityIdAndDate(unitId);
+        automaticOpenShiftGenerationService.findUnderStaffingOverStaffingByActivityIdAndDate(unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 }
