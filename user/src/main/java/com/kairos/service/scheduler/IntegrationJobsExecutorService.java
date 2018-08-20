@@ -8,7 +8,7 @@ import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.util.DateUtils;
-import com.kairos.util.timeCareShift.Transstatus;
+import com.kairos.util.external_plateform_shift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -58,8 +58,8 @@ public class IntegrationJobsExecutorService {
                 getCarteServerHost()+KETTLE_TRANS_STATUS;
         //   String startDate = DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy-MM-dd");
         //     String endDate = DateFormatUtils.format(DateUtil.addWeeksInDate(DateUtil.getCurrentDate(), 5), "yyyy-MM-dd");
-        //  String startDate = DateFormatUtils.format(controlPanel.getStartDateMillis(), "yyyy-MM-dd");
-        //  String endDate = DateFormatUtils.format(controlPanel.getEndDateMillis(), "yyyy-MM-dd");
+        //  String startDate = DateFormatUtils.format(controlPanel.getStartDate(), "yyyy-MM-dd");
+        //  String endDate = DateFormatUtils.format(controlPanel.getEndDate(), "yyyy-MM-dd");
         Long workplaceId = Long.valueOf(String.valueOf("15"));
         if(job.getUnitId() != null){
             Organization organization = organizationGraphRepository.findOne(job.getUnitId());

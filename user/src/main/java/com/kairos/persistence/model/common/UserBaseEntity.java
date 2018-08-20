@@ -3,6 +3,8 @@ package com.kairos.persistence.model.common;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.neo4j.ogm.annotation.GraphId;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
 
@@ -19,8 +21,10 @@ public abstract class UserBaseEntity implements Serializable {
     @JsonIgnore
     protected boolean deleted;
     @JsonIgnore
+    @CreatedDate
     private Long creationDate;
     @JsonIgnore
+    @LastModifiedDate
     private Long lastModificationDate;
     public void setId(Long id) {
         this.id = id;

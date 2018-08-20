@@ -1,14 +1,12 @@
 package com.kairos.persistence.model.counter;
 
-import com.kairos.ApplicableFor;
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.activity.counter.FilterCriteria;
-import com.kairos.enums.CounterType;
+import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -20,33 +18,26 @@ public class Counter extends MongoBaseEntity {
     private CounterType type;
     private String title;
     private boolean treatAsCounter;
-    private BigInteger primaryCounter;
+    private BigInteger primaryCounter; //to directly identify the base counters child
+    private BigInteger parentCounter;  //to identify parent counter
     private BigInteger categoryId;
     private List<FilterCriteria> criteriaList;
-    private Set<ApplicableFor> applicableFor=Collections.singleton(ApplicableFor.OPEN_SHIFT);
+    private Set<ModuleType> supportedModuleTypes;
 
     public Counter() {
-        //Default Constructor
     }
 
-    public Counter(CounterType type){
+    public Counter(CounterType type) {
         this.type = type;
     }
 
-    public Counter(String title, CounterType type, boolean treatAsCounter, BigInteger primaryCounter){
+    public Counter(String title, CounterType type, boolean treatAsCounter, BigInteger primaryCounter) {
         this.treatAsCounter = treatAsCounter;
         this.primaryCounter = primaryCounter;
         this.type = type;
         this.title = title;
     }
 
-    public Counter(String title, CounterType type,boolean treatAsCounter, BigInteger primaryCounter, Set<ApplicableFor> applicableFor) {
-        this.type = type;
-        this.title = title;
-        this.treatAsCounter = treatAsCounter;
-        this.primaryCounter = primaryCounter;
-        this.applicableFor = applicableFor;
-    }
 
     public Counter(CounterType restingHoursPerPresenceDay, List<FilterCriteria> criteriaList) {
         super();
@@ -100,11 +91,19 @@ public class Counter extends MongoBaseEntity {
         this.categoryId = categoryId;
     }
 
-    public Set<ApplicableFor> getApplicableFor() {
-        return applicableFor;
+    public Set<ModuleType> getSupportedModuleTypes() {
+        return supportedModuleTypes;
     }
 
-    public void setApplicableFor(Set<ApplicableFor> applicableFor) {
-        this.applicableFor = applicableFor;
+    public void setSupportedModuleTypes(Set<ModuleType> supportedModuleTypes) {
+        this.supportedModuleTypes = supportedModuleTypes;
+    }
+
+    public BigInteger getParentCounter() {
+        return parentCounter;
+    }
+
+    public void setParentCounter(BigInteger parentCounter) {
+        this.parentCounter = parentCounter;
     }
 }

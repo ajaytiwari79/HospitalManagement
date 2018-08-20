@@ -3,7 +3,6 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.LocationType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.LocationTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class LocationTypeService extends UserBaseService {
+public class LocationTypeService{
 
     @Inject
     private LocationTypeGraphRepository locationTypeGraphRepository;
@@ -29,7 +28,7 @@ public class LocationTypeService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             locationType.setCountry(country);
-             save(locationType);
+            locationTypeGraphRepository.save(locationType);
             return  locationType.retrieveDetails();
         }
         return null;
@@ -53,7 +52,7 @@ public class LocationTypeService extends UserBaseService {
         if (currentLocationType!=null){
             currentLocationType.setName(locationType.getName());
             currentLocationType.setDescription(locationType.getDescription());
-            save(currentLocationType);
+            locationTypeGraphRepository.save(currentLocationType);
             return currentLocationType.retrieveDetails();
         }
         return null;
@@ -63,7 +62,7 @@ public class LocationTypeService extends UserBaseService {
         LocationType locationType = locationTypeGraphRepository.findOne(locationTypeId);
         if (locationType!=null){
             locationType.setEnabled(false);
-            save(locationType);
+            locationTypeGraphRepository.save(locationType);
             return true;
         }
         return false;

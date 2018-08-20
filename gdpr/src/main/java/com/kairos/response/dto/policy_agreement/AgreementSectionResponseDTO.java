@@ -14,12 +14,14 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgreementSectionResponseDTO {
 
-    BigInteger id;
+    private BigInteger id;
 
     @NotBlank
     private String title;
 
     private List<ClauseBasicResponseDTO> clauses;
+
+    private List<AgreementSectionResponseDTO> subSections;
 
     public BigInteger getId() {
         return id;
@@ -28,6 +30,10 @@ public class AgreementSectionResponseDTO {
     public void setId(BigInteger id) {
         this.id = id;
     }
+
+    public List<AgreementSectionResponseDTO> getSubSections() { return subSections; }
+
+    public void setSubSections(List<AgreementSectionResponseDTO> subSections) { this.subSections = subSections; }
 
     public List<ClauseBasicResponseDTO> getClauses() {
         return clauses;

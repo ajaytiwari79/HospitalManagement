@@ -4,6 +4,7 @@ import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.access_permission.Tab;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.persistence.model.access_permission.AccessPageLanguageDTO;
+import com.kairos.service.auth.UserService;
 import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.user.access_permission.AccessPageStatusDTO;
 import com.kairos.util.response.ResponseHandler;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by prabjot on 3/1/17.
@@ -31,6 +33,8 @@ public class AccessPageController {
     @Inject
     private AccessPageService accessPageService;
 
+    @Inject
+    private UserService userService;
     @RequestMapping(value="/tab", method = RequestMethod.POST)
     public ResponseEntity<Map<String,Object>> createAccessPage(@Valid @RequestBody AccessPageDTO accessPageDTO){
         return ResponseHandler.generateResponse(HttpStatus.CREATED,true,accessPageService.createAccessPage(accessPageDTO));
@@ -47,6 +51,10 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getMainTabs(countryId));
     }
 
+    @RequestMapping(value=UNIT_URL+"/tab",method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getMainTabsForUnit(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getMainTabsForUnit(unitId));
+    }
     @RequestMapping(value = "/country/{countryId}/tab/{tabId}/tabs",method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getChildTabs(@PathVariable Long tabId, @PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getChildTabs(tabId, countryId));
@@ -77,8 +85,8 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
     }
 
-    @GetMapping(value = "/country/{countryId}/module/{moduleId}/kpi_details")
-    public ResponseEntity<Map<String, Object>> getKPITabsDataForCountry(@PathVariable String moduleId){
+    @GetMapping(value = "/module/{moduleId}/kpi_details")
+    public ResponseEntity<Map<String, Object>> getKPITabsDataForModule(@PathVariable String moduleId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getKPIAccessPageList(moduleId));
     }
 

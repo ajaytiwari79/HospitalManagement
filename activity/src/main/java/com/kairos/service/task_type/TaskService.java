@@ -2,6 +2,7 @@ package com.kairos.service.task_type;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
 import com.kairos.activity.task.AbsencePlanningStatus;
 import com.kairos.activity.task.TaskDTO;
@@ -21,6 +22,7 @@ import com.kairos.persistence.model.task_type.AddressCode;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.model.task_type.TaskTypeDefination;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionMongoRepositoryImpl;
@@ -52,10 +54,10 @@ import com.kairos.user.patient.PatientResourceList;
 import com.kairos.user.staff.*;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.util.*;
-import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResponse;
-import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResponse;
+import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.time_bank.TimeBankCalculationService;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import com.kairos.vrp.task.VRPTaskDTO;
 import com.kairos.wrapper.EscalatedTasksWrapper;
 import com.kairos.wrapper.TaskWrapper;
@@ -143,25 +145,25 @@ public class TaskService extends MongoBaseService {
     private TaskMongoRepositoryImpl taskMongoRepositoryImpl;
     @Inject
     private ClientExceptionMongoRepositoryImpl clientExceptionRepositoryImpl;
-    @Autowired
-    CountryRestClient countryRestClient;
-    @Autowired
-    IntegrationRestClient integrationServiceRestClient;
-    @Autowired
-    EnvConfig envConfig;
-    @Autowired
-    TasksMergingService tasksMergingService;
+    @Inject
+    private CountryRestClient countryRestClient;
+    @Inject
+    private IntegrationRestClient integrationServiceRestClient;
+    @Inject
+    private EnvConfig envConfig;
+    @Inject
+    private TasksMergingService tasksMergingService;
 
-    @Autowired
-    ControlPanelRestClient controlPanelRestClient;
-    @Autowired
-    OrganizationRestClient organizationRestClient;
-    @Autowired
-    TimeCareRestClient timeCareRestClient;
     @Inject
-    ClientExceptionMongoRepository clientExceptionMongoRepository;
+    private ControlPanelRestClient controlPanelRestClient;
     @Inject
-    StaffRestClient staffRestClient;
+    private OrganizationRestClient organizationRestClient;
+    @Inject
+    private TimeCareRestClient timeCareRestClient;
+    @Inject
+    private ClientExceptionMongoRepository clientExceptionMongoRepository;
+    @Inject
+    private StaffRestClient staffRestClient;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
@@ -173,8 +175,9 @@ public class TaskService extends MongoBaseService {
     private PayOutService payOutService;
     @Inject
     private PayOutCalculationService payOutCalculationService;
-    @Autowired
+    @Inject
     private ExceptionService exceptionService;
+    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
 
     public List<Long> getClientTaskServices(Long clientId, long orgId) {
         logger.info("Fetching tasks for ClientId: " + clientId);
@@ -704,6 +707,8 @@ public class TaskService extends MongoBaseService {
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(staffAdditionalInfoDTO.getUnitPosition().getCostTimeAgreementId());
+        staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
         Map<String,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getExternalId(),v->v));
         for (GetWorkShiftsFromWorkPlaceByIdResult timeCareShift : timeCareShiftsByPagination) {

@@ -34,8 +34,8 @@ import com.kairos.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.user.organization.*;
 import com.kairos.user.staff.client.ClientFilterDTO;
 import com.kairos.util.response.ResponseHandler;
-import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.util.user_context.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
@@ -1425,5 +1426,22 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getPreferedTimeWindow(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 vrpClientService.getPreferedTimeWindow(unitId));
+    }
+
+
+    @ApiOperation(value = "get Cta basic info")
+    @GetMapping(value = COUNTRY_URL+"/cta_basic_info")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCTABasicDetailInfo(@PathVariable Long countryId,@RequestParam(required = false) Long expertiseId,@RequestParam(required = false) Long organizationSubTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getCTABasicDetailInfo(expertiseId,organizationSubTypeId,countryId));
+    }
+
+    @ApiOperation(value = "get organization ids by orgSubType ids")
+    @GetMapping(value = "/orgtype/{orgTypeId}/get_organization_ids")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationIdsBySubOrgTypeId(@PathVariable Long orgTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationIdsBySubOrgTypeId(orgTypeId));
     }
 }

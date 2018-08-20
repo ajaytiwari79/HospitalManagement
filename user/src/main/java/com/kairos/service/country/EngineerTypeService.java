@@ -1,9 +1,9 @@
 package com.kairos.service.country;
+
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.EngineerType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +16,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class EngineerTypeService extends UserBaseService {
+public class EngineerTypeService{
 
     @Inject
     private EngineerTypeGraphRepository engineerTypeGraphRepository;
@@ -28,7 +28,7 @@ public class EngineerTypeService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             engineerType.setCountry(country);
-            save(engineerType);
+            engineerTypeGraphRepository.save(engineerType);
            return engineerType.retrieveDetails();
         }
         return null;
@@ -54,7 +54,7 @@ public class EngineerTypeService extends UserBaseService {
         EngineerType engineerType = engineerTypeGraphRepository.findOne(engineerTypeId);
         if (engineerType!=null){
             engineerType.setEnabled(false);
-            save(engineerType);
+            engineerTypeGraphRepository.save(engineerType);
             return true;
         }
         return false;

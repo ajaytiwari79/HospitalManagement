@@ -1,9 +1,9 @@
 package com.kairos.service.client;
 
 import com.kairos.persistence.model.client.Client;
-import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.region.Municipality;
@@ -16,7 +16,6 @@ import com.kairos.persistence.repository.user.country.CitizenStatusGraphReposito
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.region.RegionService;
 import com.kairos.user.organization.AddressDTO;
@@ -41,7 +40,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_S
  */
 @Service
 @Transactional
-public class ExternalClientService extends UserBaseService {
+public class ExternalClientService {
 
     @Inject
     private ClientService clientService;
@@ -126,7 +125,7 @@ public class ExternalClientService extends UserBaseService {
 
         detail = contactDetailsGraphRepository.save(detail);
         nextToKin.setContactDetail(detail);
-        save(nextToKin);
+         clientGraphRepository.save(nextToKin);
         Long homeAddressId = null;
         if (nextToKin.getHomeAddress() != null) homeAddressId = nextToKin.getHomeAddress().getId();
 
@@ -134,7 +133,7 @@ public class ExternalClientService extends UserBaseService {
             saveContactAddressFromKmd(patientRelative.getRelatedPatient().getCurrentAddress(), nextToKin.getId(), HAS_HOME_ADDRESS, unitId, homeAddressId);
 
  //       client.setNextToKin(nextToKin);
-        save(client);
+        clientGraphRepository.save(client);
         logger.info("nexttokin-----------> " + nextToKin.getId());
 
     }
@@ -164,7 +163,7 @@ public class ExternalClientService extends UserBaseService {
             logger.debug("Creating new Address");
             contactAddress = new ContactAddress();
         }
-        Client currentClient = (Client) findOne(clientId);
+        Client currentClient = (Client) clientGraphRepository.findOne(clientId);
 
 
         logger.debug("Sending address to verify from TOM TOM server");
@@ -293,7 +292,7 @@ public class ExternalClientService extends UserBaseService {
             }
 
             client = clientService.generateAgeAndGenderFromCPR(client);
-*/            save(client);
+*/           clientGraphRepository.save(client);
             int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
             if (count == 0) {
                 logger.debug("Creating Existing Client relationship from KMD : " + client.getId());
@@ -305,7 +304,7 @@ public class ExternalClientService extends UserBaseService {
             if (citizenStatus != null) {
                 client.setCivilianStatus(citizenStatusGraphRepository.findOne(citizenStatus.getId()));
             }
-            save(client);
+            clientGraphRepository.save(client);
             return client;
 
         }

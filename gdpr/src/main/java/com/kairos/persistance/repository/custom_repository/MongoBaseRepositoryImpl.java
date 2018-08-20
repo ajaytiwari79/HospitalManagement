@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
 import org.springframework.util.Assert;
+
 import java.io.Serializable;
 
 
@@ -19,9 +20,8 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 
     private final Logger LOGGER = LoggerFactory.getLogger(MongoBaseRepositoryImpl.class);
     private final MongoSequenceRepository mongoSequenceRepository;
-
-    private final MongoOperations mongoOperations;
     private final MongoEntityInformation<T, ID> entityInformation;
+    private final MongoOperations mongoOperations;
 
     public MongoBaseRepositoryImpl(MongoEntityInformation<T, ID> entityInformation,
                                    MongoOperations mongoOperations) throws Exception {
@@ -50,7 +50,6 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
         if (entity.getCreatedAt() == null) {
             entity.setCreatedAt(DateUtils.getDate());
         }
-
         // Set updatedAt time as current time
         entity.setUpdatedAt(DateUtils.getDate());
         mongoOperations.save(entity);

@@ -6,7 +6,6 @@ import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.organization.OrganizationTypeDTO;
 import com.kairos.util.DateUtil;
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
  */
 @Transactional
 @Service
-public class OrganizationTypeService extends UserBaseService {
+public class OrganizationTypeService{
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject
     OrganizationTypeGraphRepository organizationTypeGraphRepository;
@@ -55,7 +54,7 @@ public class OrganizationTypeService extends UserBaseService {
         List<Level> levels = countryGraphRepository.getLevelsByIdsIn(countryId, organizationTypeDTO.getLevels());
 
         OrganizationType organizationType = new OrganizationType(organizationTypeDTO.getName(), country, levels);
-        return prepareResponse(save(organizationType));
+        return prepareResponse(organizationTypeGraphRepository.save(organizationType));
     }
 
 
@@ -77,7 +76,7 @@ public class OrganizationTypeService extends UserBaseService {
         OrganizationType organizationType = organizationTypeGraphRepository.findOne(organizationTypeId);
         if (organizationType != null) {
             organizationType.setEnable(false);
-            save(organizationType);
+            organizationTypeGraphRepository.save(organizationType);
             return true;
         }
         return false;
@@ -104,7 +103,7 @@ public class OrganizationTypeService extends UserBaseService {
             orgTypeToUpdate.setLevels(levels);
         }
         orgTypeToUpdate.setName(updateOrganizationTypeDTO.getName().trim());
-        return prepareResponse(save(orgTypeToUpdate));
+        return prepareResponse(organizationTypeGraphRepository.save(orgTypeToUpdate));
     }
 
     private OrganizationType prepareResponse(OrganizationType organizationType) {

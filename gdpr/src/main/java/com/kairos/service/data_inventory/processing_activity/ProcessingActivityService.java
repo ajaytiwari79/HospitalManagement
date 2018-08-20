@@ -3,8 +3,11 @@ package com.kairos.service.data_inventory.processing_activity;
 
 import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
+import com.kairos.response.dto.data_inventory.AssetResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -14,6 +17,8 @@ import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
+
+import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -54,48 +59,25 @@ public class ProcessingActivityService extends MongoBaseService {
     @Inject
     private JaversCommonService javersCommonService;
 
+    @Inject
+    private AssetMongoRepository assetMongoRepository;
+
 
     public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
 
         ProcessingActivity exist = processingActivityMongoRepository.findByName(organizationId, processingActivityDTO.getName());
         if (Optional.ofNullable(exist).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", " Processing Activity ", processingActivityDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
         ProcessingActivity processingActivity = buildProcessingActivity(organizationId, processingActivityDTO);
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
             processingActivity.setSubProcessingActivities(createSubProcessingActivity(organizationId, processingActivityDTO.getSubProcessingActivities()));
         }
-         processingActivityMongoRepository.save(processingActivity);
-         processingActivityDTO.setId(processingActivity.getId());
-         return processingActivityDTO;
+        processingActivityMongoRepository.save(processingActivity);
+        processingActivityDTO.setId(processingActivity.getId());
+        return processingActivityDTO;
     }
-
-
-    public Boolean deleteProcessingActivity(Long organizationId, BigInteger id) {
-        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(organizationId, id);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", id);
-        }
-        delete(processingActivity);
-        return true;
-
-    }
-
-
-    public ProcessingActivityResponseDTO getProcessingActivityWithMetaDataById(Long orgId, BigInteger id) {
-        ProcessingActivityResponseDTO processingActivity = processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", id);
-        }
-        return processingActivity;
-    }
-
-
-    public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long orgId) {
-        return processingActivityMongoRepository.getAllProcessingActivityAndMetaData(orgId);
-    }
-
 
 
     public ProcessingActivityDTO updateProcessingActivity(Long organizationId, BigInteger id, ProcessingActivityDTO processingActivityDTO) {
@@ -103,11 +85,11 @@ public class ProcessingActivityService extends MongoBaseService {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByName(organizationId, processingActivityDTO.getName());
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", " Processing Activity ", processingActivityDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
         processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(organizationId, id);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Processing Activity ", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", id);
         }
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
             processingActivity.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(organizationId, processingActivityDTO.getSubProcessingActivities()));
@@ -121,7 +103,7 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivity.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
         processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
-         processingActivityMongoRepository.save(processingActivity);
+        processingActivityMongoRepository.save(processingActivity);
         return processingActivityDTO;
 
     }
@@ -213,13 +195,66 @@ public class ProcessingActivityService extends MongoBaseService {
 
     }
 
+
+    /**
+     * @param unitId
+     * @param processingActivityId
+     * @return
+     * @description method delete processing activity and Sub processing activity is activity is associated with asset then method simply return  without deleting activities
+     */
+    public Map<String, Object> deleteProcessingActivity(Long unitId, BigInteger processingActivityId) {
+
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+        }
+        Map<String, Object> result = new HashMap<>();
+        if (!processingActivity.isSubProcess()) {
+            List<AssetResponseDTO> assetRelatedToProcessingActivities = assetMongoRepository.getAllAssetRelatedToProcessingActivityById(unitId, processingActivityId);
+            if (!assetRelatedToProcessingActivities.isEmpty()) {
+                result.put(IS_SUCCESS, false);
+                result.put("data", assetRelatedToProcessingActivities);
+            } else {
+                delete(processingActivity);
+                result.put(IS_SUCCESS, true);
+            }
+        } else {
+            List<AssetResponseDTO> assetRelatedToSubProcessingActivities = assetMongoRepository.getAllAssetRelatedToSubProcessingActivityById(unitId, processingActivityId);
+            if (!assetRelatedToSubProcessingActivities.isEmpty()) {
+                result.put(IS_SUCCESS, false);
+                result.put("data", assetRelatedToSubProcessingActivities);
+            } else {
+                delete(processingActivity);
+                result.put(IS_SUCCESS, true);
+            }
+
+        }
+        return result;
+
+    }
+
+
+    public ProcessingActivityResponseDTO getProcessingActivityWithMetaDataById(Long orgId, BigInteger id) {
+        ProcessingActivityResponseDTO processingActivity = processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", id);
+        }
+        return processingActivity;
+    }
+
+
+    public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long orgId) {
+        return processingActivityMongoRepository.getAllProcessingActivityAndMetaData(orgId);
+    }
+
+
     /**
      * @param processingActivityId
      * @return
      * @description method return audit history of Processing Activity , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getProcessingActivityActivitiesHistory(BigInteger processingActivityId,int size,int skip)   {
+    public List<Map<String, Object>> getProcessingActivityActivitiesHistory(BigInteger processingActivityId, int size, int skip) {
 
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingActivityId, ProcessingActivity.class).limit(size).skip(skip);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
@@ -229,15 +264,14 @@ public class ProcessingActivityService extends MongoBaseService {
     }
 
 
-
-
-
-
-
-
-
-
-
+    /**
+     * @param unitId
+     * @return
+     * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
+     */
+    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsWithSubProcess(Long unitId) {
+        return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubprocessingActivities(unitId);
+    }
 
 
 }

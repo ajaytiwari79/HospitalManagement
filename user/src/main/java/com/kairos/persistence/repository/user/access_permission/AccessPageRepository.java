@@ -220,6 +220,15 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             " CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization")
     List<AccessPageDTO> getMainTabs(Long countryId);
 
+    @Query("match (org:Organization) where id(org)={0} with org\n" +
+            "match(org)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(accessgroup:AccessGroup{deleted: false}) with accessgroup\n" +
+            "match(accessgroup)-[r:" + HAS_ACCESS_OF_TABS + "]->(accessPage:AccessPage{isModule:true}) with  r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage\n" +
+            "return distinct id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active," +
+            "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub, \n" +
+            "CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion, \n" +
+            "CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization  ORDER BY id(accessPage)")
+    List<AccessPageDTO> getMainTabsForUnit(Long unitId);
+
 
     @Query("Match (accessPage:AccessPage)-[:" + SUB_PAGE + "]->(subPage:AccessPage) where id(accessPage)={0} WITH subPage,accessPage\n" +
             "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(subPage) WHERE id(country)={1} WITH r,subPage,id(accessPage) as parentTabId,\n" +

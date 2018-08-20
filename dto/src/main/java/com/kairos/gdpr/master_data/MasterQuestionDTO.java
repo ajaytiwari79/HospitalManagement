@@ -24,9 +24,17 @@ public class MasterQuestionDTO {
     @NotBlank(message = "Question type Must be Text ,Yes no May")
     private String questionType;
 
+    private String attributeName;
+
     private Boolean isNotSureAllowed=false;
 
     private Boolean isNotApplicableAllowed=false;
+
+    public String getAttributeName() {
+        return attributeName; }
+
+    public void setAttributeName(String attributeName) {
+        this.attributeName = attributeName; }
 
     public BigInteger getId() {
         return id;
