@@ -1,7 +1,8 @@
 package com.kairos.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.time_bank.CTARuleTemplateDTO;
+
+import com.kairos.activity.cta.CTARuleTemplateDTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.user.country.experties.AppliedFunctionDTO;
 import com.kairos.user.staff.staff.Staff;
@@ -34,6 +35,7 @@ public class StaffUnitPositionDetails {
     private float salary;
     private int totalWeeklyMinutes;
     private BigInteger workingTimeAgreementId;
+    private BigInteger costTimeAgreementId;
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
     private ZoneId unitTimeZone;
     private Long countryId;
@@ -61,6 +63,15 @@ public class StaffUnitPositionDetails {
 
     public void setUnitPositionEndDate(LocalDate unitPositionEndDate) {
         this.unitPositionEndDate = unitPositionEndDate;
+    }
+
+
+    public BigInteger getCostTimeAgreementId() {
+        return costTimeAgreementId;
+    }
+
+    public void setCostTimeAgreementId(BigInteger costTimeAgreementId) {
+        this.costTimeAgreementId = costTimeAgreementId;
     }
 
     public ZoneId getUnitTimeZone() {

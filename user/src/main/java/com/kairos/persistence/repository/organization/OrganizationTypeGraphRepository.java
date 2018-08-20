@@ -157,6 +157,9 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("MATCH (organizationSubType:OrganizationType)<-[:" +HAS_SUB_TYPE + "]-(organizationType:OrganizationType) where id(organizationSubType)={0} return id(organizationType)")
     Long findOrganizationTypeIdBySubTypeId(Long organizationSubTypeId);
 
+    @Query("MATCH (organizationSubType:OrganizationType)<-[:" +HAS_SUB_TYPE + "]-(organizationType:OrganizationType) where id(organizationSubType)={0} return organizationType")
+    OrganizationType findOrganizationTypeBySubTypeId(Long organizationSubTypeId);
+
 
 
 }
