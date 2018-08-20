@@ -149,7 +149,7 @@ public class TimeTypeService extends MongoBaseService {
         timeTypes.forEach(t->{
             if(t.getLabel().equals("Presence")){
                 presenceAbsenceTimeTypeMap.put("Presence",getChildOfTimeType(t,timeTypes));
-            }if(t.getLabel().equals("Absence")){
+            }else if(t.getLabel().equals("Absence")){
                 presenceAbsenceTimeTypeMap.put("Absence",getChildOfTimeType(t,timeTypes));
             }
 

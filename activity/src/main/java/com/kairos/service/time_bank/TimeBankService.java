@@ -197,19 +197,21 @@ public class TimeBankService extends MongoBaseService {
 
 
     public TimeBankVisualViewDTO getTimeBankForVisualView(Long unitId, Long unitPositionId, String query, Integer value, Date startDate, Date endDate) {
+        ZonedDateTime endZonedDate = null;
+        ZonedDateTime startZonedDate = null;
         if (StringUtils.isNotEmpty(query)) {
             if (query.equals(AppConstants.WEEK)) {
-                ZonedDateTime startZonedDate = ZonedDateTime.now().with(ChronoField.ALIGNED_WEEK_OF_YEAR, value).with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY)).truncatedTo(ChronoUnit.DAYS);
-                ZonedDateTime endZonedDate = startZonedDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-                startDate = DateUtils.getDateByZoneDateTime(startZonedDate);
-                endDate = DateUtils.getDateByZoneDateTime(endZonedDate);
+                startZonedDate = ZonedDateTime.now().with(ChronoField.ALIGNED_WEEK_OF_YEAR, value).with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY)).truncatedTo(ChronoUnit.DAYS);
+                endZonedDate = startZonedDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+
             }
-            if (query.equals(AppConstants.MONTH)) {
-                ZonedDateTime startZonedDate = ZonedDateTime.now().with(ChronoField.MONTH_OF_YEAR, value).with(TemporalAdjusters.firstDayOfMonth()).truncatedTo(ChronoUnit.DAYS);
-                ZonedDateTime endZonedDate = startZonedDate.with(TemporalAdjusters.lastDayOfMonth());
-                startDate = DateUtils.getDateByZoneDateTime(startZonedDate);
-                endDate = DateUtils.getDateByZoneDateTime(endZonedDate);
+            else if (query.equals(AppConstants.MONTH)) {
+                startZonedDate = ZonedDateTime.now().with(ChronoField.MONTH_OF_YEAR, value).with(TemporalAdjusters.firstDayOfMonth()).truncatedTo(ChronoUnit.DAYS);
+                endZonedDate = startZonedDate.with(TemporalAdjusters.lastDayOfMonth());
+
             }
+            startDate = DateUtils.getDateByZoneDateTime(startZonedDate);
+            endDate = DateUtils.getDateByZoneDateTime(endZonedDate);
         }
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = getCostTimeAgreement(unitPositionId);
         DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
