@@ -55,10 +55,10 @@ public class TimeBankController {
                 (unitEmploymentId,year));
     }
 
-    @GetMapping(value = "visual_view/unit_position/{unitEmploymentId}/")
-    public ResponseEntity<Map<String, Object>> getTimeBankForVisualView(@PathVariable Long unitId,@PathVariable Long unitEmploymentId, @RequestParam Integer year) {
+    @GetMapping(value = "visual_view/unit_position/{unitPositionId}")
+    public ResponseEntity<Map<String, Object>> getTimeBankForVisualView(@PathVariable Long unitId,@PathVariable Long unitPositionId,@RequestParam(value = "query",required = false) String query,@RequestParam(value = "value",required = false) Integer value,@RequestParam(value = "startDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getTimeBankForVisualView
-                (unitEmploymentId,year));
+                (unitId,unitPositionId,query,value,startDate,endDate));
     }
 
 

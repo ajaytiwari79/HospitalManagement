@@ -479,6 +479,11 @@ public class TimeBankCalculationService {
         return timeBankDTO;
     }
 
+
+    public TimeBankVisualViewDTO getVisualViewTimeBank(){
+
+    }
+
     /**
      *
      * @param interval
