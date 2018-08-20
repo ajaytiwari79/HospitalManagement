@@ -55,14 +55,14 @@ public class ProcessingActivityController {
     }
 
 
-    @ApiOperation(value = "Get Processing Activity with meta data by Id")
+    @ApiOperation(value = "Get  Sub Processing Activities of Processing Activity ")
     @GetMapping("/processing_activity/{id}")
     public ResponseEntity<Object> getProcessingActivityWithMetaDataById(@PathVariable Long unitId, @PathVariable BigInteger id) {
 
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityWithMetaDataById(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityWithWithSubProcessingActivitiesById(unitId, id));
     }
 
 
@@ -101,7 +101,7 @@ public class ProcessingActivityController {
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/processing_activity/related")
     public ResponseEntity<Object> getAllRelatedProcessingActivitiesAndSubProcessingActivities(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityBasicDetailsWithSubProcess(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityBasicDetailsAndWithSubProcess(unitId));
     }
 
 
@@ -139,8 +139,7 @@ public class ProcessingActivityController {
     public ResponseEntity<Object> removeLinkedAssetFromProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger assetId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
-        else if (assetId == null) {
+        } else if (assetId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Asset  id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedAssetFromProcessingActivity(unitId, processingActivityId, assetId));
@@ -155,7 +154,7 @@ public class ProcessingActivityController {
         } else if (processingActivityId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedDataSubjectFromProcessingActivity(unitId,processingActivityId,dataSubjectId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedDataSubjectFromProcessingActivity(unitId, processingActivityId, dataSubjectId));
     }
 
 }

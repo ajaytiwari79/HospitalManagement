@@ -243,12 +243,15 @@ public class ProcessingActivityService extends MongoBaseService {
     }
 
 
-    public ProcessingActivityResponseDTO getProcessingActivityWithMetaDataById(Long orgId, BigInteger id) {
-        ProcessingActivityResponseDTO processingActivity = processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", id);
-        }
-        return processingActivity;
+    /**
+     * @description method return list of SubProcessing Activity
+     * @param orgId
+     * @param id
+     * @return
+     */
+    public List<ProcessingActivityResponseDTO> getProcessingActivityWithWithSubProcessingActivitiesById(Long orgId, BigInteger id) {
+       return processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
+
     }
 
 
@@ -277,7 +280,7 @@ public class ProcessingActivityService extends MongoBaseService {
      * @return
      * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
      */
-    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsWithSubProcess(Long unitId) {
+    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsAndWithSubProcess(Long unitId) {
         return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubprocessingActivities(unitId);
     }
 
@@ -357,8 +360,8 @@ public class ProcessingActivityService extends MongoBaseService {
     public boolean removelinkedDataSubjectFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger dataSubjectId) {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
-        if (Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity");
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity",processingActivityId);
         }
         List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects = processingActivity.getDataSubjects();
         if (!activityRelatedDataSubjects.isEmpty())
@@ -370,6 +373,7 @@ public class ProcessingActivityService extends MongoBaseService {
                 }
             }
         }
+        processingActivity.setDataSubjects(activityRelatedDataSubjects);
         processingActivityMongoRepository.save(processingActivity);
         return true;
     }

@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
+import javax.print.Doc;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -63,9 +64,14 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     }
 
     @Override
-    public ProcessingActivityResponseDTO getAllSubProcessingActivitiesOfProcessingActivity(Long organizationId, BigInteger processingActivityId) {
+    public List<ProcessingActivityResponseDTO> getAllSubProcessingActivitiesOfProcessingActivity(Long organizationId, BigInteger processingActivityId) {
+
+        String replaceRoot = " { '$replaceRoot':{'newRoot':'$subProcessingActivities'} }";
+        Document replaceRootOperation = Document.parse(replaceRoot);
+
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(processingActivityId).and("subProcess").is(true)),
+                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(processingActivityId).and("subProcess").is(false)),
+                lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
                 unwind("subProcessingActivities"),
                 lookup("processing_purpose", "subProcessingActivities.processingPurposes", "_id", "subProcessingActivities.processingPurposes"),
                 lookup("transfer_method", "subProcessingActivities.transferMethods", "_id", "subProcessingActivities.transferMethods"),
@@ -75,13 +81,13 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 lookup("processingLegalBasis", "subProcessingActivities.processingLegalBasis", "_id", "subProcessingActivities.processingLegalBasis"),
                 group("$id")
                         .addToSet("subProcessingActivities").as("subProcessingActivities"),
-                project().andExclude("_id"),
                 unwind("subProcessingActivities"),
-                sort(Sort.Direction.ASC, "name")
+                new CustomAggregationOperation(replaceRootOperation)
+               // sort(Sort.Direction.ASC, "name")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
-        return result.getUniqueMappedResult();
+        return result.getMappedResults();
     }
 
 
