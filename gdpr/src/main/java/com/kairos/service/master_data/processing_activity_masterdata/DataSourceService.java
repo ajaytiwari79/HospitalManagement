@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.DataSourceDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
@@ -160,15 +161,33 @@ public class DataSourceService extends MongoBaseService {
 
     }
 
-
     /**
+     * @description method save Data Source suggested by unit
      * @param countryId
-     * @param organizationId - id of parent organization
-     * @param unitId         - id of unit organization
-     * @return method return list of organization Data Sources with Data Sources which were not inherited by organization  till now
+     * @param DataSourceDTOS
+     * @return
      */
-    public List<DataSourceResponseDTO> getAllNotInheritedDataSourceFromParentOrgAndUnitDataSource(Long countryId, Long organizationId, Long unitId) {
-        return dataSourceMongoRepository.getAllNotInheritedDataSourceFromParentOrgAndUnitDataSource(countryId, organizationId, unitId);
+    public List<DataSource> saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> DataSourceDTOS) {
+
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (DataSourceDTO DataSource : DataSourceDTOS) {
+            hostingProvoiderNames.add(DataSource.getName());
+        }
+        List<DataSource> existingDataSources = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, DataSource.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingDataSources, hostingProvoiderNames);
+        List<DataSource> DataSourceList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                DataSource DataSource = new DataSource(name);
+                DataSource.setCountryId(countryId);
+                DataSource.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                DataSourceList.add(DataSource);
+            }
+
+            DataSourceList = dataSourceMongoRepository.saveAll(getNextSequence(DataSourceList));
+        }
+        return DataSourceList;
     }
 
 

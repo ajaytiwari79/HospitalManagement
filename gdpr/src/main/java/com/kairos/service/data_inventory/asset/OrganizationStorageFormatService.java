@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data.asset_management.storage_fo
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,6 +35,9 @@ public class OrganizationStorageFormatService extends MongoBaseService {
 
     @Inject
     private ExceptionService exceptionService;
+
+    @Inject
+    private StorageFormatService storageFormatService;
 
 
     /**
@@ -166,6 +170,19 @@ public class OrganizationStorageFormatService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+
+    public Map<String, List<StorageFormat>> saveAndSuggestStorageFormats(Long countryId, Long organizationId, List<StorageFormatDTO> StorageFormatDTOS) {
+
+        Map<String, List<StorageFormat>> result;
+        result = createStorageFormat(organizationId, StorageFormatDTOS);
+        List<StorageFormat> masterStorageFormatSuggestedByUnit = storageFormatService.saveSuggestedStorageFormatsFromUnit(countryId, StorageFormatDTOS);
+        if (!masterStorageFormatSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterStorageFormatSuggestedByUnit);
+        }
+        return result;
     }
 
 }

@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data.processing_activity_masterd
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,9 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
     @Inject
     private ExceptionService exceptionService;
+
+    @Inject
+    private AccessorPartyService accessorPartyService;
 
     /**
      * @param organizationId
@@ -148,6 +152,19 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+
+    public Map<String, List<AccessorParty>> saveAndSuggestAccessorParties(Long countryId, Long organizationId, List<AccessorPartyDTO> AccessorPartyDTOS) {
+
+        Map<String, List<AccessorParty>> result;
+        result = createAccessorParty(organizationId, AccessorPartyDTOS);
+        List<AccessorParty> masterAccessorPartySuggestedByUnit = accessorPartyService.saveSuggestedAccessorPartysFromUnit(countryId, AccessorPartyDTOS);
+        if (!masterAccessorPartySuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterAccessorPartySuggestedByUnit);
+        }
+        return result;
     }
 
 

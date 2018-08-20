@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.HostingTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
 import com.kairos.persistance.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
@@ -168,12 +169,34 @@ public class HostingTypeService extends MongoBaseService {
     }
 
 
-    public List<HostingTypeResponseDTO> getAllNotInheritedHostingTypeFromParentOrgAndUnitHostingType(Long countryId, Long parentOrganizationId, Long unitId) {
+    /**
+     * @description method save Hosting type suggested by unit
+     * @param countryId
+     * @param HostingTypeDTOS
+     * @return
+     */
+    public List<HostingType> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> HostingTypeDTOS) {
 
-        return hostingTypeMongoRepository.getAllNotInheritedHostingTypeFromParentOrgAndUnitHostingType(countryId, parentOrganizationId, unitId);
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (HostingTypeDTO HostingType : HostingTypeDTOS) {
+            hostingProvoiderNames.add(HostingType.getName());
+        }
+        List<HostingType> existingHostingTypes = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, HostingType.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingHostingTypes, hostingProvoiderNames);
+        List<HostingType> HostingTypeList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                HostingType HostingType = new HostingType(name);
+                HostingType.setCountryId(countryId);
+                HostingType.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                HostingTypeList.add(HostingType);
+            }
+
+            HostingTypeList = hostingTypeMongoRepository.saveAll(getNextSequence(HostingTypeList));
+        }
+        return HostingTypeList;
     }
-
-
 }
 
     

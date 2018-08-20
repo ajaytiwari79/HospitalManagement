@@ -11,6 +11,7 @@ import com.kairos.persistance.repository.master_data.processing_activity_masterd
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.processing_activity_masterdata.ProcessingLegalBasisService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -33,6 +34,8 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
     @Inject
     private ProcessingLegalBasisMongoRepository legalBasisMongoRepository;
 
+    @Inject
+    private ProcessingLegalBasisService processingLegalBasisService;
     @Inject
     private ExceptionService exceptionService;
 
@@ -163,5 +166,15 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
 
     }
 
+    public Map<String, List<ProcessingLegalBasis>> saveAndSuggestProcessingLegalBasiss(Long countryId, Long organizationId, List<ProcessingLegalBasisDTO> ProcessingLegalBasisDTOS) {
+
+        Map<String, List<ProcessingLegalBasis>> result;
+        result = createProcessingLegalBasis(organizationId, ProcessingLegalBasisDTOS);
+        List<ProcessingLegalBasis> masterProcessingLegalBasisSuggestedByUnit = processingLegalBasisService.saveSuggestedProcessingLegalBasissFromUnit(countryId, ProcessingLegalBasisDTOS);
+        if (!masterProcessingLegalBasisSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterProcessingLegalBasisSuggestedByUnit);
+        }
+        return result;
+    }
 
 }

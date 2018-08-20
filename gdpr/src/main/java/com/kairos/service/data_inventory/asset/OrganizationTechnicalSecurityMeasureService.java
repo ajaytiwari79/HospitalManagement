@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data.asset_management.tech_secur
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.asset_management.TechnicalSecurityMeasureService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,6 +35,9 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
 
     @Inject
     private ExceptionService exceptionService;
+
+    @Inject
+    private TechnicalSecurityMeasureService technicalSecurityMeasureService;
 
 
     /**
@@ -166,5 +170,20 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
+
+
+
+    public Map<String, List<TechnicalSecurityMeasure>> saveAndSuggestTechnicalSecurityMeasures(Long countryId, Long organizationId, List<TechnicalSecurityMeasureDTO> TechnicalSecurityMeasureDTOS) {
+
+        Map<String, List<TechnicalSecurityMeasure>> result;
+        result = createTechnicalSecurityMeasure(organizationId, TechnicalSecurityMeasureDTOS);
+        List<TechnicalSecurityMeasure> masterTechnicalSecurityMeasureSuggestedByUnit = technicalSecurityMeasureService.saveSuggestedTechnicalSecurityMeasuresFromUnit(countryId, TechnicalSecurityMeasureDTOS);
+        if (!masterTechnicalSecurityMeasureSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterTechnicalSecurityMeasureSuggestedByUnit);
+        }
+        return result;
+    }
+    
+    
 
 }

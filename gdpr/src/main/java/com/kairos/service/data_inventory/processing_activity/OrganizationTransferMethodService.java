@@ -37,6 +37,9 @@ public class OrganizationTransferMethodService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private TransferMethodService transferMethodService;
+
     /**
      * @param organizationId
      * @param transferMethodDTOS
@@ -148,7 +151,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
      * @return TransferMethod object fetch on basis of  name
      * @throws DataNotExists throw exception if TransferMethod not exist for given name
      */
-    public TransferMethod getTransferMethodByName(Long organizationId, String name) {
+        public TransferMethod getTransferMethodByName(Long organizationId, String name) {
         if (!StringUtils.isBlank(name)) {
             TransferMethod exist = transferMethodRepository.findByOrganizationIdAndName(organizationId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
@@ -160,5 +163,16 @@ public class OrganizationTransferMethodService extends MongoBaseService {
 
     }
 
+
+    public Map<String, List<TransferMethod>> saveAndSuggestTransferMethods(Long countryId, Long organizationId, List<TransferMethodDTO> TransferMethodDTOS) {
+
+        Map<String, List<TransferMethod>> result;
+        result = createTransferMethod(organizationId, TransferMethodDTOS);
+        List<TransferMethod> masterTransferMethodSuggestedByUnit = transferMethodService.saveSuggestedTransferMethodsFromUnit(countryId, TransferMethodDTOS);
+        if (!masterTransferMethodSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterTransferMethodSuggestedByUnit);
+        }
+        return result;
+    }
 
 }

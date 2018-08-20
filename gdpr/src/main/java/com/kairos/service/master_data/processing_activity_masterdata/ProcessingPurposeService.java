@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
@@ -31,8 +32,6 @@ public class ProcessingPurposeService extends MongoBaseService {
 
     @Inject
     private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
-
-
 
     /**
      * @param countryId
@@ -167,19 +166,28 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-    /**
-     *
-     * @param countryId
-     * @param parentOrganizationId -id of parent organization
-     * @param unitId - id of current organization
-     * @return method return list of processingPurposes (organization processing purpose and processing purposes which were not inherited by organization from parent till now )
-     */
-    public List<ProcessingPurposeResponseDTO> getAllNotInheritedProcessingPurposesFromParentOrgAndUnitProcessingPurpose(Long countryId, Long parentOrganizationId, Long unitId) {
+    public List<ProcessingPurpose> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> ProcessingPurposeDTOS) {
 
-       return processingPurposeMongoRepository.getAllNotInheritedProcessingPurposesFromParentOrgAndUnitProcessingPurpose(countryId,parentOrganizationId,unitId);
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (ProcessingPurposeDTO ProcessingPurpose : ProcessingPurposeDTOS) {
+            hostingProvoiderNames.add(ProcessingPurpose.getName());
+        }
+        List<ProcessingPurpose> existingProcessingPurposes = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, ProcessingPurpose.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingProcessingPurposes, hostingProvoiderNames);
+        List<ProcessingPurpose> ProcessingPurposeList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
 
+                ProcessingPurpose ProcessingPurpose = new ProcessingPurpose(name);
+                ProcessingPurpose.setCountryId(countryId);
+                ProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                ProcessingPurposeList.add(ProcessingPurpose);
+            }
+
+            ProcessingPurposeList = processingPurposeMongoRepository.saveAll(getNextSequence(ProcessingPurposeList));
+        }
+        return ProcessingPurposeList;
     }
-
 
 }
 

@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.TransferMethodDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.TransferMethod;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
@@ -162,25 +163,33 @@ public class TransferMethodService extends MongoBaseService {
     }
 
 
-    public List<BigInteger> createTransferMethodForOrganizationOnInheritingFromParentOrganization(Long countryId, Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
+    /**
+     * @description method save TransferMethod suggested by unit
+     * @param countryId
+     * @param TransferMethodDTOS
+     * @return
+     */
+    public List<TransferMethod> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> TransferMethodDTOS) {
 
-        List<TransferMethod> newInheritTransferMethodFromParentOrg = new ArrayList<>();
-        List<BigInteger> transferMethodIds = new ArrayList<>();
-        for (TransferMethodDTO transferMethodDTO : transferMethodDTOS) {
-            if (!transferMethodDTO.getOrganizationId().equals(organizationId)) {
-                TransferMethod transferMethod = new TransferMethod(transferMethodDTO.getName());
-                transferMethod.setCountryId(countryId);
-                transferMethod.setOrganizationId(organizationId);
-                newInheritTransferMethodFromParentOrg.add(transferMethod);
-            } else {
-                transferMethodIds.add(transferMethodDTO.getId());
-            }
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (TransferMethodDTO TransferMethod : TransferMethodDTOS) {
+            hostingProvoiderNames.add(TransferMethod.getName());
         }
-        newInheritTransferMethodFromParentOrg = transferMethodRepository.saveAll(getNextSequence(newInheritTransferMethodFromParentOrg));
-        newInheritTransferMethodFromParentOrg.forEach(dataSource -> {
-            transferMethodIds.add(dataSource.getId());
-        });
-        return transferMethodIds;
+        List<TransferMethod> existingTransferMethods = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, TransferMethod.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingTransferMethods, hostingProvoiderNames);
+        List<TransferMethod> TransferMethodList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                TransferMethod TransferMethod = new TransferMethod(name);
+                TransferMethod.setCountryId(countryId);
+                TransferMethod.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                TransferMethodList.add(TransferMethod);
+            }
+
+            TransferMethodList = transferMethodRepository.saveAll(getNextSequence(TransferMethodList));
+        }
+        return TransferMethodList;
     }
 
 

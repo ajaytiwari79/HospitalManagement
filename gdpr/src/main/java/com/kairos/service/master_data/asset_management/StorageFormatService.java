@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistance.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
@@ -168,10 +169,32 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public List<StorageFormatResponseDTO> getAllNotInheritedStorageFormatFromParentOrgAndUnitStorageFormat(Long countryId, Long parentOrganizationId, Long unitId) {
+    /**
+     * @description method save Storage format suggested by unit
+     * @param countryId
+     * @param StorageFormatDTOS
+     * @return
+     */
+    public List<StorageFormat> saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> StorageFormatDTOS) {
 
-        return storageFormatMongoRepository.getAllNotInheritedStorageFormatFromParentOrgAndUnitStorageFormat(countryId, parentOrganizationId, unitId);
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (StorageFormatDTO StorageFormat : StorageFormatDTOS) {
+            hostingProvoiderNames.add(StorageFormat.getName());
+        }
+        List<StorageFormat> existingStorageFormats = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, StorageFormat.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingStorageFormats, hostingProvoiderNames);
+        List<StorageFormat> StorageFormatList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                StorageFormat StorageFormat = new StorageFormat(name);
+                StorageFormat.setCountryId(countryId);
+                StorageFormat.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                StorageFormatList.add(StorageFormat);
+            }
+
+            StorageFormatList = storageFormatMongoRepository.saveAll(getNextSequence(StorageFormatList));
+        }
+        return StorageFormatList;
     }
-
-
 }

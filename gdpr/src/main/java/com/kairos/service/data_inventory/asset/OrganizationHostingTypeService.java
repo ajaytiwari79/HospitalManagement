@@ -37,6 +37,9 @@ public class OrganizationHostingTypeService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private HostingTypeService  hostingTypeService;
+
 
     /**
      * @param organizationId
@@ -172,5 +175,17 @@ public class OrganizationHostingTypeService extends MongoBaseService {
 
     }
 
+
+
+    public Map<String, List<HostingType>> saveAndSuggestHostingTypes(Long countryId, Long organizationId, List<HostingTypeDTO> HostingTypeDTOS) {
+
+        Map<String, List<HostingType>> result;
+        result = createHostingType(organizationId, HostingTypeDTOS);
+        List<HostingType> masterHostingTypeSuggestedByUnit = hostingTypeService.saveSuggestedHostingTypesFromUnit(countryId, HostingTypeDTOS);
+        if (!masterHostingTypeSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterHostingTypeSuggestedByUnit);
+        }
+        return result;
+    }
 
 }

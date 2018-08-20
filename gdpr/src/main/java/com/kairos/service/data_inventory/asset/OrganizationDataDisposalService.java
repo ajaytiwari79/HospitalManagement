@@ -13,6 +13,7 @@ import com.kairos.persistance.repository.master_data.asset_management.data_dispo
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.asset_management.DataDisposalService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,6 +42,9 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     @Inject
     private AssetMongoRepository assetMongoRepository;
 
+    @Inject
+    private DataDisposalService dataDisposalService;
+
 
     /**
      * @param organizationId
@@ -54,28 +58,24 @@ public class OrganizationDataDisposalService extends MongoBaseService {
 
         Map<String, List<DataDisposal>> result = new HashMap<>();
         Set<String> dataDisposalsNames = new HashSet<>();
-        if (!dataDisposalDTOS.isEmpty()) {
-            for (DataDisposalDTO dataDisposal : dataDisposalDTOS) {
-                dataDisposalsNames.add(dataDisposal.getName());
+        for (DataDisposalDTO dataDisposal : dataDisposalDTOS) {
+            dataDisposalsNames.add(dataDisposal.getName());
+        }
+        List<DataDisposal> existing = findMetaDataByNameAndUnitId(organizationId, dataDisposalsNames, DataDisposal.class);
+        dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
+        List<DataDisposal> newDataDisposals = new ArrayList<>();
+        if (!dataDisposalsNames.isEmpty()) {
+            for (String name : dataDisposalsNames) {
+                DataDisposal newDataDisposal = new DataDisposal(name);
+                newDataDisposal.setOrganizationId(organizationId);
+                newDataDisposals.add(newDataDisposal);
             }
-            List<DataDisposal> existing = findMetaDataByNameAndUnitId(organizationId, dataDisposalsNames, DataDisposal.class);
-            dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
-            List<DataDisposal> newDataDisposals = new ArrayList<>();
-            if (!dataDisposalsNames.isEmpty()) {
-                for (String name : dataDisposalsNames) {
-                    DataDisposal newDataDisposal = new DataDisposal(name);
-                    newDataDisposal.setOrganizationId(organizationId);
-                    newDataDisposals.add(newDataDisposal);
-                }
 
-                newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
-            }
-            result.put(EXISTING_DATA_LIST, existing);
-            result.put(NEW_DATA_LIST, newDataDisposals);
-            return result;
-        } else
-            throw new InvalidRequestException("list cannot be empty");
-
+            newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
+        }
+        result.put(EXISTING_DATA_LIST, existing);
+        result.put(NEW_DATA_LIST, newDataDisposals);
+        return result;
 
     }
 
@@ -169,6 +169,18 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     }
 
 
+
+    public Map<String, List<DataDisposal>> saveAndSuggestDataDisposal(Long countryId, Long organizationId, List<DataDisposalDTO> dataDisposalDTOS) {
+
+        Map<String, List<DataDisposal>> result;
+        result = createDataDisposal(organizationId, dataDisposalDTOS);
+        List<DataDisposal> masterDataDisposalSuggestedByUnit = dataDisposalService.saveSuggestedDataDisposalFromUnit(countryId, dataDisposalDTOS);
+        if (!masterDataDisposalSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterDataDisposalSuggestedByUnit);
+        }
+        return result;
+
+    }
 
 
 }

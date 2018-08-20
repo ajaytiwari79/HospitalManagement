@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistance.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
@@ -164,5 +165,35 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
     }
 
+
+
+    /**
+     * @description method save technical security measure  suggested by unit
+     * @param countryId
+     * @param TechnicalSecurityMeasureDTOS
+     * @return
+     */
+    public List<TechnicalSecurityMeasure> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> TechnicalSecurityMeasureDTOS) {
+
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (TechnicalSecurityMeasureDTO TechnicalSecurityMeasure : TechnicalSecurityMeasureDTOS) {
+            hostingProvoiderNames.add(TechnicalSecurityMeasure.getName());
+        }
+        List<TechnicalSecurityMeasure> existingTechnicalSecurityMeasures = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, TechnicalSecurityMeasure.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingTechnicalSecurityMeasures, hostingProvoiderNames);
+        List<TechnicalSecurityMeasure> TechnicalSecurityMeasureList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                TechnicalSecurityMeasure TechnicalSecurityMeasure = new TechnicalSecurityMeasure(name);
+                TechnicalSecurityMeasure.setCountryId(countryId);
+                TechnicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                TechnicalSecurityMeasureList.add(TechnicalSecurityMeasure);
+            }
+
+            TechnicalSecurityMeasureList = technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(TechnicalSecurityMeasureList));
+        }
+        return TechnicalSecurityMeasureList;
+    }
 
 }

@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data.processing_activity_masterd
 import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.processing_activity_masterdata.DataSourceService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -35,6 +36,9 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
     @Inject
     private DataSourceMongoRepository dataSourceMongoRepository;
+
+    @Inject
+    private DataSourceService dataSourceService;
 
 
     /**
@@ -160,6 +164,18 @@ public class OrganizationDataSourceService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+    public Map<String, List<DataSource>> saveAndSuggestDataSources(Long countryId, Long organizationId, List<DataSourceDTO> DataSourceDTOS) {
+
+        Map<String, List<DataSource>> result;
+        result = createDataSource(organizationId, DataSourceDTOS);
+        List<DataSource> masterDataSourceSuggestedByUnit = dataSourceService.saveSuggestedDataSourcesFromUnit(countryId, DataSourceDTOS);
+        if (!masterDataSourceSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterDataSourceSuggestedByUnit);
+        }
+        return result;
     }
 
 

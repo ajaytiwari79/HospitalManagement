@@ -11,6 +11,7 @@ import com.kairos.persistance.repository.master_data.processing_activity_masterd
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.processing_activity_masterdata.ResponsibilityTypeService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -35,6 +36,9 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
     @Inject
     private ExceptionService exceptionService;
+
+    @Inject
+    private ResponsibilityTypeService responsibilityTypeService;
 
     /**
      * @param organizationId
@@ -168,5 +172,16 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
     }
 
+
+    public Map<String, List<ResponsibilityType>> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> ResponsibilityTypeDTOS) {
+
+        Map<String, List<ResponsibilityType>> result;
+        result = createResponsibilityType(organizationId, ResponsibilityTypeDTOS);
+        List<ResponsibilityType> masterResponsibilityTypeSuggestedByUnit = responsibilityTypeService.saveSuggestedResponsibilityTypesFromUnit(countryId, ResponsibilityTypeDTOS);
+        if (!masterResponsibilityTypeSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterResponsibilityTypeSuggestedByUnit);
+        }
+        return result;
+    }
 
 }
