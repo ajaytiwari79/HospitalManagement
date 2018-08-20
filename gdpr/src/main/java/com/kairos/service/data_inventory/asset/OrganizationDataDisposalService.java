@@ -6,7 +6,9 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.DataDisposalDTO;
+import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
+import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -36,6 +38,9 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private AssetMongoRepository assetMongoRepository;
+
 
     /**
      * @param organizationId
@@ -53,17 +58,14 @@ public class OrganizationDataDisposalService extends MongoBaseService {
             for (DataDisposalDTO dataDisposal : dataDisposalDTOS) {
                 dataDisposalsNames.add(dataDisposal.getName());
             }
-
             List<DataDisposal> existing = findMetaDataByNameAndUnitId(organizationId, dataDisposalsNames, DataDisposal.class);
             dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
             List<DataDisposal> newDataDisposals = new ArrayList<>();
             if (!dataDisposalsNames.isEmpty()) {
                 for (String name : dataDisposalsNames) {
-
                     DataDisposal newDataDisposal = new DataDisposal(name);
                     newDataDisposal.setOrganizationId(organizationId);
                     newDataDisposals.add(newDataDisposal);
-
                 }
 
                 newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
@@ -136,7 +138,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
         }
         dataDisposal = dataDisposalMongoRepository.findByid(id);
         if (!Optional.ofNullable(dataDisposal).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","Data Disposal",id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", id);
         }
         dataDisposal.setName(dataDisposalDTO.getName());
         dataDisposalMongoRepository.save(dataDisposal);
@@ -165,6 +167,8 @@ public class OrganizationDataDisposalService extends MongoBaseService {
             throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
+
+
 
 
 }
