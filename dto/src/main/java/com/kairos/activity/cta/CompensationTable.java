@@ -7,7 +7,6 @@ import java.util.List;
 public class CompensationTable {
     private int granularityLevel;
 //    private CompensationMeasurementType compensationMeasurementType;
-@NotNull(message = "error.cta.compensation.interval.notNull")
     private List<CompensationTableInterval> compensationTableInterval=new ArrayList<>();
 
     public CompensationTable() {
