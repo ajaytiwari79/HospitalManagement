@@ -6,6 +6,7 @@ import com.kairos.enums.DurationType;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -17,7 +18,9 @@ public class PlanningPeriodDTO {
     private String name;
     @NotNull(message = "error.startdate.notnull")
     private LocalDate startDate;
+    private LocalTime startTime;
     private LocalDate endDate;
+    private LocalTime endTime;
     private Long unitId = -1L;
     private int duration;
     private DurationType durationType;
@@ -177,6 +180,22 @@ public class PlanningPeriodDTO {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
 }
 
