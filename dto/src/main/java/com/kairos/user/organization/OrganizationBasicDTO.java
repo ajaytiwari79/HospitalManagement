@@ -30,6 +30,8 @@ public class OrganizationBasicDTO {
     private Long levelId;
     private Long typeId;
     private List<Long> subTypeId;
+    private AddressDTO addressDTO; // used in case of child organization
+    private UnitManagerDTO unitManagerDTO;  // Used in case of child organization only
 
     public Long getId() {
         return id;
@@ -133,5 +135,21 @@ public class OrganizationBasicDTO {
 
     public void setSubTypeId(List<Long> subTypeId) {
         this.subTypeId = subTypeId;
+    }
+
+    public AddressDTO getAddressDTO() {
+        return addressDTO;
+    }
+
+    public void setAddressDTO(AddressDTO addressDTO) {
+        this.addressDTO = addressDTO;
+    }
+
+    public UnitManagerDTO getUnitManagerDTO() {
+        return unitManagerDTO;
+    }
+
+    public void setUnitManagerDTO(UnitManagerDTO unitManagerDTO) {
+        this.unitManagerDTO = unitManagerDTO;
     }
 }

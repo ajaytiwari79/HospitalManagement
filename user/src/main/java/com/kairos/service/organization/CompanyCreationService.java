@@ -1,15 +1,16 @@
 package com.kairos.service.organization;
 
+import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
+import com.kairos.persistence.model.agreement.cta.cta_response.CTADetailsWrapper;
+import com.kairos.persistence.model.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
+import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationBuilder;
-import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.region.Municipality;
@@ -26,6 +27,8 @@ import com.kairos.persistence.repository.user.region.LevelGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.service.AsynchronousService;
+import com.kairos.service.agreement.cta.CountryCTAService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.user.organization.AddressDTO;
@@ -33,13 +36,22 @@ import com.kairos.user.organization.CompanyType;
 import com.kairos.user.organization.OrganizationBasicDTO;
 import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
+import com.kairos.util.user_context.UserContext;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static com.kairos.constants.AppConstants.*;
 
@@ -49,6 +61,7 @@ import static com.kairos.constants.AppConstants.*;
 @Service
 @Transactional
 public class CompanyCreationService {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
@@ -74,8 +87,12 @@ public class CompanyCreationService {
     private StaffService staffService;
     @Inject
     private UserGraphRepository userGraphRepository;
-    @Inject private OrganizationTypeGraphRepository organizationTypeGraphRepository;
-    @Inject private LevelGraphRepository levelGraphRepository;
+    @Inject
+    private OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    @Inject
+    private LevelGraphRepository levelGraphRepository;
+    @Inject
+    private AsynchronousService asynchronousService;
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId, Long organizationId) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -158,8 +175,9 @@ public class CompanyCreationService {
         return organization.getContactAddress();
     }
 
-    public UnitManagerDTO setUserInfoInOrganization(Long unitId, UnitManagerDTO unitManagerDTO) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
+    public UnitManagerDTO setUserInfoInOrganization(Long unitId, Organization organization ,UnitManagerDTO unitManagerDTO) {
+        if (organization == null)
+            organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
@@ -180,25 +198,59 @@ public class CompanyCreationService {
     public StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId) {
         return userGraphRepository.getUnitManagerOfOrganization(unitId);
     }
-    public OrganizationBasicDTO setOrganizationTypeAndSubTypeInOrganization(OrganizationBasicDTO organizationBasicDTO,Long unitId){
+
+    public OrganizationBasicDTO setOrganizationTypeAndSubTypeInOrganization(OrganizationBasicDTO organizationBasicDTO, Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
+        setOrganizationTypeAndSubTypeInOrganization(organization, organizationBasicDTO);
+        organizationGraphRepository.save(organization);
+        return organizationBasicDTO;
+    }
 
+    private void setOrganizationTypeAndSubTypeInOrganization(Organization organization, OrganizationBasicDTO organizationBasicDTO) {
         Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(organizationBasicDTO.getTypeId());
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(organizationBasicDTO.getSubTypeId());
-        if (organizationBasicDTO.getLevelId()!=null) {
+        if (organizationBasicDTO.getLevelId() != null) {
             Level level = levelGraphRepository.findOne(organizationBasicDTO.getLevelId(), 0);
             organization.setLevel(level);
         }
         organization.setOrganizationType(organizationType.get());
         organization.setOrganizationSubTypes(organizationSubTypes);
-        organizationGraphRepository.save(organization);
-        return organizationBasicDTO;
+
     }
-    Map<String,Object> getOrganizationTypeAndSubTypeByUnitId(Long unitId){
+
+    Map<String, Object> getOrganizationTypeAndSubTypeByUnitId(Long unitId) {
         return organizationTypeGraphRepository.getOrganizationTypesForUnit(unitId);
+    }
+
+
+    public OrganizationBasicDTO addNewUnit(OrganizationBasicDTO organizationBasicDTO, Long parentOrganizationId) {
+
+        Organization parentOrganization = organizationGraphRepository.findOne(parentOrganizationId);
+        if (!Optional.ofNullable(parentOrganization).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", parentOrganizationId);
+        }
+        Organization unit = new OrganizationBuilder()
+                .setName(WordUtils.capitalize(organizationBasicDTO.getName()))
+                .setDescription(organizationBasicDTO.getDescription())
+                .setDesiredUrl(organizationBasicDTO.getDesiredUrl())
+                .setShortCompanyName(organizationBasicDTO.getShortCompanyName())
+                .setCompanyType(organizationBasicDTO.getCompanyType())
+                .setVatId(organizationBasicDTO.getVatId())
+                .setTimeZone(ZoneId.of(TIMEZONE_UTC))
+                .createOrganization();
+        parentOrganization.getChildren().add(unit);
+        setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO);
+        ContactAddress contactAddress = new ContactAddress();
+        prepareAddress(contactAddress, organizationBasicDTO.getAddressDTO());
+        setUserInfoInOrganization(null,unit, organizationBasicDTO.getUnitManagerDTO());
+        //Assign Parent Organization's level to unit
+        unit.setLevel(parentOrganization.getLevel());
+        organizationGraphRepository.save(unit);
+        return organizationBasicDTO;
+
     }
 
     private void prepareAddress(ContactAddress contactAddress, AddressDTO addressDTO) {

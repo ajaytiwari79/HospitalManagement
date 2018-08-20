@@ -22,8 +22,7 @@ public class AsynchronousService {
         return executorService.invokeAll(tasks);
     }
 
-    public <T> List<Future<T>> executeAsynchronously(
-            Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+    public <T> List<Future<T>> executeAsynchronously(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
             throws InterruptedException {
         return executorService.invokeAll(tasks, timeout, unit);
     }
