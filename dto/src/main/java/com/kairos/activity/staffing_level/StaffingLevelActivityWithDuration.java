@@ -8,7 +8,18 @@ public class StaffingLevelActivityWithDuration {
     private boolean includeInMin;
     private int minNoOfStaff;
     private int maxNoOfStaff;
+    private int underStaffingOverStaffingCount;
     private Duration staffingLevelDuration;
+
+
+    public int getUnderStaffingOverStaffingCount() {
+        return underStaffingOverStaffingCount;
+    }
+
+    public void setUnderStaffingOverStaffingCount(int underStaffingOverStaffingCount) {
+        this.underStaffingOverStaffingCount = underStaffingOverStaffingCount;
+    }
+
 
     public String getName() {
         return name;
@@ -63,5 +74,13 @@ public class StaffingLevelActivityWithDuration {
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;
         this.staffingLevelDuration = staffingLevelDuration;
+    }
+    public StaffingLevelActivityWithDuration(StaffingLevelActivityWithDuration staffingLevelActivityWithDuration) {
+        this.activityId = staffingLevelActivityWithDuration.getActivityId();
+        this.minNoOfStaff = staffingLevelActivityWithDuration.getMinNoOfStaff();
+        this.maxNoOfStaff = staffingLevelActivityWithDuration.maxNoOfStaff;
+        this.underStaffingOverStaffingCount = staffingLevelActivityWithDuration.underStaffingOverStaffingCount;
+        this.name = staffingLevelActivityWithDuration.getName();
+        this.staffingLevelDuration = new Duration(staffingLevelActivityWithDuration.getStaffingLevelDuration().getFrom(),null) ;
     }
 }

@@ -230,4 +230,19 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupsForOrganizationCreation(countryId));
     }
 
+
+    @ApiOperation("Get country Access Groups by account type")
+    @GetMapping(value = COUNTRY_URL + "/access_group/account_type/{accountTypeId}" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountryAccessGroupByAccountTypeId (@PathVariable Long countryId, @PathVariable Long accountTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroupByAccountTypeId(countryId, accountTypeId));
+    }
+
+    @ApiOperation("get staff ids by unit id and accessgroup id")
+    @GetMapping(value = UNIT_URL+"/access_group/{accessGroupId}/staffs")
+    public ResponseEntity<Map<String, Object>> getStaffIdsByUnitIdAndAccessGroupId(@PathVariable Long unitId,@PathVariable Long accessGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId));
+    }
+
+
 }
