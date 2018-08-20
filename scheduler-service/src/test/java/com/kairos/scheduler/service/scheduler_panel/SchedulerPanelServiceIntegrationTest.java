@@ -132,10 +132,10 @@ public class SchedulerPanelServiceIntegrationTest {
 
     public void deleteSchedulerPanel(BigInteger createdId) {
 
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<Map<String,Object>>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = restTemplate.exchange(
                 baseUrlWithUnit + "/scheduler_panel/"+createdId,
                 HttpMethod.DELETE, null, typeReference);
         logger.info(response.toString());
