@@ -9,7 +9,6 @@ import com.kairos.persistance.repository.data_inventory.asset.AssetMongoReposito
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
-import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
@@ -349,13 +348,58 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
     /**
+     *
+     * @param unitId
+     * @param processingActivityId
+     * @param dataSubjectId
+     * @return
+     */
+    public boolean removelinkedDataSubjectFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger dataSubjectId) {
+
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity");
+        }
+        List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects = processingActivity.getDataSubjects();
+        if (!activityRelatedDataSubjects.isEmpty())
+        {
+            for (ProcessingActivityRelatedDataSubject activityRelatedDataSubject : processingActivity.getDataSubjects()) {
+                if (activityRelatedDataSubject.getId().equals(dataSubjectId)) {
+                    activityRelatedDataSubjects.remove(activityRelatedDataSubject);
+                    break;
+                }
+            }
+        }
+        processingActivityMongoRepository.save(processingActivity);
+        return true;
+    }
+
+
+    /**
+     * @description method removed linked asset id from Processing activity
+     * @param unitId
+     * @param processingActivityId
+     * @param assetId
+     * @return
+     */
+    public boolean removelinkedAssetFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+        }
+        processingActivity.setAssetId(null);
+        processingActivityMongoRepository.save(processingActivity);
+        return true;
+
+    }
+
+    /**
      * @param dataSubjectList
      * @param relatedDataCategoryMap
      * @description method filter data Category and there Corresponding data Element ,method filter data Category and remove Data category from data Category response List
      * similarly Data Elements are remove from data Element response list.
      */
     private void filterSelectedDataSubjectDataCategoryAndDataElementForProcessingActivity(List<DataSubjectMappingResponseDTO> dataSubjectList, Map<BigInteger, List<ProcessingActivityRelatedDataCategory>> relatedDataCategoryMap) {
-
 
         for (DataSubjectMappingResponseDTO dataSubjectMappingResponseDTO : dataSubjectList) {
 
