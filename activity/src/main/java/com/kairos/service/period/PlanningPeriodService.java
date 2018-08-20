@@ -76,7 +76,7 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     // To fetch list of planning periods
-    public List<PlanningPeriodDTO> getPlanningPeriods(Long unitId, LocalDate startDate, LocalDate endDate) {
+    public List<PlanningPeriodDTO> getPlanningPeriods(Long unitId, LocalDateTime startDate, LocalDateTime endDate) {
         List<PhaseDTO> phases = phaseService.getPlanningPhasesByUnit(unitId);
 
         // Prepare map for phases with id as key and sequence as value
@@ -85,7 +85,7 @@ public class PlanningPeriodService extends MongoBaseService {
         // Fetch planning periods
         List<PlanningPeriodDTO> planningPeriods = null;
         if (Optional.ofNullable(startDate).isPresent() && Optional.ofNullable(endDate).isPresent()) {
-            planningPeriods = planningPeriodMongoRepository.findPeriodsOfUnitByStartAndEndDate(unitId, startDate, endDate);
+            planningPeriods = planningPeriodMongoRepository.findPeriodsOfUnitByStartAndEndDate(unitId, startDate.toLocalDate(), endDate.toLocalDate());
         } else {
             planningPeriods = planningPeriodMongoRepository.findAllPeriodsOfUnit(unitId);
         }
@@ -162,21 +162,21 @@ public class PlanningPeriodService extends MongoBaseService {
         save(planningPeriods);
     }
 
-    public PlanningPeriod createPlanningPeriodOnMigration(LocalDate startDate, LocalDate endDate, Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> applicablePhases) {
-        String name = DateUtils.formatLocalDate(startDate, AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(endDate, AppConstants.DATE_FORMET_STRING);
+    public PlanningPeriod createPlanningPeriodOnMigration(LocalDateTime startDate, LocalDateTime endDate, Long unitId, PlanningPeriodDTO planningPeriodDTO, List<PhaseDTO> applicablePhases) {
+        String name = DateUtils.formatLocalDate(startDate.toLocalDate(), AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(endDate.toLocalDate(), AppConstants.DATE_FORMET_STRING);
         PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate, endDate, unitId);
         planningPeriod = setPhaseFlippingDatesForPlanningPeriod(startDate, applicablePhases, planningPeriod);
         return planningPeriod;
     }
 
-    public PlanningPeriod setPhaseFlippingDatesForPlanningPeriod(LocalDate startDate, List<PhaseDTO> applicablePhases, PlanningPeriod planningPeriod) {
+    public PlanningPeriod setPhaseFlippingDatesForPlanningPeriod(LocalDateTime startDate, List<PhaseDTO> applicablePhases, PlanningPeriod planningPeriod) {
 
         BigInteger currentPhaseId = null;
         BigInteger nextPhaseId = null;
         List<PeriodPhaseFlippingDate> tempPhaseFlippingDate = new ArrayList<>();
         if (Optional.ofNullable(applicablePhases).isPresent()) {
 
-            LocalDate tempFlippingDate = startDate;
+            LocalDateTime tempFlippingDate = startDate;
             boolean scopeToFlipNextPhase = true;
             BigInteger previousPhaseId = null;
             int index = 0;
@@ -186,7 +186,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 // Check if duration of period is enough to assign next flipping
                 tempFlippingDate = DateUtils.addDurationInLocalDate(tempFlippingDate, -phase.getDurationInDays(), DurationType.DAYS, 1);
                 // DateUtils.getDate().compareTo(tempFlippingDate) >= 0
-                if (applicablePhases.size() == index + 1 || (scopeToFlipNextPhase && DateUtils.getLocalDateFromDate(DateUtils.getDate()).isAfter(tempFlippingDate))) {
+                if (applicablePhases.size() == index + 1 || (scopeToFlipNextPhase && DateUtils.getLocalDateFromDate(DateUtils.getDate()).isAfter(tempFlippingDate.toLocalDate()))) {
                     if (scopeToFlipNextPhase) {
                         currentPhaseId = phase.getId();
                         nextPhaseId = previousPhaseId;
@@ -195,7 +195,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 }
                 previousPhaseId = phase.getId();
                 // Calculate flipping date by duration
-                PeriodPhaseFlippingDate periodPhaseFlippingDate = new PeriodPhaseFlippingDate(phase.getId(), scopeToFlipNextPhase ? tempFlippingDate : null);
+                PeriodPhaseFlippingDate periodPhaseFlippingDate = new PeriodPhaseFlippingDate(phase.getId(), scopeToFlipNextPhase ? tempFlippingDate.toLocalDate() : null);
                 tempPhaseFlippingDate.add(periodPhaseFlippingDate);
                 index += 1;
             }
@@ -207,10 +207,10 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     // To create Planning Period object and to save the list
-    public void createPlanningPeriod(Long unitId, LocalDate startDate, List<PlanningPeriod> planningPeriods, List<PhaseDTO> applicablePhases, PlanningPeriodDTO planningPeriodDTO, int recurringNumber) {
-        LocalDate endDate = getNextValidDateForPlanningPeriod(startDate, planningPeriodDTO);
+    public void createPlanningPeriod(Long unitId, LocalDateTime startDate, List<PlanningPeriod> planningPeriods, List<PhaseDTO> applicablePhases, PlanningPeriodDTO planningPeriodDTO, int recurringNumber) {
+        LocalDateTime endDate = getNextValidDateForPlanningPeriod(startDate, planningPeriodDTO);
         // Set name of period dynamically
-        String name = DateUtils.formatLocalDate(startDate, AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(endDate, AppConstants.DATE_FORMET_STRING);
+        String name = DateUtils.formatLocalDate(startDate.toLocalDate(), AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(endDate.toLocalDate(), AppConstants.DATE_FORMET_STRING);
         PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate,
                 endDate, unitId);
         planningPeriod = setPhaseFlippingDatesForPlanningPeriod(startDate, applicablePhases, planningPeriod);
@@ -228,20 +228,20 @@ public class PlanningPeriodService extends MongoBaseService {
         }
     }
 
-    public List<LocalDate> getListOfStartDateInWeekOrMonths(LocalDate startDate, LocalDate endDate, PlanningPeriodDTO planningPeriodDTO) {
-        List<LocalDate> startDateList = new ArrayList<>();
+    public List<LocalDateTime> getListOfStartDateInWeekOrMonths(LocalDateTime startDate, LocalDateTime endDate, PlanningPeriodDTO planningPeriodDTO) {
+        List<LocalDateTime> startDateList = new ArrayList<>();
         if (planningPeriodDTO.getDurationType().equals(DurationType.WEEKS)) {
             if (!startDate.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
                 startDateList.add(startDate);
             }
             while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
-                LocalDate startDateOfMonday = startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+                LocalDateTime startDateOfMonday = startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
                 startDateList.add((startDateOfMonday.isBefore(endDate) ? startDateOfMonday : startDate));
                 startDate = startDate.plusWeeks(planningPeriodDTO.getDuration());
             }
         } else {
             while (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
-                LocalDate startDateOfMonth = ((startDate.getDayOfMonth() != 1) ? startDate : startDate.withDayOfMonth(1));
+                LocalDateTime startDateOfMonth = ((startDate.getDayOfMonth() != 1) ? startDate : startDate.withDayOfMonth(1));
                 startDateList.add(startDateOfMonth);
                 startDate = startDate.withDayOfMonth(1).plusMonths(1);
             }
@@ -303,9 +303,9 @@ public class PlanningPeriodService extends MongoBaseService {
             planningPeriodDTO.setStartDate(lastEndDate.getEndDate().toLocalDate().plusDays(1));
             planningPeriodDTO.setStartTime(lastEndDate.getEndDate().toLocalTime().plusSeconds(1));
         }
-        createPlanningPeriod(unitId, planningPeriodDTO.getStartDate(), planningPeriods, phases, planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
+        createPlanningPeriod(unitId, LocalDateTime.of(planningPeriodDTO.getStartDate(),planningPeriodDTO.getStartTime()), planningPeriods, phases, planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
         save(planningPeriods);
-        return getPlanningPeriods(unitId, planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate());
+        return getPlanningPeriods(unitId, LocalDateTime.of(planningPeriodDTO.getStartDate(),planningPeriodDTO.getStartTime()),LocalDateTime.of(planningPeriodDTO.getEndDate(),planningPeriodDTO.getEndTime()));
     }
 
     public boolean updateFlippingDate(BigInteger periodId, Long unitId, LocalDate date) {
@@ -366,10 +366,10 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.period.phase.request.name", planningPeriod.getName());
         }
         //Check if startDate and endDate is different from the original one
-        if (!planningPeriodDTO.getStartDate().isEqual(planningPeriod.getStartDate()) &&
-                !planningPeriodDTO.getEndDate().isEqual(planningPeriod.getStartDate())) {
-            exceptionService.actionNotPermittedException("message.period.startdate.enddate.notupdate");
-        }
+//        if (!planningPeriodDTO.getStartDate().isEqual(planningPeriod.getStartDate()) &&
+//                !planningPeriodDTO.getEndDate().isEqual(planningPeriod.getStartDate())) {
+//            exceptionService.actionNotPermittedException("message.period.startdate.enddate.notupdate");
+//        }
         //If No change in date
         planningPeriod = updatePhaseFlippingDateOfPeriod(planningPeriod, planningPeriodDTO, unitId);
         planningPeriod.setName(planningPeriodDTO.getName());

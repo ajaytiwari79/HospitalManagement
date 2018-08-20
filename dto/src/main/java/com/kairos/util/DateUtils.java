@@ -494,8 +494,8 @@ public class DateUtils {
         return Date.from(zonedDateTime.toInstant());
     }
 
-    public static LocalDate addDurationInLocalDateExcludingLastDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber) {
-        LocalDate endDate = addDurationInLocalDate(localDate, duration, durationType, recurringNumber);
+    public static LocalDateTime addDurationInLocalDateExcludingLastDate(LocalDateTime localDate, int duration, DurationType durationType, int recurringNumber) {
+        LocalDateTime endDate = addDurationInLocalDate(localDate, duration, durationType, recurringNumber);
         return endDate.minusDays(1);
     }
 
@@ -518,16 +518,19 @@ public class DateUtils {
         }
     }
 
-    public static LocalDate addDurationInLocalDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber) {
+    public static LocalDateTime addDurationInLocalDate(LocalDateTime localDate, int duration, DurationType durationType, int recurringNumber) {
         switch (durationType) {
             case DAYS: {
-                return localDate.plusDays(duration * recurringNumber);
+                return LocalDateTime.of(localDate.toLocalDate().plusDays(duration * recurringNumber),localDate.toLocalTime());
             }
             case WEEKS: {
-                return localDate.plusDays(duration * recurringNumber * 7);
+                return LocalDateTime.of(localDate.toLocalDate().plusDays(duration * recurringNumber * 7),localDate.toLocalTime());
             }
             case MONTHS: {
-                return localDate.plusMonths(duration * recurringNumber);
+                return LocalDateTime.of(localDate.toLocalDate().plusMonths(duration * recurringNumber),localDate.toLocalTime());
+            }
+            case HOURS: {
+                return LocalDateTime.of(localDate.toLocalDate(),localDate.toLocalTime().plusHours(duration * recurringNumber));
             }
         }
         return localDate;
