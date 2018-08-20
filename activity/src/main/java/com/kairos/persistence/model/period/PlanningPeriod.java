@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,8 +18,8 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlanningPeriod extends MongoBaseEntity {
 
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String name;
     @Indexed
     private Long unitId = -1L;
@@ -33,26 +34,26 @@ public class PlanningPeriod extends MongoBaseEntity {
         // default constructor
     }
 
-    public PlanningPeriod(String name, LocalDate startDate, LocalDate endDate, Long unitId) {
+    public PlanningPeriod(String name, LocalDateTime startDate, LocalDateTime endDate, Long unitId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.unitId = unitId;
     }
 
-    public LocalDate getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
 

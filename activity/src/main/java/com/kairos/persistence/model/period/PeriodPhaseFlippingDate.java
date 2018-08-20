@@ -4,6 +4,7 @@ import com.kairos.persistence.model.phase.Phase;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,13 +14,13 @@ import java.util.List;
  */
 public class PeriodPhaseFlippingDate {
     private BigInteger phaseId;
-    private LocalDate flippingDate;
+    private LocalDateTime flippingDate;
 
     public PeriodPhaseFlippingDate(){
         // default constructor
     }
 
-    public PeriodPhaseFlippingDate(BigInteger phaseId, LocalDate flippingDate){
+    public PeriodPhaseFlippingDate(BigInteger phaseId, LocalDateTime flippingDate){
         this.phaseId = phaseId;
         this.flippingDate = flippingDate;
     }
@@ -32,11 +33,11 @@ public class PeriodPhaseFlippingDate {
         this.phaseId = phaseId;
     }
 
-    public LocalDate getFlippingDate() {
+    public LocalDateTime getFlippingDate() {
         return flippingDate;
     }
 
-    public void setFlippingDate(LocalDate flippingDate) {
+    public void setFlippingDate(LocalDateTime flippingDate) {
         this.flippingDate = flippingDate;
     }
 
