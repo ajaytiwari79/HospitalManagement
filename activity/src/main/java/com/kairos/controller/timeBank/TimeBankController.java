@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
@@ -51,6 +52,12 @@ public class TimeBankController {
     @GetMapping(value = "overview/unit_position/{unitEmploymentId}/")
     public ResponseEntity<Map<String, Object>> getTimeBankForOverview(@PathVariable Long unitId,@PathVariable Long unitEmploymentId, @RequestParam Integer year) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getOverviewTimeBank
+                (unitEmploymentId,year));
+    }
+
+    @GetMapping(value = "visual_view/unit_position/{unitEmploymentId}/")
+    public ResponseEntity<Map<String, Object>> getTimeBankForVisualView(@PathVariable Long unitId,@PathVariable Long unitEmploymentId, @RequestParam Integer year) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getTimeBankForVisualView
                 (unitEmploymentId,year));
     }
 

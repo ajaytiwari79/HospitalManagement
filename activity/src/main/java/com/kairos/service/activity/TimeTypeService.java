@@ -143,6 +143,11 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeDTOS;
     }
 
+    public Map<String,List<TimeType>> getPresenceAbsenceTimeType(Long countryId){
+        List<TimeType> timeTypes = timeTypeMongoRepository.findAllByCountryId(countryId);
+
+    }
+
 
     public List<TimeTypeDTO> getAllTimeTypeByCountryId(Long countryId) {
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllByCountryId(countryId);

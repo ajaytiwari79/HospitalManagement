@@ -2,30 +2,28 @@ package com.kairos.service.time_bank;
 
 
 import com.kairos.activity.shift.StaffUnitPositionDetails;
-import com.kairos.activity.time_bank.TimeBankAndPayoutDTO;
-import com.kairos.enums.Day;
-import com.kairos.persistence.model.pay_out.PayOut;
-import com.kairos.persistence.repository.pay_out.PayOutRepository;
-import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
-import com.kairos.service.pay_out.PayOutTransaction;
-import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.activity.time_bank.CalculatedTimeBankByDateDTO;
-import com.kairos.activity.time_bank.TimeBankDTO;
-import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.activity.time_bank.*;
+import com.kairos.activity.time_bank.time_bank_basic.time_bank.ScheduledActivitiesDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.rest_client.OrganizationRestClient;
-import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.persistence.repository.pay_out.PayOutRepository;
+import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.rest_client.OrganizationRestClient;
+import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.pay_out.PayOutTransaction;
+import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.util.DateUtils;
 import com.kairos.util.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -34,7 +32,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.time.DayOfWeek;
+import java.math.BigInteger;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -221,6 +220,34 @@ public class TimeBankService extends MongoBaseService {
             dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndDate(unitPositionId, interval.getStart().toDate(), interval.getEnd().toDate());
         }
         return timeBankCalculationService.getOverviewTimeBank(unitPositionId, interval.getStart().dayOfYear().withMinimumValue(), interval.getEnd().dayOfYear().withMaximumValue(), dailyTimeBankEntries, unitPositionWithCtaDetailsDTO);
+    }
+
+
+
+    public TimeBankVisualViewDTO getTimeBankForVisualView(Long unitId,Long unitPositionId,String query,Integer value,Date startDate,Date endDate){
+        if(StringUtils.isNotEmpty(query)){
+
+        }
+        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionId,startDate,endDate);
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndDate(unitPositionId,new Date(),new Date());
+        Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
+        Map<String,List<TimeType>> presenceAbsenceTimeTypeMap = timeTypeService.getPresenceAbsenceTimeType(countryId);
+        List<ScheduledActivitiesDTO> scheduledActivitiesDTOS = getScheduledActivities(shifts);
+        return timeBankCalculationService.getVisualViewTimeBank();
+
+    }
+
+
+
+
+    private List<ScheduledActivitiesDTO> getScheduledActivities(List<ShiftWithActivityDTO> shifts){
+        Map<String,Long> activityScheduledMin  = shifts.stream().collect(Collectors.groupingBy(s->s.getActivityId()+"-"+s.getActivity().getName(),Collectors.summingLong(s->s.getScheduledMinutes())));
+        List<ScheduledActivitiesDTO> scheduledActivitiesDTOS = new ArrayList<>(activityScheduledMin.size());
+        activityScheduledMin.forEach((activity, mintues) -> {
+            String[] idNameArray = activity.split("-");
+             scheduledActivitiesDTOS.add(new ScheduledActivitiesDTO(new BigInteger(idNameArray[0]),idNameArray[1],mintues));
+        });
+        return scheduledActivitiesDTOS;
     }
 
     /**
