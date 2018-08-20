@@ -46,7 +46,7 @@ public class StaffingLevelTemplateController {
     @ApiOperation("update staffing_level template ")
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(
             @RequestBody @Valid StaffingLevelTemplateDTO staffingLevelTemplateDTO, @PathVariable BigInteger id) {
-        StaffingLevelTemplateDTO response=staffingLevelTemplateService.updateStaffingTemplate(staffingLevelTemplateDTO,id);
+        StaffingLevelTemplateDTO response=staffingLevelTemplateService.updateStaffingLevelTemplte(staffingLevelTemplateDTO,id);
         if(!response.getErrors().isEmpty()){
             return ResponseHandler.invalidResponse(HttpStatus.PRECONDITION_REQUIRED, false, response.getErrors());
         }
@@ -54,7 +54,7 @@ public class StaffingLevelTemplateController {
     }
 
     @GetMapping(value = "/")
-    @ApiOperation("update staffing_level template ")
+    @ApiOperation("get staffing_level template ")
     public ResponseEntity<Map<String, Object>> getValidStaffingLevelTemplates(@PathVariable Long unitId,
       @RequestParam(value = "selectedDate",required = false)@DateTimeFormat(pattern="yyyy-MM-dd")Date selectedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,

@@ -1,7 +1,7 @@
 package com.kairos.activity.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.activity.ActivityResponse;
+import com.kairos.activity.activity.ActivityValidationError;
 import com.kairos.enums.Day;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -24,7 +24,7 @@ public class StaffingLevelTemplateDTO {
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private boolean disabled;
-    private List<ActivityResponse> errors;
+    private List<ActivityValidationError> errors;
 
     public StaffingLevelTemplateDTO() {
         //default constructor
@@ -103,11 +103,11 @@ public class StaffingLevelTemplateDTO {
         this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 
-    public List<ActivityResponse> getErrors() {
+    public List<ActivityValidationError> getErrors() {
         return Optional.ofNullable(errors).orElse(new ArrayList<>());
     }
 
-    public void setErrors(List<ActivityResponse> errors) {
+    public void setErrors(List<ActivityValidationError> errors) {
         this.errors = errors;
     }
 }

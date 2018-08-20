@@ -40,7 +40,7 @@ public class StaffingLevelTemplateIntegrationTest {
     public void addStaffingLevelTemplate() {
         String baseUrl=getBaseUrl(1L,1L);
 
-        HttpEntity<PresenceStaffingLevelDto> entity = new HttpEntity<PresenceStaffingLevelDto>(getStaffingLevelDTO());
+        HttpEntity<PresenceStaffingLevelDto> entity = new HttpEntity<>(getStaffingLevelDTO());
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl+"/staffing_level_template/",
@@ -53,9 +53,9 @@ public class StaffingLevelTemplateIntegrationTest {
 
     @Test
     public void getStaffingLevelTemplateByUnitIdAndDateTest() {
-        String baseUrl=getBaseUrl(1L,1L);
+        String baseUrl=getBaseUrl(24L,2567L);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/staffing_level_template/")
-                .queryParam("selectedDate","2017-11-10");
+                .queryParam("selectedDate","2018-08-21");
 
         ResponseEntity<String> response = restTemplate.exchange(
                 builder.toUriString(),
@@ -90,7 +90,7 @@ public class StaffingLevelTemplateIntegrationTest {
     public void deleteStaffingLevelTemplate() {
         String baseUrl=getBaseUrl(24L,2567L);
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl+"staffing_level_template/26",
+                baseUrl+"/staffing_level_template/10",
                 HttpMethod.DELETE, null, String.class);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }

@@ -10,20 +10,20 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
-public class ActivityResponse {
+public class ActivityValidationError {
     private BigInteger id;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
     private List<String> messages;
 
-    public ActivityResponse() {
+    public ActivityValidationError() {
         //Default Constructor
     }
 
 
 
-    public ActivityResponse(BigInteger id, String name, LocalDate startDate, LocalDate endDate, List<String> messages) {
+    public ActivityValidationError(BigInteger id, String name, LocalDate startDate, LocalDate endDate, List<String> messages) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;

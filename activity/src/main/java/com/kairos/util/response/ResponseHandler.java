@@ -1,11 +1,13 @@
 package com.kairos.util.response;
 
+import com.kairos.util.DateUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +20,7 @@ public final class ResponseHandler {
     }
         public static ResponseEntity<Map<String, Object>> generateResponse(HttpStatus status, boolean isSuccess, Object responseObj) {
         // Get Time as per UTC format
-        long dateTime = new DateTime( DateTimeZone.UTC).getMillis();
+        long dateTime =DateUtils.getCurrentMillis();
 
         Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("status", status.value());
@@ -31,7 +33,7 @@ public final class ResponseHandler {
 
     public static ResponseEntity<Map<String, Object>> invalidResponse(HttpStatus status, boolean isSuccess, Object errors) {
         // Get Time as per UTC format
-        long dateTime = new DateTime( DateTimeZone.UTC).getMillis();
+        long dateTime = DateUtils.getCurrentMillis();
 
         Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("status", status.value());
