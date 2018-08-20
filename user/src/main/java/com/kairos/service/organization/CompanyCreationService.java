@@ -11,6 +11,7 @@ import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
@@ -32,9 +33,7 @@ import com.kairos.service.AsynchronousService;
 import com.kairos.service.agreement.cta.CountryCTAService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.user.organization.CompanyType;
-import com.kairos.user.organization.OrganizationBasicDTO;
+import com.kairos.user.organization.*;
 import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
 import com.kairos.util.FormatUtil;
@@ -137,6 +136,47 @@ public class CompanyCreationService {
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
         organizationGraphRepository.save(organization);
 
+        orgDetails.setId(organization.getId());
+        return orgDetails;
+    }
+    public OrganizationBasicDTO updateParentOrganization(OrganizationBasicDTO orgDetails, long organizationId, long countryId) {
+        Organization organization = organizationGraphRepository.findOne(organizationId, 1);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
+
+        }
+        if (organization.getDesiredUrl() != null && !orgDetails.getDesiredUrl().trim().equalsIgnoreCase(organization.getDesiredUrl())) {
+            Boolean orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrl(orgDetails.getDesiredUrl());
+            if (orgExistWithUrl) {
+                exceptionService.dataNotFoundByIdException("error.Organization.desiredUrl.duplicate", orgDetails.getDesiredUrl());
+            }
+        }
+        if (!orgDetails.getName().equalsIgnoreCase(organization.getName())) {
+            Boolean orgExistWithName = organizationGraphRepository.checkOrgExistWithName(orgDetails.getName());
+            if (orgExistWithName) {
+                exceptionService.dataNotFoundByIdException("error.Organization.name.duplicate", orgDetails.getName());
+            }
+        }
+        organization = new OrganizationBuilder()
+                .setIsParentOrganization(true)
+                .setName(orgDetails.getName())
+                .setCompanyType(orgDetails.getCompanyType())
+                .setVatId(orgDetails.getVatId())
+                .setShortCompanyName(orgDetails.getShortCompanyName())
+                .setDesiredUrl(orgDetails.getDesiredUrl())
+                .setDescription(orgDetails.getDescription())
+                .createOrganization();
+
+        if (CompanyType.COMPANY.equals(orgDetails.getCompanyType())) {
+            AccountType accountType = accountTypeGraphRepository.findOne(orgDetails.getAccountTypeId(), 0);
+            if (!Optional.ofNullable(accountType).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.accountType.notFound");
+            }
+            organization.setAccountType(accountType);
+        }
+        organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
+        organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
+        organizationGraphRepository.save(organization);
         orgDetails.setId(organization.getId());
         return orgDetails;
     }

@@ -416,35 +416,6 @@ public class OrganizationService {
         return organizationResponseWrapper;
     }
 
-    public Map<String, OrganizationResponseDTO> updateParentOrganization(OrganizationRequestWrapper organizationRequestWrapper, long organizationId, long countryId) {
-        Map<String, OrganizationResponseDTO> organizationResponseDTOs = new HashMap<>();
-        OrganizationBasicDTO orgDetails = organizationRequestWrapper.getCompany();
-        Organization organization = organizationGraphRepository.findOne(organizationId, 2);
-        if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
-
-        }
-
-        if (organization.getDesiredUrl() != null && !orgDetails.getDesiredUrl().trim().equalsIgnoreCase(organization.getDesiredUrl())) {
-            Boolean orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrl(orgDetails.getDesiredUrl());
-            if (orgExistWithUrl) {
-                exceptionService.dataNotFoundByIdException("error.Organization.desiredUrl.duplicate", orgDetails.getDesiredUrl());
-            }
-        }
-
-        if (!orgDetails.getName().trim().equalsIgnoreCase(organization.getName())) {
-            Boolean orgExistWithName = organizationGraphRepository.checkOrgExistWithName(orgDetails.getName());
-            if (orgExistWithName) {
-                exceptionService.dataNotFoundByIdException("error.Organization.name.duplicate", orgDetails.getName());
-            }
-        }
-
-        organization = saveOrganizationDetails(organization, orgDetails, true, countryId);
-
-        organizationGraphRepository.save(organization);
-        organizationResponseDTOs.put("company", organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId(), orgDetails.getUnitManagerDTO()));
-        return organizationResponseDTOs;
-    }
 
 
     public OrganizationResponseDTO updateUnion(OrganizationBasicDTO orgDetails, long unionId, long countryId) {

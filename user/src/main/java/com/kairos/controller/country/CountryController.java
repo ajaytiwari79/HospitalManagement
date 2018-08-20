@@ -355,8 +355,8 @@ public class CountryController {
     @ApiOperation(value = "Update Parent Organization")
     @RequestMapping(value = COUNTRY_URL + "/parent_organization/{parentOrganizationId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateParentOrganization(@PathVariable long countryId, @PathVariable long parentOrganizationId, @Valid @RequestBody OrganizationRequestWrapper organizationRequestWrapper) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateParentOrganization(organizationRequestWrapper, parentOrganizationId, countryId));
+    public ResponseEntity<Map<String, Object>> updateParentOrganization(@PathVariable long countryId, @PathVariable long parentOrganizationId, @Valid @RequestBody OrganizationBasicDTO organizationRequestWrapper) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, companyCreationService.updateParentOrganization(organizationRequestWrapper, parentOrganizationId, countryId));
     }
 
     @ApiOperation(value = "Create a Union")
