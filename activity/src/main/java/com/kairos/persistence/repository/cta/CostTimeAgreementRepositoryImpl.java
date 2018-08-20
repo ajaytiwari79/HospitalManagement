@@ -90,6 +90,16 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
     @Override
+    public CTAResponseDTO getCTAByUnitPositionId(Long unitPositionId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).and("disabled").is(false)),
+                lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")
+        );
+        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation,CostTimeAgreement.class,CTAResponseDTO.class);
+        return result.getMappedResults().isEmpty()? null : result.getMappedResults().get(0);
+    }
+
+    @Override
     public List<CTAResponseDTO> getVersionsCTA(List<Long> upIds){
         String query = "{\n" +
                 "      $graphLookup: {\n" +

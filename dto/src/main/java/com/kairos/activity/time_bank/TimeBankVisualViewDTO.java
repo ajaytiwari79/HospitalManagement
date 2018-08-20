@@ -1,5 +1,6 @@
 package com.kairos.activity.time_bank;
 
+import com.kairos.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
 import com.kairos.activity.time_bank.time_bank_basic.time_bank.ScheduledActivitiesDTO;
 
 import java.util.List;
@@ -18,8 +19,21 @@ public class TimeBankVisualViewDTO {
 
     private List<TimeBankIntervalDTO> timeBankIntervals;
     private List<ScheduledActivitiesDTO> scheduledActivities;
-    private List<TimeBankCTADistributionDTO> timeBankCTADistributions;
+    private List<CTADistributionDTO> timeBankCTADistributions;
 
+
+    public TimeBankVisualViewDTO(long timeBankMinutes, long presenceScheduledMinutes, long absenceScheduledMinutes, long timeBankChange, List<TimeBankIntervalDTO> timeBankIntervals, List<ScheduledActivitiesDTO> scheduledActivities, List<CTADistributionDTO> timeBankCTADistributions) {
+        this.timeBankMinutes = timeBankMinutes;
+        this.presenceScheduledMinutes = presenceScheduledMinutes;
+        this.absenceScheduledMinutes = absenceScheduledMinutes;
+        this.timeBankChange = timeBankChange;
+        this.timeBankIntervals = timeBankIntervals;
+        this.scheduledActivities = scheduledActivities;
+        this.timeBankCTADistributions = timeBankCTADistributions;
+    }
+
+    public TimeBankVisualViewDTO() {
+    }
 
     public List<TimeBankIntervalDTO> getTimeBankIntervals() {
         return timeBankIntervals;
@@ -69,11 +83,11 @@ public class TimeBankVisualViewDTO {
         this.scheduledActivities = scheduledActivities;
     }
 
-    public List<TimeBankCTADistributionDTO> getTimeBankCTADistributions() {
+    public List<CTADistributionDTO> getTimeBankCTADistributions() {
         return timeBankCTADistributions;
     }
 
-    public void setTimeBankCTADistributions(List<TimeBankCTADistributionDTO> timeBankCTADistributions) {
+    public void setTimeBankCTADistributions(List<CTADistributionDTO> timeBankCTADistributions) {
         this.timeBankCTADistributions = timeBankCTADistributions;
     }
 }
