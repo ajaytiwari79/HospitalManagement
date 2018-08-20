@@ -52,7 +52,7 @@ public class AccessorPartyService extends MongoBaseService {
             for (AccessorPartyDTO accessorParty : accessorParties) {
                 accessorPartyNames.add(accessorParty.getName());
             }
-            List<AccessorParty> existing = findByNamesAndCountryId(countryId, accessorPartyNames, AccessorParty.class);
+            List<AccessorParty> existing = findMetaDataByNamesAndCountryId(countryId, accessorPartyNames, AccessorParty.class);
             accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();

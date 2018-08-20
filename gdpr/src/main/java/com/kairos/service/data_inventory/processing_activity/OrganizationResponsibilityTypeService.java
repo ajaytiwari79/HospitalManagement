@@ -42,7 +42,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      * @return return map which contain list of new ResponsibilityType and list of existing ResponsibilityType if ResponsibilityType already exist
      * @description this method create new ResponsibilityType if ResponsibilityType not exist with same name ,
      * and if exist then simply add  ResponsibilityType to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing ResponsibilityType using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing ResponsibilityType using collation ,used for case insensitive result
      */
     public Map<String, List<ResponsibilityType>> createResponsibilityType(Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
@@ -56,7 +56,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ResponsibilityType> existing = findAllByNameAndOrganizationId(organizationId, responsibilityTypeNames, ResponsibilityType.class);
+            List<ResponsibilityType> existing = findMetaDataByNameAndUnitId(organizationId, responsibilityTypeNames, ResponsibilityType.class);
             responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
 
             List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();

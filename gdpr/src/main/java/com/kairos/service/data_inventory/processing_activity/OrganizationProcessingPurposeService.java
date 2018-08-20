@@ -43,7 +43,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      * @return return map which contain list of new ProcessingPurpose and list of existing ProcessingPurpose if ProcessingPurpose already exist
      * @description this method create new ProcessingPurpose if ProcessingPurpose not exist with same name ,
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
     public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
@@ -53,7 +53,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
             for (ProcessingPurposeDTO processingPurpose : processingPurposeDTOS) {
                 processingPurposesNames.add(processingPurpose.getName());
             }
-            List<ProcessingPurpose> existing = findAllByNameAndOrganizationId(organizationId, processingPurposesNames, ProcessingPurpose.class);
+            List<ProcessingPurpose> existing = findMetaDataByNameAndUnitId(organizationId, processingPurposesNames, ProcessingPurpose.class);
             processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
             List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();

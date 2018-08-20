@@ -55,7 +55,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
                 orgSecurityMeasureNames.add(securityMeasure.getName());
             }
 
-            List<OrganizationalSecurityMeasure> existing = findAllByNameAndOrganizationId(organizationId, orgSecurityMeasureNames, OrganizationalSecurityMeasure.class);
+            List<OrganizationalSecurityMeasure> existing = findMetaDataByNameAndUnitId(organizationId, orgSecurityMeasureNames, OrganizationalSecurityMeasure.class);
             orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
             List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {

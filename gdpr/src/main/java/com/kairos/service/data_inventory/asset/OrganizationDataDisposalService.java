@@ -43,7 +43,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      * @return return map which contain list of new data disposal and list of existing data disposal if data disposal already exist
      * @description this method create new data Disposal if data disposal not exist with same name ,
      * and if exist then simply add  data disposal to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing data disposal using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing data disposal using collation ,used for case insensitive result
      */
     public Map<String, List<DataDisposal>> createDataDisposal(Long organizationId, List<DataDisposalDTO> dataDisposalDTOS) {
 
@@ -54,7 +54,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
                 dataDisposalsNames.add(dataDisposal.getName());
             }
 
-            List<DataDisposal> existing = findAllByNameAndOrganizationId(organizationId, dataDisposalsNames, DataDisposal.class);
+            List<DataDisposal> existing = findMetaDataByNameAndUnitId(organizationId, dataDisposalsNames, DataDisposal.class);
             dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
             List<DataDisposal> newDataDisposals = new ArrayList<>();
             if (!dataDisposalsNames.isEmpty()) {

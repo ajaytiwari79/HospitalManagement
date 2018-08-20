@@ -41,7 +41,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @return return map which contain list of new ProcessingPurpose and list of existing ProcessingPurpose if ProcessingPurpose already exist
      * @description this method create new ProcessingPurpose if ProcessingPurpose not exist with same name ,
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
     public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
@@ -55,7 +55,7 @@ public class ProcessingPurposeService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ProcessingPurpose> existing = findByNamesAndCountryId(countryId, processingPurposesNames, ProcessingPurpose.class);
+            List<ProcessingPurpose> existing = findMetaDataByNamesAndCountryId(countryId, processingPurposesNames, ProcessingPurpose.class);
             processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
             List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();

@@ -43,7 +43,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @return return map which contain list of new OrganizationalSecurityMeasure and list of existing OrganizationalSecurityMeasure if OrganizationalSecurityMeasure already exist
      * @description this method create new OrganizationalSecurityMeasure if OrganizationalSecurityMeasure not exist with same name ,
      * and if exist then simply add  OrganizationalSecurityMeasure to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing OrganizationalSecurityMeasure using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing OrganizationalSecurityMeasure using collation ,used for case insensitive result
      */
     public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long countryId, List<OrganizationalSecurityMeasureDTO> securityMeasureDTOS) {
 
@@ -54,7 +54,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
                 orgSecurityMeasureNames.add(securityMeasure.getName());
             }
 
-            List<OrganizationalSecurityMeasure> existing = findByNamesAndCountryId(countryId, orgSecurityMeasureNames, OrganizationalSecurityMeasure.class);
+            List<OrganizationalSecurityMeasure> existing = findMetaDataByNamesAndCountryId(countryId, orgSecurityMeasureNames, OrganizationalSecurityMeasure.class);
             orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
             List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {

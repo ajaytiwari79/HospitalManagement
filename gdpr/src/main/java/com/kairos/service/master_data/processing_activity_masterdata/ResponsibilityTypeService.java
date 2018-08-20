@@ -55,7 +55,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
                 responsibilityTypeNames.add(responsibilityType.getName());
             }
-            List<ResponsibilityType> existing = findByNamesAndCountryId(countryId, responsibilityTypeNames, ResponsibilityType.class);
+            List<ResponsibilityType> existing = findMetaDataByNamesAndCountryId(countryId, responsibilityTypeNames, ResponsibilityType.class);
             responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
 
             List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();

@@ -43,7 +43,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return return map which contain list of new StorageFormat and list of existing StorageFormat if StorageFormat already exist
      * @description this method create new StorageFormat if StorageFormat not exist with same name ,
      * and if exist then simply add  StorageFormat to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
      */
     public Map<String, List<StorageFormat>> createStorageFormat(Long organizationId, List<StorageFormatDTO> storageFormatDTOS) {
 
@@ -53,7 +53,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
             for (StorageFormatDTO storageFormat : storageFormatDTOS) {
                 storageFormatNames.add(storageFormat.getName());
             }
-            List<StorageFormat> existing = findAllByNameAndOrganizationId(organizationId, storageFormatNames, StorageFormat.class);
+            List<StorageFormat> existing = findMetaDataByNameAndUnitId(organizationId, storageFormatNames, StorageFormat.class);
             storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
             List<StorageFormat> newStorageFormats = new ArrayList<>();

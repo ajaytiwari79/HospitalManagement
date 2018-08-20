@@ -43,7 +43,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
      * @return return map which contain list of new TransferMethod and list of existing TransferMethod if TransferMethod already exist
      * @description this method create new TransferMethod if TransferMethod not exist with same name ,
      * and if exist then simply add  TransferMethod to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
      */
     public Map<String, List<TransferMethod>> createTransferMethod(Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
 
@@ -57,7 +57,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<TransferMethod> existing = findAllByNameAndOrganizationId(organizationId, transferMethodNames, TransferMethod.class);
+            List<TransferMethod> existing = findMetaDataByNameAndUnitId(organizationId, transferMethodNames, TransferMethod.class);
             transferMethodNames = ComparisonUtils.getNameListForMetadata(existing, transferMethodNames);
 
             List<TransferMethod> newTransferMethods = new ArrayList<>();

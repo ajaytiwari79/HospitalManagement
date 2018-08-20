@@ -43,7 +43,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
      * @return return map which contain list of new DataSource and list of existing DataSource if DataSource already exist
      * @description this method create new DataSource if DataSource not exist with same name ,
      * and if exist then simply add  DataSource to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
     public Map<String, List<DataSource>> createDataSource(Long organizationId, List<DataSourceDTO> dataSourceDTOS) {
 
@@ -54,7 +54,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
                     dataSourceNames.add(dataSource.getName());
                     }
-            List<DataSource> existing = findAllByNameAndOrganizationId(organizationId, dataSourceNames, DataSource.class);
+            List<DataSource> existing = findMetaDataByNameAndUnitId(organizationId, dataSourceNames, DataSource.class);
             dataSourceNames = ComparisonUtils.getNameListForMetadata(existing, dataSourceNames);
 
             List<DataSource> newDataSources = new ArrayList<>();

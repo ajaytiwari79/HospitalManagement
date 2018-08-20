@@ -57,7 +57,7 @@ public class OrganizationHostingTypeService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<HostingType> existing = findAllByNameAndOrganizationId(organizationId, hostingTypeNames, HostingType.class);
+            List<HostingType> existing = findMetaDataByNameAndUnitId(organizationId, hostingTypeNames, HostingType.class);
             hostingTypeNames = ComparisonUtils.getNameListForMetadata(existing, hostingTypeNames);
             List<HostingType> newHostingTypes = new ArrayList<>();
             if (!hostingTypeNames.isEmpty()) {

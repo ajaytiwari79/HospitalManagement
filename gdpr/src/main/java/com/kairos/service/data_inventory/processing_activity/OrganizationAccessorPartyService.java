@@ -37,7 +37,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
      * @return return map which contain list of new AccessorParty and list of existing AccessorParty if AccessorParty already exist
      * @description this method create new AccessorParty if AccessorParty not exist with same name ,
      * and if exist then simply add  AccessorParty to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing AccessorParty using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing AccessorParty using collation ,used for case insensitive result
      */
     public Map<String, List<AccessorParty>> createAccessorParty(Long organizationId, List<AccessorPartyDTO> accessorPartyDTOS) {
 
@@ -47,7 +47,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
             for (AccessorPartyDTO accessorParty : accessorPartyDTOS) {
                 accessorPartyNames.add(accessorParty.getName());
             }
-            List<AccessorParty> existing = findAllByNameAndOrganizationId(organizationId, accessorPartyNames, AccessorParty.class);
+            List<AccessorParty> existing = findMetaDataByNameAndUnitId(organizationId, accessorPartyNames, AccessorParty.class);
             accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();

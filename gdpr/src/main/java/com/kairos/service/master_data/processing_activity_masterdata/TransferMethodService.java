@@ -44,7 +44,7 @@ public class TransferMethodService extends MongoBaseService {
      * @return return map which contain list of new TransferMethod and list of existing TransferMethod if TransferMethod already exist
      * @description this method create new TransferMethod if TransferMethod not exist with same name ,
      * and if exist then simply add  TransferMethod to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
      */
     public Map<String, List<TransferMethod>> createTransferMethod(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
 
@@ -55,7 +55,7 @@ public class TransferMethodService extends MongoBaseService {
 
                 transferMethodNames.add(transferMethod.getName());
             }
-            List<TransferMethod> existing = findByNamesAndCountryId(countryId, transferMethodNames, TransferMethod.class);
+            List<TransferMethod> existing = findMetaDataByNamesAndCountryId(countryId, transferMethodNames, TransferMethod.class);
             transferMethodNames = ComparisonUtils.getNameListForMetadata(existing, transferMethodNames);
 
             List<TransferMethod> newTransferMethods = new ArrayList<>();

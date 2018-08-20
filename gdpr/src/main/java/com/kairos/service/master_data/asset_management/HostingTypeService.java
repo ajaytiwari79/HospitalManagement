@@ -43,7 +43,7 @@ public class HostingTypeService extends MongoBaseService {
      * @return return map which contain list of new HostingType and list of existing HostingType if HostingType already exist
      * @description this method create new HostingType if HostingType not exist with same name ,
      * and if exist then simply add  HostingType to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing HostingType using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing HostingType using collation ,used for case insensitive result
      */
     public Map<String, List<HostingType>> createHostingType(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
 
@@ -53,7 +53,7 @@ public class HostingTypeService extends MongoBaseService {
             for (HostingTypeDTO hostingType : hostingTypeDTOS) {
                 hostingTypeNames.add(hostingType.getName());
             }
-            List<HostingType> existing = findByNamesAndCountryId(countryId, hostingTypeNames, HostingType.class);
+            List<HostingType> existing = findMetaDataByNamesAndCountryId(countryId, hostingTypeNames, HostingType.class);
             hostingTypeNames = ComparisonUtils.getNameListForMetadata(existing, hostingTypeNames);
             List<HostingType> newHostingTypes = new ArrayList<>();
             if (!hostingTypeNames.isEmpty()) {

@@ -43,7 +43,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @return return map which contain list of new TechnicalSecurityMeasure and list of existing TechnicalSecurityMeasure if TechnicalSecurityMeasure already exist
      * @description this method create new TechnicalSecurityMeasure if TechnicalSecurityMeasure not exist with same name ,
      * and if exist then simply add  TechnicalSecurityMeasure to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing TechnicalSecurityMeasure using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing TechnicalSecurityMeasure using collation ,used for case insensitive result
      */
     public Map<String, List<TechnicalSecurityMeasure>> createTechnicalSecurityMeasure(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
 
@@ -53,7 +53,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
             for (TechnicalSecurityMeasureDTO technicalSecurityMeasure : technicalSecurityMeasureDTOS) {
                 techSecurityMeasureNames.add(technicalSecurityMeasure.getName());
             }
-            List<TechnicalSecurityMeasure> existing = findByNamesAndCountryId(countryId, techSecurityMeasureNames, TechnicalSecurityMeasure.class);
+            List<TechnicalSecurityMeasure> existing = findMetaDataByNamesAndCountryId(countryId, techSecurityMeasureNames, TechnicalSecurityMeasure.class);
             techSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, techSecurityMeasureNames);
 
             List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
