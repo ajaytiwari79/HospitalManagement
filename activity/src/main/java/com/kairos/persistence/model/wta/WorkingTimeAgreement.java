@@ -29,16 +29,17 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     // This will be only used when the countryId will update the WTA a new Copy of WTA will be assigned to organization having state disabled
     private Boolean disabled;
 
-    private WTAExpertise expertise;
+    private Expertise expertise;
 
-    private WTAOrganizationType organizationType;
+    private OrganizationType organizationType;
 
-    private WTAOrganizationType organizationSubType;
+    private OrganizationType organizationSubType;
 
+    private Long unitPositionId;
 
     private Long countryId;
 
-    private WTAOrganization organization;
+    private Organization organization;
 
     private List<BigInteger> ruleTemplateIds;
 
@@ -60,16 +61,25 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         return ruleTemplateIds=Optional.ofNullable(ruleTemplateIds).orElse(new ArrayList<>());
     }
 
+
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
+
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
+    }
+
     public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {
         this.ruleTemplateIds = ruleTemplateIds;
     }
 
 
-    public WTAOrganization getOrganization() {
+    public Organization getOrganization() {
         return organization;
     }
 
-    public void setOrganization(WTAOrganization organization) {
+    public void setOrganization(Organization organization) {
         this.organization = organization;
     }
 
@@ -89,11 +99,11 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         this.description = description;
     }
 
-    public WTAExpertise getExpertise() {
+    public Expertise getExpertise() {
         return expertise;
     }
 
-    public void setExpertise(WTAExpertise expertise) {
+    public void setExpertise(Expertise expertise) {
         this.expertise = expertise;
     }
 
@@ -139,19 +149,19 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         this.expiryDate = expiryDate;
     }
 
-    public WTAOrganizationType getOrganizationType() {
+    public OrganizationType getOrganizationType() {
         return organizationType;
     }
 
-    public void setOrganizationType(WTAOrganizationType organizationType) {
+    public void setOrganizationType(OrganizationType organizationType) {
         this.organizationType = organizationType;
     }
 
-    public WTAOrganizationType getOrganizationSubType() {
+    public OrganizationType getOrganizationSubType() {
         return organizationSubType;
     }
 
-    public void setOrganizationSubType(WTAOrganizationType organizationSubType) {
+    public void setOrganizationSubType(OrganizationType organizationSubType) {
         this.organizationSubType = organizationSubType;
     }
 

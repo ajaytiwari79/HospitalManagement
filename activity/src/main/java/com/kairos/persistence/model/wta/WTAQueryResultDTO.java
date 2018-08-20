@@ -32,12 +32,22 @@ public class WTAQueryResultDTO {
     private Long expiryDate;
     private String name;
     private String description;
+    private Long unitPositionId;
     private BigInteger id;
     private ExpertiseResponseDTO expertise;
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
 
     private List<WTABaseRuleTemplate> ruleTemplates;
+
+
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
+
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
+    }
 
     private List<TagDTO> tags = new ArrayList<>();
 

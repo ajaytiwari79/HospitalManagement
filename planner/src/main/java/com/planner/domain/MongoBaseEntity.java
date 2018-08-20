@@ -1,10 +1,11 @@
 package com.planner.domain;
 
+import org.bson.codecs.pojo.annotations.BsonId;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigInteger;
 public class MongoBaseEntity {
-    @Id
+    @BsonId
     protected String id;
     protected BigInteger kairosId;
 

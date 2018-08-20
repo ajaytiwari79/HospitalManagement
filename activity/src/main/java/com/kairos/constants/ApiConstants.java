@@ -32,4 +32,11 @@ public final class ApiConstants {
     public static final String COUNTRY_ACTIVITY_CONFIGURATION=COUNTRY_URL+"/activity_configuration";
     public static final String UNIT_ACTIVITY_CONFIGURATION=UNIT_URL+"/activity_configuration";
 
+
+    //RestClientURL
+    public static final String CTA_BASIC_INFO = COUNTRY_URL+"/cta_basic_info";
+    public static final String GET_UNIT_POSITION = "/unit_position/{unitPositionId}";
+
+
+
 }
