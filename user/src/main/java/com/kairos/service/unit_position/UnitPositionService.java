@@ -741,12 +741,9 @@ public class UnitPositionService {
 
         }
         updateDTO.setId(wtaId);
-        updateDTO.setStartDateMillis(DateUtils.asDate(updateDTO.getStartDate()).getTime());
-        updateDTO.setEndDateMillis(DateUtils.asDate(updateDTO.getEndDate()).getTime());
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
         unitPositionGraphRepository.save(unitPosition);
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition, wtaResponseDTO);
-        plannerSyncService.publishWTA(unitId, unitPositionId, wtaResponseDTO, IntegrationOperation.UPDATE);
         return unitPositionQueryResult;
     }
 
