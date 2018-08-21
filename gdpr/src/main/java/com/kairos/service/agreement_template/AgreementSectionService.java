@@ -19,9 +19,11 @@ import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+
 import static com.kairos.constants.AppConstant.AGREEMENT_SECTION;
 import static com.kairos.constants.AppConstant.AGREEMENT_SECTION_WRAPPER;
 
@@ -116,15 +118,15 @@ public class AgreementSectionService extends MongoBaseService {
 
 
     /**
-     * @description - method add new clause  of section and sub sections to  newClauseBasicDTOList ,so that we can create all the new clause at single time for all section and sub sections
-     *                similarly changedClausesDTOList contain list of clauses which are changed and we update the existing clauses single time.
-     * @param newClauseBasicDTOList   -list of new clause
-     * @param changedClausesDTOList  - list of clause which are changed and we need update those clause
-     * @param changedClauseIdsList -list of clause id which we need to updated
-     * @param agreementSectionDTO   ;-agreement section Dto contain list of clauses and  list of Sub section(sub section contain list of clauses )
+     * @param newClauseBasicDTOList                        -list of new clause
+     * @param changedClausesDTOList                        - list of clause which are changed and we need update those clause
+     * @param changedClauseIdsList                         -list of clause id which we need to updated
+     * @param agreementSectionDTO                          ;-agreement section Dto contain list of clauses and  list of Sub section(sub section contain list of clauses )
      * @param agreementSubSectionClauseAndClauseDtoHashMap - map contain list of clauses (new clause ,and clause which need to be update)
      *                                                     corresponding to Agreement sub section name which is unique for every subsection.
-     * @return       method return Object of agreement and Wrapper class which contain  Clause and Subsections corresponding to section
+     * @return method return Object of agreement and Wrapper class which contain  Clause and Subsections corresponding to section
+     * @description - method add new clause  of section and sub sections to  newClauseBasicDTOList ,so that we can create all the new clause at single time for all section and sub sections
+     * similarly changedClausesDTOList contain list of clauses which are changed and we update the existing clauses single time.
      */
     public Map<String, Object> buildAgreementSectionsList(List<ClauseBasicDTO> newClauseBasicDTOList, List<ClauseBasicDTO> changedClausesDTOList, List<BigInteger> changedClauseIdsList,
                                                           AgreementSectionDTO agreementSectionDTO, Map<String, AgreementSectionClauseWrapper> agreementSubSectionClauseAndClauseDtoHashMap) {
@@ -201,7 +203,7 @@ public class AgreementSectionService extends MongoBaseService {
      * @return
      */
     public List<AgreementSection> updateExistingClauseAndAddSubSectionToAgreementSection(Map<String, AgreementSectionClauseWrapper> agreementSectionMap, Map<String, AgreementSectionClauseWrapper> agreementSubSectionMap,
-                                                                                          List<Clause> changedClausesList, List<AgreementSection> agreementSectionList, List<Clause> newClauseList) {
+                                                                                         List<Clause> changedClausesList, List<AgreementSection> agreementSectionList, List<Clause> newClauseList) {
 
         Map<BigInteger, Clause> updateClauseMap = new HashMap<>();
         changedClausesList.forEach(clause -> {
@@ -232,7 +234,7 @@ public class AgreementSectionService extends MongoBaseService {
 
 
     public List<BigInteger> updateExistingClauseAddNewClauseAndAddToAgreementSubSection(Map<String, AgreementSectionClauseWrapper> agreementSubSectionMap, Map<BigInteger, Clause> updateClauseMap,
-                                                                                         Map<String, Clause> newCreatedClauseMap, List<AgreementSection> agreementSubSectionList, List<Clause> updateExistingClauseList) {
+                                                                                        Map<String, Clause> newCreatedClauseMap, List<AgreementSection> agreementSubSectionList, List<Clause> updateExistingClauseList) {
 
 
         for (AgreementSection agreementSection : agreementSubSectionList) {
@@ -254,10 +256,10 @@ public class AgreementSectionService extends MongoBaseService {
 
 
     /**
-     * @param clauseBasicDTOList        - list of clauses which were changed by user
-     * @param updateClauseMap           - map contain clause as value and key is clause id.
+     * @param clauseBasicDTOList       - list of clauses which were changed by user
+     * @param updateClauseMap          - map contain clause as value and key is clause id.
      * @param updateExistingClauseList -List of clauses which are changed and to reflect the changes in clauses
-     * @param agreementSection          -contain list clause ids, add updated clauses to agreement sections
+     * @param agreementSection         -contain list clause ids, add updated clauses to agreement sections
      * @return
      */
     //updated
@@ -469,24 +471,50 @@ public class AgreementSectionService extends MongoBaseService {
      * @param id         -agreement section id
      * @return -true on successful deletion of section
      */
-    public Boolean deleteAgreementSection(Long countryId, Long orgId, BigInteger templateId, BigInteger id) {
+    public boolean deleteAgreementSection(Long countryId, Long orgId, BigInteger templateId, BigInteger id) {
 
-        AgreementSection exist = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, id);
+        if (!Optional.ofNullable(agreementSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + id);
         }
         PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, orgId, templateId);
         List<BigInteger> agreementSectionIdList = policyAgreementTemplate.getAgreementSections();
         agreementSectionIdList.remove(id);
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
-        agreementSectionMongoRepository.delete(exist);
+        agreementSectionMongoRepository.delete(agreementSection);
+        return true;
+    }
+
+
+    /**
+     * @param countryId
+     * @param orgId
+     * @param sectionId
+     * @param clauseId
+     * @return
+     * @description remove clause id from Agreement section and Sub section if section contain clause and save section
+     */
+    public boolean removeClauseFromAgreementSection(Long countryId, Long orgId, BigInteger sectionId, BigInteger clauseId) {
+
+        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, sectionId);
+        if (!Optional.ofNullable(agreementSection).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + sectionId);
+        }
+        List<BigInteger> clausesList = agreementSection.getClauses();
+        if (clausesList.contains(clauseId)) {
+            clausesList.remove(clauseId);
+            agreementSection.setClauses(clausesList);
+            agreementSectionMongoRepository.save(agreementSection);
+        } else {
+            exceptionService.invalidRequestException("message.invalidRequest", "Clause", clauseId);
+        }
         return true;
     }
 
 
     public AgreementSectionResponseDTO getAgreementSectionWithDataById(Long countryId, BigInteger id) {
 
-        AgreementSectionResponseDTO exist = agreementSectionMongoRepository.getAgreementSectionWithDataById(countryId,id);
+        AgreementSectionResponseDTO exist = agreementSectionMongoRepository.getAgreementSectionWithDataById(countryId, id);
         if (Optional.ofNullable(exist).isPresent()) {
             return exist;
         }
