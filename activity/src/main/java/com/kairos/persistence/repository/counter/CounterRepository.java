@@ -78,7 +78,7 @@ public class CounterRepository {
     public List<ApplicableKPIDTO> getCounterListForCountryOrUnitOrStaff(Long refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation=Aggregation.newAggregation(
-          Aggregation.match(Criteria.where(refQueryField).is(refId)),
+          Aggregation.match(Criteria.where(refQueryField).is(refId).and("level").is(level)),
           Aggregation.lookup("counter","activeKpiId","_id","kpiIds"),
            Aggregation.project("level").and("kpiIds").arrayElementAt(0).as("kpi")
         );

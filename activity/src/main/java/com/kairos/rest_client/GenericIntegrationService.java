@@ -1,5 +1,7 @@
 package com.kairos.rest_client;
 
+import com.kairos.activity.counter.distribution.access_group.StaffIdsDTO;
+import com.kairos.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
 import com.kairos.enums.IntegrationOperation;
@@ -86,11 +88,11 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/"+countryId+"/module/"+moduleId+"/kpi_details", null), KPIAccessPageDTO.class);
     }
 
-    public List<Long> getOrganizationIdsBySubOrgId(Long orgTypeId){
-        return genericRestClient.publish(null, null, false, IntegrationOperation.GET, "/orgtype/{orgTypeId}/get_organization_ids", null,orgTypeId);
+    public List<OrgTypeDTO> getOrganizationIdsBySubOrgId(List<Long> orgTypeId){
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(orgTypeId, null, false, IntegrationOperation.CREATE, "/orgtype/get_organization_ids", null),OrgTypeDTO.class);
     }
-    public List<Long> getStaffIdsByunitAndAccessGroupId(Long unitId,Long accessGroupId){
-        return genericRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/access_group/{accessGroupId}/staffs",null,accessGroupId);
+    public List<StaffIdsDTO> getStaffIdsByunitAndAccessGroupId(Long unitId, List<Long> accessGroupId){
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(accessGroupId,unitId,true,IntegrationOperation.GET,"/access_group/staffs",null),StaffIdsDTO.class);
     }
 
     public List<StaffDTO> getStaffDetailByIds(Long unitId, Set<Long> staffIds){

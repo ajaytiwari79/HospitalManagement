@@ -5,6 +5,7 @@ import com.kairos.persistence.model.access_permission.AccessGroupCountQueryResul
 import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -264,10 +265,10 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "RETURN ag")
     AccessGroup getOrganizationAccessGroupByName(Long organizationId, String name, String role);
 
-    @Query("MATCH (org:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup) where id(org)={0} and id(ag)={1} \n" +
-            "with ag,org  match(ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission) with up match(up)-[:"+HAS_UNIT_PERMISSIONS+"]-(emp:Employment) with emp\n" +
-            "match (emp)-[:"+BELONGS_TO+"]-(s:Staff) RETURN id(s)")
-    List<Long> getStaffIdsByUnitIdAndAccessGroupId(Long unitId,Long accessGroupId);
+    @Query("MATCH (org:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup) where id(org)={0} and id(ag) IN {1} \n" +
+            "with ag,org  match(ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission) with up match(up)-[:"+HAS_UNIT_PERMISSIONS+"]-(emp:Employment) with ag,emp\n" +
+            "match (emp)-[:"+BELONGS_TO+"]-(s:Staff) RETURN  id(ag) as accessGroupId,collect(id(s)) as staffIds ")
+    List<StaffIdsQueryResult> getStaffIdsByUnitIdAndAccessGroupId(Long unitId, List<Long> accessGroupId);
 
     //for test cases
     @Query("Match(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup) where id(emp)=8767 return id(ag)")
