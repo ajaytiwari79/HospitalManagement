@@ -38,7 +38,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     List<Activity> findByExternalIdIn(List<String> activityExternalIds);
 
-    List<Activity> findByUnitIdAndExternalIdIn(Long unitId, List<String> activityExternalIds);
+    List<Activity> findByUnitIdAndExternalIdInAndDeletedFalse(Long unitId, List<String> activityExternalIds);
 
     @Query("{'deleted' : false, 'generalActivityTab.categoryId' :?0}")
     List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
