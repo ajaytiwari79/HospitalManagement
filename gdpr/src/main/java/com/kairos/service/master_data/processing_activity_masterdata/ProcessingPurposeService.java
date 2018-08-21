@@ -84,7 +84,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long countryId) {
-        return processingPurposeMongoRepository.findAllProcessingPurposes(countryId);
+        return processingPurposeMongoRepository.findAllProcessingPurposes(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
     /**

@@ -84,8 +84,8 @@ public class StorageFormatService extends MongoBaseService {
      * @param
      * @return list of StorageFormat
      */
-    public List<StorageFormat> getAllStorageFormat(Long countryId) {
-        return storageFormatMongoRepository.findAllStorageFormats(countryId);
+    public List<StorageFormatResponseDTO> getAllStorageFormat(Long countryId) {
+        return storageFormatMongoRepository.findAllStorageFormats(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
     /**

@@ -83,7 +83,7 @@ public class DataSourceService extends MongoBaseService {
      * @return list of DataSource
      */
     public List<DataSourceResponseDTO> getAllDataSource(Long countryId) {
-        return dataSourceMongoRepository.findAllDataSources(countryId);
+        return dataSourceMongoRepository.findAllDataSources(countryId,SuggestedDataStatus.ACCEPTED.value);
 
     }
 

@@ -80,8 +80,8 @@ public class HostingTypeService extends MongoBaseService {
      * @param
      * @return list of HostingType
      */
-    public List<HostingType> getAllHostingType(Long countryId) {
-        return hostingTypeMongoRepository.findAllHostingTypes(countryId);
+    public List<HostingTypeResponseDTO> getAllHostingType(Long countryId) {
+        return hostingTypeMongoRepository.findAllHostingTypes(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
 

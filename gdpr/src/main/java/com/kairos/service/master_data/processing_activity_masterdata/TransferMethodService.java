@@ -84,7 +84,7 @@ public class TransferMethodService extends MongoBaseService {
      * @return list of TransferMethod
      */
     public List<TransferMethodResponseDTO> getAllTransferMethod(Long countryId) {
-        return transferMethodRepository.findAllTransferMethods(countryId);
+        return transferMethodRepository.findAllTransferMethods(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
     /**

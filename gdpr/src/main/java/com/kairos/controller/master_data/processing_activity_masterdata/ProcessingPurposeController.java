@@ -94,12 +94,6 @@ public class ProcessingPurposeController {
 
     }
 
-    @ApiOperation("get All processing purpose of Current organization and Parent Oeg which were not inherited by Organization")
-    @GetMapping("/processing_purpose")
-    public ResponseEntity<Object> getAllProcessingPurposeOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getAllNotInheritedProcessingPurposesFromParentOrgAndUnitProcessingPurpose(countryId,parentOrgId,organizationId));
-    }
-
 
 
     @ApiOperation("update processing purpose by id")

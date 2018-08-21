@@ -82,8 +82,8 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @param
      * @return list of OrganizationalSecurityMeasure
      */
-    public List<OrganizationalSecurityMeasure> getAllOrganizationalSecurityMeasure(Long countryId) {
-        return organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures(countryId);
+    public List<OrganizationalSecurityMeasureResponseDTO> getAllOrganizationalSecurityMeasure(Long countryId) {
+        return organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
 

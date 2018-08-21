@@ -86,8 +86,8 @@ public class ResponsibilityTypeService extends MongoBaseService {
      * @param
      * @return list of ResponsibilityType
      */
-    public List<ResponsibilityType> getAllResponsibilityType(Long countryId) {
-        return responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId);
+    public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long countryId) {
+        return responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
     /**

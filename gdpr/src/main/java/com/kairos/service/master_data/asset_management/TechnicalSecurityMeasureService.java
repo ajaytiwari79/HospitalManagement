@@ -83,7 +83,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long countryId) {
-        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(countryId);
+        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
 
