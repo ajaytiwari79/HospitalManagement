@@ -75,16 +75,16 @@ public class AutomaticOpenShiftGenerationService {
     00:15 - 03:45 - 5
     03:45 - 06:00 - 7
      */
-    public  Map<LocalDate,Map<Long,List<StaffingLevelActivityWithDuration>>> findUnderStaffingOverStaffingByActivityIdAndDate(Long unitId) {
+    public  Map<LocalDate,Map<BigInteger,List<StaffingLevelActivityWithDuration>>> findUnderStaffingOverStaffingByActivityIdAndDate(Long unitId) {
 
         List<OpenShiftRuleTemplateDTO> openShiftRuleTemplates = openShiftRuleTemplateRepository.findOpenShiftRuleTemplatesWithInterval(unitId);
-        Map<LocalDate,Set<Long>> dateActivityIdsMap = new HashMap<>();
+        Map<LocalDate,Set<BigInteger>> dateActivityIdsMap = new HashMap<>();
 
         List<LocalDate> allOpenShiftRuleTemplateLocalDates = new ArrayList<>();
         for(OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO: openShiftRuleTemplates) {
             List<LocalDate> localDates = getOpenShiftRuleTemplateDates(openShiftRuleTemplateDTO.getOpenShiftInterval());
-            Set<Long> activityIds = openShiftRuleTemplateDTO.getActivitiesPerTimeTypes().stream().map(activitiesPerTimeType ->
-                    activitiesPerTimeType.getSelectedActivities()).flatMap(selectedActivities->selectedActivities.stream().map(BigInteger::longValue)).
+            Set<BigInteger> activityIds = openShiftRuleTemplateDTO.getActivitiesPerTimeTypes().stream().map(activitiesPerTimeType ->
+                    activitiesPerTimeType.getSelectedActivities()).flatMap(selectedActivities->selectedActivities.stream()).
                     collect(Collectors.toSet());
             allOpenShiftRuleTemplateLocalDates.addAll(localDates);
 
@@ -152,25 +152,25 @@ public class AutomaticOpenShiftGenerationService {
         return filteredActivityWithDurations;
     }
 
-    private Map<LocalDate,Map<Long,List<StaffingLevelActivityWithDuration>>> getDateAndFilteredActivityWithDurationMap(List<StaffingLevel>staffingLevels,Map<LocalDate,Set<Long>> dateActivityIdsMap,Map<LocalDate,Set<Shift>> shiftsLocalDateMap) {
-        Map<Long,List<StaffingLevelActivityWithDuration>> staffingLevelIntervalActivityIdMap ;
-        Map<LocalDate,Map<Long,List<StaffingLevelActivityWithDuration>>> dateFilteredActivityWithDurationsMap = new HashMap<>();
+    private Map<LocalDate,Map<BigInteger,List<StaffingLevelActivityWithDuration>>> getDateAndFilteredActivityWithDurationMap(List<StaffingLevel>staffingLevels,Map<LocalDate,Set<BigInteger>> dateActivityIdsMap,Map<LocalDate,Set<Shift>> shiftsLocalDateMap) {
+        Map<BigInteger,List<StaffingLevelActivityWithDuration>> staffingLevelIntervalActivityIdMap ;
+        Map<LocalDate,Map<BigInteger,List<StaffingLevelActivityWithDuration>>> dateFilteredActivityWithDurationsMap = new HashMap<>();
 
         for(StaffingLevel staffingLevel:staffingLevels) {
             staffingLevelIntervalActivityIdMap = new HashMap<>();
-            Set<Long> activityIds = dateActivityIdsMap.get(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()));
+            Set<BigInteger> activityIds = dateActivityIdsMap.get(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()));
 
-            Map<Long, List<StaffingLevelActivityWithDuration>> activityWithDuration =
+            Map<BigInteger, List<StaffingLevelActivityWithDuration>> activityWithDuration =
                     staffingLevel.getPresenceStaffingLevelInterval().stream().
                             flatMap((StaffingLevelInterval currentInterval) -> currentInterval.getStaffingLevelActivities().stream()
                                     .filter((staffingLevelActivity -> activityIds.contains(staffingLevelActivity.getActivityId())))
                                     .map((StaffingLevelActivity currentActivity) -> new StaffingLevelActivityWithDuration(currentActivity.getActivityId(), currentActivity.getMinNoOfStaff(), currentActivity.getMaxNoOfStaff(), currentInterval.getStaffingLevelDuration()))
                             ).collect(Collectors.groupingBy(ele -> ele.getActivityId()));
 
-            for(Map.Entry<Long,List<StaffingLevelActivityWithDuration>>entry:activityWithDuration.entrySet()) {
+            for(Map.Entry<BigInteger,List<StaffingLevelActivityWithDuration>>entry:activityWithDuration.entrySet()) {
                 Set<Shift> shiftsLocal =  shiftsLocalDateMap.get(DateUtils.getLocalDateFromDate(staffingLevel.getCurrentDate()));
                 if(Optional.ofNullable(shiftsLocal).isPresent()){
-                    shiftsLocal.stream().filter(shift -> shift.getActivityId().equals(BigInteger.valueOf(entry.getKey())));
+                    shiftsLocal.stream().filter(shift -> shift.getActivityId().equals(entry.getKey()));
                 } else {
                     shiftsLocal = Collections.emptySet();
                 }

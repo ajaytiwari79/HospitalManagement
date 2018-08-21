@@ -36,7 +36,6 @@ public class CTARuleTemplateDTO {
     private String ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
-    @NotNull(message = "error.cta.calculation.notNull")
     private CalculationUnit calculationUnit;
     @Valid
     private CompensationTable compensationTable;

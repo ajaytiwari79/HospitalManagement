@@ -1,6 +1,7 @@
 package com.kairos.activity.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.activity.activity.ActivityValidationError;
 import com.kairos.enums.Day;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -8,6 +9,8 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffingLevelTemplateDTO {
     private BigInteger id;
@@ -17,11 +20,11 @@ public class StaffingLevelTemplateDTO {
     private StaffingLevelTemplatePeriod validity;
     @NotNull
     private List<Long> dayType=new ArrayList<>();
-    private List<Day> validDays =new ArrayList<Day>();
+    private List<Day> validDays =new ArrayList<>();
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private boolean disabled;
-    private boolean deleted ;
+    private List<ActivityValidationError> errors;
 
     public StaffingLevelTemplateDTO() {
         //default constructor
@@ -80,15 +83,9 @@ public class StaffingLevelTemplateDTO {
     public boolean isDisabled() {
         return disabled;
     }
+
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
-    }
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 
     public StaffingLevelSetting getStaffingLevelSetting() {
@@ -106,7 +103,11 @@ public class StaffingLevelTemplateDTO {
         this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 
+    public List<ActivityValidationError> getErrors() {
+        return Optional.ofNullable(errors).orElse(new ArrayList<>());
+    }
 
-
-
+    public void setErrors(List<ActivityValidationError> errors) {
+        this.errors = errors;
+    }
 }
