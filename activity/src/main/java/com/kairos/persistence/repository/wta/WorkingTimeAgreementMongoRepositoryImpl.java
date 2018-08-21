@@ -55,7 +55,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
 
     @Override
     public WTAQueryResultDTO getWTAByUnitPosition(Long unitPositionId,Date date) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").gte(date).and("endDate").lte(date),Criteria.where("endDate").exists(false).and("startDate").gte(date));
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").gte(date).and("endDate").lte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
@@ -177,7 +177,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     @Override
     public List<WTAQueryResultDTO> getAllWTAByUpIds(List<Long> upIds, Date date) {
         //.orOperator(Criteria.where("startDate").gte(date).and("endDate").lte(date),Criteria.where("endDate").exists(false).and("startDate").gte(date)
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(upIds);
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(upIds).and("disabled").is("false");
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 //lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),

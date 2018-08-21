@@ -702,12 +702,12 @@ public class TaskService extends MongoBaseService {
         List<String> externalIdsOfActivities = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).map(timeCareShift -> timeCareShift.getActivityId()).
                 collect(Collectors.toList());
         List<Shift> shiftsInKairos = shiftMongoRepository.findByExternalIdIn(externalIdsOfShifts);
-        List<Activity> activities = activityMongoRepository.findByUnitIdAndExternalIdIn(workPlaceId, externalIdsOfActivities);
+        List<Activity> activities = activityMongoRepository.findByUnitIdAndExternalIdInAndDeletedFalse(workPlaceId, externalIdsOfActivities);
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, AppConstants.ORGANIZATION, unitPositionDTO.getId());
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(staffAdditionalInfoDTO.getUnitPosition().getCostTimeAgreementId());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
         Map<String,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getExternalId(),v->v));

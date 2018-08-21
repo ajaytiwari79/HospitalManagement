@@ -741,12 +741,9 @@ public class UnitPositionService {
 
         }
         updateDTO.setId(wtaId);
-        updateDTO.setStartDateMillis(DateUtils.asDate(updateDTO.getStartDate()).getTime());
-        updateDTO.setEndDateMillis(DateUtils.asDate(updateDTO.getEndDate()).getTime());
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO, unitPosition.isPublished());
         unitPositionGraphRepository.save(unitPosition);
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition, wtaResponseDTO);
-        plannerSyncService.publishWTA(unitId, unitPositionId, wtaResponseDTO, IntegrationOperation.UPDATE);
         return unitPositionQueryResult;
     }
 
@@ -816,10 +813,9 @@ public class UnitPositionService {
     }
 
 
-    /*public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
+    public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionCTA(Long unitPositionId, Long unitId) {
 
         StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
-        CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         com.kairos.activity.shift.StaffUnitPositionDetails unitPositionWithCtaDetailsDTO = new com.kairos.activity.shift.StaffUnitPositionDetails();
         unitPositionWithCtaDetailsDTO.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.activity.shift.Expertise.class));
@@ -828,21 +824,20 @@ public class UnitPositionService {
         unitPositionWithCtaDetailsDTO.setCountryId(countryId);
         unitPositionWithCtaDetailsDTO.setTotalWeeklyMinutes(unitPosition.getTotalWeeklyMinutes());
         unitPositionWithCtaDetailsDTO.setWorkingDaysInWeek(unitPosition.getWorkingDaysInWeek());
-        unitPositionWithCtaDetailsDTO.setStartDate(unitPosition.getStartDate());
+        unitPositionWithCtaDetailsDTO.setStartDate(new Date(unitPosition.getStartDateMillis()));
         unitPositionWithCtaDetailsDTO.setWorkingTimeAgreementId(unitPosition.getWorkingTimeAgreementId());
-        unitPositionWithCtaDetailsDTO.setUnitPositionStartDate(DateUtils.asLocalDate(new Date(unitPosition.getStartDate())));
-        if (unitPosition.getEndDate() != null) {
-            unitPositionWithCtaDetailsDTO.setUnitPositionEndDate(DateUtils.asLocalDate(new Date(unitPosition.getEndDate())));
-            unitPositionWithCtaDetailsDTO.setEndDate(unitPosition.getEndDate());
+        unitPositionWithCtaDetailsDTO.setUnitPositionStartDate(DateUtils.asLocalDate(new Date(unitPosition.getStartDateMillis())));
+        if (unitPosition.getEndDateMillis() != null) {
+            unitPositionWithCtaDetailsDTO.setUnitPositionEndDate(DateUtils.asLocalDate(new Date(unitPosition.getEndDateMillis())));
+            unitPositionWithCtaDetailsDTO.setEndDate(new Date(unitPosition.getEndDateMillis()));
         }
         Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
         unitPositionWithCtaDetailsDTO.setUnitTimeZone(organization.get().getTimeZone());
-        unitPositionWithCtaDetailsDTO.setCtaRuleTemplates(getCtaRuleTemplates(ctaQueryResults));
         com.kairos.activity.shift.EmploymentType employmentType = new com.kairos.activity.shift.EmploymentType();
         ObjectMapperUtils.copyProperties(unitPosition.getEmploymentType(), employmentType);
         unitPositionWithCtaDetailsDTO.setEmploymentType(employmentType);
         return unitPositionWithCtaDetailsDTO;
-    }*/
+    }
 
 
     public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionDetails(Long unitPositionId, Organization organization, Long countryId) {
