@@ -134,12 +134,12 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
 
 
     public List<DataSubjectMappingResponseDTO> getAllDataSubjectByUnitId(Long unitId) {
-        return dataSubjectMappingRepository.getAllDataSubjectAndMappingWithDataCategoryByUnitId(unitId);
+        return dataSubjectMappingRepository.getAllDataSubjectWithDataCategoryAndDataElementByUnitId(unitId);
     }
 
 
     public DataSubjectMappingResponseDTO getDataSubjectByUnitId(Long unitId, BigInteger dataSubjectId) {
-        return dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategoryByUnitId(unitId, dataSubjectId);
+        return dataSubjectMappingRepository.getDataSubjectWithDataCategoryAndDataElementByUnitId(unitId, dataSubjectId);
     }
 
 

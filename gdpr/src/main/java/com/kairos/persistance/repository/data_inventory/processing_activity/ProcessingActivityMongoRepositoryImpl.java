@@ -1,10 +1,12 @@
 package com.kairos.persistance.repository.data_inventory.processing_activity;
 
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistance.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -18,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
+import javax.print.Doc;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -51,8 +54,8 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 lookup("accessor_party", "accessorParties", "_id", "accessorParties"),
                 lookup("dataSource", "dataSources", "_id", "dataSources"),
                 lookup("responsibility_type", "responsibilityType", "_id", "responsibilityType"),
-                lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis")
-
+                lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis"),
+                lookup("asset", "assetId", "_id", "asset")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
@@ -61,9 +64,14 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     }
 
     @Override
-    public ProcessingActivityResponseDTO getAllSubProcessingActivitiesOfProcessingActivity(Long organizationId, BigInteger processingActivityId) {
+    public List<ProcessingActivityResponseDTO> getAllSubProcessingActivitiesOfProcessingActivity(Long organizationId, BigInteger processingActivityId) {
+
+        String replaceRoot = " { '$replaceRoot':{'newRoot':'$subProcessingActivities'} }";
+        Document replaceRootOperation = Document.parse(replaceRoot);
+
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(processingActivityId).and("subProcess").is(true)),
+                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(processingActivityId).and("subProcess").is(false)),
+                lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
                 unwind("subProcessingActivities"),
                 lookup("processing_purpose", "subProcessingActivities.processingPurposes", "_id", "subProcessingActivities.processingPurposes"),
                 lookup("transfer_method", "subProcessingActivities.transferMethods", "_id", "subProcessingActivities.transferMethods"),
@@ -73,13 +81,13 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 lookup("processingLegalBasis", "subProcessingActivities.processingLegalBasis", "_id", "subProcessingActivities.processingLegalBasis"),
                 group("$id")
                         .addToSet("subProcessingActivities").as("subProcessingActivities"),
-                project().andExclude("_id"),
                 unwind("subProcessingActivities"),
-                sort(Sort.Direction.ASC, "name")
+                new CustomAggregationOperation(replaceRootOperation)
+               // sort(Sort.Direction.ASC, "name")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
-        return result.getUniqueMappedResult();
+        return result.getMappedResults();
     }
 
 
@@ -108,5 +116,30 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
         );
         AggregationResults<ProcessingActivityBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityBasicResponseDTO.class);
         return result.getMappedResults();
+    }
+
+
+    @Override
+    public List<DataSubjectMappingResponseDTO> getAllMappedDataSubjectWithDataCategoryAndDataElement(Long unitId, List<BigInteger> dataSubjectIds) {
+
+        String addNonDeletedDataElements = CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
+        Document addToFieldOperationFilter = Document.parse(addNonDeletedDataElements);
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("_id").in(dataSubjectIds)),
+                lookup("data_category", "dataCategories", "_id", "dataCategories"),
+                unwind("dataCategories"),
+                lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
+                new CustomAggregationOperation(addToFieldOperationFilter),
+                match(Criteria.where("dataCategories.deleted").is(false)),
+                group("$id")
+                        .first("name").as("name")
+                        .first("description").as("description")
+                        .first(COUNTRY_ID).as(COUNTRY_ID)
+                        .addToSet("dataCategories").as("dataCategories")
+        );
+        AggregationResults<DataSubjectMappingResponseDTO> result = mongoTemplate.aggregate(aggregation, DataSubjectMapping.class, DataSubjectMappingResponseDTO.class);
+        return result.getMappedResults();
+
+
     }
 }

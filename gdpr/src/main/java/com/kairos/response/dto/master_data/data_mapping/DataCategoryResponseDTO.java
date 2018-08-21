@@ -14,8 +14,6 @@ public class DataCategoryResponseDTO {
 
     private String name;
 
-    private Long countryId;
-
     private List<DataElementBasicResponseDTO> dataElements=new ArrayList<>();
 
     public List<DataElementBasicResponseDTO> getDataElements() {
@@ -42,13 +40,6 @@ public class DataCategoryResponseDTO {
         this.name = name;
     }
 
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
 
     public DataCategoryResponseDTO( ){
 
