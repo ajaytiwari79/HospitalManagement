@@ -61,6 +61,20 @@ public class AgreementSectionController {
     }
 
 
+    @ApiOperation("deleted clause from section ")
+    @DeleteMapping(value = "/agreement_section/section/{sectionId}/clause/{clauseId}")
+    public ResponseEntity<Object> deleteClauseFromAgreementSection(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable BigInteger sectionId, @PathVariable BigInteger clauseId) {
+        if (sectionId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Section  id can't be null");
+        }
+        if (clauseId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Clause  id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.removeClauseFromAgreementSection(countryId,organizationId,sectionId,clauseId));
+
+    }
+
+
     @ApiOperation("get agreement section by id")
     @GetMapping(value = "/agreement_section/section/{sectionId}")
     public ResponseEntity<Object> getAgreementSectionWithDataById(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable BigInteger sectionId) {
