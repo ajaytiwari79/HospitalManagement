@@ -478,9 +478,8 @@ public class CostTimeAgreementService extends MongoBaseService {
 
         }
         OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
-        CostTimeAgreement costTimeAgreement = new CostTimeAgreement();
         collectiveTimeAgreementDTO.setId(null);
-        BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
+        CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         buildCTA(costTimeAgreement, collectiveTimeAgreementDTO);
         costTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));
         this.save(costTimeAgreement);
