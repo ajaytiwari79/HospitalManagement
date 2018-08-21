@@ -31,6 +31,7 @@ import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -163,11 +164,11 @@ public class ShiftService extends MongoBaseService {
     private ActivityConfigurationRepository activityConfigurationRepository;
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
-<<<<<<< HEAD
+
     @Inject private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
-=======
+
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
->>>>>>> d2b105a41af7205dbb5c3425069ef548bdff0d3d
+
 
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
