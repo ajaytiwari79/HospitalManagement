@@ -92,7 +92,7 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(orgTypeId, null, false, IntegrationOperation.CREATE, "/orgtype/get_organization_ids", null),OrgTypeDTO.class);
     }
     public List<StaffIdsDTO> getStaffIdsByunitAndAccessGroupId(Long unitId, List<Long> accessGroupId){
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(accessGroupId,unitId,true,IntegrationOperation.GET,"/access_group/staffs",null),StaffIdsDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(accessGroupId,unitId,true,IntegrationOperation.CREATE,"/access_group/staffs",null),StaffIdsDTO.class);
     }
 
     public List<StaffDTO> getStaffDetailByIds(Long unitId, Set<Long> staffIds){
