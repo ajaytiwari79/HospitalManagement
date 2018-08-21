@@ -1,11 +1,13 @@
 package com.kairos.persistence.model.activity.tabs;
 
 import com.kairos.activity.open_shift.DurationField;
+import com.kairos.wrapper.activity.CutOffInterval;
 
 import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pawanmandhan on 23/8/17.
@@ -26,6 +28,7 @@ public class RulesActivityTab implements Serializable{
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+    private Set<CutOffInterval> cutOffIntervals;
     // in Minutes
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
@@ -37,6 +40,14 @@ public class RulesActivityTab implements Serializable{
     private Float approvalPercentage;
     private LocalTime maximumEndTime;// shift can't be extend this time
 
+
+    public Set<CutOffInterval> getCutOffIntervals() {
+        return cutOffIntervals;
+    }
+
+    public void setCutOffIntervals(Set<CutOffInterval> cutOffIntervals) {
+        this.cutOffIntervals = cutOffIntervals;
+    }
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
