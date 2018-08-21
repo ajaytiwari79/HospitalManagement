@@ -114,6 +114,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.*;
@@ -405,8 +406,11 @@ public class OrganizationService {
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         //defalut KPI setting
-        activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), organization.getCountry().getId());
         activityIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType ->organizationType.getId()).collect(Collectors.toList()),countryId,null,countryAndOrgAccessGroupIdsMap),organization.getId());
+
+        List<Long> orgTypeIds = organization.getOrganizationTypes().stream().map(orgType -> orgType.getId()).collect(Collectors.toList());
+        List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
+        activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), organization.getCountry().getId(),orgTypeIds, orgSubTypeIds);
         // DO NOT CREATE PHASE for UNION
 
 //        if (!orgDetails.getUnion()) {
@@ -935,7 +939,9 @@ public class OrganizationService {
         timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.TASK_PLANNING);
 //        phaseRestClient.createDefaultPhases(unit.getId());
 //        periodRestClient.createDefaultPeriodSettings(unit.getId());
-        activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), unitId, parent.getCountry().getId());
+        List<Long> orgTypeIds = unit.getOrganizationTypes().stream().map(orgType -> orgType.getId()).collect(Collectors.toList());
+        List<Long> orgSubTypeIds = unit.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
+        activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), unitId, parent.getCountry().getId(), orgTypeIds,  orgSubTypeIds);
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
         activityIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType ->organizationType.getId()).collect(Collectors.toList()),country.getId(),unitId,countryAndOrgAccessGroupIdsMap),unit.getId());

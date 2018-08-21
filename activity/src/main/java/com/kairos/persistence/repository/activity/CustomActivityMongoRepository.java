@@ -22,6 +22,8 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityTagDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds);
 
+    List<Activity> findAllActivitiesByOrganizationTypeOrSubType(List<Long> orgTypeIds, List<Long> orgSubTypeIds);
+
     List<CompositeActivityDTO> getCompositeActivities(BigInteger activityId);
 
     List<ActivityTagDTO> findAllActivityByCountry(long countryId);

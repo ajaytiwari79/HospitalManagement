@@ -218,6 +218,13 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     }
 
+    public List<Activity> findAllActivitiesByOrganizationTypeOrSubType(List<Long> orgTypeIds, List<Long> orgSubTypeIds) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("isParentActivity").is(true)
+                .and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))
+                .and("state").nin("DRAFT"));
+        return mongoTemplate.find(query, Activity.class);
+    }
+
     public List<ActivityDTO> getAllActivityWithTimeType(Long unitId, List<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 //"unitId").is(unitId).and(

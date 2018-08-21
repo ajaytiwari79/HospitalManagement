@@ -189,6 +189,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
+        activityCopied.setCompositeActivities(null);
         return activityCopied;
     }
 
@@ -308,13 +309,30 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityWithTimeTypeDTO;
     }
 
-    public boolean createDefaultDataForOrganization(Long unitId, Long parentOrganizationId, Long countryId) {
+    public boolean createDefaultDataForOrganization(Long unitId, Long parentOrganizationId, Long countryId,List<Long> orgTypeIds, List<Long> orgSubTypeIds) {
         unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
         List<Phase> phases = phaseService.createDefaultPhase(unitId, countryId);
         periodSettingsService.createDefaultPeriodSettings(unitId);
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
         activityConfigurationService.createDefaultSettings(unitId, countryId, phases);
+        List<Activity>  existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubType(orgTypeIds, orgSubTypeIds);
+        if(!existingActivities.isEmpty()) {
+            List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
+            for (Activity activity : existingActivities) {
+                List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
+                for (int i = 0; i < phases.size(); i++) {
+                    PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phases.get(i).getId(), phases.get(i).getName(), phases.get(i).getDescription(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(),
+                            activity.getRulesActivityTab().getEligibleForSchedules().get(i).isEligibleForManagement(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanDelete(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanDelete(),
+                            activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanSell(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanSell());
+                    phaseTemplateValues.add(phaseTemplateValue);
+                }
+                activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
+                activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
+            }
+            save(activityCopiedList);
+        }
+
         return true;
     }
 
