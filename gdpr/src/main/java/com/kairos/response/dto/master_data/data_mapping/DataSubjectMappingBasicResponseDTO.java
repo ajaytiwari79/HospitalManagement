@@ -11,9 +11,9 @@ import java.math.BigInteger;
 public class DataSubjectMappingBasicResponseDTO {
 
 
-private BigInteger id;
+    private BigInteger id;
 
-private String name;
+    private String name;
 
     public BigInteger getId() {
         return id;
