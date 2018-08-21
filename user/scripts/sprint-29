@@ -1,0 +1,5 @@
+match (n:UnitPosition) detach delete n;
+match (n:CTARuleTemplate) detach delete n;
+match (n:CompensationTable) detach delete n;
+match (n:CalculateValueAgainst) detach delete n;
+match (n:CompensationTableInterval) detach delete n;

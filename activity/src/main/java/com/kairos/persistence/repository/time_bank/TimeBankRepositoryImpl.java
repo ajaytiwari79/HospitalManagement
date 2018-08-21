@@ -23,7 +23,6 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
     public DailyTimeBankEntry findLastTimeBankByUnitPositionId(Long unitPositionId, Date date) {
         Query query = new Query(Criteria.where("unitPositionId").is(unitPositionId).and("date").lt(date).and("deleted").is(false));
         query.with(Sort.by(Sort.Direction.ASC,"date"));
-        //query.limit(1);
         return mongoTemplate.findOne(query,DailyTimeBankEntry.class);
     }
 

@@ -347,9 +347,6 @@ public class CountryController {
     public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable Long organizationId,
                                                                         @PathVariable long countryId,
                                                                         @RequestBody OrganizationRequestWrapper organizationRequestWrapper) {
-        /*if (organization == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
-        }*/
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, organizationService.
                 createParentOrganization(organizationRequestWrapper, countryId, organizationId));
     }

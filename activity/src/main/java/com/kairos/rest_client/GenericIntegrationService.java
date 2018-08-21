@@ -86,6 +86,13 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/"+countryId+"/module/"+moduleId+"/kpi_details", null), KPIAccessPageDTO.class);
     }
 
+    public List<Long> getOrganizationIdsBySubOrgId(Long orgTypeId){
+        return genericRestClient.publish(null, null, false, IntegrationOperation.GET, "/orgtype/{orgTypeId}/get_organization_ids", null,orgTypeId);
+    }
+    public List<Long> getStaffIdsByunitAndAccessGroupId(Long unitId,Long accessGroupId){
+        return genericRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/access_group/{accessGroupId}/staffs",null,accessGroupId);
+    }
+
     public List<StaffDTO> getStaffDetailByIds(Long unitId, Set<Long> staffIds){
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(staffIds, unitId, true, IntegrationOperation.CREATE, "/staff/details", null), StaffDTO.class);
     }
@@ -97,8 +104,4 @@ public class GenericIntegrationService {
         }
         return value.longValue();
     }
-
-
-
-
 }

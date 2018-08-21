@@ -160,7 +160,7 @@ public class AgreementSectionService extends MongoBaseService {
                 agreementSubSection.setOrganizationId(UserContext.getOrgId());
                 AgreementSectionClauseWrapper agreementSubsectionClauseAndClauseDtoWrapper = new AgreementSectionClauseWrapper();
 
-                if (Optional.ofNullable(agreementSectionDTO.getClauses()).isPresent() && !agreementSubSectionDTO.getClauses().isEmpty()) {
+                if (Optional.ofNullable(agreementSubSectionDTO.getClauses()).isPresent() && !agreementSubSectionDTO.getClauses().isEmpty()) {
                     List<BigInteger> unchangedClauseIdList = new ArrayList<>();
                     List<ClauseBasicDTO> changedClauseBelongToSubSection = new ArrayList<>();
                     List<ClauseBasicDTO> newClauseBelongToSubSection = new ArrayList<>();
@@ -486,14 +486,13 @@ public class AgreementSectionService extends MongoBaseService {
 
     public AgreementSectionResponseDTO getAgreementSectionWithDataById(Long countryId, BigInteger id) {
 
-        AgreementSectionResponseDTO exist = agreementSectionMongoRepository.getAgreementSectionWithDataById(id);
+        AgreementSectionResponseDTO exist = agreementSectionMongoRepository.getAgreementSectionWithDataById(countryId,id);
         if (Optional.ofNullable(exist).isPresent()) {
             return exist;
         }
         throw new DataNotFoundByIdException("agreement section for id " + id + " not exist");
 
     }
-
 
     public void checkForDuplicacyInTitleOfAgreementSectionAndSubSection(List<AgreementSectionDTO> agreementSectionDTOS) {
         List<String> titles = new ArrayList<>();

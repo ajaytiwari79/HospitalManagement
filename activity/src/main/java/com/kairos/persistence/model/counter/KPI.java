@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.counter;
 
 import com.kairos.activity.enums.counter.ModuleType;
+import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.activity.enums.counter.CounterSize;
-import com.kairos.enums.CounterType;
 import com.kairos.persistence.model.counter.chart.BaseChart;
 import org.springframework.data.mongodb.core.mapping.Document;
 
