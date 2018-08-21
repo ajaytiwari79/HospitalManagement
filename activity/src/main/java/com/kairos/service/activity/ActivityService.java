@@ -470,15 +470,15 @@ public class ActivityService extends MongoBaseService {
         return individualPointsActivityTab;
     }
 
-    public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO,Date dateFrom,String cutOffIntervalUnit,Integer dayValue) {
+    public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
         validateActivityTimeRules(rulesActivityDTO.getEarliestStartTime(),rulesActivityDTO.getLatestStartTime(),rulesActivityDTO.getMaximumEndTime(),rulesActivityDTO.getShortestTime(),rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = rulesActivityDTO.buildRulesActivityTab();
         Activity activity = activityMongoRepository.findOne(rulesActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", rulesActivityDTO.getActivityId());
         }
-        if(StringUtils.isEmpty(cutOffIntervalUnit) && dateFrom!=null){
-            Set<CutOffInterval> cutOffIntervals = getCutoffInterval(dateFrom,cutOffIntervalUnit,dayValue);
+        if(rulesActivityDTO.getCutOffIntervalUnit()!=null && rulesActivityDTO.getCutOffStartFrom()!=null){
+            List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(),rulesActivityDTO.getCutOffIntervalUnit(),rulesActivityDTO.getCutOffdayValue());
             rulesActivityTab.setCutOffIntervals(cutOffIntervals);
             rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
         }
@@ -492,10 +492,10 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    private Set<CutOffInterval> getCutoffInterval(Date dateFrom, String cutOffIntervalUnit,Integer dayValue){
-        LocalDate startDate = DateUtils.asLocalDate(dateFrom);
+    private List<CutOffInterval> getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit,Integer dayValue){
+        LocalDate startDate = dateFrom;
         LocalDate endDate = startDate.plusYears(1);
-        Set<CutOffInterval> cutOffIntervals = new HashSet<>();
+        List<CutOffInterval> cutOffIntervals = new ArrayList<>();
         while (startDate.isBefore(endDate)){
             LocalDate nextEndDate = startDate;
             switch (cutOffIntervalUnit){
