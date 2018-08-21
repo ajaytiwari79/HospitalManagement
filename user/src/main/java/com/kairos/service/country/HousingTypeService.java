@@ -1,9 +1,9 @@
 package com.kairos.service.country;
+
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.HousingType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.HousingTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +17,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class HousingTypeService extends UserBaseService {
+public class HousingTypeService  {
 
     @Inject
     private HousingTypeGraphRepository housingTypeGraphRepository;
@@ -29,7 +29,7 @@ public class HousingTypeService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             housingType.setCountry(country);
-            save(housingType);
+            housingTypeGraphRepository.save(housingType);
             return housingType.retrieveDetails();
         }
         return null;
@@ -53,7 +53,7 @@ public class HousingTypeService extends UserBaseService {
         if (currentHousingType!=null){
             currentHousingType.setName(housingType.getName());
             currentHousingType.setDescription(housingType.getDescription());
-            save(currentHousingType);
+            housingTypeGraphRepository.save(currentHousingType);
             return currentHousingType.retrieveDetails();
         }
         return null;
@@ -63,7 +63,7 @@ public class HousingTypeService extends UserBaseService {
         HousingType housingType = housingTypeGraphRepository.findOne(kairosStatusId);
         if (housingType !=null){
             housingType.setEnabled(false);
-            save(housingType);
+            housingTypeGraphRepository.save(housingType);
             return true;
         }
         return false;

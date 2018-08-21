@@ -24,7 +24,7 @@ import static com.kairos.constants.Neo4jConstant.*;
  */
 @Configuration
 @PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
-public class Neo4jConfig implements EnvironmentAware {
+public class Neo4jConfig  implements EnvironmentAware {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
@@ -64,4 +64,5 @@ public class Neo4jConfig implements EnvironmentAware {
     public void setEnvironment(Environment environment) {
         this.environment = environment;
     }
+
   }

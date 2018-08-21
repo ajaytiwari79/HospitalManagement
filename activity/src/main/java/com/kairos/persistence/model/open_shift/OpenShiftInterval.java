@@ -2,8 +2,10 @@ package com.kairos.persistence.model.open_shift;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.DurationType;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 //Domain name can be changed
+@Document
 public class OpenShiftInterval extends MongoBaseEntity implements Comparable<OpenShiftInterval> {
     private int from;
     private int to;

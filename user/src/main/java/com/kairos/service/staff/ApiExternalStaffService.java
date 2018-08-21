@@ -7,7 +7,6 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.util.external_plateform_shift.GetEmploymentByIdResponse;
@@ -28,7 +27,7 @@ import java.util.Map;
  */
 @Transactional
 @Service
-public class ApiExternalStaffService extends UserBaseService {
+public class ApiExternalStaffService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

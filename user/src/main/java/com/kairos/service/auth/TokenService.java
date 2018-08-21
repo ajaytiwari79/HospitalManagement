@@ -1,5 +1,6 @@
 package com.kairos.service.auth;
 import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ public class TokenService {
 
     @Inject
     UserService userService;
+    @Inject
+    UserGraphRepository userGraphRepository;
+
     /**
      * Calls UserGraphRepository and fetch token , if token is null generate new token,
      * and return
@@ -31,7 +35,7 @@ public class TokenService {
             // generate token
         token = UUID.randomUUID().toString().toUpperCase();
         user.setAccessToken(token);
-        userService.save(user);
+        userGraphRepository.save(user);
         return token;
     }
 
@@ -60,7 +64,7 @@ public class TokenService {
     public boolean removeToken(String accessToken) {
         User currentUser = userService.findAndRemoveAccessToken(accessToken);
         currentUser.setAccessToken(null);
-        userService.save(currentUser);
+        userGraphRepository.save(currentUser);
         return currentUser.getAccessToken() == null;
     }
 

@@ -90,6 +90,7 @@ public class AppConstants {
 
 
     public static final String WEEK = "Week";
+    public static final String MONTH = "Month";
     public static final String MINUTES = "MINUTES";
     public static final String PERCENT = "PERCENT";
     public static final String DAILY = "daily";

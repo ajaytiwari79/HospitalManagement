@@ -1,2 +1,19 @@
 // To change the key name in existing counters
 db.counter.updateMany({},{$rename:{"applicableFor":"supportedModuleTypes"}});
+
+//for counter update setting
+
+db.categoryAssignment.drop()
+db.categoryKPIConf.drop()
+db.kPIAssignment.drop()
+db.kPICategory.drop()
+db.orgTypeKPIEntry.drop()
+db.tabKPIConf.drop()
+db.tabKPIEntry.drop()
+db.accessGroupKPIEntry.drop()
+db.applicableKPI.drop()
+
+db.getCollection('tableSetting').remove({"tableConfigurations.tableId":{$in:["36","35"]}})
+
+
+

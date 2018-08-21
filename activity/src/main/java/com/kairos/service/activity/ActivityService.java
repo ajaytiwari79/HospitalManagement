@@ -235,16 +235,16 @@ public class ActivityService extends MongoBaseService {
         return activityMongoRepository.findAllActivityWithCtaWtaSettingByUnit(unitId);
     }
 
-    public HashMap<Long, HashMap<Long, Long>> getListOfActivityIdsOfUnitByParentIds(List<BigInteger> parentActivityIds, List<Long> unitIds) {
+    public HashMap<Long, HashMap<Long, BigInteger>> getListOfActivityIdsOfUnitByParentIds(List<BigInteger> parentActivityIds, List<Long> unitIds) {
         List<OrganizationActivityDTO> unitActivities = activityMongoRepository.findAllActivityOfUnitsByParentActivity(parentActivityIds, unitIds);
-        HashMap<Long, HashMap<Long, Long>> mappedParentUnitActivities = new HashMap<Long, HashMap<Long, Long>>();
+        HashMap<Long, HashMap<Long, BigInteger>> mappedParentUnitActivities = new HashMap<>();
         unitActivities.forEach(activityDTO -> {
-            HashMap<Long, Long> unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
+            HashMap<Long, BigInteger> unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
             if (!Optional.ofNullable(unitParentActivities).isPresent()) {
-                mappedParentUnitActivities.put(activityDTO.getUnitId().longValue(), new HashMap<Long, Long>());
+                mappedParentUnitActivities.put(activityDTO.getUnitId().longValue(), new HashMap<Long, BigInteger>());
                 unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
             }
-            unitParentActivities.put(activityDTO.getParentId().longValue(), activityDTO.getId().longValue());
+            unitParentActivities.put(activityDTO.getParentId().longValue(), activityDTO.getId());
         });
         return mappedParentUnitActivities;
     }
@@ -966,7 +966,7 @@ public class ActivityService extends MongoBaseService {
 
     private List<Activity> mapActivitiesInOrganization(List<Activity> countryActivities, Long unitId, List<String> externalIds) {
 
-        List<Activity> unitActivities = activityMongoRepository.findByUnitIdAndExternalIdIn(unitId, externalIds);
+        List<Activity> unitActivities = activityMongoRepository.findByUnitIdAndExternalIdInAndDeletedFalse(unitId, externalIds);
         List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
         List<Activity> organizationActivities = new ArrayList<>();
         for (Activity countryActivity : countryActivities) {

@@ -15,7 +15,7 @@ public class PieChart extends BaseChart {
     private String displayUnit;
     private List<PieDataUnit> dataList;
 
-    public PieChart(RepresentationUnit unit, String displayUnit, List dataList){
+    public PieChart(RepresentationUnit unit, String displayUnit, List dataList) {
         super(ChartType.PIE);
         this.unit = unit;
         this.dataList = dataList;
