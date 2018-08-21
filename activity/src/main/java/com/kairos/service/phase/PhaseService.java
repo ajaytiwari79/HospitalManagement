@@ -1,5 +1,6 @@
 package com.kairos.service.phase;
 
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
@@ -269,7 +270,7 @@ public class PhaseService extends MongoBaseService {
         return phase;
     }
 
-    private void preparePhase(Phase phase, PhaseDTO phaseDTO) {
+    private void preparePlanningPhase(Phase phase, PhaseDTO phaseDTO) {
 
         phase.setDuration(phaseDTO.getDuration());
         phase.setDurationType(phaseDTO.getDurationType());
@@ -278,6 +279,22 @@ public class PhaseService extends MongoBaseService {
         phase.setDescription(phaseDTO.getDescription());
 
     }
+
+   private void prepareActualPhase(Phase phase,PhaseDTO phaseDTO){
+       phase.setName(phase.getName());
+       phase.setSequence(phase.getSequence());
+       phase.setDescription(phaseDTO.getDescription());
+       if(PhaseDefaultName.REALTIME.equals(phaseDTO.getPhaseEnum())) {
+           phase.setRealtimeDuration(phaseDTO.getRealtimeDuration());
+       }else if(PhaseDefaultName.TENTATIVE.equals(phaseDTO.getPhaseEnum())) {
+           phase.setUntilNextDay(phaseDTO.getUntilNextDay());
+       }else {
+           phase.setGracePeriodByManagement(phaseDTO.getGracePeriodByManagement());
+           phase.setGracePeriodByStaff(phaseDTO.getGracePeriodByStaff());
+       }
+   }
+
+
 
     public PhaseDTO updatePhase(BigInteger phaseId, Long unitId, PhaseDTO phaseDTO) {
         phaseDTO.setOrganizationId(unitId);
@@ -295,9 +312,12 @@ public class PhaseService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.phase.name.alreadyexists", phaseDTO.getName());
         }
         if (PhaseType.PLANNING.equals(oldPhase.getPhaseType())) {
-            preparePhase(oldPhase, phaseDTO);
-            save(oldPhase);
+            preparePlanningPhase(oldPhase, phaseDTO);
         }
+        if(PhaseType.ACTUAL.equals(oldPhase.getPhaseType())){
+            prepareActualPhase(phase,phaseDTO);
+        }
+        save(oldPhase);
         return phaseDTO;
     }
 

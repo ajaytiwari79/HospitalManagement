@@ -34,7 +34,10 @@ public class PhaseDTO {
     private String color;
     private PhaseDefaultName phaseEnum;
     private LocalTime flippingDefalutTime;
-
+    private int gracePeriodByStaff;
+    private int gracePeriodByManagement;
+    private String untilNextDay;
+    private int realtimeDuration;
     public Long getOrganizationId() {
         return organizationId;
     }
@@ -178,5 +181,37 @@ public class PhaseDTO {
 
     public void setFlippingDefalutTime(LocalTime flippingDefalutTime) {
         this.flippingDefalutTime = flippingDefalutTime;
+    }
+
+    public int getGracePeriodByStaff() {
+        return gracePeriodByStaff;
+    }
+
+    public void setGracePeriodByStaff(int gracePeriodByStaff) {
+        this.gracePeriodByStaff = gracePeriodByStaff;
+    }
+
+    public int getGracePeriodByManagement() {
+        return gracePeriodByManagement;
+    }
+
+    public void setGracePeriodByManagement(int gracePeriodByManagement) {
+        this.gracePeriodByManagement = gracePeriodByManagement;
+    }
+
+    public String getUntilNextDay() {
+        return untilNextDay;
+    }
+
+    public void setUntilNextDay(String untilNextDay) {
+        this.untilNextDay = untilNextDay;
+    }
+
+    public int getRealtimeDuration() {
+        return realtimeDuration;
+    }
+
+    public void setRealtimeDuration(int realtimeDuration) {
+        this.realtimeDuration = realtimeDuration;
     }
 }
