@@ -18,14 +18,13 @@ import java.util.List;
 @Repository
 public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEntry,BigInteger> ,CustomTimeBankRepository{
 
-    @Query("{unitPositionId:{$in:?0},date:{$gte:?1 , $lte:?2}}")
-    List<DailyTimeBankEntry> findAllByUnitPositionsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);
+
 
     @Query("{unitPositionId:?0,date:{$gte:?1 , $lt:?2}}")
     List<DailyTimeBankEntry> findAllByUnitPositionAndDate(Long unitPositionId, Date startDate, Date endDate);
 
-    @Query("{unitPositionId:?0,date:{$gte:?1}}")
-    DailyTimeBankEntry findOneByUnitPositionAndDate(Long unitPositionId, Date timeBankDate);
+    @Query(value = "{unitPositionId:?0,date:{$gte:?1 , $lt:?2}}",delete = true)
+    void deleteDailyTimeBank(Long unitPositionId, Date startDate, Date endDate);
 
     @Query("{unitPositionId:?0,date:{$lt:?1}}")
     List<DailyTimeBankEntry> findAllByUnitPositionAndBeforeDate(Long unitPositionId, Date timeBankDate);

@@ -143,6 +143,32 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeDTOS;
     }
 
+    public Map<String,List<TimeType>> getPresenceAbsenceTimeType(Long countryId){
+        List<TimeType> timeTypes = timeTypeMongoRepository.findAllByCountryId(countryId);
+        Map<String,List<TimeType>> presenceAbsenceTimeTypeMap = new HashMap<>();
+        timeTypes.forEach(t->{
+            if(t.getLabel().equals("Presence")){
+                presenceAbsenceTimeTypeMap.put("Presence",getChildOfTimeType(t,timeTypes));
+            }else if(t.getLabel().equals("Absence")){
+                presenceAbsenceTimeTypeMap.put("Absence",getChildOfTimeType(t,timeTypes));
+            }
+
+        });
+        return presenceAbsenceTimeTypeMap;
+    }
+
+
+    public List<TimeType> getChildOfTimeType(TimeType timeType,List<TimeType> timeTypes){
+        List<TimeType> timeTypes1 = new ArrayList<>();
+        timeTypes.forEach(t->{
+            if(timeType.getId().equals(t.getUpperLevelTimeTypeId())){
+                timeTypes1.add(t);
+            }
+            timeTypes.addAll(getChildOfTimeType(t,timeTypes));
+        });
+        timeTypes1.add(timeType);
+        return timeTypes1;
+    }
 
     public List<TimeTypeDTO> getAllTimeTypeByCountryId(Long countryId) {
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllByCountryId(countryId);

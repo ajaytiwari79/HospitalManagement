@@ -24,10 +24,17 @@ public class PayOutController {
     @Autowired
     private PayOutService payOutService;
 
-    @GetMapping(value = "/{payoutTransactionId}")
+    @PostMapping(value = "/{payoutTransactionId}")
     public ResponseEntity<Map<String, Object>> getPayOutForAdvanceView(@PathVariable BigInteger payoutTransactionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payOutService.approvePayOutRequest(payoutTransactionId));
     }
+
+    @PostMapping(value = "/request_payout/staff/{staffId}")
+    public ResponseEntity<Map<String, Object>> requestPayOut(@PathVariable Long staffId,@RequestParam Long unitPositionId,@RequestParam int amount) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payOutService.requestPayOut(staffId,unitPositionId,amount));
+    }
+
+
 
 
 }
