@@ -1,7 +1,5 @@
 package com.kairos.service.organization;
 
-import com.kairos.activity.counter.DefalutKPISettingDTO;
-import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
@@ -35,7 +33,6 @@ import com.kairos.user.organization.OrganizationBasicDTO;
 import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
 import com.kairos.util.FormatUtil;
-import com.kairos.util.user_context.UserContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
@@ -46,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 
@@ -374,5 +370,22 @@ public class CompanyCreationService {
         }
         return companyCategory;
     }
+    public boolean publishOrganization(Long organizationId){
+        Organization organization = organizationGraphRepository.findOne(organizationId);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
+        }else  if (organization.getDesiredUrl()==null){
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
+        }else if (organization.getCompanyCategory()==null){
 
+        }else if(organization.getOrganizationType()==null){
+
+        }else if (organization.getOrganizationSubTypes()==null || organization.getOrganizationSubTypes().isEmpty()){
+
+        }else if (organization.getBusinessTypes()==null){
+
+        }else if ()
+
+        return true;
+    }
 }

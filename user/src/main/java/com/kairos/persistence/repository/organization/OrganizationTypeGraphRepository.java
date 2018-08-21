@@ -70,7 +70,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "OPTIONAL Match (organization)-[:"+TYPE_OF+"]->(organizationType:OrganizationType) with organizationType,organization\n" +
             "OPTIONAL match (subType:OrganizationType)<-[:"+SUB_TYPE_OF+"]-(organization) with subType,organizationType,organization\n" +
             "OPTIONAL Match (organization)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false}) \n" +
-            "return id(organizationType) as id,organizationType.name as name,case when subType is null then [] else collect({id:id(subType),name:subType.name}) end as children,level as level")
+            "return id(organizationType) as id,organizationType.name as name,case when subType is null then [] else collect({id:id(subType),name:subType.name}) end as children,id(level) as levelId")
     OrganizationTypeAndSubType getOrganizationTypesForUnit(long organizationId);
 
     @Query("Match (organizationType:OrganizationType{isEnable:true})-[:BELONGS_TO]->(country:Country) where id(country)={0}\n" +

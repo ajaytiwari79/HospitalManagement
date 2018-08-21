@@ -11,7 +11,7 @@ public class OrganizationTypeAndSubType {
     private Long id;
     private String name;
     private List<OrganizationType> children;
-    private Level level;
+    private Long levelId;
 
     public OrganizationTypeAndSubType() {
         //Default Constructor
@@ -41,11 +41,11 @@ public class OrganizationTypeAndSubType {
         this.children = children;
     }
 
-    public Level getLevel() {
-        return level;
+    public Long getLevelId() {
+        return levelId;
     }
 
-    public void setLevel(Level level) {
-        this.level = level;
+    public void setLevelId(Long levelId) {
+        this.levelId = levelId;
     }
 }
