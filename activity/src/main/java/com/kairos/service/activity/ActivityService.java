@@ -966,7 +966,7 @@ public class ActivityService extends MongoBaseService {
 
     private List<Activity> mapActivitiesInOrganization(List<Activity> countryActivities, Long unitId, List<String> externalIds) {
 
-        List<Activity> unitActivities = activityMongoRepository.findByUnitIdAndExternalIdIn(unitId, externalIds);
+        List<Activity> unitActivities = activityMongoRepository.findByUnitIdAndExternalIdInAndDeletedFalse(unitId, externalIds);
         List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
         List<Activity> organizationActivities = new ArrayList<>();
         for (Activity countryActivity : countryActivities) {
