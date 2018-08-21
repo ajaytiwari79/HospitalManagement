@@ -93,4 +93,11 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "return  id(user) as id, user.firstName as firstName,user.lastName as lastName ,user.cprNumber as cprNumber,user.creationDate as creationDate ORDER BY user.creationDate DESC LIMIT 1" )
     StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId);
+
+    @Query("Match (org:Organization) where id(org) IN {0}" +
+            "Optional Match (emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) with org,unitPermission,emp\n" +
+            "Optional Match (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) with org,unitPermission,emp,r1,ag\n" +
+            "Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
+            "return  id(org) as organizationId ,id(user) as id, user.firstName as firstName,user.lastName as lastName ,user.cprNumber as cprNumber,user.creationDate as creationDate ORDER BY user.creationDate DESC LIMIT 1" )
+    List<StaffPersonalDetailDTO> getUnitManagerOfOrganization(List<Long> unitId);
 }

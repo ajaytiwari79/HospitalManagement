@@ -132,7 +132,8 @@ public class OrganizationService {
     private AccessPageRepository accessPageRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
-    @Inject private OpeningSettingsGraphRepository openingSettingsGraphRepository;
+    @Inject
+    private OpeningSettingsGraphRepository openingSettingsGraphRepository;
     @Inject
     private OrganizationTypeGraphRepository typeGraphRepository;
     @Inject
@@ -234,7 +235,7 @@ public class OrganizationService {
     //private WTAService wtaService;
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
-   @Inject
+    @Inject
     PeriodRestClient periodRestClient;
     @Inject
     private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
@@ -313,7 +314,7 @@ public class OrganizationService {
         } else {
 
             organization = organizationGraphRepository.save(organization);
-            if (!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)){
+            if (!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)) {
                 int count = organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
             }
         }
@@ -344,7 +345,6 @@ public class OrganizationService {
         }
         return true;
     }
-
 
 
     public OrganizationResponseWrapper createUnion(OrganizationBasicDTO orgDetails, long countryId, Long organizationId) {
@@ -385,7 +385,7 @@ public class OrganizationService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        activityIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType ->organizationType.getId()).collect(Collectors.toList()),countryId,null,countryAndOrgAccessGroupIdsMap),organization.getId());
+        activityIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()), countryId, null, countryAndOrgAccessGroupIdsMap), organization.getId());
         // Create Unit Manager
         orgDetails.getUnitManagerDTO().setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(orgDetails.getUnitManagerDTO().getAccessGroupId()));
         createUnitManager(organization.getId(), orgDetails);
@@ -401,7 +401,6 @@ public class OrganizationService {
 
         return organizationResponseWrapper;
     }
-
 
 
     public OrganizationResponseDTO updateUnion(OrganizationBasicDTO orgDetails, long unionId, long countryId) {
@@ -524,7 +523,7 @@ public class OrganizationService {
 
         }
 
-        if (Optional.ofNullable(orgDetails.getTypeId()).isPresent()  && Optional.ofNullable(orgDetails.getLevelId()).isPresent()) {
+        if (Optional.ofNullable(orgDetails.getTypeId()).isPresent() && Optional.ofNullable(orgDetails.getLevelId()).isPresent()) {
             Level level = organizationTypeGraphRepository.getLevel(orgDetails.getTypeId(), orgDetails.getLevelId());
             organization.setLevel(level);
         }
@@ -571,7 +570,6 @@ public class OrganizationService {
         activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId());
 
     }
-
 
 
     public List<Map<String, Object>> getAllOrganization() {
@@ -723,7 +721,7 @@ public class OrganizationService {
 
     public Map<String, Object> getParentOrganization(Long countryId) {
         Map<String, Object> data = new HashMap<>(2);
-        OrganizationQueryResult organizationQueryResult = organizationGraphRepository.getParentOrganizationOfRegion(countryId);
+        List<OrganizationBasicResponse> organizationQueryResult = organizationGraphRepository.getAllParentOrganizationOfCountry(countryId);
         OrganizationCreationData organizationCreationData = organizationGraphRepository.getOrganizationCreationData(countryId);
         List<Map<String, Object>> zipCodes = FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));
         if (Optional.ofNullable(organizationCreationData).isPresent()) {
@@ -732,33 +730,37 @@ public class OrganizationService {
         organizationCreationData.setCompanyTypes(CompanyType.getListOfCompanyType());
         organizationCreationData.setCompanyUnitTypes(CompanyUnitType.getListOfCompanyUnitType());
         organizationCreationData.setAccessGroups(accessGroupService.getCountryAccessGroupsForOrganizationCreation(countryId));
-        List<Map<String, Object>> orgData = new ArrayList<>();
-        for (Map<String, Object> organizationData : organizationQueryResult.getOrganizations()) {
-            HashMap<String, Object> orgBasicData = new HashMap<>();
-            orgBasicData.put("orgData", organizationData);
-            Map<String, Object> address = (Map<String, Object>) organizationData.get("contactAddress");
-            orgBasicData.put("municipalities", (address.get("zipCodeId") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCodeId"))));
-            orgData.add(orgBasicData);
-        }
+
         data.put("globalData", organizationCreationData);
-        data.put("organization", orgData);
+        data.put("organization", organizationQueryResult);
         return data;
     }
 
 
-    public Map<String, Object> getOrganizationGdprAndWorkcenter(Long organizationId, Long countryId) {
-        Map<String, Object> data = new HashMap<>();
-        OrganizationQueryResult organizationQueryResult = organizationGraphRepository.getOrganizationGdprAndWorkCenter(organizationId);
-        for (Map<String, Object> organizationData : organizationQueryResult.getOrganizations()) {
+    public List<Map<String, Object>> getOrganizationGdprAndWorkcenter(Long organizationId, Long countryId) {
+        List<Map<String, Object>> data = new ArrayList<>();
+        List<OrganizationBasicResponse> organizationQueryResult = organizationGraphRepository.getOrganizationGdprAndWorkCenter(organizationId);
+        List<Long> unitIds = organizationQueryResult.stream().map(organizationBasicResponse -> organizationBasicResponse.getId()).collect(Collectors.toList());
+
+        List<Map<String, Object>> organizationContactAddress = organizationGraphRepository.getContactAddressOfParentOrganization(unitIds);
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds);
+
+
+        //NOW find Address and Unit
+        for (OrganizationBasicResponse organizationData : organizationQueryResult) {
             HashMap<String, Object> orgBasicData = new HashMap<>();
             orgBasicData.put("orgData", organizationData);
-            Map<String, Object> address = (Map<String, Object>) organizationData.get("contactAddress");
-            orgBasicData.put("municipalities", (address.get("zipCodeId") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCodeId"))));
-            if (organizationData.get("gdprUnit") != null && (boolean) organizationData.get("gdprUnit")) {
-                data.put("gdprUnit", orgBasicData);
-            } else if (organizationData.get("workCenterUnit") != null && (boolean) organizationData.get("workCenterUnit")) {
-                data.put("workCenterUnit", orgBasicData);
+            for (Map<String, Object> address : organizationContactAddress) {
+                if (address.get("organizationId").equals(organizationData.getId())) {
+                    orgBasicData.put("address", address);
+                    orgBasicData.put("municipalities", (address.get("zipCodeId") == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCodeId"))));
+                    break;
+                }
             }
+
+            Optional<StaffPersonalDetailDTO> currentStaff = staffPersonalDetailDTOS.stream().filter(staffPersonalDetailDTO -> staffPersonalDetailDTO.getOrganizationId().equals(organizationData.getId())).findFirst();
+            orgBasicData.put("unitManager", currentStaff.isPresent() ? currentStaff.get() : null);
+            data.add(orgBasicData);
         }
         return data;
     }
@@ -775,7 +777,7 @@ public class OrganizationService {
 
     public OrganizationStaffWrapper getOrganizationAndStaffByExternalId(String externalId, Long staffExternalId, Long staffTimeCareEmploymentId) {
         OrganizationStaffWrapper organizationStaffWrapper = staffGraphRepository.getStaff(staffExternalId, staffTimeCareEmploymentId);
-        if(Optional.ofNullable(organizationStaffWrapper).isPresent()){
+        if (Optional.ofNullable(organizationStaffWrapper).isPresent()) {
             organizationStaffWrapper.setOrganization(organizationGraphRepository.findByExternalId(externalId));
         }
         return organizationStaffWrapper;
@@ -1482,7 +1484,7 @@ public class OrganizationService {
                 ctaBasicDetailsDTO.setCountryDTO(countryDTO);
             }
         }
-        if(organizationSubTypeId!=null){
+        if (organizationSubTypeId != null) {
             OrganizationType organizationType = organizationTypeGraphRepository.findOrganizationTypeBySubTypeId(organizationSubTypeId);
             if (Optional.ofNullable(organizationType).isPresent()) {
                 OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO();
@@ -1510,7 +1512,7 @@ public class OrganizationService {
     }
 
 
-    public List<Long> getOrganizationIdsBySubOrgTypeId(Long orgTypeId){
+    public List<Long> getOrganizationIdsBySubOrgTypeId(Long orgTypeId) {
         return organizationGraphRepository.getOrganizationIdsBySubOrgTypeId(orgTypeId);
     }
 

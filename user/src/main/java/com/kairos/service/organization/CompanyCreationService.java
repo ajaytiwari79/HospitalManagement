@@ -191,6 +191,7 @@ public class CompanyCreationService {
         return orgExistWithUrl;
     }
 
+    // tab 1 in FE
     public OrganizationBasicResponse getOrganizationDetailsById(Long unitId) {
         return organizationGraphRepository.getOrganizationDetailsById(unitId);
 
@@ -218,9 +219,9 @@ public class CompanyCreationService {
 
     public HashMap<String, Object> getAddressOfCompany(Long unitId) {
         HashMap<String, Object> orgBasicData = new HashMap<>();
-        OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getContactAddressOfOrg(unitId);
+        Map<String, Object> organizationContactAddress = organizationGraphRepository.getContactAddressOfParentOrganization(unitId);
         orgBasicData.put("address", organizationContactAddress);
-        orgBasicData.put("municipalities", (organizationContactAddress.getZipCode() == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(organizationContactAddress.getZipCode().getId())));
+        orgBasicData.put("municipalities", (organizationContactAddress.get("zipCodeId") == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long)organizationContactAddress.get("zipCodeId"))));
         return orgBasicData;
     }
 
@@ -294,6 +295,7 @@ public class CompanyCreationService {
         setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO);
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getAddressDTO());
+        unit.setContactAddress(contactAddress);
         setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManagerDTO());
         //Assign Parent Organization's level to unit
         unit.setLevel(parentOrganization.getLevel());
@@ -302,6 +304,7 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getAddressDTO() != null) {
             organizationBasicDTO.getAddressDTO().setId(unit.getContactAddress().getId());
         }
+        organizationGraphRepository.createChildOrganization(parentOrganizationId,unit.getId());
         return organizationBasicDTO;
 
     }

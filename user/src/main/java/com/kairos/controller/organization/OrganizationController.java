@@ -591,7 +591,10 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getParentOrganization(countryId));
     }
-
+/**
+ * Its fetching all the units of the  organization
+ *
+ * */
     @RequestMapping(value = "/parent/{orgId}/country/{countryId}/gdpr_workcenter", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getOrganizationGdprAndWorkcenter(@PathVariable long orgId,@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,

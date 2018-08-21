@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
+import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.Level;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -32,6 +33,7 @@ public class OrganizationCreationData {
     private List<HashMap<String,String>> companyUnitTypes;
     private Map<String, List<AccessGroupQueryResult>> accessGroups;
     private List<AccountType> accountTypes= new ArrayList<>();
+    private List<UnitType> unitTypes= new ArrayList<>();
 
     public List<Level> getLevels() {
         return levels;
@@ -112,5 +114,13 @@ public class OrganizationCreationData {
 
     public void setAccountTypes(List<AccountType> accountTypes) {
         this.accountTypes = accountTypes;
+    }
+
+    public List<UnitType> getUnitTypes() {
+        return unitTypes;
+    }
+
+    public void setUnitTypes(List<UnitType> unitTypes) {
+        this.unitTypes = unitTypes;
     }
 }

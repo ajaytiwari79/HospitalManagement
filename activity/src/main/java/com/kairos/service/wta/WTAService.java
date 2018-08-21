@@ -163,7 +163,6 @@ public class WTAService extends MongoBaseService {
 
         wtaBasicDetailsDTO.getOrganizations().forEach(organization ->
         {
-            if (!organization.isKairosHub()) {
                 WorkingTimeAgreement workingTimeAgreement = new WorkingTimeAgreement();
                 wtaBuilderService.getWtaObject(wta, workingTimeAgreement);
                 workingTimeAgreement.setCountryParentWTA(wta.getId());
@@ -180,7 +179,6 @@ public class WTAService extends MongoBaseService {
                 workingTimeAgreement.setCountryParentWTA(wta.getId());
                 workingTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));
                 workingTimeAgreements.add(workingTimeAgreement);
-            }
         });
         if (!workingTimeAgreements.isEmpty()) {
             save(workingTimeAgreements);

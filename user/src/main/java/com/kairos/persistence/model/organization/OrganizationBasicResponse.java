@@ -18,12 +18,16 @@ public class OrganizationBasicResponse {
     private String shortCompanyName;
     private String description;
     private String desiredUrl;
-    private CompanyCategory companyCategory;
-    private List<BusinessType> businessTypes;
+    private Long companyCategoryId;
+    private List<Long> businessTypeIds;
     private CompanyType companyType;
     private String vatId;
-    private AccountType accountType;
+    private Long kairosCompanyId;
+    private Long accountTypeId;
     private Boolean boardingCompleted;
+    private Long zipCodeId;
+    private Long typeId;
+    private List<Long> subTypeId;
 
     public OrganizationBasicResponse() {
     }
@@ -73,20 +77,28 @@ public class OrganizationBasicResponse {
         this.desiredUrl = desiredUrl;
     }
 
-    public CompanyCategory getCompanyCategory() {
-        return companyCategory;
+    public Long getCompanyCategoryId() {
+        return companyCategoryId;
     }
 
-    public void setCompanyCategory(CompanyCategory companyCategory) {
-        this.companyCategory = companyCategory;
+    public void setCompanyCategoryId(Long companyCategoryId) {
+        this.companyCategoryId = companyCategoryId;
     }
 
-    public List<BusinessType> getBusinessTypes() {
-        return businessTypes;
+    public Long getKairosCompanyId() {
+        return kairosCompanyId;
     }
 
-    public void setBusinessTypes(List<BusinessType> businessTypes) {
-        this.businessTypes = businessTypes;
+    public void setKairosCompanyId(Long kairosCompanyId) {
+        this.kairosCompanyId = kairosCompanyId;
+    }
+
+    public List<Long> getBusinessTypeIds() {
+        return businessTypeIds;
+    }
+
+    public void setBusinessTypeIds(List<Long> businessTypeIds) {
+        this.businessTypeIds = businessTypeIds;
     }
 
     public CompanyType getCompanyType() {
@@ -105,12 +117,12 @@ public class OrganizationBasicResponse {
         this.vatId = vatId;
     }
 
-    public AccountType getAccountType() {
-        return accountType;
+    public Long getAccountTypeId() {
+        return accountTypeId;
     }
 
-    public void setAccountType(AccountType accountType) {
-        this.accountType = accountType;
+    public void setAccountTypeId(Long accountTypeId) {
+        this.accountTypeId = accountTypeId;
     }
 
     public Boolean getBoardingCompleted() {
@@ -119,5 +131,29 @@ public class OrganizationBasicResponse {
 
     public void setBoardingCompleted(Boolean boardingCompleted) {
         this.boardingCompleted = boardingCompleted;
+    }
+
+    public Long getZipCodeId() {
+        return zipCodeId;
+    }
+
+    public void setZipCodeId(Long zipCodeId) {
+        this.zipCodeId = zipCodeId;
+    }
+
+    public Long getTypeId() {
+        return typeId;
+    }
+
+    public void setTypeId(Long typeId) {
+        this.typeId = typeId;
+    }
+
+    public List<Long> getSubTypeId() {
+        return subTypeId;
+    }
+
+    public void setSubTypeId(List<Long> subTypeId) {
+        this.subTypeId = subTypeId;
     }
 }
