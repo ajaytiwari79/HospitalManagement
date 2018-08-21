@@ -2,6 +2,7 @@ package com.kairos.response.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.gdpr.ManagingOrganization;
 import com.kairos.gdpr.Staff;
 import com.kairos.response.dto.common.*;
@@ -12,6 +13,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProcessingActivityResponseDTO {
 
     private BigInteger id;
@@ -27,6 +29,8 @@ public class ProcessingActivityResponseDTO {
 
     @NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
+
+    private AssetBasicResponseDTO asset;
 
     private List<ProcessingPurposeResponseDTO> processingPurposes;
 
@@ -51,6 +55,10 @@ public class ProcessingActivityResponseDTO {
     private Long maxDataSubjectVolume;
 
     private Integer dataRetentionPeriod;
+
+    public AssetBasicResponseDTO getAsset() { return asset; }
+
+    public void setAsset(AssetBasicResponseDTO asset) { this.asset = asset; }
 
     public List<ResponsibilityTypeResponseDTO> getResponsibilityType() { return responsibilityType; }
 
