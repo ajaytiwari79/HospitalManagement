@@ -98,7 +98,7 @@ public class AssetController {
 
 
     @ApiOperation(value = "Add processing Activity to Asset ")
-    @PostMapping("/asset/{assetId}/processing_activity")
+    @PutMapping("/asset/{assetId}/processing_activity")
     public ResponseEntity<Object> relateProcessingActivitiesAndSubProcessingActivitiesToAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @Valid @RequestBody AssetRelateProcessingActivityDTO relateProcessingActivityDTO) {
 
         if (unitId == null) {
