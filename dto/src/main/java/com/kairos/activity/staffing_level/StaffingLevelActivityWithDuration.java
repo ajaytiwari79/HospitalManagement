@@ -1,14 +1,27 @@
 package com.kairos.activity.staffing_level;
 
+import java.math.BigInteger;
+
 public class StaffingLevelActivityWithDuration {
 
     private String name;
-    private Long activityId;
+    private BigInteger activityId;
     // private int noOfStaff;
     private boolean includeInMin;
     private int minNoOfStaff;
     private int maxNoOfStaff;
+    private int underStaffingOverStaffingCount;
     private Duration staffingLevelDuration;
+
+
+    public int getUnderStaffingOverStaffingCount() {
+        return underStaffingOverStaffingCount;
+    }
+
+    public void setUnderStaffingOverStaffingCount(int underStaffingOverStaffingCount) {
+        this.underStaffingOverStaffingCount = underStaffingOverStaffingCount;
+    }
+
 
     public String getName() {
         return name;
@@ -18,11 +31,11 @@ public class StaffingLevelActivityWithDuration {
         this.name = name;
     }
 
-    public Long getActivityId() {
+    public BigInteger getActivityId() {
         return activityId;
     }
 
-    public void setActivityId(Long activityId) {
+    public void setActivityId(BigInteger activityId) {
         this.activityId = activityId;
     }
 
@@ -58,10 +71,18 @@ public class StaffingLevelActivityWithDuration {
         this.staffingLevelDuration = staffingLevelDuration;
     }
 
-    public StaffingLevelActivityWithDuration(Long activityId, int minNoOfStaff, int maxNoOfStaff, Duration staffingLevelDuration) {
+    public StaffingLevelActivityWithDuration(BigInteger activityId, int minNoOfStaff, int maxNoOfStaff, Duration staffingLevelDuration) {
         this.activityId = activityId;
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;
         this.staffingLevelDuration = staffingLevelDuration;
+    }
+    public StaffingLevelActivityWithDuration(StaffingLevelActivityWithDuration staffingLevelActivityWithDuration) {
+        this.activityId = staffingLevelActivityWithDuration.getActivityId();
+        this.minNoOfStaff = staffingLevelActivityWithDuration.getMinNoOfStaff();
+        this.maxNoOfStaff = staffingLevelActivityWithDuration.maxNoOfStaff;
+        this.underStaffingOverStaffingCount = staffingLevelActivityWithDuration.underStaffingOverStaffingCount;
+        this.name = staffingLevelActivityWithDuration.getName();
+        this.staffingLevelDuration = new Duration(staffingLevelActivityWithDuration.getStaffingLevelDuration().getFrom(),null) ;
     }
 }

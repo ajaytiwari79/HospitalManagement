@@ -463,8 +463,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "match(staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(unit:Organization) where id(unit)={0}\n " +
             " MATCH (expertise)<-[:" + HAS_EXPERTISE_IN + "]-(unitPosition) \n" +
             "match (unitPosition)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
-            " match (unitPosition)-[:" + HAS_CTA + "]->(cta_response:CostTimeAgreement)\n" +
-            "return staff as staff,expertise as expertise,cta_response as costTimeAgreement,unitPosition.workingTimeAgreementId as workingTimeAgreementId,et as employmentType,unit.unitTimeZone as unitTimeZone," +
+            "return staff as staff,expertise as expertise,unitPosition.workingTimeAgreementId as workingTimeAgreementId,et as employmentType,unit.unitTimeZone as unitTimeZone," +
             "unitPosition.totalWeeklyHours as totalWeeklyHours, unitPosition.startDateMillis as startDateMillis, unitPosition.endDateMillis as endDateMillis," +
             "unitPosition.salary as salary,unitPosition.workingDaysInWeek as workingDaysInWeek," +
             "unitPosition.hourlyWages as hourlyWages,id(unitPosition) as id,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +

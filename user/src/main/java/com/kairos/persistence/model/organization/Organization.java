@@ -1,48 +1,47 @@
-    package com.kairos.persistence.model.organization;
+package com.kairos.persistence.model.organization;
 
-    import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-    import com.fasterxml.jackson.annotation.JsonInclude;
-    import com.google.common.base.Optional;
-    import com.google.common.collect.Lists;
-    import com.kairos.enums.OrganizationLevel;
-    import com.kairos.enums.time_slot.TimeSlotMode;
-    import com.kairos.persistence.model.access_permission.AccessGroup;
-    import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
-    import com.kairos.persistence.model.client.ContactAddress;
-    import com.kairos.persistence.model.client.ContactDetail;
-    import com.kairos.persistence.model.common.UserBaseEntity;
-    import com.kairos.persistence.model.country.*;
-    import com.kairos.persistence.model.country.default_data.BusinessType;
-    import com.kairos.persistence.model.country.default_data.CompanyCategory;
-    import com.kairos.persistence.model.country.default_data.ContractType;
-    import com.kairos.persistence.model.country.default_data.UnitType;
-    import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-    import com.kairos.persistence.model.country.tag.Tag;
-    import com.kairos.persistence.model.organization.group.Group;
-    import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
-    import com.kairos.persistence.model.staff.employment.Employment;
-    import com.kairos.persistence.model.user.department.Department;
-    import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
-    import com.kairos.persistence.model.user.position_code.PositionCode;
-    import com.kairos.persistence.model.user.region.LocalAreaTag;
-    import com.kairos.persistence.model.user.region.ZipCode;
-    import com.kairos.persistence.model.user.resources.Resource;
-    import com.kairos.user.organization.CompanyType;
-    import com.kairos.user.organization.CompanyUnitType;
-    import com.kairos.util.ZoneIdStringConverter;
-    import org.neo4j.ogm.annotation.NodeEntity;
-    import org.neo4j.ogm.annotation.Property;
-    import org.neo4j.ogm.annotation.Relationship;
-    import org.neo4j.ogm.annotation.typeconversion.Convert;
-    import org.neo4j.ogm.annotation.typeconversion.DateString;
-    import org.neo4j.ogm.annotation.typeconversion.EnumString;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.kairos.enums.OrganizationLevel;
+import com.kairos.enums.time_slot.TimeSlotMode;
+import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.*;
+import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.CompanyCategory;
+import com.kairos.persistence.model.country.default_data.ContractType;
+import com.kairos.persistence.model.country.default_data.UnitType;
+import com.kairos.persistence.model.country.default_data.account_type.AccountType;
+import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
+import com.kairos.persistence.model.staff.employment.Employment;
+import com.kairos.persistence.model.user.department.Department;
+import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
+import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.persistence.model.user.region.LocalAreaTag;
+import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.model.user.resources.Resource;
+import com.kairos.user.organization.CompanyType;
+import com.kairos.user.organization.CompanyUnitType;
+import com.kairos.util.ZoneIdStringConverter;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Property;
+import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
+import org.neo4j.ogm.annotation.typeconversion.DateString;
+import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
-    import javax.validation.constraints.NotNull;
-    import java.time.ZoneId;
-    import java.util.*;
+import javax.validation.constraints.NotNull;
+import java.time.ZoneId;
+import java.util.*;
 
-    import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
-    import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.enums.time_slot.TimeSlotMode.STANDARD;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -168,12 +167,6 @@ public class Organization extends UserBaseEntity {
 
     @Relationship(type = HAS_POSITION_CODE)
     private List<PositionCode> positionCodeList = new ArrayList<>();
-/*
-    @Relationship(type = HAS_WTA)
-    private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();*/
-
-    @Relationship(type = HAS_CTA)
-    private List<CostTimeAgreement> costTimeAgreements = new ArrayList<>();
 
     @Relationship(type = HAS_TIME_SLOT_SET)
     private List<TimeSlotSet> timeSlotSets = new ArrayList<>();
@@ -239,26 +232,35 @@ public class Organization extends UserBaseEntity {
     }
 
 
-    public Organization(Long id,String name,String description,boolean isPrekairos,String desiredUrl,String shortCompanyName,Integer kairosCompanyId,CompanyType companyType,
-          String vatId,List<BusinessType> businessTypes,OrganizationType organizationType,List<OrganizationType> organizationSubTypes,   CompanyUnitType companyUnitType,
-            CompanyCategory companyCategory,ZoneId timeZone,String childLevel,boolean isParentOrganization, Country country,AccountType accountType,boolean boardingCompleted,String kairosId,
-                        List<Group> groupList, List<Organization> children,UnitType unitType,List<CostTimeAgreement> costTimeAgreements) {
-        this.name=name;this.description=description;this.isKairosHub=isPrekairos;
-        this.desiredUrl=desiredUrl;this.shortCompanyName=shortCompanyName;this.kairosCompanyId=kairosCompanyId;this.vatId=vatId;
-        this.businessTypes=businessTypes;this.organizationSubTypes=organizationSubTypes;this.organizationType =organizationType;
-        this.companyType =companyType;this.companyCategory=companyCategory;
-        this.companyUnitType=companyUnitType;
-        this.timeZone=timeZone;this.costTimeAgreements=costTimeAgreements;
-        this.childLevel=childLevel;
+    public Organization(Long id, String name, String description, boolean isPrekairos, String desiredUrl, String shortCompanyName, Integer kairosCompanyId, CompanyType companyType,
+                        String vatId, List<BusinessType> businessTypes, OrganizationType organizationType, List<OrganizationType> organizationSubTypes, CompanyUnitType companyUnitType,
+                        CompanyCategory companyCategory, ZoneId timeZone, String childLevel, boolean isParentOrganization, Country country, AccountType accountType, boolean boardingCompleted, String kairosId,
+                        List<Group> groupList, List<Organization> children, UnitType unitType) {
+        this.name = name;
+        this.description = description;
+        this.isKairosHub = isPrekairos;
+        this.desiredUrl = desiredUrl;
+        this.shortCompanyName = shortCompanyName;
+        this.kairosCompanyId = kairosCompanyId;
+        this.vatId = vatId;
+        this.businessTypes = businessTypes;
+        this.organizationSubTypes = organizationSubTypes;
+        this.organizationType = organizationType;
+        this.companyType = companyType;
+        this.companyCategory = companyCategory;
+        this.companyUnitType = companyUnitType;
+        this.timeZone = timeZone;
+        this.childLevel = childLevel;
         this.isParentOrganization = isParentOrganization;
-        this.country = country;this.id=id;
-        this.accountType=accountType;
-        this.companyType =companyType;
-        this.boardingCompleted=boardingCompleted;
-        this.kairosId=kairosId;
-            this.groupList = groupList;
-            this.children = children;
-            this.unitType=unitType;
+        this.country = country;
+        this.id = id;
+        this.accountType = accountType;
+        this.companyType = companyType;
+        this.boardingCompleted = boardingCompleted;
+        this.kairosId = kairosId;
+        this.groupList = groupList;
+        this.children = children;
+        this.unitType = unitType;
 
     }
 
@@ -751,14 +753,6 @@ public class Organization extends UserBaseEntity {
         this.workingTimeAgreements = workingTimeAgreements;
     }*/
 
-
-    public List<CostTimeAgreement> getCostTimeAgreements() {
-        return costTimeAgreements;
-    }
-
-    public void setCostTimeAgreements(List<CostTimeAgreement> costTimeAgreements) {
-        this.costTimeAgreements = costTimeAgreements;
-    }
 /*
     public void addWorkingTimeAgreements(WorkingTimeAgreement workingTimeAgreement) {
         if (workingTimeAgreement == null)

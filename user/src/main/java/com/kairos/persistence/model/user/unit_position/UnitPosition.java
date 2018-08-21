@@ -3,7 +3,6 @@ package com.kairos.persistence.model.user.unit_position;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -29,11 +28,6 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
 
-    @Relationship(type = HAS_CTA)
-    private CostTimeAgreement cta;
-
-    //  @Relationship(type = HAS_WTA)
-    private BigInteger workingTimeAgreementId;
 
     @Relationship(type = HAS_POSITION_CODE)
     private PositionCode positionCode;
@@ -77,6 +71,8 @@ public class UnitPosition extends UserBaseEntity {
 
     public UnitPosition() {
     }
+
+
 
     public int getFullTimeWeeklyMinutes() {
         return fullTimeWeeklyMinutes;
@@ -142,21 +138,7 @@ public class UnitPosition extends UserBaseEntity {
         this.expertise = expertise;
     }
 
-    public CostTimeAgreement getCta() {
-        return cta;
-    }
 
-    public void setCta(CostTimeAgreement cta) {
-        this.cta = cta;
-    }
-
-    public BigInteger getWorkingTimeAgreementId() {
-        return workingTimeAgreementId;
-    }
-
-    public void setWorkingTimeAgreementId(BigInteger workingTimeAgreementId) {
-        this.workingTimeAgreementId = workingTimeAgreementId;
-    }
 
     public Long getStartDateMillis() {
         return startDateMillis;
@@ -288,8 +270,6 @@ public class UnitPosition extends UserBaseEntity {
     public String toString() {
         return "UnitPosition{" +
                 "expertise=" + expertise +
-                ", cta=" + cta +
-                ", workingTimeAgreementId=" + workingTimeAgreementId +
                 ", positionCode=" + positionCode +
                 ", staff=" + staff +
                 ", union=" + union +

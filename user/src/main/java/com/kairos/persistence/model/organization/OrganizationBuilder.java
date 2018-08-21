@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.organization;
 
 import com.kairos.enums.OrganizationLevel;
-import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.Country;
@@ -46,7 +45,6 @@ public class OrganizationBuilder {
     private ContactAddress contactAddress;
     private String childLevel;
     private UnitType unitType;
-    private List<CostTimeAgreement> costTimeAgreements;
 
     public OrganizationBuilder setName(String name) {
         this.name = name;
@@ -187,10 +185,6 @@ public class OrganizationBuilder {
         this.unitType = unitType;
         return this;
     }
-    public OrganizationBuilder setCostTimeAgreements(List<CostTimeAgreement> costTimeAggrements) {
-        this.costTimeAgreements = costTimeAggrements;
-        return this;
-    }
 
     public String getName() {
         return name;
@@ -320,14 +314,11 @@ public class OrganizationBuilder {
         return unitType;
     }
 
-    public List<CostTimeAgreement> getCostTimeAgreements() {
-        return costTimeAgreements;
-    }
 
     public Organization createOrganization() {
         return new  Organization( id,name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
                 vatId, businessTypes,organizationType, organizationSubTypes,  companyUnitType, companyCategory, timeZone,childLevel,
-        isParentOrganization, country,accountType,boardingCompleted,kairosId,groupList,children,unitType,costTimeAgreements);
+        isParentOrganization, country,accountType,boardingCompleted,kairosId,groupList,children,unitType);
     }
 
 }

@@ -13,18 +13,16 @@ import java.util.List;
 
 
 /**
- * Created by vipul on 2/8/17.
+ * Created by pradeep on 2/8/17.
  */
 @Repository
 public interface RuleTemplateCategoryRepository extends MongoBaseRepository<RuleTemplateCategory, BigInteger> ,CustomRuleTemplateCategoryRepository {
-    @Query("{}")
+    @Query("{countryId:?0,ruleTemplateCategoryType:?1,deleted:false}")
     List<RuleTemplateCategory> getRuleTemplateCategoryByCountry(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType);
 
     @Query("{countryId:?0,ruleTemplateCategoryType:?2,deleted:false}")
     RuleTemplateCategory checkDuplicateRuleTemplateCategory(Long countryId,RuleTemplateCategoryType type,String name);
 
-    @Query("{}")
-    List<RuleTemplateCategoryTagDTO> getRuleTemplateCategoryByUnitId(Long unitId);
 
 
     @Query("{countryId:?0,name:?1,ruleTemplateCategoryType:?2,deleted:false}")

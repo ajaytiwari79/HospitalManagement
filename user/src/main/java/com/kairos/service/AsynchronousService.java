@@ -1,13 +1,10 @@
 package com.kairos.service;
 
-import com.kairos.persistence.model.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.country.Country;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;

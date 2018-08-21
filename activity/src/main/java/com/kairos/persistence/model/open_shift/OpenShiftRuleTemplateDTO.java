@@ -35,10 +35,19 @@ public class OpenShiftRuleTemplateDTO {
     private BigInteger openShiftIntervalId;
     private PlannerNotificationInfo plannerNotificationInfo;
     private Priority priority;
+    private OpenShiftInterval openShiftInterval;
 
 
     public OpenShiftRuleTemplateDTO() {
         //Default Constructor
+    }
+
+    public OpenShiftInterval getOpenShiftInterval() {
+        return openShiftInterval;
+    }
+
+    public void setOpenShiftInterval(OpenShiftInterval openShiftInterval) {
+        this.openShiftInterval = openShiftInterval;
     }
 
     public BigInteger getId() {

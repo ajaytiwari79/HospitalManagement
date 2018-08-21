@@ -2,6 +2,8 @@ package com.kairos.rest_client.priority_group;
 
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.service.exception.ExceptionService;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.inject.Inject;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,8 +28,8 @@ import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 public class GenericRestClient {
     private static Logger logger = LoggerFactory.getLogger(GenericRestClient.class);
 
-    @Autowired
-    RestTemplate restTemplate;
+    @Inject private RestTemplate restTemplate;
+    @Inject private ExceptionService exceptionService;
 
     public <T, V> V publish(T t, Long id,boolean isUnit, IntegrationOperation integrationOperation,String uri, Map<String,Object> queryParams, Object... pathParams) {
         final String baseUrl = getBaseUrl(isUnit, id);
@@ -65,6 +69,43 @@ public class GenericRestClient {
 
         }
     }
+
+
+    public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
+        final String baseUrl = getBaseUrl(isUnit,id)+uri;
+
+        try {
+            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl+getURIWithParam(queryParam),
+                            getHttpMethod(integrationOperation),
+                            new HttpEntity<>(t), typeReference,pathParams);
+            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
+            if (!restExchange.getStatusCode().is2xxSuccessful()) {
+                exceptionService.internalServerError(response.getMessage());
+            }
+            return response.getData();
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
+        }
+
+    }
+
+    public String getURIWithParam(List<NameValuePair> queryParam){
+        try {
+            URIBuilder builder = new URIBuilder();
+            if(queryParam!=null && !queryParam.isEmpty()) {
+                builder.setParameters(queryParam);
+            }
+            return builder.build().toString();
+        } catch (URISyntaxException e) {
+            exceptionService.internalServerError(e.getMessage());
+        }
+        return null;
+    }
+
     public static <T> String getURI(T t,String uri,Map<String,Object> queryParams,Object... pathParams){
         URIBuilder builder = new URIBuilder();
 

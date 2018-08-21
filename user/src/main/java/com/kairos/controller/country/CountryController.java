@@ -27,10 +27,9 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.user.country.experties.CountryExpertiseDTO;
 import com.kairos.user.country.experties.ExpertiseUpdateDTO;
-import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.user.country.skill.OrgTypeSkillDTO;
+import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.user.organization.OrganizationBasicDTO;
-import com.kairos.user.organization.OrganizationRequestWrapper;
 import com.kairos.user.organization.OrganizationTypeDTO;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.wrapper.UpdateOrganizationTypeDTO;
@@ -345,9 +344,6 @@ public class CountryController {
     public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable Long organizationId,
                                                                         @PathVariable long countryId,
                                                                         @RequestBody OrganizationBasicDTO organizationRequestWrapper) {
-        /*if (organization == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
-        }*/
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, companyCreationService.createCompany(organizationRequestWrapper, countryId, organizationId));
     }
 
@@ -356,7 +352,7 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/parent_organization/{parentOrganizationId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateParentOrganization(@PathVariable long countryId, @PathVariable long parentOrganizationId, @Valid @RequestBody OrganizationBasicDTO organizationRequestWrapper) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, companyCreationService.updateParentOrganization(organizationRequestWrapper, parentOrganizationId, countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, companyCreationService.updateParentOrganization(organizationRequestWrapper, parentOrganizationId));
     }
 
     @ApiOperation(value = "Create a Union")

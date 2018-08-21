@@ -1,17 +1,14 @@
 package com.kairos.service.organization;
 
-import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
-import com.kairos.persistence.model.agreement.cta.cta_response.CTADetailsWrapper;
-import com.kairos.persistence.model.agreement.cta.cta_response.CollectiveTimeAgreementDTO;
+import com.kairos.activity.counter.DefalutKPISettingDTO;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
-import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
@@ -30,10 +27,11 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.AsynchronousService;
-import com.kairos.service.agreement.cta.CountryCTAService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.user.organization.*;
+import com.kairos.user.organization.AddressDTO;
+import com.kairos.user.organization.CompanyType;
+import com.kairos.user.organization.OrganizationBasicDTO;
 import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
 import com.kairos.util.FormatUtil;
@@ -42,17 +40,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 
@@ -139,12 +133,20 @@ public class CompanyCreationService {
         orgDetails.setId(organization.getId());
         return orgDetails;
     }
-    public OrganizationBasicDTO updateParentOrganization(OrganizationBasicDTO orgDetails, long organizationId, long countryId) {
+
+    public OrganizationBasicDTO updateParentOrganization(OrganizationBasicDTO orgDetails, long organizationId) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 1);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
 
         }
+        updateOrganizationDetails(organization, orgDetails);
+        organizationGraphRepository.save(organization);
+        orgDetails.setId(organization.getId());
+        return orgDetails;
+    }
+
+    private void updateOrganizationDetails(Organization organization, OrganizationBasicDTO orgDetails) {
         if (organization.getDesiredUrl() != null && !orgDetails.getDesiredUrl().trim().equalsIgnoreCase(organization.getDesiredUrl())) {
             Boolean orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrl(orgDetails.getDesiredUrl());
             if (orgExistWithUrl) {
@@ -165,8 +167,8 @@ public class CompanyCreationService {
         organization.setDescription(orgDetails.getDescription());
 
         if (CompanyType.COMPANY.equals(orgDetails.getCompanyType())) {
-            if (!Optional.ofNullable(orgDetails.getAccountTypeId()).isPresent()){
-                    exceptionService.dataNotFoundByIdException("message.accountType.select");
+            if (!Optional.ofNullable(orgDetails.getAccountTypeId()).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.accountType.select");
             }
             AccountType accountType = accountTypeGraphRepository.findOne(orgDetails.getAccountTypeId(), 0);
             if (!Optional.ofNullable(accountType).isPresent()) {
@@ -176,9 +178,6 @@ public class CompanyCreationService {
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
-        organizationGraphRepository.save(organization);
-        orgDetails.setId(organization.getId());
-        return orgDetails;
     }
 
     private CompanyValidationQueryResult validateNameAndDesiredUrlOfOrganization(OrganizationBasicDTO orgDetails) {
@@ -193,7 +192,7 @@ public class CompanyCreationService {
     }
 
     public OrganizationBasicResponse getOrganizationDetailsById(Long unitId) {
-            return organizationGraphRepository.getOrganizationDetailsById(unitId);
+        return organizationGraphRepository.getOrganizationDetailsById(unitId);
 
     }
 
@@ -217,10 +216,10 @@ public class CompanyCreationService {
         return addressDTO;
     }
 
-    public HashMap<String, Object>  getAddressOfCompany(Long unitId) {
+    public HashMap<String, Object> getAddressOfCompany(Long unitId) {
         HashMap<String, Object> orgBasicData = new HashMap<>();
-        OrganizationContactAddress organizationContactAddress= organizationGraphRepository.getContactAddressOfOrg(unitId);
-        orgBasicData.put("address",organizationContactAddress);
+        OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getContactAddressOfOrg(unitId);
+        orgBasicData.put("address", organizationContactAddress);
         orgBasicData.put("municipalities", (organizationContactAddress.getZipCode() == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(organizationContactAddress.getZipCode().getId())));
         return orgBasicData;
     }
@@ -300,9 +299,22 @@ public class CompanyCreationService {
         unit.setLevel(parentOrganization.getLevel());
         organizationGraphRepository.save(unit);
         organizationBasicDTO.setId(unit.getId());
-        if (organizationBasicDTO.getAddressDTO()!=null){
+        if (organizationBasicDTO.getAddressDTO() != null) {
             organizationBasicDTO.getAddressDTO().setId(unit.getContactAddress().getId());
         }
+        return organizationBasicDTO;
+
+    }
+
+    public OrganizationBasicDTO updateUnit(OrganizationBasicDTO organizationBasicDTO, Long unitId) {
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
+        }
+        updateOrganizationDetails(organization, organizationBasicDTO);
+        setAddressInCompany(unitId, organizationBasicDTO.getAddressDTO());
+        setOrganizationTypeAndSubTypeInOrganization(organization, organizationBasicDTO);
+        setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManagerDTO());
         return organizationBasicDTO;
 
     }

@@ -33,7 +33,11 @@ import java.util.List;
             this.levels = levels;
         }
 
-        public String getDescription() {
+    public OrganizationTypeDTO(Long id) {
+        this.id = id;
+    }
+
+    public String getDescription() {
             return description;
         }
 

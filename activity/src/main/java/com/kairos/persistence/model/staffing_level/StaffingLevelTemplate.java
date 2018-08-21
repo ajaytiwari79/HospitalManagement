@@ -18,8 +18,8 @@ public class StaffingLevelTemplate extends MongoBaseEntity{
     private String name;
     private Long unitId;
     private StaffingLevelTemplatePeriod validity;
-    private List<Long> dayType=new ArrayList<Long>();
-    private List<Day> validDays =new ArrayList<Day>();
+    private List<Long> dayType=new ArrayList<>();
+    private List<Day> validDays =new ArrayList<>();
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private boolean disabled;

@@ -2,17 +2,19 @@ package com.kairos.persistence.model.pay_out;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
+import java.math.BigInteger;
+
 public class PayOutCTADistribution {
 
     private String ctaName;
     private int minutes;
-    private Long ctaRuleTemplateId;
+    private BigInteger ctaRuleTemplateId;
 
 
     public PayOutCTADistribution() {
     }
 
-    public PayOutCTADistribution(String ctaName, int minutes,Long ctaRuleTemplateId) {
+    public PayOutCTADistribution(String ctaName, int minutes,BigInteger ctaRuleTemplateId) {
         this.ctaName = ctaName;
         this.minutes = minutes;
         this.ctaRuleTemplateId = ctaRuleTemplateId;
@@ -34,11 +36,11 @@ public class PayOutCTADistribution {
         this.minutes = minutes;
     }
 
-    public Long getCtaRuleTemplateId() {
+    public BigInteger getCtaRuleTemplateId() {
         return ctaRuleTemplateId;
     }
 
-    public void setCtaRuleTemplateId(Long ctaRuleTemplateId) {
+    public void setCtaRuleTemplateId(BigInteger ctaRuleTemplateId) {
         this.ctaRuleTemplateId = ctaRuleTemplateId;
     }
 

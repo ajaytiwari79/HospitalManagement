@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter.serializeAllExcept;
@@ -98,18 +99,15 @@ public class ObjectMapperUtils {
 
 
 
-    public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object,Class<T> valueType,String... fields){
+    public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object,Class<T> valueType){
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         JavaTimeModule javaTimeModule = new JavaTimeModule();
-        SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept(fields);
-        FilterProvider filters = new SimpleFilterProvider().addFilter("PropertyFilterMixIn", theFilter);
         javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
         objectMapper.registerModule(javaTimeModule);
-        //objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         try {
-            //writer(filters).
+            //
             String json = objectMapper.writeValueAsString(object);
             return objectMapper.readValue(json, valueType);
         } catch (IOException e) {
@@ -171,6 +169,4 @@ public class ObjectMapperUtils {
         }
 
 
-    @JsonFilter("JSON_FILTER")
-    class PropertyFilterMixIn {}
 }
