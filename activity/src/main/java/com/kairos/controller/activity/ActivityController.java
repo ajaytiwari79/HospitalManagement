@@ -11,6 +11,7 @@ import com.kairos.wrapper.activity.RulesActivityTabDTO;
 import com.kairos.wrapper.activity.SkillActivityDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -164,8 +166,8 @@ public class ActivityController {
     @ApiOperation("Update Rules Tab of Activity")
     @PutMapping(value = "/activity/rules")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody RulesActivityTabDTO rulesDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateRulesTab(rulesDTO));
+    ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody RulesActivityTabDTO rulesDTO,@RequestParam(value = "dateFrom",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date dateFrom,@RequestParam(value = "cutOffIntervalUnit",required = false) String cutOffIntervalUnit,@RequestParam(value = "dayValue",required = false) Integer dayValue) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateRulesTab(rulesDTO,dateFrom,cutOffIntervalUnit,dayValue));
     }
 
 

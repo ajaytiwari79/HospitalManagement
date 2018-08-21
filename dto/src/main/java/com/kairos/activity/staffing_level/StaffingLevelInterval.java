@@ -16,7 +16,7 @@ public class StaffingLevelInterval {
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
 
     public StaffingLevelInterval() {
-        // default constractor
+        // default constructor
     }
 
     public StaffingLevelInterval(int minNoOfStaff, int maxNoOfStaff, Duration staffingLevelDuration) {

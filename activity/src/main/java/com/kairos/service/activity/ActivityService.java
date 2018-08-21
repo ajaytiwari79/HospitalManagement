@@ -80,6 +80,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -468,21 +470,55 @@ public class ActivityService extends MongoBaseService {
         return individualPointsActivityTab;
     }
 
-    public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
+    public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO,Date dateFrom,String cutOffIntervalUnit,Integer dayValue) {
         validateActivityTimeRules(rulesActivityDTO.getEarliestStartTime(),rulesActivityDTO.getLatestStartTime(),rulesActivityDTO.getMaximumEndTime(),rulesActivityDTO.getShortestTime(),rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = rulesActivityDTO.buildRulesActivityTab();
         Activity activity = activityMongoRepository.findOne(rulesActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", rulesActivityDTO.getActivityId());
         }
+        if(StringUtils.isEmpty(cutOffIntervalUnit) && dateFrom!=null){
+            Set<CutOffInterval> cutOffIntervals = getCutoffInterval(dateFrom,cutOffIntervalUnit,dayValue);
+            rulesActivityTab.setCutOffIntervals(cutOffIntervals);
+            rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
+        }
         activity.setRulesActivityTab(rulesActivityTab);
-
         if (!activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
             activity.getTimeCalculationActivityTab().setDayTypes(activity.getRulesActivityTab().getDayTypes());
         }
 
         save(activity);
         return new ActivityTabsWrapper(rulesActivityTab);
+    }
+
+
+    private Set<CutOffInterval> getCutoffInterval(Date dateFrom, String cutOffIntervalUnit,Integer dayValue){
+        LocalDate startDate = DateUtils.asLocalDate(dateFrom);
+        LocalDate endDate = startDate.plusYears(1);
+        Set<CutOffInterval> cutOffIntervals = new HashSet<>();
+        while (startDate.isBefore(endDate)){
+            LocalDate nextEndDate = startDate;
+            switch (cutOffIntervalUnit){
+                case DAYS:
+                    nextEndDate = startDate.plusDays(dayValue-1);
+                    break;
+                case WEEKS:
+                    nextEndDate = startDate.plusWeeks(1).minusDays(1);
+                    break;
+                case MONTHS:
+                    nextEndDate = startDate.plusMonths(1).minusDays(1);
+                    break;
+                case QUARTERS:
+                    nextEndDate = startDate.plusMonths(3).minusDays(1);
+                    break;
+                case YEARS:
+                    nextEndDate = startDate.plusYears(1).minusDays(1);
+                    break;
+            }
+            cutOffIntervals.add(new CutOffInterval(startDate,nextEndDate));
+            startDate = nextEndDate;
+        }
+        return cutOffIntervals;
     }
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long countryId) {
@@ -1142,4 +1178,7 @@ public class ActivityService extends MongoBaseService {
 
 
     }
+
+
+
 }

@@ -9,6 +9,7 @@ import javax.validation.constraints.AssertTrue;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pawanmandhan on 23/8/17.
@@ -30,6 +31,7 @@ public class RulesActivityTabDTO {
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+    private Set<CutOffInterval> cutOffIntervals;
 
     // in Minutes
     private LocalTime earliestStartTime;
@@ -44,6 +46,13 @@ public class RulesActivityTabDTO {
     private LocalTime maximumEndTime;
 
 
+    public Set<CutOffInterval> getCutOffIntervals() {
+        return cutOffIntervals;
+    }
+
+    public void setCutOffIntervals(Set<CutOffInterval> cutOffIntervals) {
+        this.cutOffIntervals = cutOffIntervals;
+    }
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
