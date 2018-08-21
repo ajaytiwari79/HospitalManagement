@@ -3,12 +3,18 @@ package com.kairos.service.data_inventory.processing_activity;
 
 import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
+import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
@@ -61,6 +67,9 @@ public class ProcessingActivityService extends MongoBaseService {
 
     @Inject
     private AssetMongoRepository assetMongoRepository;
+
+    @Inject
+    private DataSubjectMappingRepository dataSubjectMappingRepository;
 
 
     public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
@@ -234,12 +243,15 @@ public class ProcessingActivityService extends MongoBaseService {
     }
 
 
-    public ProcessingActivityResponseDTO getProcessingActivityWithMetaDataById(Long orgId, BigInteger id) {
-        ProcessingActivityResponseDTO processingActivity = processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", id);
-        }
-        return processingActivity;
+    /**
+     * @description method return list of SubProcessing Activity
+     * @param orgId
+     * @param id
+     * @return
+     */
+    public List<ProcessingActivityResponseDTO> getProcessingActivityWithWithSubProcessingActivitiesById(Long orgId, BigInteger id) {
+       return processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
+
     }
 
 
@@ -263,16 +275,161 @@ public class ProcessingActivityService extends MongoBaseService {
 
     }
 
-
     /**
      * @param unitId
      * @return
      * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
      */
-    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsWithSubProcess(Long unitId) {
+    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsAndWithSubProcess(Long unitId) {
         return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubprocessingActivities(unitId);
     }
 
 
+    /**
+     * @param unitId
+     * @param processingActivityId
+     * @param activityRelatedDataSubjects list of data subject which contain list of data category and data Element list
+     * @return
+     */
+    public boolean mapDataSubjectDataCategoryAndDataElementToProcessingActivity(Long unitId, BigInteger processingActivityId, List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects) {
+
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+        }
+
+        processingActivity.setDataSubjects(activityRelatedDataSubjects);
+        processingActivityMongoRepository.save(processingActivity);
+        return true;
+    }
+
+    /**
+     * @param unitId
+     * @param processingActivityId
+     * @param assetId
+     * @return
+     * @description map asset with processing activity (related tab processing activity)
+     */
+    public boolean mapAssetWithProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+        }
+        processingActivity.setAssetId(assetId);
+        processingActivityMongoRepository.save(processingActivity);
+        return true;
+
+    }
+
+    /**
+     * @param unitId
+     * @param processingActivityId
+     * @return
+     * @description map Data Subject ,Data category and Data Element with processing activity(related tab processing activity)
+     */
+    public List<DataSubjectMappingResponseDTO> getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(Long unitId, BigInteger processingActivityId) {
+
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+        }
+        List<DataSubjectMappingResponseDTO> dataSubjectList = new ArrayList<>();
+        List<ProcessingActivityRelatedDataSubject> mappedDataSubjectList = processingActivity.getDataSubjects();
+        if (!mappedDataSubjectList.isEmpty()) {
+            List<BigInteger> dataSubjectIdList = new ArrayList<>();
+            Map<BigInteger, List<ProcessingActivityRelatedDataCategory>> relatedDataCategoryMap = new HashMap<>();
+            for (ProcessingActivityRelatedDataSubject processingActivityRelatedDataSubject : mappedDataSubjectList) {
+                dataSubjectIdList.add(processingActivityRelatedDataSubject.getId());
+                relatedDataCategoryMap.put(processingActivityRelatedDataSubject.getId(), processingActivityRelatedDataSubject.getDataCategories());
+            }
+            dataSubjectList = processingActivityMongoRepository.getAllMappedDataSubjectWithDataCategoryAndDataElement(unitId, dataSubjectIdList);
+            filterSelectedDataSubjectDataCategoryAndDataElementForProcessingActivity(dataSubjectList, relatedDataCategoryMap);
+
+        }
+        return dataSubjectList;
+    }
+
+
+    /**
+     *
+     * @param unitId
+     * @param processingActivityId
+     * @param dataSubjectId
+     * @return
+     */
+    public boolean removelinkedDataSubjectFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger dataSubjectId) {
+
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity",processingActivityId);
+        }
+        List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects = processingActivity.getDataSubjects();
+        if (!activityRelatedDataSubjects.isEmpty())
+        {
+            for (ProcessingActivityRelatedDataSubject activityRelatedDataSubject : processingActivity.getDataSubjects()) {
+                if (activityRelatedDataSubject.getId().equals(dataSubjectId)) {
+                    activityRelatedDataSubjects.remove(activityRelatedDataSubject);
+                    break;
+                }
+            }
+        }
+        processingActivity.setDataSubjects(activityRelatedDataSubjects);
+        processingActivityMongoRepository.save(processingActivity);
+        return true;
+    }
+
+
+    /**
+     * @description method removed linked asset id from Processing activity
+     * @param unitId
+     * @param processingActivityId
+     * @param assetId
+     * @return
+     */
+    public boolean removelinkedAssetFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+        }
+        processingActivity.setAssetId(null);
+        processingActivityMongoRepository.save(processingActivity);
+        return true;
+
+    }
+
+    /**
+     * @param dataSubjectList
+     * @param relatedDataCategoryMap
+     * @description method filter data Category and there Corresponding data Element ,method filter data Category and remove Data category from data Category response List
+     * similarly Data Elements are remove from data Element response list.
+     */
+    private void filterSelectedDataSubjectDataCategoryAndDataElementForProcessingActivity(List<DataSubjectMappingResponseDTO> dataSubjectList, Map<BigInteger, List<ProcessingActivityRelatedDataCategory>> relatedDataCategoryMap) {
+
+        for (DataSubjectMappingResponseDTO dataSubjectMappingResponseDTO : dataSubjectList) {
+
+            List<ProcessingActivityRelatedDataCategory> relatedDataCategoriesToDataSubject = relatedDataCategoryMap.get(dataSubjectMappingResponseDTO.getId());
+            Map<BigInteger, Set<BigInteger>> dataElementsCoresspondingToDataCategory = new HashMap<>();
+            relatedDataCategoriesToDataSubject.forEach(dataCategory -> {
+                dataElementsCoresspondingToDataCategory.put(dataCategory.getId(), dataCategory.getDataElements());
+            });
+            List<DataCategoryResponseDTO> dataCategoryResponseDTOS = new ArrayList<>();
+            dataSubjectMappingResponseDTO.getDataCategories().forEach(dataCategoryResponseDTO -> {
+
+                if (dataElementsCoresspondingToDataCategory.containsKey(dataCategoryResponseDTO.getId())) {
+                    List<DataElementBasicResponseDTO> dataElementBasicResponseDTOS = new ArrayList<>();
+                    Set<BigInteger> dataELementIdList = dataElementsCoresspondingToDataCategory.get(dataCategoryResponseDTO.getId());
+                    dataCategoryResponseDTO.getDataElements().forEach(dataElementBasicResponseDTO -> {
+                        if (dataELementIdList.contains(dataElementBasicResponseDTO.getId())) {
+                            dataElementBasicResponseDTOS.add(dataElementBasicResponseDTO);
+                        }
+                    });
+                    dataCategoryResponseDTO.setDataElements(dataElementBasicResponseDTOS);
+                    dataCategoryResponseDTOS.add(dataCategoryResponseDTO);
+                }
+            });
+            dataSubjectMappingResponseDTO.setDataCategories(dataCategoryResponseDTOS);
+        }
+
+    }
 }
 

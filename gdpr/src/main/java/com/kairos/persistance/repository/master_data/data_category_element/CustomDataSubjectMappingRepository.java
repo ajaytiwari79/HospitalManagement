@@ -14,18 +14,17 @@ public interface CustomDataSubjectMappingRepository {
     DataSubjectMapping findByName(Long countryId, Long organizationId, String name);
 
 
-    DataSubjectMappingResponseDTO getDataSubjectAndMappingWithDataCategory(Long countryId, Long organizationId, BigInteger dataSubjectId);
+    DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, Long organizationId, BigInteger dataSubjectId);
 
-    List<DataSubjectMappingResponseDTO> getAllDataSubjectAndMappingWithDataCategory(Long countryId, Long organizationId);
+    List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, Long organizationId);
 
     List<DataSubjectMapping> findByNameListAndUnitId(Long unitId, Set<String> names);
 
-
     DataSubjectMapping findByNameAndUnitId(Long unitId, String name);
 
-    List<DataSubjectMappingResponseDTO> getAllDataSubjectAndMappingWithDataCategoryByUnitId(Long unitId);
+    List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryAndDataElementByUnitId(Long unitId);
 
-    DataSubjectMappingResponseDTO getDataSubjectAndMappingWithDataCategoryByUnitId(Long unitId, BigInteger dataSubjectId);
+    DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByUnitId(Long unitId, BigInteger dataSubjectId);
 
 
 }

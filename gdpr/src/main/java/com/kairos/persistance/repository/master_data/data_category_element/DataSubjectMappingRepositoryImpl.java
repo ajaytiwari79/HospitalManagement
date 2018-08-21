@@ -62,7 +62,7 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     }
 
     @Override
-    public DataSubjectMappingResponseDTO getDataSubjectAndMappingWithDataCategory(Long countryId, Long organizationId, BigInteger dataSubjectId) {
+    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, Long organizationId, BigInteger dataSubjectId) {
 
         String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter=Document.parse(addFields);
@@ -89,7 +89,7 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     }
 
     @Override
-    public List<DataSubjectMappingResponseDTO>getAllDataSubjectAndMappingWithDataCategory(Long countryId, Long organizationId)
+    public List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, Long organizationId)
     {
 
         String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
@@ -115,7 +115,7 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
 
 
     @Override
-    public List<DataSubjectMappingResponseDTO> getAllDataSubjectAndMappingWithDataCategoryByUnitId(Long unitId) {
+    public List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryAndDataElementByUnitId(Long unitId) {
         String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter=Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
@@ -138,7 +138,7 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     }
 
     @Override
-    public DataSubjectMappingResponseDTO getDataSubjectAndMappingWithDataCategoryByUnitId(Long unitId, BigInteger dataSubjectId) {
+    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByUnitId(Long unitId, BigInteger dataSubjectId) {
         String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter=Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
