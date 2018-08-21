@@ -11,20 +11,21 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
+
+import com.kairos.persistence.model.country.experties.*;
+import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.user.expertise.Response.*;
+import com.kairos.user.country.experties.*;
+import com.kairos.user.country.time_slot.TimeSlot;
 import com.kairos.persistence.model.country.experties.UnionServiceWrapper;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseEmploymentTypeRelationship;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
-import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -105,6 +106,8 @@ public class ExpertiseService {
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
 
+    @Inject private com.kairos.service.organization.OrganizationService organizationService;
+
     public ExpertiseResponseDTO saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -130,6 +133,11 @@ public class ExpertiseService {
             expertiseResponseDTO.setEditable(expertise.isHistory());
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
 
+            TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
+            ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
+                    null, null, null, null, countryId, expertise.getId());
+            genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
+                    "/expertise/" + expertise.getId() + "/night_worker_setting", null);
         } else {
             // Expertise is already created only need to add Sr level
             expertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
@@ -138,25 +146,14 @@ public class ExpertiseService {
             }
             validateSeniorityLevel(expertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), -1L);
 
-            if (expertise.isPublished()) {
-                expertiseResponseDTO = createCopyOfExpertise(expertise, expertiseDTO, countryId);
-                // Expertise is already published Now we need to maintain a tempCopy of it.
-            } else {
-                SeniorityLevel seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
-                        expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
-                addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
-                expertiseGraphRepository.save(expertise);
-                expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
-                expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
-                expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
-            }
+            SeniorityLevel seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
+                    expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
+            addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
+            expertiseGraphRepository.save(expertise);
+            expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
+            expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
+            expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
         }
-
-        TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
-        ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
-                null, null, null, null, countryId, expertise.getId());
-        genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
-                "/expertise/" + expertise.getId() + "/night_worker_setting", null);
         return expertiseResponseDTO;
     }
 
@@ -191,44 +188,6 @@ public class ExpertiseService {
             }
         }
 
-    }
-
-    public ExpertiseResponseDTO createCopyOfExpertise(Expertise expertise, CountryExpertiseDTO expertiseDTO, Long countryId) {
-
-        ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
-
-        Expertise copiedExpertise = new Expertise();
-        BeanUtils.copyProperties(expertise, copiedExpertise);
-        copiedExpertise.setId(null);
-        expertise.setHasDraftCopy(true);
-        expertise.setHistory(true);
-        copiedExpertise.setHistory(false);
-        copiedExpertise.setPublished(false);
-        copiedExpertise.setParentExpertise(expertise);
-        copiedExpertise.setSeniorityLevel(null);
-
-        List<SeniorityLevelDTO> seniorityLevelDTOList = new ArrayList<>();
-        //  Adding the currently added Sr level in expertise.
-
-
-        SeniorityLevel seniorityLevel = new SeniorityLevel(expertiseDTO.getSeniorityLevel().getFrom(), expertiseDTO.getSeniorityLevel().getTo(), expertiseDTO.getSeniorityLevel().getPensionPercentage(), expertiseDTO.getSeniorityLevel().getFreeChoicePercentage(),
-                expertiseDTO.getSeniorityLevel().getFreeChoiceToPension(), false);
-        addNewSeniorityLevelInExpertise(copiedExpertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
-        expertiseDTO.getSeniorityLevel().setParentId(expertiseDTO.getSeniorityLevel().getId());
-        expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
-        seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
-
-
-        seniorityLevelDTOList.addAll(copyExistingSeniorityLevelInExpertise(copiedExpertise, expertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel().getParentId()));
-
-        expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
-        expertiseResponseDTO.setId(copiedExpertise.getId());
-        expertiseResponseDTO.setPublished(false);
-        expertiseResponseDTO.setEditable(true);
-        // setting previous Id as parent id
-        expertiseResponseDTO.setParentId(expertise.getId());
-        expertiseResponseDTO.setSeniorityLevels(seniorityLevelDTOList);
-        return expertiseResponseDTO;
     }
 
 
@@ -769,6 +728,11 @@ public class ExpertiseService {
         countryDetail.put("employmentTypes", employmentTypes);
         countryDetail.put("presenceTypes", presenceTypes);
         return countryDetail;
+    }
+
+    public List<ExpertiseTagDTO> getExpertiseForOrgCTA(long unitId) {
+        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+        return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
     }
 
     public CopyExpertiseDTO copyExpertise(Long expertiseId, CopyExpertiseDTO copyExpertiseDTO) {

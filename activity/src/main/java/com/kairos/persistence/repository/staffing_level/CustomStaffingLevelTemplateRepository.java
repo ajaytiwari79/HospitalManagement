@@ -7,5 +7,5 @@ import java.math.BigInteger;
 
 public interface CustomStaffingLevelTemplateRepository {
 
-    void deleteStaffingLevelTemplate(BigInteger staffingLevelTemplateId);
+    boolean deleteStaffingLevelTemplate(BigInteger staffingLevelTemplateId);
 }

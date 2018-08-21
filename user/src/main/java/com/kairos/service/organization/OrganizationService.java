@@ -2,6 +2,9 @@ package com.kairos.service.organization;
 
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
+import com.kairos.activity.cta.CTABasicDetailsDTO;
+import com.kairos.activity.counter.DefalutKPISettingDTO;
+
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
@@ -47,7 +50,6 @@ import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTyp
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
-import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
@@ -236,10 +238,7 @@ public class OrganizationService {
     //private WTAService wtaService;
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
-    @Inject
-    private
-    CollectiveTimeAgreementGraphRepository collectiveTimeAgreementGraphRepository;
-    @Inject
+   @Inject
     PeriodRestClient periodRestClient;
     @Inject
     private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
@@ -313,6 +312,7 @@ public class OrganizationService {
             Organization o = organizationGraphRepository.createChildOrganization(parent.getId(), organization.getId());
             logger.info("Parent Organization: " + o.getName());
         } else {
+
             organization = organizationGraphRepository.save(organization);
             if (!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)){
                 int count = organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
@@ -320,7 +320,7 @@ public class OrganizationService {
         }
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
-        if(!baseOrganization){
+        if (!baseOrganization) {
             accessGroupService.createDefaultAccessGroups(organization);
             organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         }
@@ -392,12 +392,11 @@ public class OrganizationService {
         //linkWTAToOrganization(allWtaCopy, allWta);
         organization.setTimeZone(ZoneId.of(TIMEZONE_UTC));
 
-        organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         organizationGraphRepository.save(organization);
+
 //        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
         vrpClientService.createPreferedTimeWindow(organization.getId());
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
-//        accessGroupService.createDefaultAccessGroups(organization);
         countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
@@ -405,7 +404,9 @@ public class OrganizationService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
+        //defalut KPI setting
         activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), organization.getCountry().getId());
+        activityIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType ->organizationType.getId()).collect(Collectors.toList()),countryId,null,countryAndOrgAccessGroupIdsMap),organization.getId());
         // DO NOT CREATE PHASE for UNION
 
 //        if (!orgDetails.getUnion()) {
@@ -474,11 +475,6 @@ public class OrganizationService {
             Organization gdprUnit = organizationGraphRepository.findOne(gdprUnitId);
             gdprUnit.setGdprUnit(true);
             organizationGraphRepository.save(gdprUnit);
-
-            // Create Employment for Unit Manager
-            // Check if user exists or Create User
-//            createUnitManager(gdprUnit.getId(), gdprUnitDTO);
-
             organizationResponseWrapper = new OrganizationResponseWrapper();
             organizationResponseWrapper.setOrgData(organizationResponse(gdprUnit, gdprUnitDTO.getTypeId(), gdprUnitDTO.getSubTypeId(), gdprUnitDTO.getCompanyCategoryId(), gdprUnitDTO.getUnitManager()));
             organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(UserContext.getUserDetails().getId()));
@@ -505,13 +501,11 @@ public class OrganizationService {
         OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
         organization.setOrganizationSetting(organizationSetting);
 
-
-        organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         organizationGraphRepository.save(organization);
 //        workingTimeAgreementRestClient.makeDefaultDateForOrganization(orgDetails.getSubTypeId(), organization.getId(), countryId);
+
         vrpClientService.createPreferedTimeWindow(organization.getId());
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
-
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
         validateAccessGroupIdForUnitManager(countryId, orgDetails.getUnitManager().getAccessGroupId(), orgDetails.getCompanyType());
         countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
@@ -521,7 +515,7 @@ public class OrganizationService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-
+        activityIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType ->organizationType.getId()).collect(Collectors.toList()),countryId,null,countryAndOrgAccessGroupIdsMap),organization.getId());
         // Create Unit Manager
         orgDetails.getUnitManager().setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(orgDetails.getUnitManager().getAccessGroupId()));
         createUnitManager(organization.getId(), orgDetails);
@@ -933,10 +927,10 @@ public class OrganizationService {
         unit.setOrganizationSetting(organizationSetting);
         //Assign Parent Organization's level to unit
         unit.setLevel(parent.getLevel());
-
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
         organizationGraphRepository.save(unit);
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
-        accessGroupService.createDefaultAccessGroups(unit);
+        countryAndOrgAccessGroupIdsMap= accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.TASK_PLANNING);
 //        phaseRestClient.createDefaultPhases(unit.getId());
@@ -944,7 +938,7 @@ public class OrganizationService {
         activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), unitId, parent.getCountry().getId());
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
-
+        activityIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType ->organizationType.getId()).collect(Collectors.toList()),country.getId(),unitId,countryAndOrgAccessGroupIdsMap),unit.getId());
 //        workingTimeAgreementRestClient.makeDefaultDateForOrganization(organizationBasicDTO.getSubTypeId(), unit.getId(), country.getId());
         vrpClientService.createPreferedTimeWindow(organization.getId());
         activityIntegrationService.createDefaultPriorityGroupsFromCountry(country.getId(), unit.getId());
@@ -1294,7 +1288,7 @@ public class OrganizationService {
                         logger.info("Sending Parent ID: " + workPlace.getParentWorkPlaceID());
                         Organization parentOrganization = getOrganizationByExternalId(workPlace.getParentWorkPlaceID().toString());
                         logger.info("parentOrganization  ID: " + parentOrganization.getId());
-                        createOrganization(organization, parentOrganization.getId(),false);
+                        createOrganization(organization, parentOrganization.getId(), false);
                     }
                 }
             }
@@ -1865,6 +1859,56 @@ public class OrganizationService {
     public List<UnitAndParentOrganizationAndCountryDTO> getParentOrganizationAndCountryIdsOfUnit() {
         List<Map<String, Object>> parentOrganizationAndCountryData = organizationGraphRepository.getUnitAndParentOrganizationAndCountryIds();
         return ObjectMapperUtils.copyPropertiesOfListByMapper(parentOrganizationAndCountryData, UnitAndParentOrganizationAndCountryDTO.class);
+    }
+
+    public CTABasicDetailsDTO getCTABasicDetailInfo(Long expertiseId, Long organizationSubTypeId, Long countryId) {
+        CTABasicDetailsDTO ctaBasicDetailsDTO = new CTABasicDetailsDTO();
+        if (Optional.ofNullable(expertiseId).isPresent()) {
+            Expertise expertise = expertiseGraphRepository.findOne(expertiseId, 0);
+            if (expertise != null) {
+                ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
+                BeanUtils.copyProperties(expertise, expertiseResponseDTO);
+                ctaBasicDetailsDTO.setExpertise(expertiseResponseDTO);
+            }
+        }
+        if (Optional.ofNullable(countryId).isPresent()) {
+            Country country = countryGraphRepository.findOne(countryId, 0);
+            if (country != null) {
+                CountryDTO countryDTO = new CountryDTO();
+                BeanUtils.copyProperties(country, countryDTO);
+                ctaBasicDetailsDTO.setCountryDTO(countryDTO);
+            }
+        }
+        if(organizationSubTypeId!=null){
+            OrganizationType organizationType = organizationTypeGraphRepository.findOrganizationTypeBySubTypeId(organizationSubTypeId);
+            if (Optional.ofNullable(organizationType).isPresent()) {
+                OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO();
+                BeanUtils.copyProperties(organizationType, organizationTypeDTO);
+                ctaBasicDetailsDTO.setOrganizationType(organizationTypeDTO);
+            }
+        }
+        OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
+        List<Organization> organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+        if (Optional.ofNullable(organizationSubType).isPresent()) {
+            OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
+            BeanUtils.copyProperties(organizationSubType, organizationSubTypeDTO);
+            ctaBasicDetailsDTO.setOrganizationSubType(organizationSubTypeDTO);
+        }
+        if (Optional.ofNullable(organizations).isPresent()) {
+            List<OrganizationBasicDTO> organizationBasicDTOS = new ArrayList<>();
+            organizations.forEach(organization -> {
+                OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
+                ObjectMapperUtils.copyProperties(organization, organizationBasicDTO);
+                organizationBasicDTOS.add(organizationBasicDTO);
+            });
+            ctaBasicDetailsDTO.setOrganizations(organizationBasicDTOS);
+        }
+        return ctaBasicDetailsDTO;
+    }
+
+
+    public List<Long> getOrganizationIdsBySubOrgTypeId(Long orgTypeId){
+        return organizationGraphRepository.getOrganizationIdsBySubOrgTypeId(orgTypeId);
     }
 
 }

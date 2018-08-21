@@ -5,6 +5,8 @@ import com.kairos.activity.staffing_level.Duration;
 import com.kairos.activity.staffing_level.StaffingLevelSetting;
 import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
 import com.kairos.util.DateUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -25,6 +28,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -40,7 +44,7 @@ public class StaffingLevelTemplateIntegrationTest {
     public void addStaffingLevelTemplate() {
         String baseUrl=getBaseUrl(1L,1L);
 
-        HttpEntity<PresenceStaffingLevelDto> entity = new HttpEntity<PresenceStaffingLevelDto>(getStaffingLevelDTO());
+        HttpEntity<PresenceStaffingLevelDto> entity = new HttpEntity<>(getStaffingLevelDTO());
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl+"/staffing_level_template/",
@@ -53,9 +57,9 @@ public class StaffingLevelTemplateIntegrationTest {
 
     @Test
     public void getStaffingLevelTemplateByUnitIdAndDateTest() {
-        String baseUrl=getBaseUrl(1L,1L);
+        String baseUrl=getBaseUrl(24L,2567L);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/staffing_level_template/")
-                .queryParam("selectedDate","2017-11-10");
+                .queryParam("selectedDate","2018-08-21");
 
         ResponseEntity<String> response = restTemplate.exchange(
                 builder.toUriString(),
@@ -89,10 +93,23 @@ public class StaffingLevelTemplateIntegrationTest {
     @Test
     public void deleteStaffingLevelTemplate() {
         String baseUrl=getBaseUrl(24L,2567L);
-        ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl+"staffing_level_template/26",
-                HttpMethod.DELETE, null, String.class);
+
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffingLevelTemplate>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffingLevelTemplate>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<StaffingLevelTemplate>> response = restTemplate.exchange(
+                baseUrl+"/staffing_level_template/9",
+                HttpMethod.DELETE, null, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+
+
+
+
+//        ResponseEntity<String> response = restTemplate.exchange(
+//                baseUrl+"/staffing_level_template/10",
+//                HttpMethod.DELETE, null, String.class);
+//        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 
 

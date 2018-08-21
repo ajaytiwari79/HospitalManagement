@@ -3,6 +3,7 @@ package com.kairos.service.staffing_level;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.ActivityResponse;
+import com.kairos.activity.activity.ActivityValidationError;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.staffing_level.*;
 import com.kairos.activity.staffing_level.absence.AbsenceStaffingLevelDto;
@@ -915,7 +916,7 @@ public class StaffingLevelService extends MongoBaseService {
         List<StaffingLevel> staffingLevels=new ArrayList<>();
         Set<BigInteger> activityIds=new HashSet<>();
 
-        Map<BigInteger,BigInteger> activityIdMap=staffingLevelFromTemplateDTO.getSelectedActivityIds().stream().collect(Collectors.toMap(k->k,v->v));
+        Map<BigInteger,BigInteger> activityIdMap=staffingLevelFromTemplateDTO.getDateWiseActivityDTO().stream().collect(Collectors.toMap(k->k.getActivityIds(),v->v));
         StaffingLevelTemplate staffingLevelTemplate=staffingLevelTemplateRepository.findByIdAndUnitIdAndDeletedFalse(staffingLevelTemplateId,unitId);
         if(!Optional.ofNullable(staffingLevelTemplate).isPresent()){
             exceptionService.dataNotFoundByIdException("data.Not.found",staffingLevelTemplateId);
@@ -938,8 +939,8 @@ public class StaffingLevelService extends MongoBaseService {
         });
 
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
-
-        List<ActivityResponse> activityResponses=staffingLevelTemplateService.validateActivityRules(activities,staffingLevelTemplate.getValidity().getStartDate(),staffingLevelTemplate.getValidity().getEndDate(),staffingLevelTemplate.getDayType());
+        StaffingLevelTemplateDTO staffingLevelTemplateDTO=ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate,StaffingLevelTemplateDTO.class);
+        List<ActivityValidationError> activityValidationErrors=staffingLevelTemplateService.validateActivityRules(staffingLevelTemplateDTO);
 
 
 
@@ -947,7 +948,7 @@ public class StaffingLevelService extends MongoBaseService {
         staffingLevelTemplate.setDayType(staffingLevelFromTemplateDTO.getSelectedDayTypeIds());
 
 
-        List<LocalDate> localDates=staffingLevelFromTemplateDTO.getDatesForCreatingStaffingLevel();
+        List<LocalDate> localDates=staffingLevelFromTemplateDTO.getDateWiseActivityDTO().stream().;
         localDates.forEach(date -> {
             staffingLevels.add(ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate,StaffingLevel.class));
         });

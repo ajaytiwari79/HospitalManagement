@@ -540,7 +540,6 @@ public class AccessGroupService {
         accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
         countryGraphRepository.save(country);
-
         //set default permission of access page while creating access group
         setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), accessGroupDTO.getOrganizationCategory());
         return accessGroup;
@@ -568,7 +567,6 @@ public class AccessGroupService {
                 accessGrpToUpdate.get().setAccountType(accountTypes);
             }
         }
-
         accessGrpToUpdate.get().setName(accessGroupDTO.getName());
         accessGrpToUpdate.get().setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.get().setLastModificationDate(DateUtil.getCurrentDate().getTime());
@@ -576,7 +574,6 @@ public class AccessGroupService {
         accessGrpToUpdate.get().setEnabled(accessGroupDTO.isEnabled());
         accessGroupRepository.save(accessGrpToUpdate.get());
         return accessGrpToUpdate.get();
-
     }
 
     public boolean deleteCountryAccessGroup(long accessGroupId) {
@@ -694,7 +691,6 @@ public class AccessGroupService {
 
         AccessGroup accessGroup=new AccessGroup(accessGroupDTO.getName().trim(),accessGroupDTO.getDescription(),accessGroupDTO.getRole());
         accessGroupRepository.save(accessGroup);
-
         organization.get().getAccessGroups().add(accessGroup);
         organizationGraphRepository.save(organization.get());
         accessPageRepository.copyAccessGroupPageRelationShips(accessGroupDTO.getId(),accessGroup.getId());
@@ -766,5 +762,8 @@ public class AccessGroupService {
                 accessGroupRepository.getStaffAccessRoles(parentOrganization.getId(), unitId, AccessGroupRole.MANAGEMENT.toString(), staffId), staffId
         );
         return userAccessRoleDTO;
+    }
+    public List<Long> getStaffIdsByUnitIdAndAccessGroupId(Long unitId,Long accessGroupId){
+        return accessGroupRepository.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId);
     }
 }
