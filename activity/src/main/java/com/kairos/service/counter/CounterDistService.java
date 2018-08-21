@@ -204,9 +204,9 @@ public class CounterDistService extends MongoBaseService {
             staffIdKpiMap.get(applicableKPI.getStaffId()).put(applicableKPI.getBaseKpiId(),applicableKPI.getBaseKpiId());
         });
         staffids.forEach(staffId ->{accessGroupKPIConf.getKpiIds().forEach(kpiId->{
-            if(staffIdKpiMap.get(unitId).get(kpiId)==null){
+            if(staffIdKpiMap.get(staffId).get(kpiId)==null){
                 applicableKPISToSave.add(new ApplicableKPI(kpiId,kpiId,null, staffId, null, ConfLevel.STAFF));
-                staffIdKpiMap.get(unitId).put(kpiId,kpiId);
+                staffIdKpiMap.get(staffId).put(kpiId,kpiId);
             }
         });});
         if(!applicableKPISToSave.isEmpty()){
