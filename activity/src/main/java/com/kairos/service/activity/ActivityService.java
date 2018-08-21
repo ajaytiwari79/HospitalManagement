@@ -516,7 +516,7 @@ public class ActivityService extends MongoBaseService {
                     break;
             }
             cutOffIntervals.add(new CutOffInterval(startDate,nextEndDate));
-            startDate = nextEndDate;
+            startDate = nextEndDate.plusDays(1);
         }
         return cutOffIntervals;
     }
