@@ -1158,7 +1158,9 @@ public class OrganizationService {
 
     public OrganizationStaffWrapper getOrganizationAndStaffByExternalId(String externalId, Long staffExternalId, Long staffTimeCareEmploymentId) {
         OrganizationStaffWrapper organizationStaffWrapper = staffGraphRepository.getStaff(staffExternalId, staffTimeCareEmploymentId);
-        organizationStaffWrapper.setOrganization(organizationGraphRepository.findByExternalId(externalId));
+        if(Optional.ofNullable(organizationStaffWrapper).isPresent()){
+            organizationStaffWrapper.setOrganization(organizationGraphRepository.findByExternalId(externalId));
+        }
         return organizationStaffWrapper;
     }
 

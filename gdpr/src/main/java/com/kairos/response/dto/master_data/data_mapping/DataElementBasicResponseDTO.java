@@ -12,8 +12,6 @@ public class DataElementBasicResponseDTO {
 
     private String name;
 
-    private Long countryId;
-
     private Boolean deleted;
 
     public Boolean getDeleted() {
@@ -38,14 +36,6 @@ public class DataElementBasicResponseDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
     }
 
     public DataElementBasicResponseDTO() {
