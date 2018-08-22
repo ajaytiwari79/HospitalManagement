@@ -4,13 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.user.country.tag.TagDTO;
 import com.kairos.user.organization.OrganizationTypeDTO;
+import com.kairos.user.organization.position_code.PositionCodeDTO;
 import com.kairos.util.DateUtils;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by vipul on 21/8/17.
@@ -36,7 +39,35 @@ public class WTAResponseDTO {
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
     private WTAResponseDTO parentWTAResponse;
+    private List<WTAResponseDTO> versions = new ArrayList<>();
     private List<TagDTO> tags;
+    private Map<String, Object> unitInfo;
+    private PositionCodeDTO positionCode;
+
+
+    public Map<String, Object> getUnitInfo() {
+        return unitInfo;
+    }
+
+    public void setUnitInfo(Map<String, Object> unitInfo) {
+        this.unitInfo = unitInfo;
+    }
+
+    public PositionCodeDTO getPositionCode() {
+        return positionCode;
+    }
+
+    public void setPositionCode(PositionCodeDTO positionCode) {
+        this.positionCode = positionCode;
+    }
+
+    public List<WTAResponseDTO> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(List<WTAResponseDTO> versions) {
+        this.versions = versions;
+    }
 
     public Long getUnitPositionId() {
         return unitPositionId;
