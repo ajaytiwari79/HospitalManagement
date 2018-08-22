@@ -560,16 +560,6 @@ public class OrganizationService {
     }
 
 
-    private void createDefaultDataInUnit(Long parentId, Organization unit, Long countryId) {
-        organizationGraphRepository.createChildOrganization(parentId, unit.getId());
-        accessGroupService.createDefaultAccessGroups(unit);
-        timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.SHIFT_PLANNING);
-        timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.TASK_PLANNING);
-        activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, countryId);
-        vrpClientService.createPreferedTimeWindow(parentId);
-        activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId());
-
-    }
 
 
     public List<Map<String, Object>> getAllOrganization() {

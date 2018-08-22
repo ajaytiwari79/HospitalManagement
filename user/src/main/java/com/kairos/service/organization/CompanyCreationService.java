@@ -7,13 +7,16 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
+import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
@@ -24,12 +27,11 @@ import com.kairos.persistence.repository.user.region.LevelGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
-import com.kairos.service.AsynchronousService;
+import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.user.organization.CompanyType;
-import com.kairos.user.organization.OrganizationBasicDTO;
+import com.kairos.user.organization.*;
 import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
 import com.kairos.util.FormatUtil;
@@ -43,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
@@ -85,7 +89,16 @@ public class CompanyCreationService {
     @Inject
     private LevelGraphRepository levelGraphRepository;
     @Inject
-    private AsynchronousService asynchronousService;
+    private CompanyDefaultDataService companyDefaultDataService;
+    @Inject
+    private AccessGroupService accessGroupService;
+    @Inject
+    private TimeSlotService timeSlotService;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private TimeSlotGraphRepository timeSlotGraphRepository;
+
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId, Long organizationId) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -93,8 +106,6 @@ public class CompanyCreationService {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
         String kairosId = validateNameAndDesiredUrlOfOrganization(orgDetails);
-
-
         Organization organization = new OrganizationBuilder()
                 .setIsParentOrganization(true)
                 .setCountry(country)
@@ -137,7 +148,7 @@ public class CompanyCreationService {
     }
 
     private void updateOrganizationDetails(Organization organization, OrganizationBasicDTO orgDetails) {
-        if (orgDetails.getDesiredUrl() !=null && !orgDetails.getDesiredUrl().trim().equalsIgnoreCase(organization.getDesiredUrl())) {
+        if (orgDetails.getDesiredUrl() != null && !orgDetails.getDesiredUrl().trim().equalsIgnoreCase(organization.getDesiredUrl())) {
             Boolean orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrl(orgDetails.getDesiredUrl());
             if (orgExistWithUrl) {
                 exceptionService.dataNotFoundByIdException("error.Organization.desiredUrl.duplicate", orgDetails.getDesiredUrl());
@@ -375,8 +386,8 @@ public class CompanyCreationService {
         return companyCategory;
     }
 
-    public boolean publishOrganization(Long organizationId) {
-        Organization organization = organizationGraphRepository.findOne(organizationId,2);
+    public boolean publishOrganization(Long countryId, Long organizationId) throws InterruptedException, ExecutionException {
+        Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
         }
@@ -384,20 +395,37 @@ public class CompanyCreationService {
         // Here a list is created and organization with all its childrens are sent to function to validate weather any of organization
         //or parent has any missing required details
 
-        List<Organization> organizations = organization.getChildren();
+        List<Organization> organizations = new ArrayList<>();
+        organizations.addAll(organization.getChildren());
         organizations.add(organization);
-        validateBasicDetails(organizations,exceptionService);
+        validateBasicDetails(organizations, exceptionService);
 
-        List<Long> unitIds=organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
+        List<Long> unitIds = organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
         unitIds.add(organizationId);
 
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds);
-        validateUserDetails(staffPersonalDetailDTOS,exceptionService);
+        validateUserDetails(staffPersonalDetailDTOS, exceptionService);
 
-        List<OrganizationContactAddress> organizationContactAddresses= organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
-        validateAddressDetails(organizationContactAddresses,exceptionService);
-        organizations.forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
-        organizationGraphRepository.saveAll(organizations);
+        List<OrganizationContactAddress> organizationContactAddresses = organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
+        validateAddressDetails(organizationContactAddresses, exceptionService);
+
+        organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
+        organization.setBoardingCompleted(true);
+        organizationGraphRepository.save(organization);
+
+        // if more than 2 default things needed make a  async service Please
+
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
+        List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
+
+        CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
+                .createDefaultDataForParentOrganization(organization,countryAndOrgAccessGroupIdsMap,timeSlots);
+        CompletableFuture.allOf(hasUpdated).join();
+
+        CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
+                .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId,timeSlots);
+        CompletableFuture.allOf(createdInUnit).join();
+
         return true;
     }
 

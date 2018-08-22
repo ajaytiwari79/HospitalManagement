@@ -9,7 +9,9 @@ import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
+import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.activity.unit_settings.UnitSettingDTO;
+import com.kairos.constants.AppConstants;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.*;
@@ -31,8 +33,10 @@ import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.service.unit_settings.PhaseSettingsService;
+import com.kairos.service.unit_settings.TimeAttendanceGracePeriodService;
 import com.kairos.service.unit_settings.UnitSettingService;
 import com.kairos.service.user_service_data.UnitDataService;
 import com.kairos.user.country.day_type.DayType;
@@ -99,7 +103,10 @@ public class OrganizationActivityService extends MongoBaseService {
     private ActivityConfigurationService activityConfigurationService;
     @Inject
     private UnitDataService unitDataService;
-
+    @Inject
+    private TimeAttendanceGracePeriodService timeAttendanceGracePeriodService;
+    @Inject
+    private PriorityGroupService priorityGroupService;
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         Activity activityCopied;
@@ -116,8 +123,8 @@ public class OrganizationActivityService extends MongoBaseService {
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
             for (int i = 0; i < phaseDTOList.size(); i++) {
                 PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(),
-                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).isEligibleForManagement(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanDelete(),activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanDelete(),
-                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanSell(),activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanSell());
+                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).isEligibleForManagement(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanDelete(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanDelete(),
+                        activity.getRulesActivityTab().getEligibleForSchedules().get(i).isStaffCanSell(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).isManagementCanSell());
                 phaseTemplateValues.add(phaseTemplateValue);
             }
             activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
@@ -224,7 +231,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activity.setTags(generalDTO.getTags());
 
         save(activity);
-       // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
+        // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         Long countryId = organizationRestClient.getCountryIdOfOrganization(unitId);
         List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, generalDTO.getActivityId(), activityCategories);
@@ -285,8 +292,8 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setState(ActivityStateEnum.DRAFT);
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
-        PermissionsActivityTabDTO permissionsActivityTabDTO=new PermissionsActivityTabDTO();
-        BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(),permissionsActivityTabDTO);
+        PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
+        BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
         activityDTO.setPermissionsActivityTab(permissionsActivityTabDTO);
         return activityDTO;
     }
@@ -315,6 +322,9 @@ public class OrganizationActivityService extends MongoBaseService {
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
         activityConfigurationService.createDefaultSettings(unitId, countryId, phases);
+        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
+        timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
+        priorityGroupService.copyPriorityGroupsForUnit(unitId, countryId);
         return true;
     }
 
