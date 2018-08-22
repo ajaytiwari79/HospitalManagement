@@ -128,7 +128,7 @@ public class RulesActivityTab implements Serializable{
     public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleAgainstTimeRules, boolean lockLengthPresent, boolean eligibleToBeForced,
 
                             List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
-    , LocalTime earliestStartTime, LocalTime latestStartTime, int shortestTime, int longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,DurationField approvalTimeInAdvance,Float approvalPercentage,LocalTime maximumEndTime) {
+    , LocalTime earliestStartTime, LocalTime latestStartTime, int shortestTime, int longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,DurationField approvalTimeInAdvance,Float approvalPercentage,LocalTime maximumEndTime,Integer cutOffdayValue,CutOffIntervalUnit cutOffIntervalUnit,LocalDate cutOffStartFrom) {
 
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
@@ -152,6 +152,9 @@ public class RulesActivityTab implements Serializable{
         this.approvalTimeInAdvance=approvalTimeInAdvance;
         this.approvalPercentage=approvalPercentage;
         this.maximumEndTime=maximumEndTime;
+        this.cutOffdayValue = cutOffdayValue;
+        this.cutOffIntervalUnit = cutOffIntervalUnit;
+        this.cutOffStartFrom = cutOffStartFrom;
 
     }
 

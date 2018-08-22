@@ -112,8 +112,7 @@ public class RulesActivityTabDTO {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
 
                  eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
-                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage,maximumEndTime);
-
+                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage,maximumEndTime,cutOffdayValue,cutOffIntervalUnit,cutOffStartFrom);
 
         return rulesActivityTab;
     }
