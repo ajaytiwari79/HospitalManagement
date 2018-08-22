@@ -2,7 +2,7 @@ package com.kairos.service.counter;
 
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.counter.DefalutKPISettingDTO;
+import com.kairos.activity.counter.DefaultKPISettingDTO;
 import com.kairos.activity.counter.KPIDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
@@ -377,8 +377,8 @@ public class CounterDistIntegrationTest {
         };
         Map<Long, Long> countryAndOrgAccessGroupIdsMap=new HashMap<>();
         countryAndOrgAccessGroupIdsMap.put(82l,101101l);
-        DefalutKPISettingDTO defalutKPISettingDTO=new DefalutKPISettingDTO(Arrays.asList(14108l),4l,19449l,countryAndOrgAccessGroupIdsMap);
-        HttpEntity<DefalutKPISettingDTO> requestBodyData = new HttpEntity<>(defalutKPISettingDTO);
+        DefaultKPISettingDTO defaultKPISettingDTO =new DefaultKPISettingDTO(Arrays.asList(14108l),4l,19449l,countryAndOrgAccessGroupIdsMap);
+        HttpEntity<DefaultKPISettingDTO> requestBodyData = new HttpEntity<>(defaultKPISettingDTO);
         ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + "/unit/404/counter/dist/default_kpi_setting", HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
@@ -389,8 +389,8 @@ public class CounterDistIntegrationTest {
         String baseUrl = getBaseUrl(15l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<String>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
         };
-        DefalutKPISettingDTO defalutKPISettingDTO=new DefalutKPISettingDTO(Arrays.asList(801l));
-        HttpEntity<DefalutKPISettingDTO> requestBodyData = new HttpEntity<>(defalutKPISettingDTO);
+        DefaultKPISettingDTO defaultKPISettingDTO =new DefaultKPISettingDTO(Arrays.asList(801l));
+        HttpEntity<DefaultKPISettingDTO> requestBodyData = new HttpEntity<>(defaultKPISettingDTO);
         ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + "/unit/19394/counter/dist/staff_default_kpi_setting", HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));

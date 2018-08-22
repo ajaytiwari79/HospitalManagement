@@ -106,11 +106,5 @@ public class ProcessingLegalBasisController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(countryId, id, legalBasis));
     }
 
-    @ApiOperation("get All legal basis of Current organization and Parent Oeg which were not inherited by Organization")
-    @GetMapping("/legal_basis")
-    public ResponseEntity<Object> getAllLegalBasisOfOrganizationAndParentOrgWhichWereNotInherited(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam Long parentOrgId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getAllNotInheritedLegalBasisFromParentOrgAndUnitProcessingLegalBasis(countryId,organizationId,parentOrgId));
-    }
-
 
 }

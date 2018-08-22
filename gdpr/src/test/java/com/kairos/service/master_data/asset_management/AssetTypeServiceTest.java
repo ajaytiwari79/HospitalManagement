@@ -80,7 +80,7 @@ public class AssetTypeServiceTest {
 
 
     @Test
-    public void test2_getAssetTypebyId() throws Exception {
+    public void test2_getAssetTypeById() throws Exception {
 
         String baseUrl = getBaseUrl(24L, 4l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<AssetTypeResponseDTO>> typeReference =

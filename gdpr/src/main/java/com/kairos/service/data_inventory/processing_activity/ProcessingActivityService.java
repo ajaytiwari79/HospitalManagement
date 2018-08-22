@@ -9,7 +9,6 @@ import com.kairos.persistance.repository.data_inventory.asset.AssetMongoReposito
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
-import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
@@ -23,8 +22,6 @@ import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
-
-import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -128,11 +125,8 @@ public class ProcessingActivityService extends MongoBaseService {
             processingActivity.setSubProcess(true);
             subProcessingActivities.add(processingActivity);
         }
-        subProcessingActivities = processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
-        subProcessingActivities.forEach(processingActivity -> {
-
-            subProcessingActivityIdList.add(processingActivity.getId());
-        });
+        subProcessingActivities = processingActivityMongoRepository.saveAll(subProcessingActivities);
+        subProcessingActivities.forEach(processingActivity -> subProcessingActivityIdList.add(processingActivity.getId()));
         return subProcessingActivityIdList;
 
     }
@@ -200,7 +194,7 @@ public class ProcessingActivityService extends MongoBaseService {
             processingActivity.setResponsibilityType(processingActivityDTO.getResponsibilityType());
 
         });
-        processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
+        processingActivityMongoRepository.saveAll(subProcessingActivities);
 
     }
 
@@ -211,52 +205,69 @@ public class ProcessingActivityService extends MongoBaseService {
      * @return
      * @description method delete processing activity and Sub processing activity is activity is associated with asset then method simply return  without deleting activities
      */
-    public Map<String, Object> deleteProcessingActivity(Long unitId, BigInteger processingActivityId) {
+    public boolean deleteProcessingActivity(Long unitId, BigInteger processingActivityId) {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        Map<String, Object> result = new HashMap<>();
-        if (!processingActivity.isSubProcess()) {
-            List<AssetResponseDTO> assetRelatedToProcessingActivities = assetMongoRepository.getAllAssetRelatedToProcessingActivityById(unitId, processingActivityId);
-            if (!assetRelatedToProcessingActivities.isEmpty()) {
-                result.put(IS_SUCCESS, false);
-                result.put("data", assetRelatedToProcessingActivities);
-            } else {
-                delete(processingActivity);
-                result.put(IS_SUCCESS, true);
-            }
-        } else {
-            List<AssetResponseDTO> assetRelatedToSubProcessingActivities = assetMongoRepository.getAllAssetRelatedToSubProcessingActivityById(unitId, processingActivityId);
-            if (!assetRelatedToSubProcessingActivities.isEmpty()) {
-                result.put(IS_SUCCESS, false);
-                result.put("data", assetRelatedToSubProcessingActivities);
-            } else {
-                delete(processingActivity);
-                result.put(IS_SUCCESS, true);
-            }
+        delete(processingActivity);
+        return true;
 
+    }
+
+
+    public boolean deleteSubProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger subProcessingActivityId) {
+
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        return result;
+        ProcessingActivity subProcessingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, subProcessingActivityId);
+        if (!Optional.ofNullable(subProcessingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Processing Activity", subProcessingActivityId);
+        }
+        delete(subProcessingActivity);
+        processingActivity.getSubProcessingActivities().remove(subProcessingActivityId);
+        processingActivityMongoRepository.save(processingActivity);
+        return true;
 
     }
 
 
     /**
-     * @description method return list of SubProcessing Activity
      * @param orgId
      * @param id
      * @return
+     * @description method return list of SubProcessing Activity
      */
     public List<ProcessingActivityResponseDTO> getProcessingActivityWithWithSubProcessingActivitiesById(Long orgId, BigInteger id) {
-       return processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
+        return processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
 
     }
 
 
     public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long orgId) {
         return processingActivityMongoRepository.getAllProcessingActivityAndMetaData(orgId);
+    }
+
+
+    /**
+     *
+     * @param unitId
+     * @param processingActivityId processing activity id
+     * @param active  status of processing activity
+     * @return
+     */
+    public boolean changeStatusOfProcessingActivity(Long unitId, BigInteger processingActivityId,boolean active)
+    {
+        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+        }
+        processingActivity.setActive(active);
+        processingActivityMongoRepository.save(processingActivity);
+        return true;
     }
 
 
@@ -281,7 +292,7 @@ public class ProcessingActivityService extends MongoBaseService {
      * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
      */
     public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsAndWithSubProcess(Long unitId) {
-        return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubprocessingActivities(unitId);
+        return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubProcessingActivities(unitId);
     }
 
 
@@ -351,7 +362,6 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *
      * @param unitId
      * @param processingActivityId
      * @param dataSubjectId
@@ -361,11 +371,10 @@ public class ProcessingActivityService extends MongoBaseService {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity",processingActivityId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
         List<ProcessingActivityRelatedDataSubject> activityRelatedDataSubjects = processingActivity.getDataSubjects();
-        if (!activityRelatedDataSubjects.isEmpty())
-        {
+        if (!activityRelatedDataSubjects.isEmpty()) {
             for (ProcessingActivityRelatedDataSubject activityRelatedDataSubject : processingActivity.getDataSubjects()) {
                 if (activityRelatedDataSubject.getId().equals(dataSubjectId)) {
                     activityRelatedDataSubjects.remove(activityRelatedDataSubject);
@@ -380,11 +389,11 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
     /**
-     * @description method removed linked asset id from Processing activity
      * @param unitId
      * @param processingActivityId
      * @param assetId
      * @return
+     * @description method removed linked asset id from Processing activity
      */
     public boolean removelinkedAssetFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);

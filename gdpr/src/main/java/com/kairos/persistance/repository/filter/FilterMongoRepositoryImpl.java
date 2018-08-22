@@ -47,9 +47,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
         } else {
             aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
         }
-        filterTypes.forEach(filterType -> {
-                    buildAggregationQuery(filterType,aggregationOperations);
-                }
+        filterTypes.forEach(filterType -> buildAggregationQuery(filterType,aggregationOperations)
 
         );
 

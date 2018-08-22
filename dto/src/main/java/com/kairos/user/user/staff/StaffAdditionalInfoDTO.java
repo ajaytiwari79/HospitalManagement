@@ -5,9 +5,11 @@ import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.user.country.time_slot.TimeSlotWrapper;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oodles on 28/11/17.
@@ -23,6 +25,7 @@ public class StaffAdditionalInfoDTO {
     private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
+    private Map<Long,List<LocalDate>> publicHoliday;
     //These are the all day type of country
     private List<DayTypeDTO> dayTypes;
     private UserAccessRoleDTO user;
@@ -30,6 +33,14 @@ public class StaffAdditionalInfoDTO {
     private ZoneId unitTimeZone;
     //these Timeslot is shiftPlanning unit TimeSlot which tells us Day,Evening,Night from to
     private List<TimeSlotWrapper> timeSlotSets;
+
+    public Map<Long, List<LocalDate>> getPublicHoliday() {
+        return publicHoliday;
+    }
+
+    public void setPublicHoliday(Map<Long, List<LocalDate>> publicHoliday) {
+        this.publicHoliday = publicHoliday;
+    }
 
     public UserAccessRoleDTO getUser() {
         return user;

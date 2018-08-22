@@ -55,7 +55,7 @@ public class FilterService {
     //get fields with distinct values on which filter is applicable
     public FilterAndFavouriteFilterDTO getFilterCategories(Long countryId, Long organizationId, String moduleId) {
 
-        Map<String, AggregationOperation> filterCriteria = new HashMap<>();
+        Map<String, AggregationOperation> filterCriteria ;
         FilterGroup filterGroup = filterMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
         List<FilterResponseDTO> filterResponseData = new ArrayList<>();
         FilterAndFavouriteFilterDTO filterAndFavouriteFilterDto = new FilterAndFavouriteFilterDTO();
@@ -67,9 +67,7 @@ public class FilterService {
             FilterCategoryResult filterQueryResult = result.getUniqueMappedResult();
 
             if (Optional.ofNullable(filterQueryResult).isPresent()) {
-                filterTypes.forEach(filterType -> {
-                    filterResponseData.add(buildFiltersCategoryResponse(filterQueryResult, filterType));
-                });
+                filterTypes.forEach(filterType -> filterResponseData.add(buildFiltersCategoryResponse(filterQueryResult, filterType)));
                 filterAndFavouriteFilterDto.setAllFilters(filterResponseData);
                 filterAndFavouriteFilterDto.setFavouriteFilters(new ArrayList<>());
             } else {

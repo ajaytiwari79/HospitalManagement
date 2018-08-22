@@ -24,8 +24,8 @@ public interface OrganizationalSecurityMeasureMongoRepository extends MongoBaseR
 
     OrganizationalSecurityMeasure findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0}")
-    List<OrganizationalSecurityMeasure> findAllOrganizationalSecurityMeasures(Long countryId);
+    @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
+    List<OrganizationalSecurityMeasureResponseDTO> findAllOrganizationalSecurityMeasures(Long countryId, String suggestedDataStatus);
 
     @Query("{deleted:false,_id:{$in:?0}}")
     List<OrganizationalSecurityMeasureResponseDTO> findOrganizationalSecurityMeasuresListByIds(List<BigInteger> ids);

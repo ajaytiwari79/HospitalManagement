@@ -42,9 +42,7 @@ public class DataElementService extends MongoBaseService {
 
         checkForDuplicacyInName(dataElementsDto);
         List<String> dataElementNames = new ArrayList<>();
-        dataElementsDto.forEach(dataElement -> {
-            dataElementNames.add(dataElement.getName().trim());
-        });
+        dataElementsDto.forEach(dataElement -> dataElementNames.add(dataElement.getName().trim()));
         List<DataElement> existingDataElement = dataElementMongoRepository.findByCountryIdAndNames(countryId, organizationId, dataElementNames);
         if (existingDataElement.size() != 0) {
             exceptionService.duplicateDataException("message.duplicate", "data element", existingDataElement.iterator().next().getName());
@@ -57,7 +55,7 @@ public class DataElementService extends MongoBaseService {
             dataElementList.add(newDataElement);
         }
         try {
-            dataElementList = dataElementMongoRepository.saveAll(getNextSequence(dataElementList));
+            dataElementList = dataElementMongoRepository.saveAll(dataElementList);
             dataElementList.forEach(dataElement -> {
                 dataElementIdList.add(dataElement.getId());
             });
@@ -173,7 +171,7 @@ public class DataElementService extends MongoBaseService {
         });
         Map<String, Object> result = new HashMap<>();
         try {
-            dataElementList = dataElementMongoRepository.saveAll(getNextSequence(dataElementList));
+            dataElementList = dataElementMongoRepository.saveAll(dataElementList);
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());

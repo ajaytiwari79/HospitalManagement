@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.DataSourceDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
@@ -43,7 +44,7 @@ public class DataSourceService extends MongoBaseService {
      * @return return map which contain list of new DataSource and list of existing DataSource if DataSource already exist
      * @description this method create new DataSource if DataSource not exist with same name ,
      * and if exist then simply add  DataSource to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
     public Map<String, List<DataSource>> createDataSource(Long countryId, List<DataSourceDTO> dataSources) {
 
@@ -53,7 +54,7 @@ public class DataSourceService extends MongoBaseService {
             for (DataSourceDTO dataSource : dataSources) {
                 dataSourceNames.add(dataSource.getName());
             }
-            List<DataSource> existing = findByNamesAndCountryId(countryId, dataSourceNames, DataSource.class);
+            List<DataSource> existing = findMetaDataByNamesAndCountryId(countryId, dataSourceNames, DataSource.class);
             dataSourceNames = ComparisonUtils.getNameListForMetadata(existing, dataSourceNames);
 
             List<DataSource> newDataSources = new ArrayList<>();
@@ -66,7 +67,7 @@ public class DataSourceService extends MongoBaseService {
 
                 }
 
-                newDataSources = dataSourceMongoRepository.saveAll(getNextSequence(newDataSources));
+                newDataSources = dataSourceMongoRepository.saveAll(newDataSources);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newDataSources);
@@ -82,7 +83,7 @@ public class DataSourceService extends MongoBaseService {
      * @return list of DataSource
      */
     public List<DataSourceResponseDTO> getAllDataSource(Long countryId) {
-        return dataSourceMongoRepository.findAllDataSources(countryId);
+        return dataSourceMongoRepository.findAllDataSources(countryId,SuggestedDataStatus.ACCEPTED.value);
 
     }
 
@@ -160,15 +161,33 @@ public class DataSourceService extends MongoBaseService {
 
     }
 
-
     /**
+     * @description method save Data Source suggested by unit
      * @param countryId
-     * @param organizationId - id of parent organization
-     * @param unitId         - id of unit organization
-     * @return method return list of organization Data Sources with Data Sources which were not inherited by organization  till now
+     * @param DataSourceDTOS
+     * @return
      */
-    public List<DataSourceResponseDTO> getAllNotInheritedDataSourceFromParentOrgAndUnitDataSource(Long countryId, Long organizationId, Long unitId) {
-        return dataSourceMongoRepository.getAllNotInheritedDataSourceFromParentOrgAndUnitDataSource(countryId, organizationId, unitId);
+    public List<DataSource> saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> DataSourceDTOS) {
+
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (DataSourceDTO DataSource : DataSourceDTOS) {
+            hostingProvoiderNames.add(DataSource.getName());
+        }
+        List<DataSource> existingDataSources = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, DataSource.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingDataSources, hostingProvoiderNames);
+        List<DataSource> DataSourceList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                DataSource DataSource = new DataSource(name);
+                DataSource.setCountryId(countryId);
+                DataSource.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                DataSourceList.add(DataSource);
+            }
+
+            DataSourceList = dataSourceMongoRepository.saveAll(DataSourceList);
+        }
+        return DataSourceList;
     }
 
 

@@ -27,7 +27,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     private String description;
     // This will be only used when the countryId will update the WTA a new Copy of WTA will be assigned to organization having state disabled
-    private Boolean disabled;
+    private boolean disabled;
 
     private Expertise expertise;
 
@@ -189,11 +189,11 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         this.organizationParentWTA = organizationParentWTA;
     }
 
-    public Boolean getDisabled() {
+    public boolean getDisabled() {
         return disabled;
     }
 
-    public void setDisabled(Boolean disabled) {
+    public void setDisabled(boolean disabled) {
         this.disabled = disabled;
     }
 

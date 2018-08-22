@@ -93,7 +93,7 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
         }
 
         if (createFilterGroups.size() != 0) {
-            filterMongoRepository.saveAll(getNextSequence(createFilterGroups));
+            filterMongoRepository.saveAll(createFilterGroups);
         }
         LOGGER.info("Filter group save Successfully");
 

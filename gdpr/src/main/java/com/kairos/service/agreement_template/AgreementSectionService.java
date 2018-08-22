@@ -109,7 +109,7 @@ public class AgreementSectionService extends MongoBaseService {
         agreementSectionList = updateExistingClauseAndAddSubSectionToAgreementSection(agreementSectionClauseAndClauseDtoHashMap, agreementSubSectionClauseAndClauseDtoHashMap, existingClauseList, agreementSectionList, newCreatedClausesList);
         List<BigInteger> agreementSectionIdList = new ArrayList<>();
 
-        agreementSectionList = agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionList));
+        agreementSectionList = agreementSectionMongoRepository.saveAll(agreementSectionList);
         agreementSectionList.forEach(agreementSection -> {
             agreementSectionIdList.add(agreementSection.getId());
         });
@@ -227,7 +227,7 @@ public class AgreementSectionService extends MongoBaseService {
             addNewCreatedClauseIdsToSectionOrSubSection(newClauseBasicDTOList, newCreatedClauseMap, agreementSection);
         }
         if (!updateExistingClauseList.isEmpty()) {
-            clauseMongoRepository.saveAll(getNextSequence(updateExistingClauseList));
+            clauseMongoRepository.saveAll(updateExistingClauseList);
         }
         return agreementSectionList;
     }
@@ -244,7 +244,7 @@ public class AgreementSectionService extends MongoBaseService {
             updateExistingClauseList = agreementSectionUpdateClauseListAndAddIdsToSection(changedClauseBasicDTOList, updateClauseMap, updateExistingClauseList, agreementSection);
             addNewCreatedClauseIdsToSectionOrSubSection(newClauseBasicDTOList, newCreatedClauseMap, agreementSection);
         }
-        agreementSubSectionList = agreementSectionMongoRepository.saveAll(getNextSequence(agreementSubSectionList));
+        agreementSubSectionList = agreementSectionMongoRepository.saveAll(agreementSubSectionList);
         List<BigInteger> subSectionIdList = new ArrayList<>();
         agreementSubSectionList.forEach(agreementSection -> {
             subSectionIdList.add(agreementSection.getId());
@@ -394,7 +394,7 @@ public class AgreementSectionService extends MongoBaseService {
         }
         agreementSectionList = updateExistingClauseAndAddSubSectionToAgreementSection(agreementSectionClauseAndClauseDtoHashMap, agreementSubSectionClauseAndClauseDtoHashMap, existingClauseList, agreementSectionList, newCreatedClausesList);
         agreementSectionIdList.clear();
-        agreementSectionList = agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionList));
+        agreementSectionList = agreementSectionMongoRepository.saveAll(agreementSectionList);
         agreementSectionList.forEach(agreementSection -> {
             agreementSectionIdList.add(agreementSection.getId());
         });
@@ -484,6 +484,34 @@ public class AgreementSectionService extends MongoBaseService {
         agreementSectionMongoRepository.delete(agreementSection);
         return true;
     }
+
+
+    /**
+     *
+     * @param countryId
+     * @param orgId
+     * @param sectionId
+     * @param subSectionId
+     * @return
+     */
+    public boolean deleteAgreementSubSection(Long countryId, Long orgId, BigInteger sectionId, BigInteger subSectionId) {
+
+        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, sectionId);
+        if (!Optional.ofNullable(agreementSection).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + sectionId);
+        }
+        AgreementSection agreementSubSection = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, subSectionId);
+        if (!Optional.ofNullable(agreementSubSection).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement Sub section " + subSectionId);
+        }
+
+        agreementSection.getSubSections().remove(subSectionId);
+        delete(agreementSubSection);
+        agreementSectionMongoRepository.save(agreementSection);
+        return true;
+    }
+
+
 
 
     /**

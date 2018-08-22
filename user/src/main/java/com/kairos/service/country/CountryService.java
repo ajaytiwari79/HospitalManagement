@@ -293,7 +293,6 @@ public class CountryService {
         if (countryId == null) {
             return null;
         }
-        // return stored holidays in database
         return FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
 
     }

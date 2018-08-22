@@ -1,5 +1,6 @@
 package com.kairos.persistance.model.master_data.default_asset_setting;
 
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +15,12 @@ public class TechnicalSecurityMeasure extends MongoBaseEntity {
     private String name;
 
     private Long countryId;
+
+    private String suggestedDataStatus=SuggestedDataStatus.ACCEPTED.value;
+
+    public String getSuggestedDataStatus() { return suggestedDataStatus; }
+
+    public void setSuggestedDataStatus(String suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
     public Long getCountryId() {
         return countryId;

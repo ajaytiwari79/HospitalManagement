@@ -91,9 +91,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
         for (OrganizationDataSubjectDTO dataSubjectDTO : dataSubjectDTOS) {
             Set<BigInteger> dataCategoryIdList = new HashSet<>();
             if (Optional.ofNullable(dataSubjectDTO.getDataCategories()).isPresent() && !dataSubjectDTO.getDataCategories().isEmpty()) {
-                dataSubjectDTO.getDataCategories().forEach(dataCategoryDTO -> {
-                    dataCategoryIdList.add(dataCategoryIdCorrespondingToName.get(dataCategoryDTO.getName()));
-                });
+                dataSubjectDTO.getDataCategories().forEach(dataCategoryDTO -> dataCategoryIdList.add(dataCategoryIdCorrespondingToName.get(dataCategoryDTO.getName())));
             }
             Set<String> dataSubjectNameList = dataSubjectDTO.getDataSubjectNames();
             for (String dataSubjectName : dataSubjectNameList) {
@@ -105,7 +103,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
         }
         try {
 
-            dataSubjectMappingList = dataSubjectMappingRepository.saveAll(getNextSequence(dataSubjectMappingList));
+            dataSubjectMappingList = dataSubjectMappingRepository.saveAll(dataSubjectMappingList);
         } catch (MongoException e) {
             LOGGER.info("data Subject Mapping build", e.getMessage());
             dataCategoryMongoRepository.deleteAll(dataCategoryList);
@@ -125,7 +123,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
     public Boolean deleteDataSubjectById(Long unitId, BigInteger dataSubjectId) {
 
         DataSubjectMapping dataSubjectMapping = dataSubjectMappingRepository.findByUnitIdAndId(unitId, dataSubjectId);
-        if (Optional.ofNullable(dataSubjectMapping).isPresent()) {
+        if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Data Subject ", dataSubjectId);
         }
         delete(dataSubjectMapping);
