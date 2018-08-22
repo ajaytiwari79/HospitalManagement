@@ -910,16 +910,16 @@ public class StaffingLevelService extends MongoBaseService {
 
     }
 
-    public Map<String,Object> addStaffingLevelFromStaffingLevelTemplate(Long unitId,BigInteger staffingLevelTemplateId,StaffingLevelFromTemplateDTO staffingLevelFromTemplateDTO) {
+    public Map<String,Object> addStaffingLevelFromStaffingLevelTemplate(Long unitId,StaffingLevelFromTemplateDTO staffingLevelFromTemplateDTO) {
         logger.debug("saving staffing level organizationId {}", unitId);
         Map<String,Object> response=new HashMap<>();
 
-        StaffingLevelTemplate staffingLevelTemplate=staffingLevelTemplateRepository.findByIdAndUnitIdAndDeletedFalse(staffingLevelTemplateId,unitId);
+        StaffingLevelTemplate staffingLevelTemplate=staffingLevelTemplateRepository.findByIdAndUnitIdAndDeletedFalse(staffingLevelFromTemplateDTO.getTemplateId(),unitId);
         if(!Optional.ofNullable(staffingLevelTemplate).isPresent()){
-            exceptionService.dataNotFoundByIdException("data.Not.found",staffingLevelTemplateId);
+            exceptionService.dataNotFoundByIdException("data.Not.found",staffingLevelFromTemplateDTO.getTemplateId());
         }
 
-        Set<BigInteger> actIds=staffingLevelFromTemplateDTO.getDateWiseActivityDTO().stream().flatMap(s->s.getActivityIds().stream()).collect(Collectors.toSet());
+        Set<BigInteger> actIds=staffingLevelFromTemplateDTO.getImportIntervals().stream().flatMap(s->s.getActivityIds().stream()).collect(Collectors.toSet());
 
 
         List<ActivityValidationError> activityValidationErrors=staffingLevelTemplateService.validateActivityRules(actIds,ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate,StaffingLevelTemplateDTO.class));
@@ -930,7 +930,7 @@ public class StaffingLevelService extends MongoBaseService {
         List<StaffingLevel> staffingLevels=new ArrayList<>();
 
 
-        List<DateWiseActivityDTO> dateWiseActivityDTOS=staffingLevelFromTemplateDTO.getDateWiseActivityDTO();
+        List<DateWiseActivityDTO> dateWiseActivityDTOS=staffingLevelFromTemplateDTO.getImportIntervals();
 
         removeOutOfRangeObject(dateWiseActivityDTOS,staffingLevelTemplate.getValidity().getStartDate(),staffingLevelTemplate.getValidity().getEndDate(),activityValidationErrors);
         dateWiseActivityDTOS.forEach(localDate->{
@@ -945,23 +945,28 @@ public class StaffingLevelService extends MongoBaseService {
             staffingLevelTemplate.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval->{
                 StaffingLevelInterval staffingLevelInterval1=ObjectMapperUtils.copyPropertiesByMapper(staffingLevelInterval,StaffingLevelInterval.class);
                //In second loop having intervals of template
-
+                AtomicInteger min=new AtomicInteger(0);
+                AtomicInteger max=new AtomicInteger(0);
                 staffingLevelInterval.getStaffingLevelActivities().forEach(activity -> {
                     //In third loop having activities in each interval
 
                     if(activityMap.get(activity.getActivityId())!=null && bigIntegerActivityValidationErrorMap.get(activity.getActivityId())==null){
                         selectedActivitiesForCurrentDate.add(activity);
+                        min.addAndGet(activity.getMinNoOfStaff());
+                        max.addAndGet(activity.getMaxNoOfStaff());
                     }
                 //Closing third
                 });
 
 
                 staffingLevelInterval1.setStaffingLevelActivities(selectedActivitiesForCurrentDate);
+                staffingLevelInterval1.setMinNoOfStaff(min.get());
+                staffingLevelInterval1.setMaxNoOfStaff(max.get());
                 staffingLevelIntervals.add(staffingLevelInterval1);
                 //Closing second
             });
 
-            StaffingLevel staffingLevel=staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId,DateUtils.asDate(localDate.getSelectedDate()));
+            StaffingLevel staffingLevel=staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId,DateUtils.asDate(localDate.getDate()));
             if(staffingLevel!=null){
                 staffingLevel.setPresenceStaffingLevelInterval(staffingLevelIntervals);
             } else {
@@ -969,10 +974,10 @@ public class StaffingLevelService extends MongoBaseService {
                 staffingLevel.setId(null);
                 staffingLevel.setPresenceStaffingLevelInterval(staffingLevelIntervals);
                 TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
-                int currentWeekCount = localDate.getSelectedDate().get(woy);
-                staffingLevel.setCurrentDate(DateUtils.asDate(localDate.getSelectedDate()));
+                int currentWeekCount = localDate.getDate().get(woy);
+                staffingLevel.setCurrentDate(DateUtils.asDate(localDate.getDate()));
                 staffingLevel.setWeekCount(currentWeekCount);
-                Phase phase = phaseService.getPhaseCurrentByUnit(unitId, DateUtils.asDate(localDate.getSelectedDate()));
+                Phase phase = phaseService.getPhaseCurrentByUnit(unitId, DateUtils.asDate(localDate.getDate()));
                 staffingLevel.setPhaseId(phase.getId());
                 staffingLevel.setUnitId(unitId);
             }
@@ -992,9 +997,9 @@ public class StaffingLevelService extends MongoBaseService {
         Iterator<DateWiseActivityDTO> iterator=dateWiseActivityDTOS.iterator();
         while (iterator.hasNext()){
             DateWiseActivityDTO dateWiseActivityDTO=iterator.next();
-            if(dateWiseActivityDTO.getSelectedDate().isBefore(startDate) || dateWiseActivityDTO.getSelectedDate().isAfter(endDate)){
+            if(dateWiseActivityDTO.getDate().isBefore(startDate) ||  dateWiseActivityDTO.getDate().isAfter(endDate)){
                 iterator.remove();
-                activityValidationErrors.add(new ActivityValidationError(Arrays.asList(exceptionService.getLanguageSpecificText("date.out.of.range",dateWiseActivityDTO.getSelectedDate()))));
+                activityValidationErrors.add(new ActivityValidationError(Arrays.asList(exceptionService.getLanguageSpecificText("date.out.of.range",dateWiseActivityDTO.getDate()))));
             }
         }
     }

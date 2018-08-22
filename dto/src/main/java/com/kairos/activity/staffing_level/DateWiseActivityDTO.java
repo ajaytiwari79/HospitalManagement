@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 public class DateWiseActivityDTO {
-    private LocalDate selectedDate;
+    private LocalDate date;
     private Set<BigInteger> activityIds;
 
     public DateWiseActivityDTO() {
@@ -16,16 +16,16 @@ public class DateWiseActivityDTO {
     }
 
     public DateWiseActivityDTO(LocalDate selectedDate, Set<BigInteger> activityIds) {
-        this.selectedDate = selectedDate;
+        this.date = date;
         this.activityIds = activityIds;
     }
 
-    public LocalDate getSelectedDate() {
-        return selectedDate;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setSelectedDate(LocalDate selectedDate) {
-        this.selectedDate = selectedDate;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public Set<BigInteger> getActivityIds() {

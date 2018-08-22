@@ -12,16 +12,17 @@ import java.util.List;
 import java.util.Set;
 
 public class StaffingLevelFromTemplateDTO {
+
     private BigInteger templateId;
-    private List<DateWiseActivityDTO> dateWiseActivityDTO;
+    private List<DateWiseActivityDTO> importIntervals;
 
     public StaffingLevelFromTemplateDTO() {
         //Default Constructor
     }
 
-    public StaffingLevelFromTemplateDTO(BigInteger templateId, List<DateWiseActivityDTO> dateWiseActivityDTO) {
+    public StaffingLevelFromTemplateDTO(BigInteger templateId, List<DateWiseActivityDTO> importIntervals) {
         this.templateId = templateId;
-        this.dateWiseActivityDTO = dateWiseActivityDTO;
+        this.importIntervals = importIntervals;
     }
 
     public BigInteger getTemplateId() {
@@ -32,13 +33,11 @@ public class StaffingLevelFromTemplateDTO {
         this.templateId = templateId;
     }
 
-
-    public List<DateWiseActivityDTO> getDateWiseActivityDTO() {
-        return dateWiseActivityDTO;
+    public List<DateWiseActivityDTO> getImportIntervals() {
+        return importIntervals;
     }
 
-    public void setDateWiseActivityDTO(List<DateWiseActivityDTO> dateWiseActivityDTO) {
-        this.dateWiseActivityDTO = dateWiseActivityDTO;
+    public void setImportIntervals(List<DateWiseActivityDTO> importIntervals) {
+        this.importIntervals = importIntervals;
     }
-
 }

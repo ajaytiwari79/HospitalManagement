@@ -100,9 +100,9 @@ public class StaffingLevelTemplateIntegrationTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffingLevelTemplate>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<StaffingLevelTemplate>> response = restTemplate.exchange(
-                baseUrl+"/staffing_level_template/9",
+                baseUrl+"/staffing_level_template/14",
                 HttpMethod.DELETE, null, typeReference);
-        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+        Assert.assertTrue(HttpStatus.NO_CONTENT.equals(response.getStatusCode()));
 
 
 

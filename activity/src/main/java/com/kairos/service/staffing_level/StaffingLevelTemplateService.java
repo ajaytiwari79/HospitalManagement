@@ -49,8 +49,12 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      * @param staffingLevelTemplateDTO
      * @return
      */
-    public StaffingLevelTemplateDTO createStaffingLevelTemplate(StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
+    public StaffingLevelTemplateDTO createStaffingLevelTemplate(Long unitId,StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
         logger.info("saving staffing level Template  {}", staffingLevelTemplateDTO);
+        boolean alreadyExists=staffingLevelTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndUnitId(staffingLevelTemplateDTO.getName(),unitId);
+        if(alreadyExists){
+            exceptionService.duplicateDataException("error.name.duplicate",staffingLevelTemplateDTO.getName());
+        }
         //validating Activities
         List<ActivityValidationError> errors= validateActivityRules(new HashSet<>(),staffingLevelTemplateDTO);
         if(!errors.isEmpty()){
