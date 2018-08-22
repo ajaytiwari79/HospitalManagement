@@ -1,6 +1,6 @@
 package com.kairos.controller.counters;
 
-import com.kairos.activity.counter.DefalutKPISettingDTO;
+import com.kairos.activity.counter.DefaultKPISettingDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
@@ -208,14 +208,14 @@ public class CounterDistController {
     //defalut setting for unit and staff
 
     @PostMapping(UNIT_URL+"/counter/dist/default_kpi_setting")
-    public ResponseEntity<Map<String, Object>> createDefaluSettingForUnit(@PathVariable Long unitId, @RequestBody DefalutKPISettingDTO defalutKPISettingDTO){
-            counterManagementService.createDefaultKpiSetting(unitId,defalutKPISettingDTO);
+    public ResponseEntity<Map<String, Object>> createDefaluSettingForUnit(@PathVariable Long unitId, @RequestBody DefaultKPISettingDTO defaultKPISettingDTO){
+            counterManagementService.createDefaultKpiSetting(unitId, defaultKPISettingDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
     @PostMapping(UNIT_URL+"/counter/dist/staff_default_kpi_setting")
-    public ResponseEntity<Map<String, Object>> createDefaluSettingForStaff(@PathVariable Long unitId, @RequestBody DefalutKPISettingDTO defalutKPISettingDTO){
-        counterManagementService.createDefaultStaffKPISetting(unitId,defalutKPISettingDTO);
+    public ResponseEntity<Map<String, Object>> createDefaluSettingForStaff(@PathVariable Long unitId, @RequestBody DefaultKPISettingDTO defaultKPISettingDTO){
+        counterManagementService.createDefaultStaffKPISetting(unitId, defaultKPISettingDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 }

@@ -4,25 +4,25 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-public class DefalutKPISettingDTO {
+public class DefaultKPISettingDTO {
 
     private List<Long> orgTypeIds;
     private Long countryId;
     private Long parentUnitId;
     private Map<Long, Long> countryAndOrgAccessGroupIdsMap;
     private List<Long> staffIds;
-    public DefalutKPISettingDTO() {
+    public DefaultKPISettingDTO() {
     }
 
 
-    public DefalutKPISettingDTO(List<Long> orgTypeIds, Long countryId, Long parentUnitId, Map<Long, Long> countryAndOrgAccessGroupIdsMap) {
+    public DefaultKPISettingDTO(List<Long> orgTypeIds, Long countryId, Long parentUnitId, Map<Long, Long> countryAndOrgAccessGroupIdsMap) {
         this.orgTypeIds = orgTypeIds;
         this.countryId = countryId;
         this.parentUnitId = parentUnitId;
         this.countryAndOrgAccessGroupIdsMap = countryAndOrgAccessGroupIdsMap;
     }
 
-    public DefalutKPISettingDTO(List<Long> staffIds) {
+    public DefaultKPISettingDTO(List<Long> staffIds) {
         this.staffIds = staffIds;
     }
 
