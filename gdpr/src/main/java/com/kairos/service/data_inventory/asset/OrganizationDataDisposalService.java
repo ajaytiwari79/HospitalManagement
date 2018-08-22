@@ -6,6 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.DataDisposalDTO;
+import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
@@ -70,7 +71,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
                 newDataDisposals.add(newDataDisposal);
             }
 
-            newDataDisposals = dataDisposalMongoRepository.saveAll(newDataDisposals);
+            newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
         }
         result.put(EXISTING_DATA_LIST, existing);
         result.put(NEW_DATA_LIST, newDataDisposals);

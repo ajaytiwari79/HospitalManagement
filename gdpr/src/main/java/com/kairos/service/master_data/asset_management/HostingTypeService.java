@@ -63,7 +63,7 @@ public class HostingTypeService extends MongoBaseService {
                     newHostingType.setCountryId(countryId);
                     newHostingTypes.add(newHostingType);
                 }
-                newHostingTypes = hostingTypeMongoRepository.saveAll(newHostingTypes);
+                newHostingTypes = hostingTypeMongoRepository.saveAll(getNextSequence(newHostingTypes));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingTypes);
@@ -193,7 +193,7 @@ public class HostingTypeService extends MongoBaseService {
                 HostingTypeList.add(HostingType);
             }
 
-            HostingTypeList = hostingTypeMongoRepository.saveAll(HostingTypeList);
+            HostingTypeList = hostingTypeMongoRepository.saveAll(getNextSequence(HostingTypeList));
         }
         return HostingTypeList;
     }
