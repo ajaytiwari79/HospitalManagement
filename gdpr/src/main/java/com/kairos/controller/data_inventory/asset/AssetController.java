@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -47,11 +48,21 @@ public class AssetController {
 
         Map<String, Object> result=assetService.deleteAssetById(unitId, assetId);
         if((boolean) result.get(IS_SUCCESS)) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.deleteAssetById(unitId, assetId));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true,result);
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, result);
 
     }
+
+    @ApiOperation(value = "updated status of processing activity")
+    @PutMapping("/asset/{assetId}/status")
+    public ResponseEntity<Object> updateStatusOfAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId,@NotNull @RequestBody boolean active) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.updateStatusOfAsset(unitId, assetId, active));
+    }
+
 
 
     @ApiOperation(value = "update asset basic detail")

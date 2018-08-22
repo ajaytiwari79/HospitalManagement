@@ -116,7 +116,7 @@ public class ProcessingActivityController {
 
 
 
-    @ApiOperation(value = "change status of processing activity")
+    @ApiOperation(value = "updated status of processing activity")
     @PutMapping("/processing_activity/{processingActivityId}/status")
     public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId,@NotNull @RequestBody boolean active) {
         if (unitId == null) {

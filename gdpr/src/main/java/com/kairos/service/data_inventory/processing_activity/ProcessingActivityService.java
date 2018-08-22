@@ -258,7 +258,13 @@ public class ProcessingActivityService extends MongoBaseService {
     }
 
 
-
+    /**
+     *
+     * @param unitId
+     * @param processingActivityId processing activity id
+     * @param active  status of processing activity
+     * @return
+     */
     public boolean changeStatusOfProcessingActivity(Long unitId, BigInteger processingActivityId,boolean active)
     {
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
@@ -268,7 +274,6 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivity.setActive(active);
         processingActivityMongoRepository.save(processingActivity);
         return true;
-
     }
 
 
