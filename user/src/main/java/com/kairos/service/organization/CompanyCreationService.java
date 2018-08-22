@@ -182,7 +182,7 @@ public class CompanyCreationService {
     }
 
     private String validateNameAndDesiredUrlOfOrganization(OrganizationBasicDTO orgDetails) {
-        CompanyValidationQueryResult orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrlOrUrl("(?i)" + orgDetails.getDesiredUrl(), "(?i)" + orgDetails.getName(), orgDetails.getName().substring(0, 3));
+        CompanyValidationQueryResult orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrlOrName("(?i)" + orgDetails.getDesiredUrl(), "(?i)" + orgDetails.getName(), orgDetails.getName().substring(0, 3));
         if (orgExistWithUrl.getName()) {
             exceptionService.invalidRequestException("error.Organization.name.duplicate", orgDetails.getName());
         }

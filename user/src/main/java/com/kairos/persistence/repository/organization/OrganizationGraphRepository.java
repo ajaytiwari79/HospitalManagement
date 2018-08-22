@@ -685,7 +685,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH (org:Organization{isEnable:true}) where org.name =~{1} with desiredUrl, case when count(org)>0 THEN  true ELSE false END as name\n" +
             "OPTIONAL match(org:Organization)" +
             "return name,desiredUrl,org.kairosId as kairosId  ORDER BY org.kairosId DESC LIMIT 1")
-    CompanyValidationQueryResult checkOrgExistWithUrlOrUrl(String desiredUrl, String name, String first3Char);
+    CompanyValidationQueryResult checkOrgExistWithUrlOrName(String desiredUrl, String name, String first3Char);
 
     @Query("MATCH (org:Organization{isEnable:true}) where org.desiredUrl={0}\n" +
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
