@@ -3,6 +3,7 @@ package com.kairos.persistance.repository.custom_repository;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
 import com.kairos.utils.DateUtils;
+import com.mongodb.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -11,7 +12,6 @@ import org.springframework.data.mongodb.repository.support.SimpleMongoRepository
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
-import java.util.List;
 
 
 public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Serializable>
@@ -23,15 +23,21 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
     private final MongoEntityInformation<T, ID> entityInformation;
     private final MongoOperations mongoOperations;
 
+    private DB dataBase;
+
     public MongoBaseRepositoryImpl(MongoEntityInformation<T, ID> entityInformation,
-                                   MongoOperations mongoOperations) throws Exception {
+                                   MongoOperations mongoOperations,DB db) throws Exception {
         super(entityInformation, mongoOperations);
         // Keep the EntityManager around to used from the newly introduced methods.
         this.mongoOperations = mongoOperations;
         this.entityInformation = entityInformation;
+        this.dataBase=db;
         this.mongoSequenceRepository = new MongoSequenceRepository(mongoOperations);
     }
 
+    public void setDataBase(DB dataBase) {
+        this.dataBase = dataBase;
+    }
 
     @Override
     public <S extends T> S save(S entity) {
@@ -53,6 +59,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
         // Set updatedAt time as current time
         entity.setUpdatedAt(DateUtils.getDate());
         mongoOperations.save(entity);
+        dataBase.getCollection(entity.getClass().getName());
         return entity;
     }
 
