@@ -7,17 +7,14 @@ import com.kairos.activity.counter.DefalutKPISettingDTO;
 
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
-import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
-import com.kairos.constants.AppConstants;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
-import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.*;
 import com.kairos.persistence.model.country.DayType;
@@ -84,7 +81,6 @@ import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.user.country.basic_details.CountryDTO;
 import com.kairos.user.country.experties.ExpertiseResponseDTO;
@@ -93,7 +89,6 @@ import com.kairos.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.user.organization.*;
 import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.client.ContactAddressDTO;
-import com.kairos.user.staff.staff.StaffCreationDTO;
 import com.kairos.util.*;
 import com.kairos.util.external_plateform_shift.GetAllWorkPlacesResponse;
 import com.kairos.util.external_plateform_shift.GetAllWorkPlacesResult;
@@ -377,7 +372,7 @@ public class OrganizationService {
         vrpClientService.createPreferedTimeWindow(organization.getId());
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
-        validateAccessGroupIdForUnitManager(countryId, orgDetails.getUnitManagerDTO().getAccessGroupId(), orgDetails.getCompanyType());
+        validateAccessGroupIdForUnitManager(countryId, orgDetails.getUnitManager().getAccessGroupId(), orgDetails.getCompanyType());
         countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
@@ -387,7 +382,7 @@ public class OrganizationService {
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         activityIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()), countryId, null, countryAndOrgAccessGroupIdsMap), organization.getId());
         // Create Unit Manager
-        orgDetails.getUnitManagerDTO().setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(orgDetails.getUnitManagerDTO().getAccessGroupId()));
+        orgDetails.getUnitManager().setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(orgDetails.getUnitManager().getAccessGroupId()));
         createUnitManager(organization.getId(), orgDetails);
 
         // DO NOT CREATE PHASE for UNION
@@ -396,7 +391,7 @@ public class OrganizationService {
 //            periodRestClient.createDefaultPeriodSettings(organization.getId());
 //        }
         OrganizationResponseWrapper organizationResponseWrapper = new OrganizationResponseWrapper();
-        organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId(), orgDetails.getUnitManagerDTO()));
+        organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId(), orgDetails.getUnitManager()));
         organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(UserContext.getUserDetails().getId()));
 
         return organizationResponseWrapper;
@@ -487,7 +482,7 @@ public class OrganizationService {
 
 
         // Verify Address here
-        AddressDTO addressDTO = orgDetails.getAddressDTO();
+        AddressDTO addressDTO = orgDetails.getAddress();
         ZipCode zipCode;
         addressDTO.setVerifiedByGoogleMap(true);
         if (addressDTO.isVerifiedByGoogleMap()) {

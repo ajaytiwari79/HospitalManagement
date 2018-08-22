@@ -305,15 +305,15 @@ public class CompanyCreationService {
 
         setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO);
         ContactAddress contactAddress = new ContactAddress();
-        prepareAddress(contactAddress, organizationBasicDTO.getAddressDTO());
+        prepareAddress(contactAddress, organizationBasicDTO.getAddress());
         unit.setContactAddress(contactAddress);
-        setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManagerDTO());
+        setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager());
         //Assign Parent Organization's level to unit
         unit.setLevel(parentOrganization.getLevel());
         organizationGraphRepository.save(unit);
         organizationBasicDTO.setId(unit.getId());
-        if (organizationBasicDTO.getAddressDTO() != null) {
-            organizationBasicDTO.getAddressDTO().setId(unit.getContactAddress().getId());
+        if (organizationBasicDTO.getAddress() != null) {
+            organizationBasicDTO.getAddress().setId(unit.getContactAddress().getId());
         }
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         return organizationBasicDTO;
@@ -326,9 +326,9 @@ public class CompanyCreationService {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
         updateOrganizationDetails(organization, organizationBasicDTO);
-        setAddressInCompany(unitId, organizationBasicDTO.getAddressDTO());
+        setAddressInCompany(unitId, organizationBasicDTO.getAddress());
         setOrganizationTypeAndSubTypeInOrganization(organization, organizationBasicDTO);
-        setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManagerDTO());
+        setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManager());
         return organizationBasicDTO;
 
     }

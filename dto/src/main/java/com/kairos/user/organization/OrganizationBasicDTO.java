@@ -1,12 +1,8 @@
 package com.kairos.user.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.OrganizationLevel;
-
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,8 +26,8 @@ public class OrganizationBasicDTO {
     private Long levelId;
     private Long typeId;
     private List<Long> subTypeId;
-    private AddressDTO addressDTO; // used in case of child organization
-    private UnitManagerDTO unitManagerDTO;  // Used in case of child organization only
+    private AddressDTO address; // used in case of child organization
+    private UnitManagerDTO unitManager;  // Used in case of child organization only
 
     public Long getId() {
         return id;
@@ -137,19 +133,19 @@ public class OrganizationBasicDTO {
         this.subTypeId = subTypeId;
     }
 
-    public AddressDTO getAddressDTO() {
-        return addressDTO;
+    public AddressDTO getAddress() {
+        return address;
     }
 
-    public void setAddressDTO(AddressDTO addressDTO) {
-        this.addressDTO = addressDTO;
+    public void setAddress(AddressDTO address) {
+        this.address = address;
     }
 
-    public UnitManagerDTO getUnitManagerDTO() {
-        return unitManagerDTO;
+    public UnitManagerDTO getUnitManager() {
+        return unitManager;
     }
 
-    public void setUnitManagerDTO(UnitManagerDTO unitManagerDTO) {
-        this.unitManagerDTO = unitManagerDTO;
+    public void setUnitManager(UnitManagerDTO unitManager) {
+        this.unitManager = unitManager;
     }
 }
