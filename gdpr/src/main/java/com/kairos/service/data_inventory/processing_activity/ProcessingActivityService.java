@@ -234,9 +234,7 @@ public class ProcessingActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Processing Activity", subProcessingActivityId);
         }
         delete(subProcessingActivity);
-        List<BigInteger> subProcessingActivityIds = processingActivity.getSubProcessingActivities();
-        subProcessingActivityIds.remove(subProcessingActivityId);
-        processingActivity.setSubProcessingActivities(subProcessingActivityIds);
+        processingActivity.getSubProcessingActivities().remove(subProcessingActivityId);
         processingActivityMongoRepository.save(processingActivity);
         return true;
 
