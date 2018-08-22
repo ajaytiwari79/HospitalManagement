@@ -1,5 +1,6 @@
 package com.kairos.persistance.model.master_data.default_asset_setting;
 
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,6 +16,12 @@ public class OrganizationalSecurityMeasure extends MongoBaseEntity {
 
     private Long countryId;
 
+    private String suggestedDataStatus=SuggestedDataStatus.ACCEPTED.value;
+
+    public String getSuggestedDataStatus() { return suggestedDataStatus; }
+
+    public void setSuggestedDataStatus(String suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
+
     public Long getCountryId() {
         return countryId;
     }
@@ -22,14 +29,12 @@ public class OrganizationalSecurityMeasure extends MongoBaseEntity {
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
+
     public String getName() {
         return name.trim();
     }
 
-    public void setName(String name) {
-        this.name = name;
-
-    }
+    public void setName(String name) { this.name = name; }
 
     public OrganizationalSecurityMeasure( String name) {
         this.name = name;

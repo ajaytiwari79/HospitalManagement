@@ -1449,9 +1449,9 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "get organization ids by orgSubType ids")
-    @GetMapping(value = "/orgtype/{orgTypeId}/get_organization_ids")
+    @PostMapping(value = "/orgtype/get_organization_ids")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationIdsBySubOrgTypeId(@PathVariable Long orgTypeId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationIdsBySubOrgTypeId(@RequestBody List<Long> orgTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationIdsBySubOrgTypeId(orgTypeId));
     }

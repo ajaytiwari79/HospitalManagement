@@ -40,11 +40,11 @@ public class OrganizationDataElementService extends MongoBaseService {
         for (DataElement dataElement : dataElementList) {
             dataELementNameList.add(dataElement.getName());
         }
-        List<DataElement> previousDataElementList = findAllByNameAndOrganizationId(unitId, dataELementNameList, DataElement.class);
+        List<DataElement> previousDataElementList = findMetaDataByNameAndUnitId(unitId, dataELementNameList, DataElement.class);
         if (!previousDataElementList.isEmpty()) {
             exceptionService.duplicateDataException("message.duplicate", "Data element ", previousDataElementList.get(0).getName());
         }
-        dataElementList = dataElementMongoRepository.saveAll(getNextSequence(dataElementList));
+        dataElementList = dataElementMongoRepository.saveAll(dataElementList);
         return dataElementList;
 
     }

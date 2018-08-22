@@ -7,6 +7,7 @@ import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+
+import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 
 @Service
@@ -80,12 +83,40 @@ public class AssetService extends MongoBaseService {
     }
 
 
-    public Boolean deleteAssetById(Long organizationId, BigInteger id) {
-        Asset asset = assetMongoRepository.findByIdAndNonDeleted(organizationId, id);
+    public Map<String, Object> deleteAssetById(Long organizationId, BigInteger assetId) {
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(organizationId, assetId);
         if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + assetId);
         }
-        delete(asset);
+        List<ProcessingActivityBasicResponseDTO> linkedProcessingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkWithAssetById(organizationId, assetId);
+        Map<String, Object> result = new HashMap<>();
+        if (!linkedProcessingActivities.isEmpty()) {
+            result.put(IS_SUCCESS, false);
+            result.put("data", linkedProcessingActivities);
+            result.put("message", "Asset is linked with Processing Activities");
+        } else {
+            delete(asset);
+            result.put(IS_SUCCESS, true);
+        }
+        return result;
+    }
+
+
+    /**
+     * @description method updated active status of Asset
+     * @param unitId
+     * @param assetId asset id
+     * @param active status of Asset
+     * @return
+     */
+    public boolean updateStatusOfAsset(Long unitId, BigInteger assetId,boolean active)
+    {
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+        }
+        asset.setActive(active);
+        assetMongoRepository.save(asset);
         return true;
     }
 
@@ -132,6 +163,10 @@ public class AssetService extends MongoBaseService {
     }
 
 
+    public List<AssetBasicResponseDTO> getAllActiveAsset(Long unitId) {
+        return assetMongoRepository.getAllAssetWithBasicDetailByStatus(unitId, true);
+    }
+
     /**
      * @param
      * @param organizationId
@@ -166,6 +201,13 @@ public class AssetService extends MongoBaseService {
     }
 
 
+    /**
+     * @param unitId
+     * @param assetId
+     * @param assetRelateProcessingActivityDTO
+     * @return
+     * @description map asset with Processing activity
+     */
     public Asset addProcessingActivitiesAndSubProcessingActivitiesToAsset(Long unitId, BigInteger assetId, AssetRelateProcessingActivityDTO assetRelateProcessingActivityDTO) {
         Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
         if (!Optional.ofNullable(asset).isPresent()) {
@@ -184,20 +226,19 @@ public class AssetService extends MongoBaseService {
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
         }
-
         Set<BigInteger> processingActivitiesIdList = asset.getProcessingActivities();
         List<ProcessingActivityBasicResponseDTO> processingActivityResponseDTOList = new ArrayList<>();
         if (!processingActivitiesIdList.isEmpty()) {
             processingActivityResponseDTOList = processingActivityMongoRepository.getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(unitId, processingActivitiesIdList);
             Set<BigInteger> subProcessingActivitiesIdsList = asset.getSubProcessingActivities();
 
-            for (ProcessingActivityBasicResponseDTO processingActivityBasicResponsDTO : processingActivityResponseDTOList) {
+            for (ProcessingActivityBasicResponseDTO processingActivityBasicResponseDTO : processingActivityResponseDTOList) {
 
-                List<ProcessingActivityBasicResponseDTO> subProcessingActivites = processingActivityBasicResponsDTO.getSubProcessingActivities();
+                List<ProcessingActivityBasicResponseDTO> subProcessingActivities = processingActivityBasicResponseDTO.getSubProcessingActivities();
                 boolean defaultSelected = true;
                 List<ProcessingActivityBasicResponseDTO> defaultSubProcessingActivityList = new ArrayList<>();
 
-                for (ProcessingActivityBasicResponseDTO subProcessingActivity : subProcessingActivites) {
+                for (ProcessingActivityBasicResponseDTO subProcessingActivity : subProcessingActivities) {
                     if (subProcessingActivitiesIdsList.contains(subProcessingActivity.getId())) {
                         subProcessingActivity.setSelected(true);
                         defaultSelected = false;
@@ -209,14 +250,11 @@ public class AssetService extends MongoBaseService {
                 }
 
                 if (defaultSelected) {
-                    processingActivityBasicResponsDTO.setSubProcessingActivities(defaultSubProcessingActivityList);
+                    processingActivityBasicResponseDTO.setSubProcessingActivities(defaultSubProcessingActivityList);
                 }
             }
         }
         return processingActivityResponseDTOList;
-
-
     }
-
 
 }

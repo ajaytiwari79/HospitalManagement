@@ -13,7 +13,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssetResponseDTO {
 
-
     private BigInteger id;
 
     private String name;
@@ -50,7 +49,7 @@ public class AssetResponseDTO {
 
     private RiskSeverity risk;
 
-    private Boolean isActive;
+    private boolean active;
 
 
     public BigInteger getId() { return id; }
@@ -125,7 +124,11 @@ public class AssetResponseDTO {
 
     public void setRisk(RiskSeverity risk) { this.risk = risk; }
 
-    public Boolean getActive() { return isActive; }
+    public boolean isActive() {
+        return active;
+    }
 
-    public void setActive(Boolean active) { isActive = active; }
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

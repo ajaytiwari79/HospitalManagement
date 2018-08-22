@@ -89,11 +89,11 @@ public class CostTimeAgreementService extends MongoBaseService {
             category = new RuleTemplateCategory("NONE", "None", RuleTemplateCategoryType.CTA);
             category.setCountryId(countryId);
             save(category);
-            CountryDTO country = countryRestClient.getCountryById(countryId);
+            /*CountryDTO country = countryRestClient.getCountryById(countryId);
             if (country != null) {
                 List<CTARuleTemplate> ctaRuleTemplates = createDefaultRuleTemplate(countryId, country.getCurrencyId(), category.getId());
                 save(ctaRuleTemplates);
-            }
+            }*/
         } else {
             logger.info("default CTARuleTemplateCategory is not exist");
         }
@@ -113,8 +113,8 @@ public class CostTimeAgreementService extends MongoBaseService {
         }
         CountryDTO countryDTO = countryRestClient.getCountryById(countryId);
         ctaRuleTemplateDTO.setId(null);
-        CTARuleTemplate ctaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);
         ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplateDTO.getName());
+        CTARuleTemplate ctaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);
         this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, false, countryDTO);
         Long userId = UserContext.getUserDetails().getId();
         ctaRuleTemplate.setLastModifiedBy(userId);
@@ -478,9 +478,8 @@ public class CostTimeAgreementService extends MongoBaseService {
 
         }
         OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
-        CostTimeAgreement costTimeAgreement = new CostTimeAgreement();
         collectiveTimeAgreementDTO.setId(null);
-        BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
+        CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(collectiveTimeAgreementDTO, CostTimeAgreement.class);
         buildCTA(costTimeAgreement, collectiveTimeAgreementDTO);
         costTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));
         this.save(costTimeAgreement);

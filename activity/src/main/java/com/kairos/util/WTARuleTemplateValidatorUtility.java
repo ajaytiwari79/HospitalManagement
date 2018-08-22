@@ -101,19 +101,17 @@ public class WTARuleTemplateValidatorUtility {
 
     public static List<Integer> getValidDays(List<DayTypeDTO> dayTypeDTOS, List<Long> dayTypeIds){
         Set<Integer> dayOfWeeks = new HashSet<>();
-        dayTypeDTOS.forEach(dayTypeDTO -> {
+        Map<Long,DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v));
             dayTypeIds.forEach(dayTypeId->{
-                if(dayTypeDTO.getId().equals(dayTypeId)){
-                    dayTypeDTO.getValidDays().forEach(day -> {
+                List<Day> days = dayTypeDTOMap.get(dayTypeId).getValidDays();
+                days.forEach(day -> {
                         if(!day.equals(Day.EVERYDAY)){
                             dayOfWeeks.add(DayOfWeek.valueOf(day.name()).getValue());
-                        }if(day.equals(Day.EVERYDAY)){
+                        }else if(day.equals(Day.EVERYDAY)){
                             dayOfWeeks.addAll(Arrays.stream(DayOfWeek.values()).map(dayOfWeek -> dayOfWeek.getValue()).collect(Collectors.toList()));
                         }
-                    });
-                }
+                });
             });
-        });
         return new ArrayList<>(dayOfWeeks);
     }
 

@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistance.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
@@ -42,7 +43,7 @@ public class StorageFormatService extends MongoBaseService {
      * @return return map which contain list of new StorageFormat and list of existing StorageFormat if StorageFormat already exist
      * @description this method create new StorageFormat if StorageFormat not exist with same name ,
      * and if exist then simply add  StorageFormat to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
      */
     public Map<String, List<StorageFormat>> createStorageFormat(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
 
@@ -52,7 +53,7 @@ public class StorageFormatService extends MongoBaseService {
             for (StorageFormatDTO storageFormat : storageFormatDTOS) {
                 storageFormatNames.add(storageFormat.getName());
             }
-            List<StorageFormat> existing = findByNamesAndCountryId(countryId, storageFormatNames, StorageFormat.class);
+            List<StorageFormat> existing = findMetaDataByNamesAndCountryId(countryId, storageFormatNames, StorageFormat.class);
             storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
             List<StorageFormat> newStorageFormats = new ArrayList<>();
@@ -66,7 +67,7 @@ public class StorageFormatService extends MongoBaseService {
                 }
 
 
-                newStorageFormats = storageFormatMongoRepository.saveAll(getNextSequence(newStorageFormats));
+                newStorageFormats = storageFormatMongoRepository.saveAll(newStorageFormats);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newStorageFormats);
@@ -83,8 +84,8 @@ public class StorageFormatService extends MongoBaseService {
      * @param
      * @return list of StorageFormat
      */
-    public List<StorageFormat> getAllStorageFormat(Long countryId) {
-        return storageFormatMongoRepository.findAllStorageFormats(countryId);
+    public List<StorageFormatResponseDTO> getAllStorageFormat(Long countryId) {
+        return storageFormatMongoRepository.findAllStorageFormats(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
     /**
@@ -168,10 +169,32 @@ public class StorageFormatService extends MongoBaseService {
     }
 
 
-    public List<StorageFormatResponseDTO> getAllNotInheritedStorageFormatFromParentOrgAndUnitStorageFormat(Long countryId, Long parentOrganizationId, Long unitId) {
+    /**
+     * @description method save Storage format suggested by unit
+     * @param countryId
+     * @param StorageFormatDTOS
+     * @return
+     */
+    public List<StorageFormat> saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> StorageFormatDTOS) {
 
-        return storageFormatMongoRepository.getAllNotInheritedStorageFormatFromParentOrgAndUnitStorageFormat(countryId, parentOrganizationId, unitId);
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (StorageFormatDTO StorageFormat : StorageFormatDTOS) {
+            hostingProvoiderNames.add(StorageFormat.getName());
+        }
+        List<StorageFormat> existingStorageFormats = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, StorageFormat.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingStorageFormats, hostingProvoiderNames);
+        List<StorageFormat> StorageFormatList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                StorageFormat StorageFormat = new StorageFormat(name);
+                StorageFormat.setCountryId(countryId);
+                StorageFormat.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                StorageFormatList.add(StorageFormat);
+            }
+
+            StorageFormatList = storageFormatMongoRepository.saveAll(StorageFormatList);
+        }
+        return StorageFormatList;
     }
-
-
 }

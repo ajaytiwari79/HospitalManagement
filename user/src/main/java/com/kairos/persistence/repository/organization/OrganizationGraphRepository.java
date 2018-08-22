@@ -1,24 +1,20 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.enums.OrganizationLevel;
-import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.group.Group;
-import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import com.kairos.user.organization.OrganizationTypeAndSubTypeDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -702,8 +698,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (org:Organization)-[:"+HAS_SETTING+"]-(orgSetting:OrganizationSetting) where id(org)={0} return orgSetting")
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
 
-    @Query("Match (org:Organization)-[:"+SUB_TYPE_OF+"]->(orgType:OrganizationType) where id(orgType)={0} return id(org)")
-    List<Long> getOrganizationIdsBySubOrgTypeId(Long organizationSubTypeId);
+    @Query("Match (org:Organization)-[:"+SUB_TYPE_OF+"]->(orgType:OrganizationType) where id(orgType) IN {0} return id(orgType) as orgTypeId, collect(id(org)) as unitIds ")
+    List<OrgTypeQueryResult> getOrganizationIdsBySubOrgTypeId(List<Long> organizationSubTypeId);
 
     @Query("Match (child:Organization) \n" +
             "OPTIONAL MATCH (child)<-[:"+HAS_SUB_ORGANIZATION+"]-(parent:Organization) with child,parent\n" +

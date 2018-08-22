@@ -1,6 +1,7 @@
 package com.kairos.user.country.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.shift.BreakPaymentSetting;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Set;
 /**
  * Created by vipul on 29/3/18.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExpertiseResponseDTO {
     private Long id;

@@ -47,7 +47,7 @@ public class TemplateTypeService extends MongoBaseService {
             } else
                 throw new InvalidRequestException("name could not be empty or null");
         }
-        List<TemplateType> existing = findByNamesAndCountryId(countryId, templateNames, TemplateType.class);
+        List<TemplateType> existing = findMetaDataByNamesAndCountryId(countryId, templateNames, TemplateType.class);
         templateNames = ComparisonUtils.getNameListForMetadata(existing, templateNames);
         List<TemplateType> newDataTemplateList = new ArrayList<>();
         if (!templateNames.isEmpty()) {
@@ -58,7 +58,7 @@ public class TemplateTypeService extends MongoBaseService {
                 templateType1.setCountryId(countryId);
                 newDataTemplateList.add(templateType1);
             }
-            newDataTemplateList = templateTypeRepository.saveAll(getNextSequence(newDataTemplateList));
+            newDataTemplateList = templateTypeRepository.saveAll(newDataTemplateList);
         }
         result.put(EXISTING_DATA_LIST, existing);
         result.put(NEW_DATA_LIST, newDataTemplateList);
@@ -94,9 +94,7 @@ public class TemplateTypeService extends MongoBaseService {
     public List<TemplateType> getTemplateByIdsList(List<BigInteger> templateIds, Long countryId) {
         List<TemplateType> templates = templateTypeRepository.findTemplateTypeByIdsList(countryId, templateIds);
         List<BigInteger> ids = new ArrayList<>();
-        templates.forEach(templateType -> {
-            ids.add(templateType.getId());
-        });
+        templates.forEach(templateType -> ids.add(templateType.getId()));
         templateIds.removeAll(ids);
         if (!templateIds.isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Template type", templateIds.get(0));

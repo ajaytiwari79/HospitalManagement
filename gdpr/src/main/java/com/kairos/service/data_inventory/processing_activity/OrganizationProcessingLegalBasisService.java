@@ -11,6 +11,7 @@ import com.kairos.persistance.repository.master_data.processing_activity_masterd
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.processing_activity_masterdata.ProcessingLegalBasisService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,6 +35,8 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
     private ProcessingLegalBasisMongoRepository legalBasisMongoRepository;
 
     @Inject
+    private ProcessingLegalBasisService processingLegalBasisService;
+    @Inject
     private ExceptionService exceptionService;
 
     /**
@@ -42,7 +45,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
      * @return return map which contain list of new ProcessingLegalBasis and list of existing ProcessingLegalBasis if ProcessingLegalBasis already exist
      * @description this method create new ProcessingLegalBasis if ProcessingLegalBasis not exist with same name ,
      * and if exist then simply add  ProcessingLegalBasis to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing ProcessingLegalBasis using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing ProcessingLegalBasis using collation ,used for case insensitive result
      */
     public Map<String, List<ProcessingLegalBasis>> createProcessingLegalBasis(Long organizationId, List<ProcessingLegalBasisDTO> legalBasisDTOList) {
 
@@ -53,7 +56,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
 
                 legalBasisNames.add(legalBasis.getName());
             }
-            List<ProcessingLegalBasis> existing = findAllByNameAndOrganizationId(organizationId, legalBasisNames, ProcessingLegalBasis.class);
+            List<ProcessingLegalBasis> existing = findMetaDataByNameAndUnitId(organizationId, legalBasisNames, ProcessingLegalBasis.class);
             legalBasisNames = ComparisonUtils.getNameListForMetadata(existing, legalBasisNames);
 
             List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
@@ -66,7 +69,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
 
                 }
 
-                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(getNextSequence(newProcessingLegalBasisList));
+                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(newProcessingLegalBasisList);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingLegalBasisList);
@@ -163,5 +166,15 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
 
     }
 
+    public Map<String, List<ProcessingLegalBasis>> saveAndSuggestProcessingLegalBasiss(Long countryId, Long organizationId, List<ProcessingLegalBasisDTO> ProcessingLegalBasisDTOS) {
+
+        Map<String, List<ProcessingLegalBasis>> result;
+        result = createProcessingLegalBasis(organizationId, ProcessingLegalBasisDTOS);
+        List<ProcessingLegalBasis> masterProcessingLegalBasisSuggestedByUnit = processingLegalBasisService.saveSuggestedProcessingLegalBasissFromUnit(countryId, ProcessingLegalBasisDTOS);
+        if (!masterProcessingLegalBasisSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterProcessingLegalBasisSuggestedByUnit);
+        }
+        return result;
+    }
 
 }

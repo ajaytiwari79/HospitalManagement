@@ -1,6 +1,6 @@
 package com.kairos.service.organization;
 
-import com.kairos.activity.counter.DefalutKPISettingDTO;
+import com.kairos.activity.counter.DefaultKPISettingDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -62,7 +62,7 @@ public class CompanyDefaultDataService {
         asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(organization));
         asynchronousService.executeInBackGround(() -> organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId()));
         asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultKPISetting(
-                new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),
+                new DefaultKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),
                         organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), organization.getId()));
         asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), organization.getCountry().getId()));
         asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(organization,timeSlots));

@@ -702,7 +702,7 @@ public class TaskService extends MongoBaseService {
         List<String> externalIdsOfActivities = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).map(timeCareShift -> timeCareShift.getActivityId()).
                 collect(Collectors.toList());
         List<Shift> shiftsInKairos = shiftMongoRepository.findByExternalIdIn(externalIdsOfShifts);
-        List<Activity> activities = activityMongoRepository.findByUnitIdAndExternalIdIn(workPlaceId, externalIdsOfActivities);
+        List<Activity> activities = activityMongoRepository.findByUnitIdAndExternalIdInAndDeletedFalse(workPlaceId, externalIdsOfActivities);
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());

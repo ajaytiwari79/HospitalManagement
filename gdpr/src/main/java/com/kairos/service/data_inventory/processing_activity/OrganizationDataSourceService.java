@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data.processing_activity_masterd
 import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.processing_activity_masterdata.DataSourceService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -36,6 +37,9 @@ public class OrganizationDataSourceService extends MongoBaseService {
     @Inject
     private DataSourceMongoRepository dataSourceMongoRepository;
 
+    @Inject
+    private DataSourceService dataSourceService;
+
 
     /**
      * @param organizationId
@@ -43,7 +47,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
      * @return return map which contain list of new DataSource and list of existing DataSource if DataSource already exist
      * @description this method create new DataSource if DataSource not exist with same name ,
      * and if exist then simply add  DataSource to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
     public Map<String, List<DataSource>> createDataSource(Long organizationId, List<DataSourceDTO> dataSourceDTOS) {
 
@@ -54,7 +58,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
                     dataSourceNames.add(dataSource.getName());
                     }
-            List<DataSource> existing = findAllByNameAndOrganizationId(organizationId, dataSourceNames, DataSource.class);
+            List<DataSource> existing = findMetaDataByNameAndUnitId(organizationId, dataSourceNames, DataSource.class);
             dataSourceNames = ComparisonUtils.getNameListForMetadata(existing, dataSourceNames);
 
             List<DataSource> newDataSources = new ArrayList<>();
@@ -66,7 +70,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
                 }
 
-                newDataSources = dataSourceMongoRepository.saveAll(getNextSequence(newDataSources));
+                newDataSources = dataSourceMongoRepository.saveAll(newDataSources);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newDataSources);
@@ -160,6 +164,18 @@ public class OrganizationDataSourceService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+    public Map<String, List<DataSource>> saveAndSuggestDataSources(Long countryId, Long organizationId, List<DataSourceDTO> DataSourceDTOS) {
+
+        Map<String, List<DataSource>> result;
+        result = createDataSource(organizationId, DataSourceDTOS);
+        List<DataSource> masterDataSourceSuggestedByUnit = dataSourceService.saveSuggestedDataSourcesFromUnit(countryId, DataSourceDTOS);
+        if (!masterDataSourceSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterDataSourceSuggestedByUnit);
+        }
+        return result;
     }
 
 

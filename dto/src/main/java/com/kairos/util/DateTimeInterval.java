@@ -203,8 +203,8 @@ public class DateTimeInterval {
         return (this.end - this.start);
     }
 
-    public int getDays(){
-        return Period.between(getEnd().toLocalDate(),getStart().toLocalDate()).getDays();
+    public long getDays(){
+        return ChronoUnit.DAYS.between(getStart(),getEnd());
     }
 
     @Override

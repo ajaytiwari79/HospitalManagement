@@ -10,6 +10,7 @@ import com.kairos.persistence.model.country.default_data.account_type.AccountTyp
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
+import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -762,7 +763,7 @@ public class AccessGroupService {
         );
         return userAccessRoleDTO;
     }
-    public List<Long> getStaffIdsByUnitIdAndAccessGroupId(Long unitId,Long accessGroupId){
+    public List<StaffIdsQueryResult> getStaffIdsByUnitIdAndAccessGroupId(Long unitId, List<Long> accessGroupId){
         return accessGroupRepository.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId);
     }
 }

@@ -73,11 +73,11 @@ public class GenericRestClient {
 
     public <T extends Object, V> V publishRequest(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, List<NameValuePair> queryParam, ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference, Object... pathParams) {
         final String baseUrl = getBaseUrl(isUnit,id)+uri;
-
+        String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl+getURIWithParam(queryParam),
+                            url,
                             getHttpMethod(integrationOperation),
                             new HttpEntity<>(t), typeReference,pathParams);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();

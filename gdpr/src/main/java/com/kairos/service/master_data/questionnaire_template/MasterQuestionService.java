@@ -1,8 +1,5 @@
 package com.kairos.service.master_data.questionnaire_template;
 
-import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.enums.AssetAttributeName;
-import com.kairos.enums.ProcessingActivityAttributeName;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.gdpr.master_data.MasterQuestionDTO;
 import com.kairos.enums.QuestionType;
@@ -66,7 +63,7 @@ public class MasterQuestionService extends MongoBaseService {
             }
         }
         try {
-            masterQuestions = questionMongoRepository.saveAll(getNextSequence(masterQuestions));
+            masterQuestions = questionMongoRepository.saveAll(masterQuestions);
             masterQuestions.forEach(masterQuestion -> questionSectionIds.add(masterQuestion.getId()));
         } catch (MongoClientException e) {
             logger.info(e.getMessage());
@@ -92,6 +89,7 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
+    //todo uncomment code on integration of asseement with front end
     public void addAttributeNameToQuestion(MasterQuestion masterQuestion, MasterQuestionDTO masterQuestionDTO, QuestionnaireTemplateType templateType) {
 
         if (!Optional.ofNullable(templateType).isPresent()) {
@@ -99,18 +97,18 @@ public class MasterQuestionService extends MongoBaseService {
         }
         switch (templateType) {
             case ASSET_TYPE:
-                if (Optional.ofNullable(AssetAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
+              /*  if (Optional.ofNullable(AssetAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
                     masterQuestion.setAttributeName(masterQuestionDTO.getAttributeName());
                 } else {
                     throw new InvalidRequestException("Attribute not found for Asset ");
-                }
+                }*/
                 break;
             case PROCESSING_ACTIVITY:
-                if (Optional.ofNullable(ProcessingActivityAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
+               /* if (Optional.ofNullable(ProcessingActivityAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
                     masterQuestion.setAttributeName(masterQuestionDTO.getAttributeName());
                 } else {
                     throw new InvalidRequestException("Attribute not found for Processing Activity");
-                }
+                }*/
                 break;
         }
 
@@ -212,9 +210,7 @@ public class MasterQuestionService extends MongoBaseService {
         List<MasterQuestion> existingMasterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId, organizationId, questionIds);
 
         Map<BigInteger, Object> masterQuestionDtoCorrespondingToId = new HashMap<>();
-        masterQuestionDTOs.forEach(masterQuestionDto -> {
-            masterQuestionDtoCorrespondingToId.put(masterQuestionDto.getId(), masterQuestionDto);
-        });
+        masterQuestionDTOs.forEach(masterQuestionDto -> masterQuestionDtoCorrespondingToId.put(masterQuestionDto.getId(), masterQuestionDto));
         List<MasterQuestion> updatedQuestionsList = new ArrayList<>();
         for (MasterQuestion masterQuestion : existingMasterQuestions) {
 
@@ -233,7 +229,7 @@ public class MasterQuestionService extends MongoBaseService {
             }
         }
         try {
-            updatedQuestionsList = questionMongoRepository.saveAll(getNextSequence(updatedQuestionsList));
+            updatedQuestionsList = questionMongoRepository.saveAll(updatedQuestionsList);
         } catch (MongoClientException e) {
             logger.info(e.getMessage());
             throw new MongoClientException(e.getMessage());

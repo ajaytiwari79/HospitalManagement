@@ -2,7 +2,6 @@ package com.kairos.response.dto.policy_agreement;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.gdpr.OrganizationSubType;
 import com.kairos.gdpr.OrganizationType;
 import com.kairos.gdpr.ServiceCategory;

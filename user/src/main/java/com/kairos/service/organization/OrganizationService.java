@@ -3,13 +3,10 @@ package com.kairos.service.organization;
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.activity.cta.CTABasicDetailsDTO;
-import com.kairos.activity.counter.DefalutKPISettingDTO;
-
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
-import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
@@ -17,11 +14,14 @@ import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.*;
-import com.kairos.persistence.model.country.DayType;
-import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.CompanyCategory;
+import com.kairos.persistence.model.country.default_data.ContractType;
+import com.kairos.persistence.model.country.default_data.OrganizationMappingDTO;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.AbsenceTypes;
+import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.group.Group;
@@ -31,6 +31,7 @@ import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.persistence.model.user.expertise.Response.OrderDefaultDataWrapper;
@@ -89,7 +90,10 @@ import com.kairos.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.user.organization.*;
 import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.client.ContactAddressDTO;
-import com.kairos.util.*;
+import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
+import com.kairos.util.FormatUtil;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.util.external_plateform_shift.GetAllWorkPlacesResponse;
 import com.kairos.util.external_plateform_shift.GetAllWorkPlacesResult;
 import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
@@ -111,6 +115,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 
 
 /**
@@ -380,7 +385,6 @@ public class OrganizationService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        activityIntegrationService.createDefaultKPISetting(new DefalutKPISettingDTO(organization.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()), countryId, null, countryAndOrgAccessGroupIdsMap), organization.getId());
         // Create Unit Manager
         orgDetails.getUnitManager().setAccessGroupId(countryAndOrgAccessGroupIdsMap.get(orgDetails.getUnitManager().getAccessGroupId()));
         createUnitManager(organization.getId(), orgDetails);
@@ -552,10 +556,9 @@ public class OrganizationService {
         organization.setBoardingCompleted(true);
 
         return organization;
+
+
     }
-
-
-
 
     public List<Map<String, Object>> getAllOrganization() {
         return organizationGraphRepository.findAllOrganizations();
@@ -1183,12 +1186,12 @@ public class OrganizationService {
     }
 
 
-    public List<DayType> getDayType(Long organizationId, Date date) {
+    public List<com.kairos.persistence.model.country.DayType> getDayType(Long organizationId, Date date) {
         Long countryId = organizationGraphRepository.getCountryId(organizationId);
         return dayTypeService.getDayTypeByDate(countryId, date);
     }
 
-    public List<DayType> getAllDayTypeofOrganization(Long organizationId) {
+    public List<com.kairos.persistence.model.country.DayType> getAllDayTypeofOrganization(Long organizationId) {
         Long countryId = organizationGraphRepository.getCountryId(organizationId);
         return dayTypeService.getAllDayTypeByCountryId(countryId);
 
@@ -1373,7 +1376,7 @@ public class OrganizationService {
         List<PresenceTypeDTO> plannedTypes = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<FunctionDTO> functions = functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
         List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId, ReasonCodeType.ORDER);
-        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+        List<com.kairos.persistence.model.country.DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         return new OrderDefaultDataWrapper(orderAndActivityDTO.getOrders(), orderAndActivityDTO.getActivities(),
                 skills, expertise, staffList, plannedTypes, functions, reasonCodes, dayTypes, orderAndActivityDTO.getMinOpenShiftHours());
     }
@@ -1384,7 +1387,8 @@ public class OrganizationService {
         if (!staff.isEmpty()) {
             //TODO VIPUL check
             //  plannerSyncService.publishAllStaff(unitId,staff,IntegrationOperation.CREATE);
-            List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips = unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(unitId);
+            List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips;
+            unitPositionEmploymentTypeRelationShips = unitPositionGraphRepository.findUnitPositionEmploymentTypeRelationshipByParentOrganizationId(unitId);
             if (!unitPositionEmploymentTypeRelationShips.isEmpty()) {
                 plannerSyncService.publishAllUnitPositions(unitId, unitPositionEmploymentTypeRelationShips, IntegrationOperation.CREATE);
             }
@@ -1406,7 +1410,7 @@ public class OrganizationService {
         Organization organization = organizationGraphRepository.findOne(unitId);
         Country country = organizationGraphRepository.getCountry(organization.getId());
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(country.getId());
-        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(country.getId());
+        List<com.kairos.persistence.model.country.DayType> dayTypes = dayTypeGraphRepository.findByCountryId(country.getId());
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organization);
         List<PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p -> new PresenceTypeDTO(p.getName(), p.getId())).collect(Collectors.toList());
@@ -1497,7 +1501,8 @@ public class OrganizationService {
     }
 
 
-    public List<Long> getOrganizationIdsBySubOrgTypeId(Long orgTypeId) {
+    public List<OrgTypeQueryResult> getOrganizationIdsBySubOrgTypeId(List<Long> orgTypeId) {
+
         return organizationGraphRepository.getOrganizationIdsBySubOrgTypeId(orgTypeId);
     }
 
