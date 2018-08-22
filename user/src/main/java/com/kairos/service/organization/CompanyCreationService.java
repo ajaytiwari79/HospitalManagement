@@ -33,6 +33,7 @@ import com.kairos.user.organization.OrganizationBasicDTO;
 import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
 import com.kairos.util.FormatUtil;
+import com.kairos.util.validator.company.OrganizationDetailsValidator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
@@ -43,8 +44,12 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.util.validator.company.OrganizationDetailsValidator.validateAddressDetails;
+import static com.kairos.util.validator.company.OrganizationDetailsValidator.validateBasicDetails;
+import static com.kairos.util.validator.company.OrganizationDetailsValidator.validateUserDetails;
 
 /**
  * CreatedBy vipulpandey on 17/8/18
@@ -90,15 +95,8 @@ public class CompanyCreationService {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
-        CompanyValidationQueryResult orgExistWithUrl = validateNameAndDesiredUrlOfOrganization(orgDetails);
+        String kairosId = validateNameAndDesiredUrlOfOrganization(orgDetails);
 
-        String kairosId;
-        if (orgExistWithUrl.getKairosId() == null) {
-            kairosId = StringUtils.upperCase(orgDetails.getName().substring(0, 3)) + HYPHEN + ONE;
-        } else {
-            int lastSuffix = new Integer(orgExistWithUrl.getKairosId().substring(4, orgExistWithUrl.getKairosId().length()));
-            kairosId = StringUtils.upperCase(orgDetails.getName().substring(0, 3)) + HYPHEN + (++lastSuffix);
-        }
 
         Organization organization = new OrganizationBuilder()
                 .setIsParentOrganization(true)
@@ -143,7 +141,7 @@ public class CompanyCreationService {
     }
 
     private void updateOrganizationDetails(Organization organization, OrganizationBasicDTO orgDetails) {
-        if (organization.getDesiredUrl() != null && !orgDetails.getDesiredUrl().trim().equalsIgnoreCase(organization.getDesiredUrl())) {
+        if (orgDetails.getDesiredUrl() !=null && !orgDetails.getDesiredUrl().trim().equalsIgnoreCase(organization.getDesiredUrl())) {
             Boolean orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrl(orgDetails.getDesiredUrl());
             if (orgExistWithUrl) {
                 exceptionService.dataNotFoundByIdException("error.Organization.desiredUrl.duplicate", orgDetails.getDesiredUrl());
@@ -176,7 +174,7 @@ public class CompanyCreationService {
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
     }
 
-    private CompanyValidationQueryResult validateNameAndDesiredUrlOfOrganization(OrganizationBasicDTO orgDetails) {
+    private String validateNameAndDesiredUrlOfOrganization(OrganizationBasicDTO orgDetails) {
         CompanyValidationQueryResult orgExistWithUrl = organizationGraphRepository.checkOrgExistWithUrlOrUrl("(?i)" + orgDetails.getDesiredUrl(), "(?i)" + orgDetails.getName(), orgDetails.getName().substring(0, 3));
         if (orgExistWithUrl.getName()) {
             exceptionService.invalidRequestException("error.Organization.name.duplicate", orgDetails.getName());
@@ -184,7 +182,15 @@ public class CompanyCreationService {
         if (orgDetails.getDesiredUrl() != null && orgExistWithUrl.getDesiredUrl()) {
             exceptionService.invalidRequestException("error.Organization.desiredUrl.duplicate", orgDetails.getDesiredUrl());
         }
-        return orgExistWithUrl;
+        String kairosId;
+        if (orgExistWithUrl.getKairosId() == null) {
+            kairosId = StringUtils.upperCase(orgDetails.getName().substring(0, 3)) + HYPHEN + KAI + ONE;
+        } else {
+            int lastSuffix = new Integer(orgExistWithUrl.getKairosId().substring(4, orgExistWithUrl.getKairosId().length()));
+            kairosId = StringUtils.upperCase(orgDetails.getName().substring(0, 3)) + HYPHEN + KAI + (++lastSuffix);
+        }
+
+        return kairosId;
     }
 
     // tab 1 in FE
@@ -217,7 +223,7 @@ public class CompanyCreationService {
         HashMap<String, Object> orgBasicData = new HashMap<>();
         Map<String, Object> organizationContactAddress = organizationGraphRepository.getContactAddressOfParentOrganization(unitId);
         orgBasicData.put("address", organizationContactAddress);
-        orgBasicData.put("municipalities", (organizationContactAddress.get("zipCodeId") == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long)organizationContactAddress.get("zipCodeId"))));
+        orgBasicData.put("municipalities", (organizationContactAddress.get("zipCodeId") == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) organizationContactAddress.get("zipCodeId"))));
         return orgBasicData;
     }
 
@@ -278,6 +284,7 @@ public class CompanyCreationService {
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", parentOrganizationId);
         }
+        String kairosId = validateNameAndDesiredUrlOfOrganization(organizationBasicDTO);
         Organization unit = new OrganizationBuilder()
                 .setName(WordUtils.capitalize(organizationBasicDTO.getName()))
                 .setDescription(organizationBasicDTO.getDescription())
@@ -286,8 +293,9 @@ public class CompanyCreationService {
                 .setCompanyType(organizationBasicDTO.getCompanyType())
                 .setVatId(organizationBasicDTO.getVatId())
                 .setTimeZone(ZoneId.of(TIMEZONE_UTC))
+                .setKairosId(kairosId)
                 .createOrganization();
-        parentOrganization.getChildren().add(unit);
+
         setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO);
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getAddressDTO());
@@ -300,7 +308,7 @@ public class CompanyCreationService {
         if (organizationBasicDTO.getAddressDTO() != null) {
             organizationBasicDTO.getAddressDTO().setId(unit.getContactAddress().getId());
         }
-        organizationGraphRepository.createChildOrganization(parentOrganizationId,unit.getId());
+        organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         return organizationBasicDTO;
 
     }
@@ -370,22 +378,33 @@ public class CompanyCreationService {
         }
         return companyCategory;
     }
-    public boolean publishOrganization(Long organizationId){
-        Organization organization = organizationGraphRepository.findOne(organizationId);
+
+    public boolean publishOrganization(Long organizationId) {
+        Organization organization = organizationGraphRepository.findOne(organizationId,2);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
-        }else  if (organization.getDesiredUrl()==null){
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
-        }else if (organization.getCompanyCategory()==null){
+        }
+        // If it has any error then it will throw exception
+        // Here a list is created and organization with all its childrens are sent to function to validate weather any of organization
+        //or parent has any missing required details
 
-        }else if(organization.getOrganizationType()==null){
+        List<Organization> organizations = organization.getChildren();
+        organizations.add(organization);
+        validateBasicDetails(organizations,exceptionService);
 
-        }else if (organization.getOrganizationSubTypes()==null || organization.getOrganizationSubTypes().isEmpty()){
+        List<Long> unitIds=organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
+        unitIds.add(organizationId);
 
-        }else if (organization.getBusinessTypes()==null){
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds);
+        validateUserDetails(staffPersonalDetailDTOS,exceptionService);
 
-        }else if ()
-
+        List<OrganizationContactAddress> organizationContactAddresses= organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
+        validateAddressDetails(organizationContactAddresses,exceptionService);
+        organizations.forEach(currentOrg -> {
+            currentOrg.setBoardingCompleted(true);
+        });
+        organizationGraphRepository.saveAll(organizations);
         return true;
     }
+
 }

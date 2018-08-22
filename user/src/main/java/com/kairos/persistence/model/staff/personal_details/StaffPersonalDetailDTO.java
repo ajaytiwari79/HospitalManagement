@@ -43,7 +43,10 @@ public class StaffPersonalDetailDTO {
     private String privatePhone;
     private LocalDate dateOfBirth;
     private Boolean pregnant;
-
+    // used for staff validation
+    private Long accessGroupId;
+    private String accessGroupName;
+    private String email;
     public StaffPersonalDetailDTO() {
         // default constructor
     }
@@ -265,5 +268,27 @@ public class StaffPersonalDetailDTO {
         return age;
     }
 
+    public Long getAccessGroupId() {
+        return accessGroupId;
+    }
 
+    public void setAccessGroupId(Long accessGroupId) {
+        this.accessGroupId = accessGroupId;
+    }
+
+    public String getAccessGroupName() {
+        return accessGroupName;
+    }
+
+    public void setAccessGroupName(String accessGroupName) {
+        this.accessGroupName = accessGroupName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

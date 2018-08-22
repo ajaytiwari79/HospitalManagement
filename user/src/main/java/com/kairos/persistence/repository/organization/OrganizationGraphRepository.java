@@ -270,7 +270,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) with organizationSubTypeIds,org,ot,zipCode\n" +
             "OPTIONAL Match (org)-[:"+HAS_ACCOUNT_TYPE+"]-(accountType:AccountType)\n" +
             "return id(org) as id,org.name as name,org.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId," +
-            "accountType as accountType ,id(zipCode) as zipCodeId")
+            "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId")
     List<OrganizationBasicResponse> getAllParentOrganizationOfCountry(Long countryId);
 
     @Query("MATCH (organization:Organization)-[:"+HAS_SUB_ORGANIZATION+"]->(org:Organization{union:false,deleted:false}) where id(organization)={0}  \n" +
@@ -280,7 +280,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL Match (org)-[:"+TYPE_OF+"]->(ot:OrganizationType) with id(ot) as typeId,businessTypeIds,org,companyCategory,accountType\n" +
             "OPTIONAL match (org)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with  collect(id(subType)) as subTypeIds,typeId,businessTypeIds,org,companyCategory,accountType\n" +
             "return subTypeIds as sunTypeId ,typeId as typeId ,id(org) as id,org.kairosId as kairosId,id(companyCategory) as companyCategoryId,businessTypeIds as businessTypeIds,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,org.desiredUrl as desiredUrl," +
-            "org.shortCompanyName as shortCompanyName,org.kairosCompanyId as kairosCompanyId,org.companyType as companyType,org.vatId as vatId," +
+            "id(accountType) as accountTypeId,org.shortCompanyName as shortCompanyName,org.kairosCompanyId as kairosCompanyId,org.companyType as companyType,org.vatId as vatId," +
             "org.companyUnitType as companyUnitType")
     List<OrganizationBasicResponse> getOrganizationGdprAndWorkCenter(Long organizationId);
 
@@ -687,7 +687,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("OPTIONAL MATCH (org:Organization{isEnable:true}) where org.desiredUrl=~{0} with  case when count(org)>0 THEN  true ELSE false END as desiredUrl\n" +
             "OPTIONAL MATCH (org:Organization{isEnable:true}) where org.name =~{1} with desiredUrl, case when count(org)>0 THEN  true ELSE false END as name\n" +
-            "OPTIONAL match(org:Organization) where org.kairosId STARTS WITH {2}" +
+            "OPTIONAL match(org:Organization)" +
             "return name,desiredUrl,org.kairosId as kairosId  ORDER BY org.kairosId DESC LIMIT 1")
     CompanyValidationQueryResult checkOrgExistWithUrlOrUrl(String desiredUrl, String name, String first3Char);
 
@@ -712,10 +712,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "return id(child) as unitId, CASE WHEN parent IS NULL THEN id(child) ELSE id(parent) END as parentOrganizationId, id(country) as countryId")
     List<Map<String, Object>> getUnitAndParentOrganizationAndCountryIds();
 
-    @Query("match(org:Organization) where org.kairosId STARTS WITH {0}\n" +
-            "return org.kairosId  ORDER BY org.kairosId DESC LIMIT 1")
-    String getKairosId();
-
 
     @Query("MATCH (org:Organization) where id(org)={0} \n" +
             "OPTIONAL Match (org)-[:"+HAS_COMPANY_CATEGORY+"]->(companyCategory:CompanyCategory) with companyCategory, org\n"+
@@ -725,6 +721,13 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "org.shortCompanyName as shortCompanyName,org.kairosCompanyId as kairosCompanyId,org.companyType as companyType,org.vatId as vatId," +
             "org.companyUnitType as companyUnitType,id(accountType) as accountTypeId")
     OrganizationBasicResponse getOrganizationDetailsById(Long organizationId);
+
+    @Query("Match (organization:Organization) where id(organization) IN {0} " +
+            "Optional Match (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) with organization,contactAddress \n" +
+            "OPTIONAL Match (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) with zipCode,contactAddress,organization \n" +
+            "optional Match (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) \n" +
+            "return organization as organization, municipality as municipality,contactAddress as contactAddress,zipCode as zipCode")
+    List<OrganizationContactAddress> getContactAddressOfOrganizations(List<Long> unitIds);
 
 
 }

@@ -47,6 +47,14 @@ public class OrganizationDataController {
                 companyCreationService.setAddressInCompany(organizationId, addressDTO));
     }
 
+    @ApiOperation(value = "update address of parent organization")
+    @PutMapping(value = COUNTRY_URL + "/parent_organization/{organizationId}/on_boarding_done")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> publishOrganization(@PathVariable long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                companyCreationService.publishOrganization(organizationId));
+    }
+
     @ApiOperation(value = "get basic details  of parent organization")
     @GetMapping(value = COUNTRY_URL + "/parent_organization/{organizationId}/details")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
