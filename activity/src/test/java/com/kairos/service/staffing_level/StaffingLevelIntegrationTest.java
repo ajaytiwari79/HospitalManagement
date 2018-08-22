@@ -1,9 +1,7 @@
 package com.kairos.service.staffing_level;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.staffing_level.Duration;
-import com.kairos.activity.staffing_level.StaffingLevelSetting;
-import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.activity.staffing_level.*;
 import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.util.DateUtils;
@@ -22,9 +20,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -75,7 +74,7 @@ public class StaffingLevelIntegrationTest {
 
         Duration duration=new Duration(LocalTime.now(),LocalTime.now());
         StaffingLevelSetting staffingLevelSetting=new StaffingLevelSetting(15,duration);
-        PresenceStaffingLevelDto dto=new PresenceStaffingLevelDto(1L, DateUtils.getDate(),20L,staffingLevelSetting);
+        PresenceStaffingLevelDto dto=new PresenceStaffingLevelDto(new BigInteger("1"), DateUtils.getDate(),20,staffingLevelSetting);
         List<StaffingLevelTimeSlotDTO> staffingLevelTimeSlots=new ArrayList<>();
         StaffingLevelTimeSlotDTO timeSlotDTO1=new StaffingLevelTimeSlotDTO(0,5,10,new Duration(LocalTime.now(),
                 LocalTime.now()) );
@@ -99,6 +98,33 @@ public class StaffingLevelIntegrationTest {
     @Test
     public void getActivitesFromTimeCare(){
         activityService.getActivitesFromTimeCare();
+    }
+
+    @Test
+    public void addStaffingLevelFromStaffingLevelTemplate(){
+        String baseUrl=getBaseUrl(24L,2567L);
+
+        HttpEntity<StaffingLevelFromTemplateDTO> entity = new HttpEntity<StaffingLevelFromTemplateDTO>(prePareDtoForStaffingLevelFromTemplate());
+
+        ResponseEntity<Object> response = restTemplate.exchange(
+                baseUrl+"/staffing_level/from_staffing_level_template/13",
+                HttpMethod.POST, entity, Object.class);
+        Assert.assertEquals(HttpStatus.CREATED,response.getStatusCode());
+    }
+
+   private StaffingLevelFromTemplateDTO prePareDtoForStaffingLevelFromTemplate(){
+        List<DateWiseActivityDTO> dateWiseActivityDTOS=new ArrayList<>();
+        Set<BigInteger> activities=new HashSet<>();
+        Set<BigInteger> activitiess=new HashSet<>();
+        activities.add(new BigInteger("2474"));
+        activities.add(new BigInteger("2477"));
+        activities.add(new BigInteger("2478"));
+        activitiess.add(new BigInteger("2474"));
+        activitiess.add(new BigInteger("2477"));
+        LocalDate.of(2018,8,22);
+        dateWiseActivityDTOS.add(new DateWiseActivityDTO(LocalDate.of(2018,8,22),activities));
+        dateWiseActivityDTOS.add(new DateWiseActivityDTO(LocalDate.of(2018,8,24),activitiess));
+        return new StaffingLevelFromTemplateDTO(new BigInteger("13"),dateWiseActivityDTOS);
     }
 
 

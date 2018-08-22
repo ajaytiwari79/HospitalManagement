@@ -13,13 +13,16 @@ import java.util.Set;
 
 public class StaffingLevelFromTemplateDTO {
     private BigInteger templateId;
-    private Set<Long> selectedDayTypeIds;
     private List<DateWiseActivityDTO> dateWiseActivityDTO;
 
     public StaffingLevelFromTemplateDTO() {
         //Default Constructor
     }
 
+    public StaffingLevelFromTemplateDTO(BigInteger templateId, List<DateWiseActivityDTO> dateWiseActivityDTO) {
+        this.templateId = templateId;
+        this.dateWiseActivityDTO = dateWiseActivityDTO;
+    }
 
     public BigInteger getTemplateId() {
         return templateId;
@@ -29,14 +32,6 @@ public class StaffingLevelFromTemplateDTO {
         this.templateId = templateId;
     }
 
-
-    public Set<Long> getSelectedDayTypeIds() {
-        return selectedDayTypeIds;
-    }
-
-    public void setSelectedDayTypeIds(Set<Long> selectedDayTypeIds) {
-        this.selectedDayTypeIds = selectedDayTypeIds;
-    }
 
     public List<DateWiseActivityDTO> getDateWiseActivityDTO() {
         return dateWiseActivityDTO;

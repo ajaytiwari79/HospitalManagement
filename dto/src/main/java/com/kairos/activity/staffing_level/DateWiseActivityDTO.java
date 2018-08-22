@@ -15,6 +15,11 @@ public class DateWiseActivityDTO {
         //Default Constructor
     }
 
+    public DateWiseActivityDTO(LocalDate selectedDate, Set<BigInteger> activityIds) {
+        this.selectedDate = selectedDate;
+        this.activityIds = activityIds;
+    }
+
     public LocalDate getSelectedDate() {
         return selectedDate;
     }

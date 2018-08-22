@@ -52,7 +52,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
     public StaffingLevelTemplateDTO createStaffingLevelTemplate(StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
         logger.info("saving staffing level Template  {}", staffingLevelTemplateDTO);
         //validating Activities
-        List<ActivityValidationError> errors= validateActivityRules(staffingLevelTemplateDTO);
+        List<ActivityValidationError> errors= validateActivityRules(new HashSet<>(),staffingLevelTemplateDTO);
         if(!errors.isEmpty()){
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
@@ -79,7 +79,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         logger.info("updating staffing level Template ID={}", staffingTemplateId);
 
         //validating Activities
-        List<ActivityValidationError> errors= validateActivityRules(staffingLevelTemplateDTO);
+        List<ActivityValidationError> errors= validateActivityRules(new HashSet<>(),staffingLevelTemplateDTO);
         if(!errors.isEmpty()){
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
@@ -131,13 +131,14 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      * @param staffingLevelTemplateDTO
      * @return
      */
-    public List<ActivityValidationError> validateActivityRules(StaffingLevelTemplateDTO staffingLevelTemplateDTO){
-        Set<BigInteger> activityIds=new HashSet<>();
-        staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
-            staffingLevelInterval.getStaffingLevelActivities().forEach(staffingLevelActivity -> {
-                activityIds.add(staffingLevelActivity.getActivityId());
+    public List<ActivityValidationError> validateActivityRules(Set<BigInteger> activityIds,StaffingLevelTemplateDTO staffingLevelTemplateDTO){
+        if(activityIds.isEmpty()) {
+            staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+                staffingLevelInterval.getStaffingLevelActivities().forEach(staffingLevelActivity -> {
+                    activityIds.add(staffingLevelActivity.getActivityId());
+                });
             });
-        });
+        }
 
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         List<ActivityValidationError> activityValidationErrors =new ArrayList<>();
