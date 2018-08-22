@@ -187,7 +187,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
                 TechnicalSecurityMeasure TechnicalSecurityMeasure = new TechnicalSecurityMeasure(name);
                 TechnicalSecurityMeasure.setCountryId(countryId);
-                TechnicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                TechnicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 TechnicalSecurityMeasureList.add(TechnicalSecurityMeasure);
             }
 

@@ -183,7 +183,7 @@ public class TransferMethodService extends MongoBaseService {
 
                 TransferMethod TransferMethod = new TransferMethod(name);
                 TransferMethod.setCountryId(countryId);
-                TransferMethod.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                TransferMethod.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 TransferMethodList.add(TransferMethod);
             }
 

@@ -189,7 +189,7 @@ public class StorageFormatService extends MongoBaseService {
 
                 StorageFormat StorageFormat = new StorageFormat(name);
                 StorageFormat.setCountryId(countryId);
-                StorageFormat.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                StorageFormat.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 StorageFormatList.add(StorageFormat);
             }
 

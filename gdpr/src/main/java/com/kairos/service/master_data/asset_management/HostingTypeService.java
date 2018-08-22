@@ -189,7 +189,7 @@ public class HostingTypeService extends MongoBaseService {
 
                 HostingType HostingType = new HostingType(name);
                 HostingType.setCountryId(countryId);
-                HostingType.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                HostingType.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 HostingTypeList.add(HostingType);
             }
 

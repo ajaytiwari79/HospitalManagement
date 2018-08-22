@@ -182,7 +182,7 @@ public class DataDisposalService extends MongoBaseService {
 
                 DataDisposal newDataDisposal = new DataDisposal(name);
                 newDataDisposal.setCountryId(countryId);
-                newDataDisposal.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                newDataDisposal.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 newDataDisposals.add(newDataDisposal);
             }
 

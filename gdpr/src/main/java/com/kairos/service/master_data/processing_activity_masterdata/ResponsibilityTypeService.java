@@ -189,7 +189,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
                 ResponsibilityType ResponsibilityType = new ResponsibilityType(name);
                 ResponsibilityType.setCountryId(countryId);
-                ResponsibilityType.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                ResponsibilityType.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 ResponsibilityTypeList.add(ResponsibilityType);
             }
 

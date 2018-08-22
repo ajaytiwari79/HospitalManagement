@@ -183,7 +183,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
                 ProcessingLegalBasis ProcessingLegalBasis = new ProcessingLegalBasis(name);
                 ProcessingLegalBasis.setCountryId(countryId);
-                ProcessingLegalBasis.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                ProcessingLegalBasis.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 ProcessingLegalBasisList.add(ProcessingLegalBasis);
             }
 

@@ -187,7 +187,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
                 OrganizationalSecurityMeasure OrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name);
                 OrganizationalSecurityMeasure.setCountryId(countryId);
-                OrganizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                OrganizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 OrganizationalSecurityMeasureList.add(OrganizationalSecurityMeasure);
             }
 

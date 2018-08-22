@@ -191,7 +191,7 @@ public class HostingProviderService extends MongoBaseService {
 
                 HostingProvider hostingProvider = new HostingProvider(name);
                 hostingProvider.setCountryId(countryId);
-                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 hostingProviderList.add(hostingProvider);
             }
 

@@ -2,7 +2,7 @@ package com.kairos.enums;
 
 public enum  SuggestedDataStatus {
 
-    IN_PROGRESS("inprogress"), ACCEPTED("accepted"), REJECTED("rejected"),QUEUE("inQueue");
+    NEW("new"), ACCEPTED("accepted"), REJECTED("rejected");
 
     public String value;
     SuggestedDataStatus(String value) {

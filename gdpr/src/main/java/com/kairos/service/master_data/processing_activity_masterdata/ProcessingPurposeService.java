@@ -180,7 +180,7 @@ public class ProcessingPurposeService extends MongoBaseService {
 
                 ProcessingPurpose ProcessingPurpose = new ProcessingPurpose(name);
                 ProcessingPurpose.setCountryId(countryId);
-                ProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                ProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 ProcessingPurposeList.add(ProcessingPurpose);
             }
 

@@ -181,7 +181,7 @@ public class DataSourceService extends MongoBaseService {
 
                 DataSource DataSource = new DataSource(name);
                 DataSource.setCountryId(countryId);
-                DataSource.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                DataSource.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 DataSourceList.add(DataSource);
             }
 

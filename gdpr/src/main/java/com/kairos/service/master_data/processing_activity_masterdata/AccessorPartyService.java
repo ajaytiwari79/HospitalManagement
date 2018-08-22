@@ -176,7 +176,7 @@ public class AccessorPartyService extends MongoBaseService {
 
                 AccessorParty AccessorParty = new AccessorParty(name);
                 AccessorParty.setCountryId(countryId);
-                AccessorParty.setSuggestedDataStatus(SuggestedDataStatus.QUEUE.value);
+                AccessorParty.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
                 AccessorPartyList.add(AccessorParty);
             }
 
