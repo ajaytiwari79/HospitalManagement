@@ -1,8 +1,11 @@
 package com.kairos.persistence.model.activity.tabs;
 
 import com.kairos.activity.open_shift.DurationField;
+import com.kairos.wrapper.activity.CutOffInterval;
+import com.kairos.wrapper.activity.CutOffIntervalUnit;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,10 @@ public class RulesActivityTab implements Serializable{
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+    private LocalDate cutOffStartFrom;
+    private CutOffIntervalUnit cutOffIntervalUnit;
+    private Integer cutOffdayValue;
+    private List<CutOffInterval> cutOffIntervals;
     // in Minutes
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
@@ -37,6 +44,38 @@ public class RulesActivityTab implements Serializable{
     private Float approvalPercentage;
     private LocalTime maximumEndTime;// shift can't be extend this time
 
+
+    public LocalDate getCutOffStartFrom() {
+        return cutOffStartFrom;
+    }
+
+    public void setCutOffStartFrom(LocalDate cutOffStartFrom) {
+        this.cutOffStartFrom = cutOffStartFrom;
+    }
+
+    public CutOffIntervalUnit getCutOffIntervalUnit() {
+        return cutOffIntervalUnit;
+    }
+
+    public void setCutOffIntervalUnit(CutOffIntervalUnit cutOffIntervalUnit) {
+        this.cutOffIntervalUnit = cutOffIntervalUnit;
+    }
+
+    public Integer getCutOffdayValue() {
+        return cutOffdayValue;
+    }
+
+    public void setCutOffdayValue(Integer cutOffdayValue) {
+        this.cutOffdayValue = cutOffdayValue;
+    }
+
+    public List<CutOffInterval> getCutOffIntervals() {
+        return cutOffIntervals;
+    }
+
+    public void setCutOffIntervals(List<CutOffInterval> cutOffIntervals) {
+        this.cutOffIntervals = cutOffIntervals;
+    }
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;

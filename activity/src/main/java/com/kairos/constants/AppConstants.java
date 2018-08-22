@@ -97,6 +97,7 @@ public class AppConstants {
     public static final String ANNUALLY = "annually";
     public static final String QUATERLY = "quaterly";
     public static final String QUARTER = "quater";
+    public static final String QUARTERS = "QUARTERS";
     public static final String YEAR = "year";
     public static final String WEEKLY = "weekly";
     public static final String MONTHLY = "monthly";

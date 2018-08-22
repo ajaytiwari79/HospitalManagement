@@ -31,8 +31,8 @@ public class TimeBankIntervalDTO {
     private String headerName;
 
 
-    public TimeBankIntervalDTO(long totalTimeBankMin, long totalTimeBankDiff, String title) {
-        this.totalTimeBankMin = totalTimeBankMin;
+    public TimeBankIntervalDTO(long totalScheduledMin, long totalTimeBankDiff, String title) {
+        this.totalScheduledMin = totalScheduledMin;
         this.totalTimeBankDiff = totalTimeBankDiff;
         this.title = title;
     }
