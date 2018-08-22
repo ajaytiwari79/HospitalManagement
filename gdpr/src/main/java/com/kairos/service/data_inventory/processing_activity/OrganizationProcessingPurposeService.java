@@ -11,6 +11,7 @@ import com.kairos.persistance.repository.master_data.processing_activity_masterd
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.processing_activity_masterdata.ProcessingPurposeService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -36,6 +37,9 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private ProcessingPurposeService processingPurposeService;
+
 
     /**
      * @param organizationId
@@ -43,7 +47,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      * @return return map which contain list of new ProcessingPurpose and list of existing ProcessingPurpose if ProcessingPurpose already exist
      * @description this method create new ProcessingPurpose if ProcessingPurpose not exist with same name ,
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
     public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
@@ -53,7 +57,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
             for (ProcessingPurposeDTO processingPurpose : processingPurposeDTOS) {
                 processingPurposesNames.add(processingPurpose.getName());
             }
-            List<ProcessingPurpose> existing = findAllByNameAndOrganizationId(organizationId, processingPurposesNames, ProcessingPurpose.class);
+            List<ProcessingPurpose> existing = findMetaDataByNameAndUnitId(organizationId, processingPurposesNames, ProcessingPurpose.class);
             processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
             List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
@@ -161,6 +165,18 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+    public Map<String, List<ProcessingPurpose>> saveAndSuggestProcessingPurposes(Long countryId, Long organizationId, List<ProcessingPurposeDTO> ProcessingPurposeDTOS) {
+
+        Map<String, List<ProcessingPurpose>> result;
+        result = createProcessingPurpose(organizationId, ProcessingPurposeDTOS);
+        List<ProcessingPurpose> masterProcessingPurposeSuggestedByUnit = processingPurposeService.saveSuggestedProcessingPurposesFromUnit(countryId, ProcessingPurposeDTOS);
+        if (!masterProcessingPurposeSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterProcessingPurposeSuggestedByUnit);
+        }
+        return result;
     }
 
 

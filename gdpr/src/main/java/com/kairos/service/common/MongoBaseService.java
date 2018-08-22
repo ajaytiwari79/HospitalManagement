@@ -112,7 +112,7 @@ public class MongoBaseService {
     }
 
 
-    public <T extends MongoBaseEntity> List<T> findByNamesAndCountryId(Long countryId, Set<String> namesList, Class entity) {
+    public <T extends MongoBaseEntity> List<T> findMetaDataByNamesAndCountryId(Long countryId, Set<String> namesList, Class entity) {
 
 
         Assert.notNull(entity, "Entity must not be null!");
@@ -135,7 +135,7 @@ public class MongoBaseService {
     }
 
 
-    public <T extends MongoBaseEntity> List<T> findAllByNameAndOrganizationId(Long organizationId, Set<String> namesList, Class entity) {
+    public <T extends MongoBaseEntity> List<T> findMetaDataByNameAndUnitId(Long organizationId, Set<String> namesList, Class entity) {
 
 
         Assert.notNull(entity, "Entity must not be null!");
@@ -199,6 +199,4 @@ public class MongoBaseService {
         return true;
 
     }
-
-
 }

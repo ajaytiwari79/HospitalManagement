@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import java.math.BigInteger;
 import java.util.Map;
@@ -42,18 +43,27 @@ public class ProcessingActivityController {
     }
 
 
-    @ApiOperation(value = "delete  asset by Id")
-    @DeleteMapping("/processing_activity/delete/{id}")
-    public ResponseEntity<Object> deleteProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger id) {
+    @ApiOperation(value = "delete  Processing Activity by Id")
+    @DeleteMapping("/processing_activity/delete/{processingActivityId}")
+    public ResponseEntity<Object> deleteProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
 
-
-        Map<String, Object> result = processingActivityService.deleteProcessingActivity(unitId, id);
-        if ((boolean) result.get(IS_SUCCESS)) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, result.get("data"));
+        if (unitId == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.deleteProcessingActivity(unitId, processingActivityId));
     }
 
+    @ApiOperation(value = "delete  Sub Processing Activity ")
+    @DeleteMapping("/processing_activity/{processingActivityId}/subProcess/{subProcessId}")
+    public ResponseEntity<Object> deleteSubProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger subProcessId) {
+
+        if (unitId == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
+        } else if (processingActivityId == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Processing Activity Id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.deleteSubProcessingActivity(unitId, processingActivityId, subProcessId));
+    }
 
     @ApiOperation(value = "Get  Sub Processing Activities of Processing Activity ")
     @GetMapping("/processing_activity/{id}")
@@ -105,6 +115,17 @@ public class ProcessingActivityController {
     }
 
 
+
+    @ApiOperation(value = "updated status of processing activity")
+    @PutMapping("/processing_activity/{processingActivityId}/status")
+    public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId,@NotNull @RequestBody boolean active) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.changeStatusOfProcessingActivity(unitId, processingActivityId, active));
+    }
+
+
     @ApiOperation(value = "Map Data Subject ,Data Category and data element to  Processing activity ")
     @PutMapping("/processing_activity/{processingActivityId}/data_subject")
     public ResponseEntity<Object> mapDataSubjectToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody ValidateRequestBodyList<ProcessingActivityRelatedDataSubject> dataSubjectList) {
@@ -113,6 +134,8 @@ public class ProcessingActivityController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.mapDataSubjectDataCategoryAndDataElementToProcessingActivity(unitId, processingActivityId, dataSubjectList.getRequestBody()));
     }
+
+
 
 
     @ApiOperation(value = "get all Mapped Data Subject ,Data Category and data element of Processing Activity")

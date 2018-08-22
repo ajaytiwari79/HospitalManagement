@@ -125,7 +125,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
     public Boolean deleteDataSubjectById(Long unitId, BigInteger dataSubjectId) {
 
         DataSubjectMapping dataSubjectMapping = dataSubjectMappingRepository.findByUnitIdAndId(unitId, dataSubjectId);
-        if (Optional.ofNullable(dataSubjectMapping).isPresent()) {
+        if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Data Subject ", dataSubjectId);
         }
         delete(dataSubjectMapping);

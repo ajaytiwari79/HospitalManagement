@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.HostingTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
 import com.kairos.persistance.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
@@ -43,7 +44,7 @@ public class HostingTypeService extends MongoBaseService {
      * @return return map which contain list of new HostingType and list of existing HostingType if HostingType already exist
      * @description this method create new HostingType if HostingType not exist with same name ,
      * and if exist then simply add  HostingType to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing HostingType using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing HostingType using collation ,used for case insensitive result
      */
     public Map<String, List<HostingType>> createHostingType(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
 
@@ -53,7 +54,7 @@ public class HostingTypeService extends MongoBaseService {
             for (HostingTypeDTO hostingType : hostingTypeDTOS) {
                 hostingTypeNames.add(hostingType.getName());
             }
-            List<HostingType> existing = findByNamesAndCountryId(countryId, hostingTypeNames, HostingType.class);
+            List<HostingType> existing = findMetaDataByNamesAndCountryId(countryId, hostingTypeNames, HostingType.class);
             hostingTypeNames = ComparisonUtils.getNameListForMetadata(existing, hostingTypeNames);
             List<HostingType> newHostingTypes = new ArrayList<>();
             if (!hostingTypeNames.isEmpty()) {
@@ -79,8 +80,8 @@ public class HostingTypeService extends MongoBaseService {
      * @param
      * @return list of HostingType
      */
-    public List<HostingType> getAllHostingType(Long countryId) {
-        return hostingTypeMongoRepository.findAllHostingTypes(countryId);
+    public List<HostingTypeResponseDTO> getAllHostingType(Long countryId) {
+        return hostingTypeMongoRepository.findAllHostingTypes(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
 
@@ -168,12 +169,34 @@ public class HostingTypeService extends MongoBaseService {
     }
 
 
-    public List<HostingTypeResponseDTO> getAllNotInheritedHostingTypeFromParentOrgAndUnitHostingType(Long countryId, Long parentOrganizationId, Long unitId) {
+    /**
+     * @description method save Hosting type suggested by unit
+     * @param countryId
+     * @param HostingTypeDTOS
+     * @return
+     */
+    public List<HostingType> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> HostingTypeDTOS) {
 
-        return hostingTypeMongoRepository.getAllNotInheritedHostingTypeFromParentOrgAndUnitHostingType(countryId, parentOrganizationId, unitId);
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (HostingTypeDTO HostingType : HostingTypeDTOS) {
+            hostingProvoiderNames.add(HostingType.getName());
+        }
+        List<HostingType> existingHostingTypes = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, HostingType.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingHostingTypes, hostingProvoiderNames);
+        List<HostingType> HostingTypeList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                HostingType HostingType = new HostingType(name);
+                HostingType.setCountryId(countryId);
+                HostingType.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                HostingTypeList.add(HostingType);
+            }
+
+            HostingTypeList = hostingTypeMongoRepository.saveAll(getNextSequence(HostingTypeList));
+        }
+        return HostingTypeList;
     }
-
-
 }
 
     

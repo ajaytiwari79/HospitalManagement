@@ -37,13 +37,16 @@ public class OrganizationTransferMethodService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private TransferMethodService transferMethodService;
+
     /**
      * @param organizationId
      * @param transferMethodDTOS
      * @return return map which contain list of new TransferMethod and list of existing TransferMethod if TransferMethod already exist
      * @description this method create new TransferMethod if TransferMethod not exist with same name ,
      * and if exist then simply add  TransferMethod to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing TransferMethod using collation ,used for case insensitive result
      */
     public Map<String, List<TransferMethod>> createTransferMethod(Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
 
@@ -57,7 +60,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<TransferMethod> existing = findAllByNameAndOrganizationId(organizationId, transferMethodNames, TransferMethod.class);
+            List<TransferMethod> existing = findMetaDataByNameAndUnitId(organizationId, transferMethodNames, TransferMethod.class);
             transferMethodNames = ComparisonUtils.getNameListForMetadata(existing, transferMethodNames);
 
             List<TransferMethod> newTransferMethods = new ArrayList<>();
@@ -148,7 +151,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
      * @return TransferMethod object fetch on basis of  name
      * @throws DataNotExists throw exception if TransferMethod not exist for given name
      */
-    public TransferMethod getTransferMethodByName(Long organizationId, String name) {
+        public TransferMethod getTransferMethodByName(Long organizationId, String name) {
         if (!StringUtils.isBlank(name)) {
             TransferMethod exist = transferMethodRepository.findByOrganizationIdAndName(organizationId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
@@ -160,5 +163,16 @@ public class OrganizationTransferMethodService extends MongoBaseService {
 
     }
 
+
+    public Map<String, List<TransferMethod>> saveAndSuggestTransferMethods(Long countryId, Long organizationId, List<TransferMethodDTO> TransferMethodDTOS) {
+
+        Map<String, List<TransferMethod>> result;
+        result = createTransferMethod(organizationId, TransferMethodDTOS);
+        List<TransferMethod> masterTransferMethodSuggestedByUnit = transferMethodService.saveSuggestedTransferMethodsFromUnit(countryId, TransferMethodDTOS);
+        if (!masterTransferMethodSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterTransferMethodSuggestedByUnit);
+        }
+        return result;
+    }
 
 }

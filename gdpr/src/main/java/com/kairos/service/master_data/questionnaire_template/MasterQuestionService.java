@@ -92,6 +92,7 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
+    //todo uncomment code on integration of asseement with front end
     public void addAttributeNameToQuestion(MasterQuestion masterQuestion, MasterQuestionDTO masterQuestionDTO, QuestionnaireTemplateType templateType) {
 
         if (!Optional.ofNullable(templateType).isPresent()) {
@@ -99,18 +100,18 @@ public class MasterQuestionService extends MongoBaseService {
         }
         switch (templateType) {
             case ASSET_TYPE:
-                if (Optional.ofNullable(AssetAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
+              /*  if (Optional.ofNullable(AssetAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
                     masterQuestion.setAttributeName(masterQuestionDTO.getAttributeName());
                 } else {
                     throw new InvalidRequestException("Attribute not found for Asset ");
-                }
+                }*/
                 break;
             case PROCESSING_ACTIVITY:
-                if (Optional.ofNullable(ProcessingActivityAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
+               /* if (Optional.ofNullable(ProcessingActivityAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
                     masterQuestion.setAttributeName(masterQuestionDTO.getAttributeName());
                 } else {
                     throw new InvalidRequestException("Attribute not found for Processing Activity");
-                }
+                }*/
                 break;
         }
 
