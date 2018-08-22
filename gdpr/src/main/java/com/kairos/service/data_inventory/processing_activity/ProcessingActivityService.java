@@ -128,7 +128,7 @@ public class ProcessingActivityService extends MongoBaseService {
             processingActivity.setSubProcess(true);
             subProcessingActivities.add(processingActivity);
         }
-        subProcessingActivities = processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
+        subProcessingActivities = processingActivityMongoRepository.saveAll(subProcessingActivities);
         subProcessingActivities.forEach(processingActivity -> {
 
             subProcessingActivityIdList.add(processingActivity.getId());
@@ -200,7 +200,7 @@ public class ProcessingActivityService extends MongoBaseService {
             processingActivity.setResponsibilityType(processingActivityDTO.getResponsibilityType());
 
         });
-        processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
+        processingActivityMongoRepository.saveAll(subProcessingActivities);
 
     }
 

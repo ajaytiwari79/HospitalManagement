@@ -94,7 +94,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             subProcessingActivityList.add(subProcessingActivity);
         }
 
-        subProcessingActivityList = masterProcessingActivityRepository.saveAll(getNextSequence(subProcessingActivityList));
+        subProcessingActivityList = masterProcessingActivityRepository.saveAll(subProcessingActivityList);
         List<BigInteger> subProcessingActivityIds = new ArrayList<>();
         subProcessingActivityList.forEach(o -> subProcessingActivityIds.add(o.getId()));
         Map<String, Object> result = new HashMap<>();
@@ -229,7 +229,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         });
         Map<String, Object> result = new HashMap<>();
         try {
-            subProcessingActivityList = masterProcessingActivityRepository.saveAll(getNextSequence(subProcessingActivityList));
+            subProcessingActivityList = masterProcessingActivityRepository.saveAll(subProcessingActivityList);
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());

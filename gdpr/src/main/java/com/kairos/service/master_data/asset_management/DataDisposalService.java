@@ -186,7 +186,7 @@ public class DataDisposalService extends MongoBaseService {
                 newDataDisposals.add(newDataDisposal);
             }
 
-            newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
+            newDataDisposals = dataDisposalMongoRepository.saveAll(newDataDisposals);
         }
         return newDataDisposals;
     }

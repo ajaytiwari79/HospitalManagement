@@ -109,7 +109,7 @@ public class AgreementSectionService extends MongoBaseService {
         agreementSectionList = updateExistingClauseAndAddSubSectionToAgreementSection(agreementSectionClauseAndClauseDtoHashMap, agreementSubSectionClauseAndClauseDtoHashMap, existingClauseList, agreementSectionList, newCreatedClausesList);
         List<BigInteger> agreementSectionIdList = new ArrayList<>();
 
-        agreementSectionList = agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionList));
+        agreementSectionList = agreementSectionMongoRepository.saveAll(agreementSectionList);
         agreementSectionList.forEach(agreementSection -> {
             agreementSectionIdList.add(agreementSection.getId());
         });
@@ -227,7 +227,7 @@ public class AgreementSectionService extends MongoBaseService {
             addNewCreatedClauseIdsToSectionOrSubSection(newClauseBasicDTOList, newCreatedClauseMap, agreementSection);
         }
         if (!updateExistingClauseList.isEmpty()) {
-            clauseMongoRepository.saveAll(getNextSequence(updateExistingClauseList));
+            clauseMongoRepository.saveAll(updateExistingClauseList);
         }
         return agreementSectionList;
     }
@@ -244,7 +244,7 @@ public class AgreementSectionService extends MongoBaseService {
             updateExistingClauseList = agreementSectionUpdateClauseListAndAddIdsToSection(changedClauseBasicDTOList, updateClauseMap, updateExistingClauseList, agreementSection);
             addNewCreatedClauseIdsToSectionOrSubSection(newClauseBasicDTOList, newCreatedClauseMap, agreementSection);
         }
-        agreementSubSectionList = agreementSectionMongoRepository.saveAll(getNextSequence(agreementSubSectionList));
+        agreementSubSectionList = agreementSectionMongoRepository.saveAll(agreementSubSectionList);
         List<BigInteger> subSectionIdList = new ArrayList<>();
         agreementSubSectionList.forEach(agreementSection -> {
             subSectionIdList.add(agreementSection.getId());
@@ -394,7 +394,7 @@ public class AgreementSectionService extends MongoBaseService {
         }
         agreementSectionList = updateExistingClauseAndAddSubSectionToAgreementSection(agreementSectionClauseAndClauseDtoHashMap, agreementSubSectionClauseAndClauseDtoHashMap, existingClauseList, agreementSectionList, newCreatedClausesList);
         agreementSectionIdList.clear();
-        agreementSectionList = agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionList));
+        agreementSectionList = agreementSectionMongoRepository.saveAll(agreementSectionList);
         agreementSectionList.forEach(agreementSection -> {
             agreementSectionIdList.add(agreementSection.getId());
         });

@@ -90,7 +90,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         Map<String, Object> result = new HashMap<>();
         List<BigInteger> subAssetTypesIds = new ArrayList<>();
         try {
-            subAssetTypes = assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypes));
+            subAssetTypes = assetTypeMongoRepository.saveAll(subAssetTypes);
             subAssetTypes.forEach(subAssetType -> {
                 subAssetTypesIds.add(subAssetType.getId());
             });
@@ -127,7 +127,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         });
         Map<String, Object> result = new HashMap<>();
         try {
-            subAssetTypesList = assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypesList));
+            subAssetTypesList = assetTypeMongoRepository.saveAll(subAssetTypesList);
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());

@@ -43,74 +43,6 @@ public class MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
-    public <T extends MongoBaseEntity> List<T> getNextSequence(List<T> entities) {
-        Assert.notNull(entities, "Entity must not be null!");
-        Assert.notEmpty(entities, "Entity must not be Empty!");
-
-        String collectionName = mongoTemplate.getCollectionName(entities.get(0).getClass());
-
-        // Creating BulkWriteOperation object
-        BulkWriteOperation bulkWriteOperation = database.getCollection(collectionName).initializeUnorderedBulkOperation();
-
-        // Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObjectCode)
-        MongoConverter converter = mongoTemplate.getConverter();
-
-        BasicDBObject dbObject;
-
-        // Handling bulk write exceptions
-        try {
-
-            for (T entity : entities) {
-                //  Get class name for sequence class
-                String className = entity.getClass().getSimpleName();
-
-                //  Set createdAt if entity don't have createdAt
-                if (entity.getCreatedAt() == null) {
-                    entity.setCreatedAt(DateUtils.getDate());
-                }
-                //  Set updatedAt time as current time
-                entity.setUpdatedAt(DateUtils.getDate());
-
-
-                if (entity.getId() == null) {
-                    //  Set Id if entity don't have Id
-                    entity.setId(mongoSequenceRepository.nextSequence(className));
-
-                    dbObject = new BasicDBObject();
-
-                    //  Converting entity object to BasicDBObject
-                    converter.write(entity, dbObject);
-
-                    //  Adding entity (BasicDBObject)
-                    bulkWriteOperation.insert(dbObject);
-                } else {
-
-                    dbObject = new BasicDBObject();
-
-                    //  Converting entity object to BasicDBObject
-                    converter.write(entity, dbObject);
-
-                    //  Creating BasicDbObjectCode for find query
-                    BasicDBObject query = new BasicDBObject();
-
-                    //  Adding query (find by ID)
-                    query.put("_id", dbObject.get("_id"));
-
-                    //  Replacing whole Object
-                    bulkWriteOperation.find(query).replaceOne(dbObject);
-                }
-            }
-
-            // Executing the Operation
-            // bulkWriteOperation.execute();
-            return entities;
-
-        } catch (Exception ex) {
-            logger.error("BulkWriteOperation Exception ::  ", ex);
-            return null;
-        }
-    }
-
 
     public <T extends MongoBaseEntity> List<T> findMetaDataByNamesAndCountryId(Long countryId, Set<String> namesList, Class entity) {
 
@@ -118,9 +50,6 @@ public class MongoBaseService {
         Assert.notNull(entity, "Entity must not be null!");
         Assert.notEmpty(namesList, "Entity must not be Empty!");
         Assert.notNull(countryId, "countryId must not be null");
-
-        // collection name get collection name
-        String collectionName = entity.getClass().getSimpleName();
 
         if (namesList.size() == 0) {
             throw new InvalidRequestException("list can't be empty");
@@ -141,9 +70,6 @@ public class MongoBaseService {
         Assert.notNull(entity, "Entity must not be null!");
         Assert.notEmpty(namesList, "Entity must not be Empty!");
         Assert.notNull(organizationId, "organization Id must not be Null");
-
-        // collection name get collection name
-        String collectionName = entity.getClass().getSimpleName();
 
         if (namesList.size() == 0) {
             throw new InvalidRequestException("list can't be empty");

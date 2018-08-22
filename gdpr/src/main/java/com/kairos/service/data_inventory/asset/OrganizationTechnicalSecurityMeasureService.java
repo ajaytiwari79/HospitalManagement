@@ -71,7 +71,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
 
                 }
-                newTechnicalMeasures = technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(newTechnicalMeasures));
+                newTechnicalMeasures = technicalSecurityMeasureMongoRepository.saveAll(newTechnicalMeasures);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTechnicalMeasures);

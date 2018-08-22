@@ -9,6 +9,7 @@ import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepositoryImpl;
 import com.kairos.utils.user_context.UserContextInterceptor;
+import com.mongodb.DB;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -32,7 +33,8 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableAspectJAutoProxy
 @EnableCircuitBreaker
 @SpringBootApplication
-@EnableMongoRepositories(basePackages = "com.kairos.persistance.repository",repositoryBaseClass = MongoBaseRepositoryImpl.class)
+@EnableMongoRepositories(basePackages = "com.kairos.persistance.repository",
+        repositoryBaseClass = MongoBaseRepositoryImpl.class)
 public class KairosGdprApplication {
 
     public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");

@@ -71,7 +71,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
                 newDataDisposals.add(newDataDisposal);
             }
 
-            newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
+            newDataDisposals = dataDisposalMongoRepository.saveAll(newDataDisposals);
         }
         result.put(EXISTING_DATA_LIST, existing);
         result.put(NEW_DATA_LIST, newDataDisposals);

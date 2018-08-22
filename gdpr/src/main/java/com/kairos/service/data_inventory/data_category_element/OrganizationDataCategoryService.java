@@ -67,7 +67,7 @@ public class OrganizationDataCategoryService extends MongoBaseService {
         Map<String, Object> result = buildDataCategoryWithDataElements(unitId, dataCategoryDTOS);
         try {
             List<DataCategory> dataCategoryList = (List<DataCategory>) result.get(DATA_CATEGORY_LIST);
-            dataCategoryMongoRepository.saveAll(getNextSequence(dataCategoryList));
+            dataCategoryMongoRepository.saveAll(dataCategoryList);
 
         } catch (MongoException e) {
             dataElementMognoRepository.deleteAll((List<DataElement>) result.get(DATA_ELEMENTS_LIST));

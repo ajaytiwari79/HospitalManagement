@@ -73,7 +73,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
                 }
 
-                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(getNextSequence(newResponsibilityTypes));
+                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(newResponsibilityTypes);
 
             }
             result.put(EXISTING_DATA_LIST, existing);

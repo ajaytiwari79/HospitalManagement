@@ -58,7 +58,7 @@ public class TemplateTypeService extends MongoBaseService {
                 templateType1.setCountryId(countryId);
                 newDataTemplateList.add(templateType1);
             }
-            newDataTemplateList = templateTypeRepository.saveAll(getNextSequence(newDataTemplateList));
+            newDataTemplateList = templateTypeRepository.saveAll(newDataTemplateList);
         }
         result.put(EXISTING_DATA_LIST, existing);
         result.put(NEW_DATA_LIST, newDataTemplateList);

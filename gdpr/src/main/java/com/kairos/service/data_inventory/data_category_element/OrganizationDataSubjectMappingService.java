@@ -105,7 +105,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
         }
         try {
 
-            dataSubjectMappingList = dataSubjectMappingRepository.saveAll(getNextSequence(dataSubjectMappingList));
+            dataSubjectMappingList = dataSubjectMappingRepository.saveAll(dataSubjectMappingList);
         } catch (MongoException e) {
             LOGGER.info("data Subject Mapping build", e.getMessage());
             dataCategoryMongoRepository.deleteAll(dataCategoryList);

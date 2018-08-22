@@ -67,7 +67,7 @@ public class DataSourceService extends MongoBaseService {
 
                 }
 
-                newDataSources = dataSourceMongoRepository.saveAll(getNextSequence(newDataSources));
+                newDataSources = dataSourceMongoRepository.saveAll(newDataSources);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newDataSources);
@@ -185,7 +185,7 @@ public class DataSourceService extends MongoBaseService {
                 DataSourceList.add(DataSource);
             }
 
-            DataSourceList = dataSourceMongoRepository.saveAll(getNextSequence(DataSourceList));
+            DataSourceList = dataSourceMongoRepository.saveAll(DataSourceList);
         }
         return DataSourceList;
     }
