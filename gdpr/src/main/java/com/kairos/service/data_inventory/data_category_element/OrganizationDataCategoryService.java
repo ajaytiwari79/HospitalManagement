@@ -115,9 +115,7 @@ public class OrganizationDataCategoryService extends MongoBaseService {
             DataCategory dataCategory = entrySet.getKey();
             if (!entrySet.getValue().isEmpty()) {
                 List<BigInteger> dataElementIds = new ArrayList<>();
-                entrySet.getValue().forEach(dataElement -> {
-                    dataElementIds.add(dataElement.getId());
-                });
+                entrySet.getValue().forEach(dataElement -> dataElementIds.add(dataElement.getId()));
                 dataCategory.setDataElements(dataElementIds);
                 dataCategoryList.add(dataCategory);
             }

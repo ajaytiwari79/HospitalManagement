@@ -4,13 +4,10 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
 import com.kairos.utils.DateUtils;
-import com.mongodb.BasicDBObject;
-import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -101,9 +98,7 @@ public class MongoBaseService {
         Assert.notNull(entities, "Entity must not be null!");
         //  Get class name for sequence class
 
-        entities.forEach(entity -> {
-            entity.setDeleted(true);
-        });
+        entities.forEach(entity -> entity.setDeleted(true));
         mongoTemplate.save(entities);
         return entities;
     }

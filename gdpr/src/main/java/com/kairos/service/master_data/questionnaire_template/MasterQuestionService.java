@@ -1,8 +1,5 @@
 package com.kairos.service.master_data.questionnaire_template;
 
-import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.enums.AssetAttributeName;
-import com.kairos.enums.ProcessingActivityAttributeName;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.gdpr.master_data.MasterQuestionDTO;
 import com.kairos.enums.QuestionType;
@@ -213,9 +210,7 @@ public class MasterQuestionService extends MongoBaseService {
         List<MasterQuestion> existingMasterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId, organizationId, questionIds);
 
         Map<BigInteger, Object> masterQuestionDtoCorrespondingToId = new HashMap<>();
-        masterQuestionDTOs.forEach(masterQuestionDto -> {
-            masterQuestionDtoCorrespondingToId.put(masterQuestionDto.getId(), masterQuestionDto);
-        });
+        masterQuestionDTOs.forEach(masterQuestionDto -> masterQuestionDtoCorrespondingToId.put(masterQuestionDto.getId(), masterQuestionDto));
         List<MasterQuestion> updatedQuestionsList = new ArrayList<>();
         for (MasterQuestion masterQuestion : existingMasterQuestions) {
 

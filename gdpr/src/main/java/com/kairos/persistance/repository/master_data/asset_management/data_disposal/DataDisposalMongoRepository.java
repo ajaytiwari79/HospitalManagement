@@ -1,7 +1,6 @@
 package com.kairos.persistance.repository.master_data.asset_management.data_disposal;
 
 
-import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -27,7 +25,7 @@ public interface DataDisposalMongoRepository extends MongoBaseRepository<DataDis
     DataDisposal findByid(BigInteger id);
 
     @Query("{_id:?0,deleted:false}")
-    DataDisposalResponseDTO findDataDisposalByid(BigInteger id);
+    DataDisposalResponseDTO findDataDisposalById(BigInteger id);
 
     @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
     List<DataDisposalResponseDTO> findAllDataDisposals(Long countryId, String  suggestedDataStatus);

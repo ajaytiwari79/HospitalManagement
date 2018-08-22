@@ -7,7 +7,6 @@ import com.kairos.utils.DateUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;
-import com.mongodb.Mongo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -42,9 +41,6 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
         this.mongoSequenceRepository = new MongoSequenceRepository(mongoOperations);
         ApplicationContext context = SpringContext.getAppContext();
         this.database = (DB)context.getBean("mongoDbBean");
-        System.err.println(">>>>>>>>>>>"+database);
-        System.err.println(">>>>>>>>>>>"+database.getCollection("question"));
-
     }
 
 

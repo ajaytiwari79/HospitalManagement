@@ -131,7 +131,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
         } else {
-            Map<String, Object> subProcessingActivity = new HashMap<>();
+            Map<String, Object> subProcessingActivity;
             if (!masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
                 subProcessingActivity = updateExistingAndCreateNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto);
                 processingActivity.setSubProcessingActivityIds((List<BigInteger>) subProcessingActivity.get(IDS_LIST));
@@ -145,7 +145,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             processingActivity.setDescription(masterProcessingActivityDto.getDescription());
             processingActivity.setName(masterProcessingActivityDto.getName());
             try {
-                processingActivity = masterProcessingActivityRepository.save(processingActivity);
+                masterProcessingActivityRepository.save(processingActivity);
 
             } catch (MongoClientException e) {
                 LOGGER.info(e.getMessage());
@@ -210,11 +210,9 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
         Map<BigInteger, MasterProcessingActivityDTO> subProcessingActivityDTOList = new HashMap<>();
         List<BigInteger> subProcessingActivitiesIds = new ArrayList<>();
-        List<String> subProcessingActivityNames = new ArrayList<>();
         subProcessingActivities.forEach(subProcess -> {
             subProcessingActivityDTOList.put(subProcess.getId(), subProcess);
             subProcessingActivitiesIds.add(subProcess.getId());
-            subProcessingActivityNames.add(subProcess.getName());
         });
         List<MasterProcessingActivity> subProcessingActivityList = masterProcessingActivityRepository.getAllMasterSubProcessingActivityByIds(countryId, organizationId, subProcessingActivitiesIds);
         subProcessingActivityList.forEach(subProcess -> {

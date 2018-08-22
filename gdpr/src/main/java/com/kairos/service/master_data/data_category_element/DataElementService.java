@@ -42,9 +42,7 @@ public class DataElementService extends MongoBaseService {
 
         checkForDuplicacyInName(dataElementsDto);
         List<String> dataElementNames = new ArrayList<>();
-        dataElementsDto.forEach(dataElement -> {
-            dataElementNames.add(dataElement.getName().trim());
-        });
+        dataElementsDto.forEach(dataElement -> dataElementNames.add(dataElement.getName().trim()));
         List<DataElement> existingDataElement = dataElementMongoRepository.findByCountryIdAndNames(countryId, organizationId, dataElementNames);
         if (existingDataElement.size() != 0) {
             exceptionService.duplicateDataException("message.duplicate", "data element", existingDataElement.iterator().next().getName());

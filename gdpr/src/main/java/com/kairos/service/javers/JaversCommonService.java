@@ -197,7 +197,7 @@ public class JaversCommonService {
                 fieldValues.add(storageFormatMongoRepository.findStorageFormatByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
                 break;
             case DATA_DISPOSAL_KEY:
-                fieldValues.add(dataDisposalMongoRepository.findDataDisposalByid((BigInteger) historyMap.getPropertyValue(field)));
+                fieldValues.add(dataDisposalMongoRepository.findDataDisposalById((BigInteger) historyMap.getPropertyValue(field)));
                 break;
             case ORG_SECURITY_MEASURE_KEY:
                 fieldValues.add(organizationalSecurityMeasureRepository.findOrganizationalSecurityMeasuresListByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
@@ -234,7 +234,7 @@ public class JaversCommonService {
                 fieldValues.add(processingActivityMongoRepository.findAllSubProcessingActivitiesByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
                 break;
             default:
-                fieldValues.add((Object) historyMap.getState().getPropertyValue(field));
+                fieldValues.add(historyMap.getState().getPropertyValue(field));
                 break;
 
         }

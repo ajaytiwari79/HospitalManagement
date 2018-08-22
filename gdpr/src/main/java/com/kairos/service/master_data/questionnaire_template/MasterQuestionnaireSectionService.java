@@ -120,9 +120,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
         try {
             masterQuestionnaireSections = masterQuestionnaireSectionRepository.saveAll(masterQuestionnaireSections);
-            masterQuestionnaireSections.forEach(masterQuestionnaireSection -> {
-                questionSectionIds.add(masterQuestionnaireSection.getId());
-            });
+            masterQuestionnaireSections.forEach(masterQuestionnaireSection -> questionSectionIds.add(masterQuestionnaireSection.getId()));
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             masterQuestionMongoRepository.deleteAll(questionList);
@@ -200,7 +198,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         List<MasterQuestionnaireSection> sections = new ArrayList<>();
 
         List<BigInteger> sectionsIds = new ArrayList<>();
-        Map<String, Object> updatedSections = new HashMap<>(), newSections = new HashMap<>();
+        Map<String, Object> updatedSections , newSections;
         if (updateExistingSectionsList.size() != 0) {
             updatedSections = updateQuestionnaireSectionAndQuestionList(countryId, orgId, updateExistingSectionsList, templateType);
             sectionsIds.addAll((List<BigInteger>) updatedSections.get(IDS_LIST));
