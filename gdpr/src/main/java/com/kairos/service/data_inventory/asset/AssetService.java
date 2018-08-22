@@ -113,6 +113,25 @@ public class AssetService extends MongoBaseService {
 
 
     /**
+     * @description method updated active status of Asset
+     * @param unitId
+     * @param assetId asset id
+     * @param active status of Asset
+     * @return
+     */
+    public boolean updateStatusOfAsset(Long unitId, BigInteger assetId,boolean active)
+    {
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+        }
+        asset.setActive(active);
+        assetMongoRepository.save(asset);
+        return true;
+    }
+
+
+    /**
      * @param
      * @param organizationId
      * @param id
