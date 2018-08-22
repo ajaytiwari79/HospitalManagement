@@ -109,6 +109,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.*;
@@ -556,8 +557,6 @@ public class OrganizationService {
         organization.setBoardingCompleted(true);
 
         return organization;
-
-
     }
 
     public List<Map<String, Object>> getAllOrganization() {

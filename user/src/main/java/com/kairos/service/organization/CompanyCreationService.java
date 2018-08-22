@@ -418,8 +418,10 @@ public class CompanyCreationService {
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
+        List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
+
         CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
-                .createDefaultDataForParentOrganization(organization,countryAndOrgAccessGroupIdsMap,timeSlots);
+                .createDefaultDataForParentOrganization(organization,countryAndOrgAccessGroupIdsMap,timeSlots,organization.getOrganizationType().getId(),orgSubTypeIds);
         CompletableFuture.allOf(hasUpdated).join();
 
         CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
