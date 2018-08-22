@@ -6,6 +6,7 @@ import com.kairos.enums.DurationType;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -18,18 +19,16 @@ public class PlanningPeriodDTO {
     private String name;
     @NotNull(message = "error.startdate.notnull")
     private LocalDate startDate;
-    private LocalTime startTime;
     private LocalDate endDate;
-    private LocalTime endTime;
     private Long unitId = -1L;
     private int duration;
     private DurationType durationType;
     private int recurringNumber; // TODO HARISH rename
     private String currentPhase;
     private String nextPhase;
-    private LocalDate requestToPuzzleDate;
-    private LocalDate puzzleToConstructionDate;
-    private LocalDate constructionToDraftDate;
+    private FlippingDateDTO requestToPuzzleDate;
+    private FlippingDateDTO puzzleToConstructionDate;
+    private FlippingDateDTO constructionToDraftDate;
     private List<PeriodPhaseFlippingDateDTO> phaseFlippingDate;
     private String periodDuration;
     private boolean active=true;
@@ -94,27 +93,27 @@ public class PlanningPeriodDTO {
         this.nextPhase = nextPhase;
     }
 
-    public LocalDate getRequestToPuzzleDate() {
+    public FlippingDateDTO getRequestToPuzzleDate() {
         return requestToPuzzleDate;
     }
 
-    public void setRequestToPuzzleDate(LocalDate requestToPuzzleDate) {
+    public void setRequestToPuzzleDate(FlippingDateDTO requestToPuzzleDate) {
         this.requestToPuzzleDate = requestToPuzzleDate;
     }
 
-    public LocalDate getPuzzleToConstructionDate() {
+    public FlippingDateDTO getPuzzleToConstructionDate() {
         return puzzleToConstructionDate;
     }
 
-    public void setPuzzleToConstructionDate(LocalDate puzzleToConstructionDate) {
+    public void setPuzzleToConstructionDate(FlippingDateDTO puzzleToConstructionDate) {
         this.puzzleToConstructionDate = puzzleToConstructionDate;
     }
 
-    public LocalDate getConstructionToDraftDate() {
+    public FlippingDateDTO getConstructionToDraftDate() {
         return constructionToDraftDate;
     }
 
-    public void setConstructionToDraftDate(LocalDate constructionToDraftDate) {
+    public void setConstructionToDraftDate(FlippingDateDTO constructionToDraftDate) {
         this.constructionToDraftDate = constructionToDraftDate;
     }
 
@@ -182,20 +181,5 @@ public class PlanningPeriodDTO {
         this.color = color;
     }
 
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
 }
 

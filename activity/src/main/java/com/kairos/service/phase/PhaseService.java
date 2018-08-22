@@ -260,10 +260,11 @@ public class PhaseService extends MongoBaseService {
         /*phase.setName(phaseDTO.getName());
         phase.setSequence(phaseDTO.getSequence());*/
 
-        if (phase.getPhaseType().equals(PhaseType.PLANNING)) {
-            phase.setDescription(phaseDTO.getDescription());
-            phase.setDurationType(phaseDTO.getDurationType());
-            phase.setDuration(phaseDTO.getDuration());
+        if (PhaseType.PLANNING.equals(phase.getPhaseType())) {
+            preparePlanningPhase(phase, phaseDTO);
+        }
+        if(PhaseType.ACTUAL.equals(phase.getPhaseType())){
+            prepareActualPhase(phase,phaseDTO);
         }
         phase.setStatus(ShiftStatus.getListByValue(phaseDTO.getStatus()));
         save(phase);
@@ -271,12 +272,13 @@ public class PhaseService extends MongoBaseService {
     }
 
     private void preparePlanningPhase(Phase phase, PhaseDTO phaseDTO) {
-
         phase.setDuration(phaseDTO.getDuration());
         phase.setDurationType(phaseDTO.getDurationType());
         phase.setName(phase.getName());
         phase.setSequence(phase.getSequence());
         phase.setDescription(phaseDTO.getDescription());
+        phase.setColor(phaseDTO.getColor());
+        phase.setFlippingDefalutTime(phaseDTO.getFlippingDefalutTime());
 
     }
 
@@ -284,6 +286,7 @@ public class PhaseService extends MongoBaseService {
        phase.setName(phase.getName());
        phase.setSequence(phase.getSequence());
        phase.setDescription(phaseDTO.getDescription());
+       phase.setColor(phaseDTO.getColor());
        if(PhaseDefaultName.REALTIME.equals(phaseDTO.getPhaseEnum())) {
            phase.setRealtimeDuration(phaseDTO.getRealtimeDuration());
        }else if(PhaseDefaultName.TENTATIVE.equals(phaseDTO.getPhaseEnum())) {

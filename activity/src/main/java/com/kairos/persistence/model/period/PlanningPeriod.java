@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlanningPeriod extends MongoBaseEntity {
 
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String name;
     @Indexed
     private Long unitId = -1L;
@@ -34,26 +34,26 @@ public class PlanningPeriod extends MongoBaseEntity {
         // default constructor
     }
 
-    public PlanningPeriod(String name, LocalDateTime startDate, LocalDateTime endDate, Long unitId) {
+    public PlanningPeriod(String name, LocalDate startDate, LocalDate endDate, Long unitId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.unitId = unitId;
     }
 
-    public LocalDateTime getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDateTime getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDateTime endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
