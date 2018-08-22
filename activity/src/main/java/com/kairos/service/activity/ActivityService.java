@@ -478,6 +478,9 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id", rulesActivityDTO.getActivityId());
         }
         if(rulesActivityDTO.getCutOffIntervalUnit()!=null && rulesActivityDTO.getCutOffStartFrom()!=null){
+            if(rulesActivityDTO.getCutOffIntervalUnit().equals(DAYS) && rulesActivityDTO.getCutOffdayValue()==0){
+                exceptionService.invalidRequestException("error.DayValue.zero");
+            }
             List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(),rulesActivityDTO.getCutOffIntervalUnit(),rulesActivityDTO.getCutOffdayValue());
             rulesActivityTab.setCutOffIntervals(cutOffIntervals);
             rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
