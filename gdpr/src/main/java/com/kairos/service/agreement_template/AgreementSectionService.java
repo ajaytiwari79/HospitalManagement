@@ -487,6 +487,34 @@ public class AgreementSectionService extends MongoBaseService {
 
 
     /**
+     *
+     * @param countryId
+     * @param orgId
+     * @param sectionId
+     * @param subSectionId
+     * @return
+     */
+    public boolean deleteAgreementSubSection(Long countryId, Long orgId, BigInteger sectionId, BigInteger subSectionId) {
+
+        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, sectionId);
+        if (!Optional.ofNullable(agreementSection).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + sectionId);
+        }
+        AgreementSection agreementSubSection = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, subSectionId);
+        if (!Optional.ofNullable(agreementSubSection).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement Sub section " + subSectionId);
+        }
+
+        agreementSection.getSubSections().remove(subSectionId);
+        delete(agreementSubSection);
+        agreementSectionMongoRepository.save(agreementSection);
+        return true;
+    }
+
+
+
+
+    /**
      * @param countryId
      * @param orgId
      * @param sectionId

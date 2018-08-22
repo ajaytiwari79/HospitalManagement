@@ -59,7 +59,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * @return Object of Questionnaire template with template type and asset type if template type is(ASSET_TYPE_KEY)
      */
     public MasterQuestionnaireTemplateDTO addQuestionnaireTemplate(Long countryId, Long organizationId, MasterQuestionnaireTemplateDTO templateDto) {
-        MasterQuestionnaireTemplate previousTemplate = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, organizationId, templateDto.getName());
+        MasterQuestionnaireTemplate previousTemplate = masterQuestionnaireTemplateMongoRepository.findByName(countryId, organizationId, templateDto.getName());
         if (Optional.ofNullable(previousTemplate).isPresent()) {
             throw new DuplicateDataException("Template Exists with same name");
         }
@@ -148,7 +148,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
      * @return updated Questionnaire template with basic data (name,description ,template type)
      */
     public MasterQuestionnaireTemplateDTO updateQuestionnaireTemplate(Long countryId, Long orgId, BigInteger id, MasterQuestionnaireTemplateDTO templateDto) {
-        MasterQuestionnaireTemplate questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.findByCountryIdAndName(countryId, orgId, templateDto.getName().trim());
+        MasterQuestionnaireTemplate questionnaireTemplate = masterQuestionnaireTemplateMongoRepository.findByName(countryId, orgId, templateDto.getName().trim());
         if (Optional.ofNullable(questionnaireTemplate).isPresent() && !id.equals(questionnaireTemplate.getId())) {
             throw new DuplicateDataException("Template Exists with same name " + templateDto.getName());
         }

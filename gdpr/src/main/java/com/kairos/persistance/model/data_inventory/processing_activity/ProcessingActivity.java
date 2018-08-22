@@ -56,7 +56,7 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private Integer dataRetentionPeriod;
 
-    private boolean active;
+    private boolean active=true;
 
     private boolean subProcess=false;
 

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import java.math.BigInteger;
 
@@ -112,6 +113,17 @@ public class ProcessingActivityController {
     }
 
 
+
+    @ApiOperation(value = "updated status of processing activity")
+    @PutMapping("/processing_activity/{processingActivityId}/status")
+    public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId,@NotNull @RequestBody boolean active) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.changeStatusOfProcessingActivity(unitId, processingActivityId, active));
+    }
+
+
     @ApiOperation(value = "Map Data Subject ,Data Category and data element to  Processing activity ")
     @PutMapping("/processing_activity/{processingActivityId}/data_subject")
     public ResponseEntity<Object> mapDataSubjectToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody ValidateRequestBodyList<ProcessingActivityRelatedDataSubject> dataSubjectList) {
@@ -120,6 +132,8 @@ public class ProcessingActivityController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.mapDataSubjectDataCategoryAndDataElementToProcessingActivity(unitId, processingActivityId, dataSubjectList.getRequestBody()));
     }
+
+
 
 
     @ApiOperation(value = "get all Mapped Data Subject ,Data Category and data element of Processing Activity")
