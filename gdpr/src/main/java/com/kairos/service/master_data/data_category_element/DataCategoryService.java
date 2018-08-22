@@ -109,9 +109,7 @@ public class DataCategoryService extends MongoBaseService {
     public List<DataCategory> getDataCategoryByIds(Long countryId, Long organizationId, Set<BigInteger> ids) {
         List<DataCategory> dataCategories = dataCategoryMongoRepository.findDataCategoryByIds(countryId, organizationId, ids);
         Set<BigInteger> dataCategoryIds = new HashSet<>();
-        dataCategories.forEach(dataCategory -> {
-            dataCategoryIds.add(dataCategory.getId());
-        });
+        dataCategories.forEach(dataCategory -> dataCategoryIds.add(dataCategory.getId()));
         if (dataCategoryIds.size() != ids.size()) {
             ids.removeAll(dataCategoryIds);
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", ids.iterator().next());

@@ -9,7 +9,6 @@ import com.kairos.persistance.repository.data_inventory.asset.AssetMongoReposito
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
-import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
@@ -23,8 +22,6 @@ import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
-
-import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -128,11 +125,8 @@ public class ProcessingActivityService extends MongoBaseService {
             processingActivity.setSubProcess(true);
             subProcessingActivities.add(processingActivity);
         }
-        subProcessingActivities = processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
-        subProcessingActivities.forEach(processingActivity -> {
-
-            subProcessingActivityIdList.add(processingActivity.getId());
-        });
+        subProcessingActivities = processingActivityMongoRepository.saveAll(subProcessingActivities);
+        subProcessingActivities.forEach(processingActivity -> subProcessingActivityIdList.add(processingActivity.getId()));
         return subProcessingActivityIdList;
 
     }
@@ -200,7 +194,7 @@ public class ProcessingActivityService extends MongoBaseService {
             processingActivity.setResponsibilityType(processingActivityDTO.getResponsibilityType());
 
         });
-        processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
+        processingActivityMongoRepository.saveAll(subProcessingActivities);
 
     }
 
@@ -298,7 +292,7 @@ public class ProcessingActivityService extends MongoBaseService {
      * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
      */
     public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsAndWithSubProcess(Long unitId) {
-        return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubprocessingActivities(unitId);
+        return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubProcessingActivities(unitId);
     }
 
 

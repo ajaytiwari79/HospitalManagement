@@ -70,7 +70,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
                 }
 
-                newDataSources = dataSourceMongoRepository.saveAll(getNextSequence(newDataSources));
+                newDataSources = dataSourceMongoRepository.saveAll(newDataSources);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newDataSources);

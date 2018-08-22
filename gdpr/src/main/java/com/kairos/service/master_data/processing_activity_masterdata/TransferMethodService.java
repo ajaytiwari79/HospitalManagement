@@ -67,7 +67,7 @@ public class TransferMethodService extends MongoBaseService {
                     newTransferMethods.add(newTransferMethod);
                 }
 
-                newTransferMethods = transferMethodRepository.saveAll(getNextSequence(newTransferMethods));
+                newTransferMethods = transferMethodRepository.saveAll(newTransferMethods);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTransferMethods);
@@ -187,7 +187,7 @@ public class TransferMethodService extends MongoBaseService {
                 TransferMethodList.add(TransferMethod);
             }
 
-            TransferMethodList = transferMethodRepository.saveAll(getNextSequence(TransferMethodList));
+            TransferMethodList = transferMethodRepository.saveAll(TransferMethodList);
         }
         return TransferMethodList;
     }

@@ -173,7 +173,7 @@ public class ClauseService extends MongoBaseService {
             newClauseList.add(clause);
 
         }
-        return clauseMongoRepository.saveAll(getNextSequence(newClauseList));
+        return clauseMongoRepository.saveAll(newClauseList);
     }
 
 

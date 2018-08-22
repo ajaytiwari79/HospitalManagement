@@ -65,7 +65,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
 
                 }
-                newTechnicalMeasures = technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(newTechnicalMeasures));
+                newTechnicalMeasures = technicalSecurityMeasureMongoRepository.saveAll(newTechnicalMeasures);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTechnicalMeasures);
@@ -191,7 +191,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                 TechnicalSecurityMeasureList.add(TechnicalSecurityMeasure);
             }
 
-            TechnicalSecurityMeasureList = technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(TechnicalSecurityMeasureList));
+            TechnicalSecurityMeasureList = technicalSecurityMeasureMongoRepository.saveAll(TechnicalSecurityMeasureList);
         }
         return TechnicalSecurityMeasureList;
     }

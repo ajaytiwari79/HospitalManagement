@@ -63,7 +63,7 @@ public class AccessorPartyService extends MongoBaseService {
                     newAccessorParty.setCountryId(countryId);
                     newAccessorPartyList.add(newAccessorParty);
                 }
-                newAccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(newAccessorPartyList));
+                newAccessorPartyList = accessorPartyMongoRepository.saveAll(newAccessorPartyList);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newAccessorPartyList);
@@ -180,7 +180,7 @@ public class AccessorPartyService extends MongoBaseService {
                 AccessorPartyList.add(AccessorParty);
             }
 
-            AccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(AccessorPartyList));
+            AccessorPartyList = accessorPartyMongoRepository.saveAll(AccessorPartyList);
         }
         return AccessorPartyList;
     }

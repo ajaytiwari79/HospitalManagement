@@ -61,7 +61,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
                     newAccessorParty.setOrganizationId(organizationId);
                     newAccessorPartyList.add(newAccessorParty);
                 }
-                newAccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(newAccessorPartyList));
+                newAccessorPartyList = accessorPartyMongoRepository.saveAll(newAccessorPartyList);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newAccessorPartyList);

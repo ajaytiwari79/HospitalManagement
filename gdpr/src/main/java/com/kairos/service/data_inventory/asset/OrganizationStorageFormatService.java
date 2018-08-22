@@ -71,7 +71,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
                 }
 
 
-                newStorageFormats = storageFormatMongoRepository.saveAll(getNextSequence(newStorageFormats));
+                newStorageFormats = storageFormatMongoRepository.saveAll(newStorageFormats);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newStorageFormats);

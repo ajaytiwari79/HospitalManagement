@@ -69,7 +69,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
 
                 }
 
-                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(getNextSequence(newProcessingLegalBasisList));
+                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(newProcessingLegalBasisList);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingLegalBasisList);

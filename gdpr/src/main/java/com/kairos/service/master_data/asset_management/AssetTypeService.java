@@ -94,10 +94,8 @@ public class AssetTypeService extends MongoBaseService {
         Map<String, Object> result = new HashMap<>();
         List<BigInteger> subAssetTypesIds = new ArrayList<>();
         try {
-            subAssetTypes = assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypes));
-            subAssetTypes.forEach(subAssetType -> {
-                subAssetTypesIds.add(subAssetType.getId());
-            });
+            subAssetTypes = assetTypeMongoRepository.saveAll(subAssetTypes);
+            subAssetTypes.forEach(subAssetType -> subAssetTypesIds.add(subAssetType.getId()));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -131,7 +129,7 @@ public class AssetTypeService extends MongoBaseService {
         });
         Map<String, Object> result = new HashMap<>();
         try {
-            subAssetTypesList = assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypesList));
+            subAssetTypesList = assetTypeMongoRepository.saveAll(subAssetTypesList);
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -217,7 +215,7 @@ public class AssetTypeService extends MongoBaseService {
 
         try {
             assetType.setSubAssetTypes(updatedAndNewSubAssetTypeIds);
-            assetType = assetTypeMongoRepository.save(assetType);
+            assetTypeMongoRepository.save(assetType);
         } catch (Exception e) {
             List<AssetType> subAssetTypes = new ArrayList<>();
             subAssetTypes.addAll((List<AssetType>) newSubAssetTypes.get(ASSET_TYPES_LIST));

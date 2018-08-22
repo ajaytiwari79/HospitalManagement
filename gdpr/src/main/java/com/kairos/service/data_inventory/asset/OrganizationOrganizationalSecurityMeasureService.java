@@ -69,7 +69,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
                     newOrgSecurityMeasures.add(newOrganizationalSecurityMeasure);
 
                 }
-                newOrgSecurityMeasures = organizationalSecurityMeasureMongoRepository.saveAll(getNextSequence(newOrgSecurityMeasures));
+                newOrgSecurityMeasures = organizationalSecurityMeasureMongoRepository.saveAll(newOrgSecurityMeasures);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newOrgSecurityMeasures);

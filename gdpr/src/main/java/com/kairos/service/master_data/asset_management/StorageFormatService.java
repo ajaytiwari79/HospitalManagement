@@ -67,7 +67,7 @@ public class StorageFormatService extends MongoBaseService {
                 }
 
 
-                newStorageFormats = storageFormatMongoRepository.saveAll(getNextSequence(newStorageFormats));
+                newStorageFormats = storageFormatMongoRepository.saveAll(newStorageFormats);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newStorageFormats);
@@ -193,7 +193,7 @@ public class StorageFormatService extends MongoBaseService {
                 StorageFormatList.add(StorageFormat);
             }
 
-            StorageFormatList = storageFormatMongoRepository.saveAll(getNextSequence(StorageFormatList));
+            StorageFormatList = storageFormatMongoRepository.saveAll(StorageFormatList);
         }
         return StorageFormatList;
     }

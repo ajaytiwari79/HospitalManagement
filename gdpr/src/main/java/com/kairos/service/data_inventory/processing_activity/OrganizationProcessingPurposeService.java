@@ -69,7 +69,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
                     newProcessingPurposes.add(newProcessingPurpose);
 
                 }
-                newProcessingPurposes = processingPurposeMongoRepository.saveAll(getNextSequence(newProcessingPurposes));
+                newProcessingPurposes = processingPurposeMongoRepository.saveAll(newProcessingPurposes);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingPurposes);
