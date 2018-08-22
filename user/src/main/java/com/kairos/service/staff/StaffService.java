@@ -2079,7 +2079,7 @@ public class StaffService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffs, StaffDTO.class);
     }
 
-    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long UserId) {
+    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long UserId,boolean allOrganization) {
         List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserIdAndReasonCode(UserId, ReasonCodeType.ATTENDANCE);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
 
@@ -2087,14 +2087,11 @@ public class StaffService {
 
     public List<StaffPersonalDetail> getStaffDetailByIds(Long unitId, Set<Long> staffIds) {
         return staffExpertiseRelationShipGraphRepository.getStaffDetailByIds(staffIds, DateUtil.getCurrentDateMillis());
-<<<<<<< HEAD
         }
 
     public Long getStaffIdOfLoggedInUser(Long unitId) {
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-        return staffGraphRepository.getStaffIdOfCurrentUser(UserContext.getUserDetails().getId(),parentOrganization.getId());
-=======
->>>>>>> d2b105a41af7205dbb5c3425069ef548bdff0d3d
+        return staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
     }
 
 

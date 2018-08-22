@@ -128,11 +128,11 @@ public class UserController {
 
     @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/staffs")
     @ApiOperation("get staff ids by userid")
-    ResponseEntity<Map<String, Object>> getStaffIdsAndReasonCodeByUserId(@PathVariable long userId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdsAndReasonCodeByUserId(userId));
+    ResponseEntity<Map<String, Object>> getStaffIdsAndReasonCodeByUserId(@PathVariable long userId,@RequestParam("allOrganization") boolean allOrganization) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdsAndReasonCodeByUserId(userId,allOrganization));
     }
 
-    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"user/staffId")
+    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/user/staffId")
     @ApiOperation("get staffId by userId")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffIdOfLoggedInUser(@PathVariable Long unitId) {

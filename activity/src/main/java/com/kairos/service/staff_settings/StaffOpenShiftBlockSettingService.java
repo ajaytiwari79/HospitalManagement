@@ -29,9 +29,6 @@ public class StaffOpenShiftBlockSettingService extends MongoBaseService {
 
     public boolean savePersonalizedSettings(Long unitId, StaffPreferencesDTO staffPreferencesDTO) {
         Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
-        if(!Optional.ofNullable(staffId).isPresent()){
-            exceptionService.dataNotFoundException("Staff not found");
-        }
         StaffOpenShiftBlockSetting staffOpenShiftBlockSetting=staffOpenShiftBlockSettingRepository.findByStaffId(staffId).orElse(new StaffOpenShiftBlockSetting(staffId));
 
         switch (staffPreferencesDTO.getShiftBlockType()) {
@@ -45,7 +42,7 @@ public class StaffOpenShiftBlockSettingService extends MongoBaseService {
                 staffOpenShiftBlockSetting.getDateForWeek().add(staffPreferencesDTO.getStartDate().with(previousOrSame(DayOfWeek.MONDAY)));
                 break;
             default:
-                exceptionService.actionNotPermittedException("exception.actionNotPermittedException", "No Shift Block Type found");
+                exceptionService.actionNotPermittedException("exception.no.block.type.found");
         }
         save(staffOpenShiftBlockSetting);
         return true;
