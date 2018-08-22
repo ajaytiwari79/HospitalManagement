@@ -89,6 +89,7 @@ public class AppConstants {
     public static final String CITIZEN_ID = "citizenId";
 
 
+    public static final String EVERYDAY = "EVERYDAY";
     public static final String WEEK = "Week";
     public static final String MONTH = "Month";
     public static final String MINUTES = "MINUTES";

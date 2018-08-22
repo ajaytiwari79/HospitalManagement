@@ -133,7 +133,7 @@ public class TimeBankService extends MongoBaseService {
             }
             startDate = startDate.plusDays(1);
         }
-        if(totalTimeBank>0) {
+        if(totalTimeBank!=0) {
             timeBankRepository.updateAccumulatedTimeBank(shift.getUnitPositionId(), totalTimeBank);
         }
         return dailyTimeBanks;

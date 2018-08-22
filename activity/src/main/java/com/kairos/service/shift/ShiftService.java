@@ -296,15 +296,21 @@ public class ShiftService extends MongoBaseService {
         Map<Long,List<Day>> daytypesMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k->k.getId(), v->v.getValidDays()));
         staffAdditionalInfoDTO.getUnitPosition().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
             Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+            List<LocalDate> publicHolidays = new ArrayList<>();
             for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
                 daytypesMap.get(dayTypeId).forEach(day -> {
-                    if(!day.name().equals("EVERYDAY")){
+                    if(!day.name().equals(EVERYDAY)){
                         dayOfWeeks.add(DayOfWeek.valueOf(day.name()));
                     }else {
                         dayOfWeeks.addAll(Arrays.asList(DayOfWeek.values()));
                     }
                 });
+                List<LocalDate> publicHoliday = staffAdditionalInfoDTO.getPublicHoliday().get(dayTypeId);
+                if(publicHoliday!=null && !publicHoliday.isEmpty()){
+                    publicHolidays.addAll(publicHoliday);
+                }
             }
+            ctaRuleTemplateDTO.setPublicHolidays(publicHolidays);
             ctaRuleTemplateDTO.setDays(new ArrayList<>(dayOfWeeks));
         });
     }
