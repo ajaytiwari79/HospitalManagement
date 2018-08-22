@@ -166,8 +166,8 @@ public class ActivityController {
     @ApiOperation("Update Rules Tab of Activity")
     @PutMapping(value = "/activity/rules")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody RulesActivityTabDTO rulesDTO,@RequestParam(value = "dateFrom",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date dateFrom,@RequestParam(value = "cutOffIntervalUnit",required = false) String cutOffIntervalUnit,@RequestParam(value = "dayValue",required = false) Integer dayValue) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateRulesTab(rulesDTO,dateFrom,cutOffIntervalUnit,dayValue));
+    ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody RulesActivityTabDTO rulesDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateRulesTab(rulesDTO));
     }
 
 
