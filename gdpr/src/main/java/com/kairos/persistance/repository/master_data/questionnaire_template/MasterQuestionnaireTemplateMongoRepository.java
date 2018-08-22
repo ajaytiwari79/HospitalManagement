@@ -16,9 +16,6 @@ public interface MasterQuestionnaireTemplateMongoRepository extends MongoBaseRep
     @Query("{deleted:false,countryId:?0,organizationId:?1,_id:?2}")
     MasterQuestionnaireTemplate findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
 
-    @Query("{'name':?1, 'deleted':false, 'countryId':?0,organizationId:?1}")
-    MasterQuestionnaireTemplate findByCountryIdAndName(Long countryId,Long organizationId,String name);
-
     MasterQuestionnaireTemplate findByid(BigInteger id);
 
 }
