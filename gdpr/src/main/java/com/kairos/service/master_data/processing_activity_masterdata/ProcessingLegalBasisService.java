@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
@@ -56,7 +57,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
                 legalBasisNames.add(legalBasis.getName());
             }
 
-            List<ProcessingLegalBasis> existing = findByNamesAndCountryId(countryId, legalBasisNames, ProcessingLegalBasis.class);
+            List<ProcessingLegalBasis> existing = findMetaDataByNamesAndCountryId(countryId, legalBasisNames, ProcessingLegalBasis.class);
             legalBasisNames = ComparisonUtils.getNameListForMetadata(existing, legalBasisNames);
 
             List<ProcessingLegalBasis> newProcessingLegalBasisList = new ArrayList<>();
@@ -69,7 +70,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
                 }
 
-                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(getNextSequence(newProcessingLegalBasisList));
+                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(newProcessingLegalBasisList);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingLegalBasisList);
@@ -88,7 +89,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
      */
 
     public List<ProcessingLegalBasisResponseDTO> getAllProcessingLegalBasis(Long countryId) {
-        return legalBasisMongoRepository.findAllProcessingLegalBases(countryId);
+        return legalBasisMongoRepository.findAllProcessingLegalBases(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
     /**
@@ -167,11 +168,29 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     }
 
 
-    public List<ProcessingLegalBasisResponseDTO> getAllNotInheritedLegalBasisFromParentOrgAndUnitProcessingLegalBasis(Long countryId, Long organizationId, Long unitId) {
+   
+    public List<ProcessingLegalBasis> saveSuggestedProcessingLegalBasissFromUnit(Long countryId, List<ProcessingLegalBasisDTO> ProcessingLegalBasisDTOS) {
 
-        return legalBasisMongoRepository.getAllNotInheritedLegalBasisFromParentOrgAndUnitProcessingLegalBasis(countryId, organizationId, unitId);
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (ProcessingLegalBasisDTO ProcessingLegalBasis : ProcessingLegalBasisDTOS) {
+            hostingProvoiderNames.add(ProcessingLegalBasis.getName());
+        }
+        List<ProcessingLegalBasis> existingProcessingLegalBasiss = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, ProcessingLegalBasis.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingProcessingLegalBasiss, hostingProvoiderNames);
+        List<ProcessingLegalBasis> ProcessingLegalBasisList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                ProcessingLegalBasis ProcessingLegalBasis = new ProcessingLegalBasis(name);
+                ProcessingLegalBasis.setCountryId(countryId);
+                ProcessingLegalBasis.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                ProcessingLegalBasisList.add(ProcessingLegalBasis);
+            }
+
+            ProcessingLegalBasisList = legalBasisMongoRepository.saveAll(ProcessingLegalBasisList);
+        }
+        return ProcessingLegalBasisList;
     }
-
 
 }
 

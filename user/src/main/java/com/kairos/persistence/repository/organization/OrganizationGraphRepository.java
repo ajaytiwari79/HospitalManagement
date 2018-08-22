@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.organization;
 
+import com.kairos.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -12,6 +13,7 @@ import com.kairos.persistence.model.organization.services.OrganizationServiceQue
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
+import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -649,8 +651,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("Match (union:Organization{isEnable:true}) where id (union) IN {0}  return union")
     List<Organization> findOrganizationsByIdsIn(List<Long> orgIds);
 
-    @Query("Match (org:Organization)-[:"+SUB_TYPE_OF+"]->(orgType:OrganizationType) where id(orgType)={0} return id(org)")
-    List<Long> getOrganizationIdsBySubOrgTypeId(Long organizationSubTypeId);
+    @Query("Match (org:Organization)-[:"+SUB_TYPE_OF+"]->(orgType:OrganizationType) where id(orgType) IN {0} return id(orgType) as orgTypeId, collect(id(org)) as unitIds ")
+    List<OrgTypeQueryResult> getOrganizationIdsBySubOrgTypeId(List<Long> organizationSubTypeId);
 
     @Query("Match (child:Organization) \n" +
             "OPTIONAL MATCH (child)<-[:"+HAS_SUB_ORGANIZATION+"]-(parent:Organization) with child,parent\n" +

@@ -5,8 +5,8 @@ import com.kairos.activity.open_shift.DurationField;
 import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
 import com.kairos.persistence.model.activity.tabs.RulesActivityTab;
 
-import javax.validation.constraints.AssertTrue;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -30,6 +30,10 @@ public class RulesActivityTabDTO {
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+    private LocalDate cutOffStartFrom;
+    private CutOffIntervalUnit cutOffIntervalUnit;
+    private Integer cutOffdayValue;
+    private List<CutOffInterval> cutOffIntervals;
 
     // in Minutes
     private LocalTime earliestStartTime;
@@ -44,6 +48,37 @@ public class RulesActivityTabDTO {
     private LocalTime maximumEndTime;
 
 
+    public LocalDate getCutOffStartFrom() {
+        return cutOffStartFrom;
+    }
+
+    public void setCutOffStartFrom(LocalDate cutOffStartFrom) {
+        this.cutOffStartFrom = cutOffStartFrom;
+    }
+
+    public CutOffIntervalUnit getCutOffIntervalUnit() {
+        return cutOffIntervalUnit;
+    }
+
+    public void setCutOffIntervalUnit(CutOffIntervalUnit cutOffIntervalUnit) {
+        this.cutOffIntervalUnit = cutOffIntervalUnit;
+    }
+
+    public Integer getCutOffdayValue() {
+        return cutOffdayValue;
+    }
+
+    public void setCutOffdayValue(Integer cutOffdayValue) {
+        this.cutOffdayValue = cutOffdayValue;
+    }
+
+    public List<CutOffInterval> getCutOffIntervals() {
+        return cutOffIntervals;
+    }
+
+    public void setCutOffIntervals(List<CutOffInterval> cutOffIntervals) {
+        this.cutOffIntervals = cutOffIntervals;
+    }
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
@@ -77,8 +112,7 @@ public class RulesActivityTabDTO {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
 
                  eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
-                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage,maximumEndTime);
-
+                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage,maximumEndTime,cutOffdayValue,cutOffIntervalUnit,cutOffStartFrom);
 
         return rulesActivityTab;
     }

@@ -32,7 +32,8 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableAspectJAutoProxy
 @EnableCircuitBreaker
 @SpringBootApplication
-@EnableMongoRepositories(basePackages = "com.kairos.persistance.repository",repositoryBaseClass = MongoBaseRepositoryImpl.class)
+@EnableMongoRepositories(basePackages = "com.kairos.persistance.repository",
+        repositoryBaseClass = MongoBaseRepositoryImpl.class)
 public class KairosGdprApplication {
 
     public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");

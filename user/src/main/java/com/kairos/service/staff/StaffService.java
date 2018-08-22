@@ -1,7 +1,7 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.counter.DefalutKPISettingDTO;
+import com.kairos.activity.counter.DefaultKPISettingDTO;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.activity.task.StaffTaskDTO;
@@ -80,6 +80,7 @@ import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.user.country.day_type.PublicHoliday;
 import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.user.employment.EmploymentDTO;
 import com.kairos.user.employment.employment_dto.EmploymentOverlapDTO;
@@ -110,7 +111,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.CharBuffer;
 import java.text.ParseException;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -815,7 +815,7 @@ public class StaffService {
 
                 }
             }
-            activityIntegrationService.createDefaultKPISettingForStaff(new DefalutKPISettingDTO(staffList.stream().map(staff -> staff.getId()).collect(Collectors.toList())),unitId);
+            activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(staffList.stream().map(staff -> staff.getId()).collect(Collectors.toList())),unitId);
             return staffUploadBySheetQueryResult;
         } catch (IOException e) {
             e.printStackTrace();
@@ -1097,7 +1097,7 @@ public class StaffService {
         addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getCurrentDateMillis(), isEmploymentExist);
-        activityIntegrationService.createDefaultKPISettingForStaff(new DefalutKPISettingDTO(Arrays.asList(staff.getId())),unitId);
+        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(staff.getId())),unitId);
 
         //  plannerSyncService.publishStaff(unitId, staff, IntegrationOperation.CREATE);
         StaffDTO staffDTO = new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge());
@@ -1272,7 +1272,7 @@ public class StaffService {
         employment.getUnitPermissions().add(unitPermission);
 
         employmentGraphRepository.save(employment);
-        activityIntegrationService.createDefaultKPISettingForStaff(new DefalutKPISettingDTO(Arrays.asList(employment.getStaff().getId())),organizationId);
+        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(employment.getStaff().getId())),organizationId);
 
     }
 
@@ -1638,7 +1638,9 @@ public class StaffService {
         staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
         staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.user.country.time_slot.TimeSlotWrapper.class));
         staffAdditionalInfoDTO.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
-
+        List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
+        Map<Long,List<LocalDate>> publicHolidayMap = publicHolidaysResult.stream().collect(Collectors.groupingBy(k -> ((Long)k.get("dayTypeId")),Collectors.mapping(o->DateUtils.getLocalDate((Long)o.get("holidayDate")),Collectors.toList())));
+        staffAdditionalInfoDTO.setPublicHoliday(publicHolidayMap);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         staffAdditionalInfoDTO.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, DayTypeDTO.class));
         UserAccessRoleDTO userAccessRole = accessGroupService.checkIfUserHasAccessByRoleInUnit(unitId);

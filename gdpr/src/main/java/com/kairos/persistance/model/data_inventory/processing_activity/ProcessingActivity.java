@@ -26,6 +26,10 @@ public class ProcessingActivity extends MongoBaseEntity {
     @NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
 
+    private List<ProcessingActivityRelatedDataSubject> dataSubjects;
+
+    private BigInteger assetId;
+
     private List<BigInteger> processingPurposes;
 
     private List<BigInteger> dataSources;
@@ -52,9 +56,13 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private Integer dataRetentionPeriod;
 
-    private boolean active;
+    private boolean active=true;
 
     private boolean subProcess=false;
+
+    public List<ProcessingActivityRelatedDataSubject> getDataSubjects() { return dataSubjects; }
+
+    public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) { this.dataSubjects = dataSubjects; }
 
     public List<BigInteger> getSubProcessingActivities() { return subProcessingActivities; }
 
@@ -136,8 +144,11 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
 
-    public ProcessingActivity() {
-    }
+    public BigInteger getAssetId() { return assetId; }
+
+    public void setAssetId(BigInteger assetId) { this.assetId = assetId; }
+
+    public ProcessingActivity() { }
 
     public ProcessingActivity(String name, String description, ManagingOrganization managingDepartment, Staff processOwner) {
         this.name = name;

@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data.processing_activity_masterd
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -31,13 +32,16 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private AccessorPartyService accessorPartyService;
+
     /**
      * @param organizationId
      * @param accessorPartyDTOS
      * @return return map which contain list of new AccessorParty and list of existing AccessorParty if AccessorParty already exist
      * @description this method create new AccessorParty if AccessorParty not exist with same name ,
      * and if exist then simply add  AccessorParty to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing AccessorParty using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing AccessorParty using collation ,used for case insensitive result
      */
     public Map<String, List<AccessorParty>> createAccessorParty(Long organizationId, List<AccessorPartyDTO> accessorPartyDTOS) {
 
@@ -47,7 +51,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
             for (AccessorPartyDTO accessorParty : accessorPartyDTOS) {
                 accessorPartyNames.add(accessorParty.getName());
             }
-            List<AccessorParty> existing = findAllByNameAndOrganizationId(organizationId, accessorPartyNames, AccessorParty.class);
+            List<AccessorParty> existing = findMetaDataByNameAndUnitId(organizationId, accessorPartyNames, AccessorParty.class);
             accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();
@@ -57,7 +61,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
                     newAccessorParty.setOrganizationId(organizationId);
                     newAccessorPartyList.add(newAccessorParty);
                 }
-                newAccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(newAccessorPartyList));
+                newAccessorPartyList = accessorPartyMongoRepository.saveAll(newAccessorPartyList);
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newAccessorPartyList);
@@ -148,6 +152,19 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+
+    public Map<String, List<AccessorParty>> saveAndSuggestAccessorParties(Long countryId, Long organizationId, List<AccessorPartyDTO> AccessorPartyDTOS) {
+
+        Map<String, List<AccessorParty>> result;
+        result = createAccessorParty(organizationId, AccessorPartyDTOS);
+        List<AccessorParty> masterAccessorPartySuggestedByUnit = accessorPartyService.saveSuggestedAccessorPartysFromUnit(countryId, AccessorPartyDTOS);
+        if (!masterAccessorPartySuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterAccessorPartySuggestedByUnit);
+        }
+        return result;
     }
 
 

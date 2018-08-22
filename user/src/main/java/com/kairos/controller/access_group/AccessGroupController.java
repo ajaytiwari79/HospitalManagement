@@ -239,8 +239,8 @@ public class AccessGroupController {
     }
 
     @ApiOperation("get staff ids by unit id and accessgroup id")
-    @GetMapping(value = UNIT_URL+"/access_group/{accessGroupId}/staffs")
-    public ResponseEntity<Map<String, Object>> getStaffIdsByUnitIdAndAccessGroupId(@PathVariable Long unitId,@PathVariable Long accessGroupId) {
+    @PostMapping(value = UNIT_URL+"/access_group/staffs")
+    public ResponseEntity<Map<String, Object>> getStaffIdsByUnitIdAndAccessGroupId(@PathVariable Long unitId,@RequestBody List<Long> accessGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId));
     }
 

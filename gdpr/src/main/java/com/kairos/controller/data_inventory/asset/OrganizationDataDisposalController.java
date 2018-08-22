@@ -17,6 +17,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
@@ -101,5 +102,15 @@ public class OrganizationDataDisposalController {
 
     }
 
+
+    @ApiOperation("save Data Disposal And Suggest To Country admin")
+    @PostMapping(COUNTRY_URL + "/data_disposal")
+    public ResponseEntity<Object> saveDataDisposalAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.saveAndSuggestDataDisposal(countryId, unitId, dataDisposalDTOs.getRequestBody()));
+
+    }
 
 }

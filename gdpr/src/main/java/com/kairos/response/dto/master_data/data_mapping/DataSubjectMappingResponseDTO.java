@@ -2,14 +2,15 @@ package com.kairos.response.dto.master_data.data_mapping;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.gdpr.OrganizationSubType;
 import com.kairos.gdpr.OrganizationType;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataSubjectMappingResponseDTO {
 
     private BigInteger id;
@@ -24,7 +25,7 @@ public class DataSubjectMappingResponseDTO {
 
     private List<OrganizationSubType> organizationSubTypes;
 
-    private Set<DataCategoryResponseDTO> dataCategories;
+    private List<DataCategoryResponseDTO> dataCategories;
 
     public BigInteger getId() {
         return id;
@@ -66,11 +67,11 @@ public class DataSubjectMappingResponseDTO {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public Set<DataCategoryResponseDTO> getDataCategories() {
+    public List<DataCategoryResponseDTO> getDataCategories() {
         return dataCategories;
     }
 
-    public void setDataCategories(Set<DataCategoryResponseDTO> dataCategories) {
+    public void setDataCategories(List<DataCategoryResponseDTO> dataCategories) {
         this.dataCategories = dataCategories;
     }
 

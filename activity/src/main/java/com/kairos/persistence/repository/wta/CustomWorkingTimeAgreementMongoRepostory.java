@@ -40,9 +40,9 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
     boolean checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
 
     List<WTAQueryResultDTO> getAllWTAByUpIds(List<Long> upIds, Date date);
-    List<WTAVersionDTO> getAllParentWTAByIds(List<Long> upIds);
+    List<WTAQueryResultDTO> getAllParentWTAByIds(List<Long> upIds);
 
-    List<WTAVersionDTO> getWTAWithVersionIds(List<Long> upIds);
+    List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> upIds);
 
     WTAQueryResultDTO getWTAByUnitPosition(Long unitPositionId,Date date);
 

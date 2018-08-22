@@ -11,6 +11,7 @@ import com.kairos.persistance.repository.master_data.processing_activity_masterd
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.processing_activity_masterdata.ResponsibilityTypeService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -36,13 +37,16 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private ResponsibilityTypeService responsibilityTypeService;
+
     /**
      * @param organizationId
      * @param responsibilityTypeDTOS
      * @return return map which contain list of new ResponsibilityType and list of existing ResponsibilityType if ResponsibilityType already exist
      * @description this method create new ResponsibilityType if ResponsibilityType not exist with same name ,
      * and if exist then simply add  ResponsibilityType to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing ResponsibilityType using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing ResponsibilityType using collation ,used for case insensitive result
      */
     public Map<String, List<ResponsibilityType>> createResponsibilityType(Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
@@ -56,7 +60,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ResponsibilityType> existing = findAllByNameAndOrganizationId(organizationId, responsibilityTypeNames, ResponsibilityType.class);
+            List<ResponsibilityType> existing = findMetaDataByNameAndUnitId(organizationId, responsibilityTypeNames, ResponsibilityType.class);
             responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
 
             List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
@@ -69,7 +73,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
                 }
 
-                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(getNextSequence(newResponsibilityTypes));
+                newResponsibilityTypes = responsibilityTypeMongoRepository.saveAll(newResponsibilityTypes);
 
             }
             result.put(EXISTING_DATA_LIST, existing);
@@ -168,5 +172,16 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
     }
 
+
+    public Map<String, List<ResponsibilityType>> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> ResponsibilityTypeDTOS) {
+
+        Map<String, List<ResponsibilityType>> result;
+        result = createResponsibilityType(organizationId, ResponsibilityTypeDTOS);
+        List<ResponsibilityType> masterResponsibilityTypeSuggestedByUnit = responsibilityTypeService.saveSuggestedResponsibilityTypesFromUnit(countryId, ResponsibilityTypeDTOS);
+        if (!masterResponsibilityTypeSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterResponsibilityTypeSuggestedByUnit);
+        }
+        return result;
+    }
 
 }

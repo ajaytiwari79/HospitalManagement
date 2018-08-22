@@ -78,7 +78,7 @@ public class CounterRepository {
     public List<ApplicableKPIDTO> getCounterListForCountryOrUnitOrStaff(Long refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation=Aggregation.newAggregation(
-          Aggregation.match(Criteria.where(refQueryField).is(refId)),
+          Aggregation.match(Criteria.where(refQueryField).is(refId).and("level").is(level)),
           Aggregation.lookup("counter","activeKpiId","_id","kpiIds"),
            Aggregation.project("level").and("kpiIds").arrayElementAt(0).as("kpi")
         );
@@ -211,7 +211,7 @@ public class CounterRepository {
 
     public List<ApplicableKPI> getKPIByKPIId(List<BigInteger> kpiIds, Long refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
-        Query query=new Query(Criteria.where(refQueryField).is(refId).and("activeKpiId").in(kpiIds));
+        Query query=new Query(Criteria.where(refQueryField).is(refId).and("activeKpiId").in(kpiIds).and("level").is(level));
         return mongoTemplate.find(query,ApplicableKPI.class);
     }
 
@@ -242,13 +242,14 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,AccessGroupKPIEntry.class),AccessGroupMappingDTO.class);
     }
 
-    public List<ApplicableKPI> getApplicableKPIByReferenceId(List<BigInteger> kpiIds,Long refId, ConfLevel level){
+
+    public List<ApplicableKPI> getApplicableKPIByReferenceId(List<BigInteger> kpiIds,List<Long> refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Query query=null;
         if(kpiIds.isEmpty()){
-            query=new Query(Criteria.where(refQueryField).is(refId));
+            query=new Query(Criteria.where(refQueryField).in(refId).and("level").is(level));
         }else{
-            query=new Query(Criteria.where(refQueryField).is(refId).and("activeKpiId").in(kpiIds));
+            query=new Query(Criteria.where(refQueryField).in(refId).and("level").is(level).and("activeKpiId").in(kpiIds));
         }
         return mongoTemplate.find(query,ApplicableKPI.class);
     }

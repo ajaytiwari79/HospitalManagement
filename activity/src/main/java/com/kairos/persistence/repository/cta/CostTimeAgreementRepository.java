@@ -27,26 +27,6 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
 
 
 
-  /*  @Query("")
-    List<CostTimeAgreement> getAllCTAByOrganizationSubType(List<Long> organizationSubTypeIds, Boolean deleted);
-
-    @Query("")
-    void detachCTAFromOrganization(Long orgId, Long ctaId);
-
-    @Query("")
-    void detachAllCTAFromOrganization(Long orgId);
-
-    @Query("")
-    Boolean isCTALinkedWithCountry(BigInteger ctaId);
-
-    @Query("")
-    CostTimeAgreement fetchChildCTA(BigInteger ctaId);
-
-    @Query("")
-    void detachParentCTA(BigInteger ctaId);
-
-    @Query("")
-    List<CostTimeAgreement> getListOfOrganizationCTAByParentCountryCTA(BigInteger countryCTAId);*/
 
     @Query(value = "{countryId:?0,name:?1,deleted:false,disabled:false}",exists = true)
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name);
@@ -54,36 +34,6 @@ public interface CostTimeAgreementRepository extends MongoBaseRepository<CostTim
     @Query(value = "{countryId:?0,name:?1,_id:{$ne:?2},deleted:false,disabled:false}",exists = true)
     Boolean isCTAExistWithSameNameInCountry(Long countryId, String name, BigInteger ctaId);
 
-       
-
-
-
-   /* @Query("")
-    void linkParentCountryCTAToOrganization(BigInteger countryCtaId, BigInteger orgCtaId);
-
-    @Query("")
-    CostTimeAgreement getCTAIdByCountryAndName(Long countryId, String ctaName);
-
-    @Query("")
-    CostTimeAgreement getCTAByUnitPositionId(Long unitPositionId);
-
-    @Query("")
-    void detachOldCTAFromUnitPosition(Long unitPositinId);
-
-    @Query("")
-    CostTimeAgreement getLinkedCTAWithUnitPosition(Long unitPositinId);*/
-
-    @Query("{}")
-    List<CostTimeAgreement> getCTAsByOrganiationSubTypeIdsIn(List<Long> organizationSubTypeIds, long countryId);
-
-/*    @Query("")
-    void linkUnitCTAToOrganization(BigInteger unitCtaId, Long organizationId);*/
-
-
-
-
-    @Query("{}")
-    Integer getLastSuffixNumberOfCTAName(String name);
 
 
 }
