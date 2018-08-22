@@ -4,6 +4,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
@@ -52,7 +53,7 @@ public class AccessorPartyService extends MongoBaseService {
             for (AccessorPartyDTO accessorParty : accessorParties) {
                 accessorPartyNames.add(accessorParty.getName());
             }
-            List<AccessorParty> existing = findByNamesAndCountryId(countryId, accessorPartyNames, AccessorParty.class);
+            List<AccessorParty> existing = findMetaDataByNamesAndCountryId(countryId, accessorPartyNames, AccessorParty.class);
             accessorPartyNames = ComparisonUtils.getNameListForMetadata(existing, accessorPartyNames);
 
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();
@@ -75,7 +76,7 @@ public class AccessorPartyService extends MongoBaseService {
 
 
     public List<AccessorPartyResponseDTO> getAllAccessorParty(Long countryId) {
-        return accessorPartyMongoRepository.findAllAccessorParty(countryId);
+        return accessorPartyMongoRepository.findAllAccessorParty(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
     /**
@@ -156,13 +157,32 @@ public class AccessorPartyService extends MongoBaseService {
 
 
     /**
+     * @description method save Accesor Party suggested by unit
      * @param countryId
-     * @param organizationId - id of current organization
-     * @return method return list of Organization Accessor party with non Inherited Accessor party from  parent
+     * @param AccessorPartyDTOS
+     * @return
      */
-    public List<AccessorPartyResponseDTO> getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(Long countryId, Long parentOrgId, Long organizationId) {
+    public List<AccessorParty> saveSuggestedAccessorPartysFromUnit(Long countryId, List<AccessorPartyDTO> AccessorPartyDTOS) {
 
-        return accessorPartyMongoRepository.getAllNotInheritedAccessorPartyFromParentOrgAndUnitAccessorParty(countryId, parentOrgId, organizationId);
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (AccessorPartyDTO AccessorParty : AccessorPartyDTOS) {
+            hostingProvoiderNames.add(AccessorParty.getName());
+        }
+        List<AccessorParty> existingAccessorPartys = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, AccessorParty.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingAccessorPartys, hostingProvoiderNames);
+        List<AccessorParty> AccessorPartyList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                AccessorParty AccessorParty = new AccessorParty(name);
+                AccessorParty.setCountryId(countryId);
+                AccessorParty.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                AccessorPartyList.add(AccessorParty);
+            }
+
+            AccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(AccessorPartyList));
+        }
+        return AccessorPartyList;
     }
 
 

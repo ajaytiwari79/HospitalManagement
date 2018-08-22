@@ -17,6 +17,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
@@ -66,7 +67,7 @@ public class OrganizationTransferMethodController {
 
     @ApiOperation("get transfer Method by name")
     @GetMapping("/transfer_method/name")
-    public ResponseEntity<Object> getResponsibilityTypeByName(@PathVariable Long unitId, @RequestParam String name) {
+    public ResponseEntity<Object> getTransferMethodByName(@PathVariable Long unitId, @RequestParam String name) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
@@ -99,4 +100,15 @@ public class OrganizationTransferMethodController {
 
     }
 
+
+    @ApiOperation("save responsibility Type And Suggest To Country admin")
+    @PostMapping(COUNTRY_URL + "/transfer_method")
+    public ResponseEntity<Object> saveTransferMethodAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TransferMethodDTO> transferMethodDTOs) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.saveAndSuggestTransferMethods(countryId, unitId, transferMethodDTOs.getRequestBody()));
+
+    }
+    
 }

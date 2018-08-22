@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data.asset_management.hosting_pr
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.asset_management.HostingProviderService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -36,6 +37,9 @@ public class OrganizationHostingProviderService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private HostingProviderService hostingProviderService;
+
 
     /**
      * @param organizationId
@@ -43,7 +47,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
      * @return return map which contain list of new HostingProvider and list of existing HostingProvider if HostingProvider already exist
      * @description this method create new HostingProvider if HostingProvider not exist with same name ,
      * and if exist then simply add  HostingProvider to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
      */
     public Map<String, List<HostingProvider>> createHostingProviders(Long organizationId, List<HostingProviderDTO> hostingProviderDTOS) {
 
@@ -53,7 +57,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
             for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
                 hostingProviderNames.add(hostingProvider.getName());
             }
-            List<HostingProvider> existing = findAllByNameAndOrganizationId(organizationId, hostingProviderNames, HostingProvider.class);
+            List<HostingProvider> existing = findMetaDataByNameAndUnitId(organizationId, hostingProviderNames, HostingProvider.class);
             hostingProviderNames = ComparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
             List<HostingProvider> newHostingProviders = new ArrayList<>();
             if (!hostingProviderNames.isEmpty()) {
@@ -166,6 +170,18 @@ public class OrganizationHostingProviderService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+    public Map<String, List<HostingProvider>> saveAndSuggestHostingProviders(Long countryId, Long organizationId, List<HostingProviderDTO> hostingProviderDTOS) {
+
+        Map<String, List<HostingProvider>> result;
+        result = createHostingProviders(organizationId, hostingProviderDTOS);
+        List<HostingProvider> masterHostingProviderSuggestedByUnit = hostingProviderService.saveSuggestedHostingProvidersFromUnit(countryId, hostingProviderDTOS);
+        if (!masterHostingProviderSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterHostingProviderSuggestedByUnit);
+        }
+        return result;
     }
 
 

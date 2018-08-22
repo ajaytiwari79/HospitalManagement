@@ -1,5 +1,6 @@
 package com.kairos.persistance.repository.master_data.asset_management.storage_format;
 
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
@@ -24,8 +25,8 @@ public interface StorageFormatMongoRepository extends MongoBaseRepository<Storag
 
     StorageFormat findByid(BigInteger id);
 
-    @Query("{countryId:?0,deleted:false}")
-    List<StorageFormat> findAllStorageFormats(Long countryId);
+    @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
+    List<StorageFormatResponseDTO> findAllStorageFormats(Long countryId, String suggestedDataStatus);
 
     @Query("{_id:{$in:?0},deleted:false}")
     List<StorageFormatResponseDTO> findStorageFormatByIds(List<BigInteger> ids);

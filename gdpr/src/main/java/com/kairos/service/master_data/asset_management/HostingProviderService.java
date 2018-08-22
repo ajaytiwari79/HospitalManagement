@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.HostingProviderDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.persistance.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
@@ -42,7 +43,7 @@ public class HostingProviderService extends MongoBaseService {
      * @return return map which contain list of new HostingProvider and list of existing HostingProvider if HostingProvider already exist
      * @description this method create new HostingProvider if HostingProvider not exist with same name ,
      * and if exist then simply add  HostingProvider to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing HostingProvider using collation ,used for case insensitive result
      */
     public Map<String, List<HostingProvider>> createHostingProviders(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
 
@@ -52,7 +53,7 @@ public class HostingProviderService extends MongoBaseService {
             for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
                 hostingProviderNames.add(hostingProvider.getName());
             }
-            List<HostingProvider> existing = findByNamesAndCountryId(countryId, hostingProviderNames, HostingProvider.class);
+            List<HostingProvider> existing = findMetaDataByNamesAndCountryId(countryId, hostingProviderNames, HostingProvider.class);
             hostingProviderNames = ComparisonUtils.getNameListForMetadata(existing, hostingProviderNames);
             List<HostingProvider> newHostingProviders = new ArrayList<>();
             if (!hostingProviderNames.isEmpty()) {
@@ -82,8 +83,8 @@ public class HostingProviderService extends MongoBaseService {
      * @param
      * @return list of HostingProvider
      */
-    public List<HostingProvider> getAllHostingProvider(Long countryId) {
-        return hostingProviderMongoRepository.findAllHostingProviders(countryId);
+    public List<HostingProviderResponseDTO> getAllHostingProvider(Long countryId) {
+        return hostingProviderMongoRepository.findAllHostingProviders(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
 
@@ -169,10 +170,33 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-    public List<HostingProviderResponseDTO> getAllNotInheritedHostingProviderFromParentOrgAndUnitHostingProvider(Long countryId, Long parentOrganizationId, Long unitId) {
 
-        return hostingProviderMongoRepository.getAllNotInheritedHostingProviderFromParentOrgAndUnitHostingProvider(countryId, parentOrganizationId, unitId);
+    /**
+     * @description method save Hosting provider suggested by unit
+     * @param countryId
+     * @param hostingProviderDTOS
+     * @return
+     */
+    public List<HostingProvider> saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
+
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
+            hostingProvoiderNames.add(hostingProvider.getName());
+        }
+        List<HostingProvider> existingHostingProviders = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, HostingProvider.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingHostingProviders, hostingProvoiderNames);
+        List<HostingProvider> hostingProviderList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                HostingProvider hostingProvider = new HostingProvider(name);
+                hostingProvider.setCountryId(countryId);
+                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                hostingProviderList.add(hostingProvider);
+            }
+
+            hostingProviderList = hostingProviderMongoRepository.saveAll(getNextSequence(hostingProviderList));
+        }
+        return hostingProviderList;
     }
-
-
 }

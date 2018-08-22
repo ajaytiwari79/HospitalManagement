@@ -37,6 +37,9 @@ public class OrganizationHostingTypeService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private HostingTypeService  hostingTypeService;
+
 
     /**
      * @param organizationId
@@ -57,7 +60,7 @@ public class OrganizationHostingTypeService extends MongoBaseService {
                 } else
                     throw new InvalidRequestException("name could not be empty or null");
             }
-            List<HostingType> existing = findAllByNameAndOrganizationId(organizationId, hostingTypeNames, HostingType.class);
+            List<HostingType> existing = findMetaDataByNameAndUnitId(organizationId, hostingTypeNames, HostingType.class);
             hostingTypeNames = ComparisonUtils.getNameListForMetadata(existing, hostingTypeNames);
             List<HostingType> newHostingTypes = new ArrayList<>();
             if (!hostingTypeNames.isEmpty()) {
@@ -172,5 +175,17 @@ public class OrganizationHostingTypeService extends MongoBaseService {
 
     }
 
+
+
+    public Map<String, List<HostingType>> saveAndSuggestHostingTypes(Long countryId, Long organizationId, List<HostingTypeDTO> HostingTypeDTOS) {
+
+        Map<String, List<HostingType>> result;
+        result = createHostingType(organizationId, HostingTypeDTOS);
+        List<HostingType> masterHostingTypeSuggestedByUnit = hostingTypeService.saveSuggestedHostingTypesFromUnit(countryId, HostingTypeDTOS);
+        if (!masterHostingTypeSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterHostingTypeSuggestedByUnit);
+        }
+        return result;
+    }
 
 }

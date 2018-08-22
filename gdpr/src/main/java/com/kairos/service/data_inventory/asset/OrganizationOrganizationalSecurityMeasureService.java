@@ -36,6 +36,9 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private OrganizationalSecurityMeasureService organizationalSecurityMeasureService;
+
 
     /**
      * @param
@@ -55,7 +58,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
                 orgSecurityMeasureNames.add(securityMeasure.getName());
             }
 
-            List<OrganizationalSecurityMeasure> existing = findAllByNameAndOrganizationId(organizationId, orgSecurityMeasureNames, OrganizationalSecurityMeasure.class);
+            List<OrganizationalSecurityMeasure> existing = findMetaDataByNameAndUnitId(organizationId, orgSecurityMeasureNames, OrganizationalSecurityMeasure.class);
             orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
             List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {
@@ -167,5 +170,16 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
 
     }
 
+
+    public Map<String, List<OrganizationalSecurityMeasure>> saveAndSuggestOrganizationalSecurityMeasures(Long countryId, Long organizationId, List<OrganizationalSecurityMeasureDTO> OrganizationalSecurityMeasureDTOS) {
+
+        Map<String, List<OrganizationalSecurityMeasure>> result;
+        result = createOrganizationalSecurityMeasure(organizationId, OrganizationalSecurityMeasureDTOS);
+        List<OrganizationalSecurityMeasure> masterOrganizationalSecurityMeasureSuggestedByUnit = organizationalSecurityMeasureService.saveSuggestedOrganizationalSecurityMeasuresFromUnit(countryId, OrganizationalSecurityMeasureDTOS);
+        if (!masterOrganizationalSecurityMeasureSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterOrganizationalSecurityMeasureSuggestedByUnit);
+        }
+        return result;
+    }
 
 }
