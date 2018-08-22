@@ -502,7 +502,7 @@ public class AgreementSectionService extends MongoBaseService {
         }
         AgreementSection agreementSubSection = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, subSectionId);
         if (!Optional.ofNullable(agreementSubSection).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + sectionId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement Sub section " + subSectionId);
         }
 
         agreementSection.getSubSections().remove(subSectionId);
