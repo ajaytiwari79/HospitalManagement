@@ -20,7 +20,7 @@ public class OrganizationBuilder {
     private Long id;
     private List<Group> groupList;
     private List<Organization> children;
-    private boolean isParentOrganization;
+    private boolean parentOrganization;
     private Country country;
     private AccountType accountType;
     private CompanyType companyType;
@@ -62,7 +62,7 @@ public class OrganizationBuilder {
     }
 
     public OrganizationBuilder setIsParentOrganization(boolean isParentOrganization) {
-        this.isParentOrganization = isParentOrganization;
+        this.parentOrganization = isParentOrganization;
         return this;
     }
 
@@ -207,12 +207,9 @@ public class OrganizationBuilder {
     }
 
     public boolean isParentOrganization() {
-        return isParentOrganization;
+        return parentOrganization;
     }
 
-    public void setParentOrganization(boolean parentOrganization) {
-        isParentOrganization = parentOrganization;
-    }
 
     public Country getCountry() {
         return country;
@@ -318,7 +315,7 @@ public class OrganizationBuilder {
     public Organization createOrganization() {
         return new  Organization( id,name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
                 vatId, businessTypes,organizationType, organizationSubTypes,  companyUnitType, companyCategory, timeZone,childLevel,
-        isParentOrganization, country,accountType,boardingCompleted,kairosId,groupList,children,unitType);
+                parentOrganization, country,accountType,boardingCompleted,kairosId,groupList,children,unitType);
     }
 
 }

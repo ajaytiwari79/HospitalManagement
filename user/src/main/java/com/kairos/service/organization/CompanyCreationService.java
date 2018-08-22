@@ -33,7 +33,6 @@ import com.kairos.user.organization.OrganizationBasicDTO;
 import com.kairos.user.organization.UnitManagerDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
 import com.kairos.util.FormatUtil;
-import com.kairos.util.validator.company.OrganizationDetailsValidator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
@@ -47,9 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.util.validator.company.OrganizationDetailsValidator.validateAddressDetails;
-import static com.kairos.util.validator.company.OrganizationDetailsValidator.validateBasicDetails;
-import static com.kairos.util.validator.company.OrganizationDetailsValidator.validateUserDetails;
+import static com.kairos.util.validator.company.OrganizationDetailsValidator.*;
 
 /**
  * CreatedBy vipulpandey on 17/8/18
@@ -119,7 +116,6 @@ public class CompanyCreationService {
             }
             organization.setAccountType(accountType);
         }
-
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
         organizationGraphRepository.save(organization);
@@ -400,9 +396,7 @@ public class CompanyCreationService {
 
         List<OrganizationContactAddress> organizationContactAddresses= organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
         validateAddressDetails(organizationContactAddresses,exceptionService);
-        organizations.forEach(currentOrg -> {
-            currentOrg.setBoardingCompleted(true);
-        });
+        organizations.forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
         organizationGraphRepository.saveAll(organizations);
         return true;
     }
