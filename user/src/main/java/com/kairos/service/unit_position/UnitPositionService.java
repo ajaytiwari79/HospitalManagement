@@ -1149,7 +1149,6 @@ public class UnitPositionService {
 
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("upIds",unitpositionIds.toString().replace("[", "").replace("]", "")));
         WTATableSettingWrapper wtaWithTableSettings = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_WTA, param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTATableSettingWrapper>>() {});
-        //  Map<BigInteger, UnitPositionQueryResult> wtaPositionMap = unitPositionQueryResults.stream().collect(Collectors.toMap(w -> w.getWorkingTimeAgreementId(), w -> w));
         Map<Long,UnitPositionQueryResult> unitPositionQueryResultMap = unitPositionQueryResults.stream().filter(u->u.getHistory().equals(false)).collect(Collectors.toMap(k->k.getId(),v->v));
         wtaWithTableSettings.getAgreements().forEach(currentWTA -> {
             UnitPositionQueryResult unitPositionQueryResult = unitPositionQueryResultMap.get(currentWTA.getUnitPositionId());
