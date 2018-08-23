@@ -1,7 +1,7 @@
 package com.kairos.service.period;
 
 import com.kairos.activity.period.FlippingDateDTO;
-import com.kairos.activity.period.PeriodPhaseFlippingDateDTO;
+import com.kairos.activity.period.PeriodPhaseDTO;
 import com.kairos.activity.period.PlanningPeriodDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.constants.AppConstants;
@@ -100,24 +100,24 @@ public class PlanningPeriodService extends MongoBaseService {
             // Set duration of period
             planningPeriod.setPeriodDuration(DateUtils.getDurationOfTwoLocalDates(planningPeriod.getStartDate(), planningPeriod.getEndDate().plusDays(1)));
 
-            // Set flippind dates
-            FlippingDateDTO flippingDateDTO;
-            for (PeriodPhaseFlippingDateDTO flippingDate : planningPeriod.getPhaseFlippingDate()) {
-                int phaseSequence = phaseIdAndSequenceMap.get(flippingDate.getPhaseId());
+            // Set flipping dates
+            FlippingDateDTO flippingDateDTO=null;
+            for (PeriodPhaseDTO flippingDateTime : planningPeriod.getPhaseFlippingDate()) {
+                int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
                 switch (phaseSequence) {
                     case 4: {
-                        flippingDateDTO=new FlippingDateDTO(flippingDate.getFlippingDate(),flippingDate.getFlippingTime().getHour(),flippingDate.getFlippingTime().getMinute());
-                        planningPeriod.setConstructionToDraftDate(Optional.ofNullable(flippingDate.getFlippingDate()).isPresent() ? flippingDateDTO : null);
+                        flippingDateDTO= setFlippingDateAndTime(flippingDateDTO,flippingDateTime);
+                        planningPeriod.setConstructionToDraftDate(flippingDateDTO);
                         break;
                     }
                     case 3: {
-                        flippingDateDTO=new FlippingDateDTO(flippingDate.getFlippingDate(),flippingDate.getFlippingTime().getHour(),flippingDate.getFlippingTime().getMinute());
-                        planningPeriod.setPuzzleToConstructionDate(Optional.ofNullable(flippingDate.getFlippingDate()).isPresent() ?flippingDateDTO : null);
+                        flippingDateDTO= setFlippingDateAndTime(flippingDateDTO,flippingDateTime);
+                        planningPeriod.setPuzzleToConstructionDate(flippingDateDTO);
                         break;
                     }
                     case 2: {
-                        flippingDateDTO=new FlippingDateDTO(flippingDate.getFlippingDate(),flippingDate.getFlippingTime().getHour(),flippingDate.getFlippingTime().getMinute());
-                        planningPeriod.setRequestToPuzzleDate(Optional.ofNullable(flippingDate.getFlippingDate()).isPresent() ? flippingDateDTO: null);
+                        flippingDateDTO= setFlippingDateAndTime(flippingDateDTO,flippingDateTime);
+                        planningPeriod.setRequestToPuzzleDate(flippingDateDTO);
                         break;
                     }
                 }
@@ -125,6 +125,10 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         return planningPeriods;
     }
+
+        public  FlippingDateDTO setFlippingDateAndTime(FlippingDateDTO flippingDateDTO, PeriodPhaseDTO flippingDateTime){
+                return flippingDateDTO = (Optional.ofNullable(flippingDateTime.getFlippingDate()).isPresent())?new FlippingDateDTO(flippingDateTime.getFlippingDate(), flippingDateTime.getFlippingTime().getHour(), flippingDateTime.getFlippingTime().getMinute()):null;
+        }
 
 
     /// API END Point
