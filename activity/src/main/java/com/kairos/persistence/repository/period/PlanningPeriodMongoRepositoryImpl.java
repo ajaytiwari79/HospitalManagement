@@ -71,6 +71,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 andInclude("endDate").
                 andInclude("phaseFlippingDate").
                 and("current_phase_data.name").as("currentPhase").
+                and("current_phase_data.color").as("color").
                 and("next_phase_data.name").as("nextPhase");
 
         Aggregation aggregation = Aggregation.newAggregation(
