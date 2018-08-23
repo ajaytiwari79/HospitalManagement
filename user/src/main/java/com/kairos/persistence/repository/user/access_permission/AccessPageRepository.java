@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.AppConstants.HAS_ACCESS_OF_TABS;
 import static com.kairos.constants.AppConstants.ACCESS_PAGE_HAS_LANGUAGE;
@@ -374,6 +375,13 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("Match(accessPage:AccessPage)-[rel:"+ ACCESS_PAGE_HAS_LANGUAGE +"]->(language:SystemLanguage{deleted:false}) WHERE accessPage.moduleId={0} AND id(language)={1} RETURN rel.description as description, id(rel) as id, rel.languageId as languageId, rel.moduleId as moduleId order by rel.creationDate DESC limit 1")
     AccessPageLanguageDTO findLanguageSpecificDataByModuleIdAndLanguageId(String moduleId, Long languageId);
+
+    @Query("Match (accessPage:AccessPage{isModule:true}) where id(accessPage) IN {0} return accessPage")
+    List<AccessPage> findAllModulesByIds(Set<Long> moduleIds);
+
+    @Query("MATCH (country:Country)-[" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage:AccessPage{isModule:true,active:true}) WHERE id(country)={0} " +
+            "RETURN id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active")
+    List<AccessPageDTO> getMainActiveTabs(Long countryId);
 }
 
 
