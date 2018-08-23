@@ -23,5 +23,5 @@ public interface CustomPlanningPeriodMongoRepository {
     boolean checkIfPeriodsExistsOrOverlapWithStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate);
     PlanningPeriod findLastPlaningPeriodEndDate(Long unitId);
     List<PlanningPeriod> findAllPeriodsOfUnitByRequestPhaseId(Long unitId, String requestPhaseName);
-    List<PeriodDTO> findAllPeriodsByStartDateAndDate(Long unitId, LocalDate startDate, LocalDate endDate);
+    List<PeriodDTO> findAllPeriodsByStartDateAndLastDate(Long unitId, LocalDate startDate, LocalDate endDate);
 }

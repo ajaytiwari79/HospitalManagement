@@ -1,6 +1,5 @@
 package com.kairos.controller.period;
 
-import com.kairos.activity.period.PeriodDTO;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.activity.period.PlanningPeriodDTO;
@@ -48,9 +47,9 @@ public class PlanningPeriodController {
     }
 
     @ApiOperation(value = "Get Planning Period with phase for self roastering")
-    @GetMapping(value="/self_roastering_period")
-    public ResponseEntity<Map<String, Object>> getPlanningPeriodForSelfRoastering(@PathVariable Long unitId,@RequestParam(required = true, value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate,@RequestParam(required = true, value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPeriodWithPhase(unitId, startDate,endDate));
+    @GetMapping(value="/period_of_interval")
+    public ResponseEntity<Map<String, Object>> getPlanningPeriodOfInterval(@PathVariable Long unitId, @RequestParam(required = true, value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam(required = true, value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPeriodOfInterval(unitId, startDate,endDate));
     }
 
     @ApiOperation(value = "update period by unit Id and Period Id")

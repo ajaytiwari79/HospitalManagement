@@ -439,8 +439,8 @@ public class PlanningPeriodService extends MongoBaseService {
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
-    public List<PeriodDTO> getPeriodWithPhase(Long unitId, LocalDate startDate,LocalDate endDate){
-        return planningPeriodMongoRepository.findAllPeriodsByStartDateAndDate(unitId,startDate,endDate);
+    public List<PeriodDTO> getPeriodOfInterval(Long unitId, LocalDate startDate, LocalDate endDate){
+        return planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId,startDate,endDate);
     }
 
 

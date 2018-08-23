@@ -88,7 +88,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return result.getMappedResults();
     }
 
-    public List<PeriodDTO> findAllPeriodsByStartDateAndDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
+    public List<PeriodDTO> findAllPeriodsByStartDateAndLastDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
         Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
         Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
         ProjectionOperation projectionOperation = Aggregation.project().
