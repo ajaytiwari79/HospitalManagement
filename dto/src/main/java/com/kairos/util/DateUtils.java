@@ -13,6 +13,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -634,5 +635,10 @@ public class DateUtils {
     public static LocalDateTime getEndOfDayFromLocalDate(LocalDate localDate) {
 
         return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    public static int getWeekNumberByLocalDate(LocalDate localDate){
+        TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        return localDate.get(woy);
     }
 }

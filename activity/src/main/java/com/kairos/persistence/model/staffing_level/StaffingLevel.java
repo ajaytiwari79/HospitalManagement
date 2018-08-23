@@ -8,6 +8,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
@@ -19,8 +20,10 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Document(collection = "staffing_level")
 public class StaffingLevel extends MongoBaseEntity {
+    @Indexed
     private Date currentDate;
     private Integer weekCount;
+    @Indexed
     private Long unitId;
     private BigInteger phaseId;
     private StaffingLevelSetting staffingLevelSetting;

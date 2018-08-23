@@ -167,7 +167,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
                 if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
                     errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.for.staffing.level",activity.getName()));
                 }
-                if(activity.getRulesActivityTab().isEligibleForPresence()){
+                if(!activity.getRulesActivityTab().isEligibleForPresence()){
                     errors.add(exceptionService.getLanguageSpecificText("activity.not.presenceType",activity.getName()));
                 }
                 if(!CollectionUtils.containsAny(staffingLevelTemplateDTO.getDayType(),activity.getRulesActivityTab().getDayTypes())){

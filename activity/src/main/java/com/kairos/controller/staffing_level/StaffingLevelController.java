@@ -162,8 +162,8 @@ public class StaffingLevelController {
 
     @PostMapping(value = "/multiple")
     @ApiOperation("Create staffing_levels from StaffingLevelTemplate")
-    public ResponseEntity<Map<String, Object>> addStaffingLevelFromStaffingLevelTemplate(@PathVariable Long unitId, @RequestBody StaffingLevelFromTemplateDTO staffingLevelFromTemplateDTO) {
+    public ResponseEntity<Map<String, Object>> createStaffingLevelFromStaffingLevelTemplate(@PathVariable Long unitId, @RequestBody StaffingLevelFromTemplateDTO staffingLevelFromTemplateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                staffingLevelService.addStaffingLevelFromStaffingLevelTemplate(unitId, staffingLevelFromTemplateDTO));
+                staffingLevelService.createStaffingLevelFromStaffingLevelTemplate(unitId, staffingLevelFromTemplateDTO));
     }
 }
