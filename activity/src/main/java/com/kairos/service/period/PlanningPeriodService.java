@@ -1,7 +1,7 @@
 package com.kairos.service.period;
 
 
-import com.kairos.activity.period.PeriodPhaseDTO;
+import com.kairos.activity.period.PeriodDTO;
 import com.kairos.activity.period.FlippingDateDTO;
 import com.kairos.activity.period.PeriodPhaseFlippingDateDTO;
 import com.kairos.activity.period.PlanningPeriodDTO;
@@ -435,8 +435,8 @@ public class PlanningPeriodService extends MongoBaseService {
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
-    public List<PeriodPhaseDTO> getPeriodWithPhase(Long unitId,PeriodPhaseDTO periodPhaseDTO){
-        return planningPeriodMongoRepository.findAllPeriodsByStartDateAndDate(unitId,periodPhaseDTO.getStartDate(),periodPhaseDTO.getEndDate());
+    public List<PeriodDTO> getPeriodWithPhase(Long unitId, LocalDate startDate,LocalDate endDate){
+        return planningPeriodMongoRepository.findAllPeriodsByStartDateAndDate(unitId,startDate,endDate);
     }
 
 
