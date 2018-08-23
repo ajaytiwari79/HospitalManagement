@@ -1,18 +1,17 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.HostingProviderDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
+import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.HostingProviderService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,6 +38,9 @@ public class OrganizationHostingProviderService extends MongoBaseService {
 
     @Inject
     private HostingProviderService hostingProviderService;
+
+    @Inject
+    private AssetMongoRepository assetMongoRepository;
 
 
     /**
@@ -110,16 +112,18 @@ public class OrganizationHostingProviderService extends MongoBaseService {
     }
 
 
-    public Boolean deleteHostingProvider(Long organizationId, BigInteger id) {
+    public Boolean deleteHostingProvider(Long unitId, BigInteger hostingProviderId) {
 
-        HostingProvider hostingProvider = hostingProviderMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        if (!Optional.ofNullable(hostingProvider).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(hostingProvider);
-            return true;
-
+        List<String> assetsLinkedWithHostingProvider = assetMongoRepository.findAllAssetLinkedWithHostingProvider(unitId, hostingProviderId);
+        if (!assetsLinkedWithHostingProvider.isEmpty()) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Provider", assetsLinkedWithHostingProvider.get(0));
         }
+        HostingProvider hostingProvider = hostingProviderMongoRepository.findByOrganizationIdAndId(unitId, hostingProviderId);
+        if (!Optional.ofNullable(hostingProvider).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Provider", hostingProviderId);
+        }
+        delete(hostingProvider);
+        return true;
     }
 
 
@@ -137,7 +141,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
             if (id.equals(hostingProvider.getId())) {
                 return hostingProviderDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + hostingProviderDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Hosting Provider", hostingProvider.getName());
         }
         hostingProvider = hostingProviderMongoRepository.findByid(id);
         if (!Optional.ofNullable(hostingProvider).isPresent()) {
@@ -148,27 +152,6 @@ public class OrganizationHostingProviderService extends MongoBaseService {
         hostingProviderMongoRepository.save(hostingProvider);
         return hostingProviderDTO;
 
-
-    }
-
-
-    /**
-     * @param organizationId
-     * @param name           name of hosting provider
-     * @return return object of hosting provider
-     * @throws DataNotExists if hosting provider not exist for given name
-     */
-    public HostingProvider getHostingProviderByName(Long organizationId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            HostingProvider exist = hostingProviderMongoRepository.findByOrganizationIdAndName(organizationId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
 

@@ -6,6 +6,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.DataSourceDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
+import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -40,6 +41,9 @@ public class OrganizationDataSourceService extends MongoBaseService {
     @Inject
     private DataSourceService dataSourceService;
 
+    @Inject
+    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+
 
     /**
      * @param organizationId
@@ -56,8 +60,8 @@ public class OrganizationDataSourceService extends MongoBaseService {
         if (!dataSourceDTOS.isEmpty()) {
             for (DataSourceDTO dataSource : dataSourceDTOS) {
 
-                    dataSourceNames.add(dataSource.getName());
-                    }
+                dataSourceNames.add(dataSource.getName());
+            }
             List<DataSource> existing = findMetaDataByNameAndUnitId(organizationId, dataSourceNames, DataSource.class);
             dataSourceNames = ComparisonUtils.getNameListForMetadata(existing, dataSourceNames);
 
@@ -100,23 +104,23 @@ public class OrganizationDataSourceService extends MongoBaseService {
         DataSource exist = dataSourceMongoRepository.findByOrganizationIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            return exist;
-
         }
+        return exist;
     }
 
 
-    public Boolean deleteDataSource(Long organizationId, BigInteger id) {
+    public Boolean deleteDataSource(Long unitId, BigInteger dataSourceId) {
 
-        DataSource dataSource = dataSourceMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        if (!Optional.ofNullable(dataSource).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(dataSource);
-            return true;
-
+        List<String> processingActivitiesLinkedWithDataSource = processingActivityMongoRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
+        if (!processingActivitiesLinkedWithDataSource.isEmpty()) {
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource", processingActivitiesLinkedWithDataSource.get(0));
         }
+        DataSource dataSource = dataSourceMongoRepository.findByOrganizationIdAndId(unitId, dataSourceId);
+        if (!Optional.ofNullable(dataSource).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "DataSource", dataSourceId);
+        }
+        delete(dataSource);
+        return true;
     }
 
     /***
@@ -133,11 +137,11 @@ public class OrganizationDataSourceService extends MongoBaseService {
             if (id.equals(dataSource.getId())) {
                 return dataSourceDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + dataSourceDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate","DataSource",dataSource.getName());
         }
         dataSource = dataSourceMongoRepository.findByid(id);
         if (!Optional.ofNullable(dataSource).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Source", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "DataSource", id);
         }
         dataSource.setName(dataSourceDTO.getName());
         dataSourceMongoRepository.save(dataSource);
@@ -145,27 +149,6 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
 
     }
-
-    /**
-     * @param organizationId
-     * @param name           name of DataSource
-     * @return DataSource object fetch on basis of  name
-     * @throws DataNotExists throw exception if DataSource not exist for given name
-     */
-    public DataSource getDataSourceByName(Long organizationId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            DataSource exist = dataSourceMongoRepository.findByNameAndOrganizationId(organizationId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
 
     public Map<String, List<DataSource>> saveAndSuggestDataSources(Long countryId, Long organizationId, List<DataSourceDTO> DataSourceDTOS) {
 

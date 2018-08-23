@@ -1,12 +1,9 @@
 package com.kairos.service.data_inventory.asset;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.DataDisposalDTO;
-import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
@@ -15,7 +12,6 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.DataDisposalService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -106,16 +102,19 @@ public class OrganizationDataDisposalService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataDisposalById(Long organizationId, BigInteger id) {
+    public Boolean deleteDataDisposalById(Long unitId, BigInteger dataDisposalId) {
 
-        DataDisposal dataDisposal = dataDisposalMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        if (!Optional.ofNullable(dataDisposal).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(dataDisposal);
-            return true;
-
+        List<String> assetsLinkedWithDataDisposal = assetMongoRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
+        if (!assetsLinkedWithDataDisposal.isEmpty()) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", assetsLinkedWithDataDisposal.get(0));
         }
+        DataDisposal dataDisposal = dataDisposalMongoRepository.findByOrganizationIdAndId(unitId, dataDisposalId);
+        if (!Optional.ofNullable(dataDisposal).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Disposal", dataDisposalId);
+        }
+        delete(dataDisposal);
+        return true;
+
     }
 
 
@@ -134,7 +133,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
             if (id.equals(dataDisposal.getId())) {
                 return dataDisposalDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + dataDisposalDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Data Disposal", dataDisposal.getName());
         }
         dataDisposal = dataDisposalMongoRepository.findByid(id);
         if (!Optional.ofNullable(dataDisposal).isPresent()) {
@@ -146,29 +145,6 @@ public class OrganizationDataDisposalService extends MongoBaseService {
         return dataDisposalDTO;
 
     }
-
-
-    /**
-     * @param name
-     * @return object of data disposal
-     * @throws DataNotExists if data  disposal not exist of requested name
-     * @description this method is used for get  data disposal by name
-     */
-    public DataDisposal getDataDisposalByName(Long organizationId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            DataDisposal exist = dataDisposalMongoRepository.findByOrganizationIdAndName(organizationId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
-
 
     public Map<String, List<DataDisposal>> saveAndSuggestDataDisposal(Long countryId, Long organizationId, List<DataDisposalDTO> dataDisposalDTOS) {
 

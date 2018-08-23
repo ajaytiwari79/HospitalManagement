@@ -21,13 +21,28 @@ public interface AssetMongoRepository extends MongoBaseRepository<Asset,BigInteg
 
     Asset findByid(BigInteger id);
 
-    @Query("{organizationId:?0,processingActivities:?1,deleted:false}")
-    List<AssetResponseDTO> getAllAssetRelatedToProcessingActivityById(Long unitId,BigInteger processingActivityId);
-
-    @Query("{organizationId:?0,subProcessingActivities:?1,deleted:false}")
-    List<AssetResponseDTO> getAllAssetRelatedToSubProcessingActivityById(Long unitId,BigInteger subProcessingActivityId);
-
-    @Query("{organizationId:?0,deleted:false,active:?1}")
+    @Query("{organizationId:?0,deleted:false,active:true}")
     List<AssetBasicResponseDTO> getAllAssetWithBasicDetailByStatus(Long unitId, boolean active);
+
+    @Query("{organizationId:?0,deleted:false,active:true,dataDisposal:?1},{name:1,_id:0}")
+    List<String> findAllAssetLinkedWithDataDisposal(Long unitId, BigInteger dataDisposalId);
+
+    @Query("{organizationId:?0,deleted:false,active:true,hostingType:?1},{name:1,_id:0}")
+    List<String> findAllAssetLinkedWithHostingType(Long unitId, BigInteger dataDisposalId);
+
+    @Query("{organizationId:?0,deleted:false,active:true,hostingProvider:?1},{name:1,_id:0}")
+    List<String> findAllAssetLinkedWithHostingProvider(Long unitId, BigInteger hostingProviderId);
+
+    @Query("{organizationId:?0,deleted:false,active:true,technicalSecurityMeasures:?1},{name:1,_id:0}")
+    List<String> findAllAssetLinkedWithTechnicalSecurityMeasure(Long unitId, BigInteger technicalSecurityMeasureId);
+
+    @Query("{organizationId:?0,deleted:false,active:true,storageFormats:?1},{name:1,_id:0}")
+    List<String> findAllAssetLinkedWithStorageFormat(Long unitId, BigInteger storageFormatId);
+
+    @Query("{organizationId:?0,deleted:false,active:true,orgSecurityMeasures:?1},{name:1,_id:0}")
+    List<String> findAllAssetLinkedWithOrganizationalSecurityMeasure(Long unitId, BigInteger orgSecurityMeasureId);
+
+
+
 
 }

@@ -21,15 +21,32 @@ public interface ProcessingActivityMongoRepository extends MongoBaseRepository<P
 
     ProcessingActivity findByid(BigInteger id);
 
-
     @Query("{organizationId:?0,_id:{$in:?1},deleted:false,subProcess:false}")
     List<ProcessingActivity> findSubProcessingActivitiesByIds(Long organizationId, List<BigInteger> ids);
-
 
     @Query("{_id:{$in:?1},deleted:false,subProcess:false}")
     List<ProcessingActivityResponseDTO> findAllSubProcessingActivitiesByIds(List<BigInteger> ids);
 
     @Query("{organizationId:?0,assetId:?1,deleted:false,subProcess:false}")
     List<ProcessingActivityBasicResponseDTO> findAllProcessingActivityLinkWithAssetById(Long unitId, BigInteger assetId);
+
+    @Query("{organizationId:?0,deleted:false,active:true,responsibilityType:?1},{name:1,_id:0}")
+    List<String> findAllProcessingActivityLinkedWithResponsibilityType(Long unitId,BigInteger responsibilityTypeId);
+
+    @Query("{organizationId:?0,deleted:false,active:true,accessorParties:?1},{name:1,_id:0}")
+    List<String> findAllProcessingActivityLinkedWithAccessorParty(Long unitId,BigInteger accessorPartyId);
+
+    @Query("{organizationId:?0,deleted:false,active:true,transferMethods:?1},{name:1,_id:0}")
+    List<String> findAllProcessingActivityLinkedWithTransferMethod(Long unitId,BigInteger transferMethodId);
+
+    @Query("{organizationId:?0,deleted:false,active:true,dataSources:?1},{name:1,_id:0}")
+    List<String> findAllProcessingActivityLinkedWithDataSource(Long unitId,BigInteger dataSourceId);
+
+    @Query("{organizationId:?0,deleted:false,active:true,processingPurposes:?1},{name:1,_id:0}")
+    List<String> findAllProcessingActivityLinkedWithProcessingPurpose(Long unitId,BigInteger processingPurposeId);
+
+    @Query("{organizationId:?0,deleted:false,active:true,processingLegalBasis:?1},{name:1,_id:0}")
+    List<String> findAllProcessingActivityLinkedWithProcessingLegalBasis(Long unitId,BigInteger processingLegalBasisId);
+
 
 }

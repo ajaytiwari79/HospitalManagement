@@ -7,6 +7,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
+import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -39,6 +40,10 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
     @Inject
     private ResponsibilityTypeService responsibilityTypeService;
+
+    @Inject
+    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+
 
     /**
      * @param organizationId
@@ -112,16 +117,18 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteResponsibilityType(Long organizationId, BigInteger id) {
+    public Boolean deleteResponsibilityType(Long unitId, BigInteger responsibilityTypeId) {
 
-        ResponsibilityType responsibilityType = responsibilityTypeMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        if (!Optional.ofNullable(responsibilityType).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(responsibilityType);
-            return true;
-
+        List<String> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithResponsibilityType(unitId, responsibilityTypeId);
+        if (!processingActivities.isEmpty()) {
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Responsibility Type", processingActivities.get(0));
         }
+        ResponsibilityType responsibilityType = responsibilityTypeMongoRepository.findByOrganizationIdAndId(unitId, responsibilityTypeId);
+        if (!Optional.ofNullable(responsibilityType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Responsibility Type", responsibilityTypeId);
+        }
+        delete(responsibilityType);
+        return true;
     }
 
     /***
@@ -139,7 +146,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
             if (id.equals(responsibilityType.getId())) {
                 return responsibilityTypeDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + responsibilityTypeDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Responsibility Type", responsibilityType.getName());
         }
         responsibilityType = responsibilityTypeMongoRepository.findByid(id);
         if (!Optional.ofNullable(responsibilityType).isPresent()) {
