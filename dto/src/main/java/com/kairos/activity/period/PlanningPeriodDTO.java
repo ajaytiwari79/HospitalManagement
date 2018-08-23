@@ -6,8 +6,6 @@ import com.kairos.enums.DurationType;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -29,7 +27,7 @@ public class PlanningPeriodDTO {
     private FlippingDateDTO requestToPuzzleDate;
     private FlippingDateDTO puzzleToConstructionDate;
     private FlippingDateDTO constructionToDraftDate;
-    private List<PeriodPhaseFlippingDateDTO> phaseFlippingDate;
+    private List<PeriodPhaseDTO> phaseFlippingDate;
     private String periodDuration;
     private boolean active=true;
     private String color;
@@ -133,11 +131,11 @@ public class PlanningPeriodDTO {
         this.name = name;
     }
 
-    public List<PeriodPhaseFlippingDateDTO> getPhaseFlippingDate() {
+    public List<PeriodPhaseDTO> getPhaseFlippingDate() {
         return phaseFlippingDate;
     }
 
-    public void setPhaseFlippingDate(List<PeriodPhaseFlippingDateDTO> phaseFlippingDate) {
+    public void setPhaseFlippingDate(List<PeriodPhaseDTO> phaseFlippingDate) {
         this.phaseFlippingDate = phaseFlippingDate;
     }
 
