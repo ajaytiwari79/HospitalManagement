@@ -943,7 +943,7 @@ public class StaffingLevelService extends MongoBaseService {
                 currentInterval.setMaxNoOfStaff(max.get());
                 staffingLevelIntervals.add(currentInterval);
             });
-            StaffingLevel staffingLevel = getStaffingLevelIfExist(dateStaffingLevelMap, localDate, staffingLevelIntervals, staffingLevelTemplate, unitId);
+            StaffingLevel staffingLevel = getStaffingLevelIfExist(dateStaffingLevelMap, currentDate, staffingLevelIntervals, staffingLevelTemplate, unitId);
             staffingLevels.add(staffingLevel);
         });
 
