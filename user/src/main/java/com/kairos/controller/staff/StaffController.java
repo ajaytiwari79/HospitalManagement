@@ -22,7 +22,6 @@ import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.user.employment.EmploymentDTO;
 import com.kairos.user.staff.staff.StaffCreationDTO;
 import com.kairos.user.staff.staff.StaffDTO;
-import com.kairos.user.staff.staff.StaffPreferencesDTO;
 import com.kairos.user.user.password.PasswordUpdateDTO;
 import com.kairos.util.DateConverter;
 import com.kairos.util.response.ResponseHandler;
@@ -632,12 +631,6 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByStaffIncludeFilterForPriorityGroups(staffIncludeFilterDTO,unitId));
     }
 
-    @ApiOperation(value = "Staff personalized view in daily view")
-    @RequestMapping(value = "/personal_view_settings/daily_view", method = RequestMethod.POST)
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> blockOpenShiftByStaff(@PathVariable Long unitId,@RequestBody StaffPreferencesDTO staffPreferencesDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.savePersonalizedSettings(unitId,staffPreferencesDTO));
-    }
 
     @ApiOperation(value = "update and set main emloyment setting")
     @RequestMapping(value = "/{staffId}/main_employment",method = RequestMethod.PUT)
@@ -688,4 +681,5 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getStaffDetailByIds(@PathVariable Long unitId,@RequestBody Set<Long> staffIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffDetailByIds(unitId,staffIds));
     }
+
 }

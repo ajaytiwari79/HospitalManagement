@@ -251,7 +251,6 @@ public abstract class RelationshipConstants {
     public final static String HAS_FUNCTIONAL_AMOUNT = "HAS_FUNCTIONAL_AMOUNT";
     public final static String FUNCTIONAL_PAYMENT_MATRIX = "FUNCTIONAL_PAYMENT_MATRIX";
     public final static String APPLIED_FUNCTION = "APPLIED_FUNCTION";
-    public final static String HAS_STAFF_SETTINGS="HAS_STAFF_SETTINGS";
     public final static String HAS_OPEN_SHIFT_SETTINGS="HAS_OPEN_SHIFT_SETTINGS";
     public final static String EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT = "EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT";
     public final static String HAS_PREFERED_TIME_WINDOW = "HAS_PREFERED_TIME_WINDOW";
