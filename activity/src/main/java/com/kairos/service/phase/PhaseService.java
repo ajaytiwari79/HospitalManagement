@@ -52,7 +52,7 @@ public class PhaseService extends MongoBaseService {
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
             Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(),phaseDTO.getPhaseEnum(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
-                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(),phaseDTO.getColor(),phaseDTO.getFlippingDefalutTime());
+                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(),phaseDTO.getColor(),phaseDTO.getFlippingDefaultTime());
 
             phases.add(phase);
         }
@@ -151,7 +151,7 @@ public class PhaseService extends MongoBaseService {
 
     private Phase buildPhaseForCountry(PhaseDTO phaseDTO) {
         return new Phase(phaseDTO.getName(), phaseDTO.getDescription(),phaseDTO.getPhaseEnum(),phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(),
-                phaseDTO.getCountryId(), phaseDTO.getOrganizationId(), phaseDTO.getParentCountryPhaseId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(),phaseDTO.getColor(),phaseDTO.getFlippingDefalutTime());
+                phaseDTO.getCountryId(), phaseDTO.getOrganizationId(), phaseDTO.getParentCountryPhaseId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(),phaseDTO.getColor(),phaseDTO.getFlippingDefaultTime());
     }
 
     public List<PhaseDTO> getPhasesByCountryId(Long countryId) {
@@ -278,7 +278,7 @@ public class PhaseService extends MongoBaseService {
         phase.setSequence(phase.getSequence());
         phase.setDescription(phaseDTO.getDescription());
         phase.setColor(phaseDTO.getColor());
-        phase.setFlippingDefalutTime(phaseDTO.getFlippingDefalutTime());
+        phase.setFlippingDefaultTime(phaseDTO.getFlippingDefaultTime());
 
     }
 

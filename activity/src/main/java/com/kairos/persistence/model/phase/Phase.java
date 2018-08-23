@@ -36,7 +36,7 @@ public class Phase extends MongoBaseEntity {
     private List<ShiftStatus> status;
     private String color;
     private PhaseDefaultName phaseEnum;
-    private LocalTime flippingDefalutTime;
+    private LocalTime flippingDefaultTime;
     private int gracePeriodByStaff;
     private int gracePeriodByManagement;
     private String untilNextDay;
@@ -44,7 +44,7 @@ public class Phase extends MongoBaseEntity {
     public Phase() {
         //default constructor
     }
-    public Phase(String name, String description, PhaseDefaultName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status, String color,LocalTime flippingDefalutTime) {
+    public Phase(String name, String description, PhaseDefaultName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status, String color,LocalTime flippingDefaultTime) {
         this.name = name;
         this.description = description;
         this.phaseEnum=phaseEnum;
@@ -57,7 +57,7 @@ public class Phase extends MongoBaseEntity {
         this.phaseType = phaseType;
         this.status = ShiftStatus.getListByValue(status);
         this.color=color;
-        this.flippingDefalutTime=flippingDefalutTime;
+        this.flippingDefaultTime = flippingDefaultTime;
     }
 
     public Long getOrganizationId() {
@@ -156,12 +156,12 @@ public class Phase extends MongoBaseEntity {
         this.phaseEnum = phaseEnum;
     }
 
-    public LocalTime getFlippingDefalutTime() {
-        return flippingDefalutTime;
+    public LocalTime getFlippingDefaultTime() {
+        return flippingDefaultTime;
     }
 
-    public void setFlippingDefalutTime(LocalTime flippingDefalutTime) {
-        this.flippingDefalutTime = flippingDefalutTime;
+    public void setFlippingDefaultTime(LocalTime flippingDefaultTime) {
+        this.flippingDefaultTime = flippingDefaultTime;
     }
 
     public int getGracePeriodByStaff() {

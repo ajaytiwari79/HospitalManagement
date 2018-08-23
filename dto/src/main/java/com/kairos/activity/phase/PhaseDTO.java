@@ -33,7 +33,7 @@ public class PhaseDTO {
     private List<String> status;
     private String color;
     private PhaseDefaultName phaseEnum;
-    private LocalTime flippingDefalutTime;
+    private LocalTime flippingDefaultTime;
     private int gracePeriodByStaff;
     private int gracePeriodByManagement;
     private String untilNextDay;
@@ -175,12 +175,12 @@ public class PhaseDTO {
         this.phaseEnum = phaseEnum;
     }
 
-    public LocalTime getFlippingDefalutTime() {
-        return flippingDefalutTime;
+    public LocalTime getFlippingDefaultTime() {
+        return flippingDefaultTime;
     }
 
-    public void setFlippingDefalutTime(LocalTime flippingDefalutTime) {
-        this.flippingDefalutTime = flippingDefalutTime;
+    public void setFlippingDefaultTime(LocalTime flippingDefaultTime) {
+        this.flippingDefaultTime = flippingDefaultTime;
     }
 
     public int getGracePeriodByStaff() {

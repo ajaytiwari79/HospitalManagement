@@ -4,10 +4,8 @@ import com.kairos.activity.period.FlippingDateDTO;
 import com.kairos.activity.period.PeriodPhaseFlippingDateDTO;
 import com.kairos.activity.period.PlanningPeriodDTO;
 import com.kairos.activity.phase.PhaseDTO;
-import com.kairos.activity.staffing_level.Duration;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.DurationType;
-import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
@@ -30,7 +28,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
@@ -197,7 +194,7 @@ public class PlanningPeriodService extends MongoBaseService {
             for (PhaseDTO phase : applicablePhases) {
                 // Check if duration of period is enough to assign next flipping
                 if(DurationType.DAYS.equals(phase.getDurationType())) {
-                    tempFlippingDate = DateUtils.addDurationInLocalDateTime(LocalDateTime.of(tempFlippingDate.toLocalDate(),phase.getFlippingDefalutTime()), -phase.getDurationInDays(), DurationType.DAYS, 1);
+                    tempFlippingDate = DateUtils.addDurationInLocalDateTime(LocalDateTime.of(tempFlippingDate.toLocalDate(),phase.getFlippingDefaultTime()), -phase.getDurationInDays(), DurationType.DAYS, 1);
                 }else{
                     tempFlippingDate = DateUtils.addDurationInLocalDateTime(tempFlippingDate, -phase.getDurationInDays(), DurationType.HOURS, 1);
                 }
