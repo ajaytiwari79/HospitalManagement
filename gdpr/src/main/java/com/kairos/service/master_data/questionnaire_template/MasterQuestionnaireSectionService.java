@@ -119,8 +119,10 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
             masterQuestionnaireSections.add(questionnaireSection);
         }
         try {
-            masterQuestionnaireSections = masterQuestionnaireSectionRepository.saveAll(masterQuestionnaireSections);
-            masterQuestionnaireSections.forEach(masterQuestionnaireSection -> questionSectionIds.add(masterQuestionnaireSection.getId()));
+            masterQuestionnaireSections = masterQuestionnaireSectionRepository.saveAll(getNextSequence(masterQuestionnaireSections));
+            masterQuestionnaireSections.forEach(masterQuestionnaireSection -> {
+                questionSectionIds.add(masterQuestionnaireSection.getId());
+            });
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             masterQuestionMongoRepository.deleteAll(questionList);
@@ -198,7 +200,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         List<MasterQuestionnaireSection> sections = new ArrayList<>();
 
         List<BigInteger> sectionsIds = new ArrayList<>();
-        Map<String, Object> updatedSections , newSections;
+        Map<String, Object> updatedSections = new HashMap<>(), newSections = new HashMap<>();
         if (updateExistingSectionsList.size() != 0) {
             updatedSections = updateQuestionnaireSectionAndQuestionList(countryId, orgId, updateExistingSectionsList, templateType);
             sectionsIds.addAll((List<BigInteger>) updatedSections.get(IDS_LIST));
@@ -252,7 +254,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
 
         try {
-            updateSectionsList = masterQuestionnaireSectionRepository.saveAll(updateSectionsList);
+            updateSectionsList = masterQuestionnaireSectionRepository.saveAll(getNextSequence(updateSectionsList));
 
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());

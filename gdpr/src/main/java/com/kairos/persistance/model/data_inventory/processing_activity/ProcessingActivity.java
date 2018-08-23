@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Document(collection = "processing_activity")
 public class ProcessingActivity extends MongoBaseEntity {

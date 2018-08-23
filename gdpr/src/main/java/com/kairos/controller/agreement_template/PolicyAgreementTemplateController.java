@@ -1,6 +1,7 @@
 package com.kairos.controller.agreement_template;
 
 import com.kairos.gdpr.PolicyAgreementTemplateDTO;
+import com.kairos.service.agreement_template.AgreementSectionService;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;

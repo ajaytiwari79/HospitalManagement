@@ -134,7 +134,7 @@ public class ClauseTagService extends MongoBaseService {
             throw new DuplicateDataException("tag is already exist with name " + exists.get(0).getName());
         }
         if (clauseTagList.size() != 0) {
-            clauseTagList = clauseTagMongoRepository.saveAll(clauseTagList);
+            clauseTagList = clauseTagMongoRepository.saveAll(getNextSequence(clauseTagList));
         }
         clauseTagList.addAll(clauseTagMongoRepository.findAllClauseTagByIds(countryId, organizationId, existClauseTagIds));
         return clauseTagList;
