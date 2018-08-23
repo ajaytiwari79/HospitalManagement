@@ -921,8 +921,8 @@ public class StaffingLevelService extends MongoBaseService {
         Set<LocalDate> dates = dateWiseActivityDTOS.stream().map(DateWiseActivityDTO::getDate).collect(Collectors.toSet());
         List<StaffingLevel> allStaffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDate(unitId, dates);
         Map<LocalDate, StaffingLevel> dateStaffingLevelMap = allStaffingLevels.stream().collect(Collectors.toMap(k -> asLocalDate(k.getCurrentDate()), v -> v));
-        dateWiseActivityDTOS.forEach(localDate -> {
-            Map<BigInteger, BigInteger> activityMap = localDate.getActivityIds().stream().collect(Collectors.toMap(k -> k, v -> v));
+        dateWiseActivityDTOS.forEach(currentDate -> {
+            Map<BigInteger, BigInteger> activityMap = currentDate.getActivityIds().stream().collect(Collectors.toMap(k -> k, v -> v));
             Set<StaffingLevelActivity> selectedActivitiesForCurrentDate = new HashSet<>();
             List<StaffingLevelInterval> staffingLevelIntervals = new ArrayList<>();
             staffingLevelTemplate.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
