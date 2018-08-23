@@ -37,7 +37,7 @@ public class StaffingLevelGraphController {
 
         Duration duration=new Duration(LocalTime.now(),LocalTime.now());
         StaffingLevelSetting staffingLevelSetting=new StaffingLevelSetting(15,duration);
-        PresenceStaffingLevelDto dto=new PresenceStaffingLevelDto(1L, DateUtils.getDate(),20L,staffingLevelSetting);
+        PresenceStaffingLevelDto dto=new PresenceStaffingLevelDto(new BigInteger("1"), DateUtils.getDate(),20,staffingLevelSetting);
         List<StaffingLevelTimeSlotDTO> staffingLevelTimeSlots=new ArrayList<>();
 
         for(int i=0;i<=95;i++){

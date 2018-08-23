@@ -14,10 +14,10 @@ import java.util.List;
 public class StaffingLevelPlanningDTO {
     private BigInteger id;
     @NotNull
-    private Long phaseId;
+    private BigInteger phaseId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date currentDate;
-    private Long weekCount;
+    private Integer weekCount;
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private List<StaffingLevelInterval> absenceStaffingLevelInterval =new ArrayList<>();
@@ -25,7 +25,7 @@ public class StaffingLevelPlanningDTO {
     public StaffingLevelPlanningDTO() {
     }
 
-    public StaffingLevelPlanningDTO(BigInteger id, @NotNull Long phaseId, Date currentDate, Long weekCount, StaffingLevelSetting staffingLevelSetting,
+    public StaffingLevelPlanningDTO(BigInteger id, @NotNull BigInteger phaseId, Date currentDate, Integer weekCount, StaffingLevelSetting staffingLevelSetting,
                                     List<StaffingLevelInterval> presenceStaffingLevelInterval, List<StaffingLevelInterval> absenceStaffingLevelInterval) {
         this.id = id;
         this.phaseId = phaseId;
@@ -44,11 +44,11 @@ public class StaffingLevelPlanningDTO {
         this.id = id;
     }
 
-    public Long getPhaseId() {
+    public BigInteger getPhaseId() {
         return phaseId;
     }
 
-    public void setPhaseId(Long phaseId) {
+    public void setPhaseId(BigInteger phaseId) {
         this.phaseId = phaseId;
     }
 
@@ -60,11 +60,11 @@ public class StaffingLevelPlanningDTO {
         this.currentDate = currentDate;
     }
 
-    public Long getWeekCount() {
+    public Integer getWeekCount() {
         return weekCount;
     }
 
-    public void setWeekCount(Long weekCount) {
+    public void setWeekCount(Integer weekCount) {
         this.weekCount = weekCount;
     }
 
