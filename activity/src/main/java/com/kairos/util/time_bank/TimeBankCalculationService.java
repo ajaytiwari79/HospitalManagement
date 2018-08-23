@@ -41,6 +41,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -194,7 +196,6 @@ public class TimeBankCalculationService {
      * @param interval
      * @param ctaDto
      * @param shifts
-     * @param dailyTimeBankEntry
      * @return DailyTimeBankEntry
      */
     //TODO complete review by Sachin and need Test cases
@@ -213,13 +214,14 @@ public class TimeBankCalculationService {
                         int ctaTimeBankMin = 0;
                         boolean activityValid = ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()));
                         if (activityValid) {
-                            boolean ruleTemplateValid = ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart())))) && (ruleTemplate.getEmploymentTypes() == null || ruleTemplate.getEmploymentTypes().contains(ctaDto.getEmploymentType().getId()));
+                            java.time.LocalDate shiftDate = ZonedDateTime.ofInstant(shiftInterval.getStart().toDate().toInstant(), ZoneId.systemDefault()).toLocalDate();
+                            boolean ruleTemplateValid = ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftDate.getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(shiftDate))) && (ruleTemplate.getEmploymentTypes() == null || ruleTemplate.getEmploymentTypes().contains(ctaDto.getEmploymentType().getId()));
                             if (ruleTemplateValid) {
                                 if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shift.getStartDate().getTime())) {
                                     dailyScheduledMin += shift.getScheduledMinutes();
                                     totalDailyTimebank += dailyScheduledMin;
                                 }
-                                if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
+                                else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                                     for (CompensationTableInterval ctaInterval : ruleTemplate.getCompensationTable().getCompensationTableInterval()) {
                                         Interval intervalOfCTA = getCTAInterval(ctaInterval, interval.getStart());
                                         if (intervalOfCTA.overlaps(shiftInterval)) {
