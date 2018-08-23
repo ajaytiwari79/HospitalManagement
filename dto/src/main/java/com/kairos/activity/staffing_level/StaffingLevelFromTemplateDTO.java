@@ -4,25 +4,21 @@ package com.kairos.activity.staffing_level;
  *
  */
 
-import com.kairos.util.DateUtils;
-
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 public class StaffingLevelFromTemplateDTO {
 
     private BigInteger templateId;
-    private List<DateWiseActivityDTO> importIntervals;
+    private List<DateWiseActivityDTO> activitiesByDate;
 
     public StaffingLevelFromTemplateDTO() {
         //Default Constructor
     }
 
-    public StaffingLevelFromTemplateDTO(BigInteger templateId, List<DateWiseActivityDTO> importIntervals) {
+    public StaffingLevelFromTemplateDTO(BigInteger templateId, List<DateWiseActivityDTO> activitiesByDate) {
         this.templateId = templateId;
-        this.importIntervals = importIntervals;
+        this.activitiesByDate = activitiesByDate;
     }
 
     public BigInteger getTemplateId() {
@@ -33,11 +29,11 @@ public class StaffingLevelFromTemplateDTO {
         this.templateId = templateId;
     }
 
-    public List<DateWiseActivityDTO> getImportIntervals() {
-        return importIntervals;
+    public List<DateWiseActivityDTO> getActivitiesByDate() {
+        return activitiesByDate;
     }
 
-    public void setImportIntervals(List<DateWiseActivityDTO> importIntervals) {
-        this.importIntervals = importIntervals;
+    public void setActivitiesByDate(List<DateWiseActivityDTO> activitiesByDate) {
+        this.activitiesByDate = activitiesByDate;
     }
 }

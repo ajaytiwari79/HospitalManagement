@@ -113,7 +113,7 @@ public class StaffingLevelIntegrationTest {
     }
 
    private StaffingLevelFromTemplateDTO prePareDtoForStaffingLevelFromTemplate(){
-        List<DateWiseActivityDTO> dateWiseActivityDTOS=new ArrayList<>();
+        List<DateWiseActivityDTO> dateWiseActivityDTOS =new ArrayList<>();
         Set<BigInteger> activities=new HashSet<>();
         Set<BigInteger> activitiess=new HashSet<>();
         activities.add(new BigInteger("2474"));
@@ -124,7 +124,7 @@ public class StaffingLevelIntegrationTest {
         LocalDate.of(2018,8,22);
         dateWiseActivityDTOS.add(new DateWiseActivityDTO(LocalDate.of(2018,8,22),activities));
         dateWiseActivityDTOS.add(new DateWiseActivityDTO(LocalDate.of(2018,8,24),activitiess));
-        return new StaffingLevelFromTemplateDTO(new BigInteger("13"),dateWiseActivityDTOS);
+        return new StaffingLevelFromTemplateDTO(new BigInteger("13"), dateWiseActivityDTOS);
     }
 
 

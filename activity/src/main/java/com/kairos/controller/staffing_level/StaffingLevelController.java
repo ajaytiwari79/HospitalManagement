@@ -160,10 +160,10 @@ public class StaffingLevelController {
                 staffingLevelService.getStaffingLevel(unitId,startDate,endDate));
     }
 
-    @PostMapping(value = "/multiple")
+    @PostMapping
     @ApiOperation("Create staffing_levels from StaffingLevelTemplate")
-    public ResponseEntity<Map<String, Object>> createStaffingLevelFromStaffingLevelTemplate(@PathVariable Long unitId, @RequestBody StaffingLevelFromTemplateDTO staffingLevelFromTemplateDTO) {
+    public ResponseEntity<Map<String, Object>> createStaffingLevelFromStaffingLevelTemplate(@PathVariable Long unitId, @RequestBody StaffingLevelFromTemplateDTO staffingLevelFromTemplateDTO,@RequestParam("templateId") BigInteger templateId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
-                staffingLevelService.createStaffingLevelFromStaffingLevelTemplate(unitId, staffingLevelFromTemplateDTO));
+                staffingLevelService.createStaffingLevelFromStaffingLevelTemplate(unitId, staffingLevelFromTemplateDTO,templateId));
     }
 }

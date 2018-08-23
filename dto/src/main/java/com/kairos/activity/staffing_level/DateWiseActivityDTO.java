@@ -8,24 +8,24 @@ import java.time.LocalDate;
 import java.util.Set;
 
 public class DateWiseActivityDTO {
-    private LocalDate date;
+    private LocalDate localDate;
     private Set<BigInteger> activityIds;
 
     public DateWiseActivityDTO() {
         //Default Constructor
     }
 
-    public DateWiseActivityDTO(LocalDate selectedDate, Set<BigInteger> activityIds) {
-        this.date = date;
+    public DateWiseActivityDTO(LocalDate localDate, Set<BigInteger> activityIds) {
+        this.localDate = localDate;
         this.activityIds = activityIds;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDate getLocalDate() {
+        return localDate;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setLocalDate(LocalDate localDate) {
+        this.localDate = localDate;
     }
 
     public Set<BigInteger> getActivityIds() {
