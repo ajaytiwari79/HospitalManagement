@@ -19,8 +19,8 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
  *
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_UNIT_URL)
-@Api(API_ORGANIZATION_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL+"/staff")
+@Api(API_ORGANIZATION_UNIT_URL+"/staff")
 public class StaffOpenShiftBlockSettingController {
 
     @Inject private StaffOpenShiftBlockSettingService staffOpenShiftBlockSettingService;
