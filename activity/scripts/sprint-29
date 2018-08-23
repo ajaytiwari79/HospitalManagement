@@ -65,3 +65,6 @@ db.getCollection('phases').updateMany({"name":"REALTIME"},{$set:{"phaseEnum":"RE
 db.getCollection('phases').updateMany({"name":"TIME & ATTENDANCE"},{$set:{"phaseEnum":"TIME_ATTENDANCE"}})
 db.getCollection('phases').updateMany({"name":"TENTATIVE"},{$set:{"phaseEnum":"TENTATIVE"}})
 db.getCollection('phases').updateMany({"name":"PAYROLL"},{$set:{"phaseEnum":"PAYROLL"}})
+
+
+db.workingTimeAgreement.updateMany({"disabled":{"$exists":false}},{$set:{disabled:false}})
