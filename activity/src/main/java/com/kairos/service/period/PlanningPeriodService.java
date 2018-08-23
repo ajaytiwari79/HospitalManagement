@@ -106,17 +106,17 @@ public class PlanningPeriodService extends MongoBaseService {
                 int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
                 switch (phaseSequence) {
                     case 4: {
-                        flippingDateDTO=setFlippingDate(flippingDateDTO,flippingDateTime);
+                        flippingDateDTO= setFlippingDateAndTime(flippingDateDTO,flippingDateTime);
                         planningPeriod.setConstructionToDraftDate(flippingDateDTO);
                         break;
                     }
                     case 3: {
-                        flippingDateDTO=setFlippingDate(flippingDateDTO,flippingDateTime);
+                        flippingDateDTO= setFlippingDateAndTime(flippingDateDTO,flippingDateTime);
                         planningPeriod.setPuzzleToConstructionDate(flippingDateDTO);
                         break;
                     }
                     case 2: {
-                        flippingDateDTO=setFlippingDate(flippingDateDTO,flippingDateTime);
+                        flippingDateDTO= setFlippingDateAndTime(flippingDateDTO,flippingDateTime);
                         planningPeriod.setRequestToPuzzleDate(flippingDateDTO);
                         break;
                     }
@@ -126,7 +126,7 @@ public class PlanningPeriodService extends MongoBaseService {
         return planningPeriods;
     }
 
-        public  FlippingDateDTO setFlippingDate(FlippingDateDTO flippingDateDTO,PeriodPhaseDTO flippingDateTime){
+        public  FlippingDateDTO setFlippingDateAndTime(FlippingDateDTO flippingDateDTO, PeriodPhaseDTO flippingDateTime){
                 return flippingDateDTO = (Optional.ofNullable(flippingDateTime.getFlippingDate()).isPresent())?new FlippingDateDTO(flippingDateTime.getFlippingDate(), flippingDateTime.getFlippingTime().getHour(), flippingDateTime.getFlippingTime().getMinute()):null;
         }
 
