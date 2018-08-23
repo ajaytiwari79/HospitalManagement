@@ -1,8 +1,12 @@
 package com.kairos.persistence.model.activity.tabs;
 
 import com.kairos.activity.open_shift.DurationField;
+import com.kairos.wrapper.activity.CutOffInterval;
+import com.kairos.wrapper.activity.CutOffIntervalUnit;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,16 +29,53 @@ public class RulesActivityTab implements Serializable{
     private boolean eligibleForAbsence;
     private boolean breakAllowed = false;
     private boolean approvalAllowed = false;
+    private LocalDate cutOffStartFrom;
+    private CutOffIntervalUnit cutOffIntervalUnit;
+    private Integer cutOffdayValue;
+    private List<CutOffInterval> cutOffIntervals;
     // in Minutes
-    private Integer earliestStartTime;
-    private Integer latestStartTime;
-    private Integer shortestTime;
-    private Integer longestTime;
+    private LocalTime earliestStartTime;
+    private LocalTime latestStartTime;
+    private int shortestTime;
+    private int longestTime;
     private boolean eligibleForCopy;
     private DurationField plannedTimeInAdvance;
     private DurationField approvalTimeInAdvance;
     private Float approvalPercentage;
+    private LocalTime maximumEndTime;// shift can't be extend this time
 
+
+    public LocalDate getCutOffStartFrom() {
+        return cutOffStartFrom;
+    }
+
+    public void setCutOffStartFrom(LocalDate cutOffStartFrom) {
+        this.cutOffStartFrom = cutOffStartFrom;
+    }
+
+    public CutOffIntervalUnit getCutOffIntervalUnit() {
+        return cutOffIntervalUnit;
+    }
+
+    public void setCutOffIntervalUnit(CutOffIntervalUnit cutOffIntervalUnit) {
+        this.cutOffIntervalUnit = cutOffIntervalUnit;
+    }
+
+    public Integer getCutOffdayValue() {
+        return cutOffdayValue;
+    }
+
+    public void setCutOffdayValue(Integer cutOffdayValue) {
+        this.cutOffdayValue = cutOffdayValue;
+    }
+
+    public List<CutOffInterval> getCutOffIntervals() {
+        return cutOffIntervals;
+    }
+
+    public void setCutOffIntervals(List<CutOffInterval> cutOffIntervals) {
+        this.cutOffIntervals = cutOffIntervals;
+    }
 
     public boolean isEligibleForStaffingLevel() {
         return eligibleForStaffingLevel;
@@ -87,7 +128,7 @@ public class RulesActivityTab implements Serializable{
     public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleAgainstTimeRules, boolean lockLengthPresent, boolean eligibleToBeForced,
 
                             List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
-    , Integer earliestStartTime, Integer latestStartTime, Integer shortestTime, Integer longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,DurationField approvalTimeInAdvance,Float approvalPercentage) {
+    , LocalTime earliestStartTime, LocalTime latestStartTime, int shortestTime, int longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,DurationField approvalTimeInAdvance,Float approvalPercentage,LocalTime maximumEndTime,Integer cutOffdayValue,CutOffIntervalUnit cutOffIntervalUnit,LocalDate cutOffStartFrom) {
 
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
@@ -110,6 +151,10 @@ public class RulesActivityTab implements Serializable{
         this.plannedTimeInAdvance=plannedTimeInAdvance;
         this.approvalTimeInAdvance=approvalTimeInAdvance;
         this.approvalPercentage=approvalPercentage;
+        this.maximumEndTime=maximumEndTime;
+        this.cutOffdayValue = cutOffdayValue;
+        this.cutOffIntervalUnit = cutOffIntervalUnit;
+        this.cutOffStartFrom = cutOffStartFrom;
 
     }
 
@@ -194,35 +239,35 @@ public class RulesActivityTab implements Serializable{
     }
 
 
-    public Integer getEarliestStartTime() {
+    public LocalTime getEarliestStartTime() {
         return earliestStartTime;
     }
 
-    public void setEarliestStartTime(Integer earliestStartTime) {
+    public void setEarliestStartTime(LocalTime earliestStartTime) {
         this.earliestStartTime = earliestStartTime;
     }
 
-    public Integer getLatestStartTime() {
+    public LocalTime getLatestStartTime() {
         return latestStartTime;
     }
 
-    public void setLatestStartTime(Integer latestStartTime) {
+    public void setLatestStartTime(LocalTime latestStartTime) {
         this.latestStartTime = latestStartTime;
     }
 
-    public Integer getShortestTime() {
+    public int getShortestTime() {
         return shortestTime;
     }
 
-    public void setShortestTime(Integer shortestTime) {
+    public void setShortestTime(int shortestTime) {
         this.shortestTime = shortestTime;
     }
 
-    public Integer getLongestTime() {
+    public int getLongestTime() {
         return longestTime;
     }
 
-    public void setLongestTime(Integer longestTime) {
+    public void setLongestTime(int longestTime) {
         this.longestTime = longestTime;
     }
 
@@ -256,5 +301,13 @@ public class RulesActivityTab implements Serializable{
 
     public void setApprovalPercentage(Float approvalPercentage) {
         this.approvalPercentage = approvalPercentage;
+    }
+
+    public LocalTime getMaximumEndTime() {
+        return maximumEndTime;
+    }
+
+    public void setMaximumEndTime(LocalTime maximumEndTime) {
+        this.maximumEndTime = maximumEndTime;
     }
 }

@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -32,15 +31,15 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     private MongoTemplate mongoTemplate;
 
     public PlanningPeriod getPlanningPeriodContainsDate(Long unitId, LocalDate localDateLiesInPeriod) {
-        Date dateLiesInPeriod = DateUtils.asDate(localDateLiesInPeriod);
+        Date dateLiesInPeriod = DateUtils.getDateFromLocalDate(localDateLiesInPeriod);
         Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).
                 and("startDate").lte(dateLiesInPeriod).and("endDate").gte(dateLiesInPeriod));
         return mongoTemplate.findOne(query, PlanningPeriod.class);
     }
 
     public UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
-        Date startDate = DateUtils.asDate(startLocalDate);
-        Date endDate = DateUtils.asDate(endLocalDate);
+        Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
+        Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
         Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).
                 and("startDate").gte(startDate).and("endDate").lte(endDate));
         Update update = new Update();
@@ -72,6 +71,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 andInclude("endDate").
                 andInclude("phaseFlippingDate").
                 and("current_phase_data.name").as("currentPhase").
+                and("current_phase_data.color").as("color").
                 and("next_phase_data.name").as("nextPhase");
 
         Aggregation aggregation = Aggregation.newAggregation(
@@ -114,8 +114,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     public List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
 
-        Date startDate = DateUtils.asDate(startLocalDate);
-        Date endDate = DateUtils.asDate(endLocalDate);
+        Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
+        Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
         ProjectionOperation projectionOperation = Aggregation.project().
                 and("id").as("id").
                 andInclude("name").
@@ -141,8 +141,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     public boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate, int sequence) {
 
-        Date startDate = DateUtils.asDate(startLocalDate);
-        Date endDate = DateUtils.asDate(endLocalDate);
+        Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
+        Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("active").is(true).and("unitId").is(unitId)
                         .orOperator(
@@ -165,8 +165,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     public boolean checkIfPeriodsExistsOrOverlapWithStartAndEndDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
 
-        Date startDate = DateUtils.asDate(startLocalDate);
-        Date endDate = DateUtils.asDate(endLocalDate);
+        Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
+        Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("active").is(true).and("unitId").is(unitId)
                         .orOperator(

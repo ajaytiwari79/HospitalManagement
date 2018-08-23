@@ -4,16 +4,12 @@ import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
+import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.team.Team;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
-import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
-import com.kairos.persistence.repository.organization.TeamGraphRepository;
+import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
@@ -32,7 +28,7 @@ import static com.kairos.constants.AppConstants.TEAM;
  */
 @Transactional
 @Service
-public class OrganizationServiceService extends UserBaseService {
+public class OrganizationServiceService{
 
     @Inject
     OrganizationTypeGraphRepository organizationTypeGraphRepository;
@@ -43,9 +39,9 @@ public class OrganizationServiceService extends UserBaseService {
     @Inject
     private CountryGraphRepository countryGraphRepository;
     //TODO move this dependency in task
+   @Inject
+    private OrganizationExternalServiceRelationshipRepository organizationExternalServiceRelationshipRepository;
    /* @Inject
-    private TaskTypeService taskTypeService;
-    @Inject
     private TaskTypeMongoRepository taskTypeMongoRepository;
     @Inject*/
     @Inject
@@ -64,7 +60,7 @@ public class OrganizationServiceService extends UserBaseService {
         }
         organizationService.setName(name);
         organizationService.setDescription(description);
-        save(organizationService);
+        organizationServiceRepository.save(organizationService);
         return organizationService.retrieveDetails();
     }
 
@@ -85,10 +81,6 @@ public class OrganizationServiceService extends UserBaseService {
         return objectList;
     }
 
-    public OrganizationService updateOrganizationServiceById(OrganizationService organizationService) {
-        save(organizationService);
-        return organizationService;
-    }
 
     public boolean deleteOrganizationServiceById(Long id) {
         OrganizationService organizationService = organizationServiceRepository.findOne(id);
@@ -96,10 +88,7 @@ public class OrganizationServiceService extends UserBaseService {
             return false;
         }
         organizationService.setEnabled(false);
-        save(organizationService);
-        if (organizationServiceRepository.findOne(id).isEnabled()) {
-            return false;
-        }
+        organizationServiceRepository.save(organizationService);
         return true;
     }
 
@@ -302,7 +291,7 @@ public class OrganizationServiceService extends UserBaseService {
         organizationServices = (organizationServices == null) ? new ArrayList<>() : organizationServices;
         organizationServices.add(organizationService);
         country.setOrganizationServices(organizationServices);
-        save(country);
+        countryGraphRepository.save(country);
         return organizationService;
     }
 
@@ -322,7 +311,7 @@ public class OrganizationServiceService extends UserBaseService {
         organizationServices = (organizationServices == null) ? new ArrayList<>() : organizationServices;
         organizationServices.add(organizationService);
         country.setOrganizationServices(organizationServices);
-        save(country);
+        countryGraphRepository.save(country);
         return organizationService;
     }
 
@@ -513,14 +502,9 @@ public class OrganizationServiceService extends UserBaseService {
         organizationExternalServiceRelationship.setExternalService(mappedOrganizationService);
         organizationExternalServiceRelationship.setService(organizationService);
         mappedOrganizationService.setHasMapped(true);
-        save(organizationExternalServiceRelationship);
+        organizationExternalServiceRelationshipRepository.save(organizationExternalServiceRelationship);
         return organizationService;
     }
-
-    public Country getCountryByOranizationid(long organizationServiceId) {
-        return countryGraphRepository.getCountryByOrganizationService(organizationServiceId);
-    }
-
 
     public OrganizationService findOne(Long id) {
         OrganizationService organizationService = organizationServiceRepository.findOne(id);

@@ -8,7 +8,6 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +23,7 @@ import static com.kairos.constants.AppConstants.GROUP_LABEL;
  */
 @Transactional
 @Service
-public class GroupService extends UserBaseService {
+public class GroupService  {
     @Inject
     private GroupGraphRepository groupGraphRepository;
 
@@ -55,7 +54,7 @@ public class GroupService extends UserBaseService {
             return null;
         }
         currentOrganization.getGroupList().add(group);
-        save(currentOrganization);
+        organizationGraphRepository.save(currentOrganization);
 
         QueryResult queryResult = new QueryResult();
         queryResult.setId(group.getId());

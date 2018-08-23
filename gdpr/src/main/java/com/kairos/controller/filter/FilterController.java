@@ -1,7 +1,7 @@
 package com.kairos.controller.filter;
 
 
-import com.kairos.dto.FilterSelectionDTO;
+import com.kairos.gdpr.FilterSelectionDTO;
 import com.kairos.service.filter.FilterService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;

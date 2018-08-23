@@ -5,17 +5,23 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.gdpr.metadata.DataSourceDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.DataSourceMongoRepository;
+import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
+import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.service.common.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 
@@ -29,45 +35,39 @@ public class DataSourceService extends MongoBaseService {
     private DataSourceMongoRepository dataSourceMongoRepository;
 
     @Inject
-    private ComparisonUtils comparisonUtils;
+    private ExceptionService exceptionService;
 
 
     /**
      * @param countryId
-     * @param organizationId
      * @param dataSources
      * @return return map which contain list of new DataSource and list of existing DataSource if DataSource already exist
      * @description this method create new DataSource if DataSource not exist with same name ,
      * and if exist then simply add  DataSource to existing list and return list ;
-     * findByNamesList()  return list of existing DataSource using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing DataSource using collation ,used for case insensitive result
      */
-    public Map<String, List<DataSource>> createDataSource(Long countryId, Long organizationId, List<DataSource> dataSources) {
+    public Map<String, List<DataSource>> createDataSource(Long countryId, List<DataSourceDTO> dataSources) {
 
         Map<String, List<DataSource>> result = new HashMap<>();
         Set<String> dataSourceNames = new HashSet<>();
-        if (dataSources.size() != 0) {
-            for (DataSource dataSource : dataSources) {
-                if (!StringUtils.isBlank(dataSource.getName())) {
-                    dataSourceNames.add(dataSource.getName());
-                } else
-                    throw new InvalidRequestException("name could not be empty or null");
+        if (!dataSources.isEmpty()) {
+            for (DataSourceDTO dataSource : dataSources) {
+                dataSourceNames.add(dataSource.getName());
             }
-            List<DataSource> existing = findByNamesList(countryId, organizationId, dataSourceNames, DataSource.class);
-            dataSourceNames = comparisonUtils.getNameListForMetadata(existing, dataSourceNames);
+            List<DataSource> existing = findMetaDataByNamesAndCountryId(countryId, dataSourceNames, DataSource.class);
+            dataSourceNames = ComparisonUtils.getNameListForMetadata(existing, dataSourceNames);
 
             List<DataSource> newDataSources = new ArrayList<>();
-            if (dataSourceNames.size() != 0) {
+            if (!dataSourceNames.isEmpty()) {
                 for (String name : dataSourceNames) {
 
-                    DataSource newDataSource = new DataSource();
-                    newDataSource.setName(name);
+                    DataSource newDataSource = new DataSource(name);
                     newDataSource.setCountryId(countryId);
-                    newDataSource.setOrganizationId(organizationId);
                     newDataSources.add(newDataSource);
 
                 }
 
-                newDataSources = dataSourceMongoRepository.saveAll(sequenceGenerator(newDataSources));
+                newDataSources = dataSourceMongoRepository.saveAll(getNextSequence(newDataSources));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newDataSources);
@@ -79,25 +79,22 @@ public class DataSourceService extends MongoBaseService {
     }
 
     /**
-     *
      * @param countryId
-     * @param organizationId
      * @return list of DataSource
      */
-    public List<DataSource> getAllDataSource(Long countryId, Long organizationId) {
-        return dataSourceMongoRepository.findAllDataSources(countryId, organizationId);
+    public List<DataSourceResponseDTO> getAllDataSource(Long countryId) {
+        return dataSourceMongoRepository.findAllDataSources(countryId,SuggestedDataStatus.ACCEPTED.value);
+
     }
 
     /**
-     * @throws DataNotFoundByIdException throw exception if DataSource not found for given id
      * @param countryId
-     * @param organizationId
-     * @param id id of DataSource
      * @return DataSource object fetch by given id
+     * @throws DataNotFoundByIdException throw exception if DataSource not found for given id
      */
-    public DataSource getDataSource(Long countryId, Long organizationId, BigInteger id) {
+    public DataSource getDataSource(Long countryId, BigInteger id) {
 
-        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -107,54 +104,54 @@ public class DataSourceService extends MongoBaseService {
     }
 
 
-    public Boolean deleteDataSource(Long countryId, Long organizationId, BigInteger id) {
+    public Boolean deleteDataSource(Long countryId, BigInteger id) {
 
-        DataSource exist = dataSourceMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
-        if (!Optional.ofNullable(exist).isPresent()) {
+        DataSource dataSource = dataSourceMongoRepository.findByIdAndNonDeleted(countryId, id);
+        if (!Optional.ofNullable(dataSource).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(exist);
-            return true;
-
         }
+        delete(dataSource);
+        return true;
+
     }
 
     /***
      * @throws DuplicateDataException throw exception if DataSource data not exist for given id
      * @param countryId
-     * @param organizationId
      * @param id id of DataSource
-     * @param dataSource
+     * @param dataSourceDTO
      * @return DataSource updated object
      */
-    public DataSource updateDataSource(Long countryId, Long organizationId, BigInteger id, DataSource dataSource) {
+    public DataSourceDTO updateDataSource(Long countryId, BigInteger id, DataSourceDTO dataSourceDTO) {
 
-        DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, organizationId, dataSource.getName());
-        if (Optional.ofNullable(exist).isPresent()) {
-            if (id.equals(exist.getId())) {
-                return exist;
+        DataSource dataSource = dataSourceMongoRepository.findByNameAndCountryId(countryId, dataSourceDTO.getName());
+        if (Optional.ofNullable(dataSource).isPresent()) {
+            if (id.equals(dataSource.getId())) {
+                return dataSourceDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + dataSource.getName());
-        } else {
-            exist = dataSourceMongoRepository.findByid(id);
-            exist.setName(dataSource.getName());
-            return dataSourceMongoRepository.save(sequenceGenerator(exist));
-
+            throw new DuplicateDataException("data  exist for  " + dataSourceDTO.getName());
         }
+        dataSource = dataSourceMongoRepository.findByid(id);
+        if (!Optional.ofNullable(dataSource).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Data Source", id);
+        }
+        dataSource.setName(dataSourceDTO.getName());
+        dataSourceMongoRepository.save(dataSource);
+        return dataSourceDTO;
+
     }
 
     /**
      * @param countryId
-     * @param organizationId
-     * @param name           name of DataSource
+     * @param name      name of DataSource
      * @return DataSource object fetch on basis of  name
      * @throws DataNotExists throw exception if DataSource not exist for given name
      */
-    public DataSource getDataSourceByName(Long countryId, Long organizationId, String name) {
+    public DataSource getDataSourceByName(Long countryId, String name) {
 
 
         if (!StringUtils.isBlank(name)) {
-            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, organizationId, name);
+            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, name);
             if (!Optional.ofNullable(exist).isPresent()) {
                 throw new DataNotExists("data not exist for name " + name);
             }
@@ -162,6 +159,35 @@ public class DataSourceService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+    /**
+     * @description method save Data Source suggested by unit
+     * @param countryId
+     * @param DataSourceDTOS
+     * @return
+     */
+    public List<DataSource> saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> DataSourceDTOS) {
+
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (DataSourceDTO DataSource : DataSourceDTOS) {
+            hostingProvoiderNames.add(DataSource.getName());
+        }
+        List<DataSource> existingDataSources = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, DataSource.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingDataSources, hostingProvoiderNames);
+        List<DataSource> DataSourceList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                DataSource DataSource = new DataSource(name);
+                DataSource.setCountryId(countryId);
+                DataSource.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                DataSourceList.add(DataSource);
+            }
+
+            DataSourceList = dataSourceMongoRepository.saveAll(getNextSequence(DataSourceList));
+        }
+        return DataSourceList;
     }
 
 

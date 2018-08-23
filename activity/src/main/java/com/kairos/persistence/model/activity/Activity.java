@@ -76,6 +76,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
 // default constructor
     }
 
+
     public List<BigInteger> getTags() {
         return tags;
     }

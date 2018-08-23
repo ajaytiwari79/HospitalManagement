@@ -2,6 +2,7 @@ package com.kairos.persistence.model.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.wta.version.WTAVersionDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.user.country.tag.TagDTO;
@@ -32,12 +33,30 @@ public class WTAQueryResultDTO {
     private Long expiryDate;
     private String name;
     private String description;
+    private Long unitPositionId;
     private BigInteger id;
     private ExpertiseResponseDTO expertise;
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
+    private List<WTAQueryResultDTO> versions = new ArrayList<>();
 
     private List<WTABaseRuleTemplate> ruleTemplates;
+
+    public List<WTAQueryResultDTO> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(List<WTAQueryResultDTO> versions) {
+        this.versions = versions;
+    }
+
+    public Long getUnitPositionId() {
+        return unitPositionId;
+    }
+
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
+    }
 
     private List<TagDTO> tags = new ArrayList<>();
 

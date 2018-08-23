@@ -1,12 +1,13 @@
 package com.kairos.service.country;
-import com.kairos.util.ObjectMapperUtils;
+
+import com.kairos.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.default_data.OrganizationMappingDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.persistence.model.country.common.EmploymentTypeDTO;
-import com.kairos.persistence.model.country.common.OrganizationMappingDTO;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
@@ -15,14 +16,13 @@ import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
-import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
-import com.kairos.user.country.experties.ExpertiseResponseDTO;
-import com.kairos.activity.open_shift.PriorityGroupDefaultData;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.region.RegionService;
+import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.util.DateUtil;
+import com.kairos.util.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ import java.util.Optional;
  */
 @Service
 @Transactional
-public class EmploymentTypeService extends UserBaseService {
+public class EmploymentTypeService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -119,7 +119,7 @@ public class EmploymentTypeService extends UserBaseService {
         employmentTypeToUpdate.setAllowedForFlexPool(employmentTypeDTO.isAllowedForFlexPool());
         employmentTypeToUpdate.setEmploymentCategories(employmentTypeDTO.getEmploymentCategories());
         employmentTypeToUpdate.setPaymentFrequency(employmentTypeDTO.getPaymentFrequency());
-        return save(employmentTypeToUpdate);
+        return employmentTypeGraphRepository.save(employmentTypeToUpdate);
     }
 
     public boolean deleteEmploymentType(long countryId, long employmentTypeId) {
@@ -131,7 +131,7 @@ public class EmploymentTypeService extends UserBaseService {
         }
 
         employmentTypeToDelete.setDeleted(true);
-        save(employmentTypeToDelete);
+        employmentTypeGraphRepository.save(employmentTypeToDelete);
         return true;
     }
 

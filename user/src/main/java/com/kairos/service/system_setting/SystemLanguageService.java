@@ -7,7 +7,6 @@ import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepos
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.user.country.system_setting.SystemLanguageDTO;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ObjectMapperUtils;
 import org.slf4j.Logger;
@@ -21,7 +20,7 @@ import java.util.Optional;
 
 @Transactional
 @Service
-public class SystemLanguageService extends UserBaseService {
+public class SystemLanguageService  {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -51,7 +50,7 @@ public class SystemLanguageService extends UserBaseService {
         }
 
         SystemLanguage systemLanguage = new SystemLanguage(systemLanguageDTO.getName(), systemLanguageDTO.getCode(), systemLanguageDTO.isDefaultLanguage(), systemLanguageDTO.isActive());
-        save(systemLanguage);
+        systemLanguageGraphRepository.save(systemLanguage);
         systemLanguageDTO.setId(systemLanguage.getId());
         return systemLanguageDTO;
     }
@@ -88,7 +87,7 @@ public class SystemLanguageService extends UserBaseService {
         systemLanguage.setName(systemLanguageDTO.getName());
         systemLanguage.setDefaultLanguage(systemLanguageDTO.isDefaultLanguage());
         systemLanguage.setActive(systemLanguageDTO.isActive());
-        save(systemLanguage);
+        systemLanguageGraphRepository.save(systemLanguage);
         return systemLanguageDTO;
     }
 
@@ -99,9 +98,12 @@ public class SystemLanguageService extends UserBaseService {
         if(!Optional.ofNullable(systemLanguage).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.system.language.notFound",systemLanguageId);
         }
+        if(systemLanguage.isDefaultLanguage()) {
+            exceptionService.dataNotFoundByIdException("message.system.language.default.cannot.delete");
+        }
 
         systemLanguage.setDeleted(true);
-        save(systemLanguage);
+        systemLanguageGraphRepository.save(systemLanguage);
         return true;
     }
 
@@ -127,7 +129,7 @@ public class SystemLanguageService extends UserBaseService {
         }
 
         country.setSystemLanguage(systemLanguage);
-        save(country);
+        countryGraphRepository.save(country);
         return true;
     }
 

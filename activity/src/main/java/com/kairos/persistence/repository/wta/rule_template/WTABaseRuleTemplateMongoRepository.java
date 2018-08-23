@@ -5,6 +5,7 @@ import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -13,10 +14,8 @@ import java.util.List;
 /**
  * Created by pawanmandhan on 5/8/17.
  */
+@Repository
 public interface WTABaseRuleTemplateMongoRepository extends MongoBaseRepository<WTABaseRuleTemplate, BigInteger> {
-
-
-
 
     @Query("{ruleTemplateCategoryId:?0,deleted:false}")
     List<WTABaseRuleTemplate> findAllByCategoryId(BigInteger categoryId);
@@ -27,9 +26,5 @@ public interface WTABaseRuleTemplateMongoRepository extends MongoBaseRepository<
 
     @Query("{countryId:?0,name:?1,deleted:false}")
     WTABaseRuleTemplate existsByName(Long countryId, String name);
-
-    @Query("{}")
-    String getLastInsertedTemplateType(Long countryId, String templateType);
-
 
 }

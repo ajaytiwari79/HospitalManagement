@@ -1,9 +1,9 @@
 package com.kairos.service.country;
-import com.kairos.persistence.model.country.common.ClinicType;
+
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.ClinicType;
 import com.kairos.persistence.repository.user.country.ClinicTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +17,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class ClinicTypeService extends UserBaseService {
+public class ClinicTypeService {
 
     @Inject
     private ClinicTypeGraphRepository clinicTypeGraphRepository;
@@ -30,7 +30,7 @@ public class ClinicTypeService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             clinicType.setCountry(country);
-            save(clinicType);
+            clinicTypeGraphRepository.save(clinicType);
             return  clinicType.retrieveDetails();
         }
         return null;
@@ -54,7 +54,7 @@ public class ClinicTypeService extends UserBaseService {
         if (currentClinicType!=null){
             currentClinicType.setName(clinicType.getName());
             currentClinicType.setDescription(clinicType.getDescription());
-            save(currentClinicType);
+            clinicTypeGraphRepository.save(currentClinicType);
             return  currentClinicType.retrieveDetails();
         }
         return null;
@@ -65,7 +65,7 @@ public class ClinicTypeService extends UserBaseService {
         ClinicType currentClinicType = clinicTypeGraphRepository.findOne(clinicTypeId);
         if (currentClinicType!=null){
             currentClinicType.setEnabled(false);
-            save(currentClinicType);
+            clinicTypeGraphRepository.save(currentClinicType);
             return true;
         }
         return false;

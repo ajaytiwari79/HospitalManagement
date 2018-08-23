@@ -1,12 +1,15 @@
 package com.kairos.service.pay_table;
 
 
-import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
+import com.kairos.persistence.model.country.pay_table.PayGradeDTO;
+import com.kairos.persistence.model.country.pay_table.PayGroupAreaDTO;
+import com.kairos.persistence.model.country.pay_table.PayTableResponseWrapper;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.pay_table.*;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
-import com.kairos.persistence.model.pay_table.*;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
@@ -14,10 +17,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
-import com.kairos.persistence.model.pay_table.OrganizationLevelPayTableDTO;
 import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGraphRepository;
-import com.kairos.persistence.model.country.pay_table.*;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.country.pay_table.PayTableDTO;
 import com.kairos.user.country.pay_table.PayTableUpdateDTO;
@@ -39,7 +39,7 @@ import static javax.management.timer.Timer.ONE_DAY;
  * Created by prabjot on 26/12/17.
  */
 @Service
-public class PayTableService extends UserBaseService {
+public class PayTableService {
 
     @Inject
     private PayTableGraphRepository payTableGraphRepository;
@@ -63,7 +63,7 @@ public class PayTableService extends UserBaseService {
 
     @Inject
     private ExceptionService exceptionService;
-    private Logger logger = LoggerFactory.getLogger(PayTableService.class);
+    private final Logger logger = LoggerFactory.getLogger(PayTableService.class);
 
 
     public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, Long startDate) {
@@ -75,7 +75,7 @@ public class PayTableService extends UserBaseService {
 
         List<PayGroupAreaQueryResult> payGroupAreaQueryResults = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(organizationLevelId);
         List<FunctionDTO> functions = functionGraphRepository.getFunctionsByOrganizationLevel(organizationLevelId);
-        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTableByOrganizationLevel(organizationLevelId, startDate);
+        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId, startDate);
         PayTableResponse result = null;
         if (payTableQueryResults.size() > 1) {
             // multiple payTables are found NOW need to filter by date
@@ -95,19 +95,17 @@ public class PayTableService extends UserBaseService {
         } else if (payTableQueryResults.size() == 1)
             result = payTableQueryResults.get(0);
 
-        PayTableResponseWrapper payTableResponseWrapper = new PayTableResponseWrapper(payGroupAreaQueryResults, result, functions);
-        return payTableResponseWrapper;
+        return new PayTableResponseWrapper(payGroupAreaQueryResults, result, functions);
 
     }
 
-    public List<OrganizationLevelPayTableDTO> getOrganizationLevelWisePayTables(Long countryId) {
+    public List<OrganizationLevelPayGroupAreaDTO> getOrganizationLevelWisePayGroupAreas(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.level.id.notFound",countryId);
 
         }
-        List<OrganizationLevelPayTableDTO> payTables = payTableGraphRepository.getOrganizationLevelWisePayTables(countryId);
-        return payTables;
+        return payTableGraphRepository.getOrganizationLevelWisePayGroupAreas(countryId);
     }
 
     public PayTableResponse createPayTable(Long countryId, PayTableDTO payTableDTO) {
@@ -129,7 +127,7 @@ public class PayTableService extends UserBaseService {
         if (Optional.ofNullable(payTableToValidate).isPresent())
             validatePayLevel(payTableToValidate, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis());
         PayTable payTable = new PayTable(payTableDTO.getName().trim(), payTableDTO.getShortName(), payTableDTO.getDescription(), level, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis(), payTableDTO.getPaymentUnit(), true);
-        save(payTable);
+        payTableGraphRepository.save(payTable);
         PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), (payTable.getEndDateMillis() != null) ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         payTableResponse.setLevel(level);
@@ -216,7 +214,7 @@ public class PayTableService extends UserBaseService {
         payTable.setDescription(payTableDTO.getDescription());
         payTable.setPaymentUnit(payTableDTO.getPaymentUnit());
         prepareDates(payTable, payTableDTO);
-        save(payTable);
+        payTableGraphRepository.save(payTable);
         PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis() != null ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.getPaymentUnit(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         return payTableResponse;
@@ -269,7 +267,7 @@ public class PayTableService extends UserBaseService {
         payGradeResponses.add(addPayGradeInCurrentPayTable(copiedPayTable, payGradeDTO));
         payTable.setHasTempCopy(true);
         copiedPayTable.setPublished(false);
-        save(copiedPayTable);
+        payTableGraphRepository.save(copiedPayTable);
         // copying all previous and then adding in pay Table as well.
         List<PayGrade> payGradesObjects = new ArrayList<>();
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
@@ -289,16 +287,16 @@ public class PayTableService extends UserBaseService {
         }
         // Adding new Grade in PayTable
         copiedPayTable.setPayGrades(payGradesObjects);
-        save(copiedPayTable);
+        payTableGraphRepository.save(copiedPayTable);
 
         return payGradeResponses;
     }
 
 
-    public PayGradeResponse addPayGradeInCurrentPayTable(PayTable payTable, PayGradeDTO payGradeDTO) {
-        List<Long> payGroupAreasId = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toList());
+    private PayGradeResponse addPayGradeInCurrentPayTable(PayTable payTable, PayGradeDTO payGradeDTO) {
+        Set<Long> payGroupAreasId = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
 
-        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(payGroupAreasId);
+        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreasId);
         if (payGroupAreas.size() != payGroupAreasId.size()) {
             exceptionService.dataNotMatchedException("message.paygrouparea.unabletoget");
 
@@ -312,7 +310,7 @@ public class PayTableService extends UserBaseService {
             payGrades.add(payGrade);
             payTable.setPayGrades(payGrades);
         }
-        save(payTable);
+        payTableGraphRepository.save(payTable);
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
         // contains all
 
@@ -377,7 +375,7 @@ public class PayTableService extends UserBaseService {
         return found;
     }
 
-    public List<PayGradeResponse> removePayTable(Long payTableId) {
+    public PayTableResponse removePayTable(Long payTableId) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
             exceptionService.dataNotFoundByIdException("message.paytable.id.notfound");
@@ -387,22 +385,18 @@ public class PayTableService extends UserBaseService {
             exceptionService.actionNotPermittedException("message.paytable.alreadypublished");
 
         }
-        Long parentPayTableId = payTableGraphRepository.getParentPayTableByPayTableId(payTableId);
-        List<PayGradeResponse> payGrades = new ArrayList<>();
-        if (Optional.ofNullable(parentPayTableId).isPresent()) {
-            payGrades = payTableGraphRepository.getPayGradesByPayTableId(parentPayTableId);
-        }
+        PayTableResponse parentPayTable = payTableGraphRepository.getParentPayTableByPayTableId(payTableId);
         payTable.setPayTable(null);
         payTable.setDeleted(true);
-        save(payTable);
+        payTableGraphRepository.save(payTable);
 
-        return payGrades;
+        return parentPayTable;
     }
 
     private List<PayGradeResponse> updatePayGradeInUnpublishedPayTable(PayTable payTable, PayGradeDTO payGradeDTO, PayGrade payGrade) {
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
         Set<Long> payGroupAreaIds = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
-        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(payGroupAreaIds);
+        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreaIds);
         // removing all previous Ids
         payGradeGraphRepository.removeAllPayGroupAreasFromPayGrade(payGrade.getId());
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
@@ -437,7 +431,7 @@ public class PayTableService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.paygrade.id.notfound",payGradeId);
 
         }
-        List<PayGradeResponse> payGradeResponses = new ArrayList<>();
+        List<PayGradeResponse> payGradeResponses;
         // user is updating in a unpublished payTable
         payGradeResponses = (!payTable.isPublished()) ? updatePayGradeInUnpublishedPayTable(payTable, payGradeDTO, payGrade) :
                 updatePayGradeInPublishedPayTable(payTable, payGradeDTO, payGradeId);
@@ -445,17 +439,6 @@ public class PayTableService extends UserBaseService {
         return payGradeResponses;
     }
 
-    private void copyBasicDetailOfPayTable(PayTable payTable, PayTable newPayTable) {
-        BeanUtils.copyProperties(payTable, newPayTable);
-        newPayTable.setId(null);
-        newPayTable.setPayTable(payTable);
-        newPayTable.setPayGrades(null);
-        newPayTable.setPublished(false);
-        payTable.setHasTempCopy(true);
-        newPayTable.setHasTempCopy(false);
-        save(newPayTable);
-
-    }
 
     private List<PayGradeResponse> updatePayGradeInPublishedPayTable(PayTable payTable, PayGradeDTO payGradeDTO, Long payGradeId) {
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
@@ -470,15 +453,15 @@ public class PayTableService extends UserBaseService {
         payTable.setHasTempCopy(true);
         payTable.setEditable(false);
         payTableByMapper.setHasTempCopy(false);
-        save(payTableByMapper);
+        payTableGraphRepository.save(payTableByMapper);
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
             PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
             List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
 
             if (payGradeDTO.getPayGradeId().equals(currentPayGrade.getId())) {
                 // user has changed the value in  this pay Grade area of payTable
-                List<Long> payGroupAreasId = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toList());
-                List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(payGroupAreasId);
+                Set<Long> payGroupAreasId = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
+                List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreasId);
 
                 for (PayGroupAreaDTO currentPayGroupArea : payGradeDTO.getPayGroupAreas()) {
                     PayGroupArea payGroupArea = payGroupAreas.stream().filter(payGroupArea1 -> payGroupArea1.getId().equals(currentPayGroupArea.getPayGroupAreaId())).findFirst().get();
@@ -503,7 +486,7 @@ public class PayTableService extends UserBaseService {
 
         }
         payTableByMapper.setPayGrades(payGradesObjects);
-        save(payTableByMapper);
+        payTableGraphRepository.save(payTableByMapper);
         return payGradeResponses;
     }
 
@@ -536,9 +519,18 @@ public class PayTableService extends UserBaseService {
         payTable.setPublished(true);
         payTable.setStartDateMillis(new Date(publishedDateMillis));
         payTable.getPayGrades().forEach(currentPayGrade -> currentPayGrade.setPublished(true));
-        save(payTable);
+        payTableGraphRepository.save(payTable);
         response.add(payTable);
-
         return response;
     }
+
+
+    public List<PayTableResponse>  getPayTablesByOrganizationLevel(Long organizationLevelId) {
+
+        return payTableGraphRepository.findActivePayTablesByOrganizationLevel(organizationLevelId);
+
+    }
+
+
+
 }

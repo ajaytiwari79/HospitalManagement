@@ -1,12 +1,17 @@
 package com.kairos.activity.counter;
 
+import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.util.NotNullOrEmpty;
+
 import java.math.BigInteger;
 
 public class KPICategoryDTO {
     private BigInteger id;
+    @NotNullOrEmpty(message = "name can't be empty")
     private String name;
-    private Long levelId;
-
+    private Long countryId;
+    private Long unitId;
+    private ConfLevel level;
     public KPICategoryDTO(){
 
     }
@@ -32,11 +37,27 @@ public class KPICategoryDTO {
         this.name = name;
     }
 
-    public Long getLevelId() {
-        return levelId;
+    public Long getCountryId() {
+        return countryId;
     }
 
-    public void setLevelId(Long levelId) {
-        this.levelId = levelId;
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    public ConfLevel getLevel() {
+        return level;
+    }
+
+    public void setLevel(ConfLevel level) {
+        this.level = level;
     }
 }

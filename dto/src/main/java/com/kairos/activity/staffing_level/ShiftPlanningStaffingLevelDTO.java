@@ -12,10 +12,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftPlanningStaffingLevelDTO {
     private BigInteger id;
-    private Long phaseId;
+    private BigInteger phaseId;
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate currentDate;
-    private Long weekCount;
+    private Integer weekCount;
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelTimeSlotDTO> staffingLevelInterval=new ArrayList<>();
 
@@ -23,7 +23,7 @@ public class ShiftPlanningStaffingLevelDTO {
         //default constructor
     }
 
-    public ShiftPlanningStaffingLevelDTO(Long phaseId, LocalDate currentDate,Long weekCount,
+    public ShiftPlanningStaffingLevelDTO(BigInteger phaseId, LocalDate currentDate,Integer weekCount,
                             StaffingLevelSetting staffingLevelSetting) {
         this.phaseId = phaseId;
         this.currentDate = currentDate;
@@ -39,11 +39,11 @@ public class ShiftPlanningStaffingLevelDTO {
         this.id = id;
     }
 
-    public Long getPhaseId() {
+    public BigInteger getPhaseId() {
         return phaseId;
     }
 
-    public void setPhaseId(Long phaseId) {
+    public void setPhaseId(BigInteger phaseId) {
         this.phaseId = phaseId;
     }
 
@@ -55,11 +55,11 @@ public class ShiftPlanningStaffingLevelDTO {
         this.currentDate = currentDate;
     }
 
-    public Long getWeekCount() {
+    public Integer getWeekCount() {
         return weekCount;
     }
 
-    public void setWeekCount(Long weekCount) {
+    public void setWeekCount(Integer weekCount) {
         this.weekCount = weekCount;
     }
 

@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.persistence.model.country.common.CompanyCategory;
+import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.organization.company.CompanyCategoryResponseDTO;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;

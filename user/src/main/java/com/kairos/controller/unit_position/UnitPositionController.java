@@ -1,6 +1,7 @@
 package com.kairos.controller.unit_position;
 
 
+import com.kairos.activity.cta.CollectiveTimeAgreementDTO;
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.user.staff.unit_position.UnitPositionDTO;
@@ -19,8 +20,10 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -63,17 +66,35 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.updateUnitPosition(unitPositionId, position, unitId, type, saveAsDraft));
     }
 
+    @ApiOperation(value = "Get unit_position")
+    @GetMapping(value = "/unit_position/{unitPositionId}")
+    public ResponseEntity<Map<String, Object>> getUnitPosition(@PathVariable Long unitId, @PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPosition(unitPositionId));
+    }
+
     @ApiOperation(value = "Update unit_position's WTA")
     @PutMapping(value = "/unit_position/{unitPositionId}/wta/{wtaId}")
     public ResponseEntity<Map<String, Object>> updateUnitPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable BigInteger wtaId, @RequestBody @Valid WTADTO wtadto) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.updateUnitPositionWTA(unitId, unitPositionId, wtaId, wtadto));
     }
 
-    @ApiOperation(value = "get unit_position's WTA")
+   /* @ApiOperation(value = "get unit_position's WTA")
     @GetMapping(value = "/unit_position/{unitPositionId}/wta")
     public ResponseEntity<Map<String, Object>> getUnitPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionWTA(unitId, unitPositionId));
+    }*/
+
+    /*@ApiOperation(value = "Update Unit Position's CTA")
+    @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta/{ctaId}")
+    public ResponseEntity<Map<String, Object>> updateCostTimeAgreementForUnitPosition(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable BigInteger ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO ctaDTO) throws ExecutionException, InterruptedException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.updateCostTimeAgreementForUnitPosition(unitId, unitPositionId, ctaId, ctaDTO));
     }
+
+    @ApiOperation(value = "get unit_position's CTA")
+    @GetMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta")
+    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitId, unitPositionId));
+    }*/
 
     @ApiOperation(value = "get unit_position's CTA")
     @GetMapping(value = "/getCTAbyUnitPosition/{unitPositionId}")
@@ -115,12 +136,19 @@ public class UnitPositionController {
     @ApiOperation(value = "get all wta version for a staff")
     @RequestMapping(value = "/staff/{staffId}/wta", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllWTAOfStaff(@PathVariable Long unitId, @PathVariable Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllWTAOfStaff(staffId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllWTAOfStaff(unitId,staffId));
     }
 
     @ApiOperation(value = "get all cta version for a staff")
     @RequestMapping(value = "/staff/{staffId}/cta", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllCTAOfStaff(@PathVariable Long unitId, @PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllCTAOfStaff(unitId, staffId));
+    }
+
+    @ApiOperation(value = "update senioritylevel")
+    @RequestMapping(value = "/seniority_level_update", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> updateSeniorityLevel() {
+        unitPositionService.updateSeniorityLevelOnJobTrigger();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null );
     }
 }

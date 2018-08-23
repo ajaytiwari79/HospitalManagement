@@ -1,8 +1,8 @@
 package com.kairos.service.counter;
 
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.activity.counter.FilterCriteria;
 import com.kairos.activity.counter.KPICategoryDTO;
-import com.kairos.activity.counter.distribution.category.CategoryAssignmentDTO;
 import com.kairos.activity.counter.distribution.category.KPICategoryUpdationDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
 import com.kairos.activity.counter.enums.CounterType;
@@ -10,6 +10,7 @@ import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -31,7 +32,7 @@ public class CounterConfService extends MongoBaseService {
     private CounterRepository counterRepository;
 
     public void updateCounterCriteria(BigInteger counterId, List<FilterCriteria> criteriaList){
-        Counter counter = (Counter) counterRepository.getItemById(counterId, Counter.class);
+        Counter counter = (Counter) counterRepository.getEntityById(counterId, Counter.class);
         counter.setCriteriaList(criteriaList);
         save(counter);
     }
@@ -56,7 +57,7 @@ public class CounterConfService extends MongoBaseService {
         // confLevel, name
         List<String> formattedNames = new ArrayList<>();
         categoryNames.forEach(category -> formattedNames.add(category.trim().toLowerCase()));
-        List<KPICategoryDTO> categories = counterRepository.getKPICategory(level, refId);
+        List<KPICategoryDTO> categories = counterRepository.getKPICategory(null,level, refId);
         List<KPICategoryDTO> duplicateEntries = new ArrayList<>();
         categories.forEach(category -> {
             if(formattedNames.contains(category.getName().trim().toLowerCase())){
@@ -66,7 +67,7 @@ public class CounterConfService extends MongoBaseService {
         if(duplicateEntries.size()>0) exceptionService.duplicateDataException("error.kpi_category.duplicate");
     }
 
-    private List<String> getTrimmedNames(List<KPICategory> categories){
+    private List<String> getTrimmedNames(List<KPICategoryDTO> categories){
         List<String> categoriesNames = new ArrayList<>();
         categories.forEach(category -> {
             category.setName(category.getName().trim());
@@ -75,73 +76,58 @@ public class CounterConfService extends MongoBaseService {
         return categoriesNames;
     }
 
-    public List<KPICategory> addCategories(List<KPICategory> categories, ConfLevel level, Long ownerId){
-        Long countryId = ConfLevel.COUNTRY.equals(level)? ownerId: null;
-        Long unitId=ConfLevel.UNIT.equals(level)? ownerId: null;
+    public List<KPICategory> addCategories(List<KPICategoryDTO> categories, ConfLevel level, Long refId){
+        Long countryId = ConfLevel.COUNTRY.equals(level)? refId: null;
+        Long unitId=ConfLevel.UNIT.equals(level)? refId: null;
         List<String > names = getTrimmedNames(categories);
-        verifyForCategoryAvailability(names, ownerId, level);
-        List<KPICategory> kpiCategories=save(categories);
-        List<CategoryAssignment> categoryAssignment = kpiCategories.parallelStream().map(category -> new CategoryAssignment(category.getId(),countryId,unitId,level)).collect(Collectors.toList());
-        save(categoryAssignment);
+        verifyForCategoryAvailability(names, refId, level);
+        List<KPICategory> kpiCategories=new ArrayList<>();
+        categories.stream().forEach(kpiCategoryDTO -> {
+            kpiCategories.add(new KPICategory(kpiCategoryDTO.getName(),countryId,unitId,level));
+        });
+        if(!kpiCategories.isEmpty()){
+            save(kpiCategories);
+        }
         return kpiCategories;
     }
 
-    private List<CategoryAssignmentDTO> getExistingAssignments(List<KPICategoryDTO> deletedCategories, ConfLevel level, Long refId){
-        if(deletedCategories.isEmpty()) return new ArrayList<>();
-        List<BigInteger> deletableCategories = deletedCategories.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
-        List<CategoryAssignmentDTO> assignmentDTOs = counterRepository.getCategoryAssignments(deletableCategories, level, refId);
-        if(deletedCategories.size() != assignmentDTOs.size()){
+    private List<KPICategoryDTO> getExistingCategories(List<KPICategoryDTO> categories, ConfLevel level, Long refId){
+        if(categories.isEmpty()) return new ArrayList<>();
+        List<BigInteger> categoryIds = categories.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
+        List<KPICategoryDTO> categoryDTOs = counterRepository.getKPICategory(categoryIds, level, refId);
+        if(categories.size() != categoryDTOs.size()){
             exceptionService.invalidOperationException("error.kpi.invalidData");
         }
-        return assignmentDTOs;
+        return categoryDTOs;
     }
 
-    private void modifyCategories(List<KPICategoryDTO> changedCategories, List<CategoryAssignmentDTO> existingAssignmentDTOs, ConfLevel level, Long refId){
-        Map<BigInteger, CategoryAssignmentDTO> categoryDTOMapById = existingAssignmentDTOs.parallelStream().collect(Collectors.toMap(assignmentDTO -> assignmentDTO.getCategory().getId(), assignmentDTO -> assignmentDTO));
-        Map<String, BigInteger>  categoryNameAssignemtIdMap = new HashMap<>();
-        List<KPICategory> updatableCategories = new ArrayList<>();
-        for( KPICategoryDTO kpiCategoryDTO: changedCategories){
-            CategoryAssignmentDTO assignmentDTO = categoryDTOMapById.get(kpiCategoryDTO.getId());
-            if(!assignmentDTO.getCategory().getName().equals(kpiCategoryDTO.getName())){
-                KPICategory category = new KPICategory(kpiCategoryDTO.getName(), refId);
-                if(assignmentDTO.getCategory().getLevelId().equals(refId) && !ConfLevel.COUNTRY.equals(level)){
-                    category.setId(assignmentDTO.getCategory().getId());
-                }
-                categoryNameAssignemtIdMap.put(category.getName(), assignmentDTO.getId());
-                updatableCategories.add(category);
+         private List<KPICategory> modifyCategories(List<KPICategoryDTO> changedCategories, List<KPICategoryDTO> existingAssignmentDTOs, ConfLevel level, Long refId) {
+           if(existingAssignmentDTOs.isEmpty()){
+               return new ArrayList<>();
+           }
+        Map<BigInteger, KPICategoryDTO> categoryDTOMapById = changedCategories.parallelStream().collect(Collectors.toMap(kPICategoryDTO -> kPICategoryDTO.getId(), kPICategoryDTO -> kPICategoryDTO));
+             List<BigInteger> categoriesIds = changedCategories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
+             List<KPICategory> kpiCategories = counterRepository.getKPICategoryByIds(categoriesIds, level, refId);
+            for( KPICategory kpiCategory : kpiCategories){
+                KPICategoryDTO kpiCategoryDTO = categoryDTOMapById.get(kpiCategory.getId());
+            if(!kpiCategoryDTO.getName().equals(kpiCategory.getName())){
+             kpiCategory.setName(kpiCategoryDTO.getName());
             }
         }
-        List<CategoryAssignment> categoryAssignments = new ArrayList<>();
-        updatableCategories = save(updatableCategories);
-        updatableCategories.forEach(kpiCategory -> {
-            Long countryId = null;
-            Long unitId = null;
-            if(ConfLevel.COUNTRY.equals(level)){
-                countryId = refId;
-            }else{
-                unitId = refId;
-            }
-            CategoryAssignment assignment = new CategoryAssignment(kpiCategory.getId(), countryId, unitId, level);
-            assignment.setId(categoryNameAssignemtIdMap.get(kpiCategory.getName()));
-            categoryAssignments.add(assignment);
-        });
-        save(categoryAssignments);
+            save(kpiCategories);
+             return kpiCategories;
     }
 
-    public void updateCategories(KPICategoryUpdationDTO categories, ConfLevel level, Long refId){
+    public List<KPICategoryDTO> updateCategories(KPICategoryUpdationDTO categories, ConfLevel level, Long refId){
         Set<String> categoriesNames = categories.getUpdatedCategories().stream().map(category -> category.getName().trim().toLowerCase()).collect(Collectors.toSet());
         if(categoriesNames.size() != categories.getUpdatedCategories().size())  exceptionService.duplicateDataException("error.kpi_category.duplicate");
-        List<CategoryAssignmentDTO> deletableAssignments = getExistingAssignments(categories.getDeletedCategories(), level, refId);
-        List<CategoryAssignmentDTO> existingAssignments = getExistingAssignments(categories.getUpdatedCategories(), level, refId);
-        modifyCategories(categories.getUpdatedCategories(), existingAssignments, level, refId);
-        List<BigInteger> deletableCategoryAssignmentIds = deletableAssignments.stream().map(CategoryAssignmentDTO::getId).collect(Collectors.toList());
-        List<BigInteger> ownedDeletableCategoryIds  = new ArrayList<>();
-        if(ConfLevel.UNIT.equals(level)){
-            ownedDeletableCategoryIds = deletableAssignments.parallelStream().filter(assignmentDTO -> assignmentDTO.getCategory().getLevelId().equals(refId)).map(categoryAssignmentDTO -> categoryAssignmentDTO.getCategory().getId()).collect(Collectors.toList());
-        }
-        counterRepository.removeAll("categoryAssignmentId", deletableCategoryAssignmentIds, CategoryKPIConf.class);
-        counterRepository.removeAll("id", deletableCategoryAssignmentIds, CategoryAssignment.class);
-        counterRepository.removeAll("id", ownedDeletableCategoryIds, KPICategory.class);
+        List<KPICategoryDTO> deletableCategories = getExistingCategories(categories.getDeletedCategories(), level, refId);
+        List<KPICategoryDTO> existingCategories = getExistingCategories(categories.getUpdatedCategories(), level, refId);
+        List<KPICategory> kpiCategories=modifyCategories(categories.getUpdatedCategories(), existingCategories, level, refId);
+        List<BigInteger> deletableCategoryIds = deletableCategories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
+        counterRepository.removeAll("categoryId", deletableCategoryIds, CategoryKPIConf.class);
+        counterRepository.removeAll("id", deletableCategoryIds, KPICategory.class);
+       return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiCategories, KPICategoryDTO.class);
     }
 
     public void addEntries(Long countryId){
@@ -154,7 +140,7 @@ public class CounterConfService extends MongoBaseService {
         List<CounterType> addableCounters = Arrays.stream(CounterType.values()).filter(counterType -> !availableTypes.contains(counterType)).collect(Collectors.toList());
         addableCounters.forEach(counterType -> kpis.add(new KPI(counterType.getName(), null, null, counterType, false, null)));
         List<KPI> savedKPIs = save(kpis);
-        List<KPIAssignment> kpiAssignment = savedKPIs.parallelStream().map(kpi -> new KPIAssignment(kpi.getId(), countryId, null, null, ConfLevel.COUNTRY)).collect(Collectors.toList());
-        save(kpiAssignment);
+        List<ApplicableKPI> applicableKPIS = savedKPIs.parallelStream().map(kpi -> new ApplicableKPI(kpi.getId(),kpi.getId(), countryId, null, null, ConfLevel.COUNTRY)).collect(Collectors.toList());
+        save(applicableKPIS);
     }
 }

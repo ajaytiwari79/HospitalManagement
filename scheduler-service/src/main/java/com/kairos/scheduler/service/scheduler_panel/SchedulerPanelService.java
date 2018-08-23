@@ -112,7 +112,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
         }
         else {
-            schedulerPanel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
+            schedulerPanel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate().withHour(9).withMinute(30));
         }
 
         schedulerPanel.setActive(true);
@@ -144,8 +144,16 @@ public class SchedulerPanelService extends MongoBaseService {
             panel.setInterval(interval);
             if(schedulerPanelDTO.getRunOnce() == null) {
                 cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRepeat(), schedulerPanelDTO.getStartMinute(), schedulerPanelDTO.getSelectedHours());
-            } else
+                if(Optional.ofNullable(schedulerPanelDTO.getRepeat()).isPresent()) {
+                    panel.setRepeat(schedulerPanelDTO.getRepeat());
+                }
+                panel.setStartMinute(schedulerPanelDTO.getStartMinute());
+
+            } else{
                 cronExpression = cronExpressionRunOnceBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRunOnce());
+                panel.setRunOnce(schedulerPanelDTO.getRunOnce());
+
+            }
             panel.setCronExpression(cronExpression);
             panel.setDays(schedulerPanelDTO.getDays());
             panel.setSelectedHours(schedulerPanelDTO.getSelectedHours());
@@ -188,7 +196,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
            }
            else {
-               schedulerPanelDB.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
+               schedulerPanelDB.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate().withHour(9).withMinute(30));
            }
 
            save(schedulerPanelDB);

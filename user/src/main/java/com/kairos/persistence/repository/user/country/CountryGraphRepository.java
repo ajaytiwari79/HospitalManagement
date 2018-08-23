@@ -1,13 +1,12 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.persistence.model.country.common.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.RelationType;
+import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
-import com.kairos.persistence.model.agreement.cta.RuleTemplateCategoryType;
-import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import com.kairos.persistence.model.country.RelationType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -97,11 +96,6 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     List<Country> checkDuplicateCountry(String name, Long organizationId);
 
 
-    @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"  ]-(l:RuleTemplateCategory) Where id(c)={0} AND l.ruleTemplateCategoryType={1} AND l.name=~{2}\n" +
-            "return count(r) as number;")
-     int checkDuplicateRuleTemplateCategory(Long id, RuleTemplateCategoryType ruleTemplateCategoryType, String name);
-
-
     @Query("MATCH (n:Country{isEnabled:true}) RETURN collect({name:n.name, code:n.code}) as list")
     List<Map> getCountryNameAndCodeList();
 
@@ -134,57 +128,6 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
             "return ch.holidayDate as holidayDate, dt as dayType ")
     List<CountryHolidayCalendarQueryResult> getCountryHolidayCalendarBetweenDates(Long countryId, Long start, Long end);
-
-
-
-/*
-
-    @Query("MATCH (n:Country{isEnabled:true}) where id(n)={0} with n " +
-<<<<<<< HEAD
-=======
-            "Match (n)-[:HAS_RULE_TEMPLATE]->(t:WTABaseRuleTemplate) with t " +
-            "Match (t)<-[:"+HAS_RULE_TEMPLATES+"]-(r:RuleTemplateCategory{deleted:false,ruleTemplateCategoryType:'WTA'}) with t,r " +
-            "Optional MATCH(t)-[:"+HAS_BREAK_MATRIX+"]-(breakTemplateValue:BreakTemplateValue)" +
->>>>>>> KP-3090
-            "Return id(t) as id ,"+
-            "t.timeLimit as timeLimit,"+
-            "t.balanceType as balanceType,"+
-            "t.checkAgainstTimeRules as checkAgainstTimeRules,"+
-            "t.minimumRest as minimumRest,"+
-            "t.daysWorked as daysWorked,"+
-            "t.name as name ," +
-            "t.templateType as templateType," +
-            "r as ruleTemplateCategory," +
-            "t.disabled as disabled,"+
-            "t.description as description," +
-            "t.daysLimit as daysLimit,"+
-            "t.creationDate as creationDate,"+
-            "t.lastModificationDate as lastModificationDate,"+
-            "t.nightsWorked as nightsWorked,"+
-            "t.intervalLength as intervalLength,"+
-            "t.intervalUnit as intervalUnit,"+
-            "t.validationStartDateMillis as validationStartDateMillis,"+
-            "t.balanceAdjustment as balanceAdjustment,"+
-            "t.useShiftTimes as useShiftTimes,"+
-            "t.maximumAvgTime as maximumAvgTime,"+
-            "t.maximumVetoPercentage as maximumVetoPercentage,"+
-            "t.numberShiftsPerPeriod as numberShiftsPerPeriod,"+
-            "t.numberOfWeeks as numberOfWeeks,"+
-            "t.fromDayOfWeek as fromDayOfWeek,"+
-            "t.fromTime as fromTime,"+
-            "t.proportional as proportional,"+
-            "t.toTime as toTime,"+
-            "t.toDayOfWeek as toDayOfWeek,"+
-            "t.continuousDayRestHours as continuousDayRestHours,"+
-            "t.minimumDurationBetweenShifts as minimumDurationBetweenShifts,"+
-            "t.continuousWeekRest as continuousWeekRest,"+
-            "t.averageRest as averageRest,"+
-            "t.shiftAffiliation as shiftAffiliation,"+
-            "t.shiftsLimit as shiftsLimit,"+
-            "t.activityCode as activityCode,"+
-<<<<<<< HEAD
-            "t.onlyCompositeShifts as onlyCompositeShifts")
-    List<RuleTemplateCategoryDTO> getRuleTemplatesAndCategories (long countryId);*/
 
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level)={1} return level")

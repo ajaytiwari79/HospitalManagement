@@ -23,7 +23,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     public List<StaffUnitPositionQueryResult> getStaffByPriorityGroupStaffIncludeFilter(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId) {
 
 
-        String staffFilterQuery = "Match (up:UnitPosition)-[:" + IN_UNIT + "]-(org:Organization) where id(org)={unitId} and up.endDate is null or up.endate>{maxDate}" +
+        String staffFilterQuery = "Match (up:UnitPosition)-[:" + IN_UNIT + "]-(org:Organization) where id(org)={unitId} and (up.startDateMillis<{maxDate} and (up.endDateMillis is null or up.endateMillis>{maxDate}))" +
                 " Match(up)-[:" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) where id(expertise) in {expertiseIds}";
 
         StringBuilder stringBuilder = new StringBuilder();

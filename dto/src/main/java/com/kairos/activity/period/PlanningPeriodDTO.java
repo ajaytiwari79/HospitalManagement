@@ -24,13 +24,13 @@ public class PlanningPeriodDTO {
     private int recurringNumber; // TODO HARISH rename
     private String currentPhase;
     private String nextPhase;
-    private LocalDate requestToPuzzleDate;
-    private LocalDate puzzleToConstructionDate;
-    private LocalDate constructionToDraftDate;
-    private List<PeriodPhaseFlippingDateDTO> phaseFlippingDate;
+    private FlippingDateDTO requestToPuzzleDate;
+    private FlippingDateDTO puzzleToConstructionDate;
+    private FlippingDateDTO constructionToDraftDate;
+    private List<PeriodPhaseDTO> phaseFlippingDate;
     private String periodDuration;
     private boolean active=true;
-
+    private String color;
     public PlanningPeriodDTO(){
         // default constructor
     }
@@ -91,27 +91,27 @@ public class PlanningPeriodDTO {
         this.nextPhase = nextPhase;
     }
 
-    public LocalDate getRequestToPuzzleDate() {
+    public FlippingDateDTO getRequestToPuzzleDate() {
         return requestToPuzzleDate;
     }
 
-    public void setRequestToPuzzleDate(LocalDate requestToPuzzleDate) {
+    public void setRequestToPuzzleDate(FlippingDateDTO requestToPuzzleDate) {
         this.requestToPuzzleDate = requestToPuzzleDate;
     }
 
-    public LocalDate getPuzzleToConstructionDate() {
+    public FlippingDateDTO getPuzzleToConstructionDate() {
         return puzzleToConstructionDate;
     }
 
-    public void setPuzzleToConstructionDate(LocalDate puzzleToConstructionDate) {
+    public void setPuzzleToConstructionDate(FlippingDateDTO puzzleToConstructionDate) {
         this.puzzleToConstructionDate = puzzleToConstructionDate;
     }
 
-    public LocalDate getConstructionToDraftDate() {
+    public FlippingDateDTO getConstructionToDraftDate() {
         return constructionToDraftDate;
     }
 
-    public void setConstructionToDraftDate(LocalDate constructionToDraftDate) {
+    public void setConstructionToDraftDate(FlippingDateDTO constructionToDraftDate) {
         this.constructionToDraftDate = constructionToDraftDate;
     }
 
@@ -131,11 +131,11 @@ public class PlanningPeriodDTO {
         this.name = name;
     }
 
-    public List<PeriodPhaseFlippingDateDTO> getPhaseFlippingDate() {
+    public List<PeriodPhaseDTO> getPhaseFlippingDate() {
         return phaseFlippingDate;
     }
 
-    public void setPhaseFlippingDate(List<PeriodPhaseFlippingDateDTO> phaseFlippingDate) {
+    public void setPhaseFlippingDate(List<PeriodPhaseDTO> phaseFlippingDate) {
         this.phaseFlippingDate = phaseFlippingDate;
     }
 
@@ -170,5 +170,14 @@ public class PlanningPeriodDTO {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
 }
 

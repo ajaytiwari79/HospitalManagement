@@ -15,7 +15,7 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.user.organization.OrganizationCommonDTO;
 import com.kairos.user.reason_code.ReasonCodeDTO;
 import com.kairos.util.DateUtils;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalDate;
@@ -41,7 +41,7 @@ public class AttendanceSettingService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     public AttendanceDTO getAttendanceSetting() {
-        AttendanceSetting attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.asDate(LocalDate.now().minusDays(1)));
+        AttendanceSetting attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
         return (Optional.ofNullable(attendanceSetting).isPresent())?new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration())):null;
     }
 
@@ -92,7 +92,7 @@ public class AttendanceSettingService extends MongoBaseService {
     private AttendanceSetting checkOutAttendanceSetting(List<StaffResultDTO> staffAndOrganizationIds) {
         AttendanceDuration duration = null;
         AttendanceSetting attendanceSetting;
-        attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.asDate(LocalDate.now().minusDays(1)));
+        attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
         if (Optional.ofNullable(attendanceSetting).isPresent()) {
             duration = attendanceSetting.getAttendanceDuration();
             if (!Optional.ofNullable(duration.getTo()).isPresent()) {

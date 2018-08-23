@@ -1,9 +1,9 @@
 package com.kairos.service.country;
-import com.kairos.persistence.model.country.common.CitizenStatus;
+
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.util.FormatUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class CitizenStatusService extends UserBaseService {
+public class CitizenStatusService{
 
     @Inject
     CitizenStatusGraphRepository citizenStatusGraphRepository;
@@ -29,7 +29,7 @@ public class CitizenStatusService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             citizenStatus.setCountry(country);
-            save(citizenStatus);
+            citizenStatusGraphRepository.save(citizenStatus);
             return citizenStatus.retrieveDetails();
         }
         return  null;
@@ -40,7 +40,7 @@ public class CitizenStatusService extends UserBaseService {
         if (currentCivilianStatus!=null ){
             currentCivilianStatus.setName(citizenStatus.getName());
             currentCivilianStatus.setDescription(citizenStatus.getDescription());
-            save(currentCivilianStatus);
+            citizenStatusGraphRepository.save(currentCivilianStatus);
             return currentCivilianStatus.retrieveDetails();
         }
         return  null;
@@ -51,7 +51,7 @@ public class CitizenStatusService extends UserBaseService {
         CitizenStatus currentCivilianStatus = citizenStatusGraphRepository.findOne(citizenStatusId);
         if (currentCivilianStatus!=null){
             currentCivilianStatus.setEnabled(false);
-            save(currentCivilianStatus);
+            citizenStatusGraphRepository.save(currentCivilianStatus);
             return true;
         }
         return  false;

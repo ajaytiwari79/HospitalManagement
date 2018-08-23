@@ -47,10 +47,12 @@ public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGrou
             " with count(payGroupArea) as payGroupAreaCount " +
             " return case when payGroupAreaCount>0 then true else false end as response")
     boolean isPayGroupAreaExistWithNameInLevel(Long levelId, String payGroupAreaName);
+    
+    @Query("MATCH (level:Level)<-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false}) where id(level)={0} and lower(payGroupArea.name)=lower({1}) AND id(payGroupArea)<>{2} " +
+            " with count(payGroupArea) as payGroupAreaCount " +
+            " return case when payGroupAreaCount>0 then true else false end as response")
+    boolean isPayGroupAreaExistWithNameInLevel(Long levelId, String payGroupAreaName,Long currentPayGroupAreaId);
 
     @Query("MATCH (payGroupArea:PayGroupArea{deleted:false}) where id(payGroupArea) IN {0} return payGroupArea")
-    List<PayGroupArea> findAllById(List<Long> payGroupArea);
-
-    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false}) where id(payGroupArea) IN {0} return payGroupArea")
-    List<PayGroupArea> findAllById(Set<Long> payGroupArea);
+    List<PayGroupArea> findAllByIds(Set<Long> payGroupAreaIds);
 }

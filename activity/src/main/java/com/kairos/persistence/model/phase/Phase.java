@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.DurationType;
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -32,9 +34,30 @@ public class Phase extends MongoBaseEntity {
     private BigInteger parentCountryPhaseId;
     private PhaseType phaseType;
     private List<ShiftStatus> status;
-
+    private String color;
+    private PhaseDefaultName phaseEnum;
+    private LocalTime flippingDefaultTime;
+    private int gracePeriodByStaff;
+    private int gracePeriodByManagement;
+    private String untilNextDay;
+    private int realtimeDuration;
     public Phase() {
         //default constructor
+    }
+    public Phase(String name, String description, PhaseDefaultName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status, String color,LocalTime flippingDefaultTime) {
+        this.name = name;
+        this.description = description;
+        this.phaseEnum=phaseEnum;
+        this.duration = duration;
+        this.durationType = durationType;
+        this.sequence = sequence;
+        this.countryId = countryId;
+        this.organizationId = organizationId;
+        this.parentCountryPhaseId = parentCountryPhaseId;
+        this.phaseType = phaseType;
+        this.status = ShiftStatus.getListByValue(status);
+        this.color=color;
+        this.flippingDefaultTime = flippingDefaultTime;
     }
 
     public Long getOrganizationId() {
@@ -117,17 +140,60 @@ public class Phase extends MongoBaseEntity {
         this.status = status;
     }
 
-    public Phase(String name, String description, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status) {
-        this.name = name;
-        this.description = description;
-        this.duration = duration;
-        this.durationType = durationType;
-        this.sequence = sequence;
-        this.countryId = countryId;
-        this.organizationId = organizationId;
-        this.parentCountryPhaseId = parentCountryPhaseId;
-        this.phaseType = phaseType;
-        this.status = ShiftStatus.getListByValue(status);
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public PhaseDefaultName getPhaseEnum() {
+        return phaseEnum;
+    }
+
+    public void setPhaseEnum(PhaseDefaultName phaseEnum) {
+        this.phaseEnum = phaseEnum;
+    }
+
+    public LocalTime getFlippingDefaultTime() {
+        return flippingDefaultTime;
+    }
+
+    public void setFlippingDefaultTime(LocalTime flippingDefaultTime) {
+        this.flippingDefaultTime = flippingDefaultTime;
+    }
+
+    public int getGracePeriodByStaff() {
+        return gracePeriodByStaff;
+    }
+
+    public void setGracePeriodByStaff(int gracePeriodByStaff) {
+        this.gracePeriodByStaff = gracePeriodByStaff;
+    }
+
+    public int getGracePeriodByManagement() {
+        return gracePeriodByManagement;
+    }
+
+    public void setGracePeriodByManagement(int gracePeriodByManagement) {
+        this.gracePeriodByManagement = gracePeriodByManagement;
+    }
+
+    public String getUntilNextDay() {
+        return untilNextDay;
+    }
+
+    public void setUntilNextDay(String untilNextDay) {
+        this.untilNextDay = untilNextDay;
+    }
+
+    public int getRealtimeDuration() {
+        return realtimeDuration;
+    }
+
+    public void setRealtimeDuration(int realtimeDuration) {
+        this.realtimeDuration = realtimeDuration;
     }
 
     @Override

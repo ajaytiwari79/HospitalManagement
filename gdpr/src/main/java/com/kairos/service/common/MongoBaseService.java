@@ -32,10 +32,10 @@ import static com.kairos.constants.AppConstant.COUNTRY_ID;
 public class MongoBaseService {
 
     @Inject
-    MongoSequenceRepository mongoSequenceRepository;
+    private MongoSequenceRepository mongoSequenceRepository;
 
     @Inject
-    MongoTemplate mongoTemplate;
+    private MongoTemplate mongoTemplate;
 
     @Inject
     DB database;
@@ -43,31 +43,7 @@ public class MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
-
-    public <T extends MongoBaseEntity> T sequenceGenerator(T entity) {
-
-        Assert.notNull(entity, "Entity must not be null!");
-
-        // Get class name for sequence class
-        String className = entity.getClass().getSimpleName();
-
-        // Set Id if entity don't have Id
-        if (entity.getId() == null) {
-            entity.setId(mongoSequenceRepository.nextSequence(className));
-        }
-
-       // Set createdAt if entity don't have createdAt
-        if (entity.getCreatedAt() == null) {
-            entity.setCreatedAt(DateUtils.getDate());
-        }
-
-        // Set updatedAt time as current time
-        entity.setUpdatedAt(DateUtils.getDate());
-        //mongoTemplate.save(entity);
-        return entity;
-    }
-
-    public <T extends MongoBaseEntity> List<T> sequenceGenerator(List<T> entities) {
+    public <T extends MongoBaseEntity> List<T> getNextSequence(List<T> entities) {
         Assert.notNull(entities, "Entity must not be null!");
         Assert.notEmpty(entities, "Entity must not be Empty!");
 
@@ -97,7 +73,7 @@ public class MongoBaseService {
 
 
                 if (entity.getId() == null) {
-                  //  Set Id if entity don't have Id
+                    //  Set Id if entity don't have Id
                     entity.setId(mongoSequenceRepository.nextSequence(className));
 
                     dbObject = new BasicDBObject();
@@ -126,7 +102,7 @@ public class MongoBaseService {
             }
 
             // Executing the Operation
-           // bulkWriteOperation.execute();
+            // bulkWriteOperation.execute();
             return entities;
 
         } catch (Exception ex) {
@@ -136,12 +112,34 @@ public class MongoBaseService {
     }
 
 
-    public <T extends MongoBaseEntity> List<T> findByNamesList(Long countryId, Long organizationId, Set<String> namesList, Class entity) {
+    public <T extends MongoBaseEntity> List<T> findMetaDataByNamesAndCountryId(Long countryId, Set<String> namesList, Class entity) {
 
 
         Assert.notNull(entity, "Entity must not be null!");
         Assert.notEmpty(namesList, "Entity must not be Empty!");
         Assert.notNull(countryId, "countryId must not be null");
+
+        // collection name get collection name
+        String collectionName = entity.getClass().getSimpleName();
+
+        if (namesList.size() == 0) {
+            throw new InvalidRequestException("list can't be empty");
+        }
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and("deleted").is(false).and("name").in(namesList));
+        query.collation(Collation.of("en").
+                strength(Collation.ComparisonLevel.secondary()));
+        return mongoTemplate.find(query, entity);
+
+    }
+
+
+    public <T extends MongoBaseEntity> List<T> findMetaDataByNameAndUnitId(Long organizationId, Set<String> namesList, Class entity) {
+
+
+        Assert.notNull(entity, "Entity must not be null!");
+        Assert.notEmpty(namesList, "Entity must not be Empty!");
         Assert.notNull(organizationId, "organization Id must not be Null");
 
         // collection name get collection name
@@ -152,47 +150,53 @@ public class MongoBaseService {
         }
 
         Query query = new Query();
-        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and("deleted").is(false).and("name").in(namesList).and(ORGANIZATION_ID).is(organizationId));
+        query.addCriteria(Criteria.where(ORGANIZATION_ID).is(organizationId).and("deleted").is(false).and("name").in(namesList));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.find(query, entity);
 
     }
 
+
     public <T extends MongoBaseEntity> T delete(T entity) {
 
         Assert.notNull(entity, "Entity must not be null!");
         //  Get class name for sequence class
 
-       entity.setDeleted(true);
-       entity.setUpdatedAt(DateUtils.getDate());
+        entity.setDeleted(true);
+        entity.setUpdatedAt(DateUtils.getDate());
         mongoTemplate.save(entity);
         return entity;
     }
 
 
+    public <T extends MongoBaseEntity> List<T> deleteAll(List<T> entities) {
 
-    public Boolean remove(List<BigInteger> ids,Class entity) {
+        Assert.notNull(entities, "Entity must not be null!");
+        //  Get class name for sequence class
+
+        entities.forEach(entity -> {
+            entity.setDeleted(true);
+        });
+        mongoTemplate.save(entities);
+        return entities;
+    }
+
+
+    public Boolean remove(List<BigInteger> ids, Class entity) {
 
         Assert.notNull(entity, "Entity must not be null!");
-        Assert.notEmpty(ids,"List cannot be empty");
+        Assert.notEmpty(ids, "List cannot be empty");
 
         // Get class name for sequence class
         String className = entity.getClass().getSimpleName();
 
-        Query query=new Query();
+        Query query = new Query();
         query.addCriteria(Criteria.where("_id").in(ids));
 
 
-        mongoTemplate.remove(query,className);
+        mongoTemplate.remove(query, className);
         return true;
 
     }
-
-
-
-
-
-
-
 }

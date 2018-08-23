@@ -4,6 +4,7 @@ import java.util.List;
 import com.kairos.dto.KairosSchedulerExecutorDTO;
 import com.kairos.service.scheduler.IntegrationJobsExecutorService;
 import com.kairos.service.staff.EmploymentService;
+import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.DateUtil;
 import com.kairos.util.DateUtils;
 import org.slf4j.Logger;
@@ -20,6 +21,8 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
     private EmploymentService employmentService;
     @Inject
     private IntegrationJobsExecutorService integrationJobService;
+    @Inject
+    private UnitPositionService unitPositionService;
 
     private static Logger logger = LoggerFactory.getLogger(SchedulerToUserQueueService.class);
     
@@ -34,6 +37,9 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
                 break;
             case QUESTIONAIRE_NIGHTWORKER:
                 logger.info("Questionaire nightworker----------------->"+job.getId());
+                break;
+            case SENIORITY_LEVEL:
+                unitPositionService.updateSeniorityLevelOnJobTrigger();
                 break;
             default:
                 logger.error("No exceution route found for jobsubtype");

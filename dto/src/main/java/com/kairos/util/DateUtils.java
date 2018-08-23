@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,6 +13,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -293,12 +295,18 @@ public class DateUtils {
     }
 
 
-    public static Date asDate(LocalDate localDate) {
-        return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+    public static Date getDateFromLocalDate(LocalDate localDate) {
+        Date date = null;
+        if (localDate != null)
+            date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return date;
     }
 
     public static Date asDate(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+    public static Date asDate(@NotNull(message = "date can not be null")LocalDate localDate) {
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     public static LocalDate asLocalDate(Date date) {
@@ -454,9 +462,9 @@ public class DateUtils {
         return dateTime.toString(formatter);
     }
 
-    public static ZonedDateTime getZoneDateTime(Date date){
-         return ZonedDateTime.ofInstant(date.toInstant(),
-                 ZoneId.systemDefault());
+    public static ZonedDateTime getZoneDateTime(Date date) {
+        return ZonedDateTime.ofInstant(date.toInstant(),
+                ZoneId.systemDefault());
     }
 
     public static Date getDateByZonedDateTime(ZonedDateTime dateTime){
@@ -466,10 +474,11 @@ public class DateUtils {
     public static org.joda.time.LocalDate asJodaLocalDate(Date date) {
         return new DateTime(date).toLocalDate();
     }
+
     /**
      * returns Joda DateTime from {@link java.util.Date} and {@link java.time.LocalTime}
      */
-    public static DateTime getDateTime(Date date, LocalTime time){
+    public static DateTime getDateTime(Date date, LocalTime time) {
         return new DateTime(date).withMinuteOfHour(time.getMinute()).withHourOfDay(time.getHour());
     }
 
@@ -510,6 +519,24 @@ public class DateUtils {
         }
     }
 
+    public static LocalDateTime addDurationInLocalDateTime(LocalDateTime localDate, int duration, DurationType durationType, int recurringNumber) {
+        switch (durationType) {
+            case DAYS: {
+                return LocalDateTime.of(localDate.toLocalDate().plusDays(duration * recurringNumber),localDate.toLocalTime());
+            }
+            case WEEKS: {
+                return LocalDateTime.of(localDate.toLocalDate().plusDays(duration * recurringNumber * 7),localDate.toLocalTime());
+            }
+            case MONTHS: {
+                return LocalDateTime.of(localDate.toLocalDate().plusMonths(duration * recurringNumber),localDate.toLocalTime());
+            }
+            case HOURS: {
+                return LocalDateTime.of(localDate.toLocalDate(),localDate.toLocalTime().plusHours(duration * recurringNumber));
+            }
+        }
+        return localDate;
+    }
+
     public static LocalDate addDurationInLocalDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber) {
         switch (durationType) {
             case DAYS: {
@@ -521,6 +548,9 @@ public class DateUtils {
             case MONTHS: {
                 return localDate.plusMonths(duration * recurringNumber);
             }
+//            case HOURS: {
+//                return LocalDateTime.of(localDate.toLocalDate(),localDate.toLocalTime().plusHours(duration * recurringNumber));
+//            }
         }
         return localDate;
     }
@@ -579,11 +609,12 @@ public class DateUtils {
     public static LocalTime getTimeFromMinuteLong(Long durationInMinute) {
         return LocalTime.MIN.plus(Duration.ofMinutes(durationInMinute));
     }
-    public static LocalDate getLocalDateFromLocalDateTime(LocalDateTime localDateTime){
-       return localDateTime.toLocalDate();
+
+    public static LocalDate getLocalDateFromLocalDateTime(LocalDateTime localDateTime) {
+        return localDateTime.toLocalDate();
     }
 
-    public static LocalTime getLocalTimeFromLocalDateTime(LocalDateTime localDateTime){
+    public static LocalTime getLocalTimeFromLocalDateTime(LocalDateTime localDateTime) {
         return localDateTime.toLocalTime();
     }
     public static LocalDateTime getTimezonedCurrentDateTime(String timezone) {
@@ -612,7 +643,23 @@ public class DateUtils {
         return  LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
+    public static Long getCurrentDayStartMillis() {
+        return LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
     public static Long getCurrentMillis() {
         return System.currentTimeMillis();
+    }
+    public static LocalDateTime getStartOfDayFromLocalDate(LocalDate localDate) {
+
+        return localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+    public static LocalDateTime getEndOfDayFromLocalDate(LocalDate localDate) {
+
+        return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    public static int getWeekNumberByLocalDate(LocalDate localDate){
+        TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        return localDate.get(woy);
     }
 }

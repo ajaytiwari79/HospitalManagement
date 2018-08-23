@@ -2,13 +2,10 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.KairosScheduleJobDTO;
 import com.kairos.dto.KairosSchedulerLogsDTO;
 import com.kairos.enums.EmploymentStatus;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
 import com.kairos.enums.scheduler.Result;
 import com.kairos.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -18,7 +15,8 @@ import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.country.EngineerType;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.staff.*;
+import com.kairos.persistence.model.staff.PartialLeave;
+import com.kairos.persistence.model.staff.PartialLeaveDTO;
 import com.kairos.persistence.model.staff.employment.*;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitEmpAccessRelationship;
@@ -33,7 +31,6 @@ import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepositor
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
@@ -41,7 +38,6 @@ import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.kafka.UserToSchedulerQueueService;
-import com.kairos.service.scheduler.IntegrationJobsExecutorService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
@@ -68,7 +64,7 @@ import static com.kairos.constants.AppConstants.*;
  */
 @Transactional
 @Service
-public class EmploymentService extends UserBaseService {
+public class EmploymentService {
 
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
@@ -123,6 +119,13 @@ public class EmploymentService extends UserBaseService {
 
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
+
+        if (!Optional.ofNullable(objectToUpdate).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
+        } else if (objectToUpdate.getExternalId()!=null && !objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
+            exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
+        }
+
         EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());
         Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         if(Optional.ofNullable(employmentUnitPosition).isPresent()) {
@@ -134,14 +137,6 @@ public class EmploymentService extends UserBaseService {
 
         }
 
-        if (objectToUpdate == null) {
-            logger.info("Staff does not found by id {}", staffId);
-            exceptionService.dataNotFoundByIdException("message.staff.unitid.notfound");
-
-        } else if (!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
-           exceptionService.actionNotPermittedException("message.staff.externalid.notchanged");
-
-        }
         EngineerType engineerType = engineerTypeGraphRepository.findOne(staffEmploymentDetail.getEngineerTypeId());
         objectToUpdate.setEmail(staffEmploymentDetail.getEmail());
         objectToUpdate.setCardNumber(staffEmploymentDetail.getCardNumber());
@@ -151,7 +146,7 @@ public class EmploymentService extends UserBaseService {
         objectToUpdate.setVisitourId(staffEmploymentDetail.getVisitourId());
         objectToUpdate.setEngineerType(engineerType);
         objectToUpdate.setExternalId(staffEmploymentDetail.getTimeCareExternalId());
-        save(objectToUpdate);
+        staffGraphRepository.save(objectToUpdate);
         employmentGraphRepository.updateEmploymentStartDate(objectToUpdate.getId(), employmentStartDate);
         StaffEmploymentDTO staffEmploymentDTO = new StaffEmploymentDTO(objectToUpdate,employmentStartDate);
         return retrieveEmploymentDetails(staffEmploymentDTO);
@@ -167,7 +162,7 @@ public class EmploymentService extends UserBaseService {
         map.put("cardNumber", staff.getCardNumber());
         map.put("sendNotificationBy", staff.getSendNotificationBy());
         map.put("copyKariosMailToLogin", staff.isCopyKariosMailToLogin());
-        map.put("email", staff.getEmail());
+        map.put("email", user.getEmail());
         map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic());
         map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));
@@ -879,11 +874,6 @@ public class EmploymentService extends UserBaseService {
         }
         employmentGraphRepository.save(employment);
 
-        if(Optional.ofNullable(employmentEndDate).isPresent()&&(DateUtil.getDateFromEpoch(employmentEndDate).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0)) {
-            //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-            List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
-            moveToReadOnlyAccessGroup(employmentIds);
-        }
         EmploymentReasonCodeQueryResult employmentReasonCode = employmentGraphRepository.findEmploymentreasonCodeByStaff(staffId);
         employment.setReasonCode(employmentReasonCode.getReasonCode());
 

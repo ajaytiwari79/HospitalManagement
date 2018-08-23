@@ -13,6 +13,7 @@ import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.Currency;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.RelationType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
@@ -29,16 +30,19 @@ import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepos
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.default_data.RelationTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.default_data.VehicalGraphRepository;
+import com.kairos.persistence.repository.user.region.LevelGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.rest_client.PhaseRestClient;
 import com.kairos.rest_client.PlannedTimeTypeRestClient;
 import com.kairos.rest_client.activity_types.ActivityTypesRestClient;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.google_calender.GoogleCalenderService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.user.country.agreement.cta.cta_response.*;
+import com.kairos.user.country.basic_details.CountryDTO;
 import com.kairos.user.country.time_slot.TimeSlotDTO;
 import com.kairos.util.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
@@ -64,7 +68,7 @@ import static com.kairos.constants.AppConstants.*;
  */
 @Service
 @Transactional
-public class CountryService extends UserBaseService {
+public class CountryService {
     /**
      * Application name.
      */
@@ -124,7 +128,9 @@ public class CountryService extends UserBaseService {
     private @Autowired FunctionService functionService;
     @Inject
     private ExceptionService exceptionService;
-
+    @Inject private LevelGraphRepository levelGraphRepository;
+    @Inject private RelationTypeGraphRepository relationTypeGraphRepository;
+    @Inject private VehicalGraphRepository vehicalGraphRepository;
     /**
      * @param country
      * @return
@@ -133,7 +139,7 @@ public class CountryService extends UserBaseService {
         String name = "(?i)" + country.getName();
         List<Country> countryFound = countryGraphRepository.checkDuplicateCountry(name);
         if (countryFound == null || countryFound.isEmpty()) {
-            super.save(country);
+            countryGraphRepository.save(country);
             return country.retrieveDetails();
         } else {
             exceptionService.duplicateDataException("message.country.name.duplicate");
@@ -147,9 +153,14 @@ public class CountryService extends UserBaseService {
      * @param id
      * @return
      */
-    public Country getCountryById(Long id) {
-//        return (Country) super.findOne(id);
-        return countryGraphRepository.findOne(id);
+    public CountryDTO getCountryById(Long id) {
+        Country country = countryGraphRepository.findOne(id);
+        CountryDTO countryDTO = new CountryDTO(country.getId(),country.getName());
+        if(country!=null){
+            Currency currency = currencyService.getCurrencyByCountryId(id);
+            countryDTO.setCurrencyId(currency.getId());
+        }
+        return countryDTO;
     }
 
 
@@ -165,7 +176,7 @@ public class CountryService extends UserBaseService {
             exceptionService.duplicateDataException("message.country.name.duplicate");
 
         }
-        Country currentCountry = (Country) findOne(country.getId());
+        Country currentCountry = countryGraphRepository.findOne(country.getId());
         if (country == null) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound",country.getId());
 
@@ -173,7 +184,7 @@ public class CountryService extends UserBaseService {
         currentCountry.setName(country.getName());
         currentCountry.setCode(country.getCode());
         currentCountry.setGoogleCalendarCode(country.getGoogleCalendarCode());
-        save(currentCountry);
+        countryGraphRepository.save(currentCountry);
         return currentCountry.retrieveDetails();
     }
 
@@ -182,10 +193,10 @@ public class CountryService extends UserBaseService {
      * @param id
      */
     public boolean deleteCountry(Long id) {
-        Country currentCountry = (Country) findOne(id);
+        Country currentCountry = countryGraphRepository.findOne(id);
         if (currentCountry != null) {
             currentCountry.setEnabled(false);
-            save(currentCountry);
+            countryGraphRepository.save(currentCountry);
             return true;
         }
         return false;
@@ -282,7 +293,6 @@ public class CountryService extends UserBaseService {
         if (countryId == null) {
             return null;
         }
-        // return stored holidays in database
         return FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
 
     }
@@ -364,7 +374,9 @@ public class CountryService extends UserBaseService {
         }
         levelToUpdate.setName(level.getName());
         levelToUpdate.setDescription(level.getDescription());
-        return save(levelToUpdate);
+        // TODO FIX MAKE REPOS
+        //.save(levelToUpdate);
+        return null;
     }
 
     public boolean deleteLevel(long countryId, long levelId) {
@@ -376,7 +388,7 @@ public class CountryService extends UserBaseService {
         }
 
         levelToDelete.setEnabled(false);
-        save(levelToDelete);
+        levelGraphRepository.save(levelToDelete);
         return true;
     }
 
@@ -414,7 +426,7 @@ public class CountryService extends UserBaseService {
         }
 
         relationType.setEnabled(false);
-        save(relationType);
+        relationTypeGraphRepository.save(relationType);
         return true;
     }
 
@@ -457,7 +469,7 @@ public class CountryService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.country.vehicle.id.notFound");
         }
         vehicle.setEnabled(false);
-        save(vehicle);
+        vehicalGraphRepository.save(vehicle);
         return true;
     }
 
@@ -472,7 +484,7 @@ public class CountryService extends UserBaseService {
         vehicleToUpdate.setName(vehicle.getName());
         vehicleToUpdate.setDescription(vehicle.getDescription());
         vehicleToUpdate.setIcon(vehicle.getIcon());
-        return save(vehicleToUpdate);
+        return vehicalGraphRepository.save(vehicleToUpdate);
     }
 
     /**

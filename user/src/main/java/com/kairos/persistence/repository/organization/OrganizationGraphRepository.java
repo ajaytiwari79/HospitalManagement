@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.organization;
 
+import com.kairos.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -12,6 +13,7 @@ import com.kairos.persistence.model.organization.services.OrganizationServiceQue
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
+import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -178,13 +180,13 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "} as serviceList")
     List<Map<String, Object>> getTeamAllSelectedSubServices(Long teamId);
 
-    @Query("MATCH (c:Client)-[:GET_SERVICE_FROM]->(o:Organization)  where id(o)= {0} with c\n" +
-            "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c\n" +
-            "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with contactDetail, ca, c\n" +
-            "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(civilianStatus:CitizenStatus) with civilianStatus, contactDetail, ca, c\n" +
-            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,  civilianStatus, contactDetail, ca, c\n" +
-            "return {name:c.firstName+\" \" +c.lastName,id:id(c) , gender:c.gender, cprNumber:c.cprNumber , healthStatus:c.healthStatus,citizenDead:c.citizenDead, phoneNumber:contactDetail.mobilePhone, clientStatus:id(civilianStatus), " +
-            "address:ca.houseNumber+\" \" +ca.street1, lat:ca.latitude, lng:ca.longitude, profilePic: {1} + c.profilePic, age:c.age, " +
+    @Query("MATCH (user:User)<-[:"+IS_A+"]-(c:Client)-[:GET_SERVICE_FROM]->(o:Organization)  where id(o)= {0} with c,user\n" +
+            "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,user\n" +
+            "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with contactDetail, ca, c,user\n" +
+            "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(civilianStatus:CitizenStatus) with civilianStatus, contactDetail, ca, c,user\n" +
+            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,  civilianStatus, contactDetail, ca, c,user\n" +
+            "return {name:user.firstName+\" \" +user.lastName,id:id(c) , gender:user.gender, cprNumber:user.cprNumber , healthStatus:c.healthStatus,citizenDead:c.citizenDead, phoneNumber:contactDetail.mobilePhone, clientStatus:id(civilianStatus), " +
+            "address:ca.houseNumber+\" \" +ca.street1, lat:ca.latitude, lng:ca.longitude, profilePic: {1} + c.profilePic, age:user.age, " +
             "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client  ORDER BY c.firstName")
     List<Map<String, Object>> getClientsOfOrganization(Long organizationId, String imageUrl);
 
@@ -649,10 +651,13 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("Match (union:Organization{isEnable:true}) where id (union) IN {0}  return union")
     List<Organization> findOrganizationsByIdsIn(List<Long> orgIds);
 
+    @Query("Match (org:Organization)-[:"+SUB_TYPE_OF+"]->(orgType:OrganizationType) where id(orgType) IN {0} return id(orgType) as orgTypeId, collect(id(org)) as unitIds ")
+    List<OrgTypeQueryResult> getOrganizationIdsBySubOrgTypeId(List<Long> organizationSubTypeId);
+
     @Query("Match (child:Organization) \n" +
-            "OPTIONAL MATCH (child)<-[:HAS_SUB_ORGANIZATION]-(parent:Organization) with child,parent\n" +
-            "MATCH (child)<-[:HAS_SUB_ORGANIZATION]-(superParent:Organization) with child,parent,superParent\n" +
-            "MATCH (superParent)-[:BELONGS_TO]-(country:Country)\n" +
+            "OPTIONAL MATCH (child)<-[:"+HAS_SUB_ORGANIZATION+"]-(parent:Organization) with child,parent\n" +
+            "MATCH (child)<-[:"+HAS_SUB_ORGANIZATION+"]-(superParent:Organization) with child,parent,superParent\n" +
+            "MATCH (superParent)-[:"+BELONGS_TO+"]-(country:Country)\n" +
             "return id(child) as unitId, CASE WHEN parent IS NULL THEN id(child) ELSE id(parent) END as parentOrganizationId, id(country) as countryId")
     List<Map<String, Object>> getUnitAndParentOrganizationAndCountryIds();
 }

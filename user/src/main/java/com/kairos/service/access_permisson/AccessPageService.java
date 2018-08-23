@@ -23,7 +23,6 @@ import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.persistence.model.access_permission.AccessPageLanguageDTO;
@@ -32,7 +31,7 @@ import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.user.staff.permission.StaffPermissionDTO;
 import com.kairos.user.staff.permission.StaffTabPermission;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ import java.util.stream.Collectors;
  */
 @Transactional
 @Service
-public class AccessPageService extends UserBaseService {
+public class AccessPageService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -92,9 +91,9 @@ public class AccessPageService extends UserBaseService {
             List<AccessPage> childTabs = parentTab.getSubPages();
             childTabs.add(accessPage);
             parentTab.setSubPages(childTabs);
-            save(parentTab);
+            accessPageRepository.save(parentTab);
         } else {
-            save(accessPage);
+            accessPageRepository.save(accessPage);
         }
         return accessPage;
     }
@@ -111,6 +110,10 @@ public class AccessPageService extends UserBaseService {
 
     public List<AccessPageDTO> getMainTabs(Long countryId){
         return accessPageRepository.getMainTabs(countryId);
+    }
+
+    public List<AccessPageDTO> getMainTabsForUnit(Long unitId){
+        return accessPageRepository.getMainTabsForUnit(unitId);
     }
 
     public List<AccessPageDTO> getChildTabs(Long tabId, Long countryId){
@@ -378,10 +381,10 @@ public class AccessPageService extends UserBaseService {
         }
         if(organization.isParentOrganization()){
             organization.getEmployments().add(employment);
-            save(organization);
+            organizationGraphRepository.save(organization);
         } else {
             employment.getUnitPermissions().add(unitPermission);
-            save(employment);
+            employmentGraphRepository.save(employment);
         }
         unitEmpAccessGraphRepository.saveAll(unitEmpAccessRelationships);
         employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
@@ -410,7 +413,6 @@ public class AccessPageService extends UserBaseService {
 
     public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){
         List<AccessPage> accessPages = accessPageRepository.getKPITabsList(moduleId);
-        if(accessPages==null) return new ArrayList<>();
         List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
         return kpiTabs;
     }
@@ -422,7 +424,7 @@ public class AccessPageService extends UserBaseService {
                 exceptionService.dataNotFoundByIdException("access_page.lang.description.absent",accessPageLanguageDTO.getLanguageId());
             }
             accessPageLanguageRelationShip.get().setDescription(accessPageLanguageDTO.getDescription());
-            save(accessPageLanguageRelationShip.get());
+            accessPageLanguageRelationShipRepository.save(accessPageLanguageRelationShip.get());
             return accessPageLanguageDTO;
         }
 
@@ -436,7 +438,7 @@ public class AccessPageService extends UserBaseService {
         }
 
         AccessPageLanguageRelationShip accessPageLanguageRelationShip=new AccessPageLanguageRelationShip(accessPageLanguageDTO.getId(),accessPage,systemLanguage, accessPageLanguageDTO.getDescription());
-        save(accessPageLanguageRelationShip);
+        accessPageLanguageRelationShipRepository.save(accessPageLanguageRelationShip);
         accessPageLanguageDTO.setId(accessPageLanguageRelationShip.getId());
         return accessPageLanguageDTO;
 

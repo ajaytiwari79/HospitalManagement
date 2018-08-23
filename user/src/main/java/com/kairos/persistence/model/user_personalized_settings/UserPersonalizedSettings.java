@@ -18,18 +18,17 @@ public class UserPersonalizedSettings extends UserBaseEntity {
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private SelfRosteringView selfRosteringView;
 
+    public UserPersonalizedSettings() {
+        //Default Constructor
+    }
+    public UserPersonalizedSettings(SelfRosteringView selfRosteringView) {
+        this.selfRosteringView = selfRosteringView;
+    }
     public SelfRosteringView getSelfRosteringView() {
         return selfRosteringView;
     }
 
     public void setSelfRosteringView(SelfRosteringView selfRosteringView) {
-        this.selfRosteringView = selfRosteringView;
-    }
-
-    public UserPersonalizedSettings() {
-
-    }
-    public UserPersonalizedSettings(SelfRosteringView selfRosteringView) {
         this.selfRosteringView = selfRosteringView;
     }
 

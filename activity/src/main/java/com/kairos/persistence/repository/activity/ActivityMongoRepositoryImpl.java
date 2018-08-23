@@ -18,10 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Repository;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -33,8 +37,9 @@ import java.util.regex.Pattern;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
+
 public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepository {
-    @Autowired
+    @Inject
     private MongoTemplate mongoTemplate;
 
     public List<ActivityTagDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
@@ -246,7 +251,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     //Ignorecase
     public Activity getActivityByNameAndUnitId(Long unitId, String name) {
         Query query = new Query(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)));
-        return (Activity) mongoTemplate.findOne(query, Activity.class);
+        return  mongoTemplate.findOne(query, Activity.class);
     }
 
 
@@ -299,7 +304,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
             criteria.and("generalActivityTab.startDate").lte(endDate).orOperator(Criteria.where("generalActivityTab.endDate").exists(false), Criteria.where("generalActivityTab.endDate").gte(startDate));
         }
         Query query = new Query(criteria);
-        return (Activity) mongoTemplate.findOne(query, Activity.class);
+        return  mongoTemplate.findOne(query, Activity.class);
     }
 
     public Activity findByNameExcludingCurrentInUnitAndDate(String name, BigInteger activityId, Long unitId, LocalDate startDate, LocalDate endDate) {
@@ -312,7 +317,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
             criteria.and("generalActivityTab.startDate").lte(endDate).orOperator(Criteria.where("generalActivityTab.endDate").exists(false), Criteria.where("generalActivityTab.endDate").gte(startDate));
         }
         Query query = new Query(criteria);
-        return (Activity) mongoTemplate.findOne(query, Activity.class);
+        return mongoTemplate.findOne(query, Activity.class);
     }
 
     public Set<BigInteger> findAllActivitiesByUnitIdAndUnavailableTimeType(long unitId) {
@@ -346,9 +351,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
             criteria.and("generalActivityTab.startDate").lte(endDate).orOperator(Criteria.where("generalActivityTab.endDate").exists(false), Criteria.where("generalActivityTab.endDate").gte(startDate));
         }
         Query query = new Query(criteria);
-        Activity activity = mongoTemplate.findOne(query, Activity.class);
-        return activity;
-    }
+        return mongoTemplate.findOne(query, Activity.class);
+        }
 
 
     public Activity findByNameIgnoreCaseAndUnitIdAndByDate(String name, Long unitId, LocalDate startDate, LocalDate endDate) {
@@ -361,9 +365,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
             criteria.and("generalActivityTab.startDate").lte(endDate).orOperator(Criteria.where("generalActivityTab.endDate").exists(false), Criteria.where("generalActivityTab.endDate").gte(startDate));
         }
         Query query = new Query(criteria);
-        Activity activity = mongoTemplate.findOne(query, Activity.class);
-        return activity;
-    }
+        return mongoTemplate.findOne(query, Activity.class);
+        }
 
     public ActivityWrapper findActivityAndTimeTypeByActivityId(BigInteger activityId) {
         Aggregation aggregation = Aggregation.newAggregation(
@@ -409,11 +412,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public StaffActivitySettingDTO findStaffPersonalizedSettings(Long unitId, BigInteger activityId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("_id").is(activityId)),
-                project("rulesActivityTab.shortestTime", "rulesActivityTab.longestTime", "optaPlannerSettingActivityTab.maxThisActivityPerShift", "optaPlannerSettingActivityTab.minLength", "optaPlannerSettingActivityTab.eligibleForMove")
+                project("rulesActivityTab.shortestTime", "rulesActivityTab.longestTime","rulesActivityTab.earliestStartTime", "rulesActivityTab.latestStartTime", "rulesActivityTab.maximumEndTime","optaPlannerSettingActivityTab.maxThisActivityPerShift", "optaPlannerSettingActivityTab.minLength", "optaPlannerSettingActivityTab.eligibleForMove")
         );
         AggregationResults<StaffActivitySettingDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, StaffActivitySettingDTO.class);
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
     }
-
-
 }

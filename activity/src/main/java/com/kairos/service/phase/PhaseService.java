@@ -1,5 +1,6 @@
 package com.kairos.service.phase;
 
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
@@ -50,8 +51,8 @@ public class PhaseService extends MongoBaseService {
         List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
-            Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
-                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType(), phaseDTO.getStatus());
+            Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(),phaseDTO.getPhaseEnum(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
+                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(),phaseDTO.getColor(),phaseDTO.getFlippingDefaultTime());
 
             phases.add(phase);
         }
@@ -149,14 +150,12 @@ public class PhaseService extends MongoBaseService {
     }
 
     private Phase buildPhaseForCountry(PhaseDTO phaseDTO) {
-        Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(),
-                phaseDTO.getCountryId(), phaseDTO.getOrganizationId(), phaseDTO.getParentCountryPhaseId(), phaseDTO.getPhaseType(), phaseDTO.getStatus());
-        return phase;
+        return new Phase(phaseDTO.getName(), phaseDTO.getDescription(),phaseDTO.getPhaseEnum(),phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(),
+                phaseDTO.getCountryId(), phaseDTO.getOrganizationId(), phaseDTO.getParentCountryPhaseId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(),phaseDTO.getColor(),phaseDTO.getFlippingDefaultTime());
     }
 
     public List<PhaseDTO> getPhasesByCountryId(Long countryId) {
-        List<PhaseDTO> phases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
-        return phases;
+        return phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
     }
 
     public Map<String, List<PhaseDTO>> getPhasesWithCategoryByCountryId(Long countryId) {
@@ -168,14 +167,12 @@ public class PhaseService extends MongoBaseService {
     }
 
     public List<PhaseDTO> getApplicablePlanningPhasesByOrganizationId(Long orgId, Sort.Direction direction) {
-        List<PhaseDTO> phases = phaseMongoRepository.getApplicablePlanningPhasesByUnit(orgId, direction);
-        return phases;
-    }
+           return  phaseMongoRepository.getApplicablePlanningPhasesByUnit(orgId, direction);
+        }
 
     public List<PhaseDTO> getActualPhasesByOrganizationId(Long orgId) {
-        List<PhaseDTO> phases = phaseMongoRepository.getActualPhasesByUnit(orgId);
-        return phases;
-    }
+        return phaseMongoRepository.getActualPhasesByUnit(orgId);
+        }
 
 
     public boolean deletePhase(Long countryId, BigInteger phaseId) {
@@ -218,7 +215,7 @@ public class PhaseService extends MongoBaseService {
             else
                 return -1;
         });
-        if (weekDifference < 0) {
+        if (weekDifference <= 0) {
             Optional<Phase> phaseOptional = phases.stream().findFirst();
             phase = phaseOptional.get();
             return phase;
@@ -263,25 +260,44 @@ public class PhaseService extends MongoBaseService {
         /*phase.setName(phaseDTO.getName());
         phase.setSequence(phaseDTO.getSequence());*/
 
-        if (phase.getPhaseType().equals(PhaseType.PLANNING)) {
-            phase.setDescription(phaseDTO.getDescription());
-            phase.setDurationType(phaseDTO.getDurationType());
-            phase.setDuration(phaseDTO.getDuration());
+        if (PhaseType.PLANNING.equals(phase.getPhaseType())) {
+            preparePlanningPhase(phase, phaseDTO);
+        }
+        if(PhaseType.ACTUAL.equals(phase.getPhaseType())){
+            prepareActualPhase(phase,phaseDTO);
         }
         phase.setStatus(ShiftStatus.getListByValue(phaseDTO.getStatus()));
         save(phase);
         return phase;
     }
 
-    private void preparePhase(Phase phase, PhaseDTO phaseDTO) {
-
+    private void preparePlanningPhase(Phase phase, PhaseDTO phaseDTO) {
         phase.setDuration(phaseDTO.getDuration());
         phase.setDurationType(phaseDTO.getDurationType());
         phase.setName(phase.getName());
         phase.setSequence(phase.getSequence());
         phase.setDescription(phaseDTO.getDescription());
+        phase.setColor(phaseDTO.getColor());
+        phase.setFlippingDefaultTime(phaseDTO.getFlippingDefaultTime());
 
     }
+
+   private void prepareActualPhase(Phase phase,PhaseDTO phaseDTO){
+       phase.setName(phase.getName());
+       phase.setSequence(phase.getSequence());
+       phase.setDescription(phaseDTO.getDescription());
+       phase.setColor(phaseDTO.getColor());
+       if(PhaseDefaultName.REALTIME.equals(phaseDTO.getPhaseEnum())) {
+           phase.setRealtimeDuration(phaseDTO.getRealtimeDuration());
+       }else if(PhaseDefaultName.TENTATIVE.equals(phaseDTO.getPhaseEnum())) {
+           phase.setUntilNextDay(phaseDTO.getUntilNextDay());
+       }else {
+           phase.setGracePeriodByManagement(phaseDTO.getGracePeriodByManagement());
+           phase.setGracePeriodByStaff(phaseDTO.getGracePeriodByStaff());
+       }
+   }
+
+
 
     public PhaseDTO updatePhase(BigInteger phaseId, Long unitId, PhaseDTO phaseDTO) {
         phaseDTO.setOrganizationId(unitId);
@@ -299,9 +315,12 @@ public class PhaseService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.phase.name.alreadyexists", phaseDTO.getName());
         }
         if (PhaseType.PLANNING.equals(oldPhase.getPhaseType())) {
-            preparePhase(oldPhase, phaseDTO);
-            save(oldPhase);
+            preparePlanningPhase(oldPhase, phaseDTO);
         }
+        if(PhaseType.ACTUAL.equals(oldPhase.getPhaseType())){
+            prepareActualPhase(phase,phaseDTO);
+        }
+        save(oldPhase);
         return phaseDTO;
     }
 
@@ -355,6 +374,9 @@ public class PhaseService extends MongoBaseService {
      * @param upcomingMondayDate
      */
     private void addPlanningPhase(List<Phase> phases, LocalDate proposedDate, Map<LocalDate,List<ShiftStatus>> localDatePhaseStatusMap, LocalDate upcomingMondayDate) {
+        if(!Optional.ofNullable(phases).isPresent() || phases.isEmpty()){
+            exceptionService.actionNotPermittedException("phases.absent");
+        }
         Phase phase = null;
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
 
@@ -364,11 +386,11 @@ public class PhaseService extends MongoBaseService {
         int weekDifference = proposedWeekNumber-startWeekNumber;
 
         weekDifference++; // 34-30  its 4 but actually we need 5 including currently
-        if (weekDifference < 0) {
+        if (weekDifference <= 0) {
             Optional<Phase> phaseOptional = phases.stream().findFirst();
             if(phaseOptional.isPresent()){
                 phase = phaseOptional.get();
-                localDatePhaseStatusMap.put(proposedDate,phase.getStatus());
+
             }
 
         }
@@ -378,7 +400,7 @@ public class PhaseService extends MongoBaseService {
             if (DurationType.WEEKS .equals(phaseObject.getDurationType()) && phaseObject.getDuration() > 0) {    // Only considering Week based phases
                 for (int i = 0; i < phaseObject.getDuration(); i++) {
                     if (weekDifference == weekCount) {
-                        localDatePhaseStatusMap.put(proposedDate,phaseObject.getStatus());
+                        phase=phaseObject;
                         break outerLoop;
                     }
                     weekCount++;
@@ -387,9 +409,8 @@ public class PhaseService extends MongoBaseService {
         }
         if (!Optional.ofNullable(phase).isPresent()) {
             phase = phases.get(phases.size() - 1);
-            localDatePhaseStatusMap.put(proposedDate,phase.getStatus());
-
-        }
+            }
+        localDatePhaseStatusMap.put(proposedDate,phase.getStatus());
     }
 
 }

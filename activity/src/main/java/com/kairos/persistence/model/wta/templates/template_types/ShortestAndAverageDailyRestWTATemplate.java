@@ -122,7 +122,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
                         totalMin -=dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
                     }
                 }
-                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin/(60*dateTimeInterval.getDays()));
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin/(60*(int)dateTimeInterval.getDays()));
                 if (!isValid) {
                     if(limitAndCounter[1]!=null) {
                         int counterValue =  limitAndCounter[1] - 1;
