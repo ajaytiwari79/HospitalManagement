@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.period;
 
+import com.kairos.activity.period.PeriodPhaseDTO;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.util.DateUtils;
 import com.kairos.activity.period.PlanningPeriodDTO;
@@ -84,6 +85,33 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         );
 
         AggregationResults<PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
+        return result.getMappedResults();
+    }
+
+    public List<PeriodPhaseDTO> findAllPeriodsByStartDateAndDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
+        Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
+        Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
+        ProjectionOperation projectionOperation = Aggregation.project().
+                and("id").as("id").
+                andInclude("name").
+                andInclude("startDate").
+                andInclude("endDate").
+                and("current_phase_data.name").as("currentPhase").
+                and("current_phase_data.color").as("color").
+                and("current_phase_data.phaseEnum").as("phaseEnum").
+                and("next_phase_data.name").as("nextPhase");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).
+                        and("startDate").gte(startDate).and("endDate").lte(endDate)),
+                lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
+                lookup("phases", "nextPhaseId", "_id", "next_phase_data"),
+                sort(Sort.Direction.ASC, "startDate"),
+                projectionOperation
+
+        );
+
+        AggregationResults<PeriodPhaseDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PeriodPhaseDTO.class);
         return result.getMappedResults();
     }
 

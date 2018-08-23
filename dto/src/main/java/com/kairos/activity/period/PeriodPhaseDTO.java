@@ -70,4 +70,12 @@ public class PeriodPhaseDTO {
     public void setColor(String color) {
         this.color = color;
     }
+
+    public PhaseDefaultName getPhaseEnum() {
+        return phaseEnum;
+    }
+
+    public void setPhaseEnum(PhaseDefaultName phaseEnum) {
+        this.phaseEnum = phaseEnum;
+    }
 }
