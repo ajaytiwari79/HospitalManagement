@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
@@ -21,6 +22,6 @@ public interface StaffingLevelMongoRepository extends MongoBaseRepository<Staffi
     @Query("{deleted:false,unitId:?0,currentDate:{$gte:?1,$lte:?2}}")
     List<StaffingLevel> findByUnitIdAndCurrentDate(Long unitId, Date startDate, Date endDate);
     @Query("{deleted:false,unitId:?0,currentDate:{$in:?1}}")
-    List<StaffingLevel>findByUnitIdAndCurrentDate(Long unitId, List<LocalDate>localDates);
+    List<StaffingLevel>findByUnitIdAndCurrentDate(Long unitId, Set<LocalDate> localDates);
 
 }

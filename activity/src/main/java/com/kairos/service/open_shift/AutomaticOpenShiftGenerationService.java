@@ -80,7 +80,7 @@ public class AutomaticOpenShiftGenerationService {
         List<OpenShiftRuleTemplateDTO> openShiftRuleTemplates = openShiftRuleTemplateRepository.findOpenShiftRuleTemplatesWithInterval(unitId);
         Map<LocalDate,Set<BigInteger>> dateActivityIdsMap = new HashMap<>();
 
-        List<LocalDate> allOpenShiftRuleTemplateLocalDates = new ArrayList<>();
+        Set<LocalDate> allOpenShiftRuleTemplateLocalDates = new HashSet<>();
         for(OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO: openShiftRuleTemplates) {
             List<LocalDate> localDates = getOpenShiftRuleTemplateDates(openShiftRuleTemplateDTO.getOpenShiftInterval());
             Set<BigInteger> activityIds = openShiftRuleTemplateDTO.getActivitiesPerTimeTypes().stream().map(activitiesPerTimeType ->
