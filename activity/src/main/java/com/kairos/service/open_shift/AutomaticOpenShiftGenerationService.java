@@ -80,7 +80,7 @@ public class AutomaticOpenShiftGenerationService {
         List<OpenShiftRuleTemplateDTO> openShiftRuleTemplates = openShiftRuleTemplateRepository.findOpenShiftRuleTemplatesWithInterval(unitId);
         Map<LocalDate,Set<BigInteger>> dateActivityIdsMap = new HashMap<>();
 
-        List<LocalDate> allOpenShiftRuleTemplateLocalDates = new ArrayList<>();
+        Set<LocalDate> allOpenShiftRuleTemplateLocalDates = new HashSet<>();
         for(OpenShiftRuleTemplateDTO openShiftRuleTemplateDTO: openShiftRuleTemplates) {
             List<LocalDate> localDates = getOpenShiftRuleTemplateDates(openShiftRuleTemplateDTO.getOpenShiftInterval());
             Set<BigInteger> activityIds = openShiftRuleTemplateDTO.getActivitiesPerTimeTypes().stream().map(activitiesPerTimeType ->
@@ -97,7 +97,7 @@ public class AutomaticOpenShiftGenerationService {
             }
         }
 
-        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDate(unitId,allOpenShiftRuleTemplateLocalDates);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId,allOpenShiftRuleTemplateLocalDates);
         LocalDateTime minLocalDateTime = DateUtils.getStartOfDayFromLocalDate(allOpenShiftRuleTemplateLocalDates.stream().min(LocalDate::compareTo).get());
         LocalDateTime maxLocalDateTime = DateUtils.getEndOfDayFromLocalDate(allOpenShiftRuleTemplateLocalDates.stream().min(LocalDate::compareTo).get());
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDuration(minLocalDateTime,maxLocalDateTime,unitId);
