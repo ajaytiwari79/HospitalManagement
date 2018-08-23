@@ -919,7 +919,7 @@ public class StaffingLevelService extends MongoBaseService {
         List<DateWiseActivityDTO> dateWiseActivityDTOS = staffingLevelFromTemplateDTO.getImportIntervals();
         filterIncorrectDataByDates(dateWiseActivityDTOS, staffingLevelTemplate.getValidity().getStartDate(), staffingLevelTemplate.getValidity().getEndDate(), activityValidationErrors);
         Set<LocalDate> dates = dateWiseActivityDTOS.stream().map(DateWiseActivityDTO::getDate).collect(Collectors.toSet());
-        List<StaffingLevel> allStaffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDates(unitId, dates);
+        List<StaffingLevel> allStaffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, dates);
         Map<LocalDate, StaffingLevel> dateStaffingLevelMap = allStaffingLevels.stream().collect(Collectors.toMap(k -> asLocalDate(k.getCurrentDate()), v -> v));
         dateWiseActivityDTOS.forEach(currentDate -> {
             Map<BigInteger, BigInteger> activityMap = currentDate.getActivityIds().stream().collect(Collectors.toMap(k -> k, v -> v));
