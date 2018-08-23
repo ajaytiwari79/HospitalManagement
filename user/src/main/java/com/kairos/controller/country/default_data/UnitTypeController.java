@@ -30,7 +30,7 @@ public class UnitTypeController {
     }
 
     @GetMapping
-    @ApiOperation("THIS will is used to fetch all unit type of country")
+    @ApiOperation("this  is used to fetch all unit type of country")
     public ResponseEntity<Map<String, Object>> getAllUnitTypeOfCountry(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitTypeService.getAllUnitTypeOfCountry(countryId));
     }
