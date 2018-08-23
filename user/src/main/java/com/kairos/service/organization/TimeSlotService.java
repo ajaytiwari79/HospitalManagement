@@ -312,6 +312,7 @@ public class TimeSlotService {
     }
 
     public void createDefaultTimeSlots(Organization organization, List<TimeSlot> timeSlots) {
+        logger.info("Creating default time slot for organization "+organization.getName());
         List<TimeSlotSet> timeSlotSets = new ArrayList<>();
         timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, new Date(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING));
         timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, new Date(), organization.getTimeSlotMode(), TimeSlotType.TASK_PLANNING));
