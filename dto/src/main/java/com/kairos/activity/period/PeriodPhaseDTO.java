@@ -1,5 +1,7 @@
 package com.kairos.activity.period;
 
+import com.kairos.enums.phase.PhaseDefaultName;
+
 import java.math.BigInteger;
 import java.time.LocalDate;
 
@@ -11,6 +13,7 @@ public class PeriodPhaseDTO {
     private String currentPhase;
     private String nextPhase;
     private String color;
+    private PhaseDefaultName phaseEnum;
 
     public BigInteger getId() {
         return id;

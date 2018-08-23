@@ -8,6 +8,7 @@ import com.kairos.gdpr.OrganizationType;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)

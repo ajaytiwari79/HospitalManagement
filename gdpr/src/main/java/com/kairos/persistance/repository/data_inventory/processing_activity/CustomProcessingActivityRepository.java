@@ -19,7 +19,7 @@ public interface CustomProcessingActivityRepository {
 
     List<ProcessingActivityBasicResponseDTO>  getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(Long unitId, Set<BigInteger> processingActivityIds);
 
-    List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubProcessingActivities(Long unitId);
+    List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubprocessingActivities(Long unitId);
 
 
     List<DataSubjectMappingResponseDTO> getAllMappedDataSubjectWithDataCategoryAndDataElement(Long unitId,List<BigInteger> dataSubjectIds);

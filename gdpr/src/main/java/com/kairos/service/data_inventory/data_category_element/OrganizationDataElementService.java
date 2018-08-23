@@ -44,7 +44,7 @@ public class OrganizationDataElementService extends MongoBaseService {
         if (!previousDataElementList.isEmpty()) {
             exceptionService.duplicateDataException("message.duplicate", "Data element ", previousDataElementList.get(0).getName());
         }
-        dataElementList = dataElementMongoRepository.saveAll(dataElementList);
+        dataElementList = dataElementMongoRepository.saveAll(getNextSequence(dataElementList));
         return dataElementList;
 
     }

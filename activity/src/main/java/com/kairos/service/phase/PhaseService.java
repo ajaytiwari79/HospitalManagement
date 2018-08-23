@@ -1,5 +1,6 @@
 package com.kairos.service.phase;
 
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
@@ -50,8 +51,8 @@ public class PhaseService extends MongoBaseService {
         List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
-            Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
-                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType(), phaseDTO.getStatus());
+            Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(),phaseDTO.getPhaseEnum(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
+                    unitId, phaseDTO.getId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(),phaseDTO.getColor(),phaseDTO.getFlippingDefaultTime());
 
             phases.add(phase);
         }
@@ -149,8 +150,8 @@ public class PhaseService extends MongoBaseService {
     }
 
     private Phase buildPhaseForCountry(PhaseDTO phaseDTO) {
-        return new Phase(phaseDTO.getName(), phaseDTO.getDescription(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(),
-                phaseDTO.getCountryId(), phaseDTO.getOrganizationId(), phaseDTO.getParentCountryPhaseId(), phaseDTO.getPhaseType(), phaseDTO.getStatus());
+        return new Phase(phaseDTO.getName(), phaseDTO.getDescription(),phaseDTO.getPhaseEnum(),phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(),
+                phaseDTO.getCountryId(), phaseDTO.getOrganizationId(), phaseDTO.getParentCountryPhaseId(), phaseDTO.getPhaseType(), phaseDTO.getStatus(),phaseDTO.getColor(),phaseDTO.getFlippingDefaultTime());
     }
 
     public List<PhaseDTO> getPhasesByCountryId(Long countryId) {
@@ -259,25 +260,44 @@ public class PhaseService extends MongoBaseService {
         /*phase.setName(phaseDTO.getName());
         phase.setSequence(phaseDTO.getSequence());*/
 
-        if (phase.getPhaseType().equals(PhaseType.PLANNING)) {
-            phase.setDescription(phaseDTO.getDescription());
-            phase.setDurationType(phaseDTO.getDurationType());
-            phase.setDuration(phaseDTO.getDuration());
+        if (PhaseType.PLANNING.equals(phase.getPhaseType())) {
+            preparePlanningPhase(phase, phaseDTO);
+        }
+        if(PhaseType.ACTUAL.equals(phase.getPhaseType())){
+            prepareActualPhase(phase,phaseDTO);
         }
         phase.setStatus(ShiftStatus.getListByValue(phaseDTO.getStatus()));
         save(phase);
         return phase;
     }
 
-    private void preparePhase(Phase phase, PhaseDTO phaseDTO) {
-
+    private void preparePlanningPhase(Phase phase, PhaseDTO phaseDTO) {
         phase.setDuration(phaseDTO.getDuration());
         phase.setDurationType(phaseDTO.getDurationType());
         phase.setName(phase.getName());
         phase.setSequence(phase.getSequence());
         phase.setDescription(phaseDTO.getDescription());
+        phase.setColor(phaseDTO.getColor());
+        phase.setFlippingDefaultTime(phaseDTO.getFlippingDefaultTime());
 
     }
+
+   private void prepareActualPhase(Phase phase,PhaseDTO phaseDTO){
+       phase.setName(phase.getName());
+       phase.setSequence(phase.getSequence());
+       phase.setDescription(phaseDTO.getDescription());
+       phase.setColor(phaseDTO.getColor());
+       if(PhaseDefaultName.REALTIME.equals(phaseDTO.getPhaseEnum())) {
+           phase.setRealtimeDuration(phaseDTO.getRealtimeDuration());
+       }else if(PhaseDefaultName.TENTATIVE.equals(phaseDTO.getPhaseEnum())) {
+           phase.setUntilNextDay(phaseDTO.getUntilNextDay());
+       }else {
+           phase.setGracePeriodByManagement(phaseDTO.getGracePeriodByManagement());
+           phase.setGracePeriodByStaff(phaseDTO.getGracePeriodByStaff());
+       }
+   }
+
+
 
     public PhaseDTO updatePhase(BigInteger phaseId, Long unitId, PhaseDTO phaseDTO) {
         phaseDTO.setOrganizationId(unitId);
@@ -295,9 +315,12 @@ public class PhaseService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.phase.name.alreadyexists", phaseDTO.getName());
         }
         if (PhaseType.PLANNING.equals(oldPhase.getPhaseType())) {
-            preparePhase(oldPhase, phaseDTO);
-            save(oldPhase);
+            preparePlanningPhase(oldPhase, phaseDTO);
         }
+        if(PhaseType.ACTUAL.equals(oldPhase.getPhaseType())){
+            prepareActualPhase(phase,phaseDTO);
+        }
+        save(oldPhase);
         return phaseDTO;
     }
 
