@@ -15,6 +15,7 @@ import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.model.pay_out.PayOutCTADistribution;
 import com.kairos.user.country.agreement.cta.CalculationFor;
+import com.kairos.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -76,11 +77,11 @@ public class PayOutCalculationService {
                                     DateTimeInterval ctaInterval = getCTAInterval(ctaIntervalDTO, interval.getStart());
                                     if (ctaInterval.overlaps(shiftInterval)) {
                                         int overlapTimeInMin = ctaInterval.overlap(shiftInterval).getMinutes();
-                                        if (ctaIntervalDTO.getCompensationMeasurementType().equals(AppConstants.MINUTES)) {
+                                        if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
                                             ctaPayOutMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaIntervalDTO.getValue();
                                             totalPayOut += ctaPayOutMin;
                                             break;
-                                        } else if (ctaIntervalDTO.getCompensationMeasurementType().equals(AppConstants.PERCENT)) {
+                                        } else if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
                                             ctaPayOutMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaIntervalDTO.getValue());
                                             totalPayOut += ctaPayOutMin;
                                             break;
@@ -128,7 +129,7 @@ public class PayOutCalculationService {
     private List<PayOutCTADistribution> getCTADistribution(List<CTARuleTemplateDTO> ctaRuleTemplateCalculatedTimeBankDTOS, Map<BigInteger, Integer> ctaTimeBankMinMap) {
         List<PayOutCTADistribution> timeBankCTADistributions = new ArrayList<>(ctaRuleTemplateCalculatedTimeBankDTOS.size());
         for (CTARuleTemplateDTO ruleTemplate : ctaRuleTemplateCalculatedTimeBankDTOS) {
-            if (!ruleTemplate.isCalculateScheduledHours()) {
+            if (!ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT)) {
                 timeBankCTADistributions.add(new PayOutCTADistribution(ruleTemplate.getName(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(),0), ruleTemplate.getId()));
             }
         }
