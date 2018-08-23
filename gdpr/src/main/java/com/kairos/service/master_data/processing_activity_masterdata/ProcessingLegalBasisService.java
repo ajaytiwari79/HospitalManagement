@@ -70,7 +70,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
                 }
 
-                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(newProcessingLegalBasisList);
+                newProcessingLegalBasisList = legalBasisMongoRepository.saveAll(getNextSequence(newProcessingLegalBasisList));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingLegalBasisList);
@@ -187,7 +187,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
                 ProcessingLegalBasisList.add(ProcessingLegalBasis);
             }
 
-            ProcessingLegalBasisList = legalBasisMongoRepository.saveAll(ProcessingLegalBasisList);
+            ProcessingLegalBasisList = legalBasisMongoRepository.saveAll(getNextSequence(ProcessingLegalBasisList));
         }
         return ProcessingLegalBasisList;
     }

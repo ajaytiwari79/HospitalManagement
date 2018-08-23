@@ -8,6 +8,7 @@ import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -19,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
+import javax.print.Doc;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -104,7 +106,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
 
 
     @Override
-    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubProcessingActivities(Long unitId) {
+    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubprocessingActivities(Long unitId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
 

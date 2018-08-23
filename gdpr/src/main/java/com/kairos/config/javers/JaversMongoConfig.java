@@ -26,7 +26,6 @@ import org.springframework.core.annotation.Order;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -59,7 +58,7 @@ public class JaversMongoConfig {
         );
         MongoClientOptions.Builder builder = MongoClientOptions.builder()
                 .codecRegistry(codecRegistry);
-        final List<MongoCredential> credentialList = Collections.singletonList(MongoCredential.createCredential(environment.getMongoUserName(), environment.getDataBaseName(), environment.getMongoPassword().toCharArray()));
+        final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getMongoUserName(), environment.getDataBaseName(), environment.getMongoPassword().toCharArray()));
         return new MongoClient(new ServerAddress(environment.getMongoHost(), environment.getMongoPort()), credentialList,builder.build());
 
     }

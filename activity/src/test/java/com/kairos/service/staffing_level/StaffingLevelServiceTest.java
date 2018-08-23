@@ -25,6 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.TemporalField;
@@ -58,7 +59,7 @@ public class StaffingLevelServiceTest {
         LocalDate date = LocalDate.now();
         TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeekCount = date.get(woy);
-        staffingLevel=new StaffingLevel(DateUtils.getDate(),1L,new Long(currentWeekCount),1L,staffingLevelSetting);
+        staffingLevel=new StaffingLevel(DateUtils.getDate(),1,new Long("2567"),new BigInteger("1"),staffingLevelSetting);
         List<StaffingLevelInterval> StaffingLevelIntervals=new ArrayList<>();
         int startTimeCounter=0;
         LocalTime startTime=LocalTime.MIN;

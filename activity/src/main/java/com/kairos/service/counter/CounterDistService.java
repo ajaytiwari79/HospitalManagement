@@ -317,9 +317,7 @@ public class CounterDistService extends MongoBaseService {
                     tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, null, staffId, ConfLevel.STAFF));
                 });
             });
-
         }
-
        if(!applicableKpiIds.isEmpty()) save(applicableKPIS);
        if(!tabKPIConfKPIEntries.isEmpty()) save(tabKPIConfKPIEntries);
     }
@@ -327,7 +325,7 @@ public class CounterDistService extends MongoBaseService {
     public void createDefaultKpiSetting(Long unitId, DefaultKPISettingDTO defaultKPISettingDTO) {
         List<OrgTypeMappingDTO> orgTypeMappingDTOS = counterRepository.getOrgTypeKPIEntryOrgTypeIds(defaultKPISettingDTO.getOrgTypeIds(), new ArrayList<>(), unitId);
         if(orgTypeMappingDTOS.isEmpty()){
-                return;
+               return;
         }
         List<BigInteger> applicableKpiIds = orgTypeMappingDTOS.stream().map(orgTypeMappingDTO -> orgTypeMappingDTO.getKpiId()).collect(Collectors.toList());
         if(Optional.ofNullable(defaultKPISettingDTO.getParentUnitId()).isPresent()) {
@@ -360,9 +358,7 @@ public class CounterDistService extends MongoBaseService {
                categoriesNameMap.put(kpiCategoryDTO.getName(),kpiCategoryDTO.getId());
            });
             List<KPICategory> kpiCategories = kpiCategoryDTOS.stream().map(category -> new KPICategory(category.getName(),null,unitId,ConfLevel.UNIT)).collect(Collectors.toList());
-            if(!kpiCategories.isEmpty()) {
-                save(kpiCategories);
-            }
+            save(kpiCategories);
             kpiCategories.stream().forEach(kpiCategory -> {
                categoriesOldAndNewIds.put(categoriesNameMap.get(kpiCategory.getName()),kpiCategory.getId());
         });

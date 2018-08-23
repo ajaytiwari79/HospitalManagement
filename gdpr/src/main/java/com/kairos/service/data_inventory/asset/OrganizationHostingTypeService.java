@@ -69,7 +69,7 @@ public class OrganizationHostingTypeService extends MongoBaseService {
                     newHostingType.setOrganizationId(organizationId);
                     newHostingTypes.add(newHostingType);
                 }
-                newHostingTypes = hostingTypeMongoRepository.saveAll(newHostingTypes);
+                newHostingTypes = hostingTypeMongoRepository.saveAll(getNextSequence(newHostingTypes));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newHostingTypes);

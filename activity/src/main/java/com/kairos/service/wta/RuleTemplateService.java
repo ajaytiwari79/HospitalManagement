@@ -95,6 +95,10 @@ public class RuleTemplateService extends MongoBaseService {
         phaseTemplateValues.add(new PhaseTemplateValue(2, "PUZZLE", (short) 0, (short) 0, true, false, false));
         phaseTemplateValues.add(new PhaseTemplateValue(3, "DRAFT", (short) 0, (short) 0, true, false, false));
         phaseTemplateValues.add(new PhaseTemplateValue(4, "CONSTRUCTION", (short) 0, (short) 0, true, false, false));
+        phaseTemplateValues.add(new PhaseTemplateValue(5, "REALTIME", (short) 0, (short) 0, true, false, false));
+        phaseTemplateValues.add(new PhaseTemplateValue(6, "TIME & ATTENDANCE", (short) 0, (short) 0, true, false, false));
+        phaseTemplateValues.add(new PhaseTemplateValue(7, "TENTATIVE", (short) 0, (short) 0, true, false, false));
+        phaseTemplateValues.add(new PhaseTemplateValue(8, "PAYROLL", (short) 0, (short) 0, true, false, false));
 
         ShiftLengthWTATemplate shiftLengthWTATemplate = new ShiftLengthWTATemplate("Maximum night shift’s length", "Maximum night shift’s length", 400);
         shiftLengthWTATemplate.setCountryId(countryDTO.getId());

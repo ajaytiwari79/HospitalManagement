@@ -2,20 +2,17 @@ package com.kairos.activity.period;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 /**
  * Created by prerna on 6/4/18.
  */
-public class PeriodPhaseFlippingDateDTO {
+public class PeriodPhaseDTO {
     private BigInteger phaseId;
     private LocalDate flippingDate;
-
-    public PeriodPhaseFlippingDateDTO(){
+    private LocalTime flippingTime;
+    public PeriodPhaseDTO(){
         // default constructor
-    }
-    public PeriodPhaseFlippingDateDTO( BigInteger phaseId, LocalDate flippingDate) {
-        this.phaseId = phaseId;
-        this.flippingDate = flippingDate;
     }
 
 
@@ -35,11 +32,11 @@ public class PeriodPhaseFlippingDateDTO {
         this.flippingDate = flippingDate;
     }
 
-    /*public Date getFlippingDate() {
-        return flippingDate;
+    public LocalTime getFlippingTime() {
+        return flippingTime;
     }
 
-    public void setFlippingDate(Date flippingDate) {
-        this.flippingDate = flippingDate;
-    }*/
+    public void setFlippingTime(LocalTime flippingTime) {
+        this.flippingTime = flippingTime;
+    }
 }

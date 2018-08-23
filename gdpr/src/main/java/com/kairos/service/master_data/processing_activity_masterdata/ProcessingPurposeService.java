@@ -66,7 +66,7 @@ public class ProcessingPurposeService extends MongoBaseService {
                     newProcessingPurposes.add(newProcessingPurpose);
 
                 }
-                newProcessingPurposes = processingPurposeMongoRepository.saveAll(newProcessingPurposes);
+                newProcessingPurposes = processingPurposeMongoRepository.saveAll(getNextSequence(newProcessingPurposes));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newProcessingPurposes);
@@ -184,7 +184,7 @@ public class ProcessingPurposeService extends MongoBaseService {
                 ProcessingPurposeList.add(ProcessingPurpose);
             }
 
-            ProcessingPurposeList = processingPurposeMongoRepository.saveAll(ProcessingPurposeList);
+            ProcessingPurposeList = processingPurposeMongoRepository.saveAll(getNextSequence(ProcessingPurposeList));
         }
         return ProcessingPurposeList;
     }
