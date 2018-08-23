@@ -98,14 +98,14 @@ public class StaffingLevelController {
     }
 
 
-    @RequestMapping(value = "/activity_skills", method = RequestMethod.GET)
+    @RequestMapping(value = "/activity_skills")
     @ApiOperation("Create staffing_level")
     public ResponseEntity<Map<String, Object>> getActivityTypesAndSkillsByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 staffingLevelService.getActivityTypesAndSkillsByUnitId(unitId));
     }
 
-    @RequestMapping(value = "/phase_daytype", method = RequestMethod.GET)
+    @GetMapping(value = "/phase_daytype")
     @ApiOperation("getting phase and dayType of selected date")
     public ResponseEntity<Map<String, Object>> getPhaseAndDayTypes(@PathVariable Long unitId,@RequestParam("date")Date date ) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -120,7 +120,7 @@ public class StaffingLevelController {
         return  staffingLevelService.getPresenceStaffingLevel(unitId,message.getCurrentDate());
     }
 
-    @RequestMapping(value = "/submitShiftPlanningInfoToPlanner", method = RequestMethod.POST)
+    @PostMapping(value = "/submitShiftPlanningInfoToPlanner")
     @ApiOperation("getting phase and dayType of selected date")
     public ResponseEntity<Map<String, Object>> getShiftPlanningInfo(@PathVariable Long unitId ,@RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         staffingLevelService.submitShiftPlanningInfoToPlanner(unitId,startDate,endDate);
@@ -129,7 +129,7 @@ public class StaffingLevelController {
     }
 
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/import_csv")
+    @PutMapping(value = "/import_csv")
     @ApiOperation("update staffing level from csv")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     private ResponseEntity<Map<String, Object>> updateStaffingLevelFromCSV(@RequestParam("file") MultipartFile multipartFile,@PathVariable Long unitId) throws Exception{
@@ -139,7 +139,7 @@ public class StaffingLevelController {
 
 
 
-    @RequestMapping(value = "/absence", method = RequestMethod.POST)
+    @PostMapping(value = "/absence")
     @ApiOperation("update and create staffing_level")
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos,
                                                                    @PathVariable Long unitId) {
@@ -152,7 +152,7 @@ public class StaffingLevelController {
      * @param unitId
      * @return
      */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @GetMapping(value = "/")
     @ApiOperation("getting  staffing_level between date unit wise ")
     public ResponseEntity<Map<String, Object>> getStaffingLevels(@PathVariable Long unitId
             , @RequestParam("startDate")@DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam("endDate")@DateTimeFormat(pattern="yyyy-MM-dd")Date endDate) {
@@ -160,7 +160,7 @@ public class StaffingLevelController {
                 staffingLevelService.getStaffingLevel(unitId,startDate,endDate));
     }
 
-    @RequestMapping(value = "/multiple", method = RequestMethod.POST)
+    @PostMapping(value = "/multiple")
     @ApiOperation("Create staffing_levels from StaffingLevelTemplate")
     public ResponseEntity<Map<String, Object>> addStaffingLevelFromStaffingLevelTemplate(@PathVariable Long unitId, @RequestBody StaffingLevelFromTemplateDTO staffingLevelFromTemplateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
