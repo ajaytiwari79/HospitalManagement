@@ -7,16 +7,12 @@ import java.time.LocalTime;
 /**
  * Created by prerna on 6/4/18.
  */
-public class PeriodPhaseFlippingDateDTO {
+public class PeriodPhaseDTO {
     private BigInteger phaseId;
     private LocalDate flippingDate;
     private LocalTime flippingTime;
-    public PeriodPhaseFlippingDateDTO(){
+    public PeriodPhaseDTO(){
         // default constructor
-    }
-    public PeriodPhaseFlippingDateDTO( BigInteger phaseId, LocalDate flippingDate) {
-        this.phaseId = phaseId;
-        this.flippingDate = flippingDate;
     }
 
 
