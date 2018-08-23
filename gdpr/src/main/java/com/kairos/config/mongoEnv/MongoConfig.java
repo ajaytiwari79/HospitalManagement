@@ -1,20 +1,17 @@
 package com.kairos.config.mongoEnv;
 
 import com.mongodb.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+
 import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 public class MongoConfig extends AbstractMongoConfiguration {
 
-
-    Logger logger=LoggerFactory.getLogger(MongoConfig.class);
 
     @Autowired
     private EnvConfig environment;
@@ -31,9 +28,10 @@ public class MongoConfig extends AbstractMongoConfiguration {
         return environment.getDataBaseName();
     }
 
-    @Bean("mongoDbBean")
+    @Bean
     public DB getDb() {
         return mongoClient().getDB(getDatabaseName());
     }
+
 
 }

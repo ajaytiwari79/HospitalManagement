@@ -71,7 +71,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
                     newTransferMethods.add(newTransferMethod);
                 }
 
-                newTransferMethods = transferMethodRepository.saveAll(newTransferMethods);
+                newTransferMethods = transferMethodRepository.saveAll(getNextSequence(newTransferMethods));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newTransferMethods);

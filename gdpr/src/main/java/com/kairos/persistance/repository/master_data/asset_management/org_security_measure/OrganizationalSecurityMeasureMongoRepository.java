@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.asset_management.org_security_measure;
 
 
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
