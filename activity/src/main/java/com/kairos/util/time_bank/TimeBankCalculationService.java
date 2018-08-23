@@ -24,6 +24,7 @@ import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutTransaction;
 import com.kairos.user.country.agreement.cta.CalculationFor;
+import com.kairos.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -98,9 +99,8 @@ public class TimeBankCalculationService {
     public DailyTimeBankEntry getTimeBankByInterval(StaffUnitPositionDetails ctaDto, Interval interval, List<ShiftWithActivityDTO> shifts) {
         DailyTimeBankEntry dailyTimeBank = null;
         if (shifts != null && !shifts.isEmpty()) {
-            dailyTimeBank = new DailyTimeBankEntry(ctaDto.getId(), ctaDto.getStaffId(), ctaDto.getWorkingDaysInWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
             shifts = filterSubshifts(shifts);
-            calculateDailyTimebank(interval, ctaDto, shifts, dailyTimeBank);
+            dailyTimeBank = calculateDailyTimebank(interval, ctaDto, shifts);
         }
         return dailyTimeBank;
     }
@@ -198,7 +198,8 @@ public class TimeBankCalculationService {
      * @return DailyTimeBankEntry
      */
     //TODO complete review by Sachin and need Test cases
-    public DailyTimeBankEntry calculateDailyTimebank(Interval interval, StaffUnitPositionDetails ctaDto, List<ShiftWithActivityDTO> shifts, DailyTimeBankEntry dailyTimeBankEntry) {
+    public DailyTimeBankEntry calculateDailyTimebank(Interval interval, StaffUnitPositionDetails ctaDto, List<ShiftWithActivityDTO> shifts) {
+        DailyTimeBankEntry dailyTimeBank = new DailyTimeBankEntry(ctaDto.getId(), ctaDto.getStaffId(), ctaDto.getWorkingDaysInWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
         int totalDailyTimebank = 0;
         int dailyScheduledMin = 0;
         int contractualMin = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysInWeek() ? ctaDto.getTotalWeeklyMinutes() / ctaDto.getWorkingDaysInWeek() : 0;
@@ -212,7 +213,7 @@ public class TimeBankCalculationService {
                         int ctaTimeBankMin = 0;
                         boolean activityValid = ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()));
                         if (activityValid) {
-                            boolean ruleTemplateValid = (ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart())) && (ruleTemplate.getEmploymentTypes() == null || ruleTemplate.getEmploymentTypes().contains(ctaDto.getEmploymentType().getId())));
+                            boolean ruleTemplateValid = ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart())))) && (ruleTemplate.getEmploymentTypes() == null || ruleTemplate.getEmploymentTypes().contains(ctaDto.getEmploymentType().getId()));
                             if (ruleTemplateValid) {
                                 if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shift.getStartDate().getTime())) {
                                     dailyScheduledMin += shift.getScheduledMinutes();
@@ -223,11 +224,11 @@ public class TimeBankCalculationService {
                                         Interval intervalOfCTA = getCTAInterval(ctaInterval, interval.getStart());
                                         if (intervalOfCTA.overlaps(shiftInterval)) {
                                             int overlapTimeInMin = (int) intervalOfCTA.overlap(shiftInterval).toDuration().getStandardMinutes();
-                                            if (ctaInterval.getCompensationMeasurementType().equals(AppConstants.MINUTES)) {
+                                            if (ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
                                                 ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaInterval.getValue();
                                                 totalDailyTimebank += ctaTimeBankMin;
                                                 break;
-                                            } else if (ctaInterval.getCompensationMeasurementType().equals(AppConstants.PERCENT)) {
+                                            } else if (ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
                                                 ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaInterval.getValue());
                                                 totalDailyTimebank += ctaTimeBankMin;
                                                 break;
@@ -247,14 +248,14 @@ public class TimeBankCalculationService {
         }
         totalDailyTimebank = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysInWeek() ? totalDailyTimebank - contractualMin : totalDailyTimebank;
         int timeBankMinWithoutCta = dailyScheduledMin - contractualMin;
-        dailyTimeBankEntry.setStaffId(ctaDto.getStaffId());
-        dailyTimeBankEntry.setTimeBankMinWithoutCta(timeBankMinWithoutCta);
-        dailyTimeBankEntry.setTimeBankMinWithCta(ctaTimeBankMinMap.entrySet().stream().mapToInt(c -> c.getValue()).sum());
-        dailyTimeBankEntry.setContractualMin(contractualMin);
-        dailyTimeBankEntry.setScheduledMin(dailyScheduledMin);
-        dailyTimeBankEntry.setTotalTimeBankMin(totalDailyTimebank);
-        dailyTimeBankEntry.setTimeBankCTADistributionList(getBlankTimeBankDistribution(ctaDto.getCtaRuleTemplates(), ctaTimeBankMinMap));
-        return dailyTimeBankEntry;
+        dailyTimeBank.setStaffId(ctaDto.getStaffId());
+        dailyTimeBank.setTimeBankMinWithoutCta(timeBankMinWithoutCta);
+        dailyTimeBank.setTimeBankMinWithCta(ctaTimeBankMinMap.entrySet().stream().mapToInt(c -> c.getValue()).sum());
+        dailyTimeBank.setContractualMin(contractualMin);
+        dailyTimeBank.setScheduledMin(dailyScheduledMin);
+        dailyTimeBank.setTotalTimeBankMin(totalDailyTimebank);
+        dailyTimeBank.setTimeBankCTADistributionList(getBlankTimeBankDistribution(ctaDto.getCtaRuleTemplates(), ctaTimeBankMinMap));
+        return dailyTimeBank;
     }
 
     /**
