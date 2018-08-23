@@ -217,10 +217,10 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "with staff,unitPosition match(staff)-[staff_expertise_relation:"+STAFF_HAS_EXPERTISE+"]->(expetise) where staff_expertise_relation.expertiseStartDate is not null\n" +
             "and datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).month=datetime().month and\n" +
             "datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).day=datetime().day and datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).year<>datetime().year " +
-            "with staff,expetise,unitPosition, datetime().year-datetime({epochmillis:staff_expertise_relation.expertiseStartDate}).year as currentYear match(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expetise) with staff,unitPosition,expetise,currentYear\n" +
+            "with staff,expetise,unitPosition, datetime().year-datetime({epochmillis:staff_expertise_relation.expert00iseStartDate}).year as currentYear match(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expetise) with staff,unitPosition,expetise,currentYear\n" +
             "match(unitPosition)-[:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) where sl.to<=currentYear with unitPosition, expetise,currentYear match(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expetise) with unitPosition,expetise,currentYear\n" +
             "match(unitPosition)-[unitPositionEmploymentTypeRelationShip:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) optional " +
-            "match(expetise)-[:"+FOR_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel) where seniorityLevel.from <= currentYear and seniorityLevel.to > currentYear " +
+            "match(expetise)-[:"+FOR_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel) where seniorityLevel.from <= currentYear and (seniorityLevel.to > currentYear or senioritylevel.to is null) " +
             "return seniorityLevel,unitPosition,unitPositionEmploymentTypeRelationShip,employmentType")
     List<UnitPositionSeniorityLevelQueryResult> findUnitPositionSeniorityLeveltoUpdate();
 
