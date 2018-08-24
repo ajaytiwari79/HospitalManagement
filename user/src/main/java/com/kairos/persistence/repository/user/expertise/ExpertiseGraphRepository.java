@@ -175,11 +175,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "return expertise order by expertise.creationDate")
     List<Expertise> getExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds);
 
-    // Get Expertise data for filters by countryId
-    /*@Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}\n" +
-            "    match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {1}\n" +
-            "    match(expertise)-[:" + SUPPORTS_SERVICES + "]-(os) return toString(id(expertise)) as id, expertise.name as value ORDER BY value")
-    List<FilterSelectionQueryResult> getExpertiseByCountryIdForFilters(Long unitId, Long countryId);*/
 
     @Query("MATCH (o:Organization)-[r:" + PROVIDE_SERVICE + "{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) WHERE id(o)=64\n" +
             " MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) WHERE id(country) = 4\n" +
