@@ -318,12 +318,12 @@ public class PlanningPeriodService extends MongoBaseService {
         return getPlanningPeriods(unitId,planningPeriodDTO.getStartDate(),(planningPeriodDTO.getEndDate()!=null)?planningPeriodDTO.getEndDate():null);
     }
 
-    public boolean updateFlippingDate(BigInteger periodId, Long unitId, LocalDate date) {
+    public boolean updateFlippingDate(BigInteger periodId, Long unitId, LocalDateTime date) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
         boolean updateCurrentAndNextPhases = false;
         BigInteger nextPhaseId = null;
         for (PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()) {
-            if (phaseFlippingDate.getFlippingDate().isEqual(date)) {
+            if (phaseFlippingDate.getFlippingDate().isEqual(date.toLocalDate())&&phaseFlippingDate.getFlippingTime().equals(date.toLocalTime())) {
                 planningPeriod.setCurrentPhaseId(phaseFlippingDate.getPhaseId());
                 updateCurrentAndNextPhases = true;
                 break;
