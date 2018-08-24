@@ -100,19 +100,17 @@ public class MasterQuestionService extends MongoBaseService {
         }
         switch (templateType) {
             case ASSET_TYPE:
-              /*  if (Optional.ofNullable(AssetAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
+                if (Optional.ofNullable(AssetAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
                     masterQuestion.setAttributeName(masterQuestionDTO.getAttributeName());
-                } else {
-                    throw new InvalidRequestException("Attribute not found for Asset ");
-                }*/
-                break;
+                    break;
+                }
+                throw new InvalidRequestException("Attribute not found for Asset ");
             case PROCESSING_ACTIVITY:
-               /* if (Optional.ofNullable(ProcessingActivityAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
+                if (Optional.ofNullable(ProcessingActivityAttributeName.valueOf(masterQuestionDTO.getAttributeName())).isPresent()) {
                     masterQuestion.setAttributeName(masterQuestionDTO.getAttributeName());
-                } else {
-                    throw new InvalidRequestException("Attribute not found for Processing Activity");
-                }*/
-                break;
+                    break;
+                }
+                throw new InvalidRequestException("Attribute not found for Processing Activity");
         }
 
     }
