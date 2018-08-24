@@ -8,6 +8,7 @@ import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalS
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.TechnicalSecurityMeasureService;
@@ -118,9 +119,11 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
 
     public Boolean deleteTechnicalSecurityMeasure(Long unitId, BigInteger techSecurityMeasureId) {
 
-        List<String> assetsLinkedWithTechnicalSecurityMeasure = assetMongoRepository.findAllAssetLinkedWithTechnicalSecurityMeasure(unitId, techSecurityMeasureId);
+        List<AssetBasicResponseDTO> assetsLinkedWithTechnicalSecurityMeasure = assetMongoRepository.findAllAssetLinkedWithTechnicalSecurityMeasure(unitId, techSecurityMeasureId);
         if (!assetsLinkedWithTechnicalSecurityMeasure.isEmpty()) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Technical Security Measure", assetsLinkedWithTechnicalSecurityMeasure.get(0));
+            StringBuilder assetNames=new StringBuilder();
+            assetsLinkedWithTechnicalSecurityMeasure.forEach(asset->assetNames.append(asset.getName()+","));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Technical Security Measure", assetNames);
         }
         TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByOrganizationIdAndId(unitId, techSecurityMeasureId);
         if (!Optional.ofNullable(technicalSecurityMeasure).isPresent()) {

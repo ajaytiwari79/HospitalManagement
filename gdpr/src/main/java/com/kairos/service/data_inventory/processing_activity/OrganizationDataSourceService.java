@@ -9,6 +9,7 @@ import com.kairos.persistance.model.master_data.default_proc_activity_setting.Da
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.DataSourceService;
@@ -111,9 +112,11 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
     public Boolean deleteDataSource(Long unitId, BigInteger dataSourceId) {
 
-        List<String> processingActivitiesLinkedWithDataSource = processingActivityMongoRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
+        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithDataSource = processingActivityMongoRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
         if (!processingActivitiesLinkedWithDataSource.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource", processingActivitiesLinkedWithDataSource.get(0));
+            StringBuilder processingActivityNames=new StringBuilder();
+            processingActivitiesLinkedWithDataSource.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource", processingActivityNames);
         }
         DataSource dataSource = dataSourceMongoRepository.findByOrganizationIdAndId(unitId, dataSourceId);
         if (!Optional.ofNullable(dataSource).isPresent()) {

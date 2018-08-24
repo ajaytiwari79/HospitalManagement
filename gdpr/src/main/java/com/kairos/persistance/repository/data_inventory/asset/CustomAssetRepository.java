@@ -15,6 +15,4 @@ public interface CustomAssetRepository {
 
     List<AssetResponseDTO> findAllAssetWithMetaData( Long organizationId);
 
-    Map findAllAssetLinkedWithDataDisposal(Long unitId, BigInteger dataDisposalId);
-
 }

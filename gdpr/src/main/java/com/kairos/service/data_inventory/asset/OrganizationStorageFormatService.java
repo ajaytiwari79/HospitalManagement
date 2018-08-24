@@ -8,6 +8,7 @@ import com.kairos.persistance.model.master_data.default_asset_setting.StorageFor
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.StorageFormatService;
@@ -115,9 +116,11 @@ public class OrganizationStorageFormatService extends MongoBaseService {
 
     public Boolean deleteStorageFormat(Long unitId, BigInteger storageFormatId) {
 
-        List<String> assetsLinkedWithStorageFormat = assetMongoRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
+        List<AssetBasicResponseDTO> assetsLinkedWithStorageFormat = assetMongoRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
         if (!assetsLinkedWithStorageFormat.isEmpty()) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", assetsLinkedWithStorageFormat.get(0));
+            StringBuilder assetNames=new StringBuilder();
+            assetsLinkedWithStorageFormat.forEach(asset->assetNames.append(asset.getName()+","));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", assetNames);
         }
         StorageFormat storageFormat = storageFormatMongoRepository.findByOrganizationIdAndId(unitId, storageFormatId);
         if (!Optional.ofNullable(storageFormat).isPresent()) {

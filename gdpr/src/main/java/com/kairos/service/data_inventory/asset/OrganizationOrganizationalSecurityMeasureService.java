@@ -8,6 +8,7 @@ import com.kairos.persistance.model.master_data.default_asset_setting.Organizati
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.OrganizationalSecurityMeasureService;
@@ -112,9 +113,11 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
 
     public Boolean deleteOrganizationalSecurityMeasure(Long unitId, BigInteger orgSecurityMeasureId) {
 
-        List<String> assetsLinkedWithOrganizationalSecurityMeasure = assetMongoRepository.findAllAssetLinkedWithOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId);
+        List<AssetBasicResponseDTO> assetsLinkedWithOrganizationalSecurityMeasure = assetMongoRepository.findAllAssetLinkedWithOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId);
         if (!assetsLinkedWithOrganizationalSecurityMeasure.isEmpty()) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Organization Security Measure", assetsLinkedWithOrganizationalSecurityMeasure.get(0));
+            StringBuilder assetNames=new StringBuilder();
+            assetsLinkedWithOrganizationalSecurityMeasure.forEach(asset->assetNames.append(asset.getName()+","));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Organization Security Measure", assetNames);
         }
         OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByOrganizationIdAndId(unitId, orgSecurityMeasureId);
         if (!Optional.ofNullable(organizationalSecurityMeasure).isPresent()) {

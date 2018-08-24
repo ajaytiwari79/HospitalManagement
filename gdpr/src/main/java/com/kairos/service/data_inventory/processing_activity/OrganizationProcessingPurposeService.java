@@ -10,6 +10,7 @@ import com.kairos.persistance.model.master_data.default_proc_activity_setting.Pr
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingPurposeService;
@@ -113,8 +114,10 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
 
     public Boolean deleteProcessingPurpose(Long unitId, BigInteger processingPurposeId) {
 
-        List<String> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
+        List<ProcessingActivityBasicResponseDTO>  processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
         if (!processingActivities.isEmpty()) {
+            StringBuilder processingActivityNames=new StringBuilder();
+            processingActivities.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", processingActivities.get(0));
         }
         ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByOrganizationIdAndId(unitId, processingPurposeId);

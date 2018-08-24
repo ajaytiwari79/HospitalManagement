@@ -8,6 +8,7 @@ import com.kairos.persistance.model.master_data.default_asset_setting.HostingPro
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.HostingProviderService;
@@ -114,9 +115,11 @@ public class OrganizationHostingProviderService extends MongoBaseService {
 
     public Boolean deleteHostingProvider(Long unitId, BigInteger hostingProviderId) {
 
-        List<String> assetsLinkedWithHostingProvider = assetMongoRepository.findAllAssetLinkedWithHostingProvider(unitId, hostingProviderId);
+        List<AssetBasicResponseDTO> assetsLinkedWithHostingProvider = assetMongoRepository.findAllAssetLinkedWithHostingProvider(unitId, hostingProviderId);
         if (!assetsLinkedWithHostingProvider.isEmpty()) {
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Provider", assetsLinkedWithHostingProvider.get(0));
+            StringBuilder assetNames=new StringBuilder();
+            assetsLinkedWithHostingProvider.forEach(asset->assetNames.append(asset.getName()+","));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Provider", assetNames);
         }
         HostingProvider hostingProvider = hostingProviderMongoRepository.findByOrganizationIdAndId(unitId, hostingProviderId);
         if (!Optional.ofNullable(hostingProvider).isPresent()) {

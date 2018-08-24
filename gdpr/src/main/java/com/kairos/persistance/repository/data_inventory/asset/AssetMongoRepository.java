@@ -25,21 +25,23 @@ public interface AssetMongoRepository extends MongoBaseRepository<Asset,BigInteg
     @Query("{organizationId:?0,deleted:false,active:true}")
     List<AssetBasicResponseDTO> getAllAssetWithBasicDetailByStatus(Long unitId, boolean active);
 
+    @Query(value = "{organizationId:?0,deleted:false,active:true,dataDisposal:?1}",fields = "{name:1,_id:0}")
+    List<AssetBasicResponseDTO> findAllAssetLinkedWithDataDisposal(Long unitId, BigInteger dataDisposalId);
 
-    @Query("{organizationId:?0,deleted:false,active:true,hostingType:?1},{name:1,_id:0}")
-    List<String> findAllAssetLinkedWithHostingType(Long unitId, BigInteger dataDisposalId);
+    @Query(value = "{organizationId:?0,deleted:false,active:true,hostingType:?1}", fields = "{name:1,_id:0}")
+    List<AssetBasicResponseDTO> findAllAssetLinkedWithHostingType(Long unitId, BigInteger dataDisposalId);
 
-    @Query("{organizationId:?0,deleted:false,active:true,hostingProvider:?1},{name:1,_id:0}")
-    List<String> findAllAssetLinkedWithHostingProvider(Long unitId, BigInteger hostingProviderId);
+    @Query(value = "{organizationId:?0,deleted:false,active:true,hostingProvider:?1}",fields = "{name:1,_id:0}")
+    List<AssetBasicResponseDTO> findAllAssetLinkedWithHostingProvider(Long unitId, BigInteger hostingProviderId);
 
-    @Query("{organizationId:?0,deleted:false,active:true,technicalSecurityMeasures:?1},{name:1,_id:0}")
-    List<String> findAllAssetLinkedWithTechnicalSecurityMeasure(Long unitId, BigInteger technicalSecurityMeasureId);
+    @Query(value = "{organizationId:?0,deleted:false,active:true,technicalSecurityMeasures:?1}",fields = "{name:1,_id:0}")
+    List<AssetBasicResponseDTO>findAllAssetLinkedWithTechnicalSecurityMeasure(Long unitId, BigInteger technicalSecurityMeasureId);
 
-    @Query("{organizationId:?0,deleted:false,active:true,storageFormats:?1},{name:1,_id:0}")
-    List<String> findAllAssetLinkedWithStorageFormat(Long unitId, BigInteger storageFormatId);
+    @Query(value = "{organizationId:?0,deleted:false,active:true,storageFormats:?1}",fields = "{name:1,_id:0}")
+    List<AssetBasicResponseDTO> findAllAssetLinkedWithStorageFormat(Long unitId, BigInteger storageFormatId);
 
-    @Query("{organizationId:?0,deleted:false,active:true,orgSecurityMeasures:?1},{name:1,_id:0}")
-    List<String> findAllAssetLinkedWithOrganizationalSecurityMeasure(Long unitId, BigInteger orgSecurityMeasureId);
+    @Query(value = "{organizationId:?0,deleted:false,active:true,orgSecurityMeasures:?1}",fields = "{name:1,_id:0}")
+    List<AssetBasicResponseDTO> findAllAssetLinkedWithOrganizationalSecurityMeasure(Long unitId, BigInteger orgSecurityMeasureId);
 
 
 

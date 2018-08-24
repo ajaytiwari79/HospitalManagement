@@ -8,6 +8,7 @@ import com.kairos.persistance.model.master_data.default_asset_setting.DataDispos
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.DataDisposalService;
@@ -104,11 +105,12 @@ public class OrganizationDataDisposalService extends MongoBaseService {
 
     public Boolean deleteDataDisposalById(Long unitId, BigInteger dataDisposalId) {
 
-        Map assetsLinkedWithDataDisposal = assetMongoRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
+        List<AssetBasicResponseDTO> assetsLinkedWithDataDisposal = assetMongoRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
         if (!assetsLinkedWithDataDisposal.isEmpty()) {
-            assetsLinkedWithDataDisposal.get("name");
-           // asset.get("name");
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", assetsLinkedWithDataDisposal.get(0));
+            StringBuilder assetNames=new StringBuilder();
+            assetsLinkedWithDataDisposal.forEach(asset->assetNames.append(asset.getName()+","));
+
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", assetNames);
         }
         DataDisposal dataDisposal = dataDisposalMongoRepository.findByOrganizationIdAndId(unitId, dataDisposalId);
         if (!Optional.ofNullable(dataDisposal).isPresent()) {
