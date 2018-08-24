@@ -1099,7 +1099,7 @@ public class ActivityService extends MongoBaseService {
 
 
         Activity activityCopied = new Activity();
-        Activity.copyProperties(activityFromDatabase.get(), activityCopied, "id", "organizationTypes", "organizationSubTypes");
+        ObjectMapperUtils.copyPropertiesUsingBeanUtils(activityFromDatabase.get(), activityCopied, "id");
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.setState(ActivityStateEnum.DRAFT);

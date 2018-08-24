@@ -16,10 +16,10 @@ public class AbsenceStaffingLevelDto {
 
     BigInteger id;
     @NotNull
-    private Long phaseId;
+    private BigInteger phaseId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date currentDate;
-    private Long weekCount;
+    private Integer weekCount;
     private int minNoOfStaff;
     private int maxNoOfStaff;
     private int absentNoOfStaff;
@@ -38,7 +38,7 @@ public class AbsenceStaffingLevelDto {
 
     }
 
-    public AbsenceStaffingLevelDto(BigInteger id, Long phaseId, Date currentDate, Long weekCount) {
+    public AbsenceStaffingLevelDto(BigInteger id, BigInteger phaseId, Date currentDate, Integer weekCount) {
 
         this.id = id;
         this.phaseId = phaseId;
@@ -57,11 +57,11 @@ public class AbsenceStaffingLevelDto {
         this.id = id;
     }
 
-    public Long getPhaseId() {
+    public BigInteger getPhaseId() {
         return phaseId;
     }
 
-    public void setPhaseId(Long phaseId) {
+    public void setPhaseId(BigInteger phaseId) {
         this.phaseId = phaseId;
     }
 
@@ -73,11 +73,11 @@ public class AbsenceStaffingLevelDto {
         this.currentDate = currentDate;
     }
 
-    public Long getWeekCount() {
+    public Integer getWeekCount() {
         return weekCount;
     }
 
-    public void setWeekCount(Long weekCount) {
+    public void setWeekCount(Integer weekCount) {
         this.weekCount = weekCount;
     }
 

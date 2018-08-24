@@ -65,3 +65,15 @@ db.getCollection('phases').updateMany({"name":"REALTIME"},{$set:{"phaseEnum":"RE
 db.getCollection('phases').updateMany({"name":"TIME & ATTENDANCE"},{$set:{"phaseEnum":"TIME_ATTENDANCE"}})
 db.getCollection('phases').updateMany({"name":"TENTATIVE"},{$set:{"phaseEnum":"TENTATIVE"}})
 db.getCollection('phases').updateMany({"name":"PAYROLL"},{$set:{"phaseEnum":"PAYROLL"}})
+
+//set flipping time of planning period phase
+db.planningPeriod.find().forEach(function(e){
+    var t=e.phaseFlippingDate;
+    t.forEach(function(e){
+        if(e.flippingDate!=null){
+        e.flippingTime="23:59:59"}
+        });
+db.planningPeriod.update({_id:e._id},{$set:{phaseFlippingDate:t}})})
+
+
+db.workingTimeAgreement.updateMany({"disabled":{"$exists":false}},{$set:{disabled:false}})

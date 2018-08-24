@@ -112,7 +112,7 @@ public class StaffingLevelActivity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, minNoOfStaff,maxNoOfStaff);
+        return Objects.hash(activityId,name, minNoOfStaff,maxNoOfStaff);
     }
 
     

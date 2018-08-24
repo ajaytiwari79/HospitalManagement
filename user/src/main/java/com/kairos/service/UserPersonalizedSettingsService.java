@@ -45,7 +45,7 @@ public class UserPersonalizedSettingsService{
         if(Optional.ofNullable(userPersonalizedSettingsQueryResult).isPresent()) {
             userPersonalizedSettings = userPersonalizedSettingsQueryResult.getUserPersonalizedSettings();
             userPersonalizedSettings.setSelfRosteringView(userPersonalizedSettingsQueryResult.getSelfRosteringView());
-           userPersonalizedSettings.getSelfRosteringView().setAbsenceViewSettings(userPersonalizedSettingsDto.getSelfRosteringView().getAbsenceViewSettings());
+            userPersonalizedSettings.getSelfRosteringView().setAbsenceViewSettings(userPersonalizedSettingsDto.getSelfRosteringView().getAbsenceViewSettings());
             userPersonalizedSettingsRepository.save(userPersonalizedSettings);
 
         }
