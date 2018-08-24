@@ -23,9 +23,9 @@ public final class ApiConstants {
     public static final String API_ORGANIZATION_COUNTRY_URL =API_V1+PARENT_ORGANIZATION_URL+COUNTRY_URL;
     public static final String TIMEBANK_URL = API_ORGANIZATION_UNIT_URL+"/timeBank";
     public static final String PAYOUT_URL = API_ORGANIZATION_UNIT_URL+"/payOut";
-    public static final String COUNTER_COUNTRY_DIST_URL = API_ORGANIZATION_URL+"/counter/dist";
+    public static final String COUNTER_DIST_URL = "/counter/dist";
     public static final String COUNTER_UNIT_DIST_URL = API_ORGANIZATION_UNIT_URL+"/counter/dist";
-    public static final String COUNTER_CONF_URL = API_ORGANIZATION_URL+"/counters/conf";
+    public static final String COUNTER_CONF_URL = "/counter/conf";
     public static final String COUNTER_DATA_URL = API_ORGANIZATION_UNIT_URL+"/counters/data";
     public static final String ORDER_URL = API_V1 + PARENT_ORGANIZATION_URL + UNIT_URL + "/orders";
     public static final String OPEN_SHIFT_URL = API_V1 + PARENT_ORGANIZATION_URL + UNIT_URL + "/open_shift";
