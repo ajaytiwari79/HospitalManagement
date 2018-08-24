@@ -2079,7 +2079,7 @@ public class StaffService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffs, StaffDTO.class);
     }
 
-    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long UserId,boolean allOrganization) {
+    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long UserId) {
         List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserIdAndReasonCode(UserId, ReasonCodeType.ATTENDANCE);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
 
