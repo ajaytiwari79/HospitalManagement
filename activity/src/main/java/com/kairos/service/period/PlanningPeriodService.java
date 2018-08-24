@@ -290,11 +290,9 @@ public class PlanningPeriodService extends MongoBaseService {
 
 
     public List<PlanningPeriodDTO> addPlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO) {
-
-        // Check monday if duration is in week and first day of month if duration is in month
-//        if (!validateStartDateForPeriodCreation(LocalDateTime.of(planningPeriodDTO.getStartDate(),planningPeriodDTO.getStartTime()),planningPeriodDTO.getDurationType())) {
-//            exceptionService.actionNotPermittedException("error.period.start.date.invalid");
-//        }
+        if (!validateStartDateForPeriodCreation(planningPeriodDTO.getStartDate(),planningPeriodDTO.getDurationType())) {
+            exceptionService.actionNotPermittedException("error.period.start.date.invalid");
+        }
 
         List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);
         ;
