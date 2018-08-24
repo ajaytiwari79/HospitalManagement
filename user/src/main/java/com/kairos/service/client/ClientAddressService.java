@@ -164,7 +164,7 @@ public class ClientAddressService{
         address.put("startDate", DateConverter.getDate(contactAddress.getStartDate()));
         address.put("endDate", DateConverter.getDate(contactAddress.getEndDate()));
         address.put("description", contactAddress.getDescription());
-        address.put("street1", contactAddress.getStreet1());
+        address.put("street1", contactAddress.getStreet());
         address.put("locationName",contactAddress.getLocationName());
         return address;
     }
@@ -352,7 +352,7 @@ public class ClientAddressService{
         contactAddress.setStartDate(addressDTO.getStartDate());
         contactAddress.setTypeOfHousing(housingType);
         contactAddress.setEndDate(addressDTO.getEndDate());
-        contactAddress.setStreet1(addressDTO.getStreet1());
+        contactAddress.setStreet(addressDTO.getStreet());
         contactAddress.setHouseNumber(addressDTO.getHouseNumber());
         contactAddress.setFloorNumber(addressDTO.getFloorNumber());
         contactAddress.setZipCode(zipCode);

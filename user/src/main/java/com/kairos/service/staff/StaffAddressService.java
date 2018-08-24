@@ -130,7 +130,7 @@ public class StaffAddressService {
             contactAddress.setLatitude(addressDTO.getLatitude());
 
             // Native Details
-            contactAddress.setStreet1(addressDTO.getStreet1());
+            contactAddress.setStreet(addressDTO.getStreet());
             contactAddress.setHouseNumber(addressDTO.getHouseNumber());
             contactAddress.setFloorNumber(addressDTO.getFloorNumber());
             contactAddress.setZipCode(zipCode);
@@ -199,7 +199,7 @@ public class StaffAddressService {
 
 
                 // Native Details
-                contactAddress.setStreet1(addressDTO.getStreet1());
+                contactAddress.setStreet(addressDTO.getStreet());
                 contactAddress.setHouseNumber(addressDTO.getHouseNumber());
                 contactAddress.setFloorNumber(addressDTO.getFloorNumber());
                 contactAddress.setCity(zipCode.getName());
@@ -266,7 +266,7 @@ public class StaffAddressService {
     public ContactAddressDTO getContactAddress(ContactAddress contactAddress) {
         ContactAddressDTO contactAddressDTO;
         if(Optional.ofNullable(contactAddress).isPresent()){
-            contactAddressDTO = new ContactAddressDTO(contactAddress.getHouseNumber(),contactAddress.getFloorNumber(),contactAddress.getStreet1(),contactAddress.getCity(),
+            contactAddressDTO = new ContactAddressDTO(contactAddress.getHouseNumber(),contactAddress.getFloorNumber(),contactAddress.getStreet(),contactAddress.getCity(),
                     contactAddress.getRegionName(),contactAddress.getCountry(),contactAddress.getLatitude(),contactAddress.getLongitude(),contactAddress.getProvince(),contactAddress.getCountry(),
                     contactAddress.isAddressProtected(),contactAddress.isVerifiedByVisitour());
             contactAddressDTO.setZipCodeId(contactAddress.getZipCode()!=null ? contactAddress.getZipCode().getId(): null);
@@ -282,7 +282,7 @@ public class StaffAddressService {
         if(Optional.ofNullable(organizationAddress).isPresent()) {
             ContactAddress contactAddress = new ContactAddress();
             contactAddress.setCity(organizationAddress.getCity());
-            contactAddress.setStreet1(organizationAddress.getStreet1());
+            contactAddress.setStreet(organizationAddress.getStreet());
             contactAddress.setZipCode(organizationAddress.getZipCode());
             contactAddress.setHouseNumber(organizationAddress.getHouseNumber());
             contactAddress.setLongitude(organizationAddress.getLongitude());
