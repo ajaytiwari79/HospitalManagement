@@ -104,8 +104,10 @@ public class OrganizationDataDisposalService extends MongoBaseService {
 
     public Boolean deleteDataDisposalById(Long unitId, BigInteger dataDisposalId) {
 
-        List<String> assetsLinkedWithDataDisposal = assetMongoRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
+        Map assetsLinkedWithDataDisposal = assetMongoRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
         if (!assetsLinkedWithDataDisposal.isEmpty()) {
+            assetsLinkedWithDataDisposal.get("name");
+           // asset.get("name");
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", assetsLinkedWithDataDisposal.get(0));
         }
         DataDisposal dataDisposal = dataDisposalMongoRepository.findByOrganizationIdAndId(unitId, dataDisposalId);

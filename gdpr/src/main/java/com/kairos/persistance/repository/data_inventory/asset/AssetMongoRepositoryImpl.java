@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.DELETED;
@@ -78,5 +79,18 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
         );
         AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);
         return results.getMappedResults();
+    }
+
+    @Override
+    public Map findAllAssetLinkedWithDataDisposal(Long unitId, BigInteger dataDisposalId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+
+                match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId).and("active").is(true)),
+                group("null").push("name").as("name"),
+                project("name").andExclude("_id")
+        );
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, Asset.class, Map.class);
+        return results.getUniqueMappedResult();
+
     }
 }

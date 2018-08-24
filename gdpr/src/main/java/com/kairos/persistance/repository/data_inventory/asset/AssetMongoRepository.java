@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @JaversSpringDataAuditable
@@ -24,8 +25,6 @@ public interface AssetMongoRepository extends MongoBaseRepository<Asset,BigInteg
     @Query("{organizationId:?0,deleted:false,active:true}")
     List<AssetBasicResponseDTO> getAllAssetWithBasicDetailByStatus(Long unitId, boolean active);
 
-    @Query("{organizationId:?0,deleted:false,active:true,dataDisposal:?1},{name:1,_id:0}")
-    List<String> findAllAssetLinkedWithDataDisposal(Long unitId, BigInteger dataDisposalId);
 
     @Query("{organizationId:?0,deleted:false,active:true,hostingType:?1},{name:1,_id:0}")
     List<String> findAllAssetLinkedWithHostingType(Long unitId, BigInteger dataDisposalId);
