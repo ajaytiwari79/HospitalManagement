@@ -290,10 +290,6 @@ public class PlanningPeriodService extends MongoBaseService {
 
 
     public List<PlanningPeriodDTO> addPlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO) {
-        if (!validateStartDateForPeriodCreation(planningPeriodDTO.getStartDate(),planningPeriodDTO.getDurationType())) {
-            exceptionService.actionNotPermittedException("error.period.start.date.invalid");
-        }
-
         List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);
         ;
         if (!Optional.ofNullable(phases).isPresent()) {
@@ -310,6 +306,10 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod lastEndDate = planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
         if (Optional.ofNullable(lastEndDate).isPresent()) {
             planningPeriodDTO.setStartDate(lastEndDate.getEndDate().plusDays(1));
+        }else{
+            if (!validateStartDateForPeriodCreation(planningPeriodDTO.getStartDate(),planningPeriodDTO.getDurationType())) {
+                exceptionService.actionNotPermittedException("error.period.start.date.invalid");
+            }
         }
         createPlanningPeriod(unitId, planningPeriodDTO.getStartDate(), planningPeriods, phases, planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
         save(planningPeriods);
