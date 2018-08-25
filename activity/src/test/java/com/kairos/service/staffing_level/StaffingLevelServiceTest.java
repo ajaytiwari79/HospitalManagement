@@ -1,4 +1,8 @@
 package com.kairos.service.staffing_level;
+/*
+ *Created By Pavan on 16/8/18
+ *
+ */
 
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.config.env.EnvConfig;
@@ -21,6 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.TemporalField;
@@ -54,7 +59,7 @@ public class StaffingLevelServiceTest {
         LocalDate date = LocalDate.now();
         TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeekCount = date.get(woy);
-        staffingLevel=new StaffingLevel(DateUtils.getDate(),1L,new Long(currentWeekCount),1L,staffingLevelSetting);
+        staffingLevel=new StaffingLevel(DateUtils.getDate(),1,new Long("2567"),new BigInteger("1"),staffingLevelSetting);
         List<StaffingLevelInterval> StaffingLevelIntervals=new ArrayList<>();
         int startTimeCounter=0;
         LocalTime startTime=LocalTime.MIN;
@@ -69,15 +74,15 @@ public class StaffingLevelServiceTest {
 
     }
 
-  @Test
-  public void  updateStaffingLevelAvailableStaffCountForNewlyCreatedShiftTest(){
-      ShiftNotificationEvent shiftNotificationEvent=new ShiftNotificationEvent();
-      Shift shift =new Shift();
-      //shift.setStartDate(DateUtils.getDateFromLocalDate(LocalTime.MIN));
-      //shift.setEndDate(DateUtils.getDateFromLocalDate(LocalTime.MAX));
-      shiftNotificationEvent.setShift(shift);
-      StaffingLevel staffingLevel1=staffingLevelService.updateStaffingLevelAvailableStaffCountForNewlyCreatedShift(staffingLevel,shiftNotificationEvent);
-      staffingLevel1.getPresenceStaffingLevelInterval().stream().forEach(staffingLevelInterval -> Assert.assertEquals(1L,staffingLevelInterval.getAvailableNoOfStaff()));
+    @Test
+    public void  updateStaffingLevelAvailableStaffCountForNewlyCreatedShiftTest(){
+        ShiftNotificationEvent shiftNotificationEvent=new ShiftNotificationEvent();
+        Shift shift =new Shift();
+        //shift.setStartDate(DateUtils.getDateFromLocalDate(LocalTime.MIN));
+        //shift.setEndDate(DateUtils.getDateFromLocalDate(LocalTime.MAX));
+        shiftNotificationEvent.setShift(shift);
+        StaffingLevel staffingLevel1=staffingLevelService.updateStaffingLevelAvailableStaffCountForNewlyCreatedShift(staffingLevel,shiftNotificationEvent);
+        staffingLevel1.getPresenceStaffingLevelInterval().stream().forEach(staffingLevelInterval -> Assert.assertEquals(1L,staffingLevelInterval.getAvailableNoOfStaff()));
 
     }
 
@@ -86,8 +91,8 @@ public class StaffingLevelServiceTest {
 
         ShiftNotificationEvent shiftNotificationEvent=new ShiftNotificationEvent();
         Shift shift =new Shift();
-     //   shift.setStartDate(DateUtils.getDateFromLocalDate(LocalTime.MIN));
-       // shift.setEndDate(DateUtils.getDateFromLocalDate(LocalTime.MAX));
+        //   shift.setStartDate(DateUtils.getDateFromLocalDate(LocalTime.MIN));
+        // shift.setEndDate(DateUtils.getDateFromLocalDate(LocalTime.MAX));
         shiftNotificationEvent.setShift(shift);
         StaffingLevel updatedStaffingLevel1=staffingLevelService.updateStaffingLevelAvailableStaffCountForNewlyCreatedShift(staffingLevel,shiftNotificationEvent);
         Shift updatedShift=new Shift();
@@ -97,10 +102,10 @@ public class StaffingLevelServiceTest {
         shiftNotificationEvent.setShift(updatedShift);
         StaffingLevel updatedStaffingLevel2=staffingLevelService.updateStaffingLevelAvailableStaffCountForUpdatedShift(updatedStaffingLevel1,shiftNotificationEvent);
         updatedStaffingLevel2.getPresenceStaffingLevelInterval().stream().forEach(staffingLevelInterval -> {
-            if(staffingLevelInterval.getStaffingLevelDuration().getFrom().compareTo(LocalTime.NOON)<0){
+                    if(staffingLevelInterval.getStaffingLevelDuration().getFrom().compareTo(LocalTime.NOON)<0){
                         Assert.assertEquals(1L,staffingLevelInterval.getAvailableNoOfStaff());
                     }
-        }
+                }
         );
     }
 

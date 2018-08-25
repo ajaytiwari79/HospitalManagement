@@ -10,6 +10,7 @@ import com.kairos.persistence.model.country.default_data.account_type.AccountTyp
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
+import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -27,7 +28,6 @@ import com.kairos.user.access_permission.AccessPermissionDTO;
 import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.util.DateUtil;
-import com.kairos.util.DateUtils;
 import com.kairos.util.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -541,8 +541,6 @@ public class AccessGroupService {
         accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
         countryGraphRepository.save(country);
-
-
         //set default permission of access page while creating access group
         setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), accessGroupDTO.getOrganizationCategory());
         return accessGroup;
@@ -624,7 +622,7 @@ public class AccessGroupService {
     }
 
     /**
-     * @param accounttypeId
+     * @param accountTypeId
      * @return
      * @author vipul
      * @Desc This api is used to fetch all access group by account type id in country.
@@ -766,7 +764,7 @@ public class AccessGroupService {
         );
         return userAccessRoleDTO;
     }
-    public List<Long> getStaffIdsByUnitIdAndAccessGroupId(Long unitId,Long accessGroupId){
+    public List<StaffIdsQueryResult> getStaffIdsByUnitIdAndAccessGroupId(Long unitId, List<Long> accessGroupId){
         return accessGroupRepository.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId);
     }
 }

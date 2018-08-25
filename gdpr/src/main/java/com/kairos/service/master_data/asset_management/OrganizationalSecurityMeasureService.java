@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistance.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
@@ -43,7 +44,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @return return map which contain list of new OrganizationalSecurityMeasure and list of existing OrganizationalSecurityMeasure if OrganizationalSecurityMeasure already exist
      * @description this method create new OrganizationalSecurityMeasure if OrganizationalSecurityMeasure not exist with same name ,
      * and if exist then simply add  OrganizationalSecurityMeasure to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing OrganizationalSecurityMeasure using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing OrganizationalSecurityMeasure using collation ,used for case insensitive result
      */
     public Map<String, List<OrganizationalSecurityMeasure>> createOrganizationalSecurityMeasure(Long countryId, List<OrganizationalSecurityMeasureDTO> securityMeasureDTOS) {
 
@@ -54,7 +55,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
                 orgSecurityMeasureNames.add(securityMeasure.getName());
             }
 
-            List<OrganizationalSecurityMeasure> existing = findByNamesAndCountryId(countryId, orgSecurityMeasureNames, OrganizationalSecurityMeasure.class);
+            List<OrganizationalSecurityMeasure> existing = findMetaDataByNamesAndCountryId(countryId, orgSecurityMeasureNames, OrganizationalSecurityMeasure.class);
             orgSecurityMeasureNames = ComparisonUtils.getNameListForMetadata(existing, orgSecurityMeasureNames);
             List<OrganizationalSecurityMeasure> newOrgSecurityMeasures = new ArrayList<>();
             if (!orgSecurityMeasureNames.isEmpty()) {
@@ -81,8 +82,8 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @param
      * @return list of OrganizationalSecurityMeasure
      */
-    public List<OrganizationalSecurityMeasure> getAllOrganizationalSecurityMeasure(Long countryId) {
-        return organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures(countryId);
+    public List<OrganizationalSecurityMeasureResponseDTO> getAllOrganizationalSecurityMeasure(Long countryId) {
+        return organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
 
@@ -166,10 +167,33 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     }
 
 
-    public List<OrganizationalSecurityMeasureResponseDTO> getAllNotInheritedFromParentOrgAndUnitOrgSecurityMeasure(Long countryId, Long parentOrganizationId, Long unitId) {
+    /**
+     * @description method save Organizational security measure suggested by unit
+     * @param countryId
+     * @param OrganizationalSecurityMeasureDTOS
+     * @return
+     */
+    public List<OrganizationalSecurityMeasure> saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> OrganizationalSecurityMeasureDTOS) {
 
-        return organizationalSecurityMeasureMongoRepository.getAllNotInheritedFromParentOrgAndUnitOrgSecurityMeasure(countryId, parentOrganizationId, unitId);
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (OrganizationalSecurityMeasureDTO OrganizationalSecurityMeasure : OrganizationalSecurityMeasureDTOS) {
+            hostingProvoiderNames.add(OrganizationalSecurityMeasure.getName());
+        }
+        List<OrganizationalSecurityMeasure> existingOrganizationalSecurityMeasures = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, OrganizationalSecurityMeasure.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingOrganizationalSecurityMeasures, hostingProvoiderNames);
+        List<OrganizationalSecurityMeasure> OrganizationalSecurityMeasureList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                OrganizationalSecurityMeasure OrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name);
+                OrganizationalSecurityMeasure.setCountryId(countryId);
+                OrganizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                OrganizationalSecurityMeasureList.add(OrganizationalSecurityMeasure);
+            }
+
+            OrganizationalSecurityMeasureList = organizationalSecurityMeasureMongoRepository.saveAll(getNextSequence(OrganizationalSecurityMeasureList));
+        }
+        return OrganizationalSecurityMeasureList;
     }
-
 
 }

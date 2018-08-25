@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
@@ -32,8 +33,6 @@ public class ProcessingPurposeService extends MongoBaseService {
     @Inject
     private ProcessingPurposeMongoRepository processingPurposeMongoRepository;
 
-
-
     /**
      * @param countryId
      * @param
@@ -41,7 +40,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @return return map which contain list of new ProcessingPurpose and list of existing ProcessingPurpose if ProcessingPurpose already exist
      * @description this method create new ProcessingPurpose if ProcessingPurpose not exist with same name ,
      * and if exist then simply add  ProcessingPurpose to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing ProcessingPurpose using collation ,used for case insensitive result
      */
     public Map<String, List<ProcessingPurpose>> createProcessingPurpose(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
@@ -55,7 +54,7 @@ public class ProcessingPurposeService extends MongoBaseService {
                     throw new InvalidRequestException("name could not be empty or null");
 
             }
-            List<ProcessingPurpose> existing = findByNamesAndCountryId(countryId, processingPurposesNames, ProcessingPurpose.class);
+            List<ProcessingPurpose> existing = findMetaDataByNamesAndCountryId(countryId, processingPurposesNames, ProcessingPurpose.class);
             processingPurposesNames = ComparisonUtils.getNameListForMetadata(existing, processingPurposesNames);
 
             List<ProcessingPurpose> newProcessingPurposes = new ArrayList<>();
@@ -85,7 +84,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long countryId) {
-        return processingPurposeMongoRepository.findAllProcessingPurposes(countryId);
+        return processingPurposeMongoRepository.findAllProcessingPurposes(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
     /**
@@ -167,19 +166,28 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-    /**
-     *
-     * @param countryId
-     * @param parentOrganizationId -id of parent organization
-     * @param unitId - id of current organization
-     * @return method return list of processingPurposes (organization processing purpose and processing purposes which were not inherited by organization from parent till now )
-     */
-    public List<ProcessingPurposeResponseDTO> getAllNotInheritedProcessingPurposesFromParentOrgAndUnitProcessingPurpose(Long countryId, Long parentOrganizationId, Long unitId) {
+    public List<ProcessingPurpose> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> ProcessingPurposeDTOS) {
 
-       return processingPurposeMongoRepository.getAllNotInheritedProcessingPurposesFromParentOrgAndUnitProcessingPurpose(countryId,parentOrganizationId,unitId);
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (ProcessingPurposeDTO ProcessingPurpose : ProcessingPurposeDTOS) {
+            hostingProvoiderNames.add(ProcessingPurpose.getName());
+        }
+        List<ProcessingPurpose> existingProcessingPurposes = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, ProcessingPurpose.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingProcessingPurposes, hostingProvoiderNames);
+        List<ProcessingPurpose> ProcessingPurposeList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
 
+                ProcessingPurpose ProcessingPurpose = new ProcessingPurpose(name);
+                ProcessingPurpose.setCountryId(countryId);
+                ProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                ProcessingPurposeList.add(ProcessingPurpose);
+            }
+
+            ProcessingPurposeList = processingPurposeMongoRepository.saveAll(getNextSequence(ProcessingPurposeList));
+        }
+        return ProcessingPurposeList;
     }
-
 
 }
 

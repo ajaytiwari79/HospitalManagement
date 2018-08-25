@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 //  Created By vipul   On 9/8/18
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -12,6 +13,7 @@ public class UnitTypeDTO {
     @NotNull
     private String name;
     private String description;
+    private Set<Long> moduleIds;
 
     public UnitTypeDTO(){
         // dc
@@ -42,5 +44,13 @@ public class UnitTypeDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Set<Long> getModuleIds() {
+        return moduleIds;
+    }
+
+    public void setModuleIds(Set<Long> moduleIds) {
+        this.moduleIds = moduleIds;
     }
 }

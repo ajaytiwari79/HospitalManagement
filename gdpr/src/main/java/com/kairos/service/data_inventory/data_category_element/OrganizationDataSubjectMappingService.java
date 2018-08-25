@@ -125,7 +125,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
     public Boolean deleteDataSubjectById(Long unitId, BigInteger dataSubjectId) {
 
         DataSubjectMapping dataSubjectMapping = dataSubjectMappingRepository.findByUnitIdAndId(unitId, dataSubjectId);
-        if (Optional.ofNullable(dataSubjectMapping).isPresent()) {
+        if (!Optional.ofNullable(dataSubjectMapping).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Data Subject ", dataSubjectId);
         }
         delete(dataSubjectMapping);
@@ -134,12 +134,12 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
 
 
     public List<DataSubjectMappingResponseDTO> getAllDataSubjectByUnitId(Long unitId) {
-        return dataSubjectMappingRepository.getAllDataSubjectAndMappingWithDataCategoryByUnitId(unitId);
+        return dataSubjectMappingRepository.getAllDataSubjectWithDataCategoryAndDataElementByUnitId(unitId);
     }
 
 
     public DataSubjectMappingResponseDTO getDataSubjectByUnitId(Long unitId, BigInteger dataSubjectId) {
-        return dataSubjectMappingRepository.getDataSubjectAndMappingWithDataCategoryByUnitId(unitId, dataSubjectId);
+        return dataSubjectMappingRepository.getDataSubjectWithDataCategoryAndDataElementByUnitId(unitId, dataSubjectId);
     }
 
 

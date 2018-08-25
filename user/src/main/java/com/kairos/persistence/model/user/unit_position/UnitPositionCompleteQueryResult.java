@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.user.unit_position;
 
-import com.kairos.persistence.model.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
@@ -19,7 +18,6 @@ public class UnitPositionCompleteQueryResult {
     private Staff staff;
     private Expertise expertise;
     private EmploymentType employmentType;
-    private CostTimeAgreement cta;
     private PositionCode positionCode;
     private Organization unit;
     private Organization unionOrg;
@@ -68,13 +66,6 @@ public class UnitPositionCompleteQueryResult {
         this.employmentType = employmentType;
     }
 
-    public CostTimeAgreement getCta() {
-        return cta;
-    }
-
-    public void setCta(CostTimeAgreement cta) {
-        this.cta = cta;
-    }
 
     public PositionCode getPositionCode() {
         return positionCode;

@@ -13,18 +13,18 @@ import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface TransferMethodMongoRepository extends MongoBaseRepository<TransferMethod,BigInteger>,CustomTransferMethodRepository {
+public interface TransferMethodMongoRepository extends MongoBaseRepository<TransferMethod, BigInteger>, CustomTransferMethodRepository {
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
-    TransferMethod findByIdAndNonDeleted(Long countryId,BigInteger id);
+    TransferMethod findByIdAndNonDeleted(Long countryId, BigInteger id);
 
     TransferMethod findByid(BigInteger id);
 
     @Query("{countryId:?0,name:?1,deleted:false}")
-    TransferMethod findByName(Long countryId,String name);
+    TransferMethod findByName(Long countryId, String name);
 
-    @Query("{countryId:?0,deleted:false}")
-    List<TransferMethodResponseDTO> findAllTransferMethods(Long countryId);
+    @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
+    List<TransferMethodResponseDTO> findAllTransferMethods(Long countryId, String suggestedDataStatus);
 
     @Query("{_id:{$in:?0},deleted:false}")
     List<TransferMethodResponseDTO> findTransferMethodByIds(List<BigInteger> transferMethodIds);
@@ -35,9 +35,9 @@ public interface TransferMethodMongoRepository extends MongoBaseRepository<Trans
 
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    TransferMethod findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    TransferMethod findByOrganizationIdAndId(Long organizationId, BigInteger id);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    TransferMethod findByOrganizationIdAndName(Long organizationId,String name);
+    TransferMethod findByOrganizationIdAndName(Long organizationId, String name);
 
 }

@@ -1,10 +1,11 @@
 package com.kairos.service.pay_out;
 
+import com.kairos.activity.cta.CTARuleTemplateDTO;
+import com.kairos.activity.cta.CompensationTableInterval;
 import com.kairos.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.activity.pay_out.PayOutDTO;
 import com.kairos.activity.pay_out.PayOutIntervalDTO;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
-import com.kairos.activity.time_bank.CTARuleTemplateDTO;
 import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
 import com.kairos.constants.AppConstants;
@@ -14,18 +15,24 @@ import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.model.pay_out.PayOutCTADistribution;
 import com.kairos.user.country.agreement.cta.CalculationFor;
+import com.kairos.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
 import java.time.DayOfWeek;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.activity.cta.AccountType.PAID_OUT;
 import static com.kairos.constants.AppConstants.*;
 
 
@@ -51,33 +58,33 @@ public class PayOutCalculationService {
         int totalPayOut = 0;
         int scheduledMin = 0;
         int contractualMin = interval.getStart().get(ChronoField.DAY_OF_WEEK) <= unitPositionDetails.getWorkingDaysInWeek() ? unitPositionDetails.getTotalWeeklyMinutes() / unitPositionDetails.getWorkingDaysInWeek() : 0;
-        Map<Long, Integer> ctaPayoutMinMap = new HashMap<>();
+        Map<BigInteger, Integer> ctaPayoutMinMap = new HashMap<>();
         DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStartDate().getTime(), shift.getEndDate().getTime());
         if (interval.overlaps(shiftInterval)) {
             shiftInterval = interval.overlap(shiftInterval);
             for (CTARuleTemplateDTO ruleTemplate : unitPositionDetails.getCtaRuleTemplates()) {
-                if (ruleTemplate.getAccountType() == null) continue;
-                if (ruleTemplate.getAccountType().equals(PAIDOUT_ACCOUNT)) {
+                if (ruleTemplate.getPlannedTimeWithFactor().getAccountType() != null && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT)) {
                     int ctaPayOutMin = 0;
                     boolean activityValid = ruleTemplate.getActivityIds().contains(activity.getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(activity.getBalanceSettingsActivityTab().getTimeTypeId()));
                     if (activityValid) {
-                        boolean ruleTemplateValid = ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek().getValue())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(shiftInterval.getStart()))) && (ruleTemplate.getEmploymentTypes() == null || ruleTemplate.getEmploymentTypes().contains(unitPositionDetails.getEmploymentType().getId()));
+                        java.time.LocalDate shiftDate = shiftInterval.getStart().toLocalDate();
+                        boolean ruleTemplateValid = ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftDate.getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(shiftDate))) && (ruleTemplate.getEmploymentTypes() == null || ruleTemplate.getEmploymentTypes().contains(unitPositionDetails.getEmploymentType().getId()));
                         if (ruleTemplateValid) {
                             if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shift.getStartDate().getTime())) {
                                 scheduledMin += shift.getScheduledMinutes();
                                 totalPayOut += scheduledMin;
                             }
                             if (ruleTemplate.getCalculationFor().equals(CalculationFor.BONUS_HOURS)) {
-                                for (com.kairos.activity.time_bank.CTAIntervalDTO ctaIntervalDTO : ruleTemplate.getCtaIntervalDTOS()) {
+                                for (CompensationTableInterval ctaIntervalDTO : ruleTemplate.getCompensationTable().getCompensationTableInterval()) {
                                     DateTimeInterval ctaInterval = getCTAInterval(ctaIntervalDTO, interval.getStart());
                                     if (ctaInterval.overlaps(shiftInterval)) {
                                         int overlapTimeInMin = ctaInterval.overlap(shiftInterval).getMinutes();
-                                        if (ctaIntervalDTO.getCompensationType().equals(AppConstants.MINUTES)) {
-                                            ctaPayOutMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getGranularity()) * ctaIntervalDTO.getCompensationValue();
+                                        if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
+                                            ctaPayOutMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaIntervalDTO.getValue();
                                             totalPayOut += ctaPayOutMin;
                                             break;
-                                        } else if (ctaIntervalDTO.getCompensationType().equals(AppConstants.PERCENT)) {
-                                            ctaPayOutMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getGranularity()) / 100) * ctaIntervalDTO.getCompensationValue());
+                                        } else if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
+                                            ctaPayOutMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaIntervalDTO.getValue());
                                             totalPayOut += ctaPayOutMin;
                                             break;
                                         }
@@ -104,16 +111,15 @@ public class PayOutCalculationService {
 
     /**
      *
-     * @param ctaIntervalDTO
+     * @param interval
      * @param startDate
      * @return DateTimeInterval
      */
-    private DateTimeInterval getCTAInterval(com.kairos.activity.time_bank.CTAIntervalDTO ctaIntervalDTO, ZonedDateTime startDate) {
-        int ctaStart = ctaIntervalDTO.getStartTime();
-        //totalMin in a day
-        int totalMinInADay = 1440;
-        int ctaEnd = ctaIntervalDTO.getStartTime() >= ctaIntervalDTO.getEndTime() ? totalMinInADay + ctaIntervalDTO.getEndTime() : ctaIntervalDTO.getEndTime();
-        return new DateTimeInterval(startDate.plusMinutes(ctaStart), startDate.plusMinutes(ctaEnd));
+    private DateTimeInterval getCTAInterval(CompensationTableInterval interval, ZonedDateTime startDate) {
+        int ctaStart = (interval.getFrom().getHour()*60)+interval.getFrom().getMinute();
+        int intervalEnd = (interval.getTo().getHour()*60)+interval.getTo().getMinute();
+        int ctaEnd = ctaStart >= intervalEnd ? 1440 + intervalEnd : intervalEnd;
+        return new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(ctaStart), startDate.plusMinutes(ctaEnd));
     }
 
     /**
@@ -122,10 +128,10 @@ public class PayOutCalculationService {
      * @param ctaTimeBankMinMap
      * @return List<PayOutCTADistribution>s
      */
-    private List<PayOutCTADistribution> getCTADistribution(List<CTARuleTemplateDTO> ctaRuleTemplateCalculatedTimeBankDTOS, Map<Long, Integer> ctaTimeBankMinMap) {
+    private List<PayOutCTADistribution> getCTADistribution(List<CTARuleTemplateDTO> ctaRuleTemplateCalculatedTimeBankDTOS, Map<BigInteger, Integer> ctaTimeBankMinMap) {
         List<PayOutCTADistribution> timeBankCTADistributions = new ArrayList<>(ctaRuleTemplateCalculatedTimeBankDTOS.size());
         for (CTARuleTemplateDTO ruleTemplate : ctaRuleTemplateCalculatedTimeBankDTOS) {
-            if (!ruleTemplate.isCalculateScheduledHours()) {
+            if (!CalculationFor.SCHEDULED_HOURS.equals(ruleTemplate.getCalculationFor()) && PAID_OUT.equals(ruleTemplate.getPlannedTimeWithFactor().getAccountType())) {
                 timeBankCTADistributions.add(new PayOutCTADistribution(ruleTemplate.getName(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(),0), ruleTemplate.getId()));
             }
         }
@@ -145,7 +151,7 @@ public class PayOutCalculationService {
         Map<Interval, List<PayOut>> payoutsIntervalMap = getPayoutIntervalsMap(intervals, payOuts);
        List<PayOutIntervalDTO> payoutIntervalDTOS = getPayoutIntervals(intervals, payoutsIntervalMap,payoutTransactionAndIntervalMap,unitPositionWithCtaDetailsDTO,query);
         long[] payoutCalculatedValue = calculatePayoutForInterval(payoutIntervalDTOS);
-        Map<Long,Long> ctaDistributionMap = payoutIntervalDTOS.stream().flatMap(p->p.getPayOutDistribution().getChildren().stream()).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(ptb->ptb.getId(),Collectors.summingLong(p->p.getMinutes())));
+        Map<BigInteger,Long> ctaDistributionMap = payoutIntervalDTOS.stream().flatMap(p->p.getPayOutDistribution().getChildren().stream()).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(ptb->ptb.getId(),Collectors.summingLong(p->p.getMinutes())));
         List<CTADistributionDTO> ctaDistributionDTOS = getDistributionOfPayout(ctaDistributionMap,unitPositionWithCtaDetailsDTO);
         long payoutChange = payoutCalculatedValue[0];
         long payoutBefore = payoutCalculatedValue[1];
@@ -177,7 +183,7 @@ public class PayOutCalculationService {
     private List<PayOut> getPayoutsByInterval(Interval interval, List<PayOut> payOuts) {
         List<PayOut> payOutList = new ArrayList<>();
         payOuts.forEach(payOut -> {
-            if (interval.contains(DateUtils.getDateFromLocalDate(payOut.getDate()).getTime()) || interval.getStart().equals(DateUtils.toJodaDateTime(payOut.getDate()))) {
+            if (interval.contains(DateUtils.asDate(payOut.getDate()).getTime()) || interval.getStart().equals(DateUtils.toJodaDateTime(payOut.getDate()))) {
                 payOutList.add(payOut);
             }
         });
@@ -203,7 +209,7 @@ public class PayOutCalculationService {
             payoutChange += approvePayOut;
             Long payoutBefore = payOuts.isEmpty()?0:payOuts.get(0).getPayoutBeforeThisDate();
             Long payoutAfter = payoutBefore+payoutChange;
-            Map<Long,Long> ctaDistributionMap = payOuts.stream().flatMap(p->p.getPayOutCTADistributions().stream()).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(ptb->ptb.getCtaRuleTemplateId(),Collectors.summingLong(p->p.getMinutes())));
+            Map<BigInteger,Long> ctaDistributionMap = payOuts.stream().flatMap(p->p.getPayOutCTADistributions().stream()).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(ptb->ptb.getCtaRuleTemplateId(),Collectors.summingLong(p->p.getMinutes())));
             List<CTADistributionDTO> payOutCTADistributionDTOS = getDistributionOfPayout(ctaDistributionMap,unitPositionWithCtaDetailsDTO);
             Long payoutFromCTA = payOutCTADistributionDTOS.stream().mapToLong(pd->pd.getMinutes()).sum();
             PayOutCTADistributionDTO payOutCTADistributionDTO = new PayOutCTADistributionDTO(payoutFromCTA,payOutCTADistributionDTOS);
@@ -238,10 +244,10 @@ public class PayOutCalculationService {
      * @param unitPositionWithCtaDetailsDTO
      * @return List<CTADistributionDTO>
      */
-    private List<CTADistributionDTO> getDistributionOfPayout(Map<Long, Long> ctaDistributionMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
+    private List<CTADistributionDTO> getDistributionOfPayout(Map<BigInteger, Long> ctaDistributionMap, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<CTADistributionDTO> distributionDTOS = new ArrayList<>();
         unitPositionWithCtaDetailsDTO.getCtaRuleTemplates().forEach(cta -> {
-            if (!cta.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && cta.getAccountType().equals(PAIDOUT_ACCOUNT)) {
+            if (!cta.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && cta.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT)) {
                 distributionDTOS.add(new CTADistributionDTO(cta.getId(), cta.getName(),ctaDistributionMap.getOrDefault(cta.getId(), 0l).intValue()));
             }
         });
@@ -255,13 +261,13 @@ public class PayOutCalculationService {
      */
     private long[] calculatePayoutForInterval(List<PayOutIntervalDTO> timeBankIntervalDTOS){
         long payoutChange = 0l;
-        long payoutBefore = 0l;
-        long payoutAfter = 0l;
+        long payoutBefore = timeBankIntervalDTOS.get(timeBankIntervalDTOS.size()-1).getTotalPayOutBeforeCtaMin();
         long payoutFromCTA = 0l;
         for (PayOutIntervalDTO payOutIntervalDTO : timeBankIntervalDTOS) {
             payoutChange += payOutIntervalDTO.getPayoutChange();
             payoutFromCTA += payOutIntervalDTO.getPayOutDistribution().getMinutes();
         }
+        long payoutAfter = payoutBefore+payoutChange;
         return new long[]{payoutChange,payoutBefore,payoutAfter,payoutFromCTA};
 
     }

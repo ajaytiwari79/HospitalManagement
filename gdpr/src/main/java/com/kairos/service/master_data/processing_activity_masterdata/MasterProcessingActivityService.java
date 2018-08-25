@@ -135,6 +135,8 @@ public class MasterProcessingActivityService extends MongoBaseService {
             if (!masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
                 subProcessingActivity = updateExistingAndCreateNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto);
                 processingActivity.setSubProcessingActivityIds((List<BigInteger>) subProcessingActivity.get(IDS_LIST));
+                processingActivity.setHasSubProcessingActivity(true);
+
             }
             processingActivity.setOrganizationTypes(masterProcessingActivityDto.getOrganizationTypes());
             processingActivity.setOrganizationSubTypes(masterProcessingActivityDto.getOrganizationSubTypes());

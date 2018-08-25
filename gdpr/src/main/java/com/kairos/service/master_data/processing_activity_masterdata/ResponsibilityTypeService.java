@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
@@ -55,7 +56,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
                 responsibilityTypeNames.add(responsibilityType.getName());
             }
-            List<ResponsibilityType> existing = findByNamesAndCountryId(countryId, responsibilityTypeNames, ResponsibilityType.class);
+            List<ResponsibilityType> existing = findMetaDataByNamesAndCountryId(countryId, responsibilityTypeNames, ResponsibilityType.class);
             responsibilityTypeNames = ComparisonUtils.getNameListForMetadata(existing, responsibilityTypeNames);
 
             List<ResponsibilityType> newResponsibilityTypes = new ArrayList<>();
@@ -85,8 +86,8 @@ public class ResponsibilityTypeService extends MongoBaseService {
      * @param
      * @return list of ResponsibilityType
      */
-    public List<ResponsibilityType> getAllResponsibilityType(Long countryId) {
-        return responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId);
+    public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long countryId) {
+        return responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId,SuggestedDataStatus.ACCEPTED.value);
     }
 
     /**
@@ -169,16 +170,33 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
 
     /**
+     * @description method save ResponsibilityType suggested by unit
      * @param countryId
-     * @param parentOrganizationId -id of parent organization
-     * @param unitId               - id of current organization
-     * @return method return list of processingPurposes (organization processing purpose and processing purposes which were not inherited by organization from parent till now )
+     * @param ResponsibilityTypeDTOS
+     * @return
      */
-    public List<ResponsibilityTypeResponseDTO> getAllNotInheritedResponsibilityTypesFromParentOrgAndUnitResponsibilityType(Long countryId, Long parentOrganizationId, Long unitId) {
+    public List<ResponsibilityType> saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> ResponsibilityTypeDTOS) {
 
-        return responsibilityTypeMongoRepository.getAllNotInheritedResponsibilityTypesFromParentOrgAndUnitResponsibilityType(countryId, parentOrganizationId, unitId);
+        Set<String> hostingProvoiderNames = new HashSet<>();
+        for (ResponsibilityTypeDTO ResponsibilityType : ResponsibilityTypeDTOS) {
+            hostingProvoiderNames.add(ResponsibilityType.getName());
+        }
+        List<ResponsibilityType> existingResponsibilityTypes = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, ResponsibilityType.class);
+        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingResponsibilityTypes, hostingProvoiderNames);
+        List<ResponsibilityType> ResponsibilityTypeList = new ArrayList<>();
+        if (hostingProvoiderNames.size() != 0) {
+            for (String name : hostingProvoiderNames) {
+
+                ResponsibilityType ResponsibilityType = new ResponsibilityType(name);
+                ResponsibilityType.setCountryId(countryId);
+                ResponsibilityType.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                ResponsibilityTypeList.add(ResponsibilityType);
+            }
+
+            ResponsibilityTypeList = responsibilityTypeMongoRepository.saveAll(getNextSequence(ResponsibilityTypeList));
+        }
+        return ResponsibilityTypeList;
     }
-
 
 }
 

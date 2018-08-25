@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
@@ -1427,10 +1428,19 @@ public class OrganizationController {
                 vrpClientService.getPreferedTimeWindow(unitId));
     }
 
-    @ApiOperation(value = "get organization ids by orgSubType ids")
-    @GetMapping(value = "/orgtype/{orgTypeId}/get_organization_ids")
+
+    @ApiOperation(value = "get Cta basic info")
+    @GetMapping(value = COUNTRY_URL+"/cta_basic_info")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationIdsBySubOrgTypeId(@PathVariable Long orgTypeId) {
+    public ResponseEntity<Map<String, Object>> getCTABasicDetailInfo(@PathVariable Long countryId,@RequestParam(required = false) Long expertiseId,@RequestParam(required = false) Long organizationSubTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getCTABasicDetailInfo(expertiseId,organizationSubTypeId,countryId));
+    }
+
+    @ApiOperation(value = "get organization ids by orgSubType ids")
+    @PostMapping(value = "/orgtype/get_organization_ids")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationIdsBySubOrgTypeId(@RequestBody List<Long> orgTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationIdsBySubOrgTypeId(orgTypeId));
     }

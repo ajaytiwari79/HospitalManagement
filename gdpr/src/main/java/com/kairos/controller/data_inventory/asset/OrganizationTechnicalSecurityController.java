@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
@@ -97,6 +98,17 @@ public class OrganizationTechnicalSecurityController {
 
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure( unitId, id, securityMeasure));
+
+    }
+
+
+    @ApiOperation("save technical security And Suggest To Country admin")
+    @PostMapping(COUNTRY_URL + "/technical_security")
+    public ResponseEntity<Object> saveTechnicalSecurityAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> technicalSecurityDTOs) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.saveAndSuggestTechnicalSecurityMeasures(countryId, unitId, technicalSecurityDTOs.getRequestBody()));
 
     }
 

@@ -80,6 +80,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -235,16 +237,16 @@ public class ActivityService extends MongoBaseService {
         return activityMongoRepository.findAllActivityWithCtaWtaSettingByUnit(unitId);
     }
 
-    public HashMap<Long, HashMap<Long, Long>> getListOfActivityIdsOfUnitByParentIds(List<BigInteger> parentActivityIds, List<Long> unitIds) {
+    public HashMap<Long, HashMap<Long, BigInteger>> getListOfActivityIdsOfUnitByParentIds(List<BigInteger> parentActivityIds, List<Long> unitIds) {
         List<OrganizationActivityDTO> unitActivities = activityMongoRepository.findAllActivityOfUnitsByParentActivity(parentActivityIds, unitIds);
-        HashMap<Long, HashMap<Long, Long>> mappedParentUnitActivities = new HashMap<Long, HashMap<Long, Long>>();
+        HashMap<Long, HashMap<Long, BigInteger>> mappedParentUnitActivities = new HashMap<>();
         unitActivities.forEach(activityDTO -> {
-            HashMap<Long, Long> unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
+            HashMap<Long, BigInteger> unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
             if (!Optional.ofNullable(unitParentActivities).isPresent()) {
-                mappedParentUnitActivities.put(activityDTO.getUnitId().longValue(), new HashMap<Long, Long>());
+                mappedParentUnitActivities.put(activityDTO.getUnitId().longValue(), new HashMap<Long, BigInteger>());
                 unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
             }
-            unitParentActivities.put(activityDTO.getParentId().longValue(), activityDTO.getId().longValue());
+            unitParentActivities.put(activityDTO.getParentId().longValue(), activityDTO.getId());
         });
         return mappedParentUnitActivities;
     }
@@ -475,14 +477,51 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", rulesActivityDTO.getActivityId());
         }
+        if(rulesActivityDTO.getCutOffIntervalUnit()!=null && rulesActivityDTO.getCutOffStartFrom()!=null){
+            if(rulesActivityDTO.getCutOffIntervalUnit().equals(DAYS) && rulesActivityDTO.getCutOffdayValue()==0){
+                exceptionService.invalidRequestException("error.DayValue.zero");
+            }
+            List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(),rulesActivityDTO.getCutOffIntervalUnit(),rulesActivityDTO.getCutOffdayValue());
+            rulesActivityTab.setCutOffIntervals(cutOffIntervals);
+            rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
+        }
         activity.setRulesActivityTab(rulesActivityTab);
-
         if (!activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
             activity.getTimeCalculationActivityTab().setDayTypes(activity.getRulesActivityTab().getDayTypes());
         }
 
         save(activity);
         return new ActivityTabsWrapper(rulesActivityTab);
+    }
+
+
+    private List<CutOffInterval> getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit,Integer dayValue){
+        LocalDate startDate = dateFrom;
+        LocalDate endDate = startDate.plusYears(1);
+        List<CutOffInterval> cutOffIntervals = new ArrayList<>();
+        while (startDate.isBefore(endDate)){
+            LocalDate nextEndDate = startDate;
+            switch (cutOffIntervalUnit){
+                case DAYS:
+                    nextEndDate = startDate.plusDays(dayValue-1);
+                    break;
+                case WEEKS:
+                    nextEndDate = startDate.plusWeeks(1).minusDays(1);
+                    break;
+                case MONTHS:
+                    nextEndDate = startDate.plusMonths(1).minusDays(1);
+                    break;
+                case QUARTERS:
+                    nextEndDate = startDate.plusMonths(3).minusDays(1);
+                    break;
+                case YEARS:
+                    nextEndDate = startDate.plusYears(1).minusDays(1);
+                    break;
+            }
+            cutOffIntervals.add(new CutOffInterval(startDate,nextEndDate));
+            startDate = nextEndDate.plusDays(1);
+        }
+        return cutOffIntervals;
     }
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long countryId) {
@@ -966,7 +1005,7 @@ public class ActivityService extends MongoBaseService {
 
     private List<Activity> mapActivitiesInOrganization(List<Activity> countryActivities, Long unitId, List<String> externalIds) {
 
-        List<Activity> unitActivities = activityMongoRepository.findByUnitIdAndExternalIdIn(unitId, externalIds);
+        List<Activity> unitActivities = activityMongoRepository.findByUnitIdAndExternalIdInAndDeletedFalse(unitId, externalIds);
         List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
         List<Activity> organizationActivities = new ArrayList<>();
         for (Activity countryActivity : countryActivities) {
@@ -1060,7 +1099,7 @@ public class ActivityService extends MongoBaseService {
 
 
         Activity activityCopied = new Activity();
-        Activity.copyProperties(activityFromDatabase.get(), activityCopied, "id", "organizationTypes", "organizationSubTypes");
+        ObjectMapperUtils.copyPropertiesUsingBeanUtils(activityFromDatabase.get(), activityCopied, "id");
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.setState(ActivityStateEnum.DRAFT);
@@ -1142,4 +1181,7 @@ public class ActivityService extends MongoBaseService {
 
 
     }
+
+
+
 }

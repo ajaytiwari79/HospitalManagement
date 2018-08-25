@@ -31,6 +31,12 @@ public class TimeBankIntervalDTO {
     private String headerName;
 
 
+    public TimeBankIntervalDTO(long totalScheduledMin, long totalTimeBankDiff, String title) {
+        this.totalScheduledMin = totalScheduledMin;
+        this.totalTimeBankDiff = totalTimeBankDiff;
+        this.title = title;
+    }
+
     public TimeBankCTADistributionDTO getTimeBankDistribution() {
         return timeBankDistribution;
     }

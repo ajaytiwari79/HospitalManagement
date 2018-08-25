@@ -13,6 +13,7 @@ import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.Currency;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.RelationType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
@@ -41,6 +42,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.google_calender.GoogleCalenderService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.user.country.agreement.cta.cta_response.*;
+import com.kairos.user.country.basic_details.CountryDTO;
 import com.kairos.user.country.time_slot.TimeSlotDTO;
 import com.kairos.util.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
@@ -151,9 +153,14 @@ public class CountryService {
      * @param id
      * @return
      */
-    public Country getCountryById(Long id) {
-//        return (Country) super.findOne(id);
-        return countryGraphRepository.findOne(id);
+    public CountryDTO getCountryById(Long id) {
+        Country country = countryGraphRepository.findOne(id);
+        CountryDTO countryDTO = new CountryDTO(country.getId(),country.getName());
+        if(country!=null){
+            Currency currency = currencyService.getCurrencyByCountryId(id);
+            countryDTO.setCurrencyId(currency.getId());
+        }
+        return countryDTO;
     }
 
 
@@ -286,7 +293,6 @@ public class CountryService {
         if (countryId == null) {
             return null;
         }
-        // return stored holidays in database
         return FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
 
     }

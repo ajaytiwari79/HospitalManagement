@@ -18,10 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Repository;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -33,8 +37,9 @@ import java.util.regex.Pattern;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
+
 public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepository {
-    @Autowired
+    @Inject
     private MongoTemplate mongoTemplate;
 
     public List<ActivityTagDTO> findAllActivityByOrganizationGroupWithCategoryName(Long unitId, boolean deleted) {
@@ -412,6 +417,4 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<StaffActivitySettingDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, StaffActivitySettingDTO.class);
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
     }
-
-
 }

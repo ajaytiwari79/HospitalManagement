@@ -2,6 +2,7 @@ package com.kairos.persistance.repository.data_inventory.asset;
 
 import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.Query;
@@ -25,5 +26,8 @@ public interface AssetMongoRepository extends MongoBaseRepository<Asset,BigInteg
 
     @Query("{organizationId:?0,subProcessingActivities:?1,deleted:false}")
     List<AssetResponseDTO> getAllAssetRelatedToSubProcessingActivityById(Long unitId,BigInteger subProcessingActivityId);
+
+    @Query("{organizationId:?0,deleted:false,active:?1}")
+    List<AssetBasicResponseDTO> getAllAssetWithBasicDetailByStatus(Long unitId, boolean active);
 
 }

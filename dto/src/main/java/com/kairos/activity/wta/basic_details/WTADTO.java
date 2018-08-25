@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 /**
  * Created by vipul on 21/12/17.
@@ -18,6 +19,8 @@ public class WTADTO {
     private long expertiseId;
     private long startDateMillis;
     private Long endDateMillis;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Long expiryDate;
     @NotNull(message = "error.RuleTemplate.description.notnull")
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
@@ -27,6 +30,22 @@ public class WTADTO {
 
     public WTADTO() {
         //default cons
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
     public BigInteger getId() {

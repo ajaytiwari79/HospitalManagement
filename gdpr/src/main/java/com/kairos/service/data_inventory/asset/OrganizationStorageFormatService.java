@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data.asset_management.storage_fo
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -35,6 +36,9 @@ public class OrganizationStorageFormatService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
+    @Inject
+    private StorageFormatService storageFormatService;
+
 
     /**
      * @param
@@ -43,7 +47,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return return map which contain list of new StorageFormat and list of existing StorageFormat if StorageFormat already exist
      * @description this method create new StorageFormat if StorageFormat not exist with same name ,
      * and if exist then simply add  StorageFormat to existing list and return list ;
-     * findByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
+     * findMetaDataByNamesAndCountryId()  return list of existing StorageFormat using collation ,used for case insensitive result
      */
     public Map<String, List<StorageFormat>> createStorageFormat(Long organizationId, List<StorageFormatDTO> storageFormatDTOS) {
 
@@ -53,7 +57,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
             for (StorageFormatDTO storageFormat : storageFormatDTOS) {
                 storageFormatNames.add(storageFormat.getName());
             }
-            List<StorageFormat> existing = findAllByNameAndOrganizationId(organizationId, storageFormatNames, StorageFormat.class);
+            List<StorageFormat> existing = findMetaDataByNameAndUnitId(organizationId, storageFormatNames, StorageFormat.class);
             storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
             List<StorageFormat> newStorageFormats = new ArrayList<>();
@@ -166,6 +170,19 @@ public class OrganizationStorageFormatService extends MongoBaseService {
         } else
             throw new InvalidRequestException("request param cannot be empty  or null");
 
+    }
+
+
+
+    public Map<String, List<StorageFormat>> saveAndSuggestStorageFormats(Long countryId, Long organizationId, List<StorageFormatDTO> StorageFormatDTOS) {
+
+        Map<String, List<StorageFormat>> result;
+        result = createStorageFormat(organizationId, StorageFormatDTOS);
+        List<StorageFormat> masterStorageFormatSuggestedByUnit = storageFormatService.saveSuggestedStorageFormatsFromUnit(countryId, StorageFormatDTOS);
+        if (!masterStorageFormatSuggestedByUnit.isEmpty()) {
+            result.put("SuggestedData", masterStorageFormatSuggestedByUnit);
+        }
+        return result;
     }
 
 }

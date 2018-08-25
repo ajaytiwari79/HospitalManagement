@@ -3,8 +3,12 @@ package com.kairos.service.pay_out;
 
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
+import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.OrganizationRestClient;
+import com.kairos.rest_client.StaffRestClient;
 import com.kairos.rest_client.pay_out.PayOutRestClient;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.pay_out.PayOut;
@@ -54,6 +58,8 @@ public class PayOutService extends MongoBaseService {
     private OrganizationRestClient organizationRestClient;
     @Inject
     private TimeTypeService timeTypeService;
+    @Inject private TimeBankRepository timeBankRepository;
+    @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
 
 
@@ -130,13 +136,29 @@ public class PayOutService extends MongoBaseService {
         PayOutTransaction approvedPayOutTransaction = new PayOutTransaction(payOutTransaction.getStaffId(),payOutTransaction.getUnitPositionId(), PayOutTrasactionStatus.APPROVED,payOutTransaction.getMinutes(), LocalDate.now());
         save(approvedPayOutTransaction);
         PayOut payOut = new PayOut(payOutTransaction.getUnitPositionId(),payOutTransaction.getStaffId(),payOutTransaction.getMinutes(),payOutTransaction.getDate());
-        PayOut lastPayOut = payOutRepository.findLastPayoutByUnitPositionId(payOutTransaction.getUnitPositionId(),DateUtils.getDateFromLocalDate(payOutTransaction.getDate()));
+        PayOut lastPayOut = payOutRepository.findLastPayoutByUnitPositionId(payOutTransaction.getUnitPositionId(),DateUtils.asDate(payOutTransaction.getDate()));
         if(lastPayOut!=null) {
             payOut.setPayoutBeforeThisDate(lastPayOut.getPayoutBeforeThisDate() + lastPayOut.getTotalPayOutMin());
         }
         payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
         save(payOut);
         return true;
+    }
+
+    /**
+     *
+     * @param staffId
+     * @param unitPositionId
+     * @param amount
+     * @return boolean
+     */
+    public boolean requestPayOut(Long staffId,Long unitPositionId,int amount){
+       // DailyTimeBankEntry dailyTimeBankEntry = timeBankRepository.findLastTimeBankByUnitPositionId(unitPositionId,new Date());
+        PayOutTransaction requestPayOutTransaction = new PayOutTransaction(staffId,unitPositionId, PayOutTrasactionStatus.REQUESTED,amount, LocalDate.now());
+        //Todo change this functionality when CTA Merge to dev @Pradeep
+        save(requestPayOutTransaction);
+        return true;
+
     }
 
     /**

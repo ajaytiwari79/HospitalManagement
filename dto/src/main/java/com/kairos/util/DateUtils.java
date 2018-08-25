@@ -13,6 +13,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -518,6 +519,24 @@ public class DateUtils {
         }
     }
 
+    public static LocalDateTime addDurationInLocalDateTime(LocalDateTime localDate, int duration, DurationType durationType, int recurringNumber) {
+        switch (durationType) {
+            case DAYS: {
+                return LocalDateTime.of(localDate.toLocalDate().plusDays(duration * recurringNumber),localDate.toLocalTime());
+            }
+            case WEEKS: {
+                return LocalDateTime.of(localDate.toLocalDate().plusDays(duration * recurringNumber * 7),localDate.toLocalTime());
+            }
+            case MONTHS: {
+                return LocalDateTime.of(localDate.toLocalDate().plusMonths(duration * recurringNumber),localDate.toLocalTime());
+            }
+            case HOURS: {
+                return LocalDateTime.of(localDate.toLocalDate(),localDate.toLocalTime().plusHours(duration * recurringNumber));
+            }
+        }
+        return localDate;
+    }
+
     public static LocalDate addDurationInLocalDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber) {
         switch (durationType) {
             case DAYS: {
@@ -529,6 +548,9 @@ public class DateUtils {
             case MONTHS: {
                 return localDate.plusMonths(duration * recurringNumber);
             }
+//            case HOURS: {
+//                return LocalDateTime.of(localDate.toLocalDate(),localDate.toLocalTime().plusHours(duration * recurringNumber));
+//            }
         }
         return localDate;
     }
@@ -626,5 +648,18 @@ public class DateUtils {
     }
     public static Long getCurrentMillis() {
         return System.currentTimeMillis();
+    }
+    public static LocalDateTime getStartOfDayFromLocalDate(LocalDate localDate) {
+
+        return localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+    public static LocalDateTime getEndOfDayFromLocalDate(LocalDate localDate) {
+
+        return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    public static int getWeekNumberByLocalDate(LocalDate localDate){
+        TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        return localDate.get(woy);
     }
 }
