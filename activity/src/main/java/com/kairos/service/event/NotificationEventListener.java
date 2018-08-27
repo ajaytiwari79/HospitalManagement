@@ -26,6 +26,7 @@ public class NotificationEventListener {
     @Autowired
     MailService mailService;
 
+
     @Async
     @EventListener
     public void shiftNotificationEvent(ShiftNotificationEvent shiftNotificationEvent) throws UnsupportedEncodingException {
