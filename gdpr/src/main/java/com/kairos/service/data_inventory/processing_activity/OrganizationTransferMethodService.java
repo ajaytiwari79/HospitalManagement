@@ -118,7 +118,6 @@ public class OrganizationTransferMethodService extends MongoBaseService {
         if (!processingActivitiesLinkedWithTransferMethod.isEmpty()) {
             StringBuilder processingActivityNames=new StringBuilder();
             processingActivitiesLinkedWithTransferMethod.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
-
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Transfer Method", processingActivityNames);
         }
         TransferMethod transferMethod = transferMethodRepository.findByOrganizationIdAndId(unitId, transferMethodId);

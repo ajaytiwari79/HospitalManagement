@@ -107,9 +107,8 @@ public class OrganizationDataDisposalService extends MongoBaseService {
 
         List<AssetBasicResponseDTO> assetsLinkedWithDataDisposal = assetMongoRepository.findAllAssetLinkedWithDataDisposal(unitId, dataDisposalId);
         if (!assetsLinkedWithDataDisposal.isEmpty()) {
-            StringBuilder assetNames=new StringBuilder();
-            assetsLinkedWithDataDisposal.forEach(asset->assetNames.append(asset.getName()+","));
-
+            StringBuilder assetNames = new StringBuilder();
+            assetsLinkedWithDataDisposal.forEach(asset -> assetNames.append(asset.getName() + ","));
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", assetNames);
         }
         DataDisposal dataDisposal = dataDisposalMongoRepository.findByOrganizationIdAndId(unitId, dataDisposalId);
