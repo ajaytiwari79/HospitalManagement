@@ -66,9 +66,15 @@ public class Asset extends MongoBaseEntity {
     @NotNull(message = "Status can't be empty")
     private boolean active=true;
 
+    private BigInteger assessmentId;
+
     public boolean isActive() { return active; }
 
     public void setActive(boolean active) { this.active = active; }
+
+    public BigInteger getAssessmentId() { return assessmentId; }
+
+    public void setAssessmentId(BigInteger assessmentId) { this.assessmentId = assessmentId; }
 
     public Set<BigInteger> getProcessingActivities() { return processingActivities; }
 

@@ -27,15 +27,9 @@ public class Assessment extends MongoBaseEntity {
 
     private Staff approver;
 
-    private BigInteger assetId;
-
-    private BigInteger processingActivityId;
-
-    private AssessmentStatus  assessmentStatus;
+    private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
 
     private BigInteger questionnaireTemplateId;
-
-    private AssessmentType assessmentType;
 
     public String getName() { return name; }
 
@@ -61,14 +55,6 @@ public class Assessment extends MongoBaseEntity {
 
     public void setApprover(Staff approver) { this.approver = approver; }
 
-    public BigInteger getAssetId() { return assetId; }
-
-    public void setAssetId(BigInteger assetId) { this.assetId = assetId; }
-
-    public BigInteger getProcessingActivityId() { return processingActivityId; }
-
-    public void setProcessingActivityId(BigInteger processingActivityId) { this.processingActivityId = processingActivityId; }
-
     public AssessmentStatus getAssessmentStatus() { return assessmentStatus; }
 
     public void setAssessmentStatus(AssessmentStatus assessmentStatus) { this.assessmentStatus = assessmentStatus; }
@@ -77,7 +63,5 @@ public class Assessment extends MongoBaseEntity {
 
     public void setQuestionnaireTemplateId(BigInteger questionnaireTemplateId) { this.questionnaireTemplateId = questionnaireTemplateId; }
 
-    public AssessmentType getAssessmentType() { return assessmentType; }
 
-    public void setAssessmentType(AssessmentType assessmentType) { this.assessmentType = assessmentType; }
 }

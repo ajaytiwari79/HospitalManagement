@@ -70,7 +70,7 @@ public class AssetDTO {
 
     private RiskSeverity risk;
 
-    private Boolean active;
+    private boolean active;
 
     public BigInteger getId() { return id; }
 
@@ -108,8 +108,6 @@ public class AssetDTO {
     public Long getMaxDataSubjectVolume() { return maxDataSubjectVolume; }
 
     public RiskSeverity getRisk() { return risk; }
-
-    public Boolean getActive() { return active; }
 
     public AssetDTO() {
     }

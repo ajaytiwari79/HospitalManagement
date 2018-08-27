@@ -193,7 +193,6 @@ public class AssetService extends MongoBaseService {
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
         } else if (!asset.isActive()) {
-
             exceptionService.invalidRequestException("message.asset.inactive");
         }
         AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
