@@ -229,10 +229,10 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         if (!assetsLinkedWithAssetType.isEmpty()) {
             StringBuilder assetNames = new StringBuilder();
             assetsLinkedWithAssetType.forEach(asset -> assetNames.append(asset.getName() + ","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", assetNames);
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Asset Type", assetNames);
         }
         AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(unitId, assetTypeId);
-        if (!Optional.ofNullable(assetType).isPresent()) {
+        if (!Optional.ofNullable(assetType).isPresent() && !assetType.isSubAsset()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetType);
         }
         delete(assetType);
