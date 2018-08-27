@@ -21,7 +21,9 @@ public class ActivityValidationError {
         //Default Constructor
     }
 
-
+    public ActivityValidationError(List<String> messages) {
+        this.messages = messages;
+    }
 
     public ActivityValidationError(BigInteger id, String name, LocalDate startDate, LocalDate endDate, List<String> messages) {
         this.id = id;

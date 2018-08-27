@@ -56,7 +56,7 @@ public class StaffingLevelUtil {
                                                      Long unitId, StaffingLevel staffingLevel){
 
         BeanUtils.copyProperties(presenceStaffingLevelDTO,staffingLevel);
-        staffingLevel.setUnitID(unitId);
+        staffingLevel.setUnitId(unitId);
         staffingLevel.setId(staffingLevelId);
         return staffingLevel;
 
@@ -67,7 +67,7 @@ public class StaffingLevelUtil {
 
         staffingLevel.setPhaseId(absenceStaffingLevelDto.getPhaseId());
         staffingLevel.setWeekCount(absenceStaffingLevelDto.getWeekCount());
-        staffingLevel.setUnitID(unitId);
+        staffingLevel.setUnitId(unitId);
 
         Duration staffingLevelDuration = new Duration(LocalTime.MIN, LocalTime.MAX);
         List<StaffingLevelInterval> absenceStaffingLevelIntervals = new ArrayList<StaffingLevelInterval>();

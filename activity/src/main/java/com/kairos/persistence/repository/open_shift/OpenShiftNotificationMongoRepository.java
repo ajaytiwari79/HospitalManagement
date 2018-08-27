@@ -8,8 +8,8 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 
-public interface OpenShiftNotificationMongoRepository extends MongoBaseRepository<OpenShiftNotification, BigInteger> {
+public interface OpenShiftNotificationMongoRepository extends MongoBaseRepository<OpenShiftNotification, BigInteger>,CustomOpenShiftNotificationMongoRepository {
 
     @Query("{'deleted':false, 'staffId':{'$in':?0},'response':{$ne: true}}")
-    public List<OpenShiftNotification> findByOpenShiftIds(List<Long>staffIds);
+    List<OpenShiftNotification> findByOpenShiftIds(List<Long>staffIds);
 }

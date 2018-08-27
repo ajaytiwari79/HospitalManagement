@@ -49,10 +49,14 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      * @param staffingLevelTemplateDTO
      * @return
      */
-    public StaffingLevelTemplateDTO createStaffingLevelTemplate(StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
+    public StaffingLevelTemplateDTO createStaffingLevelTemplate(Long unitId,StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
         logger.info("saving staffing level Template  {}", staffingLevelTemplateDTO);
+        boolean alreadyExists=staffingLevelTemplateRepository.existsByNameIgnoreCaseAndDeletedFalseAndUnitId(staffingLevelTemplateDTO.getName(),unitId);
+        if(alreadyExists){
+            exceptionService.duplicateDataException("error.name.duplicate",staffingLevelTemplateDTO.getName());
+        }
         //validating Activities
-        List<ActivityValidationError> errors= validateActivityRules(staffingLevelTemplateDTO);
+        List<ActivityValidationError> errors= validateActivityRules(new HashSet<>(),staffingLevelTemplateDTO);
         if(!errors.isEmpty()){
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
@@ -79,7 +83,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         logger.info("updating staffing level Template ID={}", staffingTemplateId);
 
         //validating Activities
-        List<ActivityValidationError> errors= validateActivityRules(staffingLevelTemplateDTO);
+        List<ActivityValidationError> errors= validateActivityRules(new HashSet<>(),staffingLevelTemplateDTO);
         if(!errors.isEmpty()){
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
@@ -131,13 +135,14 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      * @param staffingLevelTemplateDTO
      * @return
      */
-    private List<ActivityValidationError> validateActivityRules(StaffingLevelTemplateDTO staffingLevelTemplateDTO){
-        Set<BigInteger> activityIds=new HashSet<>();
-        staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
-            staffingLevelInterval.getStaffingLevelActivities().forEach(staffingLevelActivity -> {
-                activityIds.add(staffingLevelActivity.getActivityId());
+    public List<ActivityValidationError> validateActivityRules(Set<BigInteger> activityIds,StaffingLevelTemplateDTO staffingLevelTemplateDTO){
+        if(activityIds.isEmpty()) {
+            staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+                staffingLevelInterval.getStaffingLevelActivities().forEach(staffingLevelActivity -> {
+                    activityIds.add(staffingLevelActivity.getActivityId());
+                });
             });
-        });
+        }
 
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         List<ActivityValidationError> activityValidationErrors =new ArrayList<>();
@@ -162,7 +167,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
                 if(!activity.getRulesActivityTab().isEligibleForStaffingLevel())  {
                     errors.add(exceptionService.getLanguageSpecificText("activity.not.eligible.for.staffing.level",activity.getName()));
                 }
-                if(activity.getRulesActivityTab().isEligibleForPresence()){
+                if(!activity.getRulesActivityTab().isEligibleForPresence()){
                     errors.add(exceptionService.getLanguageSpecificText("activity.not.presenceType",activity.getName()));
                 }
                 if(!CollectionUtils.containsAny(staffingLevelTemplateDTO.getDayType(),activity.getRulesActivityTab().getDayTypes())){

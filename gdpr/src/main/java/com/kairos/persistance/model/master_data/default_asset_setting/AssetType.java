@@ -19,9 +19,9 @@ public class AssetType extends MongoBaseEntity {
 
     private Long countryId;
 
-    private Boolean isSubAsset=false ;
+    private boolean subAsset=false ;
 
-    private Boolean hasSubAsset=false;
+    private boolean hasSubAsset=false;
 
     private String suggestedDataStatus=SuggestedDataStatus.ACCEPTED.value;
 
@@ -29,32 +29,19 @@ public class AssetType extends MongoBaseEntity {
 
     public void setSuggestedDataStatus(String suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
-    public Boolean getHasSubAsset() {
-        return hasSubAsset;
-    }
+    public boolean isHasSubAsset() { return hasSubAsset; }
 
-    public void setHasSubAsset(Boolean hasSubAsset) {
-        this.hasSubAsset = hasSubAsset;
-    }
+    public void setHasSubAsset(boolean hasSubAsset) { this.hasSubAsset = hasSubAsset; }
 
     private List<BigInteger> subAssetTypes;
 
-    public List<BigInteger> getSubAssetTypes() {
-        return subAssetTypes;
-    }
+    public List<BigInteger> getSubAssetTypes() { return subAssetTypes; }
 
-    public void setSubAssetTypes(List<BigInteger> subAssetTypes) {
-        this.subAssetTypes = subAssetTypes;
-    }
+    public void setSubAssetTypes(List<BigInteger> subAssetTypes) { this.subAssetTypes = subAssetTypes; }
 
-    public Boolean getSubAsset() {
-        return isSubAsset;
-    }
+    public boolean isSubAsset() { return subAsset; }
 
-    public void setSubAsset(Boolean subAsset) {
-        isSubAsset = subAsset;
-    }
-
+    public void setSubAsset(boolean subAsset) { this.subAsset = subAsset; }
 
     public Long getCountryId() {
         return countryId;

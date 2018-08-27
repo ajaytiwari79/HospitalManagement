@@ -17,4 +17,8 @@ public interface StaffingLevelTemplateRepository extends MongoBaseRepository<Sta
 
     List<StaffingLevelTemplateDTO> findAllByUnitIdAndDeletedFalse(Long unitId);
 
+    StaffingLevelTemplate findByIdAndUnitIdAndDeletedFalse(BigInteger staffingLevelTemplateId,Long unitId);
+
+    boolean existsByNameIgnoreCaseAndDeletedFalseAndUnitId(String name,Long unitId);
+
 }

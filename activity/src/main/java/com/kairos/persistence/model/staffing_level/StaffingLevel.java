@@ -8,8 +8,10 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,10 +20,12 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Document(collection = "staffing_level")
 public class StaffingLevel extends MongoBaseEntity {
+    @Indexed
     private Date currentDate;
-    private Long weekCount;
+    private Integer weekCount;
+    @Indexed
     private Long unitId;
-    private Long phaseId;
+    private BigInteger phaseId;
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
 
@@ -42,16 +46,16 @@ public class StaffingLevel extends MongoBaseEntity {
     }
 
 
-    public StaffingLevel(Date currentDate, Long weekCount,
-                         Long organizationId, Long phaseId, StaffingLevelSetting staffingLevelSetting) {
+    public StaffingLevel(Date currentDate, Integer weekCount,
+                         Long organizationId, BigInteger phaseId, StaffingLevelSetting staffingLevelSetting) {
         this.currentDate = currentDate;
         this.weekCount = weekCount;
         this.unitId = organizationId;
         this.phaseId = phaseId;
         this.staffingLevelSetting = staffingLevelSetting;
     }
-    public StaffingLevel(Date currentDate, Long weekCount,
-                         Long organizationId, Long phaseId) {
+    public StaffingLevel(Date currentDate, int weekCount,
+                         Long organizationId, BigInteger phaseId) {
         this.currentDate = currentDate;
         this.weekCount = weekCount;
         this.unitId = organizationId;
@@ -66,27 +70,27 @@ public class StaffingLevel extends MongoBaseEntity {
         this.currentDate = currentDate;
     }
 
-    public Long getWeekCount() {
+    public Integer getWeekCount() {
         return weekCount;
     }
 
-    public void setWeekCount(Long weekCount) {
+    public void setWeekCount(Integer weekCount) {
         this.weekCount = weekCount;
     }
 
-    public Long getUnitID() {
+    public Long getUnitId() {
         return unitId;
     }
 
-    public void setUnitID(Long unitID) {
-        this.unitId = unitID;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 
-    public Long getPhaseId() {
+    public BigInteger getPhaseId() {
         return phaseId;
     }
 
-    public void setPhaseId(Long phaseId) {
+    public void setPhaseId(BigInteger phaseId) {
         this.phaseId = phaseId;
     }
 

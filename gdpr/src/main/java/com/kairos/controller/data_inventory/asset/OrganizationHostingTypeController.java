@@ -39,10 +39,8 @@ public class OrganizationHostingTypeController {
 
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(unitId, hostingTypeDTOs.getRequestBody()));
-
     }
 
 
@@ -68,19 +66,6 @@ public class OrganizationHostingTypeController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getAllHostingType(unitId));
     }
-
-
-    @ApiOperation("get HostingType by name")
-    @GetMapping("/hosting_type/name")
-    public ResponseEntity<Object> getHostingTypeByName(@PathVariable Long unitId, @RequestParam String name) {
-
-         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingTypeByName(unitId, name));
-
-    }
-
 
     @ApiOperation("delete HostingType  by id")
     @DeleteMapping("/hosting_type/delete/{id}")
@@ -114,5 +99,5 @@ public class OrganizationHostingTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.saveAndSuggestHostingTypes(countryId, unitId, hostingTypeDTOs.getRequestBody()));
 
     }
-    
+
 }
