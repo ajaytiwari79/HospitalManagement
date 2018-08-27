@@ -16,10 +16,12 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
+
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_URL_UNIT_URL + COUNTRY_URL)
+@Api(API_ORGANIZATION_URL_UNIT_URL + COUNTRY_URL)
 public class AssessmentController {
 
 
@@ -27,35 +29,26 @@ public class AssessmentController {
     private AssessmentService assessmentService;
 
 
-
     @ApiOperation(value = "Add assessment to Asset")
     @PostMapping("/assessment/asset/{assetId}")
-    public ResponseEntity<Object>  addAssessmentToAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentDTO assessmentDTO)
-    {
-        if (unitId==null)
-        {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"Organization id can;t be null");
+    public ResponseEntity<Object> addAssessmentToAsset(@PathVariable Long unitId, @PathVariable Long countryId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can;t be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,assessmentService.saveAssessmentForAsset(unitId,assetId,assessmentDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentForAsset(unitId, countryId, assetId, assessmentDTO));
 
     }
 
 
     @ApiOperation(value = "Add assessment to Processing Activity")
     @PostMapping("/assessment/processing_activity/{processingActivityId}")
-    public ResponseEntity<Object>  addAssessmentToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO)
-    {
-        if (unitId==null)
-        {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"Organization id can;t be null");
+    public ResponseEntity<Object> addAssessmentToProcessingActivity(@PathVariable Long unitId, @PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can;t be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,assessmentService.saveAssessmentForProcessingActivity(unitId,processingActivityId,assessmentDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentForProcessingActivity(unitId, countryId, processingActivityId, assessmentDTO));
 
     }
-
-
-
-
 
 
 }

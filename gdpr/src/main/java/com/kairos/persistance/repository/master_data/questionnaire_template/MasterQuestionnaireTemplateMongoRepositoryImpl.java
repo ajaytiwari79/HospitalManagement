@@ -1,13 +1,16 @@
 package com.kairos.persistance.repository.master_data.questionnaire_template;
 
+import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireTemplate;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 import org.bson.Document;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.convert.QueryMapper;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -20,7 +23,9 @@ import static com.kairos.constants.AppConstant.DELETED;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionnaireTemplateRepository {
 
@@ -94,5 +99,18 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
 
         AggregationResults<MasterQuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterQuestionnaireTemplate.class, MasterQuestionnaireTemplateResponseDTO.class);
         return result.getUniqueMappedResult();
+    }
+
+
+    @Override
+    public BigInteger getMasterQuestionanaireTemplateIdListByTemplateType(Long countryId, Long unitId, QuestionnaireTemplateType templateType) {
+        List<BigInteger> assetNames=new ArrayList<>();
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE));
+        query.fields().include("_id");
+        query.fields().exclude("name");
+       /* QueryMapper mapper = new QueryMapper(mongoTemplate.getConverter());
+        org.bson.Document mappedQuery = mapper.getMappedObject(query.getQueryObject(), Optional.empty());
+      */
+       return mongoTemplate.findOne(query,MasterQuestionnaireTemplate.class).getId();
     }
 }
