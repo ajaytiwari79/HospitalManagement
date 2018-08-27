@@ -69,10 +69,14 @@ public class CounterConfService extends MongoBaseService {
 
     private List<String> getTrimmedNames(List<KPICategoryDTO> categories){
         List<String> categoriesNames = new ArrayList<>();
-        categories.forEach(category -> {
-            category.setName(category.getName().trim());
-            categoriesNames.add(category.getName());
-        });
+        try {
+            categories.forEach(category -> {
+                category.setName(category.getName().trim());
+                categoriesNames.add(category.getName());
+            });
+        }catch (NullPointerException e){
+            exceptionService.dataNotFoundException("message.category.name.notnull");
+        }
         return categoriesNames;
     }
 
