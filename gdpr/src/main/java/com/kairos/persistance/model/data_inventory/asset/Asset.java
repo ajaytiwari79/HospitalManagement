@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -66,15 +67,15 @@ public class Asset extends MongoBaseEntity {
     @NotNull(message = "Status can't be empty")
     private boolean active=true;
 
-    private BigInteger assessmentId;
+    private List<BigInteger> assessments=new ArrayList<>();
 
     public boolean isActive() { return active; }
 
     public void setActive(boolean active) { this.active = active; }
 
-    public BigInteger getAssessmentId() { return assessmentId; }
+    public List<BigInteger> getAssessments() { return assessments; }
 
-    public void setAssessmentId(BigInteger assessmentId) { this.assessmentId = assessmentId; }
+    public void setAssessments(List<BigInteger> assessments) { this.assessments = assessments; }
 
     public Set<BigInteger> getProcessingActivities() { return processingActivities; }
 

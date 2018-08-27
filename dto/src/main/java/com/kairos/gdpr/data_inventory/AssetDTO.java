@@ -74,6 +74,8 @@ public class AssetDTO {
 
     public BigInteger getId() { return id; }
 
+    public boolean isActive() { return active; }
+
     public String getName() { return name.trim(); }
 
     public String getDescription() { return description; }

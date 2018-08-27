@@ -2,12 +2,12 @@ package com.kairos.persistance.model.data_inventory.assessment;
 
 
 import com.kairos.enums.AssessmentStatus;
-import com.kairos.enums.AssessmentType;
 import com.kairos.gdpr.Staff;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
 
@@ -17,14 +17,17 @@ public class Assessment extends MongoBaseEntity {
     @NotBlank
     private String name;
 
+    @NotNull
     private LocalDate endDate;
 
     private LocalDate completedDate;
 
     private String comment;
 
+    @NotNull
     private Staff assignee;
 
+    @NotNull
     private Staff approver;
 
     private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
@@ -63,5 +66,10 @@ public class Assessment extends MongoBaseEntity {
 
     public void setQuestionnaireTemplateId(BigInteger questionnaireTemplateId) { this.questionnaireTemplateId = questionnaireTemplateId; }
 
-
+    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull Staff assignee, @NotNull Staff approver) {
+        this.name = name;
+        this.endDate = endDate;
+        this.assignee = assignee;
+        this.approver = approver;
+    }
 }
