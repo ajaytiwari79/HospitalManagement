@@ -3,14 +3,26 @@ package com.kairos.persistence.model.break_settings;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigInteger;
+
 @Document
 public class BreakSettings extends MongoBaseEntity {
     private Long unitId;
     private Long shiftDurationInMinute;
     private Long breakDurationInMinute;
     private Long numberOfBreaks;
+    private BigInteger paidActivityId;
+    private BigInteger unPaidActivityId;
 
     public BreakSettings() {
+        //Default Constructor
+    }
+
+    public BreakSettings(Long unitId, Long shiftDurationInMinute, Long breakDurationInMinute, Long numberOfBreaks) {
+        this.unitId = unitId;
+        this.shiftDurationInMinute = shiftDurationInMinute;
+        this.breakDurationInMinute = breakDurationInMinute;
+        this.numberOfBreaks = numberOfBreaks;
     }
 
     public Long getUnitId() {
@@ -45,10 +57,19 @@ public class BreakSettings extends MongoBaseEntity {
         this.numberOfBreaks = numberOfBreaks;
     }
 
-    public BreakSettings(Long unitId, Long shiftDurationInMinute, Long breakDurationInMinute, Long numberOfBreaks) {
-        this.unitId = unitId;
-        this.shiftDurationInMinute = shiftDurationInMinute;
-        this.breakDurationInMinute = breakDurationInMinute;
-        this.numberOfBreaks = numberOfBreaks;
+    public BigInteger getPaidActivityId() {
+        return paidActivityId;
+    }
+
+    public void setPaidActivityId(BigInteger paidActivityId) {
+        this.paidActivityId = paidActivityId;
+    }
+
+    public BigInteger getUnPaidActivityId() {
+        return unPaidActivityId;
+    }
+
+    public void setUnPaidActivityId(BigInteger unPaidActivityId) {
+        this.unPaidActivityId = unPaidActivityId;
     }
 }

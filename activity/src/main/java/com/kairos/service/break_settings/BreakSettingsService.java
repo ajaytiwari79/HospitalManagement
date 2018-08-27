@@ -1,10 +1,12 @@
 package com.kairos.service.break_settings;
 
 import com.kairos.persistence.model.break_settings.BreakSettings;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.activity.break_settings.BreakSettingsDTO;
+import com.kairos.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -19,20 +21,21 @@ public class BreakSettingsService extends MongoBaseService {
     private BreakSettingMongoRepository breakSettingMongoRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject private ActivityMongoRepository activityMongoRepository;
 
     public BreakSettingsDTO createBreakSettings(Long unitId, BreakSettingsDTO breakSettingsDTO) {
-
         BreakSettings breakSettings = breakSettingMongoRepository.findByDeletedFalseAndUnitIdAndShiftDurationInMinuteEquals(unitId, breakSettingsDTO.getShiftDurationInMinute());
         if (Optional.ofNullable(breakSettings).isPresent()) {
             exceptionService.duplicateDataException("error.breakSettings.duplicate", breakSettingsDTO.getShiftDurationInMinute());
         }
-        breakSettings = new BreakSettings(unitId, breakSettingsDTO.getShiftDurationInMinute(), breakSettingsDTO.getBreakDurationInMinute(), breakSettingsDTO.getNumberOfBreaks());
+        breakSettings =ObjectMapperUtils.copyPropertiesByMapper(breakSettingsDTO,BreakSettings.class);
         save(breakSettings);
         breakSettingsDTO.setId(breakSettings.getId());
         return breakSettingsDTO;
     }
 
     public List<BreakSettingsDTO> getBreakSettings(Long unitId) {
+        List<Object> objectList=activityMongoRepository.XYZ(unitId);
         return breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdOrderByCreatedAtAsc(unitId);
     }
 
@@ -58,11 +61,11 @@ public class BreakSettingsService extends MongoBaseService {
             }
 
         }
-        breakSettings.setShiftDurationInMinute(breakSettingsDTO.getShiftDurationInMinute());
-        breakSettings.setBreakDurationInMinute(breakSettingsDTO.getBreakDurationInMinute());
-        breakSettings.setNumberOfBreaks(breakSettingsDTO.getNumberOfBreaks());
+        breakSettings=ObjectMapperUtils.copyPropertiesByMapper(breakSettingsDTO,BreakSettings.class);
         save(breakSettings);
         return breakSettingsDTO;
     }
+
+
 
 }

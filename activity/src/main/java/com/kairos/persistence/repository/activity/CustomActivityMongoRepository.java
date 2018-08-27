@@ -64,4 +64,5 @@ public interface CustomActivityMongoRepository {
 
     StaffActivitySettingDTO findStaffPersonalizedSettings(Long unitId,BigInteger activityId);
 
+    List<Object> XYZ(Long unitId);
 }

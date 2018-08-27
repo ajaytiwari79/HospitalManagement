@@ -7,6 +7,7 @@ import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.user.staff.staff_settings.StaffActivitySettingDTO;
+import com.kairos.util.ObjectMapperUtils;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
 import com.kairos.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
@@ -416,5 +417,22 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<StaffActivitySettingDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, StaffActivitySettingDTO.class);
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
+    }
+
+    public List<Object> XYZ(Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                        "test"),
+                group("$test.timeTypes").push("$name").as("name").push("_id").as("id")
+                //unwind("balanceSettingsActivityTab.timeType"),
+        );
+                //group("$id").first("test").as("timeType").push("name").as("name"));
+                //match(Criteria.where("balanceSettingsActivityTab.timeType.timeTypes").is(WORKING_TYPE)),
+                //project("balanceSettingsActivityTab", "name").and("balanceSettingsActivityTab.timeType").arrayElementAt(0).as("timeType").andInclude("timeType.label")
+
+
+        AggregationResults<Object> result = mongoTemplate.aggregate(aggregation, Activity.class, Object.class);
+        return result.getMappedResults();
     }
 }
