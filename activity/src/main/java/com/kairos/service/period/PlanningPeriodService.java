@@ -1,5 +1,7 @@
 package com.kairos.service.period;
 
+
+import com.kairos.activity.period.PeriodDTO;
 import com.kairos.activity.period.FlippingDateDTO;
 import com.kairos.activity.period.PeriodPhaseDTO;
 import com.kairos.activity.period.PlanningPeriodDTO;
@@ -436,6 +438,11 @@ public class PlanningPeriodService extends MongoBaseService {
 
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
+
+    public List<PeriodDTO> getPeriodOfInterval(Long unitId, LocalDate startDate, LocalDate endDate){
+        return planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId,startDate,endDate);
+    }
+
 
 /*  not delete this code harish
 * public boolean updateFlippingDate(BigInteger periodId, Long unitId, LocalDate date){

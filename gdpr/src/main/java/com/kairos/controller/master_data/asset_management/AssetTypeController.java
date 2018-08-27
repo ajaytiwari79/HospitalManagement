@@ -84,10 +84,10 @@ public class AssetTypeController {
 
 
     @ApiOperation("delete AssetType  by id")
-    @DeleteMapping("/asset_type/delete/{id}")
-    public ResponseEntity<Object> deleteAssetTypeById(@PathVariable Long countryId, @PathVariable BigInteger id) {
+    @DeleteMapping("/asset_type/{assetId}")
+    public ResponseEntity<Object> deleteAssetTypeById(@PathVariable Long countryId, @PathVariable BigInteger assetId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, false, assetTypeService.deleteAssetType(countryId,id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, false, assetTypeService.deleteAssetType(countryId,assetId));
 
     }
 

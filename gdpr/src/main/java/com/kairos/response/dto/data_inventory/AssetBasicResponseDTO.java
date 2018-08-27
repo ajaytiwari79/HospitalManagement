@@ -11,8 +11,6 @@ import java.math.BigInteger;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssetBasicResponseDTO {
 
-
-
     private BigInteger id;
 
     private String name;

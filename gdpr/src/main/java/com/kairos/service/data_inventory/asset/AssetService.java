@@ -76,7 +76,7 @@ public class AssetService extends MongoBaseService {
             }
         }
         Asset asset = new Asset(assetDTO.getName(), assetDTO.getDescription(), assetDTO.getHostingLocation(),
-                assetDTO.getAssetType(), assetDTO.getAssetSubTypes(), assetDTO.getManagingDepartment(), assetDTO.getAssetOwner(), true);
+                assetDTO.getAssetType(), assetDTO.getAssetSubTypes(), assetDTO.getManagingDepartment(), assetDTO.getAssetOwner());
         asset.setOrganizationId(organizationId);
         asset.setHostingProvider(assetDTO.getHostingProvider());
         asset.setHostingType(assetDTO.getHostingType());
@@ -113,14 +113,13 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     * @description method updated active status of Asset
      * @param unitId
      * @param assetId asset id
-     * @param active status of Asset
+     * @param active  status of Asset
      * @return
+     * @description method updated active status of Asset
      */
-    public boolean updateStatusOfAsset(Long unitId, BigInteger assetId,boolean active)
-    {
+    public boolean updateStatusOfAsset(Long unitId, BigInteger assetId, boolean active) {
         Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
@@ -193,6 +192,9 @@ public class AssetService extends MongoBaseService {
         asset = assetMongoRepository.findByIdAndNonDeleted(organizationId, assetId);
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+        } else if (!asset.isActive()) {
+
+            exceptionService.invalidRequestException("message.asset.inactive");
         }
         AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {

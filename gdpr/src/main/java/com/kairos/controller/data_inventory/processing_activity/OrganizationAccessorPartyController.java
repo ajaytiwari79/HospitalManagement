@@ -65,18 +65,6 @@ public class OrganizationAccessorPartyController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllAccessorParty(unitId));
     }
 
-    @ApiOperation("get AccessorParty by name")
-    @GetMapping("/accessor_party/name")
-    public ResponseEntity<Object> getAccessorPartyByIdByName(@PathVariable Long unitId, @RequestParam String name) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorPartyByName(unitId, name));
-
-    }
-
-
     @ApiOperation("delete AccessorParty  by id")
     @DeleteMapping("/accessor_party/delete/{id}")
     public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long unitId, @PathVariable BigInteger id) {
