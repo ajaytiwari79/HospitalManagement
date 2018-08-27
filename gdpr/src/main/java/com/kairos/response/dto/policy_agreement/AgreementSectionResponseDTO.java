@@ -6,11 +6,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
 
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgreementSectionResponseDTO {
 
@@ -19,9 +20,19 @@ public class AgreementSectionResponseDTO {
     @NotBlank
     private String title;
 
+    private Integer orderedIndex;
+
     private List<ClauseBasicResponseDTO> clauses;
 
     private List<AgreementSectionResponseDTO> subSections;
+
+    public Integer getOrderedIndex() {
+        return orderedIndex;
+    }
+
+    public void setOrderedIndex(Integer orderedIndex) {
+        this.orderedIndex = orderedIndex;
+    }
 
     public BigInteger getId() {
         return id;
@@ -31,9 +42,13 @@ public class AgreementSectionResponseDTO {
         this.id = id;
     }
 
-    public List<AgreementSectionResponseDTO> getSubSections() { return subSections; }
+    public List<AgreementSectionResponseDTO> getSubSections() {
+        return subSections;
+    }
 
-    public void setSubSections(List<AgreementSectionResponseDTO> subSections) { this.subSections = subSections; }
+    public void setSubSections(List<AgreementSectionResponseDTO> subSections) {
+        this.subSections = subSections;
+    }
 
     public List<ClauseBasicResponseDTO> getClauses() {
         return clauses;
@@ -43,12 +58,15 @@ public class AgreementSectionResponseDTO {
         this.clauses = clauses;
     }
 
-    public String getTitle() { return title; }
+    public String getTitle() {
+        return title;
+    }
 
-    public void setTitle(String title) { this.title = title; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public AgreementSectionResponseDTO()
-    {
+    public AgreementSectionResponseDTO() {
 
     }
 
