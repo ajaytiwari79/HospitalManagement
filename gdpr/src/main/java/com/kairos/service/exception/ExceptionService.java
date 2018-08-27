@@ -1,8 +1,6 @@
 package com.kairos.service.exception;
 
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.custom_exception.*;
 import com.kairos.service.locale.LocaleService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -42,20 +40,31 @@ public class ExceptionService {
     public void invalidRequestException(String message, Object... params) {
         throw new InvalidRequestException(convertMessage(message, params));
     }
+
+    public void metaDataLinkedWithAssetException(String message, Object... params) {
+        throw new MetaDataLinkedWithAssetException(convertMessage(message, params));
+    }
+    public void metaDataLinkedWithProcessingActivityException(String message, Object... params) {
+        throw new MetaDataLinkedWithProcessingActivityException(convertMessage(message, params));
+    }
+
     public void internalServerError(String message, Object... params) {
         throw new InternalError(convertMessage(message, params));
     }
+
     public void illegalArgumentException(String message, Object... params) {
         throw new IllegalArgumentException(convertMessage(message, params));
     }
-    public void usernameNotFoundException(String message,Object... params) {
+
+    public void usernameNotFoundException(String message, Object... params) {
         throw new UsernameNotFoundException(convertMessage(message, params));
     }
 
-    public void unsupportedOperationException(String message,Object... params) {
+    public void unsupportedOperationException(String message, Object... params) {
         throw new UnsupportedOperationException(convertMessage(message, params));
     }
-    public void runtimeException(String message,Object... params) {
+
+    public void runtimeException(String message, Object... params) {
         throw new RuntimeException(convertMessage(message, params));
     }
 
