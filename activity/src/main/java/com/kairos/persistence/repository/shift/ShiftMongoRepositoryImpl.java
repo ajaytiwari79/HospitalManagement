@@ -3,8 +3,10 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.activity.shift.ShiftCountDTO;
 import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.activity.shift.ShiftsOfStaffDTO;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
+import com.kairos.util.DateTimeInterval;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.mongodb.client.result.UpdateResult;
@@ -165,6 +167,15 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
         mongoTemplate.updateMulti(query, update, Shift.class);
 
+    }
+
+    public List<ShiftsOfStaffDTO> getShiftsByStaffForInterval(List<Long> staffIdList, DateTimeInterval interval){
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("staffId").in(staffIdList).and("startDate").gte(interval.getStartDate()).and("startDate").lte(interval.getEndDate()))
+                //, group("staffId").push()
+        );
+        return null;
     }
 
 }

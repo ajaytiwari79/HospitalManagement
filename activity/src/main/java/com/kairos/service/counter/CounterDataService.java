@@ -8,6 +8,7 @@ package com.kairos.service.counter;
 import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.activity.enums.counter.RepresentationUnit;
+import com.kairos.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.counter.chart.BaseChart;
@@ -352,6 +353,8 @@ public class CounterDataService {
         }
         return durationMillis;
     }
+
+    //public List<ShiftDTO> getShifts
 
     //public void
 }
