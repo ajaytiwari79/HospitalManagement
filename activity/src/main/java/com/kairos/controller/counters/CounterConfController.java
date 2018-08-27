@@ -33,7 +33,7 @@ public class CounterConfController {
     @Inject
     private CounterConfService counterConfService;
 
-    @PostMapping(value = COUNTRY_URL+"/counter/conf/counter")
+    @PostMapping(value = COUNTRY_URL+COUNTER_CONF_URL+"/counter")
     public ResponseEntity<Map<String, Object>> addCounterEntries(@PathVariable Long countryId){
         counterConfService.addEntries(countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
@@ -49,34 +49,34 @@ public class CounterConfController {
      * updated counter copy will be different than normal counter copies with a boolean field updatedDefinition.
      * In this scenario, there should be two states for this 'draft' and 'publish'
     */
-    @PutMapping(value="/counter/conf/counter/{counterId}")
+    @PutMapping(value=COUNTER_CONF_URL+"/counter/{counterId}")
     public ResponseEntity<Map<String, Object>> updateCounterCriteria(@PathVariable BigInteger counterId, @RequestBody List<FilterCriteria> criteriaList){
         counterConfService.updateCounterCriteria(counterId, criteriaList);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, criteriaList);
     }
 
-    @PostMapping(value="/counter/conf/counter")
+    @PostMapping(value=COUNTER_CONF_URL+"/counter")
     public ResponseEntity<Map<String, Object>> addCounter(@RequestBody Counter counter){
         counterConfService.addCounter(counter);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PostMapping(value=COUNTRY_URL+"/counter/conf/category")
+    @PostMapping(value=COUNTRY_URL+COUNTER_CONF_URL+"/category")
     public ResponseEntity<Map<String, Object>> addCategoriesAtCountryLevel(@PathVariable Long countryId, @RequestBody List<KPICategoryDTO> categories){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.addCategories(categories, ConfLevel.COUNTRY, countryId));
     }
 
-    @PostMapping(value=UNIT_URL+"/counter/conf/category")
+    @PostMapping(value=UNIT_URL+COUNTER_CONF_URL+"/category")
     public ResponseEntity<Map<String, Object>> addCategoriesAtUnitLevel(@PathVariable Long unitId, @RequestBody List<KPICategoryDTO> categories){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.addCategories(categories, ConfLevel.UNIT, unitId));
     }
 
-    @PutMapping(value = COUNTRY_URL+"/counter/conf/category")
+    @PutMapping(value = COUNTRY_URL+COUNTER_CONF_URL+"/category")
     public ResponseEntity<Map<String, Object>> updateCategoriesForCountry(@RequestBody @Valid KPICategoryUpdationDTO categories, @PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.updateCategories(categories, ConfLevel.COUNTRY, countryId));
     }
 
-    @PutMapping(value =UNIT_URL+"/counter/conf/category")
+    @PutMapping(value =UNIT_URL+COUNTER_CONF_URL+"/category")
     public ResponseEntity<Map<String, Object>> updateCategoriesForUnit(@RequestBody @Valid KPICategoryUpdationDTO categories, @PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterConfService.updateCategories(categories, ConfLevel.UNIT, unitId));
     }
