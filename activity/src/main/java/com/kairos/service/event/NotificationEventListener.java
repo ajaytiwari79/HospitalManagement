@@ -30,7 +30,6 @@ public class NotificationEventListener {
     @Inject
     PriorityGroupService priorityGroupService;
 
-
     @Async
     @EventListener
     public void shiftNotificationEvent(ShiftNotificationEvent shiftNotificationEvent) throws UnsupportedEncodingException {
@@ -40,9 +39,9 @@ public class NotificationEventListener {
     }
     @Async
     @EventListener
-    public void shiftNotificationEvent(Map<BigInteger,List<StaffUnitPositionQueryResult>> openShiftStaffMap) throws UnsupportedEncodingException {
+    public void shiftNotificationEvent(PriorityGroupRuleDataDTO priorityGroupRuleDataDTO) throws UnsupportedEncodingException {
         logger.info("send emails to staff filtered for openshifts {send Emails}");
 
-        priorityGroupService.sendNotificationsToStaff(openShiftStaffMap);
+        priorityGroupService.sendNotificationsToStaff(priorityGroupRuleDataDTO.getOpenShiftStaffMap());
        }
 }

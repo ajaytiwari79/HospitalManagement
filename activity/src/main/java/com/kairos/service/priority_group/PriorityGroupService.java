@@ -213,7 +213,7 @@ public class PriorityGroupService extends MongoBaseService {
             logger.info("Priority group data---------->filtering staffs from---------->"+priorityGroupRuleDataDTO.getOpenShiftStaffMap().toString());
 
 
-            applicationContext.publishEvent(priorityGroupRuleDataDTO.getOpenShiftStaffMap());
+            applicationContext.publishEvent(priorityGroupRuleDataDTO);
         }
 
     }
