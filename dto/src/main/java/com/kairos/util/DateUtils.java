@@ -522,16 +522,16 @@ public class DateUtils {
     public static LocalDateTime addDurationInLocalDateTime(LocalDateTime localDate, int duration, DurationType durationType, int recurringNumber) {
         switch (durationType) {
             case DAYS: {
-                return LocalDateTime.of(localDate.toLocalDate().plusDays(duration * recurringNumber),localDate.toLocalTime());
+                return localDate.plusDays(duration * recurringNumber);
             }
             case WEEKS: {
-                return LocalDateTime.of(localDate.toLocalDate().plusDays(duration * recurringNumber * 7),localDate.toLocalTime());
+                return localDate.plusDays(duration * recurringNumber * 7);
             }
             case MONTHS: {
-                return LocalDateTime.of(localDate.toLocalDate().plusMonths(duration * recurringNumber),localDate.toLocalTime());
+                return localDate.plusMonths(duration * recurringNumber);
             }
             case HOURS: {
-                return LocalDateTime.of(localDate.toLocalDate(),localDate.toLocalTime().plusHours(duration * recurringNumber));
+                return localDate.plusHours(duration * recurringNumber);
             }
         }
         return localDate;
@@ -548,9 +548,6 @@ public class DateUtils {
             case MONTHS: {
                 return localDate.plusMonths(duration * recurringNumber);
             }
-//            case HOURS: {
-//                return LocalDateTime.of(localDate.toLocalDate(),localDate.toLocalTime().plusHours(duration * recurringNumber));
-//            }
         }
         return localDate;
     }

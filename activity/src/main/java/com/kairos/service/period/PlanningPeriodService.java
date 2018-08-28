@@ -382,13 +382,34 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.period.startdate.enddate.notupdate");
         }
         //If No change in date
+
+        LocalDateTime puzzleFlippingDateTime=(Optional.ofNullable(planningPeriodDTO.getRequestToPuzzleDate()).isPresent())?(getLocalDateTime(planningPeriodDTO.getRequestToPuzzleDate().getDate(),
+                planningPeriodDTO.getPuzzleToConstructionDate().getHours(),planningPeriodDTO.getPuzzleToConstructionDate().getMinutes())):null;
+        LocalDateTime constructionFlippingDate=(Optional.ofNullable(planningPeriodDTO.getPuzzleToConstructionDate()).isPresent())?getLocalDateTime(planningPeriodDTO.getPuzzleToConstructionDate().getDate(),
+                planningPeriodDTO.getPuzzleToConstructionDate().getHours(),planningPeriodDTO.getPuzzleToConstructionDate().getMinutes()):null;
+        LocalDateTime draftFlippingDate=(Optional.ofNullable(planningPeriodDTO.getConstructionToDraftDate()).isPresent())?getLocalDateTime(planningPeriodDTO.getConstructionToDraftDate().getDate(),planningPeriodDTO.getConstructionToDraftDate().getHours(),
+                planningPeriodDTO.getConstructionToDraftDate().getMinutes()):null;
+        if(Optional.ofNullable(draftFlippingDate).isPresent()&&Optional.ofNullable(constructionFlippingDate).isPresent()){
+            if(draftFlippingDate.isBefore(constructionFlippingDate)){
+                exceptionService.actionNotPermittedException("message.period.invalid.flippingdate");
+            }
+        }
+        if(Optional.ofNullable(constructionFlippingDate).isPresent()&&Optional.ofNullable(puzzleFlippingDateTime).isPresent()){
+            if(constructionFlippingDate.isBefore(puzzleFlippingDateTime)){
+                exceptionService.actionNotPermittedException("message.period.invalid.flippingdate");
+            }
+        }
         planningPeriod = updatePhaseFlippingDateOfPeriod(planningPeriod, planningPeriodDTO, unitId);
         planningPeriod.setName(planningPeriodDTO.getName());
         save(planningPeriod);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate());
     }
 
-    // To delete planning period
+    public LocalDateTime getLocalDateTime(LocalDate localDate,int hours,int minutes){
+        return LocalDateTime.of(localDate,LocalTime.of(hours,minutes));
+    }
+    // To delete planning period\
+
     public boolean deletePlanningPeriod(Long unitId, BigInteger periodId) {
 
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
