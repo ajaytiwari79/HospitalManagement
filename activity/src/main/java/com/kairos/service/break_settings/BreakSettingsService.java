@@ -1,5 +1,8 @@
 package com.kairos.service.break_settings;
 
+import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.break_settings.BreakSettingAndActivitiesWrapper;
+import com.kairos.activity.break_settings.PaidAndUnPaidActivities;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
@@ -12,7 +15,12 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.kairos.enums.TimeTypes.NON_WORKING_TYPE;
+import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 
 @Service
 public class BreakSettingsService extends MongoBaseService {
@@ -29,14 +37,17 @@ public class BreakSettingsService extends MongoBaseService {
             exceptionService.duplicateDataException("error.breakSettings.duplicate", breakSettingsDTO.getShiftDurationInMinute());
         }
         breakSettings =ObjectMapperUtils.copyPropertiesByMapper(breakSettingsDTO,BreakSettings.class);
+        breakSettings.setUnitId(unitId);
         save(breakSettings);
         breakSettingsDTO.setId(breakSettings.getId());
         return breakSettingsDTO;
     }
 
-    public List<BreakSettingsDTO> getBreakSettings(Long unitId) {
-        List<Object> objectList=activityMongoRepository.XYZ(unitId);
-        return breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdOrderByCreatedAtAsc(unitId);
+    public BreakSettingAndActivitiesWrapper getBreakSettings(Long unitId) {
+        List<PaidAndUnPaidActivities> paidAndUnPaidActivities=activityMongoRepository.getAllWorkingAndNonWorkingTypeActivities(unitId);
+        Map<String,List<ActivityDTO>> stringActivityDTOMap=paidAndUnPaidActivities.stream().collect(Collectors.toMap(k->k.getId(),v->v.getActivities()));
+        List<BreakSettingsDTO> breakSettings= breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdOrderByCreatedAtAsc(unitId);
+        return new BreakSettingAndActivitiesWrapper(breakSettings,stringActivityDTOMap.get(WORKING_TYPE.name()),stringActivityDTOMap.get(NON_WORKING_TYPE.name()));
     }
 
     public Boolean removeBreakSettings(Long unitId, BigInteger breakSettingsId) {
@@ -62,6 +73,7 @@ public class BreakSettingsService extends MongoBaseService {
 
         }
         breakSettings=ObjectMapperUtils.copyPropertiesByMapper(breakSettingsDTO,BreakSettings.class);
+        breakSettings.setUnitId(unitId);
         save(breakSettings);
         return breakSettingsDTO;
     }

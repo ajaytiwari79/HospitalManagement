@@ -1,7 +1,10 @@
 package com.kairos.activity.break_settings;
 
+import com.kairos.activity.activity.ActivityDTO;
+
 import javax.validation.constraints.Min;
 import java.math.BigInteger;
+import java.util.List;
 
 public class BreakSettingsDTO {
     private BigInteger id;
@@ -12,7 +15,7 @@ public class BreakSettingsDTO {
     private Long breakDurationInMinute;
     private Long numberOfBreaks;
     private BigInteger paidActivityId;
-    private BigInteger unPaidActivityId;
+    private BigInteger unpaidActivityId;
 
     public BreakSettingsDTO() {
         //Default Constructor
@@ -73,11 +76,11 @@ public class BreakSettingsDTO {
         this.paidActivityId = paidActivityId;
     }
 
-    public BigInteger getUnPaidActivityId() {
-        return unPaidActivityId;
+    public BigInteger getUnpaidActivityId() {
+        return unpaidActivityId;
     }
 
-    public void setUnPaidActivityId(BigInteger unPaidActivityId) {
-        this.unPaidActivityId = unPaidActivityId;
+    public void setUnpaidActivityId(BigInteger unpaidActivityId) {
+        this.unpaidActivityId = unpaidActivityId;
     }
 }

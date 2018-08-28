@@ -12,7 +12,7 @@ public class BreakSettings extends MongoBaseEntity {
     private Long breakDurationInMinute;
     private Long numberOfBreaks;
     private BigInteger paidActivityId;
-    private BigInteger unPaidActivityId;
+    private BigInteger unpaidActivityId;
 
     public BreakSettings() {
         //Default Constructor
@@ -65,11 +65,11 @@ public class BreakSettings extends MongoBaseEntity {
         this.paidActivityId = paidActivityId;
     }
 
-    public BigInteger getUnPaidActivityId() {
-        return unPaidActivityId;
+    public BigInteger getUnpaidActivityId() {
+        return unpaidActivityId;
     }
 
-    public void setUnPaidActivityId(BigInteger unPaidActivityId) {
-        this.unPaidActivityId = unPaidActivityId;
+    public void setUnpaidActivityId(BigInteger unpaidActivityId) {
+        this.unpaidActivityId = unpaidActivityId;
     }
 }

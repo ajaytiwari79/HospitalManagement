@@ -2,29 +2,26 @@ package com.kairos.persistence.repository.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.CompositeActivityDTO;
+import com.kairos.activity.break_settings.PaidAndUnPaidActivities;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.user.staff.staff_settings.StaffActivitySettingDTO;
-import com.kairos.util.ObjectMapperUtils;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
 import com.kairos.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.mongodb.BasicDBObject;
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -419,20 +416,14 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
     }
 
-    public List<Object> XYZ(Long unitId) {
+    public List<PaidAndUnPaidActivities> getAllWorkingAndNonWorkingTypeActivities(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
                         "test"),
-                group("$test.timeTypes").push("$name").as("name").push("_id").as("id")
-                //unwind("balanceSettingsActivityTab.timeType"),
+                group("$test.timeTypes").push(new BasicDBObject("id","$_id").append("name","$name").append("_id","$_id")).as("activities")
         );
-                //group("$id").first("test").as("timeType").push("name").as("name"));
-                //match(Criteria.where("balanceSettingsActivityTab.timeType.timeTypes").is(WORKING_TYPE)),
-                //project("balanceSettingsActivityTab", "name").and("balanceSettingsActivityTab.timeType").arrayElementAt(0).as("timeType").andInclude("timeType.label")
-
-
-        AggregationResults<Object> result = mongoTemplate.aggregate(aggregation, Activity.class, Object.class);
+        AggregationResults<PaidAndUnPaidActivities> result = mongoTemplate.aggregate(aggregation, Activity.class, PaidAndUnPaidActivities.class);
         return result.getMappedResults();
     }
 }
