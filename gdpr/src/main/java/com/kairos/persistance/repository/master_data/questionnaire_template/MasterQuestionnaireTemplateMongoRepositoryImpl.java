@@ -103,14 +103,30 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
 
 
     @Override
-    public BigInteger getMasterQuestionanaireTemplateIdListByTemplateType(Long countryId, Long unitId, QuestionnaireTemplateType templateType) {
+    public BigInteger getMasterQuestionanaireTemplateIdListByTemplateType(Long countryId,QuestionnaireTemplateType templateType) {
         List<BigInteger> assetNames=new ArrayList<>();
-        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE));
-        query.fields().include("_id");
-        query.fields().exclude("name");
-       /* QueryMapper mapper = new QueryMapper(mongoTemplate.getConverter());
-        org.bson.Document mappedQuery = mapper.getMappedObject(query.getQueryObject(), Optional.empty());
-      */
+        Query query = new Query(Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(countryId).and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE));
        return mongoTemplate.findOne(query,MasterQuestionnaireTemplate.class).getId();
+    }
+
+
+    @Override
+    public MasterQuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsByCountryIdAndId(Long countryId, BigInteger templateId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(templateId)),
+                lookup("questionnaire_section", "sections", "_id", "sections"),
+                lookup("asset_type", "assetType", "_id", "assetType"),
+                new CustomAggregationOperation(sectionsAddFieldOperation),
+                new CustomAggregationOperation(assetTypeAddFieldOperation),
+                unwind("sections", true),
+                lookup("question", "sections.questions", "_id", "questions"),
+                new CustomAggregationOperation(questionsAddFieldOperation),
+                new CustomAggregationOperation(projectionOperation),
+                new CustomAggregationOperation(groupDataOperation)
+        );
+
+        AggregationResults<MasterQuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterQuestionnaireTemplate.class, MasterQuestionnaireTemplateResponseDTO.class);
+        return result.getUniqueMappedResult();
     }
 }

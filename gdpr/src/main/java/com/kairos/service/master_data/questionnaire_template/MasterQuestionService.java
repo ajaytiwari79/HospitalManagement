@@ -133,7 +133,7 @@ public class MasterQuestionService extends MongoBaseService {
         MasterQuestionnaireSection questionnaireSection = masterQuestionnaireSectionRepository.findByIdAndNonDeleted(countryId, organizationId, sectionId);
         List<BigInteger> questionsIdList = questionnaireSection.getQuestions();
         if (!questionsIdList.contains(id)) {
-            exceptionService.invalidRequestException("message.invalid", "question  not present in questionnaire section " + questionnaireSection.getTitle() + "");
+            exceptionService.invalidRequestException("message.invalid.request", "question  not present in questionnaire section " + questionnaireSection.getTitle() + "");
         }
         questionsIdList.remove(id);
         questionnaireSection.setQuestions(questionsIdList);

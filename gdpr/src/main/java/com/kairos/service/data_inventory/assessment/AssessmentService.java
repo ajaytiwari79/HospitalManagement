@@ -48,7 +48,7 @@ public class AssessmentService extends MongoBaseService {
     public AssessmentDTO saveAssessmentForAsset(Long unitId, Long countryId, BigInteger assetId, AssessmentDTO assessmentDTO) {
 
         Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
-        if (Optional.ofNullable(asset).isPresent()) {
+        if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
         }
         Assessment assessment = buildAssessmentWithBasicDetail(unitId, countryId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE);
@@ -69,7 +69,7 @@ public class AssessmentService extends MongoBaseService {
     public AssessmentDTO saveAssessmentForProcessingActivity(Long unitId, Long countryId, BigInteger processingActivityId, AssessmentDTO assessmentDTO) {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
-        if (Optional.ofNullable(processingActivity).isPresent()) {
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
         Assessment assessment = buildAssessmentWithBasicDetail(unitId, countryId, assessmentDTO, QuestionnaireTemplateType.PROCESSING_ACTIVITY);
@@ -93,7 +93,7 @@ public class AssessmentService extends MongoBaseService {
             exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
         }
         BigInteger questionnaireTemplateId = masterQuestionnaireTemplateMongoRepository.
-                getMasterQuestionanaireTemplateIdListByTemplateType(countryId, unitId, templateType);
+                getMasterQuestionanaireTemplateIdListByTemplateType(countryId,  templateType);
         if (!Optional.ofNullable(questionnaireTemplateId).isPresent()) {
             exceptionService.invalidRequestException("message.questionnaire.template.Not.Found.For.Template.Type", templateType);
         }

@@ -1,15 +1,25 @@
 package com.kairos.service.data_inventory.asset;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.enums.AssessmentStatus;
+import com.kairos.enums.AssetAttributeName;
+import com.kairos.enums.QuestionType;
 import com.kairos.gdpr.data_inventory.AssetDTO;
 import com.kairos.gdpr.data_inventory.AssetRelateProcessingActivityDTO;
+import com.kairos.persistance.model.data_inventory.assessment.Assessment;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
+import com.kairos.persistance.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
+import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionBasicResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireSectionResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
@@ -19,6 +29,7 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
@@ -49,6 +60,12 @@ public class AssetService extends MongoBaseService {
     @Inject
     private ProcessingActivityMongoRepository processingActivityMongoRepository;
 
+    @Inject
+    private AssessmentMongoRepository assessmentMongoRepository;
+
+    @Inject
+    private MasterQuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
+
 
     public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
         Asset previousAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
@@ -61,7 +78,7 @@ public class AssetService extends MongoBaseService {
         } else {
             if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent()) {
                 if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
-                    exceptionService.invalidRequestException("message.invalid", " invalid Sub Asset is Selected ");
+                    exceptionService.invalidRequestException("message.invalid.request", " invalid Sub Asset is Selected ");
                 }
             }
         }
@@ -192,7 +209,7 @@ public class AssetService extends MongoBaseService {
         } else {
             if (Optional.ofNullable(assetType.getSubAssetTypes()).isPresent()) {
                 if (!assetType.getSubAssetTypes().containsAll(assetDTO.getAssetSubTypes())) {
-                    exceptionService.invalidRequestException("message.invalid", " invalid Sub Asset is Selected ");
+                    exceptionService.invalidRequestException("message.invalid.request", " invalid Sub Asset is Selected ");
                 }
             }
         }
@@ -256,6 +273,40 @@ public class AssetService extends MongoBaseService {
             }
         }
         return processingActivityResponseDTOList;
+    }
+
+
+    /**
+     *
+     * @param countryId
+     * @param unitId
+     * @param assetId
+     * @param assessmentId
+     * @return
+     */
+    public List<MasterQuestionnaireSectionResponseDTO> getAssetAssessmnetById(Long countryId, Long unitId, BigInteger assetId, BigInteger assessmentId) {
+
+        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
+        if (!Optional.ofNullable(assessment).isPresent()) {
+            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentId);
+        }
+        AssetResponseDTO asset = assetMongoRepository.findAssetWithMetaDataById(unitId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+        }
+        MasterQuestionnaireTemplateResponseDTO assetAssessmentQuestionnaireTemplate = questionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsByCountryIdAndId(countryId, assessment.getQuestionnaireTemplateId());
+        List<MasterQuestionnaireSectionResponseDTO> assetAssessmentQuestionnaireSections = assetAssessmentQuestionnaireTemplate.getSections();
+
+        ObjectMapper mapValuesAndField = new ObjectMapper();
+        Map<String, Object> props = mapValuesAndField.convertValue(asset, Map.class);
+        for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assetAssessmentQuestionnaireSections) {
+            for (MasterQuestionBasicResponseDTO assetAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
+                if (props.containsKey(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
+                    assetAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(props.get(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
+                }
+            }
+        }
+        return assetAssessmentQuestionnaireSections;
     }
 
 }
