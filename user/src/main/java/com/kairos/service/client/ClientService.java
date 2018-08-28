@@ -1257,7 +1257,7 @@ public class ClientService {
         clientTemporaryAddress.setCountry(String.valueOf(geographyData.get("countryName")));
         clientTemporaryAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
         clientTemporaryAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-        clientTemporaryAddress.setStreet1(addressDTO.getStreet1());
+        clientTemporaryAddress.setStreet(addressDTO.getStreet());
         clientTemporaryAddress.setHouseNumber(addressDTO.getHouseNumber());
         clientTemporaryAddress.setFloorNumber(addressDTO.getFloorNumber());
         clientTemporaryAddress.setCity(zipCode.getName());
@@ -1284,7 +1284,7 @@ public class ClientService {
         taskAddress.setCountry("DK");
         taskAddress.setZip(zipCode.getZipCode());
         taskAddress.setCity(homeAddress.getCity());
-        taskAddress.setStreet(homeAddress.getStreet1());
+        taskAddress.setStreet(homeAddress.getStreet());
         taskAddress.setHouseNumber(homeAddress.getHouseNumber());
 
         Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId(), new Date());
@@ -1322,7 +1322,7 @@ public class ClientService {
         taskAddress.setCountry("DK");
         taskAddress.setZip(zipCode.getZipCode());
         taskAddress.setCity(homeAddress.getCity());
-        taskAddress.setStreet(homeAddress.getStreet1());
+        taskAddress.setStreet(homeAddress.getStreet());
         taskAddress.setHouseNumber(homeAddress.getHouseNumber());
 
         Staff loggedInUser = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(userName).getId());
@@ -1446,7 +1446,7 @@ public class ClientService {
             ZipCode zipCodeOfClient = addressOfClient.getZipCode();
             ContactAddress homeAddressofHouseHoldPerson = addressOfHouseHoldPerson.getHomeAddress();
             ZipCode zipCodeOfHouseHoldPerson = addressOfHouseHoldPerson.getZipCode();
-            hasSameAddress = (homeAddressOfClient.getStreet1().equalsIgnoreCase(homeAddressofHouseHoldPerson.getStreet1()) &&
+            hasSameAddress = (homeAddressOfClient.getStreet().equalsIgnoreCase(homeAddressofHouseHoldPerson.getStreet()) &&
                     homeAddressOfClient.getHouseNumber().equalsIgnoreCase(homeAddressofHouseHoldPerson.getHouseNumber()) &&
                     zipCodeOfClient.getZipCode().equals(zipCodeOfHouseHoldPerson.getZipCode()));
         }

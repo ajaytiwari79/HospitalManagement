@@ -7,6 +7,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBuilder;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -380,7 +381,7 @@ public class CitizenService {
             Organization supplier = organizationGraphRepository.findByKmdExternalId(citizenSupplier.getId());
             Optional supplierOptional = Optional.ofNullable(supplier);
             if (!supplierOptional.isPresent()) {
-                supplier = new Organization(citizenSupplier.getName());
+                supplier = new OrganizationBuilder().setName(citizenSupplier.getName()).createOrganization();
                 supplier.setCountry(organization.getCountry());
                 supplier.setKmdExternalId(citizenSupplier.getId());
             }
