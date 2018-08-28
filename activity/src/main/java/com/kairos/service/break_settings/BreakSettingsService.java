@@ -2,7 +2,7 @@ package com.kairos.service.break_settings;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.break_settings.BreakSettingAndActivitiesWrapper;
-import com.kairos.activity.break_settings.PaidAndUnPaidActivities;
+import com.kairos.activity.break_settings.BreakActivities;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
@@ -44,8 +44,8 @@ public class BreakSettingsService extends MongoBaseService {
     }
 
     public BreakSettingAndActivitiesWrapper getBreakSettings(Long unitId) {
-        List<PaidAndUnPaidActivities> paidAndUnPaidActivities=activityMongoRepository.getAllWorkingAndNonWorkingTypeActivities(unitId);
-        Map<String,List<ActivityDTO>> stringActivityDTOMap=paidAndUnPaidActivities.stream().collect(Collectors.toMap(k->k.getId(),v->v.getActivities()));
+        List<BreakActivities> breakActivities =activityMongoRepository.getAllWorkingAndNonWorkingTypeActivities(unitId);
+        Map<String,List<ActivityDTO>> stringActivityDTOMap= breakActivities.stream().collect(Collectors.toMap(k->k.getId(), v->v.getActivities()));
         List<BreakSettingsDTO> breakSettings= breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdOrderByCreatedAtAsc(unitId);
         return new BreakSettingAndActivitiesWrapper(breakSettings,stringActivityDTOMap.get(WORKING_TYPE.name()),stringActivityDTOMap.get(NON_WORKING_TYPE.name()));
     }

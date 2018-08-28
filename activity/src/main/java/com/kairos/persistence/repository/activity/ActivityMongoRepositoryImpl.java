@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.CompositeActivityDTO;
-import com.kairos.activity.break_settings.PaidAndUnPaidActivities;
+import com.kairos.activity.break_settings.BreakActivities;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -416,13 +416,13 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
     }
 
-    public List<PaidAndUnPaidActivities> getAllWorkingAndNonWorkingTypeActivities(Long unitId) {
+    public List<BreakActivities> getAllWorkingAndNonWorkingTypeActivities(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                group("$timeType.timeTypes").push(new BasicDBObject("id","$_id").append("name","$name")).as("activities")
+                group("$timeType.timeTypes").push(new BasicDBObject("_id","$_id").append("name","$name")).as("activities")
         );
-        AggregationResults<PaidAndUnPaidActivities> result = mongoTemplate.aggregate(aggregation, Activity.class, PaidAndUnPaidActivities.class);
+        AggregationResults<BreakActivities> result = mongoTemplate.aggregate(aggregation, Activity.class, BreakActivities.class);
         return result.getMappedResults();
     }
 }
