@@ -4,6 +4,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.auth.TabPermission;
 import com.kairos.persistence.model.auth.User;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -83,4 +84,20 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     @Query("Match(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) where id(user)={0} return id(userLanguage)")
     Long getUserSelectedLanguageId(Long userId);
+
+
+    // This is used to get the very first user of the organization
+    @Query("Match (org:Organization) where id(org)={0}" +
+            "Optional Match (emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) with org,unitPermission,emp\n" +
+            "Optional Match (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) with org,unitPermission,emp,r1,ag\n" +
+            "Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
+            "return  id(org) as organizationId ,id(user) as id, user.email as email,user.firstName as firstName,ag.name as accessGroupName,id(ag) as accessGroupId,user.lastName as lastName ,user.cprNumber as cprNumber,user.creationDate as creationDate ORDER BY user.creationDate DESC LIMIT 1" )
+    StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId);
+
+    @Query("Match (org:Organization) where id(org) IN {0}" +
+            "Optional Match (emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) with org,unitPermission,emp\n" +
+            "Optional Match (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) with org,unitPermission,emp,r1,ag\n" +
+            "Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
+            "return  id(org) as organizationId ,user.email as email,id(user) as id,ag.name as accessGroupName,id(ag) as accessGroupId, user.firstName as firstName,user.lastName as lastName ,user.cprNumber as cprNumber,user.creationDate as creationDate ORDER BY user.creationDate DESC LIMIT 1" )
+    List<StaffPersonalDetailDTO> getUnitManagerOfOrganization(List<Long> unitId);
 }

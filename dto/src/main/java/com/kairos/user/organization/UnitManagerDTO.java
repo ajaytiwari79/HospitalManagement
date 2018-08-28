@@ -8,13 +8,11 @@ import javax.validation.constraints.NotNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UnitManagerDTO {
-
     @NotNull(message = "error.Organization.unitmanager.accessgroupid.notnull")
     private Long accessGroupId;
+    @NotNull(message = "error.cprNumber.notnull")
     private String cprNumber;
-    @NotNull(message = "error.firstname.notnull")
     private String firstName;
-    @NotNull(message = "error.lastname.notnull")
     private String lastName;
     private String email;
     private String accessGroupName;

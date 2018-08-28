@@ -301,7 +301,7 @@ public class DataImportService {
                                 addressDTO.setCity(city);
                                 addressDTO.setHouseNumber(hnr);
                                 addressDTO.setZipCodeValue(zipCode);
-                                addressDTO.setStreet1(street);
+                                addressDTO.setStreet(street);
 
                                 Map<String,Object> result = addressVerificationService.verifyAddressSheet(addressDTO);
                                 Integer geoCodeStatus = (Integer) result.get("statusCode");
@@ -350,7 +350,7 @@ public class DataImportService {
 
 
                                     // Native Details
-                                    contactAddress.setStreet1(addressDTO.getStreet1());
+                                    contactAddress.setStreet(addressDTO.getStreet());
                                     contactAddress.setHouseNumber(addressDTO.getHouseNumber());
                                     contactAddress.setFloorNumber(addressDTO.getFloorNumber());
 

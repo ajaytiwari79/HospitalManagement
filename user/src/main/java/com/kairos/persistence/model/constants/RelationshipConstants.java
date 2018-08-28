@@ -261,6 +261,7 @@ public abstract class RelationshipConstants {
     public final static String SELECTED_LANGUAGE ="SELECTED_LANGUAGE";
     public final static String IN_COUNTRY = "IN_COUNTRY";
     public final static String HAS_ACCOUNT_TYPE = "HAS_ACCOUNT_TYPE";
+    public final static String HAS_UNIT_TYPE = "HAS_UNIT_TYPE";
     public final static String HAS_ACCESS_Of_MODULE = "HAS_ACCESS_Of_MODULE";
 
 
