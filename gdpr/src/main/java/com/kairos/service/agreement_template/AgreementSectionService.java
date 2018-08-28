@@ -131,7 +131,7 @@ public class AgreementSectionService extends MongoBaseService {
     public Map<String, Object> buildAgreementSectionsList(List<ClauseBasicDTO> newClauseBasicDTOList, List<ClauseBasicDTO> changedClausesDTOList, List<BigInteger> changedClauseIdsList,
                                                           AgreementSectionDTO agreementSectionDTO, Map<String, AgreementSectionClauseWrapper> agreementSubSectionClauseAndClauseDtoHashMap) {
         Map<String, Object> result = new HashMap<>();
-        AgreementSection agreementSection = new AgreementSection(UserContext.getCountryId(), agreementSectionDTO.getTitle());
+        AgreementSection agreementSection = new AgreementSection(UserContext.getCountryId(), agreementSectionDTO.getTitle(),agreementSectionDTO.getOrderedIndex());
         agreementSection.setOrganizationId(UserContext.getOrgId());
         AgreementSectionClauseWrapper sectionClauseAndClauseDtoWrapper = new AgreementSectionClauseWrapper();
 
@@ -158,7 +158,7 @@ public class AgreementSectionService extends MongoBaseService {
         if (Optional.ofNullable(agreementSectionDTO.getSubSections()).isPresent() && !agreementSectionDTO.getSubSections().isEmpty()) {
             List<AgreementSection> agreementSubSectionList = new ArrayList<>();
             agreementSectionDTO.getSubSections().forEach(agreementSubSectionDTO -> {
-                AgreementSection agreementSubSection = new AgreementSection(UserContext.getCountryId(), agreementSubSectionDTO.getTitle());
+                AgreementSection agreementSubSection = new AgreementSection(UserContext.getCountryId(), agreementSubSectionDTO.getTitle(),agreementSubSectionDTO.getOrderedIndex());
                 agreementSubSection.setOrganizationId(UserContext.getOrgId());
                 AgreementSectionClauseWrapper agreementSubsectionClauseAndClauseDtoWrapper = new AgreementSectionClauseWrapper();
 
@@ -269,6 +269,7 @@ public class AgreementSectionService extends MongoBaseService {
         clauseBasicDTOList.forEach(clauseBasicDTO -> {
             Clause clause = updateClauseMap.get(clauseBasicDTO.getId());
             clause.setDescription(clauseBasicDTO.getDescription());
+            clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
             updateExistingClauseList.add(clause);
             clauseIdList.add(clauseBasicDTO.getId());
         });
@@ -355,6 +356,7 @@ public class AgreementSectionService extends MongoBaseService {
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOList) {
             AgreementSection agreementSection = agreementSectionMap.get(agreementSectionDTO.getId());
             agreementSection.setTitle(agreementSectionDTO.getTitle());
+            agreementSection.setOrderedIndex(agreementSectionDTO.getOrderedIndex());
             AgreementSectionClauseWrapper sectionClauseAndClauseDtoWrapper = new AgreementSectionClauseWrapper();
             if (agreementSectionDTO.getClauses() != null && !agreementSectionDTO.getClauses().isEmpty()) {
                 List<BigInteger> unchangedClauseIdList = new ArrayList<>();
@@ -432,8 +434,9 @@ public class AgreementSectionService extends MongoBaseService {
             if (Optional.ofNullable(agreementSubSectionDTO.getId()).isPresent()) {
                 agreementSubSection = agreementSubSectionMap.get(agreementSubSectionDTO.getId());
                 agreementSubSection.setTitle(agreementSubSectionDTO.getTitle());
+                agreementSubSection.setOrderedIndex(agreementSubSectionDTO.getOrderedIndex());
             } else {
-                agreementSubSection = new AgreementSection(UserContext.getCountryId(), agreementSubSectionDTO.getTitle());
+                agreementSubSection = new AgreementSection(UserContext.getCountryId(), agreementSubSectionDTO.getTitle(),agreementSubSectionDTO.getOrderedIndex());
                 agreementSubSection.setOrganizationId(UserContext.getOrgId());
             }
 

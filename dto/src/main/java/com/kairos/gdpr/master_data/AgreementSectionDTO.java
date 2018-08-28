@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.List;
@@ -18,6 +19,9 @@ public class AgreementSectionDTO {
     @Pattern(message = "Numbers and special character are not allowed",regexp = "^[a-zA-Z\\s]+$")
     @NotBlank(message = "Section Name can't be Empty")
     private String title;
+
+    @NotNull(message = "Section order is Not defined")
+    private Integer orderedIndex;
 
     @Valid
     private List<ClauseBasicDTO> clauses;
@@ -55,6 +59,10 @@ public class AgreementSectionDTO {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public Integer getOrderedIndex() { return orderedIndex; }
+
+    public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
 
     public AgreementSectionDTO() {
     }
