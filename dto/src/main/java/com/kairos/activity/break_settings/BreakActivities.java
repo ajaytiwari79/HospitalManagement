@@ -9,19 +9,19 @@ import java.math.BigInteger;
 import java.util.List;
 
 public class BreakActivities {
-    private String id;
+    private String timeType;
     private List<ActivityDTO> activities;
 
     public BreakActivities() {
         //Default Constructor
     }
 
-    public String getId() {
-        return id;
+    public String getTimeType() {
+        return timeType;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTimeType(String timeType) {
+        this.timeType = timeType;
     }
 
     public List<ActivityDTO> getActivities() {

@@ -420,8 +420,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                group("$timeType.timeTypes").push(new BasicDBObject("_id","$_id").append("name","$name")).as("activities")
-        );
+                group("$timeType.timeTypes").push(new BasicDBObject("_id","$_id").append("name","$name")).as("activities"),
+                project("activities").and("_id").as("timeType"));
         AggregationResults<BreakActivities> result = mongoTemplate.aggregate(aggregation, Activity.class, BreakActivities.class);
         return result.getMappedResults();
     }

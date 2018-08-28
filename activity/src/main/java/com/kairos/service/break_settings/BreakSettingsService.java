@@ -45,9 +45,9 @@ public class BreakSettingsService extends MongoBaseService {
 
     public BreakSettingAndActivitiesWrapper getBreakSettings(Long unitId) {
         List<BreakActivities> breakActivities =activityMongoRepository.getAllWorkingAndNonWorkingTypeActivities(unitId);
-        Map<String,List<ActivityDTO>> stringActivityDTOMap= breakActivities.stream().collect(Collectors.toMap(k->k.getId(), v->v.getActivities()));
+        Map<String,List<ActivityDTO>> timeTypeActivityMap= breakActivities.stream().collect(Collectors.toMap(k->k.getTimeType(), v->v.getActivities()));
         List<BreakSettingsDTO> breakSettings= breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdOrderByCreatedAtAsc(unitId);
-        return new BreakSettingAndActivitiesWrapper(breakSettings,stringActivityDTOMap.get(WORKING_TYPE.name()),stringActivityDTOMap.get(NON_WORKING_TYPE.name()));
+        return new BreakSettingAndActivitiesWrapper(breakSettings,timeTypeActivityMap.get(WORKING_TYPE.name()),timeTypeActivityMap.get(NON_WORKING_TYPE.name()));
     }
 
     public Boolean removeBreakSettings(Long unitId, BigInteger breakSettingsId) {
