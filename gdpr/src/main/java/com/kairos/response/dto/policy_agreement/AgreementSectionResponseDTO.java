@@ -8,6 +8,7 @@ import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -24,7 +25,7 @@ public class AgreementSectionResponseDTO {
 
     private List<ClauseBasicResponseDTO> clauses;
 
-    private List<AgreementSectionResponseDTO> subSections;
+    private List<AgreementSectionResponseDTO> subSections=new ArrayList<>();
 
     public Integer getOrderedIndex() {
         return orderedIndex;
