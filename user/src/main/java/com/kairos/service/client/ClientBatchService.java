@@ -258,7 +258,7 @@ public class ClientBatchService {
                     contactAddress = new ContactAddress();
                     newAddress++;
                 } else {
-                    logger.info("Existing address found: " + contactAddress.getId() + " 1. " + contactAddress.getStreet1());
+                    logger.info("Existing address found: " + contactAddress.getId() + " 1. " + contactAddress.getStreet());
                     existingAddress++;
                 }
 
@@ -293,7 +293,7 @@ public class ClientBatchService {
                 addressDTO.setCity(city);
                 addressDTO.setHouseNumber(hnr.toString());
                 addressDTO.setZipCodeValue(zipCode);
-                addressDTO.setStreet1(street);
+                addressDTO.setStreet(street);
 
                 Map<String, Object> result = addressVerificationService.verifyAddressSheet(addressDTO, unitId);
                 Integer geoCodeStatus = (Integer) result.get("statusCode");
@@ -383,7 +383,7 @@ public class ClientBatchService {
 
 
                     // Native Details
-                    contactAddress.setStreet1(addressDTO.getStreet1());
+                    contactAddress.setStreet(addressDTO.getStreet());
                     contactAddress.setHouseNumber(addressDTO.getHouseNumber());
                     contactAddress.setFloorNumber(addressDTO.getFloorNumber());
                     contactAddressGraphRepository.save(contactAddress);
@@ -409,7 +409,7 @@ public class ClientBatchService {
                         if (contactAddress != null) {
                             clientInfo.put("city", contactAddress.getCity());
                             clientInfo.put("zipcode", (zipCodeDb == null) ? null : zipCodeDb.getZipCode());
-                            clientInfo.put("address", contactAddress.getHouseNumber() + ", " + contactAddress.getStreet1());
+                            clientInfo.put("address", contactAddress.getHouseNumber() + ", " + contactAddress.getStreet());
                         } else {
                             clientInfo.put("city", "");
                         }

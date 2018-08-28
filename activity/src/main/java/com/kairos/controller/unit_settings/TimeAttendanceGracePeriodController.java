@@ -29,7 +29,7 @@ public class TimeAttendanceGracePeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tAndAGracePeriodService.getTAndAGracePeriodSetting(unitId));
     }
 
-    @ApiOperation(value = "update unit T&A GracePeriod settings")
+    @ApiOperation(value = "save unit T&A GracePeriod settings")
     @PostMapping(value = "/grace_period_setting")
     public ResponseEntity<Map<String, Object>> updateGracePeriodSettings(@PathVariable Long unitId,
                                                                          @RequestBody TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO) {

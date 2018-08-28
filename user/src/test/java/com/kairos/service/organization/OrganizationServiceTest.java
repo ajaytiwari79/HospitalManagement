@@ -41,7 +41,7 @@ public class OrganizationServiceTest {
                 true,"My pharmacy",null,Arrays.asList(86L),Arrays.asList(0L));
         parentOrganizationDTO.setVerifiedByGoogleMap(true);
         AddressDTO addressDTO = new AddressDTO();
-        addressDTO.setStreet1("Frederiksberg");
+        addressDTO.setStreet("Frederiksberg");
         addressDTO.setZipCodeId(65L);
         addressDTO.setZipCodeValue(2000);
         addressDTO.setMunicipalityId(59L);
