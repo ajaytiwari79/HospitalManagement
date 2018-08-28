@@ -75,7 +75,7 @@ public class OrganizationController {
 
     @Inject
     private OrganizationService organizationService;
-
+    @Inject private CompanyCreationService companyCreationService;
     @Inject
     private SkillCategoryService skillCategoryService;
     @Inject
@@ -188,11 +188,19 @@ public class OrganizationController {
      * @return Organization
      */
     @ApiOperation(value = "Create a New Organization(Location)")
-    @RequestMapping(value = UNIT_URL + "/unit", method = RequestMethod.POST)
+    @PostMapping(value = UNIT_URL + "/unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addOrganization(@Validated @RequestBody OrganizationBasicDTO organizationBasicDTO, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.createNewUnit(organizationBasicDTO, unitId,false,false));
+                companyCreationService.addNewUnit(organizationBasicDTO, unitId));
+    }
+
+    @ApiOperation(value = "Create a New Organization(Location)")
+    @PutMapping(value = UNIT_URL + "/unit/{unitId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateUnit(@Validated @RequestBody OrganizationBasicDTO organizationBasicDTO, @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                companyCreationService.updateUnit(organizationBasicDTO, unitId));
     }
 
 
@@ -200,7 +208,7 @@ public class OrganizationController {
      *
      */
     @ApiOperation(value = "Get a Organization(Location)")
-    @RequestMapping(value = UNIT_URL + "/unit", method = RequestMethod.GET)
+    @GetMapping(value = UNIT_URL + "/unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganization(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -211,7 +219,7 @@ public class OrganizationController {
      *
      */
     @ApiOperation(value = "Get organization herirchy data")
-    @RequestMapping(value = UNIT_URL + "/manage_hierarchy", method = RequestMethod.GET)
+    @GetMapping(value = UNIT_URL + "/manage_hierarchy")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getManageHierarchyData(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -583,7 +591,10 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getParentOrganization(countryId));
     }
-
+/**
+ * Its fetching all the units of the  organization
+ *
+ * */
     @RequestMapping(value = "/parent/{orgId}/country/{countryId}/gdpr_workcenter", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getOrganizationGdprAndWorkcenter(@PathVariable long orgId,@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,

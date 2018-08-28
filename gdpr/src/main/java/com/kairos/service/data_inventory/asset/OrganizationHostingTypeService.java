@@ -1,13 +1,14 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.HostingTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
+import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.HostingTypeService;
@@ -38,7 +39,10 @@ public class OrganizationHostingTypeService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     @Inject
-    private HostingTypeService  hostingTypeService;
+    private HostingTypeService hostingTypeService;
+
+    @Inject
+    private AssetMongoRepository assetMongoRepository;
 
 
     /**
@@ -110,16 +114,20 @@ public class OrganizationHostingTypeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteHostingType(Long organizationId, BigInteger id) {
+    public Boolean deleteHostingType(Long unitId, BigInteger hostingTypeId) {
 
-        HostingType hostingType = hostingTypeMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        if (!Optional.ofNullable(hostingType).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(hostingType);
-            return true;
-
+        List<AssetBasicResponseDTO> assetsLinkedWithHostingType = assetMongoRepository.findAllAssetLinkedWithHostingType(unitId, hostingTypeId);
+        if (!assetsLinkedWithHostingType.isEmpty()) {
+            StringBuilder assetNames=new StringBuilder();
+            assetsLinkedWithHostingType.forEach(asset->assetNames.append(asset.getName()+","));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Type", assetNames);
         }
+        HostingType hostingType = hostingTypeMongoRepository.findByOrganizationIdAndId(unitId, hostingTypeId);
+        if (!Optional.ofNullable(hostingType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Type", hostingTypeId);
+        }
+        delete(hostingType);
+        return true;
     }
 
 
@@ -139,11 +147,10 @@ public class OrganizationHostingTypeService extends MongoBaseService {
             if (id.equals(hostingType.getId())) {
                 return hostingTypeDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + hostingTypeDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Hosting Type", hostingType.getName());
         }
         hostingType = hostingTypeMongoRepository.findByid(id);
         if (!Optional.ofNullable(hostingType).isPresent()) {
-
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Type", id);
         }
         hostingType.setName(hostingTypeDTO.getName());
@@ -152,29 +159,6 @@ public class OrganizationHostingTypeService extends MongoBaseService {
 
 
     }
-
-
-    /**
-     * @param
-     * @param organizationId
-     * @param name           name of HostingType
-     * @return HostingType object fetch on the basis of name
-     * @throws DataNotExists if HostingType not exist for given name
-     */
-    public HostingType getHostingTypeByName(Long organizationId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            HostingType exist = hostingTypeMongoRepository.findByOrganizationIdAndName(organizationId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
 
 
     public Map<String, List<HostingType>> saveAndSuggestHostingTypes(Long countryId, Long organizationId, List<HostingTypeDTO> HostingTypeDTOS) {

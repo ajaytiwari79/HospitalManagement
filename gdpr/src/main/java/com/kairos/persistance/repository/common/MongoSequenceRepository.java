@@ -21,6 +21,7 @@ public class MongoSequenceRepository {
     @Inject
     MongoOperations mongoOperations;
 
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**

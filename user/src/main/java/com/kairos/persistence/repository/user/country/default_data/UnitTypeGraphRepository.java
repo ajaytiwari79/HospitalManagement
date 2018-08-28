@@ -7,6 +7,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCESS_Of_MODULE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.IN_COUNTRY;
@@ -22,4 +23,8 @@ public interface UnitTypeGraphRepository extends Neo4jBaseRepository<UnitType,Lo
             "OPTIONAL MATCH(unitType)-[:"+HAS_ACCESS_Of_MODULE+"]-(accessPage:AccessPage{isModule:true}) " +
             "RETURN id(unitType) as id,unitType.name as name,unitType.description as description,collect(accessPage) as modules" )
     List<UnitTypeQueryResult> getAllUnitTypeOfCountry(Long countryId);
+
+    @Query("MATCH(unitType:UnitType{deleted:false}) where id(unitType) IN {0} " +
+            "RETURN unitType" )
+    List<UnitType> getUnitTypeByIds(Set<Long> unitTypeIds);
 }

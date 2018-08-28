@@ -1,18 +1,18 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
+import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,9 @@ public class OrganizationStorageFormatService extends MongoBaseService {
 
     @Inject
     private StorageFormatService storageFormatService;
+
+    @Inject
+    private AssetMongoRepository assetMongoRepository;
 
 
     /**
@@ -111,16 +114,20 @@ public class OrganizationStorageFormatService extends MongoBaseService {
     }
 
 
-    public Boolean deleteStorageFormat(Long organizationId, BigInteger id) {
+    public Boolean deleteStorageFormat(Long unitId, BigInteger storageFormatId) {
 
-        StorageFormat storageFormat = storageFormatMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        if (!Optional.ofNullable(storageFormat).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id " + id);
-        } else {
-            delete(storageFormat);
-            return true;
-
+        List<AssetBasicResponseDTO> assetsLinkedWithStorageFormat = assetMongoRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
+        if (!assetsLinkedWithStorageFormat.isEmpty()) {
+            StringBuilder assetNames=new StringBuilder();
+            assetsLinkedWithStorageFormat.forEach(asset->assetNames.append(asset.getName()+","));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", assetNames);
         }
+        StorageFormat storageFormat = storageFormatMongoRepository.findByOrganizationIdAndId(unitId, storageFormatId);
+        if (!Optional.ofNullable(storageFormat).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Storage Format", storageFormatId);
+        }
+        delete(storageFormat);
+        return true;
     }
 
 
@@ -139,7 +146,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
             if (id.equals(storageFormat.getId())) {
                 return storageFormatDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + storageFormatDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Storage Format", storageFormat.getName());
         }
         storageFormat = storageFormatMongoRepository.findByid(id);
         if (!Optional.ofNullable(storageFormat).isPresent()) {
@@ -150,28 +157,6 @@ public class OrganizationStorageFormatService extends MongoBaseService {
         return storageFormatDTO;
 
     }
-
-    /**
-     * @param
-     * @param organizationId
-     * @param name           name of StorageFormat
-     * @return StorageFormat object fetch on basis of  name
-     * @throws DataNotExists throw exception if StorageFormat not exist for given name
-     */
-    public StorageFormat getStorageFormatByName(Long organizationId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            StorageFormat exist = storageFormatMongoRepository.findByOrganizationIdAndName(organizationId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
 
 
     public Map<String, List<StorageFormat>> saveAndSuggestStorageFormats(Long countryId, Long organizationId, List<StorageFormatDTO> StorageFormatDTOS) {

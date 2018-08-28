@@ -34,6 +34,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.kairos.constants.ApiConstants.COUNTER_DIST_URL;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class CounterDistIntegrationTest {
@@ -50,7 +52,7 @@ public class CounterDistIntegrationTest {
         String baseUrl = getBaseUrl(2567l, 4l);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<KPIDTO>>>() {
         };
-        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/counters/", HttpMethod.GET, null, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/counters/", HttpMethod.GET, null, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -81,7 +83,7 @@ public class CounterDistIntegrationTest {
         String baseUrl = getBaseUrl(2567l, 4l);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>>() {
         };
-        ResponseEntity<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/category", HttpMethod.GET, null, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<InitialKPICategoryDistDataDTO>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/category", HttpMethod.GET, null, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -103,7 +105,7 @@ public class CounterDistIntegrationTest {
         };
         CategoryKPIsDTO categoryKPIsDTO=new CategoryKPIsDTO(BigInteger.valueOf(15),Arrays.asList(BigInteger.valueOf(29)));
         HttpEntity<CategoryKPIsDTO> requestBodyData=new HttpEntity<>(categoryKPIsDTO);
-        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/category", HttpMethod.POST, requestBodyData, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<List<KPIDTO>>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/category", HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -128,7 +130,7 @@ public class CounterDistIntegrationTest {
         String baseUrl = getBaseUrl(256l, 4l);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<BigInteger>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<BigInteger>>>() {
         };
-        ResponseEntity<RestTemplateResponseEnvelope<List<BigInteger>>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/module/1", HttpMethod.GET, null, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<List<BigInteger>>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/module/1", HttpMethod.GET, null, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -160,7 +162,7 @@ public class CounterDistIntegrationTest {
         };
         TabKPIEntryConfDTO tabKPIEntryConfDTO = new TabKPIEntryConfDTO(Arrays.asList("1"), Arrays.asList(BigInteger.valueOf(1)));
         HttpEntity<TabKPIEntryConfDTO> reqestBodyDate = new HttpEntity<>(tabKPIEntryConfDTO);
-        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/module/create_dist_entry", HttpMethod.POST, reqestBodyDate, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/module/create_dist_entry", HttpMethod.POST, reqestBodyDate, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -197,7 +199,7 @@ public class CounterDistIntegrationTest {
         List<TabKPIMappingDTO> tabKPIEntryConfDTO =new ArrayList<>();
         tabKPIEntryConfDTO.add(new TabKPIMappingDTO("1",BigInteger.valueOf(23), CounterSize.SIZE_2X2,new KPIPosition(1,4)));
         HttpEntity<List<TabKPIMappingDTO>> reqestBodyDate = new HttpEntity<>(tabKPIEntryConfDTO);
-        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/module/remove_dist_entry", HttpMethod.PUT, reqestBodyDate, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/module/remove_dist_entry", HttpMethod.PUT, reqestBodyDate, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -209,7 +211,7 @@ public class CounterDistIntegrationTest {
         List<TabKPIMappingDTO> tabKPIEntryConfDTO =new ArrayList<>();
         tabKPIEntryConfDTO.add(new TabKPIMappingDTO("1",BigInteger.valueOf(23), CounterSize.SIZE_2X2,new KPIPosition(1,4)));
         HttpEntity<List<TabKPIMappingDTO>> reqestBodyDate = new HttpEntity<>(tabKPIEntryConfDTO);
-        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/module/remove_dist_entry", HttpMethod.PUT, reqestBodyDate, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/module/remove_dist_entry", HttpMethod.PUT, reqestBodyDate, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -221,7 +223,7 @@ public class CounterDistIntegrationTest {
         List<TabKPIMappingDTO> tabKPIEntryConfDTO =new ArrayList<>();
         tabKPIEntryConfDTO.add(new TabKPIMappingDTO("1",BigInteger.valueOf(23), CounterSize.SIZE_2X2,new KPIPosition(1,4)));
         HttpEntity<List<TabKPIMappingDTO>> reqestBodyDate = new HttpEntity<>(tabKPIEntryConfDTO);
-        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/module/remove_dist_entry", HttpMethod.PUT, reqestBodyDate, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/module/remove_dist_entry", HttpMethod.PUT, reqestBodyDate, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -233,7 +235,7 @@ public class CounterDistIntegrationTest {
         };
         TabKPIMappingDTO tabKPIEntryConfDTO = new TabKPIMappingDTO("1", BigInteger.valueOf(1));
         HttpEntity<TabKPIMappingDTO> reqestBodyDate = new HttpEntity<>(tabKPIEntryConfDTO);
-        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/module/remove_dist_entry", HttpMethod.PUT, reqestBodyDate, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/module/remove_dist_entry", HttpMethod.PUT, reqestBodyDate, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -269,7 +271,7 @@ public class CounterDistIntegrationTest {
         String baseUrl = getBaseUrl(153l, 4l);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<BigInteger>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<BigInteger>>>() {
         };
-        ResponseEntity<RestTemplateResponseEnvelope<List<BigInteger>>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/org_type/345", HttpMethod.GET, null, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<List<BigInteger>>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/org_type/345", HttpMethod.GET, null, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -281,7 +283,7 @@ public class CounterDistIntegrationTest {
         };
         OrgTypeKPIConfDTO orgTypeKPIConfDTO = new OrgTypeKPIConfDTO(Arrays.asList(14108l), Arrays.asList(BigInteger.valueOf(1)));
         HttpEntity<OrgTypeKPIConfDTO> requestBodyDate = new HttpEntity<>(orgTypeKPIConfDTO);
-        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/org_type/create_dist_entry", HttpMethod.POST, requestBodyDate, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/org_type/create_dist_entry", HttpMethod.POST, requestBodyDate, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -293,7 +295,7 @@ public class CounterDistIntegrationTest {
         };
         OrgTypeMappingDTO orgTypeMappingDTO = new OrgTypeMappingDTO(345l, BigInteger.valueOf(26));
         HttpEntity<OrgTypeMappingDTO> requestBodyDate = new HttpEntity<>(orgTypeMappingDTO);
-        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/org_type/remove_dist_entry", HttpMethod.PUT, requestBodyDate, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/org_type/remove_dist_entry", HttpMethod.PUT, requestBodyDate, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -305,7 +307,7 @@ public class CounterDistIntegrationTest {
         String baseUrl = getBaseUrl(15l, 4l);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<BigInteger>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<BigInteger>>>() {
         };
-        ResponseEntity<RestTemplateResponseEnvelope<List<BigInteger>>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/access_group/82", HttpMethod.GET, null, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<List<BigInteger>>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/access_group/82", HttpMethod.GET, null, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -327,7 +329,7 @@ public class CounterDistIntegrationTest {
         };
         AccessGroupKPIConfDTO accessGroupKPIConfDTO = new AccessGroupKPIConfDTO(Arrays.asList(14108l), Arrays.asList(BigInteger.valueOf(1)));
         HttpEntity<AccessGroupKPIConfDTO> requestBodyDate = new HttpEntity<>(accessGroupKPIConfDTO);
-        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/access_group/create_dist_entry", HttpMethod.POST, requestBodyDate, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/access_group/create_dist_entry", HttpMethod.POST, requestBodyDate, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -351,7 +353,7 @@ public class CounterDistIntegrationTest {
         };
         AccessGroupMappingDTO accessGroupMappingDTO=new AccessGroupMappingDTO(83l,BigInteger.valueOf(25));
         HttpEntity<AccessGroupMappingDTO> requestBodyData=new HttpEntity<>(accessGroupMappingDTO);
-        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + "/counter/dist/access_group/remove_dist_entry", HttpMethod.PUT, requestBodyData, typeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<String>> response = testRestTemplate.exchange(baseUrl + COUNTER_DIST_URL+"/access_group/remove_dist_entry", HttpMethod.PUT, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }

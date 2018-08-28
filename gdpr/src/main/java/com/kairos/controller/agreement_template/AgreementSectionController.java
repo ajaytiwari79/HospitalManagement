@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 
 import java.math.BigInteger;
 
@@ -37,7 +38,7 @@ public class AgreementSectionController {
 
     @ApiOperation("add section to Agreement template ")
     @PostMapping(value = "/agreement_template/{templateId}/section")
-    public ResponseEntity<Object> createAgreementSection(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @RequestBody ValidateRequestBodyList<AgreementSectionDTO> agreementSection) {
+    public ResponseEntity<Object> createAgreementSection(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId,@Valid @RequestBody ValidateRequestBodyList<AgreementSectionDTO> agreementSection) {
 
         if (templateId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, " Agreement Template  id can't be null");

@@ -99,6 +99,8 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(organizationId, id);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", id);
+        } else if (!processingActivity.isActive()) {
+            exceptionService.invalidRequestException("message.processing.activity.inactive");
         }
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
             processingActivity.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(organizationId, processingActivityDTO.getSubProcessingActivities()));
@@ -259,14 +261,12 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *
      * @param unitId
      * @param processingActivityId processing activity id
-     * @param active  status of processing activity
+     * @param active               status of processing activity
      * @return
      */
-    public boolean changeStatusOfProcessingActivity(Long unitId, BigInteger processingActivityId,boolean active)
-    {
+    public boolean changeStatusOfProcessingActivity(Long unitId, BigInteger processingActivityId, boolean active) {
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
