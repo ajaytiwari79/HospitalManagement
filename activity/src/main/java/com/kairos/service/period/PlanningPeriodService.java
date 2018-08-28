@@ -383,21 +383,15 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         //If No change in date
 
-        LocalDateTime puzzleFlippingDateTime=(Optional.ofNullable(planningPeriodDTO.getRequestToPuzzleDate()).isPresent())?(getLocalDateTime(planningPeriodDTO.getRequestToPuzzleDate().getDate(),
-                planningPeriodDTO.getPuzzleToConstructionDate().getHours(),planningPeriodDTO.getPuzzleToConstructionDate().getMinutes())):null;
-        LocalDateTime constructionFlippingDate=(Optional.ofNullable(planningPeriodDTO.getPuzzleToConstructionDate()).isPresent())?getLocalDateTime(planningPeriodDTO.getPuzzleToConstructionDate().getDate(),
+        LocalDateTime puzzleFlippingDateTime=(Optional.ofNullable(planningPeriodDTO.getRequestToPuzzleDate()).isPresent())?DateUtils.getLocalDateTime(planningPeriodDTO.getRequestToPuzzleDate().getDate(),
                 planningPeriodDTO.getPuzzleToConstructionDate().getHours(),planningPeriodDTO.getPuzzleToConstructionDate().getMinutes()):null;
-        LocalDateTime draftFlippingDate=(Optional.ofNullable(planningPeriodDTO.getConstructionToDraftDate()).isPresent())?getLocalDateTime(planningPeriodDTO.getConstructionToDraftDate().getDate(),planningPeriodDTO.getConstructionToDraftDate().getHours(),
+        LocalDateTime constructionFlippingDate=(Optional.ofNullable(planningPeriodDTO.getPuzzleToConstructionDate()).isPresent())?DateUtils.getLocalDateTime(planningPeriodDTO.getPuzzleToConstructionDate().getDate(),
+                planningPeriodDTO.getPuzzleToConstructionDate().getHours(),planningPeriodDTO.getPuzzleToConstructionDate().getMinutes()):null;
+        LocalDateTime draftFlippingDate=(Optional.ofNullable(planningPeriodDTO.getConstructionToDraftDate()).isPresent())?DateUtils.getLocalDateTime(planningPeriodDTO.getConstructionToDraftDate().getDate(),planningPeriodDTO.getConstructionToDraftDate().getHours(),
                 planningPeriodDTO.getConstructionToDraftDate().getMinutes()):null;
-        if(Optional.ofNullable(draftFlippingDate).isPresent()&&Optional.ofNullable(constructionFlippingDate).isPresent()){
-            if(draftFlippingDate.isBefore(constructionFlippingDate)){
+        if(Optional.ofNullable(draftFlippingDate).isPresent() && Optional.ofNullable(constructionFlippingDate).isPresent() && draftFlippingDate.isBefore(constructionFlippingDate)
+                || Optional.ofNullable(constructionFlippingDate).isPresent() && Optional.ofNullable(puzzleFlippingDateTime).isPresent()&&constructionFlippingDate.isBefore(puzzleFlippingDateTime)){
                 exceptionService.actionNotPermittedException("message.period.invalid.flippingdate");
-            }
-        }
-        if(Optional.ofNullable(constructionFlippingDate).isPresent()&&Optional.ofNullable(puzzleFlippingDateTime).isPresent()){
-            if(constructionFlippingDate.isBefore(puzzleFlippingDateTime)){
-                exceptionService.actionNotPermittedException("message.period.invalid.flippingdate");
-            }
         }
         planningPeriod = updatePhaseFlippingDateOfPeriod(planningPeriod, planningPeriodDTO, unitId);
         planningPeriod.setName(planningPeriodDTO.getName());
@@ -405,10 +399,7 @@ public class PlanningPeriodService extends MongoBaseService {
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate());
     }
 
-    public LocalDateTime getLocalDateTime(LocalDate localDate,int hours,int minutes){
-        return LocalDateTime.of(localDate,LocalTime.of(hours,minutes));
-    }
-    // To delete planning period\
+    // To delete planning period
 
     public boolean deletePlanningPeriod(Long unitId, BigInteger periodId) {
 
