@@ -419,9 +419,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<PaidAndUnPaidActivities> getAllWorkingAndNonWorkingTypeActivities(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
-                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
-                        "test"),
-                group("$test.timeTypes").push(new BasicDBObject("id","$_id").append("name","$name").append("_id","$_id")).as("activities")
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                group("$timeType.timeTypes").push(new BasicDBObject("id","$_id").append("name","$name")).as("activities")
         );
         AggregationResults<PaidAndUnPaidActivities> result = mongoTemplate.aggregate(aggregation, Activity.class, PaidAndUnPaidActivities.class);
         return result.getMappedResults();
