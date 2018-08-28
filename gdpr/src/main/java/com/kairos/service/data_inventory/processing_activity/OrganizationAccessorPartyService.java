@@ -6,8 +6,10 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
+import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
@@ -35,6 +37,10 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
     @Inject
     private AccessorPartyService accessorPartyService;
 
+
+    @Inject
+    private ProcessingActivityMongoRepository processingActivityMongoRepository;
+
     /**
      * @param organizationId
      * @param accessorPartyDTOS
@@ -61,7 +67,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
                     newAccessorParty.setOrganizationId(organizationId);
                     newAccessorPartyList.add(newAccessorParty);
                 }
-                newAccessorPartyList = accessorPartyMongoRepository.saveAll(newAccessorPartyList);
+                newAccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(newAccessorPartyList));
             }
             result.put(EXISTING_DATA_LIST, existing);
             result.put(NEW_DATA_LIST, newAccessorPartyList);
@@ -94,16 +100,20 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
     }
 
 
-    public Boolean deleteAccessorParty(Long organizationId, BigInteger id) {
+    public Boolean deleteAccessorParty(Long unitId, BigInteger accessorPartyId) {
 
-        AccessorParty accessorParty = accessorPartyMongoRepository.findOrganizationIdAndIdAndNonDeleted(organizationId, id);
-        if (!Optional.ofNullable(accessorParty).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(accessorParty);
-            return true;
-
+        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithAccesorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
+        if (!processingActivitiesLinkedWithAccesorParty.isEmpty()) {
+            StringBuilder processingActivityNames=new StringBuilder();
+            processingActivitiesLinkedWithAccesorParty.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", processingActivityNames);
         }
+        AccessorParty accessorParty = accessorPartyMongoRepository.findOrganizationIdAndIdAndNonDeleted(unitId, accessorPartyId);
+        if (!Optional.ofNullable(accessorParty).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", accessorPartyId);
+        }
+        delete(accessorParty);
+        return true;
     }
 
     /**
@@ -121,7 +131,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
             if (id.equals(accessorParty.getId())) {
                 return accessorPartyDTO;
             }
-            throw new DuplicateDataException("Name Already Exist");
+            exceptionService.duplicateDataException("message.duplicate", "Accessor Party", accessorParty.getName());
         }
         accessorParty = accessorPartyMongoRepository.findByid(id);
         if (!Optional.ofNullable(accessorParty).isPresent()) {
@@ -133,28 +143,6 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
 
     }
-
-    /**
-     * @param organizationId
-     * @param name           name of AccessorParty
-     * @return AccessorParty object fetch on basis of  name
-     * @throws DataNotExists throw exception if AccessorParty exist for given name
-     */
-    public AccessorParty getAccessorPartyByName(Long organizationId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            AccessorParty exist = accessorPartyMongoRepository.findByNameAndOrganizationId(organizationId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
-
 
     public Map<String, List<AccessorParty>> saveAndSuggestAccessorParties(Long countryId, Long organizationId, List<AccessorPartyDTO> AccessorPartyDTOS) {
 

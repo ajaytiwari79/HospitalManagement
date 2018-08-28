@@ -9,6 +9,7 @@ import com.kairos.persistance.repository.data_inventory.asset.AssetMongoReposito
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
+import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
@@ -22,6 +23,8 @@ import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
+
+import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -96,6 +99,8 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(organizationId, id);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", id);
+        } else if (!processingActivity.isActive()) {
+            exceptionService.invalidRequestException("message.processing.activity.inactive");
         }
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
             processingActivity.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(organizationId, processingActivityDTO.getSubProcessingActivities()));
@@ -125,8 +130,11 @@ public class ProcessingActivityService extends MongoBaseService {
             processingActivity.setSubProcess(true);
             subProcessingActivities.add(processingActivity);
         }
-        subProcessingActivities = processingActivityMongoRepository.saveAll(subProcessingActivities);
-        subProcessingActivities.forEach(processingActivity -> subProcessingActivityIdList.add(processingActivity.getId()));
+        subProcessingActivities = processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
+        subProcessingActivities.forEach(processingActivity -> {
+
+            subProcessingActivityIdList.add(processingActivity.getId());
+        });
         return subProcessingActivityIdList;
 
     }
@@ -194,7 +202,7 @@ public class ProcessingActivityService extends MongoBaseService {
             processingActivity.setResponsibilityType(processingActivityDTO.getResponsibilityType());
 
         });
-        processingActivityMongoRepository.saveAll(subProcessingActivities);
+        processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
 
     }
 
@@ -253,14 +261,12 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *
      * @param unitId
      * @param processingActivityId processing activity id
-     * @param active  status of processing activity
+     * @param active               status of processing activity
      * @return
      */
-    public boolean changeStatusOfProcessingActivity(Long unitId, BigInteger processingActivityId,boolean active)
-    {
+    public boolean changeStatusOfProcessingActivity(Long unitId, BigInteger processingActivityId, boolean active) {
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
@@ -292,7 +298,7 @@ public class ProcessingActivityService extends MongoBaseService {
      * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
      */
     public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsAndWithSubProcess(Long unitId) {
-        return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubProcessingActivities(unitId);
+        return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubprocessingActivities(unitId);
     }
 
 

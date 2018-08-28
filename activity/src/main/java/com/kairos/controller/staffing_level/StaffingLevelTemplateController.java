@@ -33,8 +33,8 @@ public class StaffingLevelTemplateController {
     @PostMapping(value = "/")
     @ApiOperation("Create staffing level template ")
     public ResponseEntity<Map<String, Object>> addStaffingLevelTemplate(
-            @RequestBody @Valid StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
-         staffingLevelTemplateDTO=staffingLevelTemplateService.createStaffingLevelTemplate(staffingLevelTemplateDTO);
+           @PathVariable Long unitId, @RequestBody @Valid StaffingLevelTemplateDTO staffingLevelTemplateDTO) {
+         staffingLevelTemplateDTO=staffingLevelTemplateService.createStaffingLevelTemplate(unitId,staffingLevelTemplateDTO);
         if(!staffingLevelTemplateDTO.getErrors().isEmpty()){
             return ResponseHandler.invalidResponse(HttpStatus.PRECONDITION_REQUIRED, false, staffingLevelTemplateDTO.getErrors());
         }
@@ -64,7 +64,7 @@ public class StaffingLevelTemplateController {
     @DeleteMapping(value = "/{staffingLevelTemplateId}")
     @ApiOperation("delete staffing_level template ")
     public ResponseEntity<Map<String, Object>> deleteStaffingLevelTemplate(@PathVariable BigInteger staffingLevelTemplateId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+        return ResponseHandler.generateResponse(HttpStatus.NO_CONTENT, true,
                 staffingLevelTemplateService.deleteStaffingLevelTemplate(staffingLevelTemplateId));
 
     }

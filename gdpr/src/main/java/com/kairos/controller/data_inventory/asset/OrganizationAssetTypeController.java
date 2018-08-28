@@ -11,9 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
 
 @RestController
@@ -64,14 +66,24 @@ public class OrganizationAssetTypeController {
     }
 
 
-    @ApiOperation("get AssetType by name")
-    @GetMapping("/asset_type/name")
-    public ResponseEntity<Object> getAssetTypeByName(@PathVariable Long unitId, @RequestParam String name) {
+    @ApiOperation("delete Asset Type by Id")
+    @DeleteMapping("/asset_type/{assetTypeId}")
+    public ResponseEntity<Object> deleteAssetTypeById(@PathVariable Long unitId, @PathVariable BigInteger assetTypeId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAssetTypeByName(unitId, name));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.deleteAssetTypeById(unitId, assetTypeId));
+
+    }
+
+
+    @ApiOperation("delete Asset Sub type by Id")
+    @DeleteMapping("/asset_type/{assetTypeId}/sub_asset_type/{subAssetTypeId}")
+    public ResponseEntity<Object> deleteAssetSubTypeById(@PathVariable Long unitId, @PathVariable BigInteger assetTypeId, @PathVariable BigInteger subAssetTypeId) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.deleteAssetSubTypeById(unitId, assetTypeId, subAssetTypeId));
 
     }
 
@@ -88,8 +100,6 @@ public class OrganizationAssetTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(unitId, id, assetType));
 
     }
-
-
 
 
 }

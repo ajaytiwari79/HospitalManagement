@@ -58,7 +58,7 @@ public class TemplateTypeService extends MongoBaseService {
                 templateType1.setCountryId(countryId);
                 newDataTemplateList.add(templateType1);
             }
-            newDataTemplateList = templateTypeRepository.saveAll(newDataTemplateList);
+            newDataTemplateList = templateTypeRepository.saveAll(getNextSequence(newDataTemplateList));
         }
         result.put(EXISTING_DATA_LIST, existing);
         result.put(NEW_DATA_LIST, newDataTemplateList);
@@ -94,7 +94,9 @@ public class TemplateTypeService extends MongoBaseService {
     public List<TemplateType> getTemplateByIdsList(List<BigInteger> templateIds, Long countryId) {
         List<TemplateType> templates = templateTypeRepository.findTemplateTypeByIdsList(countryId, templateIds);
         List<BigInteger> ids = new ArrayList<>();
-        templates.forEach(templateType -> ids.add(templateType.getId()));
+        templates.forEach(templateType -> {
+            ids.add(templateType.getId());
+        });
         templateIds.removeAll(ids);
         if (!templateIds.isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Template type", templateIds.get(0));

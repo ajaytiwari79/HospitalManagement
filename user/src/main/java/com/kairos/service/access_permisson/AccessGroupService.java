@@ -622,7 +622,7 @@ public class AccessGroupService {
     }
 
     /**
-     * @param accounttypeId
+     * @param accountTypeId
      * @return
      * @author vipul
      * @Desc This api is used to fetch all access group by account type id in country.

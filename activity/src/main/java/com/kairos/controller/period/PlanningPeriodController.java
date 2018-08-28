@@ -46,6 +46,11 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPlanningPeriods(unitId, null, null));
     }
 
+    @ApiOperation(value = "Get Planning Period with phase for self roastering")
+    @GetMapping(value="/period_of_interval")
+    public ResponseEntity<Map<String, Object>> getPlanningPeriodOfInterval(@PathVariable Long unitId, @RequestParam(required = true, value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam(required = true, value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPeriodOfInterval(unitId, startDate,endDate));
+    }
 
     @ApiOperation(value = "update period by unit Id and Period Id")
     @PutMapping(value = "/period/{periodId}")

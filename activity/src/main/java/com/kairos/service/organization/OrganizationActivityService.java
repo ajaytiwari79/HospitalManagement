@@ -4,6 +4,8 @@ import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.activity.activity.activity_tabs.GeneralActivityTabDTO;
 import com.kairos.activity.activity.activity_tabs.PermissionsActivityTabDTO;
+import com.kairos.activity.counter.CounterDTO;
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
@@ -19,6 +21,7 @@ import com.kairos.persistence.model.open_shift.OrderAndActivityDTO;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
@@ -107,6 +110,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private TimeAttendanceGracePeriodService timeAttendanceGracePeriodService;
     @Inject
     private PriorityGroupService priorityGroupService;
+    @Inject private CounterRepository counterRepository;
+
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         Activity activityCopied;
@@ -312,7 +317,8 @@ public class OrganizationActivityService extends MongoBaseService {
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
         UnitSettingDTO minOpenShiftHours = unitSettingRepository.getMinOpenShiftHours(unitId);
-        ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours());
+        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
+        ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours(),counters);
         return activityWithTimeTypeDTO;
     }
 
