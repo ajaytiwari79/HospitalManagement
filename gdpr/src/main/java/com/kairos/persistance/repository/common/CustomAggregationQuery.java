@@ -176,7 +176,7 @@ public class CustomAggregationQuery {
                 "  'dataRetentionPeriod':1," +
                 "  'minDataSubjectVolume':1," +
                 "  'maxDataSubjectVolume':1," +
-                "  'isActive':1," +
+                "  'active':1," +
 
                 "            }}";
     }
