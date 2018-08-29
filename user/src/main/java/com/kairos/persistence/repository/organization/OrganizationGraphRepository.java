@@ -476,8 +476,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "optional Match (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) with municipality,zipCode,contactAddress,organization \n" +
             "return id(organization) as organizationId,id(contactAddress) as id,contactAddress.houseNumber as houseNumber,contactAddress.floorNumber as floorNumber," +
             "contactAddress.city as city,id(zipCode) as zipCodeId,contactAddress.regionName as regionName,contactAddress.province as province," +
-            "contactAddress.municipalityName as municipalityName,contactAddress.isAddressProtected as isAddressProtected,contactAddress.longitude as longitude," +
-            "contactAddress.latitude as latitude,contactAddress.street as street,id(municipality) as municipalityId")
+            " contactAddress.isAddressProtected as isAddressProtected,contactAddress.longitude as longitude," +
+            "contactAddress.latitude as latitude,contactAddress.street as street,id(municipality) as municipalityId,municipality.name as municipalityName")
     List<Map<String, Object>> getContactAddressOfParentOrganization(List<Long> unitId);
 
     @Query("Match (unit:Organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) where id(unit)={0} \n" +
@@ -704,10 +704,11 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     List<OrganizationContactAddress> getContactAddressOfOrganizations(List<Long> unitIds);
 
 
-    @Query("Match (child:Organization) \n" +
-            "OPTIONAL MATCH (child)<-[:"+HAS_SUB_ORGANIZATION+"]-(parent:Organization) with child " +
-            "OPTIONAL Match (child)-[rel:"+HAS_ACCOUNT_TYPE+"]->(accountType:AccountType) " +
-            "with child detach delete rel " +
-            "MERGE (child)-[:"+HAS_ACCOUNT_TYPE+"]->(accountType:AccountType) where id(accountType)={0}")
-    void updateAccountTypeOfChildOrganization(Long accountTypeId);
+    @Query("Match (parent:Organization) where id(parent)={0} \n" +
+            "OPTIONAL MATCH (parent)-[:HAS_SUB_ORGANIZATION]->(child:Organization) with child\n" +
+            "OPTIONAL Match (child)-[rel:HAS_ACCOUNT_TYPE]->(accountType:AccountType) \n" +
+            " detach delete rel \n" +
+            "with child match(accountType:AccountType) where id(accountType)={1}\n" +
+            "MERGE (child)-[:HAS_ACCOUNT_TYPE]->(accountType)")
+    void updateAccountTypeOfChildOrganization(Long parentOrganization,Long accountTypeId);
 }
