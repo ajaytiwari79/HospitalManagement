@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
 import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.counter.CounterDTO;
 import com.kairos.activity.open_shift.OrderResponseDTO;
 import com.kairos.activity.presence_type.PresenceTypeDTO;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
@@ -23,13 +24,15 @@ public class OrderDefaultDataWrapper {
     private List<ReasonCodeResponseDTO> reasonCodes;
     private List<com.kairos.persistence.model.country.DayType> dayTypes;
     private Integer minOpenShiftHours;
+    private List<CounterDTO> counters;
 
     public OrderDefaultDataWrapper() {
         //Default Constructor
     }
 
     public OrderDefaultDataWrapper(List<OrderResponseDTO> orders, List<ActivityDTO> activities, List<Skill> skills, List<Expertise> expertise, List<StaffPersonalDetailDTO> staffList,
-                                   List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes, List<com.kairos.persistence.model.country.DayType> dayTypes, Integer minOpenShiftHours) {
+                                   List<PresenceTypeDTO> plannedTime, List<FunctionDTO> functions, List<ReasonCodeResponseDTO> reasonCodes,
+                                   List<com.kairos.persistence.model.country.DayType> dayTypes, Integer minOpenShiftHours,List<CounterDTO> counters) {
         this.orders = orders;
         this.activities = activities;
         this.skills = skills;
@@ -41,6 +44,7 @@ public class OrderDefaultDataWrapper {
         this.reasonCodes = reasonCodes;
         this.dayTypes = dayTypes;
         this.minOpenShiftHours=minOpenShiftHours;
+        this.counters=counters;
     }
 
     public List<OrderResponseDTO> getOrders() {
@@ -129,5 +133,13 @@ public class OrderDefaultDataWrapper {
 
     public void setMinOpenShiftHours(Integer minOpenShiftHours) {
         this.minOpenShiftHours = minOpenShiftHours;
+    }
+
+    public List<CounterDTO> getCounters() {
+        return counters;
+    }
+
+    public void setCounters(List<CounterDTO> counters) {
+        this.counters = counters;
     }
 }
