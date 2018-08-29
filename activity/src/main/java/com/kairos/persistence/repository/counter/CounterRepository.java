@@ -176,8 +176,8 @@ public class CounterRepository {
         return aggregationResults.getMappedResults();
     };
 
-    public List<TabKPIConf> findTabKPIConfigurationByTabIds(List<BigInteger> ids){
-        Query query=new Query(Criteria.where("_id").in(ids));
+    public List<TabKPIConf> findTabKPIConfigurationByTabIds(List<String> tabIds,Long staffId,ConfLevel level){
+        Query query=new Query(Criteria.where("tabId").in(tabIds).and("staffId").is(staffId).and("level").is(level));
         return mongoTemplate.find(query,TabKPIConf.class);
     }
 

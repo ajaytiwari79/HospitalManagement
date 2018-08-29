@@ -114,18 +114,16 @@ public class CounterDistService extends MongoBaseService {
         return tabKPIDTOS;
     }
 
-    public List<TabKPIDTO> addTabKPIEntriesOfStaff(List<TabKPIMappingDTO> tabKPIMappingDTOS,Long staffId,ConfLevel level){
+    public List<TabKPIDTO> addTabKPIEntriesOfStaff(List<TabKPIMappingDTO> tabKPIMappingDTOS,Long unitId,Long staffId,ConfLevel level){
+        Long staffId1=genericIntegrationService.getStaffIdByUserId(unitId);
         List<TabKPIConf> entriesToSave = new ArrayList<>();
         Map<BigInteger,KPIPosition> kpiPositionMap=new HashMap<>();
-        tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
-            kpiPositionMap.put(tabKPIMappingDTO.getKpiId(),tabKPIMappingDTO.getKpiPosition());
-        });
         List<String> tabIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getTabId()).collect(toList());
         List<BigInteger> kpiIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(toList());
-        entriesToSave=setTabKPIEntries(tabIds,kpiIds,entriesToSave,null,null,staffId,level);
-        entriesToSave.stream().forEach(tabKPIConf -> {
-            if(kpiPositionMap.get(tabKPIConf.getKpiId())!=null){
-                tabKPIConf.setKpiPosition(kpiPositionMap.get(tabKPIConf.getKpiId()));
+        Map<String, Map<BigInteger, BigInteger>> tabKpiMap=setTabKPIEntries(tabIds,kpiIds,entriesToSave,null,null,staffId,level);
+        tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
+            if(tabKpiMap.get(tabKPIMappingDTO.getTabId()).get(tabKPIMappingDTO.getKpiId())==null){
+                entriesToSave.add(new TabKPIConf(tabKPIMappingDTO.getTabId(),tabKPIMappingDTO.getKpiId(),null,null,staffId,level,tabKPIMappingDTO.getKpiPosition()));
             }
         });
         if (entriesToSave.isEmpty()) {
@@ -137,13 +135,18 @@ public class CounterDistService extends MongoBaseService {
 
     public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries,Long countryId,Long unitId,Long staffId, ConfLevel level) {
         List<TabKPIConf> entriesToSave = new ArrayList<>();
-        entriesToSave=setTabKPIEntries(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),entriesToSave,countryId,unitId,staffId,level);
+        Map<String, Map<BigInteger, BigInteger>> tabKpiMap=setTabKPIEntries(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),entriesToSave,countryId,unitId,staffId,level);
+        tabKPIEntries.getTabIds().forEach(tabId->{tabKPIEntries.getKpiIds().forEach(kpiId->{
+            if(tabKpiMap.get(tabId).get(kpiId)==null){
+                entriesToSave.add(new TabKPIConf(tabId,kpiId,countryId,unitId,staffId,level,null));
+            }
+        });});
         if (entriesToSave.isEmpty()) {
             exceptionService.invalidRequestException("error.kpi.invalidData");
         }
         save(entriesToSave);
     }
-    public List<TabKPIConf> setTabKPIEntries(List<String> tabIds,List<BigInteger> kpiIds,List<TabKPIConf> entriesToSave,Long countryId,Long unitId,Long staffId, ConfLevel level){
+    public Map<String, Map<BigInteger, BigInteger>> setTabKPIEntries(List<String> tabIds,List<BigInteger> kpiIds,List<TabKPIConf> entriesToSave,Long countryId,Long unitId,Long staffId, ConfLevel level){
         Long refId = ConfLevel.COUNTRY.equals(level) ? countryId : unitId;
         if(ConfLevel.STAFF.equals(level)){
             refId=staffId;
@@ -160,16 +163,12 @@ public class CounterDistService extends MongoBaseService {
         tabKPIMappingDTOS.forEach(tabKPIMappingDTO -> {
             tabKpiMap.get(tabKPIMappingDTO.getTabId()).put(tabKPIMappingDTO.getKpiId(), tabKPIMappingDTO.getKpiId());
         });
-        tabIds.forEach(tabId->{kpiIds.forEach(kpiId->{
-            if(tabKpiMap.get(tabId).get(kpiId)==null){
-                entriesToSave.add(new TabKPIConf(tabId,kpiId,countryId,unitId,staffId,level));
-            }
-        });});
-        return  entriesToSave;
+        return  tabKpiMap;
     }
-    public void updateTabKPIEntries(List<TabKPIMappingDTO> tabKPIMappingDTOS, Long countryId, Long unitId, Long staffId, ConfLevel level) {
-        List<BigInteger> tabIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getId()).collect(toList());
-        List<TabKPIConf> tabKPIConfs=counterRepository.findTabKPIConfigurationByTabIds(tabIds);
+    public void updateTabKPIEntries(List<TabKPIMappingDTO> tabKPIMappingDTOS,Long unitId,Long staffId, ConfLevel level) {
+        //Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
+        List<String> tabIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getTabId()).collect(toList());
+        List<TabKPIConf> tabKPIConfs=counterRepository.findTabKPIConfigurationByTabIds(tabIds,staffId,level);
         Map<BigInteger,TabKPIMappingDTO> tabKPIMappingDTOMap=new HashMap<>();
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
             tabKPIMappingDTOMap.put(tabKPIMappingDTO.getId(),tabKPIMappingDTO);
@@ -177,13 +176,15 @@ public class CounterDistService extends MongoBaseService {
         tabKPIConfs.stream().forEach(tabKPIConf -> {
            TabKPIMappingDTO tabKPIMappingDTO=tabKPIMappingDTOMap.get(tabKPIConf.getId());
            tabKPIConf.setKpiPosition(tabKPIMappingDTO.getKpiPosition());
-           tabKPIConf.setCounterSize(tabKPIMappingDTO.getCounterSize());
         });
         save(tabKPIConfs);
     }
 
 
     public void removeTabKPIEntries(TabKPIMappingDTO tabKPIMappingDTO,Long refId,ConfLevel level) {
+        if(ConfLevel.STAFF.equals(level)){
+            refId=genericIntegrationService.getStaffIdByUserId(refId);
+        }
        counterRepository.removeTabKPIConfiguration(tabKPIMappingDTO,refId,level);
     }
 
@@ -344,7 +345,7 @@ public class CounterDistService extends MongoBaseService {
         if(!tabKPIConf.isEmpty()){
             defaultKPISettingDTO.getStaffIds().forEach(staffId -> {
                 tabKPIConf.stream().forEach(tabKPIConfKPI -> {
-                    tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, null, staffId, ConfLevel.STAFF));
+                    tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, null, staffId, ConfLevel.STAFF,tabKPIConfKPI.getKpiPosition()));
                 });
             });
         }
@@ -379,7 +380,7 @@ public class CounterDistService extends MongoBaseService {
         });
         List<TabKPIConf> tabKPIConf=counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds,refId,level);
         tabKPIConf.stream().forEach(tabKPIConfKPI->{
-            tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(),tabKPIConfKPI.getKpiId(),null,unitId,null,ConfLevel.UNIT));
+            tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(),tabKPIConfKPI.getKpiId(),null,unitId,null,ConfLevel.UNIT,null));
         });
           List<KPICategoryDTO> kpiCategoryDTOS = counterRepository.getKPICategory(null, level, refId);
            Map<String,BigInteger> categoriesNameMap=new HashMap<>();

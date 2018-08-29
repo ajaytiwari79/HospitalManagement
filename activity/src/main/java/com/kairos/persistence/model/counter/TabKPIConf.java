@@ -21,25 +21,16 @@ public class TabKPIConf extends MongoBaseEntity {
 
     }
 
-    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level,KPIPosition kpiPosition) {
         this.tabId = tabId;
         this.kpiId = kpiId;
         this.countryId = countryId;
         this.unitId = unitId;
         this.staffId = staffId;
         this.level = level;
+        this.kpiPosition=kpiPosition;
     }
 
-    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, CounterSize counterSize, KPIPosition kpiPosition) {
-        this.tabId = tabId;
-        this.kpiId = kpiId;
-        this.countryId = countryId;
-        this.unitId = unitId;
-        this.staffId = staffId;
-        this.level = level;
-        this.counterSize = counterSize;
-        this.kpiPosition = kpiPosition;
-    }
 
     public String getTabId() {
         return tabId;
