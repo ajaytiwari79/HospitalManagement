@@ -5,8 +5,10 @@ package com.kairos.service.shift;
  */
 
 import com.kairos.activity.shift.ActivityAndShiftStatusSettingsDTO;
+import com.kairos.activity.shift.ActivityAndShiftStatusWrapper;
 import com.kairos.persistence.model.shift.ActivityAndShiftStatusSettings;
 import com.kairos.persistence.repository.shift.ActivityAndShiftStatusSettingsRepository;
+import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class ActivityAndShiftStatusSettingsService {
+public class ActivityAndShiftStatusSettingsService extends MongoBaseService {
 
     @Inject
     private ActivityAndShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
@@ -29,7 +31,7 @@ public class ActivityAndShiftStatusSettingsService {
     public ActivityAndShiftStatusSettingsDTO addActivityAndShiftStatusSettings(Long countryId,ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
         ActivityAndShiftStatusSettings activityAndShiftStatusSettings=ObjectMapperUtils.copyPropertiesByMapper(activityAndShiftStatusSettingsDTO,ActivityAndShiftStatusSettings.class);
         activityAndShiftStatusSettings.setCountryId(countryId);
-        activityAndShiftStatusSettingsRepository.save(activityAndShiftStatusSettings);
+        save(activityAndShiftStatusSettings);
         activityAndShiftStatusSettingsDTO.setId(activityAndShiftStatusSettings.getId());
         return activityAndShiftStatusSettingsDTO;
     }
@@ -44,13 +46,17 @@ public class ActivityAndShiftStatusSettingsService {
             exceptionService.dataNotFoundException("",id);
         }
         ObjectMapperUtils.copyProperties(activityAndShiftStatusSettingsDTO,activityAndShiftStatusSettings);
-        activityAndShiftStatusSettingsRepository.save(activityAndShiftStatusSettings.get());
+        save(activityAndShiftStatusSettings.get());
         return activityAndShiftStatusSettingsDTO;
 
     }
 
     public boolean deleteActivityAndShiftStatusSettings(BigInteger id){
         return true;
+    }
+
+    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long countryId){
+          return activityAndShiftStatusSettingsRepository.getActivityAndShiftStatusSettingsGroupedByStatus(countryId);
     }
 
 

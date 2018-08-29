@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import java.math.BigInteger;
 import java.util.Set;
 
-@CompoundIndex(name = "phase_shiftStatus",def = "{'phaseId' : 1, 'shiftStatus': 1}")
+@CompoundIndex(name = "phase_shiftStatus",def = "{'phaseId','shiftStatus'}",unique = true)
 public class ActivityAndShiftStatusSettings extends MongoBaseEntity {
     private BigInteger activityId;
     private BigInteger phaseId;

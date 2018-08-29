@@ -13,7 +13,7 @@ import java.util.List;
  *
  */
 @Repository
-public interface ActivityAndShiftStatusSettingsRepository extends MongoBaseRepository<ActivityAndShiftStatusSettings,BigInteger> {
+public interface ActivityAndShiftStatusSettingsRepository extends MongoBaseRepository<ActivityAndShiftStatusSettings,BigInteger> ,CustomActivityAndShiftStatusSettingsRepository {
 
     List<ActivityAndShiftStatusSettingsDTO> findAllByCountryIdAndDeletedFalse(Long countryId);
 }

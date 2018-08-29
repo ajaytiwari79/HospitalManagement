@@ -32,36 +32,36 @@ public class ActivityAndShiftStatusSettingsController {
 
     @PostMapping(value = COUNTRY_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL)
     @ApiOperation("create Activity and shift status setting")
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> addActivityAndShiftStatusSetting(@PathVariable Long countryId, @Valid @RequestBody ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.addActivityAndShiftStatusSettings(countryId,activityAndShiftStatusSettingsDTO));
     }
 
     @GetMapping(value = COUNTRY_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL)
     @ApiOperation("get All Activity and shift status setting")
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> getAllActivityAndShiftStatusSettings(@PathVariable Long countryId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.getAllActivityAndShiftStatusSettings(countryId))
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.getAllActivityAndShiftStatusSettings(countryId));
     }
 
     @PutMapping(value = COUNTRY_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL+"/{id}")
     @ApiOperation("update Activity and shift status setting")
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> updateActivityAndShiftStatusSettings(@PathVariable BigInteger id,@PathVariable Long countryId,@RequestBody ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.updateActivityAndShiftStatusSettings(id,countryId,activityAndShiftStatusSettingsDTO));
     }
 
     @DeleteMapping(value = COUNTRY_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL+"/{id}")
     @ApiOperation("delete Activity and shift status setting")
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> deleteActivityAndShiftStatusSettings(@PathVariable BigInteger id){
         return ResponseHandler.generateResponse(HttpStatus.NO_CONTENT,true,activityAndShiftStatusSettingsService.deleteActivityAndShiftStatusSettings(id));
     }
 
-    @GetMapping(value = COUNTRY_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL)
+    @GetMapping(value = COUNTRY_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL+"/group_by_status")
     @ApiOperation("get All Activity and shift status setting group by status")
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> getActivityAndShiftStatusSettingsGroupByStatus(@PathVariable Long countryId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupByStatus(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupedByStatus(countryId));
     }
 }
