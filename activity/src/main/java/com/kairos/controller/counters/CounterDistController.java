@@ -91,9 +91,9 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(tabId, unitId, ConfLevel.UNIT));
     }
 
-    @GetMapping(STAFF_URL+COUNTER_DIST_URL+"/tab/{tabId}")
-    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long staffId, @PathVariable String tabId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(tabId,staffId, ConfLevel.STAFF));
+    @GetMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/{tabId}")
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long staffId,@PathVariable Long unitId, @PathVariable String tabId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConfForStaff(tabId,staffId, ConfLevel.STAFF));
     }
 
     @PostMapping(COUNTRY_URL+COUNTER_DIST_URL+"/tab/create_dist_entry")
@@ -109,9 +109,8 @@ public class CounterDistController {
     }
 
     @PostMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/create_dist_entry")
-    public ResponseEntity<Map<String, Object>> addTabKPIsEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody TabKPIEntryConfDTO tabKPIEntry){
-        counterManagementService.addTabKPIEntries(tabKPIEntry,null,unitId,staffId,ConfLevel.STAFF);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    public ResponseEntity<Map<String, Object>> addTabKPIsEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,counterManagementService.addTabKPIEntriesOfStaff(tabKPIMappingDTOS,staffId,ConfLevel.STAFF));
     }
 
     @PutMapping(COUNTRY_URL+COUNTER_DIST_URL+"/tab/update_dist_entry")

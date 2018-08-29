@@ -14,6 +14,8 @@ import com.kairos.activity.counter.distribution.category.InitialKPICategoryDistD
 import com.kairos.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
+import com.kairos.activity.counter.distribution.tab.KPIPosition;
+import com.kairos.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.activity.counter.enums.ConfLevel;
@@ -107,36 +109,64 @@ public class CounterDistService extends MongoBaseService {
         return tabKPIMappingDTOS.stream().map(tabKPIMappingDTO ->tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
     }
 
+    public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId,Long refId, ConfLevel level){
+        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(Arrays.asList(moduleId),new ArrayList<>(),refId,level);
+        return tabKPIDTOS;
+    }
+
+    public List<TabKPIDTO> addTabKPIEntriesOfStaff(List<TabKPIMappingDTO> tabKPIMappingDTOS,Long staffId,ConfLevel level){
+        List<TabKPIConf> entriesToSave = new ArrayList<>();
+        Map<BigInteger,KPIPosition> kpiPositionMap=new HashMap<>();
+        tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
+            kpiPositionMap.put(tabKPIMappingDTO.getKpiId(),tabKPIMappingDTO.getKpiPosition());
+        });
+        List<String> tabIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getTabId()).collect(toList());
+        List<BigInteger> kpiIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(toList());
+        entriesToSave=setTabKPIEntries(tabIds,kpiIds,entriesToSave,null,null,staffId,level);
+        entriesToSave.stream().forEach(tabKPIConf -> {
+            if(kpiPositionMap.get(tabKPIConf.getKpiId())!=null){
+                tabKPIConf.setKpiPosition(kpiPositionMap.get(tabKPIConf.getKpiId()));
+            }
+        });
+        if (entriesToSave.isEmpty()) {
+            exceptionService.invalidRequestException("error.kpi.invalidData");
+        }
+        save(entriesToSave);
+        return counterRepository.getTabKPIForStaffByTabAndStaffId(tabIds,kpiIds,staffId,level);
+    }
 
     public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries,Long countryId,Long unitId,Long staffId, ConfLevel level) {
-        Long refId = ConfLevel.COUNTRY.equals(level) ? countryId : unitId;
-        if(ConfLevel.STAFF.equals(level)){
-            refId=staffId;
-        }
-        List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),refId,level);
-       List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(tabKPIEntries.getKpiIds(),refId,level);
-        if (tabKPIEntries.getKpiIds().size() != applicableKPIS.size()) {
-            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
-        }
-        Map<String, Map<BigInteger, BigInteger>> tabKpiMap = new HashMap<>();
         List<TabKPIConf> entriesToSave = new ArrayList<>();
-        tabKPIEntries.getTabIds().forEach(tabKpiId -> {
-            tabKpiMap.put(tabKpiId, new HashMap<BigInteger, BigInteger>());
-        });
-        tabKPIMappingDTOS.forEach(tabKPIMappingDTO -> {
-            tabKpiMap.get(tabKPIMappingDTO.getTabId()).put(tabKPIMappingDTO.getKpiId(), tabKPIMappingDTO.getKpiId());
-        });
-      tabKPIEntries.getTabIds().forEach(tabId->{tabKPIEntries.getKpiIds().forEach(kpiId->{
-          if(tabKpiMap.get(tabId).get(kpiId)==null){
-              entriesToSave.add(new TabKPIConf(tabId,kpiId,countryId,unitId,staffId,level));
-          }
-      });});
+        entriesToSave=setTabKPIEntries(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),entriesToSave,countryId,unitId,staffId,level);
         if (entriesToSave.isEmpty()) {
             exceptionService.invalidRequestException("error.kpi.invalidData");
         }
         save(entriesToSave);
     }
-
+    public List<TabKPIConf> setTabKPIEntries(List<String> tabIds,List<BigInteger> kpiIds,List<TabKPIConf> entriesToSave,Long countryId,Long unitId,Long staffId, ConfLevel level){
+        Long refId = ConfLevel.COUNTRY.equals(level) ? countryId : unitId;
+        if(ConfLevel.STAFF.equals(level)){
+            refId=staffId;
+        }
+        List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabIds,kpiIds,refId,level);
+        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(kpiIds,refId,level);
+        if (kpiIds.size() != applicableKPIS.size()) {
+            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
+        }
+        Map<String, Map<BigInteger, BigInteger>> tabKpiMap = new HashMap<>();
+        tabIds.forEach(tabKpiId -> {
+            tabKpiMap.put(tabKpiId, new HashMap<BigInteger, BigInteger>());
+        });
+        tabKPIMappingDTOS.forEach(tabKPIMappingDTO -> {
+            tabKpiMap.get(tabKPIMappingDTO.getTabId()).put(tabKPIMappingDTO.getKpiId(), tabKPIMappingDTO.getKpiId());
+        });
+        tabIds.forEach(tabId->{kpiIds.forEach(kpiId->{
+            if(tabKpiMap.get(tabId).get(kpiId)==null){
+                entriesToSave.add(new TabKPIConf(tabId,kpiId,countryId,unitId,staffId,level));
+            }
+        });});
+        return  entriesToSave;
+    }
     public void updateTabKPIEntries(List<TabKPIMappingDTO> tabKPIMappingDTOS, Long countryId, Long unitId, Long staffId, ConfLevel level) {
         List<BigInteger> tabIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getId()).collect(toList());
         List<TabKPIConf> tabKPIConfs=counterRepository.findTabKPIConfigurationByTabIds(tabIds);
