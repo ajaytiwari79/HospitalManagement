@@ -12,7 +12,6 @@ public enum CompanyType {
     HUB("HUB"), COMPANY("Company"),UNION("union");
 
 
-    ;
 
     public String value;
     CompanyType(String value) {
