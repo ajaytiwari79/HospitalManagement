@@ -1055,7 +1055,10 @@ public class StaffService {
 
 
     public StaffDTO createStaffFromWeb(Long unitId, StaffCreationDTO payload) throws ParseException {
-
+         if(payload.getCprNumber().length()!=10)
+         {
+             exceptionService.invalidSize("message.staff.cprNumber.size");
+         }
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
