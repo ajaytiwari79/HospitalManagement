@@ -1233,7 +1233,39 @@ public class StaffService {
 //        }
     }
 
+    public void setAccessGroupInUserAccount(User user,Long organizationId, Long accessGroupId) {
+        UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organizationId,user.getId());
+        if (accessGroupId!=null) {
+            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+            if (Optional.ofNullable(accessGroup).isPresent()) {
+                unitPermission.setAccessGroup(accessGroup);
+            }
+        }
+        unitPermissionGraphRepository.save(unitPermission);
+    }
 
+    public void setUserAndEmployment(Organization organization , User user, Long accessGroupId) {
+        Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
+                user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
+        Employment employment = new Employment();
+        employment.setStaff(staff);
+        staff.setUser(user);
+        employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
+        employment.setStaff(staff);
+        employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
+        organization.getEmployments().add(employment);
+        organizationGraphRepository.save(organization);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(organization);
+        if (accessGroupId!=null) {
+            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+            if (Optional.ofNullable(accessGroup).isPresent()) {
+                unitPermission.setAccessGroup(accessGroup);
+            }
+        }
+        employment.getUnitPermissions().add(unitPermission);
+        employmentGraphRepository.save(employment);
+    }
     public void setUnitManagerAndEmployment(Organization organization , User user, Long accessGroupId) {
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
                 user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());

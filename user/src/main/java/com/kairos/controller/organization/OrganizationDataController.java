@@ -78,7 +78,7 @@ public class OrganizationDataController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setUserInfoInOrganization(@Validated @RequestBody UnitManagerDTO unitManagerDTO, @PathVariable long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                companyCreationService.setUserInfoInOrganization(organizationId, null, unitManagerDTO));
+                companyCreationService.setUserInfoInOrganization(organizationId, null, unitManagerDTO,false));
     }
 
     @ApiOperation(value = "get address of parent organization")
