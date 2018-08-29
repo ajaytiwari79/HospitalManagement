@@ -2,6 +2,7 @@ package com.kairos.persistence.model.open_shift;
 
 
 import com.kairos.activity.activity.ActivityDTO;
+import com.kairos.activity.counter.CounterDTO;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ public class OrderAndActivityDTO {
     private List<ActivityDTO> activities;
     private List<Order> orders;
     private Integer minOpenShiftHours;
+    private List<CounterDTO> counters;
 
     public OrderAndActivityDTO() {
         //Default Constructor
@@ -36,5 +38,13 @@ public class OrderAndActivityDTO {
 
     public void setMinOpenShiftHours(Integer minOpenShiftHours) {
         this.minOpenShiftHours = minOpenShiftHours;
+    }
+
+    public List<CounterDTO> getCounters() {
+        return counters;
+    }
+
+    public void setCounters(List<CounterDTO> counters) {
+        this.counters = counters;
     }
 }
