@@ -1128,31 +1128,13 @@ public class OrganizationService {
 
 
     public Long getOrganization(Long id, String type) {
-        Organization organization = null;
-        switch (type.toLowerCase()) {
-            case ORGANIZATION:
-                organization = organizationGraphRepository.findOne(id);
-                break;
-            case GROUP:
-                organization = groupService.getUnitByGroupId(id);
-                break;
-            case TEAM:
-                organization = teamService.getOrganizationByTeamId(id);
-                break;
-            default:
-                exceptionService.unsupportedOperationException("message.organization.type.notvalid");
-
-        }
-        if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organization.id.notFound", id);
-
-        }
+        Organization organization = getOrganizationDetail( id,type);
         return organization.getId();
     }
 
     public Organization getOrganizationDetail(Long id, String type) {
         Organization organization = null;
-        switch (type.toLowerCase()) {
+        switch (type.toUpperCase()) {
             case ORGANIZATION:
                 organization = organizationGraphRepository.findOne(id, 1);
                 break;
