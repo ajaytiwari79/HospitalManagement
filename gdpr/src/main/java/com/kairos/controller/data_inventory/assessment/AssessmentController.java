@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
@@ -48,6 +49,17 @@ public class AssessmentController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentForProcessingActivity(unitId, countryId, processingActivityId, assessmentDTO));
 
+    }
+
+
+    @ApiOperation(value = "get Assessment  By Id")
+    @GetMapping(COUNTRY_URL+"/assessment/{assessmentId}")
+    public ResponseEntity<Object> getAssetAssessmentById(@PathVariable Long countryId,@PathVariable Long unitId,@PathVariable BigInteger assessmentId) throws IOException {
+
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAssessmentById(countryId,unitId,assessmentId));
     }
 
 

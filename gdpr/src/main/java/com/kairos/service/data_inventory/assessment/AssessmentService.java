@@ -1,6 +1,11 @@
 package com.kairos.service.data_inventory.assessment;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.enums.AssessmentStatus;
+import com.kairos.enums.AssetAttributeName;
+import com.kairos.enums.ProcessingActivityAttributeName;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.gdpr.data_inventory.AssessmentDTO;
 import com.kairos.persistance.model.data_inventory.assessment.Assessment;
@@ -10,12 +15,21 @@ import com.kairos.persistance.repository.data_inventory.Assessment.AssessmentMon
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
+import com.kairos.response.dto.data_inventory.AssetResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionBasicResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireSectionResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -52,6 +66,7 @@ public class AssessmentService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
         }
         Assessment assessment = buildAssessmentWithBasicDetail(unitId, countryId, assessmentDTO, QuestionnaireTemplateType.ASSET_TYPE);
+        assessment.setAssetId(assetId);
         assessmentMongoRepository.save(assessment);
         asset.getAssessments().add(assessment.getId());
         assetMongoRepository.save(asset);
@@ -93,7 +108,7 @@ public class AssessmentService extends MongoBaseService {
             exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
         }
         BigInteger questionnaireTemplateId = masterQuestionnaireTemplateMongoRepository.
-                getMasterQuestionanaireTemplateIdListByTemplateType(countryId,  templateType);
+                getMasterQuestionanaireTemplateIdListByTemplateType(countryId, templateType);
         if (!Optional.ofNullable(questionnaireTemplateId).isPresent()) {
             exceptionService.invalidRequestException("message.questionnaire.template.Not.Found.For.Template.Type", templateType);
         }
@@ -102,6 +117,124 @@ public class AssessmentService extends MongoBaseService {
         assessment.setComment(assessmentDTO.getComment());
         assessment.setQuestionnaireTemplateId(questionnaireTemplateId);
         return assessment;
+
+    }
+
+
+    /**
+     * @param countryId
+     * @param unitId
+     * @param assessmentId
+     * @return
+     */
+    public List<MasterQuestionnaireSectionResponseDTO> getAssessmentById(Long countryId, Long unitId, BigInteger assessmentId) throws IOException {
+
+        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
+        if (!Optional.ofNullable(assessment).isPresent()) {
+            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentId);
+        }
+        MasterQuestionnaireTemplateResponseDTO assessmentQuestionnaireTemplate = masterQuestionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsByCountryIdAndId(countryId, assessment.getQuestionnaireTemplateId());
+        List<MasterQuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = assessmentQuestionnaireTemplate.getSections();
+        if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
+            getAssetAssessmentQuestionAndValuesById(unitId, assessment.getAssessmentStatus(), assessment, assessmentQuestionnaireSections);
+        } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
+
+            getProcessingActivityAssessmentQuestionAndValuesById(unitId, assessment.getAssessmentStatus(), assessment, assessmentQuestionnaireSections);
+        }
+        return assessmentQuestionnaireSections;
+    }
+
+    /**
+     * @param unitId
+     * @param assessmentStatus
+     * @param assessment
+     * @param assessmentQuestionnaireSections
+     * @throws IOException
+     */
+    private void getAssetAssessmentQuestionAndValuesById(Long unitId, AssessmentStatus assessmentStatus, Assessment assessment, List<MasterQuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) throws IOException {
+
+        switch (assessmentStatus) {
+            case NEW:
+                AssetResponseDTO asset = assetMongoRepository.findAssetWithMetaDataById(unitId, assessment.getAssetId());
+                if (!Optional.ofNullable(asset).isPresent()) {
+                    exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assessment.getAssetId());
+                }
+                ObjectMapper mapValuesAndField = new ObjectMapper();
+                Map<String, Object> props = mapValuesAndField.convertValue(asset, Map.class);
+                for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
+                    for (MasterQuestionBasicResponseDTO assetAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
+                        if (props.containsKey(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
+                            assetAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(props.get(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
+                        }
+                    }
+                }
+                break;
+            case INPROGRESS:
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> assessmentQuestionAnswersAndFieldKeyValuePair = objectMapper.readValue(assessment.getAssessmentQuestionAnswersJsonString(), new TypeReference<Map<String, String>>() {
+                });
+
+                for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
+                    for (MasterQuestionBasicResponseDTO assetAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
+                        if (assessmentQuestionAnswersAndFieldKeyValuePair.containsKey(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
+                            assetAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(assessmentQuestionAnswersAndFieldKeyValuePair.get(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
+                        }
+                    }
+                }
+                break;
+            case COMPLETED:
+                exceptionService.invalidRequestException("Assessment is Completed");
+                break;
+
+        }
+
+    }
+
+
+    /**
+     * @param unitId
+     * @param assessmentStatus
+     * @param assessment
+     * @param assessmentQuestionnaireSections
+     * @throws IOException
+     */
+    private void getProcessingActivityAssessmentQuestionAndValuesById(Long unitId, AssessmentStatus assessmentStatus, Assessment assessment, List<MasterQuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) throws IOException {
+
+        switch (assessmentStatus) {
+            case NEW:
+                ProcessingActivityResponseDTO processingActivity = processingActivityMongoRepository.getProcessingActivityAndMetaDataById(unitId, assessment.getProcessingActivityId());
+                if (!Optional.ofNullable(processingActivity).isPresent()) {
+                    exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assessment.getProcessingActivityId());
+                }
+                ObjectMapper mapValuesAndField = new ObjectMapper();
+                Map<String, Object> props = mapValuesAndField.convertValue(processingActivity, Map.class);
+                for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
+                    for (MasterQuestionBasicResponseDTO processingActivityAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
+                        if (props.containsKey(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
+                            processingActivityAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(props.get(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
+                        }
+                    }
+                }
+                break;
+            case INPROGRESS:
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> assessmentQuestionAnswersAndFieldKeyValuePair = objectMapper.readValue(assessment.getAssessmentQuestionAnswersJsonString(), new TypeReference<Map<String, String>>() {
+                });
+
+                for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
+                    for (MasterQuestionBasicResponseDTO processingActivityAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
+                        if (assessmentQuestionAnswersAndFieldKeyValuePair.containsKey(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
+                            processingActivityAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(assessmentQuestionAnswersAndFieldKeyValuePair.get(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
+                        }
+                    }
+                }
+
+                break;
+            case COMPLETED:
+                exceptionService.invalidRequestException("Assessment is Completed");
+                break;
+
+        }
 
     }
 

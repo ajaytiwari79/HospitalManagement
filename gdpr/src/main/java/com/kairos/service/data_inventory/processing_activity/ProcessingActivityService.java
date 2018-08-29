@@ -462,37 +462,6 @@ public class ProcessingActivityService extends MongoBaseService {
     }
 
 
-    /**
-     * @param countryId
-     * @param unitId
-     * @param processingActivityId
-     * @param assessmentId
-     * @return
-     */
-    public List<MasterQuestionnaireSectionResponseDTO> getProcessingActivityAssessmnetById(Long countryId, Long unitId, BigInteger processingActivityId, BigInteger assessmentId) {
-
-        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
-        if (!Optional.ofNullable(assessment).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentId);
-        }
-        ProcessingActivityResponseDTO processingActivity = processingActivityMongoRepository.getProcessingActivityAndMetaDataById(unitId, processingActivityId);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", processingActivityId);
-        }
-        MasterQuestionnaireTemplateResponseDTO processingActivityAssessmentQuestionnaireTemplate = questionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsByCountryIdAndId(countryId, assessment.getQuestionnaireTemplateId());
-        List<MasterQuestionnaireSectionResponseDTO> processingActivityAssessmentQuestionnaireSections = processingActivityAssessmentQuestionnaireTemplate.getSections();
-
-        ObjectMapper mapValuesAndField = new ObjectMapper();
-        Map<String, Object> props = mapValuesAndField.convertValue(processingActivity, Map.class);
-        for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : processingActivityAssessmentQuestionnaireSections) {
-            for (MasterQuestionBasicResponseDTO assetAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
-                if (props.containsKey(ProcessingActivityAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
-                    assetAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(props.get(ProcessingActivityAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
-                }
-            }
-        }
-        return processingActivityAssessmentQuestionnaireSections;
-    }
 
 
 }

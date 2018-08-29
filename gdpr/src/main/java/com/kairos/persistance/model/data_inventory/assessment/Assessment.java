@@ -24,6 +24,12 @@ public class Assessment extends MongoBaseEntity {
 
     private String comment;
 
+    private BigInteger assetId;
+
+    private BigInteger processingActivityId;
+
+    private String assessmentQuestionAnswersJsonString;
+
     @NotNull
     private Staff assignee;
 
@@ -65,6 +71,18 @@ public class Assessment extends MongoBaseEntity {
     public BigInteger getQuestionnaireTemplateId() { return questionnaireTemplateId; }
 
     public void setQuestionnaireTemplateId(BigInteger questionnaireTemplateId) { this.questionnaireTemplateId = questionnaireTemplateId; }
+
+    public BigInteger getAssetId() { return assetId; }
+
+    public void setAssetId(BigInteger assetId) { this.assetId = assetId; }
+
+    public BigInteger getProcessingActivityId() { return processingActivityId; }
+
+    public void setProcessingActivityId(BigInteger processingActivityId) { this.processingActivityId = processingActivityId; }
+
+    public String getAssessmentQuestionAnswersJsonString() { return assessmentQuestionAnswersJsonString; }
+
+    public void setAssessmentQuestionAnswersJsonString(String assessmentQuestionAnswersJsonString) { this.assessmentQuestionAnswersJsonString = assessmentQuestionAnswersJsonString; }
 
     public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull Staff assignee, @NotNull Staff approver) {
         this.name = name;
