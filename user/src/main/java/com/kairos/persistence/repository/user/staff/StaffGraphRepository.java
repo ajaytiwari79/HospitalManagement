@@ -174,13 +174,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "return {skills:case when skills[0].id is null then [] else skills end,id:id(staff),name:staff.firstName+\" \" +staff.lastName,cprNumber:user.cprNumber, profilePic: staff.profilePic} as data")
     List<Map<String, Object>> getSkillsOfStaffs(List<Long> staffIds);
 
-    @Query("Match (emp:Employment)-[:" + BELONGS_TO + "]->(s:Staff) where id(s)={0} with emp\n" +
-            "Match (emp)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(unit:Organization) where id(unit)={1} with unitPermission\n" +
-            "Match (unitPermission)-[:" + HAS_ACCESS_PERMISSION + "]->(accessPermission:AccessPermission)-[:" + HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup{typeOfTaskGiver:true})\n" +
-            "return count(accessGroup) as accessGroup")
-    int checkIfStaffIsTaskGiver(long staffId, long unitId);
-
-
     @Query("MATCH (c:Client) , (s:Staff) where id(c)={0}  AND id(s) IN {1}  " +
             "OPTIONAL MATCH (c)-[r1:SERVED_BY_STAFF]->(s) delete r1  " +
             "  Create Unique (c)-[r:SERVED_BY_STAFF{type:'PREFERRED'}]->(s) return count(r)")

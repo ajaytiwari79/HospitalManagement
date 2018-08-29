@@ -313,5 +313,45 @@ public class CounterDataService {
 
     }
 
+    private void setShiftDayCollisionMap(long shiftCornerTs, long initTs, Map<Long, Integer> shiftDayCollisionMap) {
+        if ((shiftCornerTs) > initTs) {
+            long key = (shiftCornerTs - initTs) / (24 * 3600 * 1000);
+            if (shiftDayCollisionMap.get(key) == null) {
+                shiftDayCollisionMap.put(key, 0);
+            }
+            shiftDayCollisionMap.put(key, shiftDayCollisionMap.get(key) + 1);
+        }
+    }
+
+    public long getTotalRestingHours(List<Shift> shifts, long initTs, long endTs, long restingHoursMillis, boolean dayOffAllowed) {
+        //all shifts should be sorted on startDate
+        Map<Long, Integer> shiftDayCollisionMap = new HashMap<>();
+        long baseInitTs = initTs;
+        long durationMillis = endTs - initTs;
+        for (Shift shift : shifts) {
+            if (initTs >= shift.getStartDate().getTime() && initTs >= shift.getEndDate().getTime()) {
+                durationMillis -= 0;
+                setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
+            } else if (initTs >= shift.getStartDate().getTime() && initTs < shift.getEndDate().getTime()) {
+                durationMillis -= (shift.getEndDate().getTime() - initTs);
+                initTs = shift.getEndDate().getTime();
+                setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
+            } else if (initTs < shift.getStartDate().getTime() && endTs > shift.getEndDate().getTime()) {
+                durationMillis -= (shift.getEndDate().getTime() - shift.getStartDate().getTime());
+                initTs = shift.getEndDate().getTime();
+                setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
+                setShiftDayCollisionMap(shift.getStartDate().getTime(), baseInitTs, shiftDayCollisionMap);
+            } else if (initTs < shift.getStartDate().getTime() && endTs < shift.getEndDate().getTime()) {
+                durationMillis -= (endTs - shift.getStartDate().getTime());
+                initTs = endTs;
+                setShiftDayCollisionMap(shift.getStartDate().getTime(), baseInitTs, shiftDayCollisionMap);
+            }
+        }
+        if (dayOffAllowed) {
+            durationMillis -= (shiftDayCollisionMap.entrySet().size() * (24 * 3600 * 1000));
+        }
+        return durationMillis;
+    }
+
     //public void
 }

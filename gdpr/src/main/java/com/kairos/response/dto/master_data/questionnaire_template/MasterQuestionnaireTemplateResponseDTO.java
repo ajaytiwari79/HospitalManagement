@@ -2,6 +2,7 @@ package com.kairos.response.dto.master_data.questionnaire_template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 
 import java.math.BigInteger;
@@ -15,7 +16,7 @@ public class MasterQuestionnaireTemplateResponseDTO {
 
     private String name;
     private String description;
-    private String templateType;
+    private QuestionnaireTemplateType templateType;
 
     private AssetType assetType;
 
@@ -45,13 +46,9 @@ public class MasterQuestionnaireTemplateResponseDTO {
         this.description = description;
     }
 
-    public String getTemplateType() {
-        return templateType;
-    }
+    public QuestionnaireTemplateType getTemplateType() { return templateType; }
 
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
+    public void setTemplateType(QuestionnaireTemplateType templateType) { this.templateType = templateType; }
 
     public AssetType getAssetType() {
         return assetType;

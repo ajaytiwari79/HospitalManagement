@@ -29,6 +29,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kairos.constants.ApiConstants.COUNTER_CONF_URL;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class CounterConfIntegrationTest {
@@ -44,7 +46,7 @@ public class CounterConfIntegrationTest {
     public void addCounterEntries() throws Exception{
         String baseUrl = getBaseUrl(2567l, 5l);
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/counter/conf/counter",
+                baseUrl + COUNTER_CONF_URL+"/counter",
                 HttpMethod.GET, null, String.class);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
@@ -60,7 +62,7 @@ public class CounterConfIntegrationTest {
                 new ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<Counter>>() {
                 };
         ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<Counter>> response = restTemplate.exchange(
-                baseUrl + "/counter/conf/counter",
+                baseUrl + COUNTER_CONF_URL+"/counter",
                 HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
@@ -77,7 +79,7 @@ public class CounterConfIntegrationTest {
                 new ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<FilterCriteria>>>() {
                 };
         ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<List<FilterCriteria>>> response = restTemplate.exchange(
-                baseUrl + "/counter/conf/counter/5",
+                baseUrl + COUNTER_CONF_URL+"/counter/5",
                 HttpMethod.PUT, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
@@ -94,7 +96,7 @@ public class CounterConfIntegrationTest {
                 new ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>>() {
                 };
         ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> response = restTemplate.exchange(
-                baseUrl+"/counter/conf/category", HttpMethod.POST, requestBodyData, typeReference);
+                baseUrl+COUNTER_CONF_URL+"/category", HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode()+""+kpiCategories);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -133,7 +135,7 @@ public class CounterConfIntegrationTest {
         HttpEntity<KPICategoryUpdationDTO> requestBodyDate=new HttpEntity<>(kpiCategoryUpdationDTO);
         ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> typeReference=new ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>>() {
         };
-        ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> response=restTemplate.exchange(baseUrl+"/counter/conf/category",HttpMethod.PUT,requestBodyDate,typeReference);
+        ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> response=restTemplate.exchange(baseUrl+COUNTER_CONF_URL+"/category",HttpMethod.PUT,requestBodyDate,typeReference);
         logger.info("Status Code : " + response.getStatusCode()+""+kpiCategories);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
