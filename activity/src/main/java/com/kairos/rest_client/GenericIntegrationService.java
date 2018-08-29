@@ -99,4 +99,11 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(staffIds, unitId, true, IntegrationOperation.CREATE, "/staff/details", null), StaffDTO.class);
     }
 
+    public Long getStaffIdByUserId(Long unitId) {
+        Integer value = genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null,Long.class);
+        if (value == null) {
+            exceptionService.dataNotFoundByIdException("message.staff.notFound");
+        }
+        return value.longValue();
+    }
 }

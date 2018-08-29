@@ -5,6 +5,8 @@ import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.activity.activity.CompositeActivityDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
 import com.kairos.activity.activity.activity_tabs.*;
+import com.kairos.activity.counter.CounterDTO;
+import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.activity.phase.PhaseWeeklyDTO;
@@ -24,6 +26,7 @@ import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
+import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
@@ -135,6 +138,7 @@ public class ActivityService extends MongoBaseService {
     private ShiftTemplateService shiftTemplateService;
     @Inject
     private GenericIntegrationService genericIntegrationService;
+    @Inject private CounterRepository counterRepository;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -1099,7 +1103,7 @@ public class ActivityService extends MongoBaseService {
 
 
         Activity activityCopied = new Activity();
-        Activity.copyProperties(activityFromDatabase.get(), activityCopied, "id", "organizationTypes", "organizationSubTypes");
+        ObjectMapperUtils.copyPropertiesUsingBeanUtils(activityFromDatabase.get(), activityCopied, "id");
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.setState(ActivityStateEnum.DRAFT);
@@ -1158,7 +1162,8 @@ public class ActivityService extends MongoBaseService {
         List<ActivityDTO> activityDTOS = activityMongoRepository.findAllActivitiesWithTimeTypes(countryId);
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
-        ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals);
+        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
+        ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals,counters);
         return activityWithTimeTypeDTO;
     }
 

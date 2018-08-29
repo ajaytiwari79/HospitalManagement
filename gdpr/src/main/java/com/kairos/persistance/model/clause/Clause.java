@@ -50,6 +50,7 @@ public class Clause extends MongoBaseEntity {
 
     private List<BigInteger> templateTypes;
 
+    private Integer orderedIndex;
 
     public List<Long> getOrganizationList() {
         return organizationList;
@@ -119,33 +120,25 @@ public class Clause extends MongoBaseEntity {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes; }
 
     public List<OrganizationSubType> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
     public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
 
     public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
-    }
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
     public Set<AccountTypeDTO> getAccountTypes() {
         return accountTypes;
@@ -154,6 +147,10 @@ public class Clause extends MongoBaseEntity {
     public void setAccountTypes(Set<AccountTypeDTO> accountTypes) {
         this.accountTypes = accountTypes;
     }
+
+    public Integer getOrderedIndex() { return orderedIndex; }
+
+    public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
 
     public Clause(Long countryId, String title, String description) {
         this.countryId = countryId;

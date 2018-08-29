@@ -168,6 +168,7 @@ public class ClauseService extends MongoBaseService {
             List<BigInteger> templateTypes=new ArrayList<>();
             templateTypes.add(policyAgreementTemplate.getTemplateType());
             clause.setTemplateTypes(templateTypes);
+            clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
             clause.setOrganizationId(organizationId);
             clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
             newClauseList.add(clause);

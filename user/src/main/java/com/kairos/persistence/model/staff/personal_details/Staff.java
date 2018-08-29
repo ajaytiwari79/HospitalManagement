@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.EngineerType;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
-import com.kairos.persistence.model.staff.StaffSettings;
 import com.kairos.persistence.model.user.language.Language;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -93,8 +91,6 @@ public class Staff extends UserBaseEntity {
     private List<StaffFavouriteFilter> staffFavouriteFilterList;
     private String careOfName;
 
-    @Relationship(type = HAS_STAFF_SETTINGS)
-    private StaffSettings staffSettings;
     private String access_token;
     private String user_id;
 
@@ -452,15 +448,6 @@ public class Staff extends UserBaseEntity {
 
     public void setSecondaryContactAddress(ContactAddress secondaryContactAddress) {
         this.secondaryContactAddress = secondaryContactAddress;
-    }
-
-
-    public StaffSettings getStaffSettings() {
-        return staffSettings = Optional.ofNullable(staffSettings).orElse(new StaffSettings());
-    }
-
-    public void setStaffSettings(StaffSettings staffSettings) {
-        this.staffSettings = staffSettings;
     }
 
     public String getAccess_token() {

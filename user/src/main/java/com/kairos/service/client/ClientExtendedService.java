@@ -247,7 +247,7 @@ public class ClientExtendedService{
         contactAddressToSave.setZipCode(zipCode);
 
         // Native Details
-        contactAddressToSave.setStreet1(addressDTO.getStreet1());
+        contactAddressToSave.setStreet(addressDTO.getStreet());
         contactAddressToSave.setHouseNumber(addressDTO.getHouseNumber());
         contactAddressToSave.setFloorNumber(addressDTO.getFloorNumber());
         contactAddressToSave.setCity(zipCode.getName());
@@ -426,7 +426,7 @@ public class ClientExtendedService{
             ContactAddress contactAddress = contactAddressGraphRepository.findOne(addressId);
             if (contactAddress != null) {
                 logger.debug("AddressDTO found: Updating...");
-                contactAddress.setStreet1((String) relativeProperties.get("street1"));
+                contactAddress.setStreet((String) relativeProperties.get("street1"));
                 contactAddress.setCity((String) relativeProperties.get("city"));
 //                contactAddress.setZipCodeValue((Integer) relativeProperties.get("zipCode"));
                 contactAddress.setCountry((String) relativeProperties.get("country"));
@@ -483,7 +483,7 @@ public class ClientExtendedService{
             ContactAddress contactAddress = contactAddressGraphRepository.findOne(addressId);
             if (contactAddress != null) {
                 logger.debug("AddressDTO found: Updating...");
-                contactAddress.setStreet1((String) relativeProperties.get("street1"));
+                contactAddress.setStreet((String) relativeProperties.get("street1"));
                 contactAddress.setCity((String) relativeProperties.get("city"));
 //                contactAddress.setZipCodeValue((Integer) relativeProperties.get("zipCode"));
                 contactAddress.setCountry((String) relativeProperties.get("country"));

@@ -65,16 +65,6 @@ public class OrganizationTransferMethodController {
 
     }
 
-    @ApiOperation("get transfer Method by name")
-    @GetMapping("/transfer_method/name")
-    public ResponseEntity<Object> getTransferMethodByName(@PathVariable Long unitId, @RequestParam String name) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethodByName(unitId, name));
-
-    }
-
 
     @ApiOperation("delete transfer Method by id")
     @DeleteMapping("/transfer_method/delete/{id}")

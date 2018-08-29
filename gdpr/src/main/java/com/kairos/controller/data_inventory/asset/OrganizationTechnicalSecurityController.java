@@ -39,7 +39,7 @@ public class OrganizationTechnicalSecurityController {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure( unitId, securityMeasures.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(unitId, securityMeasures.getRequestBody()));
 
     }
 
@@ -65,17 +65,6 @@ public class OrganizationTechnicalSecurityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getAllTechnicalSecurityMeasure(unitId));
     }
 
-    @ApiOperation("get TechnicalSecurityMeasure by name")
-    @GetMapping("/technical_security/name")
-    public ResponseEntity<Object> getTechnicalSecurityMeasureByName(@PathVariable Long unitId, @RequestParam String name) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasureByName( unitId, name));
-
-    }
-
-
     @ApiOperation("delete TechnicalSecurityMeasure  by id")
     @DeleteMapping("/technical_security/delete/{id}")
     public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger id) {
@@ -84,7 +73,7 @@ public class OrganizationTechnicalSecurityController {
         } else if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.deleteTechnicalSecurityMeasure( unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.deleteTechnicalSecurityMeasure(unitId, id));
 
     }
 
@@ -97,7 +86,7 @@ public class OrganizationTechnicalSecurityController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure( unitId, id, securityMeasure));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure(unitId, id, securityMeasure));
 
     }
 

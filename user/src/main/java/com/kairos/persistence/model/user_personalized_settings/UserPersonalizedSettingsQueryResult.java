@@ -7,7 +7,12 @@ import org.springframework.data.neo4j.annotation.QueryResult;
  */
 @QueryResult
 public class UserPersonalizedSettingsQueryResult {
-   private UserPersonalizedSettings userPersonalizedSettings;
+    private UserPersonalizedSettings userPersonalizedSettings;
+    private SelfRosteringView selfRosteringView;
+
+    public UserPersonalizedSettingsQueryResult() {
+        //Default Constructor
+    }
 
     public SelfRosteringView getSelfRosteringView() {
         return selfRosteringView;
@@ -16,8 +21,6 @@ public class UserPersonalizedSettingsQueryResult {
     public void setSelfRosteringView(SelfRosteringView selfRosteringView) {
         this.selfRosteringView = selfRosteringView;
     }
-
-    private SelfRosteringView selfRosteringView;
 
     public UserPersonalizedSettings getUserPersonalizedSettings() {
         return userPersonalizedSettings;

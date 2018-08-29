@@ -28,7 +28,6 @@ import com.kairos.user.access_permission.AccessPermissionDTO;
 import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.user.organization.OrganizationCategoryDTO;
 import com.kairos.util.DateUtil;
-import com.kairos.util.DateUtils;
 import com.kairos.util.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -542,8 +541,6 @@ public class AccessGroupService {
         accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
         countryGraphRepository.save(country);
-
-
         //set default permission of access page while creating access group
         setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), accessGroupDTO.getOrganizationCategory());
         return accessGroup;
@@ -625,7 +622,7 @@ public class AccessGroupService {
     }
 
     /**
-     * @param accounttypeId
+     * @param accountTypeId
      * @return
      * @author vipul
      * @Desc This api is used to fetch all access group by account type id in country.
@@ -692,7 +689,6 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupDTO.getId());
 
         }
-
         AccessGroup accessGroup=new AccessGroup(accessGroupDTO.getName().trim(),accessGroupDTO.getDescription(),accessGroupDTO.getRole());
         accessGroupRepository.save(accessGroup);
         organization.get().getAccessGroups().add(accessGroup);
