@@ -54,6 +54,7 @@ public class UnitPositionQueryResult {
     private Boolean history;
     private Boolean editable;
     private Boolean published;
+    private float hourlyCost;
 
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
@@ -308,10 +309,18 @@ public class UnitPositionQueryResult {
         this.id = id;
     }
 
+
+    public float getHourlyCost() {
+        return hourlyCost;
+    }
+
+    public void setHourlyCost(float hourlyCost) {
+        this.hourlyCost = hourlyCost;
+    }
+
     public UnitPositionQueryResult() {
         //default cons
     }
-
 
     public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CTAResponseDTO cta, WTAResponseDTO wta) {
         this.expertise = expertise;
