@@ -56,6 +56,12 @@ public class ProcessingActivityResponseDTO {
 
     private Integer dataRetentionPeriod;
 
+    private boolean active;
+
+    public boolean isActive() { return active; }
+
+    public void setActive(boolean active) { this.active = active; }
+
     public AssetBasicResponseDTO getAsset() { return asset; }
 
     public void setAsset(AssetBasicResponseDTO asset) { this.asset = asset; }

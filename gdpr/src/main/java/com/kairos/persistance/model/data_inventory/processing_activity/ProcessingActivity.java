@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -61,6 +62,8 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private boolean subProcess=false;
 
+    private List<BigInteger> assessments=new ArrayList<>();
+
     public List<ProcessingActivityRelatedDataSubject> getDataSubjects() { return dataSubjects; }
 
     public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) { this.dataSubjects = dataSubjects; }
@@ -72,6 +75,10 @@ public class ProcessingActivity extends MongoBaseEntity {
     public boolean isActive() { return active; }
 
     public void setActive(boolean active) { this.active = active; }
+
+    public List<BigInteger> getAssessments() { return assessments; }
+
+    public void setAssessments(List<BigInteger> assessments) { this.assessments = assessments; }
 
     public boolean isSubProcess() {
         return subProcess;
