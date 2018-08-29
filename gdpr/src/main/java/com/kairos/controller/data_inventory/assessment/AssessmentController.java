@@ -21,8 +21,8 @@ import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL + COUNTRY_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL + COUNTRY_URL)
+@RequestMapping(API_ORGANIZATION_URL_UNIT_URL )
+@Api(API_ORGANIZATION_URL_UNIT_URL )
 public class AssessmentController {
 
 
@@ -31,7 +31,7 @@ public class AssessmentController {
 
 
     @ApiOperation(value = "Add assessment to Asset")
-    @PostMapping("/assessment/asset/{assetId}")
+    @PostMapping(COUNTRY_URL+"/assessment/asset/{assetId}")
     public ResponseEntity<Object> addAssessmentToAsset(@PathVariable Long unitId, @PathVariable Long countryId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be null");
@@ -42,7 +42,7 @@ public class AssessmentController {
 
 
     @ApiOperation(value = "Add assessment to Processing Activity")
-    @PostMapping("/assessment/processing_activity/{processingActivityId}")
+    @PostMapping(COUNTRY_URL+"/assessment/processing_activity/{processingActivityId}")
     public ResponseEntity<Object> addAssessmentToProcessingActivity(@PathVariable Long unitId, @PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be null");
@@ -61,6 +61,31 @@ public class AssessmentController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAssessmentById(countryId,unitId,assessmentId));
     }
+
+
+    @ApiOperation(value = "get All launched Assessment Assign to respondent and are in New and InProgress state")
+    @GetMapping("/assessment")
+    public ResponseEntity<Object> getAllLaunchedAssessment(@PathVariable Long unitId) {
+
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchAssessment(unitId));
+    }
+
+    //todo add function to fill assessment for asset and processing activity
+    @ApiOperation(value = "get All launched Assessment Assign to respondent and are in New and InProgress state")
+    @GetMapping("/assessment/{assessmentId}")
+    public ResponseEntity<Object> completeAssessmentForAsset(@PathVariable Long unitId,@PathVariable BigInteger assessmentId) {
+
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchAssessment(unitId));
+    }
+
+
+
 
 
 }

@@ -56,7 +56,7 @@ public class AssetController {
 
     @ApiOperation(value = "updated status of processing activity")
     @PutMapping("/asset/{assetId}/status")
-    public ResponseEntity<Object> updateStatusOfAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId,@NotNull @RequestBody boolean active) {
+    public ResponseEntity<Object> updateStatusOfAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId,@RequestParam boolean active) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }

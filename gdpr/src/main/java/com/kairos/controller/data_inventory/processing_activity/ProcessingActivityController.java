@@ -118,7 +118,8 @@ public class ProcessingActivityController {
 
     @ApiOperation(value = "updated status of processing activity")
     @PutMapping("/processing_activity/{processingActivityId}/status")
-    public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @NotNull @RequestBody boolean active) {
+    public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId,@RequestParam boolean active) {
+
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }

@@ -15,6 +15,7 @@ import com.kairos.persistance.repository.data_inventory.Assessment.AssessmentMon
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
+import com.kairos.response.dto.data_inventory.AssessmentResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionBasicResponseDTO;
@@ -185,7 +186,6 @@ public class AssessmentService extends MongoBaseService {
             case COMPLETED:
                 exceptionService.invalidRequestException("Assessment is Completed");
                 break;
-
         }
 
     }
@@ -220,7 +220,6 @@ public class AssessmentService extends MongoBaseService {
                 ObjectMapper objectMapper = new ObjectMapper();
                 Map<String, Object> assessmentQuestionAnswersAndFieldKeyValuePair = objectMapper.readValue(assessment.getAssessmentQuestionAnswersJsonString(), new TypeReference<Map<String, String>>() {
                 });
-
                 for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
                     for (MasterQuestionBasicResponseDTO processingActivityAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
                         if (assessmentQuestionAnswersAndFieldKeyValuePair.containsKey(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
@@ -228,14 +227,17 @@ public class AssessmentService extends MongoBaseService {
                         }
                     }
                 }
-
                 break;
             case COMPLETED:
                 exceptionService.invalidRequestException("Assessment is Completed");
                 break;
-
         }
 
+    }
+
+
+    public List<AssessmentResponseDTO> getAllLaunchAssessment(Long unitId) {
+        return assessmentMongoRepository.getAllLaunchAssessmentAssignToRespondent(unitId);
     }
 
 
