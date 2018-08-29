@@ -1,11 +1,14 @@
 package com.kairos.response.dto.master_data.questionnaire_template;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.QuestionType;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MasterQuestionBasicResponseDTO {
 
     private BigInteger id;
@@ -15,7 +18,9 @@ public class MasterQuestionBasicResponseDTO {
 
     private String description;
 
-    private String questionType;
+    private Object assessmentQuestionValues;
+
+    private QuestionType questionType;
 
     private String attributeName;
 
@@ -53,13 +58,13 @@ public class MasterQuestionBasicResponseDTO {
         this.description = description;
     }
 
-    public String getQuestionType() {
-        return questionType;
-    }
+    public QuestionType getQuestionType() { return questionType; }
 
-    public void setQuestionType(String questionType) {
-        this.questionType = questionType;
-    }
+    public void setQuestionType(QuestionType questionType) { this.questionType = questionType; }
+
+    public Object getAssessmentQuestionValues() { return assessmentQuestionValues; }
+
+    public void setAssessmentQuestionValues(Object assessmentQuestionValues) { this.assessmentQuestionValues = assessmentQuestionValues; }
 
     public MasterQuestionBasicResponseDTO() {
     }
