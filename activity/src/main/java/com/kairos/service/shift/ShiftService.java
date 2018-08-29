@@ -171,7 +171,7 @@ public class ShiftService extends MongoBaseService {
 
 
 
-    public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
+    public ShiftWithViolatedInfoDTO createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivityId());
         Activity activity = activityWrapper.getActivity();
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -210,7 +210,8 @@ public class ShiftService extends MongoBaseService {
             shiftQueryResults = Arrays.asList(shiftQueryResult);
 
         }
-        return shiftQueryResults;
+        ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
+        return new ShiftWithViolatedInfoDTO(shiftQueryResults,violatedRulesDTO);
     }
 
     private ShiftQueryResult saveShift(Activity activity, String timeType, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO) {
@@ -894,7 +895,7 @@ public class ShiftService extends MongoBaseService {
 
     public Boolean addSubShifts(Long unitId, List<ShiftDTO> shiftDTOS, String type) {
         for (ShiftDTO shiftDTO : shiftDTOS) {
-            ShiftQueryResult shiftQueryResult = createShift(unitId, shiftDTO, "Organization", true).get(0);
+            ShiftQueryResult shiftQueryResult = createShift(unitId, shiftDTO, "Organization", true).getShifts().get(0);
             shiftDTO.setId(shiftQueryResult.getId());
         }
 
