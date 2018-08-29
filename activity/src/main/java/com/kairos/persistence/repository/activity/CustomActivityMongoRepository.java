@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.CompositeActivityDTO;
-import com.kairos.activity.break_settings.BreakActivities;
+import com.kairos.activity.break_settings.BreakActivitiesDTO;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.user.staff.staff_settings.StaffActivitySettingDTO;
@@ -65,5 +65,5 @@ public interface CustomActivityMongoRepository {
 
     StaffActivitySettingDTO findStaffPersonalizedSettings(Long unitId,BigInteger activityId);
 
-    List<BreakActivities> getAllWorkingAndNonWorkingTypeActivities(Long unitId);
+    List<BreakActivitiesDTO> getAllWorkingAndNonWorkingTypeActivities(Long unitId);
 }
