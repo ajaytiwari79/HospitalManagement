@@ -34,6 +34,7 @@ public class SickSettingConfigurationController {
         return null;
     }
 
-
+    //@ApiOperation(value = "used to update the sick settings of the unit")
+    //@PutMapping(value = "/{sickSettingsId}")
 
 }
