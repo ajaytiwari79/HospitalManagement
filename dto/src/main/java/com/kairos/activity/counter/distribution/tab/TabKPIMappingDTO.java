@@ -3,14 +3,13 @@ package com.kairos.activity.counter.distribution.tab;
 import com.kairos.activity.enums.counter.CounterSize;
 
 import java.math.BigInteger;
-import java.util.List;
 
 public class TabKPIMappingDTO {
     private BigInteger id;
     private String tabId;
     private BigInteger kpiId;
-    private CounterSize counterSize;
-    private KPIPosition kpiPosition;
+    private CounterSize size;
+    private KPIPosition position;
 
     public TabKPIMappingDTO() {
     }
@@ -20,11 +19,11 @@ public class TabKPIMappingDTO {
         this.kpiId = kpiId;
     }
 
-    public TabKPIMappingDTO(String tabId, BigInteger kpiId, CounterSize counterSize, KPIPosition kpiPosition) {
+    public TabKPIMappingDTO(String tabId, BigInteger kpiId, CounterSize size, KPIPosition position) {
         this.tabId = tabId;
         this.kpiId = kpiId;
-        this.counterSize = counterSize;
-        this.kpiPosition = kpiPosition;
+        this.size = size;
+        this.position = position;
     }
 
     public String getTabId() {
@@ -43,20 +42,20 @@ public class TabKPIMappingDTO {
         this.kpiId = kpiId;
     }
 
-    public CounterSize getCounterSize() {
-        return counterSize;
+    public CounterSize getSize() {
+        return size;
     }
 
-    public KPIPosition getKpiPosition() {
-        return kpiPosition;
+    public KPIPosition getPosition() {
+        return position;
     }
 
-    public void setKpiPosition(KPIPosition kpiPosition) {
-        this.kpiPosition = kpiPosition;
+    public void setPosition(KPIPosition position) {
+        this.position = position;
     }
 
-    public void setCounterSize(CounterSize counterSize) {
-        this.counterSize = counterSize;
+    public void setSize(CounterSize size) {
+        this.size = size;
     }
 
     public BigInteger getId() {

@@ -109,21 +109,21 @@ public class CounterDistService extends MongoBaseService {
         return tabKPIMappingDTOS.stream().map(tabKPIMappingDTO ->tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
     }
 
-    public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId,Long refId, ConfLevel level){
-        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(Arrays.asList(moduleId),new ArrayList<>(),refId,level);
+    public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId,Long unitId, ConfLevel level){
+        Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
+        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(Arrays.asList(moduleId),new ArrayList<>(),staffId,level);
         return tabKPIDTOS;
     }
 
-    public List<TabKPIDTO> addTabKPIEntriesOfStaff(List<TabKPIMappingDTO> tabKPIMappingDTOS,Long unitId,Long staffId,ConfLevel level){
-        Long staffId1=genericIntegrationService.getStaffIdByUserId(unitId);
+    public List<TabKPIDTO> addTabKPIEntriesOfStaff(List<TabKPIMappingDTO> tabKPIMappingDTOS,Long unitId,ConfLevel level){
+        Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
         List<TabKPIConf> entriesToSave = new ArrayList<>();
-        Map<BigInteger,KPIPosition> kpiPositionMap=new HashMap<>();
         List<String> tabIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getTabId()).collect(toList());
         List<BigInteger> kpiIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(toList());
         Map<String, Map<BigInteger, BigInteger>> tabKpiMap=setTabKPIEntries(tabIds,kpiIds,entriesToSave,null,null,staffId,level);
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
             if(tabKpiMap.get(tabKPIMappingDTO.getTabId()).get(tabKPIMappingDTO.getKpiId())==null){
-                entriesToSave.add(new TabKPIConf(tabKPIMappingDTO.getTabId(),tabKPIMappingDTO.getKpiId(),null,null,staffId,level,tabKPIMappingDTO.getKpiPosition()));
+                entriesToSave.add(new TabKPIConf(tabKPIMappingDTO.getTabId(),tabKPIMappingDTO.getKpiId(),null,null,staffId,level,tabKPIMappingDTO.getPosition()));
             }
         });
         if (entriesToSave.isEmpty()) {
@@ -165,17 +165,16 @@ public class CounterDistService extends MongoBaseService {
         });
         return  tabKpiMap;
     }
-    public void updateTabKPIEntries(List<TabKPIMappingDTO> tabKPIMappingDTOS,Long unitId,Long staffId, ConfLevel level) {
-        //Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
-        List<String> tabIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getTabId()).collect(toList());
-        List<TabKPIConf> tabKPIConfs=counterRepository.findTabKPIConfigurationByTabIds(tabIds,staffId,level);
+    public void updateTabKPIEntries(List<TabKPIMappingDTO> tabKPIMappingDTOS,String tabId,Long unitId, ConfLevel level) {
+        Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
+        List<TabKPIConf> tabKPIConfs=counterRepository.findTabKPIConfigurationByTabIds(Arrays.asList(tabId),staffId,level);
         Map<BigInteger,TabKPIMappingDTO> tabKPIMappingDTOMap=new HashMap<>();
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
             tabKPIMappingDTOMap.put(tabKPIMappingDTO.getId(),tabKPIMappingDTO);
         });
         tabKPIConfs.stream().forEach(tabKPIConf -> {
            TabKPIMappingDTO tabKPIMappingDTO=tabKPIMappingDTOMap.get(tabKPIConf.getId());
-           tabKPIConf.setKpiPosition(tabKPIMappingDTO.getKpiPosition());
+           tabKPIConf.setPosition(tabKPIMappingDTO.getPosition());
         });
         save(tabKPIConfs);
     }
@@ -345,7 +344,7 @@ public class CounterDistService extends MongoBaseService {
         if(!tabKPIConf.isEmpty()){
             defaultKPISettingDTO.getStaffIds().forEach(staffId -> {
                 tabKPIConf.stream().forEach(tabKPIConfKPI -> {
-                    tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, null, staffId, ConfLevel.STAFF,tabKPIConfKPI.getKpiPosition()));
+                    tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, null, staffId, ConfLevel.STAFF,tabKPIConfKPI.getPosition()));
                 });
             });
         }

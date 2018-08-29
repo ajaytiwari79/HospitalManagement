@@ -7,9 +7,9 @@ import java.math.BigInteger;
 public class TabKPIDTO {
     private BigInteger id;
     private String tabId;
-    private KPIDTO kpis;
+    private KPIDTO kpi;
     private String data;
-    private KPIPosition kpiPosition;
+    private KPIPosition position;
 
     public String getTabId() {
         return tabId;
@@ -27,12 +27,12 @@ public class TabKPIDTO {
         this.tabId = tabId;
     }
 
-    public KPIDTO getKpis() {
-        return kpis;
+    public KPIDTO getKpi() {
+        return kpi;
     }
 
-    public void setKpis(KPIDTO kpis) {
-        this.kpis = kpis;
+    public void setKpi(KPIDTO kpi) {
+        this.kpi = kpi;
     }
 
     public String getData() {
@@ -43,11 +43,11 @@ public class TabKPIDTO {
         this.data = data;
     }
 
-    public KPIPosition getKpiPosition() {
-        return kpiPosition;
+    public KPIPosition getPosition() {
+        return position;
     }
 
-    public void setKpiPosition(KPIPosition kpiPosition) {
-        this.kpiPosition = kpiPosition;
+    public void setPosition(KPIPosition position) {
+        this.position = position;
     }
 }

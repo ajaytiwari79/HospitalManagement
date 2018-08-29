@@ -168,9 +168,9 @@ public class CounterRepository {
         Aggregation aggregation=Aggregation.newAggregation(
           Aggregation.match(criteria),
           Aggregation.lookup("counter","kpiId","_id","kpis"),
-          Aggregation.project("tabId","kpiPosition","id").and("kpis").arrayElementAt(0).as("kpis"),
-          Aggregation.project("tabId","kpiPosition","id").and("kpis.title").as("kpis.title").
-                  and("kpis._id").as("kpis._id").and("kpis.treatAsCounter").as("kpis.treatAsCounter")
+          Aggregation.project("tabId","position","id").and("kpis").arrayElementAt(0).as("kpis"),
+          Aggregation.project("tabId","position","id").and("kpis.title").as("kpi.title").
+                  and("kpis._id").as("kpi._id").and("kpis.treatAsCounter").as("kpi.treatAsCounter")
         );
         AggregationResults<TabKPIDTO> aggregationResults=mongoTemplate.aggregate(aggregation,TabKPIConf.class,TabKPIDTO.class);
         return aggregationResults.getMappedResults();

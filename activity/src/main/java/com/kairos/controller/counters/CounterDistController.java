@@ -92,8 +92,8 @@ public class CounterDistController {
     }
 
     @GetMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/{tabId}")
-    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long staffId,@PathVariable Long unitId, @PathVariable String tabId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConfForStaff(tabId,staffId, ConfLevel.STAFF));
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String tabId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConfForStaff(tabId,unitId, ConfLevel.STAFF));
     }
 
     @PostMapping(COUNTRY_URL+COUNTER_DIST_URL+"/tab/create_dist_entry")
@@ -109,13 +109,13 @@ public class CounterDistController {
     }
 
     @PostMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/create_dist_entry")
-    public ResponseEntity<Map<String, Object>> addTabKPIsEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,counterManagementService.addTabKPIEntriesOfStaff(tabKPIMappingDTOS,unitId,staffId,ConfLevel.STAFF));
+    public ResponseEntity<Map<String, Object>> addTabKPIsEntryForStaff(@PathVariable Long unitId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,counterManagementService.addTabKPIEntriesOfStaff(tabKPIMappingDTOS,unitId,ConfLevel.STAFF));
     }
 
-    @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/update_dist_entry")
-    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
-        counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,unitId,staffId,ConfLevel.STAFF);
+    @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/{tabId}/update_dist_entry")
+    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForStaff(@PathVariable String tabId,@PathVariable Long unitId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
+        counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,tabId,unitId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
@@ -132,7 +132,7 @@ public class CounterDistController {
     }
 
     @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/remove_dist_entry")
-    public ResponseEntity<Map<String, Object>> removeTabKPIEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody TabKPIMappingDTO tabKPIMappingDTO){
+    public ResponseEntity<Map<String, Object>> removeTabKPIEntryForStaff(@PathVariable Long unitId,@RequestBody TabKPIMappingDTO tabKPIMappingDTO){
         counterManagementService.removeTabKPIEntries(tabKPIMappingDTO,unitId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
