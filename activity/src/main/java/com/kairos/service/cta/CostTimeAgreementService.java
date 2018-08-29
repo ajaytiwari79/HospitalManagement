@@ -263,6 +263,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(ctaDTO, CostTimeAgreement.class);
             List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
             if(!ctaRuleTemplates.isEmpty()) {
+                ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
                 save(ctaRuleTemplates);
                 List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
                 costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
@@ -285,6 +286,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             save(costTimeAgreement);
         } else {
             List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
+            ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
             save(ctaRuleTemplates);
             List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
             oldCTA.setRuleTemplateIds(ruleTemplateIds);
