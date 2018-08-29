@@ -9,6 +9,9 @@ import com.kairos.enums.ProcessingActivityAttributeName;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.gdpr.data_inventory.AssessmentDTO;
 import com.kairos.persistance.model.data_inventory.assessment.Assessment;
+import com.kairos.persistance.model.data_inventory.assessment.AssessmentAnswerValueObject;
+import com.kairos.persistance.model.data_inventory.assessment.AssetAssessmentAnswer;
+import com.kairos.persistance.model.data_inventory.assessment.ProcessingActivityAssessmentAnswer;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistance.repository.data_inventory.Assessment.AssessmentMongoRepository;
@@ -171,14 +174,14 @@ public class AssessmentService extends MongoBaseService {
                 }
                 break;
             case INPROGRESS:
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> assessmentQuestionAnswersAndFieldKeyValuePair = objectMapper.readValue(assessment.getAssessmentQuestionAnswersJsonString(), new TypeReference<Map<String, String>>() {
-                });
+                List<AssetAssessmentAnswer> assetAssessmentAnswers = assessment.getAssetAssessmentAnswers();
+                Map<AssetAttributeName, Object> assetAttributeNameObjectMap = new HashMap<>();
+                assetAssessmentAnswers.forEach(assetAssessmentAnswer -> assetAttributeNameObjectMap.put(assetAssessmentAnswer.getAssetField(), assetAssessmentAnswer.getValue()));
 
                 for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
                     for (MasterQuestionBasicResponseDTO assetAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
-                        if (assessmentQuestionAnswersAndFieldKeyValuePair.containsKey(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
-                            assetAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(assessmentQuestionAnswersAndFieldKeyValuePair.get(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
+                        if (assetAttributeNameObjectMap.containsKey(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
+                            assetAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(assetAttributeNameObjectMap.get(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
                         }
                     }
                 }
@@ -217,13 +220,13 @@ public class AssessmentService extends MongoBaseService {
                 }
                 break;
             case INPROGRESS:
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> assessmentQuestionAnswersAndFieldKeyValuePair = objectMapper.readValue(assessment.getAssessmentQuestionAnswersJsonString(), new TypeReference<Map<String, String>>() {
-                });
+                List<ProcessingActivityAssessmentAnswer> processingActivityAssessmentAnswers = assessment.getProcessingActivityAssessmentAnswers();
+                Map<ProcessingActivityAttributeName, Object> processingActivityAttributeNameObjectMap = new HashMap<>();
+                processingActivityAssessmentAnswers.forEach(processingActivityAssessmentAnswer -> processingActivityAttributeNameObjectMap.put(processingActivityAssessmentAnswer.getProcessingActivityField(), processingActivityAssessmentAnswer.getValue()));
                 for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
                     for (MasterQuestionBasicResponseDTO processingActivityAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
-                        if (assessmentQuestionAnswersAndFieldKeyValuePair.containsKey(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
-                            processingActivityAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(assessmentQuestionAnswersAndFieldKeyValuePair.get(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
+                        if (processingActivityAttributeNameObjectMap.containsKey(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
+                            processingActivityAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(processingActivityAttributeNameObjectMap.get(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
                         }
                     }
                 }
@@ -236,8 +239,44 @@ public class AssessmentService extends MongoBaseService {
     }
 
 
+    /**
+     * @param unitId
+     * @return
+     */
     public List<AssessmentResponseDTO> getAllLaunchAssessment(Long unitId) {
         return assessmentMongoRepository.getAllLaunchAssessmentAssignToRespondent(unitId);
+    }
+
+
+    /**
+     * @param unitId
+     * @param assessmentId
+     * @param assessmentAnswerValueObject
+     * @return
+     */
+    public AssessmentAnswerValueObject addAssessmentAnswerForAssetOrProcessingActivity(Long unitId, BigInteger assessmentId, AssessmentAnswerValueObject assessmentAnswerValueObject) {
+
+        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
+        if (!Optional.ofNullable(assessment).isPresent()) {
+            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentId);
+        }
+        if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
+            if (Optional.ofNullable(assessmentAnswerValueObject.getAssetAssessmentAnswers()).isPresent()) {
+                assessment.setAssetAssessmentAnswers(assessmentAnswerValueObject.getAssetAssessmentAnswers());
+
+            } else {
+                exceptionService.invalidRequestException("Unable to create Assessment for Asset " + assessment.getRelatedAssetOrProcessingActivityName() + "");
+            }
+        } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
+            if (Optional.ofNullable(assessmentAnswerValueObject.getProcessingActivityAssessmentAnswers()).isPresent()) {
+
+            } else {
+                exceptionService.invalidRequestException("Unable to create Assessment for Processing Activity " + assessment.getRelatedAssetOrProcessingActivityName() + "");
+            }
+        }
+        assessmentMongoRepository.save(assessment);
+        return assessmentAnswerValueObject;
+
     }
 
 
