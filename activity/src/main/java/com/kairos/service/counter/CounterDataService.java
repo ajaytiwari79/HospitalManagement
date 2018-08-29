@@ -8,7 +8,7 @@ package com.kairos.service.counter;
 import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.activity.enums.counter.CounterSize;
 import com.kairos.activity.enums.counter.RepresentationUnit;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.counter.chart.BaseChart;
 import com.kairos.persistence.model.counter.chart.PieChart;
