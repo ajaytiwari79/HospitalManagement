@@ -77,4 +77,8 @@ public class ExceptionService {
     public void unitNotFoundException(String message,Object... params) {
         throw new UnitNotFoundException(convertMessage(message, params));
     }
+
+    public void invalidSize(String message,Object... params) {
+        throw new InvalidSize(convertMessage(message, params));
+    }
 }
