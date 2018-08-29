@@ -416,7 +416,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
     }
 
-    public List<BreakActivitiesDTO> getAllWorkingAndNonWorkingTypeActivities(Long unitId) {
+    public List<BreakActivitiesDTO> getAllActivitiesGroupedByTimeType(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),

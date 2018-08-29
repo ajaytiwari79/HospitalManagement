@@ -65,5 +65,5 @@ public interface CustomActivityMongoRepository {
 
     StaffActivitySettingDTO findStaffPersonalizedSettings(Long unitId,BigInteger activityId);
 
-    List<BreakActivitiesDTO> getAllWorkingAndNonWorkingTypeActivities(Long unitId);
+    List<BreakActivitiesDTO> getAllActivitiesGroupedByTimeType(Long unitId);
 }
