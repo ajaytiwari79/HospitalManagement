@@ -21,7 +21,6 @@ import com.kairos.persistence.model.country.default_data.OrganizationMappingDTO;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.AbsenceTypes;
-import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.group.Group;
@@ -109,7 +108,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.*;
@@ -421,7 +419,7 @@ public class OrganizationService {
 
         OrganizationResponseDTO organizationResponseDTO = new OrganizationResponseDTO();
         organizationResponseDTO.setName(organization.getName());
-        organizationResponseDTO.setKairosId(organization.getKairosId());
+        organizationResponseDTO.setKairosCompanyId(organization.getKairosCompanyId());
         organizationResponseDTO.setId(organization.getId());
         organizationResponseDTO.setPrekairos(organization.isPrekairos());
         organizationResponseDTO.setKairosHub(organization.isKairosHub());
@@ -487,7 +485,7 @@ public class OrganizationService {
 
 
         // Verify Address here
-        AddressDTO addressDTO = orgDetails.getAddress();
+        AddressDTO addressDTO = orgDetails.getContactAddress();
         ZipCode zipCode;
         addressDTO.setVerifiedByGoogleMap(true);
         if (addressDTO.isVerifiedByGoogleMap()) {
@@ -724,32 +722,25 @@ public class OrganizationService {
     }
 
 
-    public List<Map<String, Object>> getOrganizationGdprAndWorkcenter(Long organizationId, Long countryId) {
-        List<Map<String, Object>> data = new ArrayList<>();
+    public List<OrganizationBasicResponse> getOrganizationGdprAndWorkcenter(Long organizationId, Long countryId) {
+
         List<OrganizationBasicResponse> organizationQueryResult = organizationGraphRepository.getOrganizationGdprAndWorkCenter(organizationId);
         List<Long> unitIds = organizationQueryResult.stream().map(organizationBasicResponse -> organizationBasicResponse.getId()).collect(Collectors.toList());
-
         List<Map<String, Object>> organizationContactAddress = organizationGraphRepository.getContactAddressOfParentOrganization(unitIds);
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds);
 
-
         //NOW find Address and Unit
         for (OrganizationBasicResponse organizationData : organizationQueryResult) {
-            HashMap<String, Object> orgBasicData = new HashMap<>();
-            orgBasicData.put("orgData", organizationData);
             for (Map<String, Object> address : organizationContactAddress) {
                 if (address.get("organizationId").equals(organizationData.getId())) {
-                    orgBasicData.put("address", address);
-                    orgBasicData.put("municipalities", (address.get("zipCodeId") == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCodeId"))));
+                    organizationData.setContactAddress(address);
                     break;
                 }
             }
-
             Optional<StaffPersonalDetailDTO> currentStaff = staffPersonalDetailDTOS.stream().filter(staffPersonalDetailDTO -> staffPersonalDetailDTO.getOrganizationId().equals(organizationData.getId())).findFirst();
-            orgBasicData.put("unitManager", currentStaff.isPresent() ? currentStaff.get() : null);
-            data.add(orgBasicData);
+            organizationData.setUnitManager(currentStaff.isPresent() ? currentStaff.get() : null);
         }
-        return data;
+        return organizationQueryResult;
     }
 
     public Organization getByPublicPhoneNumber(String phoneNumber) {

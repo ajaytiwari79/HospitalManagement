@@ -1121,13 +1121,12 @@ public class StaffService {
         user.setEmail(staffCreationDTO.getPrivateEmail());
         user.setUserName(staffCreationDTO.getPrivateEmail());
         user.setFirstName(staffCreationDTO.getFirstName());
-        user.setGender(CPRUtil.getGenderFromCPRNumber(staffCreationDTO.getCprNumber()));
         user.setLastName(staffCreationDTO.getLastName());
-        String defaultPassword = user.getFirstName().trim() + "@kairos";
-        user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
+        user.setPassword(Optional.ofNullable(user.getFirstName()).isPresent()?new BCryptPasswordEncoder().encode(user.getFirstName().trim() + "@kairos"):null);
         user.setCprNumber(staffCreationDTO.getCprNumber());
         if (!StringUtils.isBlank(staffCreationDTO.getCprNumber())) {
             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffCreationDTO.getCprNumber()));
+            user.setGender(CPRUtil.getGenderFromCPRNumber(staffCreationDTO.getCprNumber()));
         }
     }
 
