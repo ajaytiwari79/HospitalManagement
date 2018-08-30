@@ -28,8 +28,6 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     private long intervalLength;
     private String intervalUnit;
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
 
 
@@ -49,13 +47,6 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
         this.intervalUnit = intervalUnit;
     }
 
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
-    }
 
     public float getRecommendedValue() {
         return recommendedValue;
@@ -87,13 +78,6 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
     }
 
-    public List<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
@@ -113,7 +97,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
             shifts = sortShifts(shifts);
             int maxRestingTime = getMaxRestingTime(shifts);
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
-            if (!isValid(minMaxSetting, limitAndCounter[0], maxRestingTime/60)) {
+            if (!isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], maxRestingTime/60)) {
                 if (limitAndCounter[1] != null) {
                     int counterValue = limitAndCounter[1] - 1;
                     if (counterValue < 0) {

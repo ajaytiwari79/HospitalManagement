@@ -23,8 +23,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
 
-    private long minimumRest;//hh:mm
-    private long daysWorked;
     private Long consecutiveDays;
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
 
@@ -82,22 +80,6 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-    public long getMinimumRest() {
-        return minimumRest;
-    }
-
-
-    public void setMinimumRest(long minimumRest) {
-        this.minimumRest = minimumRest;
-    }
-
-    public long getDaysWorked() {
-        return daysWorked;
-    }
-
-    public void setDaysWorked(long daysWorked) {
-        this.daysWorked = daysWorked;
-    }
 
     public Long getConsecutiveDays() {
         return consecutiveDays;
@@ -107,12 +89,10 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         this.consecutiveDays = consecutiveDays;
     }
 
-    public ConsecutiveRestPartOfDayWTATemplate(String name, boolean disabled, String description, long minimumRest, long daysWorked) {
+    public ConsecutiveRestPartOfDayWTATemplate(String name, boolean disabled, String description) {
         this.name=name;
         this.disabled=disabled;
         this.description=description;
-        this.minimumRest = minimumRest;
-        this.daysWorked = daysWorked;
         wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
 
     }

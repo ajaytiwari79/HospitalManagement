@@ -42,7 +42,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
     private boolean restingTimeAllowed;
     private int restingTime;
 
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
+
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
@@ -86,14 +86,6 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         this.minMaxSetting = minMaxSetting;
     }
 
-
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
 
     public float getRecommendedValue() {
         return recommendedValue;

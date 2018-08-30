@@ -30,7 +30,6 @@ import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
 public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
 
-    private List<PartOfDay> partOfDays = new ArrayList<>();
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
@@ -62,13 +61,6 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
         this.timeTypeIds = timeTypeIds;
     }
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
 
     public float getRecommendedValue() {
         return recommendedValue;

@@ -28,10 +28,8 @@ import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
 
-    private long noOfPartOfDayWorked;
     private long intervalLength;
     private String intervalUnit;
-
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
@@ -97,13 +95,6 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public long getNoOfPartOfDayWorked() {
-        return noOfPartOfDayWorked;
-    }
-
-    public void setNoOfPartOfDayWorked(long noOfPartOfDayWorked) {
-        this.noOfPartOfDayWorked = noOfPartOfDayWorked;
-    }
 
     public long getIntervalLength() {
         return intervalLength;
@@ -114,8 +105,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public NumberOfPartOfDayShiftsWTATemplate(String name, boolean disabled, String description, long noOfPartOfDayWorked) {
-        this.noOfPartOfDayWorked = noOfPartOfDayWorked;
+    public NumberOfPartOfDayShiftsWTATemplate(String name, boolean disabled, String description) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;

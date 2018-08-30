@@ -28,8 +28,6 @@ import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
-    private boolean checkAgainstTimeRules;
-    private long limitCount;//no of days
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
@@ -105,21 +103,6 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public boolean isCheckAgainstTimeRules() {
-        return checkAgainstTimeRules;
-    }
-
-    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-    }
-
-    public long getLimitCount() {
-        return limitCount;
-    }
-
-    public void setLimitCount(long limitCount) {
-        this.limitCount = limitCount;
-    }
 
     public ConsecutiveWorkWTATemplate() {
         wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
@@ -165,10 +148,8 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         return exception;
     }
 
-    public ConsecutiveWorkWTATemplate(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {
+    public ConsecutiveWorkWTATemplate(String name, String description) {
         super(name, description);
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-        this.limitCount = limitCount;
         this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 }

@@ -29,7 +29,6 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     private long intervalLength;//
     private String intervalUnit;
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
 
@@ -50,13 +49,6 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         this.timeTypeIds = timeTypeIds;
     }
 
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
-    }
 
 
     public float getRecommendedValue() {
@@ -122,7 +114,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
                         totalMin -=dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
                     }
                 }
-                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin/(60*(int)dateTimeInterval.getDays()));
+                boolean isValid = isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], totalMin/(60*(int)dateTimeInterval.getDays()));
                 if (!isValid) {
                     if(limitAndCounter[1]!=null) {
                         int counterValue =  limitAndCounter[1] - 1;
