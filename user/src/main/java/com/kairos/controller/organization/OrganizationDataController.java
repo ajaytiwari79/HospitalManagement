@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -77,7 +78,7 @@ public class OrganizationDataController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setUserInfoInOrganization(@Validated @RequestBody UnitManagerDTO unitManagerDTO, @PathVariable long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                companyCreationService.setUserInfoInOrganization(organizationId, null, unitManagerDTO));
+                companyCreationService.setUserInfoInOrganization(organizationId, null, unitManagerDTO,false));
     }
 
     @ApiOperation(value = "get address of parent organization")
@@ -102,4 +103,29 @@ public class OrganizationDataController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 companyCreationService.getOrganizationTypeAndSubTypeByUnitId(organizationId));
     }
+
+    @ApiOperation(value = "Create a New Organization")
+    @PostMapping(value = "parent_organization/{organizationId}/unit")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addOrganization(@Validated @RequestBody OrganizationBasicDTO organizationBasicDTO, @PathVariable long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                companyCreationService.addNewUnit(organizationBasicDTO, organizationId));
+    }
+
+    @ApiOperation(value = "update  a child Organization")
+    @PutMapping(value = "parent_organization/{organizationId}/unit/{unitId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateUnit(@Validated @RequestBody OrganizationBasicDTO organizationBasicDTO, @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                companyCreationService.updateUnit(organizationBasicDTO, unitId));
+    }
+
+
+    @ApiOperation(value = "Update Parent Organization")
+    @RequestMapping(value = COUNTRY_URL + "/parent_organization/{parentOrganizationId}", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateParentOrganization(@PathVariable long countryId, @PathVariable long parentOrganizationId, @Valid @RequestBody OrganizationBasicDTO organizationBasicDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, companyCreationService.updateParentOrganization(organizationBasicDTO, parentOrganizationId));
+    }
+
 }

@@ -6,5 +6,5 @@ package com.kairos.wrapper.activity;
  */
 
 public enum CutOffIntervalUnit {
-    DAYS,WEEKS,MONTHS,QUARTERS,YEARS;
+    DAYS,WEEKS,MONTHS,QUARTERS,YEARS,HALF_YEARLY;
 }

@@ -3,10 +3,12 @@ package com.kairos.persistence.model.organization;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.user.organization.CompanyType;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by vipul on 26/2/18.
@@ -22,12 +24,15 @@ public class OrganizationBasicResponse {
     private List<Long> businessTypeIds;
     private CompanyType companyType;
     private String vatId;
-    private Long kairosCompanyId;
+    private String kairosCompanyId;
     private Long accountTypeId;
     private Boolean boardingCompleted;
     private Long zipCodeId;
     private Long typeId;
     private List<Long> subTypeId;
+    // Used in case of child
+    Map<String, Object> contactAddress;
+    private StaffPersonalDetailDTO unitManager;
 
     public OrganizationBasicResponse() {
     }
@@ -85,11 +90,11 @@ public class OrganizationBasicResponse {
         this.companyCategoryId = companyCategoryId;
     }
 
-    public Long getKairosCompanyId() {
+    public String getKairosCompanyId() {
         return kairosCompanyId;
     }
 
-    public void setKairosCompanyId(Long kairosCompanyId) {
+    public void setKairosCompanyId(String kairosCompanyId) {
         this.kairosCompanyId = kairosCompanyId;
     }
 
@@ -155,5 +160,21 @@ public class OrganizationBasicResponse {
 
     public void setSubTypeId(List<Long> subTypeId) {
         this.subTypeId = subTypeId;
+    }
+
+    public Map<String, Object> getContactAddress() {
+        return contactAddress;
+    }
+
+    public void setContactAddress(Map<String, Object> contactAddress) {
+        this.contactAddress = contactAddress;
+    }
+
+    public StaffPersonalDetailDTO getUnitManager() {
+        return unitManager;
+    }
+
+    public void setUnitManager(StaffPersonalDetailDTO unitManager) {
+        this.unitManager = unitManager;
     }
 }
