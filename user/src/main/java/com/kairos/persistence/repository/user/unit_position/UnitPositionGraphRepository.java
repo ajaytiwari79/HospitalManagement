@@ -77,8 +77,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(unitPosition)-[employmentRel:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "match(unitPosition)-[:HAS_SENIORITY_LEVEL]->(seniorityLevel:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]->(payGrade:PayGrade)OPTIONAL MATCH (unitPosition)-[:HAS_REASON_CODE]->(reasonCode:ReasonCode) \n" +
-            "match(org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)->[:" + MUNICIPALITY + "]-(municipality:Municipality) "+
-            "Match(payGrade)-[pgaRel:"+HAS_PAY_GROUP_AREA+"]->(pga:PayGroupArea)-[:"+HAS_MUNICIPALITY+"]-(municipality)"+
+            "optional match(org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) "+
+            "optional Match(payGrade)-[pgaRel:"+HAS_PAY_GROUP_AREA+"]->(pga:PayGroupArea)-[:"+HAS_MUNICIPALITY+"]-(municipality)"+
             "optional match (expertise)-[:SUPPORTED_BY_UNION]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "optional match(unitPosition)-[rel:HAS_FUNCTION]->(functions:Function)with pgaRel, expertise ,org,subOrg,reasonCode,unitPosition,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData " +
             "return expertise as expertise,unionData as union, positionCode as positionCode, \n" +
@@ -95,8 +95,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(unitPosition)-[employmentRel:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "match(unitPosition)-[:HAS_SENIORITY_LEVEL]->(seniorityLevel:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]->(payGrade:PayGrade)" +
-            "match(org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) "+
-            "Match(payGrade)-[pgaRel:"+HAS_PAY_GROUP_AREA+"]->(pga:PayGroupArea)-[:"+HAS_MUNICIPALITY+"]-(municipality)"+
+            "optional match(org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) "+
+            "optional Match(payGrade)-[pgaRel:"+HAS_PAY_GROUP_AREA+"]->(pga:PayGroupArea)-[:"+HAS_MUNICIPALITY+"]-(municipality)"+
             "OPTIONAL MATCH (unitPosition)-[:HAS_REASON_CODE]->(reasonCode:ReasonCode) \n" +
             "optional match (expertise)-[:SUPPORTED_BY_UNION]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "optional match(unitPosition)-[rel:HAS_FUNCTION]->(functions:Function)with pgaRel, expertise ,org,reasonCode,unitPosition,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount,icon:functions.icon }) END as functionData " +
@@ -161,8 +161,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "OPTIONAL MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
             "optional match (expertise)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "optional match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function) \n" +
-            "match(org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)->[:" + MUNICIPALITY + "]-(municipality:Municipality) "+
-            "Match(payGrade)-[pgaRel:"+HAS_PAY_GROUP_AREA+"]->(pga:PayGroupArea)-[:"+HAS_MUNICIPALITY+"]-(municipality)"+
+            "optional match(org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) "+
+            "optional Match(payGrade)-[pgaRel:"+HAS_PAY_GROUP_AREA+"]->(pga:PayGroupArea)-[:"+HAS_MUNICIPALITY+"]-(municipality)"+
             "with pgaRel, expertise ,org,subOrg,reasonCode,unitPosition,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData return expertise as expertise,unionData as union, positionCode as positionCode, \n" +
             "{id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage, freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGrade:{id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}} as seniorityLevel, \n" +
             "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes, unitPosition.startDateMillis as startDateMillis, unitPosition.endDateMillis as endDateMillis, \n" +
@@ -180,8 +180,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "OPTIONAL MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
             "optional match (expertise)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "optional match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function) \n" +
-            "match(org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)->[:" + MUNICIPALITY + "]-(municipality:Municipality) "+
-            "Match(payGrade)-[pgaRel:"+HAS_PAY_GROUP_AREA+"]->(pga:PayGroupArea)-[:"+HAS_MUNICIPALITY+"]-(municipality)"+
+            "optional match(org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) "+
+            "optional Match(payGrade)-[pgaRel:"+HAS_PAY_GROUP_AREA+"]->(pga:PayGroupArea)-[:"+HAS_MUNICIPALITY+"]-(municipality)"+
             "with pgaRel, expertise ,org,subOrg,reasonCode,unitPosition,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount,icon:functions.icon }) END as functionData return expertise as expertise,unionData as union, positionCode as positionCode, \n" +
             "{id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage, freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGrade:{id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}} as seniorityLevel, \n" +
             "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes, unitPosition.startDateMillis as startDateMillis, unitPosition.endDateMillis as endDateMillis, \n" +
