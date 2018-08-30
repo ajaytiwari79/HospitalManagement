@@ -4,6 +4,7 @@ import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessGroupCountQueryResult;
 import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
 import com.kairos.persistence.model.access_permission.AccessPage;
+import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
@@ -279,6 +280,10 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.role as role, ag.enabled as enabled ")
     List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId);
 
+    @Query("MATCH (staff:Staff),(org:Organization) where id(staff)={0} AND id(org)={1} " +
+            "match (staff)-[:"+BELONGS_TO+"]-(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(org) " +
+            "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag) RETURN id(ag)")
+    List<Long> getAccessGroupIdsByStaffIdAndUnitId(Long staffId,Long unitId);
 }
 
 

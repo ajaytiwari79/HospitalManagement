@@ -5,6 +5,7 @@ import java.util.List;
 
 public class CategoryKPIMappingDTO {
     private BigInteger categoryId;
+    private String name;
     private List<BigInteger> kpiId;
 
     public BigInteger getCategoryId() {
@@ -21,5 +22,13 @@ public class CategoryKPIMappingDTO {
 
     public void setKpiId(List<BigInteger> kpiId) {
         this.kpiId = kpiId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

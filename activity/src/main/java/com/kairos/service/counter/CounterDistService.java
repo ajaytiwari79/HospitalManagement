@@ -7,10 +7,12 @@ import com.kairos.activity.counter.KPICategoryDTO;
 import com.kairos.activity.counter.KPIDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
+import com.kairos.activity.counter.distribution.access_group.AccessGroupPermissionDTO;
 import com.kairos.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
+import com.kairos.activity.counter.distribution.category.StaffKPIGalleryDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
@@ -23,6 +25,7 @@ import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.util.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -70,6 +73,16 @@ public class CounterDistService extends MongoBaseService {
         List<BigInteger> categoryIds = categories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(toList());
         List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategories(categoryIds);
         return new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
+    }
+
+    public StaffKPIGalleryDTO getInitialCategoryKPIDistDataForStaff(Long unitId, ConfLevel level) {
+        Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
+        AccessGroupPermissionDTO accessGroupPermissionDTO=genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId,staffId);
+        List<KPICategoryDTO> categories = counterRepository.getKPICategory(null, level, staffId);
+        List<BigInteger> categoryIds = categories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(toList());
+        List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategories(categoryIds);
+        new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
+        return null;
     }
 
     public void addCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {

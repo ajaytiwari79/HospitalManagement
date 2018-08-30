@@ -2,6 +2,7 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.counter.DefaultKPISettingDTO;
+import com.kairos.activity.counter.distribution.access_group.AccessGroupPermissionDTO;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.activity.task.StaffTaskDTO;
@@ -2078,6 +2079,16 @@ public class StaffService {
     public Long getStaffIdOfLoggedInUser(Long unitId) {
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
         return staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
+    }
+
+    public AccessGroupPermissionDTO getAccessGroupIdsOfStaff(Long unitId,Long staffId) {
+        long loggedinUserId = UserContext.getUserDetails().getId();
+        List<Long> accessGroupIds=new ArrayList<>();
+        Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
+        if(!isCountryAdmin){
+        accessGroupIds= accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
+        }
+        return new AccessGroupPermissionDTO(isCountryAdmin,accessGroupIds);
     }
 
 

@@ -1,5 +1,6 @@
 package com.kairos.rest_client;
 
+import com.kairos.activity.counter.distribution.access_group.AccessGroupPermissionDTO;
 import com.kairos.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
@@ -105,5 +106,10 @@ public class GenericIntegrationService {
             exceptionService.dataNotFoundByIdException("message.staff.notFound");
         }
         return value.longValue();
+    }
+
+    public AccessGroupPermissionDTO getAccessGroupIdsAndCountryAdmin(Long unitId,Long staffId){
+        AccessGroupPermissionDTO accessGroupPermissionDTO=genericRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/staff/{staffId}/user/accessgroup",null,staffId);
+        return accessGroupPermissionDTO;
     }
 }

@@ -139,4 +139,10 @@ public class UserController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdOfLoggedInUser(unitId));
     }
 
+    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/staff/{staffId}/user/accessgroup")
+    @ApiOperation("get accessgroup ids and iscountryadmin")
+    public ResponseEntity<Map<String, Object>> getStaffIdOfLoggedInUser(@PathVariable Long unitId,@PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAccessGroupIdsOfStaff(unitId,staffId));
+    }
+
 }
