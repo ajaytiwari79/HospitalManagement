@@ -5,14 +5,22 @@ import com.kairos.activity.counter.KPIDTO;
 import java.util.List;
 
 public class StaffKPIGalleryDTO {
-    private CategoryKPIMappingDTO category;
+    private List<CategoryKPIMappingDTO> category;
     private List<KPIDTO> kpis;
 
-    public CategoryKPIMappingDTO getCategory() {
+    public StaffKPIGalleryDTO() {
+    }
+
+    public StaffKPIGalleryDTO(List<CategoryKPIMappingDTO> category, List<KPIDTO> kpis) {
+        this.category = category;
+        this.kpis = kpis;
+    }
+
+    public List<CategoryKPIMappingDTO> getCategory() {
         return category;
     }
 
-    public void setCategory(CategoryKPIMappingDTO category) {
+    public void setCategory(List<CategoryKPIMappingDTO> category) {
         this.category = category;
     }
 

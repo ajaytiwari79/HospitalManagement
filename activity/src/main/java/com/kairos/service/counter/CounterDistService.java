@@ -81,16 +81,14 @@ public class CounterDistService extends MongoBaseService {
         if(accessGroupPermissionCounterDTO.getCountryAdmin()){
             level=ConfLevel.COUNTRY;
             refId=accessGroupPermissionCounterDTO.getCountryId();
-//            categories = counterRepository.getKPICategory(null, level, refId);
         }else{
             level=ConfLevel.UNIT;
             refId=unitId;
-//           categories= counterRepository.getKPICategory(null, level, refId);
         }
-       //List<BigInteger> categoryIds = categories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(toList());
+        List<ApplicableKPIDTO> applicableKPIList=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
+        List<KPIDTO> kpidtos=applicableKPIList.stream().map(applicableKPIDTO -> applicableKPIDTO.getKpi()).collect(Collectors.toList());
         List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategoriesForStaff(new ArrayList<>(),refId,level);
-       new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
-        return null;
+        return new StaffKPIGalleryDTO(categoryKPIMapping,kpidtos);
     }
 
     public void addCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {
