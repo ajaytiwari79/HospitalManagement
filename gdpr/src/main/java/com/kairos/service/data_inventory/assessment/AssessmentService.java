@@ -274,8 +274,8 @@ public class AssessmentService extends MongoBaseService {
      * @param unitId
      * @return
      */
-    public List<AssessmentResponseDTO> getAllLaunchAssessment(Long unitId) {
-        return assessmentMongoRepository.getAllLaunchAssessmentAssignToRespondent(unitId);
+    public List<AssessmentResponseDTO> getAllLaunchedAssessmentOfAssignee(Long unitId) {
+        return assessmentMongoRepository.getAllLaunchedAssessmentAssignToRespondent(unitId);
     }
 
 
@@ -285,7 +285,6 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentAnswerValueObject
      * @return
      */
-    //todo working on it fixed method and update for fill Answer
     public AssessmentAnswerValueObject addAssessmentAnswerForAssetOrProcessingActivity(Long unitId, BigInteger assessmentId, AssessmentAnswerValueObject assessmentAnswerValueObject) {
 
         Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
@@ -297,18 +296,9 @@ public class AssessmentService extends MongoBaseService {
         }
 
         if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
-            if (Optional.ofNullable(assessmentAnswerValueObject.getAssetAssessmentAnswers()).isPresent()) {
-                assessment.setAssetAssessmentAnswers(assessmentAnswerValueObject.getAssetAssessmentAnswers());
-
-            } else {
-                exceptionService.invalidRequestException("Unable to create Assessment for Asset " + assessment.getRelatedAssetOrProcessingActivityName() + "");
-            }
+            assessment.setAssetAssessmentAnswers(assessmentAnswerValueObject.getAssetAssessmentAnswers());
         } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
-            if (Optional.ofNullable(assessmentAnswerValueObject.getProcessingActivityAssessmentAnswers()).isPresent()) {
-
-            } else {
-                exceptionService.invalidRequestException("Unable to create Assessment for Processing Activity " + assessment.getRelatedAssetOrProcessingActivityName() + "");
-            }
+            assessment.setProcessingActivityAssessmentAnswers(assessmentAnswerValueObject.getProcessingActivityAssessmentAnswers());
         }
         assessmentMongoRepository.save(assessment);
         return assessmentAnswerValueObject;
@@ -316,11 +306,124 @@ public class AssessmentService extends MongoBaseService {
     }
 
 
+    /**
+     * @param unitId
+     * @param assessmentId
+     * @param assessmentAnswerValueObject
+     * @return
+     */
+    public AssessmentAnswerValueObject saveAssessmentFinalDataToAssetOrProcessingActivity(Long unitId, BigInteger assessmentId, AssessmentAnswerValueObject assessmentAnswerValueObject) {
+
+        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
+        if (!Optional.ofNullable(assessment).isPresent()) {
+            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentId);
+        }
+        if (!assessment.getAssessmentStatus().equals(AssessmentStatus.INPROGRESS)) {
+            exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.INPROGRESS);
+        }
+
+        if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
+            Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
+            List<AssetAssessmentAnswer> assessmentAnswersForAsset = assessmentAnswerValueObject.getAssetAssessmentAnswers();
+            assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> saveAssessmentAnswerForAsset(assetAssessmentAnswer.getAssetField(), assetAssessmentAnswer.getValue(), asset));
+            assetMongoRepository.save(asset);
+            assessment.setAssessmentStatus(AssessmentStatus.COMPLETED);
+            assessment.setAssetAssessmentAnswers(assessmentAnswerValueObject.getAssetAssessmentAnswers());
+
+        } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
+            ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
+            List<ProcessingActivityAssessmentAnswer> assessmentAnswersForProcessingActivity = assessmentAnswerValueObject.getProcessingActivityAssessmentAnswers();
+
+            assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer
+                    -> saveAssessmentAnswerForProcessingActivity(processingActivityAssessmentAnswer.getProcessingActivityField(), processingActivityAssessmentAnswer.getValue(), processingActivity));
+            processingActivityMongoRepository.save(processingActivity);
+            assessment.setAssessmentStatus(AssessmentStatus.COMPLETED);
+            assessment.setProcessingActivityAssessmentAnswers(assessmentAnswerValueObject.getProcessingActivityAssessmentAnswers());
+
+        }
+        assessmentMongoRepository.save(assessment);
+        return assessmentAnswerValueObject;
+
+    }
 
 
+    /**
+     * @param assetAttributeName  asset field
+     * @param assetAttributeValue asset value corressponding to field
+     * @param asset               asset to which value Assessment answer were filed by assignee
+     */
+    public void saveAssessmentAnswerForAsset(AssetAttributeName assetAttributeName, Object assetAttributeValue, Asset asset) {
+        switch (assetAttributeName) {
+            case NAME:
+                asset.setName((String) assetAttributeValue);
+                break;
+            case DESCRIPTION:
+                asset.setDescription((String) assetAttributeValue);
+                break;
+            case HOSTING_LOCATION:
+                asset.setHostingLocation((String) assetAttributeValue);
+                break;
+            case HOSTING_TYPE:
+                asset.setHostingType((BigInteger) assetAttributeValue);
+                break;
+            case DATA_DISPOSAL:
+                asset.setDataDisposal((BigInteger) assetAttributeValue);
+                break;
+            case HOSTING_PROVIDER:
+                asset.setHostingProvider((BigInteger) assetAttributeValue);
+                break;
+            case ASSET_TYPE:
+                asset.setAssetType((BigInteger) assetAttributeValue);
+                break;
+            case STORAGE_FORMAT:
+                asset.setStorageFormats((List<BigInteger>) assetAttributeValue);
+                break;
+            case ASSET_SUB_TYPE:
+                asset.setAssetSubTypes((List<BigInteger>) assetAttributeValue);
+                break;
+            case TECHNICAL_SECURITY_MEASURES:
+                asset.setTechnicalSecurityMeasures((List<BigInteger>) assetAttributeValue);
+                break;
+            case ORGANIZATION_SECURITY_MEASURES:
+                asset.setOrgSecurityMeasures((List<BigInteger>) assetAttributeValue);
+                break;
+        }
+    }
 
 
-
+    /**
+     * @param processingActivityAttributeName  processing activity field
+     * @param processingActivityAttributeValue processing activity  value corressponding to field
+     * @param processingActivity               processing activity to which value Assessment answer were filed by assignee
+     */
+    public void saveAssessmentAnswerForProcessingActivity(ProcessingActivityAttributeName processingActivityAttributeName, Object processingActivityAttributeValue, ProcessingActivity processingActivity) {
+        switch (processingActivityAttributeName) {
+            case NAME:
+                processingActivity.setName((String) processingActivityAttributeValue);
+                break;
+            case DESCRIPTION:
+                processingActivity.setDescription((String) processingActivityAttributeValue);
+                break;
+            case RESPONSIBILITY_TYPE:
+                processingActivity.setResponsibilityType((BigInteger) processingActivityAttributeValue);
+                break;
+            case ACCESSOR_PARTY:
+                processingActivity.setAccessorParties((List<BigInteger>) processingActivityAttributeValue);
+                break;
+            case PROCESSING_PURPOSES:
+                processingActivity.setProcessingPurposes((List<BigInteger>) processingActivityAttributeValue);
+                break;
+            case PROCESSING_LEGAL_BASIS:
+                processingActivity.setProcessingLegalBasis((List<BigInteger>) processingActivityAttributeValue);
+                break;
+            case TRANSFER_METHOD:
+                processingActivity.setTransferMethods((List<BigInteger>) processingActivityAttributeValue);
+                break;
+            case DATA_SOURCES:
+                processingActivity.setDataSources((List<BigInteger>) processingActivityAttributeValue);
+                break;
+        }
+    }
 
 
 }

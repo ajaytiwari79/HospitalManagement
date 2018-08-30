@@ -36,7 +36,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     }
 
     @Override
-    public List<AssessmentResponseDTO> getAllLaunchAssessmentAssignToRespondent(Long unitId) {
+    public List<AssessmentResponseDTO> getAllLaunchedAssessmentAssignToRespondent(Long unitId) {
         List<AssessmentStatus> assessmentStatusList = new ArrayList<>();
         assessmentStatusList.add(AssessmentStatus.NEW);
         assessmentStatusList.add(AssessmentStatus.INPROGRESS);
