@@ -588,9 +588,7 @@ public class ShiftService extends MongoBaseService {
         Specification<BigInteger> activitySpecification = shiftAllowedToDelete;
         List<String> messages = activitySpecification.isSatisfiedString(phase.getId());
         if (!messages.isEmpty()) {
-            List<String> errors = new ArrayList<>();
-            messages.forEach(responseMessage -> errors.add(localeService.getMessage(responseMessage)));
-            exceptionService.actionNotPermittedException(errors.get(0));
+            exceptionService.actionNotPermittedException(messages.get(0));
         }
         shift.setDeleted(true);
         save(shift);
