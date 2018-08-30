@@ -243,6 +243,35 @@ public class AssessmentService extends MongoBaseService {
 
     /**
      * @param unitId
+     * @param assessmentId
+     * @param assessmentStatus
+     * @return
+     */
+    public boolean updateAssessmentStatus(Long unitId, BigInteger assessmentId, AssessmentStatus assessmentStatus) {
+        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
+        if (!Optional.ofNullable(assessment).isPresent()) {
+            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentId);
+        }
+        switch (assessment.getAssessmentStatus()) {
+            case INPROGRESS:
+                if (assessmentStatus.equals(AssessmentStatus.NEW)) {
+                    exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
+                }
+                break;
+            case COMPLETED:
+                if (assessmentStatus.equals(AssessmentStatus.NEW) || assessmentStatus.equals(AssessmentStatus.INPROGRESS)) {
+                    exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
+                }
+                break;
+        }
+        assessment.setAssessmentStatus(assessmentStatus);
+        assessmentMongoRepository.save(assessment);
+        return true;
+    }
+
+
+    /**
+     * @param unitId
      * @return
      */
     public List<AssessmentResponseDTO> getAllLaunchAssessment(Long unitId) {
@@ -256,12 +285,17 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentAnswerValueObject
      * @return
      */
+    //todo working on it fixed method and update for fill Answer
     public AssessmentAnswerValueObject addAssessmentAnswerForAssetOrProcessingActivity(Long unitId, BigInteger assessmentId, AssessmentAnswerValueObject assessmentAnswerValueObject) {
 
         Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentId);
         }
+        if (!assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
+            exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.INPROGRESS);
+        }
+
         if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
             if (Optional.ofNullable(assessmentAnswerValueObject.getAssetAssessmentAnswers()).isPresent()) {
                 assessment.setAssetAssessmentAnswers(assessmentAnswerValueObject.getAssetAssessmentAnswers());
@@ -280,6 +314,13 @@ public class AssessmentService extends MongoBaseService {
         return assessmentAnswerValueObject;
 
     }
+
+
+
+
+
+
+
 
 
 }
