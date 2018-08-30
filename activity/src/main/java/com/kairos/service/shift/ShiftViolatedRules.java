@@ -1,16 +1,32 @@
-package com.kairos.activity.shift;
+package com.kairos.service.shift;
 
+import com.kairos.activity.shift.ActivityRuleViolation;
+import com.kairos.activity.shift.WorkTimeAgreementRuleViolation;
+import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.service.MongoBaseService;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.math.BigInteger;
 import java.util.List;
 
 /**
  * @author pradeep
- * @date - 29/8/18
+ * @date - 30/8/18
  */
+@Document
+public class ShiftViolatedRules extends MongoBaseEntity{
 
-public class ViolatedRulesDTO {
-
+    private BigInteger shiftId;
     private List<WorkTimeAgreementRuleViolation> workTimeAggreements;
     private List<ActivityRuleViolation> activities;
+
+    public BigInteger getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(BigInteger shiftId) {
+        this.shiftId = shiftId;
+    }
 
     public List<WorkTimeAgreementRuleViolation> getWorkTimeAggreements() {
         return workTimeAggreements;

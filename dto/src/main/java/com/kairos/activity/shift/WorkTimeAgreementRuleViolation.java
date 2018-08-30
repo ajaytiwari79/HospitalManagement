@@ -7,14 +7,25 @@ import java.math.BigInteger;
  * @date - 29/8/18
  */
 
-public class RuleViolation {
+public class WorkTimeAgreementRuleViolation {
 
-    BigInteger id;
-    String name;
-    int counter;
-    boolean broken;
-    boolean canBeIgnore;
+    private BigInteger id;
+    private String name;
+    private int counter;
+    private boolean broken;
+    private boolean canBeIgnore;
 
+
+    public WorkTimeAgreementRuleViolation() {
+    }
+
+    public WorkTimeAgreementRuleViolation(BigInteger id, String name, int counter, boolean broken, boolean canBeIgnore) {
+        this.id = id;
+        this.name = name;
+        this.counter = counter;
+        this.broken = broken;
+        this.canBeIgnore = canBeIgnore;
+    }
 
     public BigInteger getId() {
         return id;
