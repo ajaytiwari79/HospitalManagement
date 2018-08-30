@@ -1,6 +1,6 @@
 package com.kairos.controller.organization.default_data;
 
-import com.kairos.service.organization_meta_data.SickConfigurationSettingsService;
+import com.kairos.service.organization_meta_data.SickConfigurationService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,21 +21,21 @@ import static com.kairos.constants.ApiConstants.API_SICK_SETTINGS_URL;
 @RestController
 @RequestMapping(API_SICK_SETTINGS_URL)
 @Api(API_SICK_SETTINGS_URL)
-public class SickSettingConfigurationController {
+public class SickConfigurationController {
     @Inject
-    SickConfigurationSettingsService sickConfigurationSettingsService;
+    private SickConfigurationService sickConfigurationService;
 
     @ApiOperation(value = "api used to save the sick settings of the organization")
     @PostMapping
     public ResponseEntity<Map<String,Object>> saveSickSettingsOfUnit(@RequestBody Set<BigInteger> timeTypes, @PathVariable Long unitId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,sickConfigurationSettingsService.saveSickSettingsOfUnit(unitId,timeTypes));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true, sickConfigurationService.saveSickSettingsOfUnit(unitId,timeTypes));
     }
 
     @ApiOperation(value = "used to get sick settings of the organization")
     @GetMapping
     public ResponseEntity<Map<String,Object>> getSickSettingsOfUnit(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK  ,true,
-                sickConfigurationSettingsService.getSickSettingsOfUnit(unitId));
+                sickConfigurationService.getSickSettingsOfUnit(unitId));
 
     }
 

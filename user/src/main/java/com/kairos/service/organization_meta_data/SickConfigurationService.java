@@ -20,9 +20,9 @@ import java.util.*;
  **/
 @Service
 @Transactional
-public class SickConfigurationSettingsService {
+public class SickConfigurationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SickConfigurationSettingsService.class);
+    private static final Logger logger = LoggerFactory.getLogger(SickConfigurationService.class);
 
     @Inject
     private SickConfigurationRepository sickConfigurationRepository;
