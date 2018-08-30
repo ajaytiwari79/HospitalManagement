@@ -261,6 +261,22 @@ public class AssessmentService extends MongoBaseService {
             case COMPLETED:
                 if (assessmentStatus.equals(AssessmentStatus.NEW) || assessmentStatus.equals(AssessmentStatus.INPROGRESS)) {
                     exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
+                } else {
+                    if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
+                        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
+                        List<AssetAssessmentAnswer> assessmentAnswersForAsset = assessment.getAssetAssessmentAnswers();
+                        assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> saveAssessmentAnswerForAsset(assetAssessmentAnswer.getAssetField(), assetAssessmentAnswer.getValue(), asset));
+                        assetMongoRepository.save(asset);
+
+                    } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
+                        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
+                        List<ProcessingActivityAssessmentAnswer> assessmentAnswersForProcessingActivity = assessment.getProcessingActivityAssessmentAnswers();
+
+                        assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer
+                                -> saveAssessmentAnswerForProcessingActivity(processingActivityAssessmentAnswer.getProcessingActivityField(), processingActivityAssessmentAnswer.getValue(), processingActivity));
+                        processingActivityMongoRepository.save(processingActivity);
+
+                    }
                 }
                 break;
         }
@@ -285,7 +301,7 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentAnswerValueObject
      * @return
      */
-    public AssessmentAnswerValueObject addAssessmentAnswerForAssetOrProcessingActivity(Long unitId, BigInteger assessmentId, AssessmentAnswerValueObject assessmentAnswerValueObject) {
+    public AssessmentAnswerValueObject addAssessmentAnswerForAssetOrProcessingActivityToAssessment(Long unitId, BigInteger assessmentId, AssessmentAnswerValueObject assessmentAnswerValueObject) {
 
         Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
@@ -299,47 +315,6 @@ public class AssessmentService extends MongoBaseService {
             assessment.setAssetAssessmentAnswers(assessmentAnswerValueObject.getAssetAssessmentAnswers());
         } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
             assessment.setProcessingActivityAssessmentAnswers(assessmentAnswerValueObject.getProcessingActivityAssessmentAnswers());
-        }
-        assessmentMongoRepository.save(assessment);
-        return assessmentAnswerValueObject;
-
-    }
-
-
-    /**
-     * @param unitId
-     * @param assessmentId
-     * @param assessmentAnswerValueObject
-     * @return
-     */
-    public AssessmentAnswerValueObject saveAssessmentFinalDataToAssetOrProcessingActivity(Long unitId, BigInteger assessmentId, AssessmentAnswerValueObject assessmentAnswerValueObject) {
-
-        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
-        if (!Optional.ofNullable(assessment).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentId);
-        }
-        if (!assessment.getAssessmentStatus().equals(AssessmentStatus.INPROGRESS)) {
-            exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.INPROGRESS);
-        }
-
-        if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
-            Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
-            List<AssetAssessmentAnswer> assessmentAnswersForAsset = assessmentAnswerValueObject.getAssetAssessmentAnswers();
-            assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> saveAssessmentAnswerForAsset(assetAssessmentAnswer.getAssetField(), assetAssessmentAnswer.getValue(), asset));
-            assetMongoRepository.save(asset);
-            assessment.setAssessmentStatus(AssessmentStatus.COMPLETED);
-            assessment.setAssetAssessmentAnswers(assessmentAnswerValueObject.getAssetAssessmentAnswers());
-
-        } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
-            ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
-            List<ProcessingActivityAssessmentAnswer> assessmentAnswersForProcessingActivity = assessmentAnswerValueObject.getProcessingActivityAssessmentAnswers();
-
-            assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer
-                    -> saveAssessmentAnswerForProcessingActivity(processingActivityAssessmentAnswer.getProcessingActivityField(), processingActivityAssessmentAnswer.getValue(), processingActivity));
-            processingActivityMongoRepository.save(processingActivity);
-            assessment.setAssessmentStatus(AssessmentStatus.COMPLETED);
-            assessment.setProcessingActivityAssessmentAnswers(assessmentAnswerValueObject.getProcessingActivityAssessmentAnswers());
-
         }
         assessmentMongoRepository.save(assessment);
         return assessmentAnswerValueObject;
