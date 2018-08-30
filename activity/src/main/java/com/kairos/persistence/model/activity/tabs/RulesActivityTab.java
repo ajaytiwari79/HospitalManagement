@@ -43,7 +43,8 @@ public class RulesActivityTab implements Serializable{
     private DurationField approvalTimeInAdvance;
     private Float approvalPercentage;
     private LocalTime maximumEndTime;// shift can't be extend this time
-
+    private short recurrenceDays;
+    private short recurrenceTime;
 
     public LocalDate getCutOffStartFrom() {
         return cutOffStartFrom;
