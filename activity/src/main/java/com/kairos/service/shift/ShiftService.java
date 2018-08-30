@@ -762,10 +762,7 @@ public class ShiftService extends MongoBaseService {
             if (!Optional.ofNullable(shift).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getId());
             }
-        } else {
-            shift = new Shift();
         }
-
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
         if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getStaffId());
@@ -900,13 +897,10 @@ public class ShiftService extends MongoBaseService {
         for (ShiftDTO shiftDTO : shiftDTOS) {
             ShiftQueryResult shiftQueryResult = createShift(unitId, shiftDTO, "Organization", true).getShifts().get(0);
             shiftDTO.setId(shiftQueryResult.getId());
-        }
-
-        shiftDTOS.forEach(shiftDTO -> {
             if (shiftDTO.getSubShifts() != null && !shiftDTO.getSubShifts().isEmpty()) {
                 addSubShift(unitId, shiftDTO, type);
             }
-        });
+        }
         return true;
     }
 
@@ -917,9 +911,6 @@ public class ShiftService extends MongoBaseService {
         List<ShiftDTO> shiftDTOS = new ArrayList<>(7);
         Date shiftDate = fromDate;
         for (int day = 0; day < 7; day++) {
-            /*if (staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes() <= totalContractualMinOfShift) {
-                break;
-            }*/
             ShiftDTO shiftDTO = calculateAverageShiftByActivity(shiftQueryResultsInInterval, activity, staffAdditionalInfoDTO, shiftDate);
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             shiftDTOS.add(shiftDTO);
