@@ -60,11 +60,13 @@ public class CounterDistService extends MongoBaseService {
 
 
     public List<KPIDTO> getKPIsList(Long refId, ConfLevel level) {
-        List<ApplicableKPIDTO> applicableKPIList=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
-        if(applicableKPIList.isEmpty()){
+        if(ConfLevel.STAFF.equals(level)){
+            refId=genericIntegrationService.getStaffIdByUserId(refId);
+        }
+        List<KPIDTO> kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
+        if(kpidtos.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
-        List<KPIDTO> kpidtos=applicableKPIList.stream().map(applicableKPIDTO -> applicableKPIDTO.getKpi()).collect(Collectors.toList());
         return kpidtos;
     }
 
@@ -76,21 +78,40 @@ public class CounterDistService extends MongoBaseService {
         return new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
     }
 
-    public StaffKPIGalleryDTO getInitialCategoryKPIDistDataForStaff(Long unitId, ConfLevel level) {
-        List<KPICategoryDTO> categories=null;
-        Long refId=null;
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+    public StaffKPIGalleryDTO getInitialCategoryKPIDistDataForStaff(Long refId, ConfLevel level) {
+        List<BigInteger> kpiIds=null;
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
         if(accessGroupPermissionCounterDTO.getCountryAdmin()){
             level=ConfLevel.COUNTRY;
             refId=accessGroupPermissionCounterDTO.getCountryId();
+            List<KPIDTO> kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
+            kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
         }else{
             level=ConfLevel.UNIT;
-            refId=unitId;
+            List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(accessGroupPermissionCounterDTO.getAccessGroupIds(),new ArrayList<>(),level,refId);
+            kpiIds=accessGroupMappingDTOS.stream().map(accessGroupMappingDTO -> accessGroupMappingDTO.getKpiId()).collect(Collectors.toList());
         }
-        List<ApplicableKPIDTO> applicableKPIList=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
-        List<KPIDTO> kpidtos=applicableKPIList.stream().map(applicableKPIDTO -> applicableKPIDTO.getKpi()).collect(Collectors.toList());
+        List<KPIDTO> kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
+      //  counterRepository.removeCategoryKPIEntryOfStaff(refId,kpiIds,level);
         List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategoriesForStaff(new ArrayList<>(),refId,level);
         return new StaffKPIGalleryDTO(categoryKPIMapping,kpidtos);
+    }
+
+    public void getKpiIdsForStaff(Long refId,ConfLevel level){
+        List<BigInteger> kpiIds=null;
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
+        if(accessGroupPermissionCounterDTO.getCountryAdmin()){
+            level=ConfLevel.COUNTRY;
+            refId=accessGroupPermissionCounterDTO.getCountryId();
+            List<KPIDTO> kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
+            kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
+        }else{
+            level=ConfLevel.UNIT;
+            List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(accessGroupPermissionCounterDTO.getAccessGroupIds(),new ArrayList<>(),level,refId);
+            kpiIds=accessGroupMappingDTOS.stream().map(accessGroupMappingDTO -> accessGroupMappingDTO.getKpiId()).collect(Collectors.toList());
+        }
+        //counterRepository.removeCategoryKPIEntryOfStaff(unitId,kpiIds,level);
+        //counterRepository.removeTabKPIConfigurationForStaff(kpiIds,accessGroupPermissionCounterDTO.getStaffId(),ConfLevel.STAFF);
     }
 
     public void addCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {

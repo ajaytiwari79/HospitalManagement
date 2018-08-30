@@ -39,4 +39,12 @@ public class AccessGroupPermissionCounterDTO {
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
 }

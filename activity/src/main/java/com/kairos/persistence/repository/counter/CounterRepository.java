@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.counter;
 import com.kairos.activity.counter.ApplicableKPIDTO;
 import com.kairos.activity.counter.CounterDTO;
 import com.kairos.activity.counter.KPICategoryDTO;
+import com.kairos.activity.counter.KPIDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
@@ -76,14 +77,15 @@ public class CounterRepository {
 
     //test cases..
     //getCounterListByType for testcases
-    public List<ApplicableKPIDTO> getCounterListForCountryOrUnitOrStaff(Long refId, ConfLevel level){
+    public List<KPIDTO> getCounterListForCountryOrUnitOrStaff(Long refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation=Aggregation.newAggregation(
           Aggregation.match(Criteria.where(refQueryField).is(refId).and("level").is(level)),
-          Aggregation.lookup("counter","activeKpiId","_id","kpiIds"),
-           Aggregation.project("level").and("kpiIds").arrayElementAt(0).as("kpi")
+          Aggregation.lookup("counter","activeKpiId","_id","kpi"),
+           Aggregation.project().and("kpi._id").as("_id")
+                   .and("kpi.title").as("title").and("kpi.treatAsCounter").as("treatAsCounter")
         );
-        AggregationResults<ApplicableKPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,ApplicableKPIDTO.class);
+        AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,KPIDTO.class);
         return results.getMappedResults();
         }
 
@@ -198,6 +200,12 @@ public class CounterRepository {
         mongoTemplate.remove(query, TabKPIConf.class);
     }
 
+    public void removeTabKPIConfigurationForStaff(List<BigInteger> kpiIds,Long refId,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where(refQueryField).is(refId).and("level").is(level).and("kpiId").nin(kpiIds));
+        mongoTemplate.remove(query, TabKPIConf.class);
+    }
+
 
     //accessGroupKPI distribution crud
 
@@ -220,6 +228,13 @@ public class CounterRepository {
         Query query = new Query(Criteria.where("unitId").in(unitIds).and("kpiId").is(kpiId));
         mongoTemplate.remove(query, CategoryKPIConf.class);
     }
+
+    public void removeCategoryKPIEntryOfStaff(Long unitId,List<BigInteger> kpiId,ConfLevel level){
+        Query query = new Query(Criteria.where("unitId").is(unitId).and("kpiId").nin(kpiId).and("level").is(level));
+        mongoTemplate.remove(query, CategoryKPIConf.class);
+    }
+
+
 
     public void removeAccessGroupKPIEntryForCountry(AccessGroupMappingDTO entry,Long refId){
         Query query = new Query(Criteria.where("accessGroupId").is(entry.getAccessGroupId()).and("kpiId").is(entry.getKpiId()).and("countryId").is(refId));

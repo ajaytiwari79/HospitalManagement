@@ -50,9 +50,9 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList(unitId,ConfLevel.UNIT));
     }
 
-    @GetMapping(STAFF_URL+COUNTER_DIST_URL+"/counters")
-    public ResponseEntity<Map<String, Object>> getAvailableKPIsListForStaff(@PathVariable Long staffId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList(staffId, ConfLevel.STAFF));
+    @GetMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/counters")
+    public ResponseEntity<Map<String, Object>> getAvailableKPIsListForStaff(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList(unitId, ConfLevel.STAFF));
     }
 
     //category KPI

@@ -2085,10 +2085,15 @@ public class StaffService {
         long loggedinUserId = UserContext.getUserDetails().getId();
         AccessGroupCounterQueryResult accessGroupCounterQueryResult=new AccessGroupCounterQueryResult();
         Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
-        if(!isCountryAdmin){
+        if(isCountryAdmin) {
+            Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
+            accessGroupCounterQueryResult.setCountryId(countryId);
+        }else{
             accessGroupCounterQueryResult= accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
         }
         accessGroupCounterQueryResult.setCountryAdmin(isCountryAdmin);
+        accessGroupCounterQueryResult.setStaffId(staffId);
+
         return accessGroupCounterQueryResult;
     }
 
