@@ -56,6 +56,9 @@ public class AssessmentService extends MongoBaseService {
     @Inject
     private MasterQuestionnaireTemplateMongoRepository masterQuestionnaireTemplateMongoRepository;
 
+    @Inject
+    private ObjectMapper objectMapper;
+
 
     /**
      * @param unitId        organization id
@@ -163,8 +166,8 @@ public class AssessmentService extends MongoBaseService {
                 if (!Optional.ofNullable(asset).isPresent()) {
                     exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assessment.getAssetId());
                 }
-                ObjectMapper mapValuesAndField = new ObjectMapper();
-                Map<String, Object> props = mapValuesAndField.convertValue(asset, Map.class);
+
+                Map<String, Object> props = objectMapper.convertValue(asset, Map.class);
                 for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
                     for (MasterQuestionBasicResponseDTO assetAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
                         if (props.containsKey(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
@@ -209,8 +212,7 @@ public class AssessmentService extends MongoBaseService {
                 if (!Optional.ofNullable(processingActivity).isPresent()) {
                     exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assessment.getProcessingActivityId());
                 }
-                ObjectMapper mapValuesAndField = new ObjectMapper();
-                Map<String, Object> props = mapValuesAndField.convertValue(processingActivity, Map.class);
+                Map<String, Object> props = objectMapper.convertValue(processingActivity, Map.class);
                 for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
                     for (MasterQuestionBasicResponseDTO processingActivityAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
                         if (props.containsKey(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
