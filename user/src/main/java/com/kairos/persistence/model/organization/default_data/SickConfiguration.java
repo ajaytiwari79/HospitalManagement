@@ -4,6 +4,7 @@ import com.kairos.persistence.model.organization.Organization;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.math.BigInteger;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.IN_UNIT;
@@ -13,15 +14,15 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_UN
  **/
 @NodeEntity
 public class SickConfiguration {
-    private Set<Long> timeTypes;
+    private Set<BigInteger> timeTypes;
     @Relationship(type = IN_UNIT)
     private Organization organization;
 
-    public Set<Long> getTimeTypes() {
+    public Set<BigInteger> getTimeTypes() {
         return timeTypes;
     }
 
-    public void setTimeTypes(Set<Long> timeTypes) {
+    public void setTimeTypes(Set<BigInteger> timeTypes) {
         this.timeTypes = timeTypes;
     }
 
@@ -33,7 +34,7 @@ public class SickConfiguration {
         this.organization = organization;
     }
 
-    public SickConfiguration(Set<Long> timeTypes, Organization organization) {
+    public SickConfiguration(Set<BigInteger> timeTypes, Organization organization) {
         this.timeTypes = timeTypes;
         this.organization = organization;
     }
