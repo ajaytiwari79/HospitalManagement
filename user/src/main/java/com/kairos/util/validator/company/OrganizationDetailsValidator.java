@@ -33,7 +33,7 @@ public class OrganizationDetailsValidator {
             if (CompanyType.COMPANY.equals(organization.getCompanyType()) && !Optional.ofNullable(organization.getAccountType()).isPresent()) {
                 exceptionService.invalidRequestException("error.Organization.accountType.notNull", organization.getName());
             }
-            if (!Optional.ofNullable(organization.getKairosId()).isPresent()) {
+            if (!Optional.ofNullable(organization.getKairosCompanyId()).isPresent()) {
                 exceptionService.invalidRequestException("error.Organization.kairosId.notnull", organization.getName());
             }
             if (!Optional.ofNullable(organization.getVatId()).isPresent()) {

@@ -187,22 +187,6 @@ public class OrganizationController {
      * @param organizationBasicDTO
      * @return Organization
      */
-    @ApiOperation(value = "Create a New Organization(Location)")
-    @PostMapping(value = UNIT_URL + "/unit")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addOrganization(@Validated @RequestBody OrganizationBasicDTO organizationBasicDTO, @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                companyCreationService.addNewUnit(organizationBasicDTO, unitId));
-    }
-
-    @ApiOperation(value = "Create a New Organization(Location)")
-    @PutMapping(value = UNIT_URL + "/unit/{unitId}")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateUnit(@Validated @RequestBody OrganizationBasicDTO organizationBasicDTO, @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                companyCreationService.updateUnit(organizationBasicDTO, unitId));
-    }
-
 
     /**
      *

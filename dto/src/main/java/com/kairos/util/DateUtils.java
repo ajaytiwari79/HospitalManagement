@@ -519,22 +519,22 @@ public class DateUtils {
         }
     }
 
-    public static LocalDateTime addDurationInLocalDateTime(LocalDateTime localDate, int duration, DurationType durationType, int recurringNumber) {
+    public static LocalDateTime addDurationInLocalDateTime(LocalDateTime localDateTime, int duration, DurationType durationType, int recurringNumber) {
         switch (durationType) {
             case DAYS: {
-                return LocalDateTime.of(localDate.toLocalDate().plusDays(duration * recurringNumber),localDate.toLocalTime());
+                return localDateTime.plusDays(duration * recurringNumber);
             }
             case WEEKS: {
-                return LocalDateTime.of(localDate.toLocalDate().plusDays(duration * recurringNumber * 7),localDate.toLocalTime());
+                return localDateTime.plusDays(duration * recurringNumber * 7);
             }
             case MONTHS: {
-                return LocalDateTime.of(localDate.toLocalDate().plusMonths(duration * recurringNumber),localDate.toLocalTime());
+                return localDateTime.plusMonths(duration * recurringNumber);
             }
             case HOURS: {
-                return LocalDateTime.of(localDate.toLocalDate(),localDate.toLocalTime().plusHours(duration * recurringNumber));
+                return localDateTime.plusHours(duration * recurringNumber);
             }
         }
-        return localDate;
+        return localDateTime;
     }
 
     public static LocalDate addDurationInLocalDate(LocalDate localDate, int duration, DurationType durationType, int recurringNumber) {
@@ -548,9 +548,6 @@ public class DateUtils {
             case MONTHS: {
                 return localDate.plusMonths(duration * recurringNumber);
             }
-//            case HOURS: {
-//                return LocalDateTime.of(localDate.toLocalDate(),localDate.toLocalTime().plusHours(duration * recurringNumber));
-//            }
         }
         return localDate;
     }
@@ -656,6 +653,10 @@ public class DateUtils {
     public static LocalDateTime getEndOfDayFromLocalDate(LocalDate localDate) {
 
         return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    public static LocalDateTime getLocalDateTime(LocalDate localDate,int hours,int minutes){
+        return LocalDateTime.of(localDate,LocalTime.of(hours,minutes));
     }
 
     public static int getWeekNumberByLocalDate(LocalDate localDate){

@@ -25,8 +25,9 @@ public class OrganizationBasicDTO {
     private Long accountTypeId;
     private Long levelId;
     private Long typeId;
+    private String kairosCompanyId;
     private List<Long> subTypeId;
-    private AddressDTO address; // used in case of child organization
+    private AddressDTO contactAddress; // used in case of child organization
     private UnitManagerDTO unitManager;  // Used in case of child organization only
 
     public Long getId() {
@@ -133,12 +134,12 @@ public class OrganizationBasicDTO {
         this.subTypeId = subTypeId;
     }
 
-    public AddressDTO getAddress() {
-        return address;
+    public AddressDTO getContactAddress() {
+        return contactAddress;
     }
 
-    public void setAddress(AddressDTO address) {
-        this.address = address;
+    public void setContactAddress(AddressDTO contactAddress) {
+        this.contactAddress = contactAddress;
     }
 
     public UnitManagerDTO getUnitManager() {
@@ -147,5 +148,13 @@ public class OrganizationBasicDTO {
 
     public void setUnitManager(UnitManagerDTO unitManager) {
         this.unitManager = unitManager;
+    }
+
+    public String getKairosCompanyId() {
+        return kairosCompanyId;
+    }
+
+    public void setKairosCompanyId(String kairosCompanyId) {
+        this.kairosCompanyId = kairosCompanyId;
     }
 }

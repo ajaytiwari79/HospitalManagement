@@ -1,15 +1,15 @@
 package com.kairos.service.wta;
 
+import com.kairos.activity.tags.TagDTO;
 import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.activity.wta.rule_template_category.RuleTemplateAndCategoryDTO;
-import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
-import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
+import com.kairos.activity.wta.rule_template_category.*;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.persistence.repository.cta.CTARuleTemplateRepository;
+import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
@@ -55,7 +55,8 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     private OrganizationRestClient organizationRestClient;
     @Autowired
     private ExceptionService excpExceptionService;
-
+    @Inject
+    TagMongoRepository tagMongoRepository;
     private final Logger logger = LoggerFactory.getLogger(RuleTemplateCategoryService.class);
 
     /**
@@ -64,14 +65,14 @@ public class RuleTemplateCategoryService extends MongoBaseService {
      * params countryId and rule template category via name and desc
      */
     //TODO need to modified this method
-    public RuleTemplateAndCategoryDTO createRuleTemplateCategory(long countryId, RuleTemplateCategoryDTO ruleTemplateCategoryDTO) {
+    public RuleTemplateAndCategoryResponseDTO createRuleTemplateCategory(long countryId, RuleTemplateCategoryRequestDTO ruleTemplateCategoryDTO) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             excpExceptionService.dataNotFoundByIdException("message.country.id", countryId);
         }
 
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, ruleTemplateCategoryDTO.getName(), ruleTemplateCategoryDTO.getRuleTemplateCategoryType());
-        RuleTemplateAndCategoryDTO ruleTemplateAndCategoryDTO = null;
+        RuleTemplateAndCategoryResponseDTO ruleTemplateAndCategoryDTO = null;
         if (ruleTemplateCategory == null) {
             ruleTemplateCategory = new RuleTemplateCategory();
             ObjectMapperUtils.copyProperties(ruleTemplateCategoryDTO, ruleTemplateCategory);
@@ -90,7 +91,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
 
     }
 
-    private RuleTemplateAndCategoryDTO updateCategoryToCTATemplate(RuleTemplateCategory ruleTemplateCategory, RuleTemplateCategoryDTO ruleTemplateCategoryDTO) {
+    private RuleTemplateAndCategoryResponseDTO updateCategoryToCTATemplate(RuleTemplateCategory ruleTemplateCategory, RuleTemplateCategoryRequestDTO ruleTemplateCategoryDTO) {
         List<CTARuleTemplate> ctaRuleTemplates = (List<CTARuleTemplate>) ctaRuleTemplateRepository.findAllById(ruleTemplateCategoryDTO.getRuleTemplateIds());
         for (CTARuleTemplate ctaRuleTemplate : ctaRuleTemplates) {
             ctaRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
@@ -99,10 +100,10 @@ public class RuleTemplateCategoryService extends MongoBaseService {
             save(ctaRuleTemplates);
         }
         ruleTemplateCategoryDTO.setId(ruleTemplateCategory.getId());
-        return new RuleTemplateAndCategoryDTO(ruleTemplateCategoryDTO, null);
+        return new RuleTemplateAndCategoryResponseDTO(ruleTemplateCategoryDTO, null);
     }
 
-    private RuleTemplateAndCategoryDTO updateCategoryToWTATemplates(RuleTemplateCategory ruleTemplateCategory, RuleTemplateCategoryDTO ruleTemplateCategoryDTO) {
+    private RuleTemplateAndCategoryResponseDTO updateCategoryToWTATemplates(RuleTemplateCategory ruleTemplateCategory, RuleTemplateCategoryRequestDTO ruleTemplateCategoryDTO) {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>) wtaBaseRuleTemplateMongoRepository.findAllById(ruleTemplateCategoryDTO.getRuleTemplateIds());
         wtaBaseRuleTemplates.forEach(wtr -> wtr.setRuleTemplateCategoryId(ruleTemplateCategory.getId()));
         if (!wtaBaseRuleTemplates.isEmpty()) {
@@ -110,8 +111,12 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         }
         ruleTemplateCategoryDTO.setId(ruleTemplateCategory.getId());
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates);
-        wtaBaseRuleTemplateDTOS.forEach(wtaBaseRuleTemplateDTO -> wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplateCategoryDTO));
-        return new RuleTemplateAndCategoryDTO(ruleTemplateCategoryDTO, wtaBaseRuleTemplateDTOS);
+        List<TagDTO> tagDTOS = tagMongoRepository.findAllTagsByIdIn(ruleTemplateCategoryDTO.getTags());
+        RuleTemplateCategoryDTO ruleTemplateCatg = new RuleTemplateCategoryDTO();
+        ObjectMapperUtils.copyProperties(ruleTemplateCategoryDTO, ruleTemplateCatg);
+        ruleTemplateCatg.setTags(tagDTOS);
+        wtaBaseRuleTemplateDTOS.forEach(wtaBaseRuleTemplateDTO -> wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplateCatg));
+        return new RuleTemplateAndCategoryResponseDTO(ruleTemplateCategoryDTO, wtaBaseRuleTemplateDTOS);
     }
 
 
@@ -154,7 +159,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
 
 
     //Create and Update method should be different
-    public RuleTemplateAndCategoryDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId, RuleTemplateCategoryDTO ruleTemplateCategoryDTO, RuleTemplateCategory ruleTemplateCategoryObj) {
+    public RuleTemplateAndCategoryResponseDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId, RuleTemplateCategoryRequestDTO ruleTemplateCategoryDTO, RuleTemplateCategory ruleTemplateCategoryObj) {
         if (!Optional.ofNullable(ruleTemplateCategoryObj).isPresent()) {
             excpExceptionService.dataNotFoundByIdException("message.ruletemplatecategory.name.notfound", ruleTemplateCategoryDTO.getName());
         }
@@ -178,7 +183,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         }
     }
 
-    private RuleTemplateAndCategoryDTO updateWTADefaultCategory(Long countryId, RuleTemplateCategory ruleTemplateCategoryObj, RuleTemplateCategoryDTO ruleTemplateCategoryDTO) {
+    private RuleTemplateAndCategoryResponseDTO updateWTADefaultCategory(Long countryId, RuleTemplateCategory ruleTemplateCategoryObj, RuleTemplateCategoryRequestDTO ruleTemplateCategoryDTO) {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(ruleTemplateCategoryObj.getId());
         RuleTemplateCategory defaultCategory = ruleTemplateCategoryMongoRepository
                 .findByName(countryId, "NONE", WTA);
@@ -187,17 +192,17 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         return updateCategoryToWTATemplates(ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
     }
 
-    private RuleTemplateAndCategoryDTO updateCTADefaultCategory(Long countryId, RuleTemplateCategory ruleTemplateCategoryObj, RuleTemplateCategoryDTO ruleTemplateCategoryDTO) {
+    private RuleTemplateAndCategoryResponseDTO updateCTADefaultCategory(Long countryId, RuleTemplateCategory ruleTemplateCategoryObj, RuleTemplateCategoryRequestDTO ruleTemplateCategoryDTO) {
         List<CTARuleTemplate> ctaRuleTemplates = ctaRuleTemplateRepository.findAllByCategoryId(ruleTemplateCategoryObj.getId());
         RuleTemplateCategory defaultCategory = ruleTemplateCategoryMongoRepository
-                .findByName(countryId, "NONE", WTA);
+                .findByName(countryId, "NONE", CTA);
         ctaRuleTemplates.forEach(ctr -> ctr.setRuleTemplateCategoryId(defaultCategory.getId()));
         ruleTemplateCategoryDTO.setId(ruleTemplateCategoryObj.getId());
         return updateCategoryToCTATemplate(ruleTemplateCategoryObj, ruleTemplateCategoryDTO);
     }
 
 
-    public RuleTemplateCategoryDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId, RuleTemplateCategoryDTO ruleTemplateCategory) {
+    public RuleTemplateCategoryRequestDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId, RuleTemplateCategoryRequestDTO ruleTemplateCategory) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             excpExceptionService.dataNotFoundByIdException("message.country.id", countryId);
