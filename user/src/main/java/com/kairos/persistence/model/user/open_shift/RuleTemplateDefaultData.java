@@ -19,7 +19,8 @@ public class RuleTemplateDefaultData {
     private List<EmploymentTypeDTO> employmentTypes;
     private List<ExpertiseResponseDTO> expertises;
     private Integer minOpenShiftHours;
-    private List<CounterDTO> counters;
+
+    private List<CounterDTO> counters ;
     public RuleTemplateDefaultData() {
         //Default Constructor
     }
@@ -34,7 +35,6 @@ public class RuleTemplateDefaultData {
         this.expertises = expertises;
         this.minOpenShiftHours=minOpenShiftHours;
         this.counters=counters;
-
     }
 
     public RuleTemplateDefaultData(List<OrganizationTypeAndSubType> organizationTypeAndSubType, List<Skill> skills, List<TimeTypeDTO> timeTypes, List<ActivityDTO> activities,
