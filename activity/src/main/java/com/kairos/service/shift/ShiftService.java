@@ -1340,7 +1340,7 @@ public class ShiftService extends MongoBaseService {
 
     private boolean validateAccessGroup(Phase phase,ShiftStatus status,BigInteger activityId){
        ActivityAndShiftStatusSettings activityAndShiftStatusSettings= activityAndShiftStatusSettingsRepository.findByPhaseIdAndActivityIdAndShiftStatus(phase.getId(),activityId,status);
-        Set<Long> accessGroupIds=new HashSet<>();
+        Set<Long> accessGroupIds=
         return CollectionUtils.containsAny(activityAndShiftStatusSettings.getAccessGroupIds(),accessGroupIds);
     }
 
