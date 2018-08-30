@@ -39,6 +39,13 @@ public class TimeSlotSet extends UserBaseEntity{
         this.startDate = startDate;
         this.timeSlotMode = timeSlotMode;
     }
+    public TimeSlotSet(String name, Date startDate,TimeSlotMode timeSlotMode,TimeSlotType timeSlotType) {
+        this.name = name;
+        this.startDate = startDate;
+        this.timeSlotMode = timeSlotMode;
+        this.defaultSet=true;
+        this.timeSlotType=timeSlotType;
+    }
 
     public String getName() {
         return name;

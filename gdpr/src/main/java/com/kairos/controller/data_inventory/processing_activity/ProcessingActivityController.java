@@ -19,6 +19,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Map;
 
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.AppConstant.IS_SUCCESS;
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
 
@@ -179,5 +180,16 @@ public class ProcessingActivityController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedDataSubjectFromProcessingActivity(unitId, processingActivityId, dataSubjectId));
     }
+
+    @ApiOperation(value = "get Assessment of Processing Activity By Id")
+    @GetMapping(COUNTRY_URL+"/processing_activity/{processingActivityId}/assessment/{assessmentId}")
+    public ResponseEntity<Object> getAssetAssessmentById(@PathVariable Long countryId,@PathVariable Long unitId,@PathVariable BigInteger processingActivityId,@PathVariable BigInteger assessmentId) {
+
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityAssessmnetById(countryId,unitId,processingActivityId,assessmentId));
+    }
+
 
 }

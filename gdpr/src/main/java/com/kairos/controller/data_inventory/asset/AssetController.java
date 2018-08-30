@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 
@@ -138,6 +139,16 @@ public class AssetController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllActiveAsset(unitId));
+    }
+
+    @ApiOperation(value = "get Assessment of asset By Id")
+    @GetMapping(COUNTRY_URL+"/asset/{assetId}/assessment/{assessmentId}")
+    public ResponseEntity<Object> getAssetAssessmentById(@PathVariable Long countryId,@PathVariable Long unitId,@PathVariable BigInteger assetId,@PathVariable BigInteger assessmentId) {
+
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetAssessmnetById(countryId,unitId,assetId,assessmentId));
     }
 
 

@@ -7,8 +7,10 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
+import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingPurposeService;
@@ -39,6 +41,9 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
 
     @Inject
     private ProcessingPurposeService processingPurposeService;
+
+    @Inject
+    private ProcessingActivityMongoRepository processingActivityMongoRepository;
 
 
     /**
@@ -107,16 +112,20 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
     }
 
 
-    public Boolean deleteProcessingPurpose(Long organizationId, BigInteger id) {
+    public Boolean deleteProcessingPurpose(Long unitId, BigInteger processingPurposeId) {
 
-        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        if (!Optional.ofNullable(processingPurpose).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(processingPurpose);
-            return true;
-
+        List<ProcessingActivityBasicResponseDTO>  processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
+        if (!processingActivities.isEmpty()) {
+            StringBuilder processingActivityNames=new StringBuilder();
+            processingActivities.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", processingActivities.get(0));
         }
+        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByOrganizationIdAndId(unitId, processingPurposeId);
+        if (!Optional.ofNullable(processingPurpose).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", processingPurposeId);
+        }
+        delete(processingPurpose);
+        return true;
     }
 
     /***
@@ -128,13 +137,12 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      */
     public ProcessingPurposeDTO updateProcessingPurpose(Long organizationId, BigInteger id, ProcessingPurposeDTO processingPurposeDTO) {
 
-
         ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByOrganizationIdAndName(organizationId, processingPurposeDTO.getName());
         if (Optional.ofNullable(processingPurpose).isPresent()) {
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + processingPurposeDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Processing Purpose", processingPurpose.getName());
         }
         processingPurpose = processingPurposeMongoRepository.findByid(id);
         if (!Optional.ofNullable(processingPurpose).isPresent()) {
@@ -145,28 +153,6 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
         return processingPurposeDTO;
 
     }
-
-
-    /**
-     * @param organizationId
-     * @param name           name of ProcessingPurpose
-     * @return ProcessingPurpose object fetch on basis of  name
-     * @throws DataNotExists throw exception if ProcessingPurpose not exist for given name
-     */
-    public ProcessingPurpose getProcessingPurposeByName(Long organizationId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            ProcessingPurpose exist = processingPurposeMongoRepository.findByOrganizationIdAndName(organizationId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
 
     public Map<String, List<ProcessingPurpose>> saveAndSuggestProcessingPurposes(Long countryId, Long organizationId, List<ProcessingPurposeDTO> ProcessingPurposeDTOS) {
 

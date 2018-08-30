@@ -5,6 +5,7 @@ import com.kairos.persistence.model.cta.CostTimeAgreement;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,6 +30,6 @@ public interface CustomCostTimeAgreementRepository {
     List<CTAResponseDTO> getVersionsCTA(List<Long> upIds);
     List<CTAResponseDTO> getParentCTAByUpIds(List<Long> unitPositionIds);
     List<CTAResponseDTO> getCTAByUpIds(List<Long> unitPositionIds);
-    CTAResponseDTO getCTAByUnitPositionId(Long unitPositionId);
+    CTAResponseDTO getCTAByUnitPositionId(Long unitPositionId,Date date);
 
 }

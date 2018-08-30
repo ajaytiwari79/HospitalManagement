@@ -142,4 +142,21 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
 
 
     }
+
+    @Override
+    public ProcessingActivityResponseDTO getProcessingActivityAndMetaDataById(Long unitId, BigInteger processingActivityId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false)),
+                lookup("processing_purpose", "processingPurposes", "_id", "processingPurposes"),
+                lookup("transfer_method", "transferMethods", "_id", "transferMethods"),
+                lookup("accessor_party", "accessorParties", "_id", "accessorParties"),
+                lookup("dataSource", "dataSources", "_id", "dataSources"),
+                lookup("responsibility_type", "responsibilityType", "_id", "responsibilityType"),
+                lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis"),
+                lookup("asset", "assetId", "_id", "asset")
+        );
+
+        AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
+        return result.getUniqueMappedResult();
+    }
 }

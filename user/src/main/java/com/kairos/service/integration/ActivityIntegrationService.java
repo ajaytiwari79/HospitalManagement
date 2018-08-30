@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -40,10 +41,12 @@ public class ActivityIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/orders_and_activities", null), OrderAndActivityDTO.class);
     }
 
-    public void crateDefaultDataForOrganization(Long unitId, Long parentOrganizationId, Long countryId) {
+    public void crateDefaultDataForOrganization(Long unitId, Long parentOrganizationId, Long countryId, Long orgTypeId, List<Long> orgSubTypeIds) {
         Map<String, Object> countryDetail = new HashMap<>();
         countryDetail.put("countryId", countryId);
         countryDetail.put("parentOrganizationId", parentOrganizationId);
+        countryDetail.put("orgTypeIds", orgTypeId);
+        countryDetail.put("orgSubTypeIds", orgSubTypeIds);
         genericRestClient.publish(null, unitId, true, IntegrationOperation.CREATE, "/organization_default_data", countryDetail);
     }
 
