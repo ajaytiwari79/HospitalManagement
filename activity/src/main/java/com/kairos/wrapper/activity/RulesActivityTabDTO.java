@@ -46,6 +46,9 @@ public class RulesActivityTabDTO {
     private DurationField approvalTimeInAdvance;
     private Float approvalPercentage;
     private LocalTime maximumEndTime;
+    private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --
+    private byte recurrenceTimes;// -- the  shift of that staff will be entered.
+
 
 
     public LocalDate getCutOffStartFrom() {
@@ -104,19 +107,6 @@ public class RulesActivityTabDTO {
         this.eligibleForAbsence = eligibleForAbsence;
     }
 
-
-
-
-
-    public RulesActivityTab buildRulesActivityTab() {
-        RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
-
-                 eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
-                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage,maximumEndTime,cutOffdayValue,cutOffIntervalUnit,cutOffStartFrom);
-
-        return rulesActivityTab;
-    }
-
     public BigInteger getActivityId() {
         return activityId;
     }
@@ -149,8 +139,6 @@ public class RulesActivityTabDTO {
         this.eligibleForRequest = eligibleForRequest;
     }
 
-
-
     public boolean isEligibleAgainstTimeRules() {
         return eligibleAgainstTimeRules;
     }
@@ -158,8 +146,6 @@ public class RulesActivityTabDTO {
     public void setEligibleAgainstTimeRules(boolean eligibleAgainstTimeRules) {
         this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
     }
-
-
 
     public boolean isLockLengthPresent() {
         return lockLengthPresent;
@@ -280,5 +266,31 @@ public class RulesActivityTabDTO {
     public void setMaximumEndTime(LocalTime maximumEndTime) {
         this.maximumEndTime = maximumEndTime;
     }
+
+    public byte getRecurrenceDays() {
+        return recurrenceDays;
+    }
+
+    public void setRecurrenceDays(byte recurrenceDays) {
+        this.recurrenceDays = recurrenceDays;
+    }
+
+    public byte getRecurrenceTimes() {
+        return recurrenceTimes;
+    }
+
+    public void setRecurrenceTimes(byte recurrenceTimes) {
+        this.recurrenceTimes = recurrenceTimes;
+    }
+
+    public RulesActivityTab buildRulesActivityTab() {
+        RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
+
+                eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
+                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage,maximumEndTime,cutOffdayValue,cutOffIntervalUnit,cutOffStartFrom,recurrenceDays,recurrenceTimes);
+
+        return rulesActivityTab;
+    }
+
 
 }
