@@ -1,19 +1,39 @@
 package com.kairos.activity.break_settings;
 
+import com.kairos.activity.activity.ActivityDTO;
+
 import javax.validation.constraints.Min;
 import java.math.BigInteger;
+import java.util.List;
 
 public class BreakSettingsDTO {
+    private BigInteger id;
     private Long unitId;
     @Min(value = 1, message = "shift duration cant be zero")
     private Long shiftDurationInMinute;
     @Min(value = 1, message = "Break duration cant be zero")
     private Long breakDurationInMinute;
     private Long numberOfBreaks;
-    private BigInteger id;
+    private BigInteger paidActivityId;
+    private BigInteger unpaidActivityId;
 
     public BreakSettingsDTO() {
-        //
+        //Default Constructor
+    }
+
+    public BreakSettingsDTO(Long unitId, Long shiftDurationInMinute, Long breakDurationInMinute, Long numberOfBreaks) {
+        this.unitId = unitId;
+        this.shiftDurationInMinute = shiftDurationInMinute;
+        this.breakDurationInMinute = breakDurationInMinute;
+        this.numberOfBreaks = numberOfBreaks;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public Long getUnitId() {
@@ -48,18 +68,19 @@ public class BreakSettingsDTO {
         this.numberOfBreaks = numberOfBreaks;
     }
 
-    public BigInteger getId() {
-        return id;
+    public BigInteger getPaidActivityId() {
+        return paidActivityId;
     }
 
-    public void setId(BigInteger id) {
-        this.id = id;
+    public void setPaidActivityId(BigInteger paidActivityId) {
+        this.paidActivityId = paidActivityId;
     }
 
-    public BreakSettingsDTO(Long unitId, Long shiftDurationInMinute, Long breakDurationInMinute, Long numberOfBreaks) {
-        this.unitId = unitId;
-        this.shiftDurationInMinute = shiftDurationInMinute;
-        this.breakDurationInMinute = breakDurationInMinute;
-        this.numberOfBreaks = numberOfBreaks;
+    public BigInteger getUnpaidActivityId() {
+        return unpaidActivityId;
+    }
+
+    public void setUnpaidActivityId(BigInteger unpaidActivityId) {
+        this.unpaidActivityId = unpaidActivityId;
     }
 }
