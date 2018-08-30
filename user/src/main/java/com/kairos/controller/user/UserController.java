@@ -3,6 +3,7 @@ package com.kairos.controller.user;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.service.staff.UserSickService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,8 +36,8 @@ public class UserController {
 
     @Inject
     private StaffService staffService;
-   /* @Inject
-    TaskReportService taskReportService;*/
+   @Inject
+    private UserSickService userSickService;
     /**
      * @return List of Users- All Users in db
      */
@@ -138,5 +139,13 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> getStaffIdOfLoggedInUser(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdOfLoggedInUser(unitId));
     }
+
+
+    @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/unit_sick_settings")
+    @ApiOperation("get staff ids by userid")
+    ResponseEntity<Map<String, Object>> getStaffAndUnitSickSettings(@PathVariable long userId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffAndUnitSickSettings(userId));
+    }
+
 
 }
