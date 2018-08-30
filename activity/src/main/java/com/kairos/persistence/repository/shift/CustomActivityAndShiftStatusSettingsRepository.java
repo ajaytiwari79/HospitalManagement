@@ -10,4 +10,7 @@ import java.util.List;
 public interface CustomActivityAndShiftStatusSettingsRepository {
 
     List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long countryId);
+
+    List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatusForUnit(Long unitId);
+
 }

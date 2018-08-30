@@ -22,12 +22,14 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
+import com.kairos.persistence.model.shift.ActivityAndShiftStatusSettings;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
+import com.kairos.persistence.repository.shift.ActivityAndShiftStatusSettingsRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.planner.planninginfo.PlannerSyncResponseDTO;
@@ -139,6 +141,7 @@ public class ActivityService extends MongoBaseService {
     @Inject
     private GenericIntegrationService genericIntegrationService;
     @Inject private CounterRepository counterRepository;
+    @Inject private ActivityAndShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -1110,6 +1113,9 @@ public class ActivityService extends MongoBaseService {
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
         save(activityCopied);
+
+        // copying activity and shift status settings of this activity
+        copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId());
         activityDTO.setId(activityCopied.getId());
         PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
         BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
@@ -1186,6 +1192,26 @@ public class ActivityService extends MongoBaseService {
 
 
     }
+
+    public void copyActivityAndShiftStatusOfThisActivity(BigInteger activityId,BigInteger newActivityId){
+        List<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findAllByActivityId(activityId);
+
+        if(!activityAndShiftStatusSettings.isEmpty()){
+            activityAndShiftStatusSettings.forEach(currentActivityAndShiftStatusSettings->{
+                currentActivityAndShiftStatusSettings.setActivityId(newActivityId);
+            });
+            save(activityAndShiftStatusSettings);
+        }
+    }
+
+    public void deleteActivityAndShiftStatusOfThisActivity(BigInteger activityId){
+        Optional<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityId);
+        if(activityAndShiftStatusSettings.isPresent()){
+            activityAndShiftStatusSettings.get().setDeleted(true);
+            save(activityAndShiftStatusSettings.get());
+        }
+    }
+
 
 
 

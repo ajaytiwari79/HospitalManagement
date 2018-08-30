@@ -14,6 +14,7 @@ import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.shift.ActivityAndShiftStatusSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.activity.tabs.CompositeActivity;
 import com.kairos.persistence.model.break_settings.BreakSettings;
@@ -35,6 +36,7 @@ import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.shift.ActivityAndShiftStatusSettingsRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
@@ -80,6 +82,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -168,6 +171,7 @@ public class ShiftService extends MongoBaseService {
     @Inject private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
 
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject private ActivityAndShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
 
 
 
@@ -1024,21 +1028,32 @@ public class ShiftService extends MongoBaseService {
         response.put("error", error);
 
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftPublishDTO.getShiftIds());
+
         if (!shifts.isEmpty()) {
             Set<LocalDate> dates = shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
-            Map<LocalDate, List<ShiftStatus>> phaseListByDate = phaseService.getStatusByDates(unitId, dates);
+            Map<LocalDate, Phase> phaseListByDate = phaseService.getStatusByDates(unitId, dates);
             for (Shift shift : shifts) {
-                List<ShiftStatus> phaseStatuses = phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
-                if (phaseStatuses.containsAll(shiftPublishDTO.getStatus())) {
+                List<ShiftStatus> phaseStatuses = phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate())).getStatus();
+                Phase phase=phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
+                 boolean validAccessGroup= validateAccessGroup(phase,shiftPublishDTO.getStatus().get(0),shift.getActivityId());
+                 boolean validStatus=phaseStatuses.containsAll(shiftPublishDTO.getStatus());
+                if (validStatus && validAccessGroup ) {
                     shift.getStatus().addAll(shiftPublishDTO.getStatus());
                     success.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("message.shift.status.added")), true));
                 } else {
-
                     List<Object> errorMessages = new ArrayList<>();
-                    errorMessages.addAll(shiftPublishDTO.getStatus());
-                    errorMessages.addAll(phaseStatuses);
-                    error.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("error.shift.status", errorMessages.toArray())), false));
+                    List<String> messages=new ArrayList<>();
+                    if(!validStatus) {
+                        errorMessages.addAll(shiftPublishDTO.getStatus());
+                        errorMessages.addAll(phaseStatuses);
+                        messages.add(localeService.getMessage("error.shift.status", errorMessages.toArray()));
+                    }
+                    if(!validAccessGroup){
+                        messages.add(localeService.getMessage("access.group.not.matched"));
+                    }
+                    error.add(new ShiftResponse(shift.getId(), shift.getName(),messages, false));
                 }
+
             }
             save(shifts);
         }
@@ -1321,6 +1336,12 @@ public class ShiftService extends MongoBaseService {
         breakActivityIds.addAll(breakSettings.stream().map(BreakSettings::getUnpaidActivityId).collect(Collectors.toSet()));
         List<Activity> breakActivities=activityRepository.findAllActivitiesByIds(breakActivityIds);
         return breakActivities.stream().collect(Collectors.toMap(Activity::getId,v->v));
+    }
+
+    private boolean validateAccessGroup(Phase phase,ShiftStatus status,BigInteger activityId){
+       ActivityAndShiftStatusSettings activityAndShiftStatusSettings= activityAndShiftStatusSettingsRepository.findByPhaseIdAndActivityIdAndShiftStatus(phase.getId(),activityId,status);
+        Set<Long> accessGroupIds=new HashSet<>();
+        return CollectionUtils.containsAny(activityAndShiftStatusSettings.getAccessGroupIds(),accessGroupIds);
     }
 
 

@@ -36,16 +36,13 @@ public class ActivityAndShiftStatusSettingsService extends MongoBaseService {
         return activityAndShiftStatusSettingsDTO;
     }
 
-    public List<ActivityAndShiftStatusSettingsDTO> getAllActivityAndShiftStatusSettings(Long countryId){
-        return activityAndShiftStatusSettingsRepository.findAllByCountryIdAndDeletedFalse(countryId);
-    }
-
-    public ActivityAndShiftStatusSettingsDTO updateActivityAndShiftStatusSettings(BigInteger id, Long countryId,ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
-        Optional<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(id);
+    public ActivityAndShiftStatusSettingsDTO updateActivityAndShiftStatusSettings(Long countryId,ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
+        Optional<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityAndShiftStatusSettingsDTO.getId());
         if(!activityAndShiftStatusSettings.isPresent()){
-            exceptionService.dataNotFoundException("",id);
+            exceptionService.dataNotFoundException("",activityAndShiftStatusSettingsDTO.getId());
         }
-        ObjectMapperUtils.copyProperties(activityAndShiftStatusSettingsDTO,activityAndShiftStatusSettings);
+        ObjectMapperUtils.copyProperties(activityAndShiftStatusSettingsDTO,activityAndShiftStatusSettings.get());
+        activityAndShiftStatusSettings.get().setCountryId(countryId);
         save(activityAndShiftStatusSettings.get());
         return activityAndShiftStatusSettingsDTO;
 
@@ -57,6 +54,33 @@ public class ActivityAndShiftStatusSettingsService extends MongoBaseService {
 
     public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long countryId){
           return activityAndShiftStatusSettingsRepository.getActivityAndShiftStatusSettingsGroupedByStatus(countryId);
+    }
+
+    // Endpoints methods for unit
+
+    public ActivityAndShiftStatusSettingsDTO addActivityAndShiftStatusSettingForUnit(Long unitId,ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
+        ActivityAndShiftStatusSettings activityAndShiftStatusSettings=ObjectMapperUtils.copyPropertiesByMapper(activityAndShiftStatusSettingsDTO,ActivityAndShiftStatusSettings.class);
+        activityAndShiftStatusSettings.setUnitId(unitId);
+        save(activityAndShiftStatusSettings);
+        activityAndShiftStatusSettingsDTO.setId(activityAndShiftStatusSettings.getId());
+        return activityAndShiftStatusSettingsDTO;
+    }
+
+
+    public ActivityAndShiftStatusSettingsDTO updateActivityAndShiftStatusSettingsForUnit(Long unitId,ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
+        Optional<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityAndShiftStatusSettingsDTO.getId());
+        if(!activityAndShiftStatusSettings.isPresent()){
+            exceptionService.dataNotFoundException("",activityAndShiftStatusSettingsDTO.getId());
+        }
+        ObjectMapperUtils.copyProperties(activityAndShiftStatusSettingsDTO,activityAndShiftStatusSettings);
+        activityAndShiftStatusSettings.get().setUnitId(unitId);
+        save(activityAndShiftStatusSettings.get());
+        return activityAndShiftStatusSettingsDTO;
+
+    }
+
+    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatusForUnit(Long unitId){
+        return activityAndShiftStatusSettingsRepository.getActivityAndShiftStatusSettingsGroupedByStatusForUnit(unitId);
     }
 
 

@@ -714,7 +714,11 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", countryAccessGroupDTO.getId());
 
         }
-        AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole());
+        List<AccountType> accountType = accountTypeGraphRepository.getAllAccountTypeByIds(countryAccessGroupDTO.getAccountTypeIds());
+        if (accountType.size() != countryAccessGroupDTO.getAccountTypeIds().size()) {
+            exceptionService.dataNotMatchedException("message.accountType.notFound");
+        }
+        AccessGroup accessGroup = OrganizationCategory.ORGANIZATION.equals(countryAccessGroupDTO.getOrganizationCategory()) ? new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole(), accountType) : new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole());
         accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 

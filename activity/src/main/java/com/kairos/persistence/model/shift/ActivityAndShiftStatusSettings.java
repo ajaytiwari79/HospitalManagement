@@ -7,6 +7,7 @@ package com.kairos.persistence.model.shift;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
 import java.util.Set;
@@ -14,8 +15,9 @@ import java.util.Set;
 @CompoundIndex(name = "phase_shiftStatus",def = "{'phaseId','shiftStatus'}",unique = true)
 public class ActivityAndShiftStatusSettings extends MongoBaseEntity {
     private BigInteger activityId;
+    @Indexed
     private BigInteger phaseId;
-    private ShiftStatus shiftStatus;
+    @Indexed private ShiftStatus shiftStatus;
     private Set<Long> accessGroupIds;
     private Long countryId;
     private Long unitId;

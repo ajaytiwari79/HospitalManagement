@@ -1,4 +1,5 @@
-package com.kairos.activity.shift;/*
+package com.kairos.activity.shift;
+/*
  *Created By Pavan on 29/8/18
  *
  */
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class ActivityAndShiftStatusWrapper {
     private ShiftStatus status;
-    private List<ActivityAndShiftStatusSettingsDTO> rowData;
+    private List<ActivityAndShiftStatusSettingsDTO> activityAndShiftStatusSettings;
 
     public ActivityAndShiftStatusWrapper() {
         //Default Constructor
@@ -23,11 +24,11 @@ public class ActivityAndShiftStatusWrapper {
         this.status = status;
     }
 
-    public List<ActivityAndShiftStatusSettingsDTO> getRowData() {
-        return rowData;
+    public List<ActivityAndShiftStatusSettingsDTO> getActivityAndShiftStatusSettings() {
+        return activityAndShiftStatusSettings;
     }
 
-    public void setRowData(List<ActivityAndShiftStatusSettingsDTO> rowData) {
-        this.rowData = rowData;
+    public void setActivityAndShiftStatusSettings(List<ActivityAndShiftStatusSettingsDTO> activityAndShiftStatusSettings) {
+        this.activityAndShiftStatusSettings = activityAndShiftStatusSettings;
     }
 }

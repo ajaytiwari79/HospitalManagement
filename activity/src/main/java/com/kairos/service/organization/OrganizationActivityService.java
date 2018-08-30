@@ -135,9 +135,13 @@ public class OrganizationActivityService extends MongoBaseService {
             activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             save(activityCopied);
+            // copying activity and shift status settings of this activity
+            activityService.copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId());
         } else {
             activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
             activityCopied.setDeleted(true);
+            activityService.deleteActivityAndShiftStatusOfThisActivity(activityCopied.getId());
+
 
         }
         save(activityCopied);
@@ -297,6 +301,9 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
         activityCopied.setState(ActivityStateEnum.DRAFT);
         save(activityCopied);
+
+        // copying activity and shift status settings of this activity
+        activityService.copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId());
         activityDTO.setId(activityCopied.getId());
         PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
         BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
