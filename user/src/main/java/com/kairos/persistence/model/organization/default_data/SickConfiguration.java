@@ -19,6 +19,10 @@ public class SickConfiguration extends UserBaseEntity {
     @Relationship(type = IN_UNIT)
     private Organization organization;
 
+    public SickConfiguration() {
+        // DC
+    }
+
     public Set<BigInteger> getTimeTypes() {
         return timeTypes;
     }

@@ -47,10 +47,10 @@ public class SickConfigurationService {
     public Map<String, Object> getSickSettingsOfUnit(Long unitId) {
 
         List<TimeTypeDTO> timeTypes = timeTypeRestClient.getAllTimeTypes(organizationGraphRepository.getCountryId(unitId));
-        List<BigInteger> selectedTimeTypeIds = sickConfigurationRepository.findAllSickTimeTypesOfUnit(unitId);
+        SickConfiguration sickConfiguration = sickConfigurationRepository.findSickConfigurationOfUnit(unitId);
         Map<String, Object> response = new HashMap<>();
         response.put("timeTypes", timeTypes);
-        response.put("selectedTimeTypeIds", selectedTimeTypeIds);
+        response.put("selectedTimeTypeIds", sickConfiguration!=null?sickConfiguration.getTimeTypes():Collections.emptyList());
         return response;
     }
 
