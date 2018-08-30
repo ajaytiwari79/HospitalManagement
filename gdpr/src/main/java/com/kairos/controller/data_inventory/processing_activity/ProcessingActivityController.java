@@ -116,10 +116,10 @@ public class ProcessingActivityController {
     }
 
 
-
     @ApiOperation(value = "updated status of processing activity")
     @PutMapping("/processing_activity/{processingActivityId}/status")
-    public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId,@NotNull @RequestBody boolean active) {
+    public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId,@RequestParam boolean active) {
+
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }
@@ -135,8 +135,6 @@ public class ProcessingActivityController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.mapDataSubjectDataCategoryAndDataElementToProcessingActivity(unitId, processingActivityId, dataSubjectList.getRequestBody()));
     }
-
-
 
 
     @ApiOperation(value = "get all Mapped Data Subject ,Data Category and data element of Processing Activity")
@@ -179,16 +177,6 @@ public class ProcessingActivityController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedDataSubjectFromProcessingActivity(unitId, processingActivityId, dataSubjectId));
-    }
-
-    @ApiOperation(value = "get Assessment of Processing Activity By Id")
-    @GetMapping(COUNTRY_URL+"/processing_activity/{processingActivityId}/assessment/{assessmentId}")
-    public ResponseEntity<Object> getAssetAssessmentById(@PathVariable Long countryId,@PathVariable Long unitId,@PathVariable BigInteger processingActivityId,@PathVariable BigInteger assessmentId) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityAssessmnetById(countryId,unitId,processingActivityId,assessmentId));
     }
 
 
