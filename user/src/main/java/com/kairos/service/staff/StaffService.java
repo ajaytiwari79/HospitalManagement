@@ -2,7 +2,6 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.counter.DefaultKPISettingDTO;
-import com.kairos.activity.counter.distribution.access_group.AccessGroupPermissionDTO;
 import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.activity.task.StaffTaskDTO;
@@ -13,6 +12,7 @@ import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.access_permission.AccessGroupCounterQueryResult;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
@@ -81,7 +81,6 @@ import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.access_permission.AccessGroupRole;
 import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.user.country.day_type.PublicHoliday;
 import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.user.employment.EmploymentDTO;
 import com.kairos.user.employment.employment_dto.EmploymentOverlapDTO;
@@ -2081,14 +2080,16 @@ public class StaffService {
         return staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
     }
 
-    public AccessGroupPermissionDTO getAccessGroupIdsOfStaff(Long unitId,Long staffId) {
+    public AccessGroupCounterQueryResult getAccessGroupIdsOfStaff(Long unitId) {
+        Long staffId=getStaffIdOfLoggedInUser(unitId);
         long loggedinUserId = UserContext.getUserDetails().getId();
-        List<Long> accessGroupIds=new ArrayList<>();
+        AccessGroupCounterQueryResult accessGroupCounterQueryResult=new AccessGroupCounterQueryResult();
         Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
         if(!isCountryAdmin){
-        accessGroupIds= accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
+            accessGroupCounterQueryResult= accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
         }
-        return new AccessGroupPermissionDTO(isCountryAdmin,accessGroupIds);
+        accessGroupCounterQueryResult.setCountryAdmin(isCountryAdmin);
+        return accessGroupCounterQueryResult;
     }
 
 

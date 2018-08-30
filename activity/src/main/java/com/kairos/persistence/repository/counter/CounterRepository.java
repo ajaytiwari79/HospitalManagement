@@ -134,7 +134,7 @@ public class CounterRepository {
 
     public List<CategoryKPIMappingDTO> getKPIsMappingForCategories(List<BigInteger> categoryIds){
         Aggregation ag = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("categoryId").in(categoryIds))
+                               Aggregation.match(Criteria.where("categoryId").in(categoryIds))
                 , Aggregation.group("categoryId").push("kpiId").as("kpiIds")
                 , Aggregation.project().and("_id").as("categoryId").and("kpiIds").as("kpiId")
         );
@@ -143,6 +143,17 @@ public class CounterRepository {
     }
 
 
+    public List<CategoryKPIMappingDTO> getKPIsMappingForCategoriesForStaff(List<BigInteger> categoryIds,Long refId,ConfLevel level){
+        String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
+        Aggregation ag = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where(queryField).is(refId).and("level").is(level)),
+                Aggregation.lookup("categoryKPIConf","_id","categoryId","category")
+                , Aggregation.group("id","name").push("category.kpiId").as("kpiId")
+                , Aggregation.project().and("id").as("categoryId").and("kpiId").arrayElementAt(0).as("kpiId").and("name").as("name")
+        );
+        AggregationResults<CategoryKPIMappingDTO> results = mongoTemplate.aggregate(ag, KPICategory.class, CategoryKPIMappingDTO.class);
+        return results.getMappedResults();
+    }
 
     //tabKPI distribution crud
 

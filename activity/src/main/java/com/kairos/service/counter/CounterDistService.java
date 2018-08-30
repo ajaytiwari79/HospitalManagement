@@ -7,7 +7,7 @@ import com.kairos.activity.counter.KPICategoryDTO;
 import com.kairos.activity.counter.KPIDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
-import com.kairos.activity.counter.distribution.access_group.AccessGroupPermissionDTO;
+import com.kairos.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
@@ -25,7 +25,6 @@ import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -76,12 +75,21 @@ public class CounterDistService extends MongoBaseService {
     }
 
     public StaffKPIGalleryDTO getInitialCategoryKPIDistDataForStaff(Long unitId, ConfLevel level) {
-        Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
-        AccessGroupPermissionDTO accessGroupPermissionDTO=genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId,staffId);
-        List<KPICategoryDTO> categories = counterRepository.getKPICategory(null, level, staffId);
-        List<BigInteger> categoryIds = categories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(toList());
-        List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategories(categoryIds);
-        new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
+        List<KPICategoryDTO> categories=null;
+        Long refId=null;
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+        if(accessGroupPermissionCounterDTO.getCountryAdmin()){
+            level=ConfLevel.COUNTRY;
+            refId=accessGroupPermissionCounterDTO.getCountryId();
+//            categories = counterRepository.getKPICategory(null, level, refId);
+        }else{
+            level=ConfLevel.UNIT;
+            refId=unitId;
+//           categories= counterRepository.getKPICategory(null, level, refId);
+        }
+       //List<BigInteger> categoryIds = categories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(toList());
+        List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategoriesForStaff(new ArrayList<>(),refId,level);
+       new InitialKPICategoryDistDataDTO(categories, categoryKPIMapping);
         return null;
     }
 

@@ -31,4 +31,6 @@ public class CategoryKPIMappingDTO {
     public void setName(String name) {
         this.name = name;
     }
+
+
 }

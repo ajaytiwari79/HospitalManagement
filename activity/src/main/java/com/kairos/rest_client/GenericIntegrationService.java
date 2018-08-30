@@ -1,6 +1,6 @@
 package com.kairos.rest_client;
 
-import com.kairos.activity.counter.distribution.access_group.AccessGroupPermissionDTO;
+import com.kairos.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
@@ -108,8 +108,7 @@ public class GenericIntegrationService {
         return value.longValue();
     }
 
-    public AccessGroupPermissionDTO getAccessGroupIdsAndCountryAdmin(Long unitId,Long staffId){
-        AccessGroupPermissionDTO accessGroupPermissionDTO=genericRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/staff/{staffId}/user/accessgroup",null,staffId);
-        return accessGroupPermissionDTO;
+    public AccessGroupPermissionCounterDTO getAccessGroupIdsAndCountryAdmin(Long unitId){
+            return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/staff/user/accessgroup",null),AccessGroupPermissionCounterDTO.class);
     }
 }

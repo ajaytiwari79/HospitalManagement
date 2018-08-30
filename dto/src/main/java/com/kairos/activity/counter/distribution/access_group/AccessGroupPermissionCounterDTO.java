@@ -2,14 +2,16 @@ package com.kairos.activity.counter.distribution.access_group;
 
 import java.util.List;
 
-public class AccessGroupPermissionDTO {
+public class AccessGroupPermissionCounterDTO {
+    private Long staffId;
+    private Long countryId;
     private Boolean isCountryAdmin;
     private List<Long> accessGroupIds;
 
-    public AccessGroupPermissionDTO() {
+    public AccessGroupPermissionCounterDTO() {
     }
 
-    public AccessGroupPermissionDTO(Boolean isCountryAdmin, List<Long> accessGroupIds) {
+    public AccessGroupPermissionCounterDTO(Boolean isCountryAdmin, List<Long> accessGroupIds) {
         this.isCountryAdmin = isCountryAdmin;
         this.accessGroupIds = accessGroupIds;
     }
@@ -28,5 +30,13 @@ public class AccessGroupPermissionDTO {
 
     public void setAccessGroupIds(List<Long> accessGroupIds) {
         this.accessGroupIds = accessGroupIds;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 }
