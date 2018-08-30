@@ -22,9 +22,9 @@ public interface SickConfigurationRepository extends Neo4jBaseRepository<SickCon
             " return sickConfiguration.timeTypes as timeTypes")
     List<BigInteger> findAllSickTimeTypesOfUnit(Long unitId);
 
-    @Query("")
-    void updateSickConfigurationOfUnit(Long unitId, Set<BigInteger> allowedTimeTypes);
-
-
+    @Query("MATCH(unit:Organization) where id(unit)={0}" +
+            " MATCH(unit)-["+IN_UNIT+"]-(sickConfiguration:SickConfiguration)" +
+            " return sickConfiguration")
+    SickConfiguration findSickConfigurationOfUnit(Long unitId);
 
 }

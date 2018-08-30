@@ -178,7 +178,7 @@ public class ShiftService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivityId());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTO.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
@@ -332,25 +332,23 @@ public class ShiftService extends MongoBaseService {
         if (activity.getRulesActivityTab().isBreakAllowed()) {
             Long shiftDurationInMinute = (mainShift.getEndDate().getTime() - mainShift.getStartDate().getTime()) / ONE_MINUTE;
             List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(mainShift.getUnitId(), shiftDurationInMinute);
+            Map<BigInteger,Activity> breakActivitiesMap=getBreakActivities(breakSettings);
 
-            Activity breakActivity = null;
+            boolean paid=false;
             if (Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition().getExpertise().getBreakPaymentSetting()).isPresent() &&
                     staffAdditionalInfoDTO.getUnitPosition().getExpertise().getBreakPaymentSetting().equals(BreakPaymentSetting.PAID)) {
-                breakActivity = activityRepository.findByNameIgnoreCaseAndUnitIdAndDeletedFalse(PAID_BREAK, mainShift.getUnitId());
+                paid=true;
 
-            } else if (Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition().getExpertise().getBreakPaymentSetting()).isPresent() &&
-                    staffAdditionalInfoDTO.getUnitPosition().getExpertise().getBreakPaymentSetting().equals(BreakPaymentSetting.UNPAID)) {
-                breakActivity = activityRepository.findByNameIgnoreCaseAndUnitIdAndDeletedFalse(UNPAID_BREAK, mainShift.getUnitId());
             }
-            if (Optional.ofNullable(breakActivity).isPresent() && Optional.ofNullable(breakSettings).isPresent() && breakSettings.size() > 0) {
-                return addBreakInShifts(mainShift, breakActivity, breakSettings, shiftDurationInMinute);
+            if (Optional.ofNullable(breakSettings).isPresent() && breakSettings.size() > 0) {
+                return addBreakInShifts(mainShift, breakSettings, shiftDurationInMinute,breakActivitiesMap,paid);
             }
         }
         return Collections.emptyList();
 
     }
 
-    private List<ShiftQueryResult> addBreakInShifts(Shift mainShift, Activity breakActivity, List<BreakSettings> breakSettings, Long shiftDurationInMinute) {
+    private List<ShiftQueryResult> addBreakInShifts(Shift mainShift,  List<BreakSettings> breakSettings, Long shiftDurationInMinute,Map<BigInteger,Activity> breakActivitiesMap,Boolean paid) {
         logger.info("ShiftDurationInMinute = {}", shiftDurationInMinute);
         Long startDateMillis = mainShift.getStartDate().getTime();
         Long endDateMillis = null;
@@ -359,7 +357,9 @@ public class ShiftService extends MongoBaseService {
         Long totalBreakAllotedInMinute = 0L;
         String lastItemAdded = null;
         List<Shift> shifts = new ArrayList<>();
+        Activity breakActivity=null;
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>();
+
         for (int i = 0; i < breakSettings.size(); i++) {
             /**
              * The first eligible break hours after.It specifies you can take first break after this duration
@@ -367,6 +367,9 @@ public class ShiftService extends MongoBaseService {
             breakAllowedAfterMinute = breakSettings.get(i).getShiftDurationInMinute();
 
             if (shiftDurationInMinute > breakAllowedAfterMinute) {
+                if(paid!=null){
+                    breakActivity=paid?breakActivitiesMap.get(breakSettings.get(i).getPaidActivityId()):breakActivitiesMap.get(breakSettings.get(i).getUnpaidActivityId());
+                }
                 endDateMillis = startDateMillis + (breakAllowedAfterMinute * ONE_MINUTE);
                 shifts.add(getShiftObject(mainShift, mainShift.getName(), mainShift.getActivityId(), new Date(startDateMillis), new Date(endDateMillis), null));
                 // we have added a sub shift now adding the break for remaining period
@@ -1090,19 +1093,18 @@ public class ShiftService extends MongoBaseService {
         List<WorkingTimeAgreement> workingTimeAgreements = wtaService.findAllByIdAndDeletedFalse(wtaIds);
         List<Phase> phases = phaseService.getAllPhasesOfUnit(unitId);
         List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByUnitIdAndDeletedFalseOrderByCreatedAtAsc(unitId);
-        activities.addAll(activityRepository.findAllByUnitIdAndNameInIgnoreCaseAndDeletedFalse(unitId, PAID_BREAK, UNPAID_BREAK));
 
+        Map<BigInteger,Activity> breakActivitiesMap=getBreakActivities(breakSettings);
         Integer unCopiedShiftCount = 0;
         CopyShiftResponse copyShiftResponse = new CopyShiftResponse();
 
         for (Long currentStaffId : copyShiftDTO.getStaffIds()) {
 
             StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
-            String breakActivityForStaff = staffUnitPosition.getExpertise().getBreakPaymentSetting().equals(BreakPaymentSetting.PAID) ? PAID_BREAK : UNPAID_BREAK;
-            Activity breakActivity = activities.stream().filter(activity -> activity.getName().equalsIgnoreCase(breakActivityForStaff)).findFirst().get();
+            boolean paid=staffUnitPosition.getExpertise().getBreakPaymentSetting().equals(BreakPaymentSetting.PAID);
             WorkingTimeAgreement workingTimeAgreement = workingTimeAgreements.stream().filter(wta -> wta.getId().equals(staffUnitPosition.getWorkingTimeAgreementId())).findAny().get();
 
-            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activities, workingTimeAgreement, phases, copyShiftDTO, breakSettings, breakActivity);
+            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activities, workingTimeAgreement, phases, copyShiftDTO, breakSettings,breakActivitiesMap, paid);
 
             StaffWiseShiftResponse successfullyCopied = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("success"));
             StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffUnitPosition.getStaff(), response.get("error"));
@@ -1115,7 +1117,7 @@ public class ShiftService extends MongoBaseService {
         return copyShiftResponse;
     }
 
-    private Map<String, List<ShiftResponse>> copyForThisStaff(List<DateWiseShiftResponse> shifts, StaffUnitPositionDetails staffUnitPosition, List<Activity> activities, WorkingTimeAgreement workingTimeAgreement, List<Phase> phases, CopyShiftDTO copyShiftDTO, List<BreakSettings> breakSettings, Activity breakActivity) {
+    private Map<String, List<ShiftResponse>> copyForThisStaff(List<DateWiseShiftResponse> shifts, StaffUnitPositionDetails staffUnitPosition, List<Activity> activities, WorkingTimeAgreement workingTimeAgreement, List<Phase> phases, CopyShiftDTO copyShiftDTO, List<BreakSettings> breakSettings,Map<BigInteger,Activity> breakActivitiesMap, Boolean paid) {
 
         List<Shift> newShifts = new ArrayList<>(shifts.size());
         Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
@@ -1134,7 +1136,7 @@ public class ShiftService extends MongoBaseService {
                 ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift, ShiftWithActivityDTO.class);
                 shiftWithActivityDTO.setActivity(currentActivity);
                 List<String> validationMessages = validateShiftWhileCopy(shiftWithActivityDTO, staffUnitPosition, workingTimeAgreement, phases, copyShiftDTO);
-                shiftResponse = addShift(validationMessages, sourceShift, staffUnitPosition, shiftCreationDate, newShifts, breakActivity, breakSettings, currentActivity);
+                shiftResponse = addShift(validationMessages, sourceShift, staffUnitPosition, shiftCreationDate, newShifts, breakSettings, currentActivity,breakActivitiesMap,paid);
 
                 if (shiftResponse.isSuccess()) {
                     successfullyCopiedShifts.add(shiftResponse);
@@ -1154,7 +1156,7 @@ public class ShiftService extends MongoBaseService {
         return statusMap;
     }
 
-    private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffUnitPositionDetails staffUnitPosition, LocalDate shiftCreationFirstDate, List<Shift> newShifts, Activity breakActivity, List<BreakSettings> breakSettings, Activity activity) {
+    private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffUnitPositionDetails staffUnitPosition, LocalDate shiftCreationFirstDate, List<Shift> newShifts, List<BreakSettings> breakSettings, Activity activity,Map<BigInteger,Activity> breakActivitiesMap,boolean paid) {
         if (responseMessages.isEmpty()) {
             Long shiftDurationInMinute = (sourceShift.getEndDate().getTime() - sourceShift.getStartDate().getTime()) / ONE_MINUTE;
 
@@ -1163,7 +1165,7 @@ public class ShiftService extends MongoBaseService {
                     sourceShift.getScheduledMinutes(), sourceShift.getDurationMinutes(), sourceShift.isMainShift(), sourceShift.getExternalId(), staffUnitPosition.getId(), sourceShift.getStatus(), sourceShift.getParentOpenShiftId(), sourceShift.getAllowedBreakDurationInMinute(), sourceShift.getId());
             if (activity.getRulesActivityTab().isBreakAllowed()) {
 
-                List<ShiftQueryResult> shiftQueryResults = addBreakInShifts(copiedShift, breakActivity, breakSettings, shiftDurationInMinute);
+                List<ShiftQueryResult> shiftQueryResults = addBreakInShifts(copiedShift, breakSettings, shiftDurationInMinute,breakActivitiesMap,paid);
                 Set<BigInteger> breakShiftIds = shiftQueryResults.stream().map(s -> s.getId()).collect(Collectors.toSet());
                 copiedShift.setSubShifts(breakShiftIds);
             }
@@ -1312,6 +1314,13 @@ public class ShiftService extends MongoBaseService {
     }
     public void deleteShiftsAfterEmploymentEndDate(Long staffId, Long unitId, LocalDate employmentEndDate) {
         shiftMongoRepository.deleteShiftsAfterDate(staffId,employmentEndDate.atStartOfDay());
+    }
+
+    private Map<BigInteger,Activity> getBreakActivities(List<BreakSettings> breakSettings){
+        Set<BigInteger> breakActivityIds=breakSettings.stream().map(BreakSettings::getPaidActivityId).collect(Collectors.toSet());
+        breakActivityIds.addAll(breakSettings.stream().map(BreakSettings::getUnpaidActivityId).collect(Collectors.toSet()));
+        List<Activity> breakActivities=activityRepository.findAllActivitiesByIds(breakActivityIds);
+        return breakActivities.stream().collect(Collectors.toMap(Activity::getId,v->v));
     }
 
 

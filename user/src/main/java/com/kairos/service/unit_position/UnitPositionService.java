@@ -413,7 +413,9 @@ public class UnitPositionService {
         Long reasonCodeId = Optional.ofNullable(employment.getReasonCode()).isPresent() ? employment.getReasonCode().getId() : null;
         employmentQueryResult = new EmploymentQueryResult(employment.getId(), employment.getStartDateMillis(), employment.getEndDateMillis(), reasonCodeId, employment.getAccessGroupIdOnEmploymentEnd());
         // Deleting All shifts after employment end date
-        activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId,unitPositionDTO.getEndLocalDate(),unitPositionDTO.getStaffId());
+        if(unitPositionDTO.getEndLocalDate()!=null){
+            activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId,unitPositionDTO.getEndLocalDate(),unitPositionDTO.getStaffId());
+        }
         //TODO might remove -- FOR FE compactibility
         WTAResponseDTO wtaResponseDTO = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_WTA_BY_UNITPOSITION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>>() {},unitPositionId);
         unitPositionQueryResult.setWorkingTimeAgreement(wtaResponseDTO);

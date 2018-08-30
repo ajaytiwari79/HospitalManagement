@@ -1,6 +1,8 @@
 package com.kairos.service.organization_meta_data;
 
 import com.kairos.activity.time_type.TimeTypeDTO;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.default_data.SickConfiguration;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.default_data.SickConfigurationRepository;
 import com.kairos.service.country.TimeTypeRestClient;
@@ -11,10 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * CreatedBy vipulpandey on 29/8/18
@@ -23,23 +22,36 @@ import java.util.Set;
 @Transactional
 public class SickConfigurationSettingsService {
 
-    private static  final Logger  logger=LoggerFactory.getLogger(SickConfigurationSettingsService.class);
-    @Inject private SickConfigurationRepository sickConfigurationRepository;
-    @Inject private TimeTypeRestClient timeTypeRestClient;
-    @Inject private
-    OrganizationGraphRepository organizationGraphRepository;
-    public boolean saveSickSettingsOfUnit(Long unitId, Set<BigInteger> allowedTimeTypes){
-        sickConfigurationRepository.updateSickConfigurationOfUnit(unitId,allowedTimeTypes);
+    private static final Logger logger = LoggerFactory.getLogger(SickConfigurationSettingsService.class);
+
+    @Inject
+    private SickConfigurationRepository sickConfigurationRepository;
+    @Inject
+    private TimeTypeRestClient timeTypeRestClient;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
+
+    public boolean saveSickSettingsOfUnit(Long unitId, Set<BigInteger> allowedTimeTypes) {
+        SickConfiguration sickConfiguration = sickConfigurationRepository.findSickConfigurationOfUnit(unitId);
+        if (!Optional.ofNullable(sickConfiguration).isPresent()) {
+            Organization organization = organizationGraphRepository.findOne(unitId, 0);
+            sickConfiguration = new SickConfiguration(allowedTimeTypes, organization);
+
+        } else {
+            sickConfiguration.setTimeTypes(allowedTimeTypes);
+        }
+        sickConfigurationRepository.save(sickConfiguration);
         return true;
     }
-    public Map<String,Object> getSickSettingsOfUnit(Long unitId){
 
-        List<TimeTypeDTO> timeTypes= timeTypeRestClient.getAllTimeTypes(organizationGraphRepository.getCountryId(unitId));
-        List<BigInteger> selectedTimeTypeIds=sickConfigurationRepository.findAllSickTimeTypesOfUnit(unitId);
-        Map<String,Object> response= new HashMap<>();
-        response.put("timeTypes",timeTypes);
-        response.put("selectedTimeTypeIds",selectedTimeTypeIds);
-        return new HashMap<>();
+    public Map<String, Object> getSickSettingsOfUnit(Long unitId) {
+
+        List<TimeTypeDTO> timeTypes = timeTypeRestClient.getAllTimeTypes(organizationGraphRepository.getCountryId(unitId));
+        List<BigInteger> selectedTimeTypeIds = sickConfigurationRepository.findAllSickTimeTypesOfUnit(unitId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("timeTypes", timeTypes);
+        response.put("selectedTimeTypeIds", selectedTimeTypeIds);
+        return response;
     }
 
 }

@@ -27,7 +27,7 @@ public class SickSettingConfigurationController {
 
     @ApiOperation(value = "api used to save the sick settings of the organization")
     @PostMapping
-    public ResponseEntity<Map<String,Object>> saveSickSettingsOfUnit(Set<BigInteger> timeTypes, @PathVariable Long unitId){
+    public ResponseEntity<Map<String,Object>> saveSickSettingsOfUnit(@RequestBody Set<BigInteger> timeTypes, @PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,sickConfigurationSettingsService.saveSickSettingsOfUnit(unitId,timeTypes));
     }
 

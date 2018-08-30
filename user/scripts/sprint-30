@@ -1,0 +1,5 @@
+match(c:Organization) remove c.companyType
+match wd= (w:Organization)
+forEach(n IN nodes(wd)|
+set n.kairosCompanyId=toUpper(subString(n.name,0,3)+"-KAI-00")
+);
