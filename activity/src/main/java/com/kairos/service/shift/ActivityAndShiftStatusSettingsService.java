@@ -39,7 +39,7 @@ public class ActivityAndShiftStatusSettingsService extends MongoBaseService {
     public ActivityAndShiftStatusSettingsDTO updateActivityAndShiftStatusSettings(Long countryId,ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
         Optional<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityAndShiftStatusSettingsDTO.getId());
         if(!activityAndShiftStatusSettings.isPresent()){
-            exceptionService.dataNotFoundException("",activityAndShiftStatusSettingsDTO.getId());
+            exceptionService.dataNotFoundException("data.Not.found",activityAndShiftStatusSettingsDTO.getId());
         }
         ObjectMapperUtils.copyProperties(activityAndShiftStatusSettingsDTO,activityAndShiftStatusSettings.get());
         activityAndShiftStatusSettings.get().setCountryId(countryId);
@@ -48,9 +48,6 @@ public class ActivityAndShiftStatusSettingsService extends MongoBaseService {
 
     }
 
-    public boolean deleteActivityAndShiftStatusSettings(BigInteger id){
-        return true;
-    }
 
     public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long countryId,BigInteger activityId){
           return activityAndShiftStatusSettingsRepository.getActivityAndShiftStatusSettingsGroupedByStatus(countryId,activityId);

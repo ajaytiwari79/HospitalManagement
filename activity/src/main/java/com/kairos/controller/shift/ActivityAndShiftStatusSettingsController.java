@@ -52,13 +52,6 @@ public class ActivityAndShiftStatusSettingsController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.updateActivityAndShiftStatusSettings(countryId,activityAndShiftStatusSettingsDTO));
     }
 
-    @DeleteMapping(value = COUNTRY_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL+"/{id}")
-    @ApiOperation("delete Activity and shift status setting")
-   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> deleteActivityAndShiftStatusSettings(@PathVariable BigInteger id){
-        return ResponseHandler.generateResponse(HttpStatus.NO_CONTENT,true,activityAndShiftStatusSettingsService.deleteActivityAndShiftStatusSettings(id));
-    }
-
 
     // EndPoints for unit
 
@@ -83,11 +76,5 @@ public class ActivityAndShiftStatusSettingsController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.updateActivityAndShiftStatusSettingsForUnit(unitId,activityAndShiftStatusSettingsDTO));
     }
 
-    @DeleteMapping(value = UNIT_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL+"/{id}")
-    @ApiOperation("delete Activity and shift status setting")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> deleteActivityAndShiftStatusSettingsForUnit(@PathVariable BigInteger id){
-        return ResponseHandler.generateResponse(HttpStatus.NO_CONTENT,true,activityAndShiftStatusSettingsService.deleteActivityAndShiftStatusSettings(id));
-    }
 
 }
