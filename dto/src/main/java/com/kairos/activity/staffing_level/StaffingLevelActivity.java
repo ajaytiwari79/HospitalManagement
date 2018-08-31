@@ -10,7 +10,6 @@ public class StaffingLevelActivity {
 
     private String name;
     private BigInteger activityId;
-   // private int noOfStaff;
     private boolean includeInMin;
     private int minNoOfStaff;
     private int maxNoOfStaff;
@@ -63,8 +62,6 @@ public class StaffingLevelActivity {
         this.activityId = activityId;
     }
 
-
-
     public boolean isIncludeInMin() {
         return includeInMin;
     }
@@ -91,22 +88,12 @@ public class StaffingLevelActivity {
 
         return new EqualsBuilder()
                 .append(activityId, that.activityId)
-                .append(minNoOfStaff, that.minNoOfStaff)
-                .append(maxNoOfStaff, that.maxNoOfStaff)
                 .isEquals();
     }
 
-    /*@Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(activityId)
-                .append(noOfStaff)
-                .toHashCode();
-    }*/
-
     @Override
     public int hashCode() {
-        return Objects.hash(activityId,name, minNoOfStaff,maxNoOfStaff);
+        return Objects.hash(activityId);
     }
 
     
@@ -114,8 +101,6 @@ public class StaffingLevelActivity {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("activityId", activityId)
-                .append("minNoOfStaff", minNoOfStaff)
-                .append("maxNoOfStaff",maxNoOfStaff)
                 .toString();
     }
 }

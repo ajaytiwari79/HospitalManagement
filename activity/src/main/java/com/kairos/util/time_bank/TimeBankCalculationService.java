@@ -511,7 +511,7 @@ public class TimeBankCalculationService {
             String title = byMonth ? localDate.getDayOfMonth()+" "+localDate.getMonth() : localDate.getDayOfWeek().toString();
             TimeBankIntervalDTO timeBankIntervalDTO = new TimeBankIntervalDTO(0,0,title);
             if(Optional.ofNullable(dailyTimeBankEntry).isPresent()){
-                long scheduledMin = dailyTimeBankEntry.getScheduledMin()+(dailyTimeBankEntry.getTimeBankMinWithoutCta()-dailyTimeBankEntry.getTimeBankMinWithCta());
+                long scheduledMin = dailyTimeBankEntry.getScheduledMin()+dailyTimeBankEntry.getTimeBankMinWithCta();
                 long totalTimeBankChange = dailyTimeBankEntry.getTotalTimeBankMin()<0 ? 0 : dailyTimeBankEntry.getTotalTimeBankMin();
                 timeBankIntervalDTO = new TimeBankIntervalDTO(scheduledMin,totalTimeBankChange,title);
             }

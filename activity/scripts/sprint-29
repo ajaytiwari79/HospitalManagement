@@ -1,6 +1,10 @@
 // To change the key name in existing counters
 db.counter.updateMany({},{$rename:{"applicableFor":"supportedModuleTypes"}});
 
+//To set supportedModuleTypes in counters
+db.counter.updateMany({},{$set:{"supportedModuleTypes":["OPEN_SHIFT"]}});
+
+
 
 db.wtaBaseRuleTemplate.updateMany({},{$push:{"phaseTemplateValues" :{$each:[ {
             "phaseId" : NumberLong(5),

@@ -72,12 +72,13 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
     Boolean checkUnitPermissionLinkedWithAccessGroup(Long unitPermissionId, Long accessGroupId);
 
     // forg parent organization
-    @Query("Match (organization:Organization),(staff:Staff) where id(organization)={0} AND id(staff)={1} with organization,staff \n" +
-            "Match (organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff)  \n" +
-            "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]-(organization)\n" +
+    @Query("Match (organization:Organization),(user:User) where id(organization)={0} AND id(user)={1} with organization,user \n" +
+            "Match (organization)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user)  \n" +
+            "Match (employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization)\n" +
             "return  unitPermission")
-    UnitPermission checkUnitPermissionOfStaff(Long parentOrganizationId, Long staffId);
+    UnitPermission checkUnitPermissionOfUser(Long parentOrganizationId, Long userId);
 
     @Query("Match (emp:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]-(co:Organization) where id(emp)=(1) and id(co)={0} return unitPermission")
     UnitPermission findUnitPermissionOfStaffByEmployment( Long organizationId, Long employmentId);
+
 }

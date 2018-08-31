@@ -141,7 +141,7 @@ public class TimeBankService extends MongoBaseService {
      */
     public UnitPositionWithCtaDetailsDTO getCostTimeAgreement(Long unitPositionId) {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(unitPositionId);
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(unitPositionId,DateUtils.asDate(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()));
         unitPositionWithCtaDetailsDTO.setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         return unitPositionWithCtaDetailsDTO;
     }

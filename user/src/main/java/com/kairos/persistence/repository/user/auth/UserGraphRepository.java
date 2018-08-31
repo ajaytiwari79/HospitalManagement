@@ -100,4 +100,10 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "return  id(org) as organizationId ,user.email as email,id(user) as id,ag.name as accessGroupName,id(ag) as accessGroupId, user.firstName as firstName,user.lastName as lastName ,user.cprNumber as cprNumber,user.creationDate as creationDate ORDER BY user.creationDate DESC LIMIT 1" )
     List<StaffPersonalDetailDTO> getUnitManagerOfOrganization(List<Long> unitId);
+
+    @Query("Match (org:Organization) where id(org)={0}" +
+            "Optional Match (emp:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(org) with org,emp\n" +
+            "Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
+            " return user " )
+    User getUserOfOrganization(Long unitId);
 }

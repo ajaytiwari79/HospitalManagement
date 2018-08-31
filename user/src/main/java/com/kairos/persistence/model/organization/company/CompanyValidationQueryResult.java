@@ -7,7 +7,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 public class CompanyValidationQueryResult {
     private Boolean name;
     private Boolean desiredUrl;
-    private String kairosId;
+    private String kairosCompanyId;
 
     public Boolean getName() {
         return name;
@@ -25,11 +25,11 @@ public class CompanyValidationQueryResult {
         this.desiredUrl = desiredUrl;
     }
 
-    public String getKairosId() {
-        return kairosId;
+    public String getKairosCompanyId() {
+        return kairosCompanyId;
     }
 
-    public void setKairosId(String kairosId) {
-        this.kairosId = kairosId;
+    public void setKairosCompanyId(String kairosCompanyId) {
+        this.kairosCompanyId = kairosCompanyId;
     }
 }

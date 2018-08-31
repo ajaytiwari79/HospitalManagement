@@ -186,7 +186,7 @@ public class ShiftService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivityId());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTO.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
@@ -459,7 +459,7 @@ public class ShiftService extends MongoBaseService {
         if (staffAdditionalInfoDTO.getDayTypes() != null && !staffAdditionalInfoDTO.getDayTypes().isEmpty()) {
             activityDayTypes = WTARuleTemplateValidatorUtility.getValidDays(staffAdditionalInfoDTO.getDayTypes(), activity.getTimeCalculationActivityTab().getDayTypes());
         }
-        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
+        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTOS.get(0).getStartDate());
         for (ShiftDTO shiftDTO : shiftDTOS) {
             Date shiftStartDate = DateUtils.onlyDate(shiftDTO.getStartDate());
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
@@ -498,7 +498,7 @@ public class ShiftService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.shift.state.update", shift.getStatus());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(staffAdditionalInfoDTO.getUnitPosition().getCostTimeAgreementId());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTO.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.dataNotFoundByIdException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
@@ -509,7 +509,7 @@ public class ShiftService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivityId());
         }
         Activity activityOld = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
-        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
+        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTO.getStartDate());
         //copy old state of activity object
         Shift oldStateOfShift = new Shift();
         BeanUtils.copyProperties(shift, oldStateOfShift);
@@ -591,7 +591,7 @@ public class ShiftService extends MongoBaseService {
         }
         Activity activity = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId());
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(staffAdditionalInfoDTO.getUnitPosition().getCostTimeAgreementId());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),shift.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
         validateStaffingLevel(phase,shift, activity, false, staffAdditionalInfoDTO);
@@ -599,9 +599,7 @@ public class ShiftService extends MongoBaseService {
         Specification<BigInteger> activitySpecification = shiftAllowedToDelete;
         List<String> messages = activitySpecification.isSatisfiedString(phase.getId());
         if (!messages.isEmpty()) {
-            List<String> errors = new ArrayList<>();
-            messages.forEach(responseMessage -> errors.add(localeService.getMessage(responseMessage)));
-            exceptionService.actionNotPermittedException(errors.get(0));
+            exceptionService.actionNotPermittedException(messages.get(0));
         }
         shift.setDeleted(true);
         save(shift);
@@ -777,7 +775,7 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getStaffId());
         }
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(staffAdditionalInfoDTO.getUnitPosition().getCostTimeAgreementId());
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTO.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivityId());
         Activity activity = activityWrapper.getActivity();
@@ -790,7 +788,7 @@ public class ShiftService extends MongoBaseService {
         ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO, activity);
         shiftWithActivityDTO.setActivity(activity);
         shiftWithActivityDTO.setUnitId(unitId);
-        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
+        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTO.getStartDate());
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
         validateShiftWithActivity(phase,wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         ShiftQueryResult shiftQueryResult;

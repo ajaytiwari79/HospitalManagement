@@ -19,7 +19,7 @@ import java.util.Map;
 public class CTAResponseDTO {
     @NotNull
     private BigInteger id;
-    private Long parentCTAId;
+    private BigInteger parentCTAId;
     private String name;
     private String description;
     private ExpertiseResponseDTO expertise;
@@ -39,7 +39,7 @@ public class CTAResponseDTO {
         //Default constructor
     }
 
-    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled) {
+    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled,Long unitPositionId) {
         this.id = id;
         this.name = name;
         this.expertise = expertise;
@@ -47,6 +47,7 @@ public class CTAResponseDTO {
         this.startDate = startDate;
         this.endDate = endDate;
         this.disabled = disabled;
+        this.unitPositionId = unitPositionId;
     }
 
     public ExpertiseResponseDTO getExpertise() {
@@ -97,11 +98,11 @@ public class CTAResponseDTO {
         this.id = id;
     }
 
-    public Long getParentCTAId() {
+    public BigInteger getParentCTAId() {
         return parentCTAId;
     }
 
-    public void setParentCTAId(Long parentCTAId) {
+    public void setParentCTAId(BigInteger parentCTAId) {
         this.parentCTAId = parentCTAId;
     }
 

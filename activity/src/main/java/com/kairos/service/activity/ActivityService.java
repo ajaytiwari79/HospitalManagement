@@ -512,6 +512,9 @@ public class ActivityService extends MongoBaseService {
                 case DAYS:
                     nextEndDate = startDate.plusDays(dayValue-1);
                     break;
+                case HALF_YEARLY:
+                    nextEndDate = startDate.plusMonths(6).minusDays(1);
+                    break;
                 case WEEKS:
                     nextEndDate = startDate.plusWeeks(1).minusDays(1);
                     break;
