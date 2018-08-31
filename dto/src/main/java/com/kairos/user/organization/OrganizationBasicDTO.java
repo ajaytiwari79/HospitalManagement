@@ -14,7 +14,7 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationBasicDTO {
     private Long id;
-    @NotNull(message = "error.name.notnull")@NotBlank(message = "error.name.notnull")
+    @NotNull(message = "error.name.notnull")
     private String name;
     private String shortCompanyName;
     private String description;

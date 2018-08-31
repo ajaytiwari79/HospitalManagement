@@ -105,6 +105,9 @@ public class CompanyCreationService {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
         }
+        if (StringUtils.isEmpty(orgDetails.getName()) || orgDetails.getName().length()<3){
+                exceptionService.actionNotPermittedException("error.Organization.name.insuffient");
+        }
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(orgDetails);
         Organization organization = new OrganizationBuilder()
                 .setIsParentOrganization(true)
