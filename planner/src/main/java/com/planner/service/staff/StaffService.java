@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,15 @@ import java.util.List;
 @Transactional
 public class StaffService {
     private static Logger log= LoggerFactory.getLogger(StaffService.class);
-   /* @Autowired
+
+    @Inject
+    private com.planner.repository.staffRepository.StaffRepository staffRepository;
+
+    public String test()
+    {
+       return  staffRepository.findStaffNameById(0L);
+    }
+    /* @Autowired
     private StaffRepository staffRepository;
     public void createStaff(Long unitId, StaffBasicDetailsDTO staffDTO) {
         Staff staff = new Staff(staffDTO.getFirstName(),staffDTO.getLastName(),staffDTO.getSkills());

@@ -20,7 +20,7 @@ import java.util.Map;
 import static com.planner.constants.ApiConstants.API_UNIT_URL;
 
 @RestController
-@RequestMapping(API_UNIT_URL + "/staff")
+@RequestMapping()
 public class StaffController {
     /*private static Logger logger= LoggerFactory.getLogger(StaffController.class);
     @Autowired
@@ -50,7 +50,14 @@ public class StaffController {
 
     }*/
 
+    @Autowired
+    private StaffService staffService;
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    @ApiOperation("Create staff")
+    public ResponseEntity<Map<String, Object>> addStaffingLevel() {
 
+        return ResponseHandler.generateResponseWithData("Success",HttpStatus.CREATED, staffService.test());
+    }
 
 
 }

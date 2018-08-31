@@ -20,6 +20,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -41,6 +42,7 @@ import java.util.jar.JarFile;
 @EnableEurekaClient
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableMongoRepositories(basePackages ={"com.planner.repository"})
+@EnableNeo4jRepositories(basePackages ={"com.planner.repository"})
 public class PlanningAppConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(PlanningAppConfig.class);
