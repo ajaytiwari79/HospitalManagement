@@ -252,14 +252,14 @@ public class AssessmentService extends MongoBaseService {
         if (!Optional.ofNullable(assessment).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentId);
         }
-        switch (assessment.getAssessmentStatus()) {
+        switch (assessmentStatus) {
             case INPROGRESS:
-                if (assessmentStatus.equals(AssessmentStatus.NEW)) {
+                if (assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
                     exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
                 }
                 break;
             case COMPLETED:
-                if (assessmentStatus.equals(AssessmentStatus.NEW) || assessmentStatus.equals(AssessmentStatus.INPROGRESS)) {
+                if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW) ) {
                     exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
                 } else {
                     if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
