@@ -1,4 +1,4 @@
-package com.planner.service.Client;
+package com.planner.service.rest_client;
 
 import com.kairos.enums.IntegrationOperation;
 import org.slf4j.Logger;
@@ -12,9 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service

@@ -9,7 +9,6 @@ import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.vrp.vrpPlanning.VRPIndictmentDTO;
 import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
-import com.planner.appConfig.appConfig.AppConfig;
 import com.planner.domain.taskPlanning.PlanningProblem;
 import com.planner.domain.vrpPlanning.VRPPlanningSolution;
 import com.planner.enums.PlanningStatus;
@@ -18,11 +17,10 @@ import com.planner.repository.taskPlanningRepository.PlanningRepository;
 import com.planner.repository.vrpPlanning.IndictmentMongoRepository;
 import com.planner.repository.vrpPlanning.VRPPlanningMongoRepository;
 import com.planner.responseDto.PlanningDto.taskplanning.TaskPlanningDTO;
-import com.planner.service.Client.PlannerRestClient;
+import com.planner.service.rest_client.PlannerRestClient;
 import com.planner.service.config.DroolsConfigService;
 import com.planner.service.config.PathProvider;
 import com.planner.service.config.SolverConfigService;
-import com.planner.service.shiftPlanningService.ShiftPlanningService;
 import com.planner.service.tomtomService.TomTomService;
 import com.planner.service.vrpService.VRPGeneratorService;
 import com.planner.util.wta.FileIOUtil;
@@ -36,7 +34,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.util.List;
 
 
 @Service
@@ -46,11 +43,9 @@ public class PlannerService {
 
     @Autowired
     private PlanningRepository planningRepository;
-    @Autowired private TaskPlanningSolutionService taskPlanningSolutionService;
     @Autowired private DroolsConfigService droolsConfigService;
     @Autowired private SolverConfigService solverConfigService;
     @Autowired private SolverConfigRepository solverConfigRepository;
-    @Autowired private ShiftPlanningService shiftPlanningService;
     @Autowired
     private PathProvider pathProvider;
     @Autowired
@@ -114,7 +109,7 @@ public class PlannerService {
 
 
     public PlanningSubmissonResponseDTO submitShiftPlanningProblem(Long unitId, PlanningSubmissionDTO planningSubmissionDTO) {
-        ShiftRequestPhasePlanningSolution problem=shiftPlanningService.createShiftPlanningProblem(unitId,planningSubmissionDTO.getDates());
+        ShiftRequestPhasePlanningSolution problem=null;//shiftPlanningService.createShiftPlanningProblem(unitId,planningSubmissionDTO.getDates());
         FileIOUtil.writeShiftPlanningXMLToFile(problem,pathProvider.getProblemXmlpath());
         Document solverConfig=solverConfigService.createShiftPlanningSolverConfig(planningSubmissionDTO.getSolverConfigId());
         FileIOUtil.writeXMLDocumentToFile(solverConfig,pathProvider.getProblemXmlpath());

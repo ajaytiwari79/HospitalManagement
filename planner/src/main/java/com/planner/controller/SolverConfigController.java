@@ -19,7 +19,7 @@ import static com.planner.constants.ApiConstants.API_UNIT_URL;
 @RestController
 @RequestMapping(API_UNIT_URL + "/solverConfig")
 public class SolverConfigController {
-    private static Logger logger= LoggerFactory.getLogger(StaffController.class);
+    private static Logger logger= LoggerFactory.getLogger(SolverConfigController.class);
     @Autowired
     private SolverConfigService solverConfigService;
 

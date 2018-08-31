@@ -1,4 +1,4 @@
-package com.planner.service.Client;
+package com.planner.service.rest_client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
