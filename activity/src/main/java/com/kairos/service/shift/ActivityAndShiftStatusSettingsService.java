@@ -39,7 +39,7 @@ public class ActivityAndShiftStatusSettingsService extends MongoBaseService {
     public ActivityAndShiftStatusSettingsDTO updateActivityAndShiftStatusSettings(Long countryId,ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
         Optional<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityAndShiftStatusSettingsDTO.getId());
         if(!activityAndShiftStatusSettings.isPresent()){
-            exceptionService.dataNotFoundException("data.Not.found",activityAndShiftStatusSettingsDTO.getId());
+            exceptionService.dataNotFoundException("settings.not.found",activityAndShiftStatusSettingsDTO.getId());
         }
         ObjectMapperUtils.copyProperties(activityAndShiftStatusSettingsDTO,activityAndShiftStatusSettings.get());
         activityAndShiftStatusSettings.get().setCountryId(countryId);
@@ -67,7 +67,7 @@ public class ActivityAndShiftStatusSettingsService extends MongoBaseService {
     public ActivityAndShiftStatusSettingsDTO updateActivityAndShiftStatusSettingsForUnit(Long unitId,ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
         Optional<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityAndShiftStatusSettingsDTO.getId());
         if(!activityAndShiftStatusSettings.isPresent()){
-            exceptionService.dataNotFoundException("",activityAndShiftStatusSettingsDTO.getId());
+            exceptionService.dataNotFoundException("settings.not.found",activityAndShiftStatusSettingsDTO.getId());
         }
         ObjectMapperUtils.copyProperties(activityAndShiftStatusSettingsDTO,activityAndShiftStatusSettings);
         activityAndShiftStatusSettings.get().setUnitId(unitId);
