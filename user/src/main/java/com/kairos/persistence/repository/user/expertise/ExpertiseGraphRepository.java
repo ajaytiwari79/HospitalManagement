@@ -136,7 +136,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels order by expertise.creationDate")
     ExpertiseQueryResult getExpertiseById(Long expertiseId);
 
-    @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0} AND expertise.startDateMillis<={1} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis > {1})" +
+    @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0} " +
             "match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
             "match(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
             "match(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
@@ -152,7 +152,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "services as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels ,seniorDays,childCareDays order by expertise.creationDate")
-    List<ExpertiseQueryResult> getAllExpertiseByCountryId(Long countryId, Long selectedDateMillis);
+    List<ExpertiseQueryResult> getAllExpertiseByCountryId(Long countryId);
 
 
     @Query("MATCH (expertise:Expertise) where id(expertise)={0} \n" +
