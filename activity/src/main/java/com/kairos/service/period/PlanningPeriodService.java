@@ -386,7 +386,7 @@ public class PlanningPeriodService extends MongoBaseService {
         //If No change in date
 
         LocalDateTime puzzleFlippingDateTime=(Optional.ofNullable(planningPeriodDTO.getRequestToPuzzleDate()).isPresent())?DateUtils.getLocalDateTime(planningPeriodDTO.getRequestToPuzzleDate().getDate(),
-                planningPeriodDTO.getPuzzleToConstructionDate().getHours(),planningPeriodDTO.getPuzzleToConstructionDate().getMinutes()):null;
+                planningPeriodDTO.getRequestToPuzzleDate().getHours(),planningPeriodDTO.getRequestToPuzzleDate().getMinutes()):null;
         LocalDateTime constructionFlippingDate=(Optional.ofNullable(planningPeriodDTO.getPuzzleToConstructionDate()).isPresent())?DateUtils.getLocalDateTime(planningPeriodDTO.getPuzzleToConstructionDate().getDate(),
                 planningPeriodDTO.getPuzzleToConstructionDate().getHours(),planningPeriodDTO.getPuzzleToConstructionDate().getMinutes()):null;
         LocalDateTime draftFlippingDate=(Optional.ofNullable(planningPeriodDTO.getConstructionToDraftDate()).isPresent())?DateUtils.getLocalDateTime(planningPeriodDTO.getConstructionToDraftDate().getDate(),planningPeriodDTO.getConstructionToDraftDate().getHours(),
