@@ -13,7 +13,6 @@ public class MasterQuestionDTO {
     private BigInteger id;
 
     @NotBlank(message = "Question title  can't be  empty")
-    @Pattern(message = "numeric and Special character are not allowed in question title",regexp ="^[a-zA-Z\\s]+$" )
     private String question;
 
     @NotBlank(message = "Description  can't be  Empty")

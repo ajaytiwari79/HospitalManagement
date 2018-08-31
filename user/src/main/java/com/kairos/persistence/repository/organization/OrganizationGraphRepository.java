@@ -294,7 +294,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             " WITH {children: case when oss is NULL then [] else collect({name:oss.name,id:id(oss)}) end,name:os.name,id:id(os)} as orgServices,bt,organizationTypes,cc,country " +
             " WITH collect(orgServices) as serviceTypes,bt,organizationTypes,cc,country " +
             " OPTIONAL match(country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) with organizationTypes,bt ,cc ,serviceTypes,collect(accountType) as accountTypes \n" +
-            " OPTIONAL match(country)<-[:" + IN_COUNTRY + "]-(unitType:unitType{deleted:false}) with organizationTypes,bt ,cc ,serviceTypes,accountTypes,collect(unitType) as unitTypes \n" +
+            " OPTIONAL match(country)<-[:" + IN_COUNTRY + "]-(unitType:UnitType{deleted:false}) with organizationTypes,bt ,cc ,serviceTypes,accountTypes,collect(unitType) as unitTypes \n" +
             "return organizationTypes,bt as businessTypes,cc as companyCategories,serviceTypes,accountTypes,unitTypes")
     OrganizationCreationData getOrganizationCreationData(long countryId);
 

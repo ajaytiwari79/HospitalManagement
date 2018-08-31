@@ -362,7 +362,7 @@ public class Organization extends UserBaseEntity {
     }
 
     public List<Organization> getChildren() {
-        return children;
+        return java.util.Optional.ofNullable(children).orElse(new ArrayList<>());
 
     }
 
