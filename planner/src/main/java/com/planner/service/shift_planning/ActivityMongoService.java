@@ -1,4 +1,4 @@
-package com.planner.domain.shift_planning.staffinglevel;
+package com.planner.service.shift_planning;
 
 import com.kairos.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
 import com.kairos.activity.staffing_level.StaffingLevelActivity;

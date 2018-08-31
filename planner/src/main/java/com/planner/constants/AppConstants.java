@@ -22,7 +22,7 @@ public class AppConstants {
     public static final String CONNECTION_POOL_SIZE = "spring.data.neo4j.connection.pool.size";
 
     /**
-     *MongoDb {Collections} Constants for Activity micro-service
+     *MongoDb {Collections names} Constants for Activity micro-service
      * @author mohit
      * @date 31-8-17
      */

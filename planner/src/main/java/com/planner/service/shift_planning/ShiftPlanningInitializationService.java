@@ -1,7 +1,6 @@
 package com.planner.service.shift_planning;
 
 import com.kairos.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
-import com.planner.domain.shift_planning.staffinglevel.ActivityMongoService;
 import com.planner.responseDto.PlanningDto.shiftPlanningDto.ActivityDTO;
 import org.springframework.stereotype.Service;
 
