@@ -55,7 +55,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
 
     @Override
     public WTAQueryResultDTO getWTAByUnitPosition(Long unitPositionId,Date date) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").gte(date).and("endDate").lte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").gte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
@@ -208,7 +208,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     @Override
     public List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> upIds) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitPositionId").in(upIds).and("deleted").is(false).and("disabled").is(false)),
+                match(Criteria.where("unitPositionId").in(upIds).and("deleted").is(false).and("disabled").is(true)),
                 graphLookup("workingTimeAgreement").startWith("parentWTA").connectFrom("parentWTA").connectTo("_id").as("versions"),
                 unwind("versions"),
                 project("versions").andExclude("_id"),
