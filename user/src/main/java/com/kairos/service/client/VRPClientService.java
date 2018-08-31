@@ -160,7 +160,11 @@ public class VRPClientService {
         }
         return preferedTimeWindowDTOS;
     }
-
+    public void createDefaultPreferredTimeWindow(Organization organization){
+        List<PreferedTimeWindow>
+            preferedTimeWindows = Arrays.asList(new PreferedTimeWindow(LocalTime.of(07,00),LocalTime.of(11,30),organization,"Time window 1"),new PreferedTimeWindow(LocalTime.of(12,00),LocalTime.of(16,00),organization,"Time window 2"));
+            preferedTimeWindowRepository.saveAll(preferedTimeWindows);
+    }
     public List<PreferedTimeWindowDTO> getPreferedTimeWindow(Long unitId){
         List<PreferedTimeWindow> preferedTimeWindows = preferedTimeWindowRepository.getAllByUnitId(unitId);
         List<PreferedTimeWindowDTO> preferedTimeWindowDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(preferedTimeWindows,PreferedTimeWindowDTO.class);

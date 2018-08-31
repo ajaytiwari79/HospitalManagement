@@ -1,5 +1,7 @@
 package com.kairos.service.period;
 
+
+import com.kairos.activity.period.PeriodDTO;
 import com.kairos.activity.period.FlippingDateDTO;
 import com.kairos.activity.period.PeriodPhaseDTO;
 import com.kairos.activity.period.PlanningPeriodDTO;
@@ -290,12 +292,6 @@ public class PlanningPeriodService extends MongoBaseService {
 
 
     public List<PlanningPeriodDTO> addPlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO) {
-
-        // Check monday if duration is in week and first day of month if duration is in month
-//        if (!validateStartDateForPeriodCreation(LocalDateTime.of(planningPeriodDTO.getStartDate(),planningPeriodDTO.getStartTime()),planningPeriodDTO.getDurationType())) {
-//            exceptionService.actionNotPermittedException("error.period.start.date.invalid");
-//        }
-
         List<PhaseDTO> phases = getPhasesWithDurationInDays(unitId);
         ;
         if (!Optional.ofNullable(phases).isPresent()) {
@@ -312,6 +308,10 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod lastEndDate = planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
         if (Optional.ofNullable(lastEndDate).isPresent()) {
             planningPeriodDTO.setStartDate(lastEndDate.getEndDate().plusDays(1));
+        }else{
+            if (!validateStartDateForPeriodCreation(planningPeriodDTO.getStartDate(),planningPeriodDTO.getDurationType())) {
+                exceptionService.actionNotPermittedException("error.period.start.date.invalid");
+            }
         }
         createPlanningPeriod(unitId, planningPeriodDTO.getStartDate(), planningPeriods, phases, planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
         save(planningPeriods);
@@ -384,6 +384,17 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.period.startdate.enddate.notupdate");
         }
         //If No change in date
+
+        LocalDateTime puzzleFlippingDateTime=(Optional.ofNullable(planningPeriodDTO.getRequestToPuzzleDate()).isPresent())?DateUtils.getLocalDateTime(planningPeriodDTO.getRequestToPuzzleDate().getDate(),
+                planningPeriodDTO.getRequestToPuzzleDate().getHours(),planningPeriodDTO.getRequestToPuzzleDate().getMinutes()):null;
+        LocalDateTime constructionFlippingDate=(Optional.ofNullable(planningPeriodDTO.getPuzzleToConstructionDate()).isPresent())?DateUtils.getLocalDateTime(planningPeriodDTO.getPuzzleToConstructionDate().getDate(),
+                planningPeriodDTO.getPuzzleToConstructionDate().getHours(),planningPeriodDTO.getPuzzleToConstructionDate().getMinutes()):null;
+        LocalDateTime draftFlippingDate=(Optional.ofNullable(planningPeriodDTO.getConstructionToDraftDate()).isPresent())?DateUtils.getLocalDateTime(planningPeriodDTO.getConstructionToDraftDate().getDate(),planningPeriodDTO.getConstructionToDraftDate().getHours(),
+                planningPeriodDTO.getConstructionToDraftDate().getMinutes()):null;
+        if(Optional.ofNullable(draftFlippingDate).isPresent() && Optional.ofNullable(constructionFlippingDate).isPresent() && draftFlippingDate.isBefore(constructionFlippingDate)
+                || Optional.ofNullable(constructionFlippingDate).isPresent() && Optional.ofNullable(puzzleFlippingDateTime).isPresent()&&constructionFlippingDate.isBefore(puzzleFlippingDateTime)){
+                exceptionService.actionNotPermittedException("message.period.invalid.flippingdate");
+        }
         planningPeriod = updatePhaseFlippingDateOfPeriod(planningPeriod, planningPeriodDTO, unitId);
         planningPeriod.setName(planningPeriodDTO.getName());
         save(planningPeriod);
@@ -391,6 +402,7 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     // To delete planning period
+
     public boolean deletePlanningPeriod(Long unitId, BigInteger periodId) {
 
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
@@ -436,6 +448,11 @@ public class PlanningPeriodService extends MongoBaseService {
 
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
+
+    public List<PeriodDTO> getPeriodOfInterval(Long unitId, LocalDate startDate, LocalDate endDate){
+        return planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId,startDate,endDate);
+    }
+
 
 /*  not delete this code harish
 * public boolean updateFlippingDate(BigInteger periodId, Long unitId, LocalDate date){

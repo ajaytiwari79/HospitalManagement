@@ -479,7 +479,7 @@ public class EmploymentService {
         engineerMetaData.put("scountry", "DK");
         engineerMetaData.put("szip", officeZipCode.getZipCode());
         engineerMetaData.put("scity", officeAddress.getCity());
-        engineerMetaData.put("sstreet", officeAddress.getStreet1() + " " + officeAddress.getHouseNumber());
+        engineerMetaData.put("sstreet", officeAddress.getStreet() + " " + officeAddress.getHouseNumber());
 
         //personal details
         engineerMetaData.put("email", staff.getEmail());
@@ -491,7 +491,7 @@ public class EmploymentService {
         engineerMetaData.put("ecountry", "DK");
         engineerMetaData.put("ezip", officeZipCode.getZipCode());
         engineerMetaData.put("ecity", officeAddress.getCity());
-        engineerMetaData.put("estreet", officeAddress.getStreet1() + " " + officeAddress.getHouseNumber());
+        engineerMetaData.put("estreet", officeAddress.getStreet() + " " + officeAddress.getHouseNumber());
 
         //skills of staff
         engineerMetaData.put("lskills", visitourSkillRequestData);

@@ -5,6 +5,7 @@ import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -18,6 +19,9 @@ public class AgreementSection extends MongoBaseEntity {
     private List<BigInteger> clauses;
 
     private List<BigInteger> subSections;
+
+    @NotNull(message = "Clause order is Not defined")
+    private Integer orderedIndex;
 
     private Long countryId;
 
@@ -53,11 +57,15 @@ public class AgreementSection extends MongoBaseEntity {
         this.clauses = clauses;
     }
 
+    public Integer getOrderedIndex() { return orderedIndex; }
 
-    public AgreementSection(Long countryId , String title)
+    public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
+
+    public AgreementSection(Long countryId , @NotBlank(message = "Section Title cannot be empty") String title,@NotNull(message = "Clause order is Not defined") Integer orderedIndex)
     {
         this.title=title;
         this.countryId=countryId;
+        this.orderedIndex=orderedIndex;
     }
     public AgreementSection(){ }
 

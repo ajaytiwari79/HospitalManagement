@@ -1,9 +1,6 @@
 package com.kairos.user.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * Created by prabjot on 19/1/17.
@@ -12,8 +9,7 @@ import javax.validation.constraints.NotNull;
 public class AddressDTO {
     private Long id;
     private String streetUrl;
-    @NotEmpty(message = "error.ContactAddress.street.notnull") @NotNull(message = "error.ContactAddress.street.notnull")
-    private String street1;
+    private String street;
     private int floorNumber;
     private String houseNumber;
     private String billingPerson;
@@ -141,8 +137,8 @@ public class AddressDTO {
         return province;
     }
 
-    public String getStreet1() {
-        return street1;
+    public String getStreet() {
+        return street;
     }
 
     public int getFloorNumber() {
@@ -181,8 +177,8 @@ public class AddressDTO {
         this.streetUrl = streetUrl;
     }
 
-    public void setStreet1(String street1) {
-        this.street1 = street1;
+    public void setStreet(String street) {
+        this.street = street;
     }
 
     public void setFloorNumber(int floorNumber) {

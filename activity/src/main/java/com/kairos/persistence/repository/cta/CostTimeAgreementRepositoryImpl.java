@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
@@ -90,9 +91,10 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
     @Override
-    public CTAResponseDTO getCTAByUnitPositionId(Long unitPositionId) {
+    public CTAResponseDTO getCTAByUnitPositionId(Long unitPositionId,Date date) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").gte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).and("disabled").is(false)),
+                match(criteria),
                 lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation,CostTimeAgreement.class,CTAResponseDTO.class);

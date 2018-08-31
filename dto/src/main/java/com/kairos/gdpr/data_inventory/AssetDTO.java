@@ -70,8 +70,6 @@ public class AssetDTO {
 
     private RiskSeverity risk;
 
-    private Boolean active;
-
     public BigInteger getId() { return id; }
 
     public String getName() { return name.trim(); }
@@ -109,8 +107,6 @@ public class AssetDTO {
 
     public RiskSeverity getRisk() { return risk; }
 
-    public Boolean getActive() { return active; }
-
-    public AssetDTO() {
+        public AssetDTO() {
     }
 }

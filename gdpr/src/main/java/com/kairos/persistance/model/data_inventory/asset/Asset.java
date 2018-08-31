@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -64,11 +65,17 @@ public class Asset extends MongoBaseEntity {
     private RiskSeverity risk;
 
     @NotNull(message = "Status can't be empty")
-    private Boolean active;
+    private boolean active=true;
 
-    public Boolean getActive() { return active; }
+    private List<BigInteger> assessments=new ArrayList<>();
 
-    public void setActive(Boolean active) { this.active = active; }
+    public boolean isActive() { return active; }
+
+    public void setActive(boolean active) { this.active = active; }
+
+    public List<BigInteger> getAssessments() { return assessments; }
+
+    public void setAssessments(List<BigInteger> assessments) { this.assessments = assessments; }
 
     public Set<BigInteger> getProcessingActivities() { return processingActivities; }
 
@@ -158,7 +165,7 @@ public class Asset extends MongoBaseEntity {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public Asset(String name, String description, String hostingLocation, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner,boolean active) {
+    public Asset(String name, String description, String hostingLocation, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner) {
         this.name = name;
         this.description = description;
         this.hostingLocation=hostingLocation;
@@ -166,7 +173,6 @@ public class Asset extends MongoBaseEntity {
         this.assetSubTypes=assetSubTypes;
         this.assetOwner=assetOwner;
         this.managingDepartment=managingDepartment;
-        this.active=active;
     }
 
 
