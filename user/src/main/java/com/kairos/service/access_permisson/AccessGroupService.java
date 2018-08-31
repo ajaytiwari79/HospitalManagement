@@ -778,4 +778,8 @@ public class AccessGroupService {
         Long staffId=staffService.getStaffIdOfLoggedInUser(unitId);
         return accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
     }
+
+    public List<Long> getAccessGroupIdsFromUnitByParentIds(Long unitId,Set<Long> accessGroupIds){
+        return accessGroupRepository.getAccessGroupIdsFromUnitByParentIds(unitId,accessGroupIds);
+    }
 }

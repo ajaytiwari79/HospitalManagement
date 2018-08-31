@@ -34,10 +34,7 @@ import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoReposi
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.planner.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
-import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
-import com.kairos.rest_client.SkillRestClient;
-import com.kairos.rest_client.StaffRestClient;
+import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
@@ -67,6 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -93,6 +91,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static javafx.scene.input.KeyCode.V;
 import static org.springframework.http.MediaType.APPLICATION_XML;
 
 
@@ -142,6 +141,7 @@ public class ActivityService extends MongoBaseService {
     private GenericIntegrationService genericIntegrationService;
     @Inject private CounterRepository counterRepository;
     @Inject private ActivityAndShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
+    @Inject private GenericRestClient genericRestClient;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -1118,7 +1118,7 @@ public class ActivityService extends MongoBaseService {
         save(activityCopied);
 
         // copying activity and shift status settings of this activity
-        copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId(),null);
+        copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId());
         activityDTO.setId(activityCopied.getId());
         PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
         BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
@@ -1196,15 +1196,28 @@ public class ActivityService extends MongoBaseService {
 
     }
 
-    public void copyActivityAndShiftStatusOfThisActivity(BigInteger activityId,BigInteger newActivityId,Long unitId){
+    public void copyActivityAndShiftStatusOfThisActivity(BigInteger activityId,BigInteger newActivityId){
         List<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findAllByActivityId(activityId);
-        Set<Long> accessGroupIds=activityAndShiftStatusSettings.stream().
-
         if(!activityAndShiftStatusSettings.isEmpty()){
             activityAndShiftStatusSettings.forEach(currentActivityAndShiftStatusSettings->{
                 currentActivityAndShiftStatusSettings.setId(null);
+                currentActivityAndShiftStatusSettings.setActivityId(newActivityId);
+            });
+            save(activityAndShiftStatusSettings);
+        }
+    }
+
+    public void copyActivityAndShiftStatusOfThisActivityForUnit(BigInteger activityId,BigInteger newActivityId,Long unitId){
+        List<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findAllByActivityId(activityId);
+        Set<Long> accessGroupIds =activityAndShiftStatusSettings.stream().flatMap(current->current.getAccessGroupIds().stream()).collect(Collectors.toSet());
+        Set<Long> unitAccessGroupIds=genericRestClient.publishRequest(accessGroupIds, unitId, true, IntegrationOperation.CREATE, "access_group_from_unit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Long>>>() {});
+        if(!activityAndShiftStatusSettings.isEmpty()){
+            activityAndShiftStatusSettings.forEach(currentActivityAndShiftStatusSettings->{
+                currentActivityAndShiftStatusSettings.setId(null);
+                currentActivityAndShiftStatusSettings.setCountryId(null);
                 currentActivityAndShiftStatusSettings.setUnitId(unitId);
                 currentActivityAndShiftStatusSettings.setActivityId(newActivityId);
+                currentActivityAndShiftStatusSettings.setAccessGroupIds(unitAccessGroupIds);
             });
             save(activityAndShiftStatusSettings);
         }

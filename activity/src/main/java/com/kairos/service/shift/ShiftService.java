@@ -1344,7 +1344,7 @@ public class ShiftService extends MongoBaseService {
         if(activityId!=null){
             ActivityAndShiftStatusSettings activityAndShiftStatusSettings= activityAndShiftStatusSettingsRepository.findByPhaseIdAndActivityIdAndShiftStatus(phase.getId(),activityId,status);
             StaffAccessGroupDTO staffAccessGroupDTO=genericRestClient.publishRequest(null, null, true, IntegrationOperation.GET, "/staff/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAccessGroupDTO>>() {});
-            return CollectionUtils.containsAny(activityAndShiftStatusSettings.getAccessGroupIds(),staffAccessGroupDTO.getAccessGroupIds());
+            return activityAndShiftStatusSettings!=null && CollectionUtils.containsAny(activityAndShiftStatusSettings.getAccessGroupIds(),staffAccessGroupDTO.getAccessGroupIds());
         }
         return false;
     }

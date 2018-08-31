@@ -136,7 +136,7 @@ public class OrganizationActivityService extends MongoBaseService {
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             save(activityCopied);
             // copying activity and shift status settings of this activity
-            activityService.copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId(),unitId);
+            activityService.copyActivityAndShiftStatusOfThisActivityForUnit(activityId,activityCopied.getId(),unitId);
         } else {
             activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
             activityCopied.setDeleted(true);
@@ -303,7 +303,7 @@ public class OrganizationActivityService extends MongoBaseService {
         save(activityCopied);
 
         // copying activity and shift status settings of this activity
-        activityService.copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId(),unitId);
+        activityService.copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId());
         activityDTO.setId(activityCopied.getId());
         PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
         BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
