@@ -20,20 +20,16 @@ import com.kairos.service.country.*;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.language.LanguageLevelService;
 import com.kairos.service.language.LanguageService;
-import com.kairos.service.organization.OrganizationService;
-import com.kairos.service.organization.OrganizationServiceService;
-import com.kairos.service.organization.OrganizationTypeService;
-import com.kairos.service.organization.TimeSlotService;
+import com.kairos.service.organization.*;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.user.country.experties.CountryExpertiseDTO;
 import com.kairos.user.country.experties.ExpertiseUpdateDTO;
-import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.user.country.skill.OrgTypeSkillDTO;
+import com.kairos.user.country.skill.SkillDTO;
 import com.kairos.user.organization.OrganizationBasicDTO;
-import com.kairos.user.organization.OrganizationRequestWrapper;
 import com.kairos.user.organization.OrganizationTypeDTO;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.wrapper.UpdateOrganizationTypeDTO;
@@ -125,6 +121,7 @@ public class CountryController {
     private AccessPageService accessPageService;
     @Inject
     private FunctionService functionService;
+    @Inject private CompanyCreationService companyCreationService;
 
     // Country
     @RequestMapping(value = "/country", method = RequestMethod.POST)
@@ -346,18 +343,10 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable Long organizationId,
                                                                         @PathVariable long countryId,
-                                                                        @RequestBody OrganizationRequestWrapper organizationRequestWrapper) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, organizationService.
-                createParentOrganization(organizationRequestWrapper, countryId, organizationId));
+                                                                        @RequestBody OrganizationBasicDTO organizationBasicDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, companyCreationService.createCompany(organizationBasicDTO, countryId, organizationId));
     }
 
-
-    @ApiOperation(value = "Update Parent Organization")
-    @RequestMapping(value = COUNTRY_URL + "/parent_organization/{parentOrganizationId}", method = RequestMethod.PUT)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateParentOrganization(@PathVariable long countryId, @PathVariable long parentOrganizationId, @Valid @RequestBody OrganizationRequestWrapper organizationRequestWrapper) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateParentOrganization(organizationRequestWrapper, parentOrganizationId, countryId));
-    }
 
     @ApiOperation(value = "Create a Union")
     @RequestMapping(value = COUNTRY_URL + "/union", method = RequestMethod.POST)

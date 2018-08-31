@@ -1,18 +1,18 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
+import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.OrganizationalSecurityMeasureService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,9 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
 
     @Inject
     private OrganizationalSecurityMeasureService organizationalSecurityMeasureService;
+
+    @Inject
+    private AssetMongoRepository assetMongoRepository;
 
 
     /**
@@ -102,23 +105,27 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
         OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByOrganizationIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            return exist;
-
         }
+        return exist;
+
     }
 
 
-    public Boolean deleteOrganizationalSecurityMeasure(Long organizationId, BigInteger id) {
+    public Boolean deleteOrganizationalSecurityMeasure(Long unitId, BigInteger orgSecurityMeasureId) {
 
-        OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByOrganizationIdAndId(organizationId, id);
-        if (!Optional.ofNullable(organizationalSecurityMeasure).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(organizationalSecurityMeasure);
-            return true;
-
+        List<AssetBasicResponseDTO> assetsLinkedWithOrganizationalSecurityMeasure = assetMongoRepository.findAllAssetLinkedWithOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId);
+        if (!assetsLinkedWithOrganizationalSecurityMeasure.isEmpty()) {
+            StringBuilder assetNames=new StringBuilder();
+            assetsLinkedWithOrganizationalSecurityMeasure.forEach(asset->assetNames.append(asset.getName()+","));
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Organization Security Measure", assetNames);
         }
+        OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByOrganizationIdAndId(unitId, orgSecurityMeasureId);
+        if (!Optional.ofNullable(organizationalSecurityMeasure).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Security Measure", orgSecurityMeasureId);
+        }
+        delete(organizationalSecurityMeasure);
+        return true;
+
     }
 
     /**
@@ -136,7 +143,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
             if (id.equals(organizationalSecurityMeasure.getId())) {
                 return orgSecurityMeasureDTO;
             }
-            throw new DuplicateDataException("data exist of " + orgSecurityMeasureDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Security Measure", organizationalSecurityMeasure.getName());
         }
         organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByid(id);
         if (!Optional.ofNullable(organizationalSecurityMeasure).isPresent()) {
@@ -146,27 +153,6 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
         organizationalSecurityMeasureMongoRepository.save(organizationalSecurityMeasure);
         return orgSecurityMeasureDTO;
 
-
-    }
-
-    /**
-     * @param
-     * @param organizationId
-     * @param name           OrganizationalSecurityMeasure name
-     * @return OrganizationalSecurityMeasure fetch via name
-     * @throws DataNotExists throw exception if OrganizationalSecurityMeasure not exist for given name
-     */
-    public OrganizationalSecurityMeasure getOrganizationalSecurityMeasureByName(Long organizationId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByOrganizationIdAndName(organizationId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
 

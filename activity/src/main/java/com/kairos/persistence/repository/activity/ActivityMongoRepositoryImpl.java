@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.CompositeActivityDTO;
+import com.kairos.activity.break_settings.BreakActivitiesDTO;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -13,17 +14,14 @@ import com.kairos.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.mongodb.BasicDBObject;
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -216,6 +214,13 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Query query = new Query(Criteria.where("balanceSettingsActivityTab.timeTypeId").is(timeTypeId).and("deleted").is(false));
         return mongoTemplate.find(query, Activity.class);
 
+    }
+
+    public List<Activity> findAllActivitiesByOrganizationTypeOrSubType(Long orgTypeIds, List<Long> orgSubTypeIds) {
+        Query query = new Query(Criteria.where("deleted").is(false).and("isParentActivity").is(true)
+                .and("organizationTypes").is(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))
+                .and("state").nin("DRAFT"));
+        return mongoTemplate.find(query, Activity.class);
     }
 
     public List<ActivityDTO> getAllActivityWithTimeType(Long unitId, List<BigInteger> activityIds) {
@@ -416,5 +421,15 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<StaffActivitySettingDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, StaffActivitySettingDTO.class);
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
+    }
+
+    public List<BreakActivitiesDTO> getAllActivitiesGroupedByTimeType(Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                group("$timeType.timeTypes").push(new BasicDBObject("_id","$_id").append("name","$name")).as("activities"),
+                project("activities").and("_id").as("timeType"));
+        AggregationResults<BreakActivitiesDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, BreakActivitiesDTO.class);
+        return result.getMappedResults();
     }
 }

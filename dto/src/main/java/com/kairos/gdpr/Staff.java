@@ -13,7 +13,7 @@ public class Staff {
     @NotNull
     private Long id;
 
-    private String userName;
+    private String lastName;
 
     @NotBlank(message = "Staff Name can't be empty ")
     private String firstName;
@@ -23,17 +23,21 @@ public class Staff {
     public void setId(Long id) { this.id = id; }
 
 
-    public String getUserName() { return userName; }
+    public String getLastName() {
+        return lastName;
+    }
 
-    public void setUserName(String userName) { this.userName = userName; }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
     public String getFirstName() { return firstName; }
 
     public void setFirstName(String firstName) { this.firstName = firstName; }
 
-    public Staff(Long id, String email, String userName, String firstName) {
+    public Staff(Long id,String lastName, String firstName) {
         this.id = id;
-        this.userName = userName;
+        this.lastName = lastName;
         this.firstName = firstName;
     }
 

@@ -67,16 +67,6 @@ public class OrganizationProcessingPurposeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getAllProcessingPurpose(unitId));
     }
 
-    @ApiOperation("get Processing purpose by name")
-    @GetMapping("/processing_purpose/name")
-    public ResponseEntity<Object> getProcessingPurposeByName( @PathVariable Long unitId, @RequestParam String name) {
-       if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurposeByName(unitId, name));
-
-    }
-
 
     @ApiOperation("delete processing purpose by id")
     @DeleteMapping("/processing_purpose/delete/{id}")

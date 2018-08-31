@@ -1,20 +1,28 @@
 package com.kairos.service.data_inventory.processing_activity;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.enums.ProcessingActivityAttributeName;
 import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
+import com.kairos.persistance.model.data_inventory.assessment.Assessment;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
+import com.kairos.persistance.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
+import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionBasicResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireSectionResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
@@ -71,6 +79,12 @@ public class ProcessingActivityService extends MongoBaseService {
     @Inject
     private DataSubjectMappingRepository dataSubjectMappingRepository;
 
+    @Inject
+    private AssessmentMongoRepository assessmentMongoRepository;
+
+    @Inject
+    private MasterQuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
+
 
     public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
@@ -99,6 +113,8 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(organizationId, id);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", id);
+        } else if (!processingActivity.isActive()) {
+            exceptionService.invalidRequestException("message.processing.activity.inactive");
         }
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
             processingActivity.setSubProcessingActivities(updateExistingSubProcessingActivitiesAndCreateNewSubProcess(organizationId, processingActivityDTO.getSubProcessingActivities()));
@@ -259,14 +275,12 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *
      * @param unitId
      * @param processingActivityId processing activity id
-     * @param active  status of processing activity
+     * @param active               status of processing activity
      * @return
      */
-    public boolean changeStatusOfProcessingActivity(Long unitId, BigInteger processingActivityId,boolean active)
-    {
+    public boolean changeStatusOfProcessingActivity(Long unitId, BigInteger processingActivityId, boolean active) {
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
@@ -446,5 +460,9 @@ public class ProcessingActivityService extends MongoBaseService {
         }
 
     }
+
+
+
+
 }
 

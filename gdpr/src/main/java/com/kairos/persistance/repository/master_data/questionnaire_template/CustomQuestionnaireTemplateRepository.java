@@ -1,6 +1,7 @@
 package com.kairos.persistance.repository.master_data.questionnaire_template;
 
 
+import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireTemplate;
 import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 
@@ -13,5 +14,10 @@ public interface CustomQuestionnaireTemplateRepository {
 
     List<MasterQuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId,Long organizationId);
 
-    MasterQuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId, Long organizationId,BigInteger id);
+    MasterQuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsAndQuestions(Long countryId, Long organizationId,BigInteger templateId);
+
+    MasterQuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsByCountryIdAndId(Long countryId,BigInteger templateId);
+
+    BigInteger getMasterQuestionanaireTemplateIdListByTemplateType(Long countryId, QuestionnaireTemplateType templateType);
+
 }
