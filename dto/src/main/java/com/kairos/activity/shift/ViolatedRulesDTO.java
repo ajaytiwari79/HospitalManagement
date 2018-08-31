@@ -1,5 +1,6 @@
 package com.kairos.activity.shift;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,8 +10,8 @@ import java.util.List;
 
 public class ViolatedRulesDTO {
 
-    private List<WorkTimeAgreementRuleViolation> workTimeAggreements;
-    private List<ActivityRuleViolation> activities;
+    private List<WorkTimeAgreementRuleViolation> workTimeAggreements = new ArrayList<>();
+    private List<ActivityRuleViolation> activities = new ArrayList<>();
 
     public List<WorkTimeAgreementRuleViolation> getWorkTimeAggreements() {
         return workTimeAggreements;

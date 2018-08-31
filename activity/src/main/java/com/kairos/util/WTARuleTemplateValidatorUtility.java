@@ -5,6 +5,8 @@ package com.kairos.util;
  * @date - 11/5/18
  */
 
+import com.kairos.custom_exception.ActionNotPermittedException;
+import com.kairos.custom_exception.DataNotFoundException;
 import com.kairos.enums.Day;
 import com.kairos.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.MinMaxSetting;
@@ -15,6 +17,8 @@ import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -75,17 +79,7 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     public static Comparator getShiftStartTimeComparator() {
-        Comparator shiftStartComparator = new Comparator<ShiftWithActivityDTO>() {
-            @Override
-            public int compare(ShiftWithActivityDTO shift1, ShiftWithActivityDTO shift2) {
-                if (shift1.getStartDate() != null && shift2.getStartDate() != null) {
-                    return shift1.getStartDate().compareTo(shift2.getStartDate());
-                } else {
-                    return -1;
-                }
-            }
-        };
-        return shiftStartComparator;
+        return (Comparator<ShiftWithActivityDTO>)(ShiftWithActivityDTO s1,ShiftWithActivityDTO s2)->s1.getStartDate().compareTo(s2.getStartDate());
     }
 
     public static boolean isValid(MinMaxSetting minMaxSetting,int limitValue,int calculatedValue){
@@ -99,20 +93,20 @@ public class WTARuleTemplateValidatorUtility {
     }
 
 
-    public static List<Integer> getValidDays(List<DayTypeDTO> dayTypeDTOS, List<Long> dayTypeIds){
-        Set<Integer> dayOfWeeks = new HashSet<>();
+    public static Set<DayOfWeek> getValidDays(List<DayTypeDTO> dayTypeDTOS, List<Long> dayTypeIds){
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         Map<Long,DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v));
             dayTypeIds.forEach(dayTypeId->{
                 List<Day> days = dayTypeDTOMap.get(dayTypeId).getValidDays();
                 days.forEach(day -> {
                         if(!day.equals(Day.EVERYDAY)){
-                            dayOfWeeks.add(DayOfWeek.valueOf(day.name()).getValue());
+                            dayOfWeeks.add(DayOfWeek.valueOf(day.name()));
                         }else if(day.equals(Day.EVERYDAY)){
-                            dayOfWeeks.addAll(Arrays.stream(DayOfWeek.values()).map(dayOfWeek -> dayOfWeek.getValue()).collect(Collectors.toList()));
+                            dayOfWeeks.addAll(Arrays.stream(DayOfWeek.values()).map(dayOfWeek -> dayOfWeek).collect(Collectors.toList()));
                         }
                 });
             });
-        return new ArrayList<>(dayOfWeeks);
+        return new HashSet<>(dayOfWeeks);
     }
 
    /* public static boolean isValidForPartOfDay(ShiftWithActivityDTO shift, List<PartOfDay> partOfDays, List<TimeSlotWrapper> timeSlotWrappers){
@@ -170,6 +164,9 @@ public class WTARuleTemplateValidatorUtility {
 
     public static DateTimeInterval getIntervalByRuleTemplate(ShiftWithActivityDTO shift, String intervalUnit, long intervalValue){
         DateTimeInterval interval = null;
+        if(intervalValue==0 || StringUtils.isEmpty(intervalUnit)){
+            throw new DataNotFoundException("Interval Unit or Interval value Doesn't exists");
+        }
         switch (intervalUnit){
             case DAYS:interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusDays((int)intervalValue).truncatedTo(ChronoUnit.DAYS),DateUtils.getZoneDateTime(shift.getEndDate()).plusDays((int)intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
@@ -194,8 +191,11 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     public static DateTimeInterval getIntervalByNumberOfWeeks(ShiftWithActivityDTO shift, int numberOfWeeks, LocalDate validationStartDate){
-        LocalDate endDate = validationStartDate.plusWeeks(numberOfWeeks);
+        if(numberOfWeeks==0 || validationStartDate==null){
+            throw new DataNotFoundException("Number of Weeks or Validate start Date Doesn't exists");
+        }
         DateTimeInterval dateTimeInterval = null;
+        LocalDate endDate = validationStartDate.plusWeeks(numberOfWeeks);
         while (true){
             dateTimeInterval = new DateTimeInterval(validationStartDate.atStartOfDay(ZoneId.systemDefault()),endDate.atStartOfDay(ZoneId.systemDefault()));
             endDate = validationStartDate.plusWeeks(numberOfWeeks);

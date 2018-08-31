@@ -107,10 +107,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     public List<ShiftQueryResult> getShiftsByUnitBeforeDate(Long unitId, Date endDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("endDate").lte(endDate))
-                , project("unitId")
-                        .andInclude("startDate")
-                        .andInclude("endDate").andInclude("unitPositionId").andInclude("staffId"));
+                match(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("endDate").lte(endDate)));
         AggregationResults<ShiftQueryResult> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResult.class);
         return result.getMappedResults();
     }

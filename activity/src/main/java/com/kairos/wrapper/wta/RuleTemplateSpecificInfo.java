@@ -1,5 +1,6 @@
 package com.kairos.wrapper.wta;
 
+import com.kairos.activity.shift.ViolatedRulesDTO;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.user.country.time_slot.TimeSlotWrapper;
@@ -27,9 +28,10 @@ public class RuleTemplateSpecificInfo {
     private List<DayTypeDTO> dayTypes;
     private UserAccessRoleDTO user;
     private int totalTimeBank;
+    private ViolatedRulesDTO violatedRules;
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, List<TimeSlotWrapper> timeSlotWrappers, String phase, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, List<DayTypeDTO> dayTypes,UserAccessRoleDTO user,int totalTimeBank) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, List<TimeSlotWrapper> timeSlotWrappers, String phase, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, List<DayTypeDTO> dayTypes,UserAccessRoleDTO user,int totalTimeBank,ViolatedRulesDTO violatedRules) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrappers = timeSlotWrappers;
@@ -39,6 +41,16 @@ public class RuleTemplateSpecificInfo {
         this.dayTypes = dayTypes;
         this.user = user;
         this.totalTimeBank = totalTimeBank;
+        this.violatedRules = violatedRules;
+    }
+
+
+    public ViolatedRulesDTO getViolatedRules() {
+        return violatedRules;
+    }
+
+    public void setViolatedRules(ViolatedRulesDTO violatedRules) {
+        this.violatedRules = violatedRules;
     }
 
     public int getTotalTimeBank() {
