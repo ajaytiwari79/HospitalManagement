@@ -1,6 +1,7 @@
 package com.kairos.controller.data_inventory.assessment;
 
 
+import com.kairos.enums.AssessmentStatus;
 import com.kairos.gdpr.data_inventory.AssessmentDTO;
 import com.kairos.persistance.model.data_inventory.assessment.AssessmentAnswerValueObject;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
@@ -16,6 +17,7 @@ import javax.validation.Valid;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Optional;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
@@ -71,17 +73,32 @@ public class AssessmentController {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchAssessment(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchedAssessmentOfAssignee(unitId));
     }
 
-    @ApiOperation(value = "get All launched Assessment Assign to respondent and are in New and InProgress state")
+    @ApiOperation(value = "Update Answer of assessment question In progress state by  Assignee")
     @PutMapping("/assessment/{assessmentId}")
-    public ResponseEntity<Object> completeAssessmentForAsset(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody AssessmentAnswerValueObject assessmentAnswerValueObject) {
+    public ResponseEntity<Object> saveAssessmentAnswerForAssetOrProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @Valid @RequestBody AssessmentAnswerValueObject assessmentAnswerValueObject) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivity(unitId, assessmentId, assessmentAnswerValueObject));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.addAssessmentAnswerForAssetOrProcessingActivityToAssessment(unitId, assessmentId, assessmentAnswerValueObject));
     }
+
+
+    @ApiOperation(value = "Change Assessment status")
+    @PutMapping("/assessment/{assessmentId}/status")
+    public ResponseEntity<Object> changeAssessmentStatusinKanbanView(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @RequestParam AssessmentStatus assessmentStatus) {
+        if (!Optional.ofNullable(assessmentStatus).isPresent())
+        {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Assessment Status "+assessmentStatus+" is invalid");
+        }
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.updateAssessmentStatus(unitId, assessmentId,assessmentStatus));
+    }
+
 
 
 }

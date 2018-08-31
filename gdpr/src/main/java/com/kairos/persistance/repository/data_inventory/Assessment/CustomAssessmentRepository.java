@@ -9,7 +9,7 @@ public interface CustomAssessmentRepository {
 
     Assessment findAssessmentByNameAndUnitId(Long unitId,String name);
 
-    List<AssessmentResponseDTO> getAllLaunchAssessmentAssignToRespondent(Long unitId);
+    List<AssessmentResponseDTO> getAllLaunchedAssessmentAssignToRespondent(Long unitId);
 
 
 
