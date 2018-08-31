@@ -25,7 +25,7 @@ public class OrganizationResponseDTO {
     private String desiredUrl;
     private String shortCompanyName;
     private Long companyCategoryId;
-    private Integer kairosCompanyId;
+    private String kairosCompanyId;
     private CompanyType companyType;
     private Long accountTypeId;
     private String vatId;
@@ -156,11 +156,11 @@ public class OrganizationResponseDTO {
         this.companyCategoryId = companyCategoryId;
     }
 
-    public Integer getKairosCompanyId() {
+    public String getKairosCompanyId() {
         return kairosCompanyId;
     }
 
-    public void setKairosCompanyId(Integer kairosCompanyId) {
+    public void setKairosCompanyId(String kairosCompanyId) {
         this.kairosCompanyId = kairosCompanyId;
     }
 

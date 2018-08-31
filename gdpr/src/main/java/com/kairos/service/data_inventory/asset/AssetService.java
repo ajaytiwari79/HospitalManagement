@@ -1,6 +1,7 @@
 package com.kairos.service.data_inventory.asset;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
 import com.kairos.enums.AssessmentStatus;
 import com.kairos.enums.AssetAttributeName;
 import com.kairos.enums.QuestionType;
@@ -276,37 +277,5 @@ public class AssetService extends MongoBaseService {
     }
 
 
-    /**
-     *
-     * @param countryId
-     * @param unitId
-     * @param assetId
-     * @param assessmentId
-     * @return
-     */
-    public List<MasterQuestionnaireSectionResponseDTO> getAssetAssessmnetById(Long countryId, Long unitId, BigInteger assetId, BigInteger assessmentId) {
-
-        Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
-        if (!Optional.ofNullable(assessment).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentId);
-        }
-        AssetResponseDTO asset = assetMongoRepository.findAssetWithMetaDataById(unitId, assetId);
-        if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
-        }
-        MasterQuestionnaireTemplateResponseDTO assetAssessmentQuestionnaireTemplate = questionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsByCountryIdAndId(countryId, assessment.getQuestionnaireTemplateId());
-        List<MasterQuestionnaireSectionResponseDTO> assetAssessmentQuestionnaireSections = assetAssessmentQuestionnaireTemplate.getSections();
-
-        ObjectMapper mapValuesAndField = new ObjectMapper();
-        Map<String, Object> props = mapValuesAndField.convertValue(asset, Map.class);
-        for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assetAssessmentQuestionnaireSections) {
-            for (MasterQuestionBasicResponseDTO assetAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
-                if (props.containsKey(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
-                    assetAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(props.get(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
-                }
-            }
-        }
-        return assetAssessmentQuestionnaireSections;
-    }
 
 }

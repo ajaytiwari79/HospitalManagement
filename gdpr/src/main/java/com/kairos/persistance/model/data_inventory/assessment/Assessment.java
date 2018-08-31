@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.List;
 
 @Document
 public class Assessment extends MongoBaseEntity {
@@ -23,6 +24,16 @@ public class Assessment extends MongoBaseEntity {
     private LocalDate completedDate;
 
     private String comment;
+
+    private BigInteger assetId;
+
+    private BigInteger processingActivityId;
+
+    private String relatedAssetOrProcessingActivityName;
+
+    private List<AssetAssessmentAnswer> assetAssessmentAnswers;
+
+    private List<ProcessingActivityAssessmentAnswer> processingActivityAssessmentAnswers;
 
     @NotNull
     private Staff assignee;
@@ -66,10 +77,36 @@ public class Assessment extends MongoBaseEntity {
 
     public void setQuestionnaireTemplateId(BigInteger questionnaireTemplateId) { this.questionnaireTemplateId = questionnaireTemplateId; }
 
+    public BigInteger getAssetId() { return assetId; }
+
+    public void setAssetId(BigInteger assetId) { this.assetId = assetId; }
+
+    public BigInteger getProcessingActivityId() { return processingActivityId; }
+
+    public void setProcessingActivityId(BigInteger processingActivityId) { this.processingActivityId = processingActivityId; }
+
     public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull Staff assignee, @NotNull Staff approver) {
         this.name = name;
         this.endDate = endDate;
         this.assignee = assignee;
         this.approver = approver;
     }
+
+    public String getRelatedAssetOrProcessingActivityName() {
+        return relatedAssetOrProcessingActivityName;
+    }
+
+    public void setRelatedAssetOrProcessingActivityName(String relatedAssetOrProcessingActivityName) {
+        this.relatedAssetOrProcessingActivityName = relatedAssetOrProcessingActivityName;
+    }
+
+    public List<AssetAssessmentAnswer> getAssetAssessmentAnswers() { return assetAssessmentAnswers;}
+
+    public void setAssetAssessmentAnswers(List<AssetAssessmentAnswer> assetAssessmentAnswers) { this.assetAssessmentAnswers = assetAssessmentAnswers; }
+
+    public List<ProcessingActivityAssessmentAnswer> getProcessingActivityAssessmentAnswers() { return processingActivityAssessmentAnswers; }
+
+    public void setProcessingActivityAssessmentAnswers(List<ProcessingActivityAssessmentAnswer> processingActivityAssessmentAnswers) { this.processingActivityAssessmentAnswers = processingActivityAssessmentAnswers; }
+
+
 }

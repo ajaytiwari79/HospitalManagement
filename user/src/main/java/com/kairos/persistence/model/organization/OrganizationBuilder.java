@@ -25,12 +25,12 @@ public class OrganizationBuilder {
     private AccountType accountType;
     private CompanyType companyType;
     private boolean boardingCompleted;
-    private String kairosId;
+
     private String description;
     private boolean isPrekairos;
     private String desiredUrl;
     private String shortCompanyName;
-    private Integer kairosCompanyId;
+    private String kairosCompanyId;
     private String vatId;
     private List<BusinessType> businessTypes;
     private OrganizationType organizationType;
@@ -86,10 +86,6 @@ public class OrganizationBuilder {
         return this;
     }
 
-    public OrganizationBuilder setKairosId(String kairosId) {
-        this.kairosId = kairosId;
-        return this;
-    }
 
     public OrganizationBuilder setDescription(String description) {
         this.description = description;
@@ -111,7 +107,7 @@ public class OrganizationBuilder {
         return this;
     }
 
-    public OrganizationBuilder setKairosCompanyId(Integer kairosCompanyId) {
+    public OrganizationBuilder setKairosCompanyId(String kairosCompanyId) {
         this.kairosCompanyId = kairosCompanyId;
         return this;
     }
@@ -227,10 +223,6 @@ public class OrganizationBuilder {
         return boardingCompleted;
     }
 
-    public String getKairosId() {
-        return kairosId;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -251,7 +243,7 @@ public class OrganizationBuilder {
         return shortCompanyName;
     }
 
-    public Integer getKairosCompanyId() {
+    public String getKairosCompanyId() {
         return kairosCompanyId;
     }
 
@@ -315,7 +307,7 @@ public class OrganizationBuilder {
     public Organization createOrganization() {
         return new  Organization( id,name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
                 vatId, businessTypes,organizationType, organizationSubTypes,  companyUnitType, companyCategory, timeZone,childLevel,
-                parentOrganization, country,accountType,boardingCompleted,kairosId,groupList,children,unitType);
+                parentOrganization, country,accountType,boardingCompleted,groupList,children,unitType);
     }
 
 }
