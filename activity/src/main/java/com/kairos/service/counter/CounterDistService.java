@@ -80,38 +80,17 @@ public class CounterDistService extends MongoBaseService {
 
     public StaffKPIGalleryDTO getInitialCategoryKPIDistDataForStaff(Long refId, ConfLevel level) {
         List<BigInteger> kpiIds=null;
+        List<KPIDTO> kpidtos=null;
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
         if(accessGroupPermissionCounterDTO.getCountryAdmin()){
-            level=ConfLevel.COUNTRY;
-            refId=accessGroupPermissionCounterDTO.getCountryId();
-            List<KPIDTO> kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
-            kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
+             kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,ConfLevel.UNIT);
         }else{
-            level=ConfLevel.UNIT;
-            List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(accessGroupPermissionCounterDTO.getAccessGroupIds(),new ArrayList<>(),level,refId);
-            kpiIds=accessGroupMappingDTOS.stream().map(accessGroupMappingDTO -> accessGroupMappingDTO.getKpiId()).collect(Collectors.toList());
+            kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(),level,refId);
         }
-        List<KPIDTO> kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
-      //  counterRepository.removeCategoryKPIEntryOfStaff(refId,kpiIds,level);
-        List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategoriesForStaff(new ArrayList<>(),refId,level);
+        kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
+        counterRepository.removeApplicableKPI(Arrays.asList(accessGroupPermissionCounterDTO.getStaffId()),kpiIds,ConfLevel.STAFF);
+        List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategoriesForStaff(new ArrayList<>(),refId,ConfLevel.UNIT);
         return new StaffKPIGalleryDTO(categoryKPIMapping,kpidtos);
-    }
-
-    public void getKpiIdsForStaff(Long refId,ConfLevel level){
-        List<BigInteger> kpiIds=null;
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
-        if(accessGroupPermissionCounterDTO.getCountryAdmin()){
-            level=ConfLevel.COUNTRY;
-            refId=accessGroupPermissionCounterDTO.getCountryId();
-            List<KPIDTO> kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
-            kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
-        }else{
-            level=ConfLevel.UNIT;
-            List<AccessGroupMappingDTO> accessGroupMappingDTOS = counterRepository.getAccessGroupKPIEntryAccessGroupIds(accessGroupPermissionCounterDTO.getAccessGroupIds(),new ArrayList<>(),level,refId);
-            kpiIds=accessGroupMappingDTOS.stream().map(accessGroupMappingDTO -> accessGroupMappingDTO.getKpiId()).collect(Collectors.toList());
-        }
-        //counterRepository.removeCategoryKPIEntryOfStaff(unitId,kpiIds,level);
-        //counterRepository.removeTabKPIConfigurationForStaff(kpiIds,accessGroupPermissionCounterDTO.getStaffId(),ConfLevel.STAFF);
     }
 
     public void addCategoryKPIsDistribution(CategoryKPIsDTO categoryKPIsDetails, ConfLevel level, Long refId) {
@@ -293,7 +272,7 @@ public class CounterDistService extends MongoBaseService {
             }
                List<StaffIdsDTO> staffIdsDTOS = genericIntegrationService.getStaffIdsByunitAndAccessGroupId(accessGroupKPIEntry.getUnitId(),Arrays.asList(accessGroupKPIEntry.getAccessGroupId()));
                 List<Long> staffIds=staffIdsDTOS.stream().flatMap(staffIdsDTO -> staffIdsDTO.getStaffIds().stream()).collect(Collectors.toList());
-            counterRepository.removeApplicableKPI(staffIds, accessGroupKPIEntry.getKpiId(), ConfLevel.STAFF);
+            counterRepository.removeApplicableKPI(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()), ConfLevel.STAFF);
             counterRepository.removeTabKPIEntry(staffIds, accessGroupKPIEntry.getKpiId(), ConfLevel.STAFF);
             counterRepository.removeEntityById(accessGroupKPIEntry.getId(), AccessGroupKPIEntry.class);
         }else{
@@ -365,7 +344,7 @@ public class CounterDistService extends MongoBaseService {
         counterRepository.removeCategoryKPIEntry(unitIds,orgTypeKPIEntry.getKpiId());
         counterRepository.removeAccessGroupKPIEntry(unitIds,orgTypeKPIEntry.getKpiId());
         counterRepository.removeTabKPIEntry(unitIds,orgTypeKPIEntry.getKpiId(),ConfLevel.UNIT);
-        counterRepository.removeApplicableKPI(unitIds,orgTypeKPIEntry.getKpiId(),ConfLevel.UNIT);
+        counterRepository.removeApplicableKPI(unitIds,Arrays.asList(orgTypeKPIEntry.getKpiId()),ConfLevel.UNIT);
         counterRepository.removeEntityById(orgTypeKPIEntry.getId(),OrgTypeKPIEntry.class);
     }
 

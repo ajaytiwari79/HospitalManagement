@@ -241,9 +241,9 @@ public class CounterRepository {
         mongoTemplate.remove(query, AccessGroupKPIEntry.class);
     }
 
-    public void removeApplicableKPI(List<Long> refIds,BigInteger kpiId,ConfLevel level){
+    public void removeApplicableKPI(List<Long> refIds,List<BigInteger> kpiIds,ConfLevel level){
         String refQueryField = getRefQueryField(level);
-        Query query = new Query(Criteria.where(refQueryField).in(refIds).and("activeKpiId").is(kpiId));
+        Query query = new Query(Criteria.where(refQueryField).in(refIds).and("activeKpiId").in(kpiIds).and("levele").in(level));
         mongoTemplate.remove(query, ApplicableKPI.class);
     }
 
@@ -287,6 +287,17 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,AccessGroupKPIEntry.class),AccessGroupMappingDTO.class);
     }
 
+    public List<KPIDTO> getAccessGroupKPIDto(List<Long> accessGroupIds , ConfLevel level, Long refId){
+        String refQueryField = getRefQueryField(level);
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
+                Aggregation.lookup("counter","kpiId","_id","kpi"),
+                Aggregation.project().and("kpi._id").as("_id")
+                        .and("kpi.title").as("title").and("kpi.treatAsCounter").as("treatAsCounter")
+        );
+        AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,KPIDTO.class);
+        return results.getMappedResults();
+    }
 
     public List<ApplicableKPI> getApplicableKPIByReferenceId(List<BigInteger> kpiIds,List<Long> refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);

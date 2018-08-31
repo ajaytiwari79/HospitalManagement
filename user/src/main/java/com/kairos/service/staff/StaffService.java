@@ -2082,18 +2082,18 @@ public class StaffService {
 
     public AccessGroupCounterQueryResult getAccessGroupIdsOfStaff(Long unitId) {
         Long staffId=getStaffIdOfLoggedInUser(unitId);
-        long loggedinUserId = UserContext.getUserDetails().getId();
         AccessGroupCounterQueryResult accessGroupCounterQueryResult=new AccessGroupCounterQueryResult();
-        Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
-        if(isCountryAdmin) {
-            Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-            accessGroupCounterQueryResult.setCountryId(countryId);
-        }else{
-            accessGroupCounterQueryResult= accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
+        if(staffId==null){
+            Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+            staffId= staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
         }
-        accessGroupCounterQueryResult.setCountryAdmin(isCountryAdmin);
+        long loggedinUserId = UserContext.getUserDetails().getId();
+       Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
+       if(!isCountryAdmin) {
+           accessGroupCounterQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
+       }
         accessGroupCounterQueryResult.setStaffId(staffId);
-
+        accessGroupCounterQueryResult.setCountryAdmin(true);
         return accessGroupCounterQueryResult;
     }
 
