@@ -38,11 +38,11 @@ public class ActivityAndShiftStatusSettingsController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.addActivityAndShiftStatusSettings(countryId,activityAndShiftStatusSettingsDTO));
     }
 
-    @GetMapping(value = COUNTRY_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL)
+    @GetMapping(value = COUNTRY_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL+"/activity/{activityId}")
     @ApiOperation("get All Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> getAllActivityAndShiftStatusSettings(@PathVariable Long countryId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupedByStatus(countryId));
+    public ResponseEntity<Map<String,Object>> getAllActivityAndShiftStatusSettings(@PathVariable Long countryId,@PathVariable BigInteger activityId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupedByStatus(countryId,activityId));
     }
 
     @PutMapping(value = COUNTRY_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL)
@@ -69,11 +69,11 @@ public class ActivityAndShiftStatusSettingsController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.addActivityAndShiftStatusSettingForUnit(unitId,activityAndShiftStatusSettingsDTO));
     }
 
-    @GetMapping(value = UNIT_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL)
+    @GetMapping(value = UNIT_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL+"/activity/{activityId}")
     @ApiOperation("get All Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> getAllActivityAndShiftStatusSettingsForUnit(@PathVariable Long unitId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupedByStatusForUnit(unitId));
+    public ResponseEntity<Map<String,Object>> getAllActivityAndShiftStatusSettingsForUnit(@PathVariable Long unitId,@PathVariable BigInteger activityId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupedByStatusForUnit(unitId,activityId));
     }
 
     @PutMapping(value = UNIT_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL)

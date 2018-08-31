@@ -5,12 +5,13 @@ package com.kairos.persistence.repository.shift;/*
 
 import com.kairos.activity.shift.ActivityAndShiftStatusWrapper;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public interface CustomActivityAndShiftStatusSettingsRepository {
 
-    List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long countryId);
+    List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long countryId, BigInteger activityId);
 
-    List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatusForUnit(Long unitId);
+    List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatusForUnit(Long unitId,BigInteger activityId);
 
 }

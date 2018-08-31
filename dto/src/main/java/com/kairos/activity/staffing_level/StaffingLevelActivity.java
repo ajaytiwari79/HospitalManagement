@@ -63,13 +63,7 @@ public class StaffingLevelActivity {
         this.activityId = activityId;
     }
 
-//    public int getNoOfStaff() {
-//        return noOfStaff;
-//    }
-//
-//    public void setNoOfStaff(int noOfStaff) {
-//        this.noOfStaff = noOfStaff;
-//    }
+
 
     public boolean isIncludeInMin() {
         return includeInMin;

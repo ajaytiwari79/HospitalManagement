@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -19,9 +20,9 @@ public class ActivityAndShiftStatusSettingsRepositoryImpl implements CustomActiv
     @Inject private MongoTemplate mongoTemplate;
 
     @Override
-    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long countryId) {
+    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long countryId, BigInteger activityId) {
         Aggregation aggregation=newAggregation(
-               match(Criteria.where("countryId").is(countryId).and("deleted").is(false)),
+               match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("activityId").is(activityId)),
                 group("shiftStatus").push("$$ROOT").as("activityAndShiftStatusSettings"),
                 project("activityAndShiftStatusSettings").and("_id").as("status"));
         AggregationResults<ActivityAndShiftStatusWrapper> result=mongoTemplate.aggregate(aggregation,ActivityAndShiftStatusSettings.class,ActivityAndShiftStatusWrapper.class);
@@ -29,9 +30,9 @@ public class ActivityAndShiftStatusSettingsRepositoryImpl implements CustomActiv
     }
 
     @Override
-    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatusForUnit(Long unitId) {
+    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatusForUnit(Long unitId,BigInteger activityId) {
         Aggregation aggregation=newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("activityId").is(activityId)),
                 group("shiftStatus").push("$$ROOT").as("activityAndShiftStatusSettings"),
                 project("activityAndShiftStatusSettings").and("_id").as("status"));
         AggregationResults<ActivityAndShiftStatusWrapper> result=mongoTemplate.aggregate(aggregation,ActivityAndShiftStatusSettings.class,ActivityAndShiftStatusWrapper.class);

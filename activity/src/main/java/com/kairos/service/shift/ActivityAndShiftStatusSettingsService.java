@@ -52,8 +52,8 @@ public class ActivityAndShiftStatusSettingsService extends MongoBaseService {
         return true;
     }
 
-    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long countryId){
-          return activityAndShiftStatusSettingsRepository.getActivityAndShiftStatusSettingsGroupedByStatus(countryId);
+    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long countryId,BigInteger activityId){
+          return activityAndShiftStatusSettingsRepository.getActivityAndShiftStatusSettingsGroupedByStatus(countryId,activityId);
     }
 
     // Endpoints methods for unit
@@ -79,8 +79,8 @@ public class ActivityAndShiftStatusSettingsService extends MongoBaseService {
 
     }
 
-    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatusForUnit(Long unitId){
-        return activityAndShiftStatusSettingsRepository.getActivityAndShiftStatusSettingsGroupedByStatusForUnit(unitId);
+    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatusForUnit(Long unitId,BigInteger activityId){
+        return activityAndShiftStatusSettingsRepository.getActivityAndShiftStatusSettingsGroupedByStatusForUnit(unitId,activityId);
     }
 
 

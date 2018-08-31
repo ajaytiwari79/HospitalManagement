@@ -1198,6 +1198,7 @@ public class ActivityService extends MongoBaseService {
 
         if(!activityAndShiftStatusSettings.isEmpty()){
             activityAndShiftStatusSettings.forEach(currentActivityAndShiftStatusSettings->{
+                currentActivityAndShiftStatusSettings.setId(null);
                 currentActivityAndShiftStatusSettings.setActivityId(newActivityId);
             });
             save(activityAndShiftStatusSettings);
@@ -1211,8 +1212,4 @@ public class ActivityService extends MongoBaseService {
             save(activityAndShiftStatusSettings.get());
         }
     }
-
-
-
-
 }

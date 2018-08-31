@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.activity.cta.CTABasicDetailsDTO;
 import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.activity.shift.*;
@@ -9,6 +10,7 @@ import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.enums.Day;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.enums.shift.ShiftStatus;
@@ -47,9 +49,7 @@ import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.response.dto.web.shift.IndividualShiftTemplateDTO;
-import com.kairos.rest_client.CountryRestClient;
-import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.StaffRestClient;
+import com.kairos.rest_client.*;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
 import com.kairos.service.MongoBaseService;
@@ -62,6 +62,7 @@ import com.kairos.service.unit_settings.PhaseSettingsService;
 import com.kairos.service.wta.WTAService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.access_permission.AccessGroupRole;
+import com.kairos.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.user.country.experties.AppliedFunctionDTO;
 import com.kairos.user.staff.staff.StaffAccessRoleDTO;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
@@ -81,6 +82,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -99,6 +101,7 @@ import static com.kairos.constants.AppConstants.*;
 import static com.kairos.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 import static com.kairos.util.DateUtils.ONLY_DATE;
 import static com.kairos.util.WTARuleTemplateValidatorUtility.getIntervalByRuleTemplates;
+import static javafx.scene.input.KeyCode.V;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
@@ -172,6 +175,7 @@ public class ShiftService extends MongoBaseService {
 
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject private ActivityAndShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
+    @Inject private GenericRestClient genericRestClient;
 
 
 
@@ -1339,9 +1343,12 @@ public class ShiftService extends MongoBaseService {
     }
 
     private boolean validateAccessGroup(Phase phase,ShiftStatus status,BigInteger activityId){
-       ActivityAndShiftStatusSettings activityAndShiftStatusSettings= activityAndShiftStatusSettingsRepository.findByPhaseIdAndActivityIdAndShiftStatus(phase.getId(),activityId,status);
-        Set<Long> accessGroupIds=
-        return CollectionUtils.containsAny(activityAndShiftStatusSettings.getAccessGroupIds(),accessGroupIds);
+        if(activityId!=null){
+            ActivityAndShiftStatusSettings activityAndShiftStatusSettings= activityAndShiftStatusSettingsRepository.findByPhaseIdAndActivityIdAndShiftStatus(phase.getId(),activityId,status);
+            StaffAccessGroupDTO staffAccessGroupDTO=genericRestClient.publishRequest(null, null, true, IntegrationOperation.GET, "/staff/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAccessGroupDTO>>() {});
+            return CollectionUtils.containsAny(activityAndShiftStatusSettings.getAccessGroupIds(),staffAccessGroupDTO.getAccessGroupIds());
+        }
+        return false;
     }
 
 
