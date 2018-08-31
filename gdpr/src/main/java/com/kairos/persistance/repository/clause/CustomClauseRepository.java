@@ -1,12 +1,11 @@
 package com.kairos.persistance.repository.clause;
 
-import com.kairos.dto.FilterSelection;
-import com.kairos.dto.FilterSelectionDTO;
+import com.kairos.gdpr.FilterSelection;
+import com.kairos.gdpr.FilterSelectionDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
 import java.math.BigInteger;
 import java.util.List;

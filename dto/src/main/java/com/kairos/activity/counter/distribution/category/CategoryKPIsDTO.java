@@ -16,6 +16,11 @@ public class CategoryKPIsDTO {
     public CategoryKPIsDTO(){
     }
 
+    public CategoryKPIsDTO(BigInteger categoryId, List<BigInteger> kpiIds) {
+        this.categoryId = categoryId;
+        this.kpiIds = kpiIds;
+    }
+
     public BigInteger getCategoryId() {
         return categoryId;
     }

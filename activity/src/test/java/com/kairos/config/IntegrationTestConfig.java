@@ -1,10 +1,6 @@
 package com.kairos.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.kairos.util.userContext.UserContext;
+import com.kairos.util.user_context.UserContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -17,10 +13,8 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import java.io.IOException;
-import java.time.LocalDate;
 
 @Configuration
 public class IntegrationTestConfig {
@@ -28,6 +22,7 @@ public class IntegrationTestConfig {
     private String authorization ;
 
     @Bean
+    @Profile("local")
     @Primary
     public TestRestTemplate getTestRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         restTemplateBuilder = restTemplateBuilder

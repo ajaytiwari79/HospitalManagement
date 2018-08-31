@@ -3,15 +3,18 @@ package com.kairos.service.pay_out;
 
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
+import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.OrganizationRestClient;
+import com.kairos.rest_client.StaffRestClient;
 import com.kairos.rest_client.pay_out.PayOutRestClient;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.pay_out.PayOutRepository;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
@@ -55,6 +58,8 @@ public class PayOutService extends MongoBaseService {
     private OrganizationRestClient organizationRestClient;
     @Inject
     private TimeTypeService timeTypeService;
+    @Inject private TimeBankRepository timeBankRepository;
+    @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
 
 
@@ -142,6 +147,22 @@ public class PayOutService extends MongoBaseService {
 
     /**
      *
+     * @param staffId
+     * @param unitPositionId
+     * @param amount
+     * @return boolean
+     */
+    public boolean requestPayOut(Long staffId,Long unitPositionId,int amount){
+       // DailyTimeBankEntry dailyTimeBankEntry = timeBankRepository.findLastTimeBankByUnitPositionId(unitPositionId,new Date());
+        PayOutTransaction requestPayOutTransaction = new PayOutTransaction(staffId,unitPositionId, PayOutTrasactionStatus.REQUESTED,amount, LocalDate.now());
+        //Todo change this functionality when CTA Merge to dev @Pradeep
+        save(requestPayOutTransaction);
+        return true;
+
+    }
+
+    /**
+     *
      * @param staffAdditionalInfoDTO
      * @param shift
      * @param activity
@@ -150,6 +171,7 @@ public class PayOutService extends MongoBaseService {
         ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
         List<PayOut> payOuts = payOutRepository.findAllByShiftId(shift.getId());
+        if(!payOuts.isEmpty()){
         while (startDate.isBefore(endDate)) {
             DateTimeInterval interval = new DateTimeInterval(startDate, startDate.plusDays(1));
             PayOut payOut = payOuts.stream().filter(p -> p.getDate().equals(interval.getStartLocalDate())).findFirst().get();
@@ -167,7 +189,6 @@ public class PayOutService extends MongoBaseService {
             }
             startDate = startDate.plusDays(1);
         }
-        if(!payOuts.isEmpty()){
             save(payOuts);
         }
 

@@ -2,13 +2,13 @@ package com.kairos.persistance.repository.filter;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.dto.master_data.ModuleIdDTO;
+import com.kairos.gdpr.master_data.ModuleIdDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
-import com.kairos.response.dto.filter.FilterQueryResult;
+import com.kairos.response.dto.filter.FilterCategoryResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -16,14 +16,11 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.facet;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static com.kairos.constants.AppConstant.CLAUSE_MODULE_NAME;
@@ -51,7 +48,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
             aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
         }
         filterTypes.forEach(filterType -> {
-                    aggregationOperations.put(filterType.value, buildAggregationQuery(filterType));
+                    buildAggregationQuery(filterType,aggregationOperations);
                 }
 
         );
@@ -59,20 +56,31 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
         return aggregationOperations;
     }
 
+
+    /**accountTypes ,organizationServices ,organizationSubServices ,organizationSubTypes ,organizationTypes    are fields in domain (cluse ,asset ,master processing activity)
+     * ACCOUNT_TYPES ,ORGANIZATION_SERVICES,ORGANIZATION_SUB_SERVICES ,ORGANIZATION_TYPES,ORGANIZATION_SUB_TYPESetc represent field name in domains(Clause,MasterAsset and Master Processing activity)
+     * @param filterType
+     * @return
+     */
     @Override
-    public AggregationOperation buildAggregationQuery(FilterType filterType) {
+    public void buildAggregationQuery(FilterType filterType, Map<String, AggregationOperation> aggregationOperations ) {
         switch (filterType) {
 
             case ACCOUNT_TYPES:
-                return Aggregation.unwind(filterType.value);
+                aggregationOperations.put("accountTypes",Aggregation.unwind("accountTypes"));
+                break;
             case ORGANIZATION_SERVICES:
-                return Aggregation.unwind(filterType.value);
+                aggregationOperations.put("organizationServices",Aggregation.unwind("organizationServices"));
+                break;
             case ORGANIZATION_SUB_SERVICES:
-                return Aggregation.unwind(filterType.value);
+                aggregationOperations.put("organizationSubServices",Aggregation.unwind("organizationSubServices"));
+                break;
             case ORGANIZATION_TYPES:
-                return Aggregation.unwind(filterType.value);
+                aggregationOperations.put("organizationTypes",Aggregation.unwind("organizationTypes"));
+                break;
             case ORGANIZATION_SUB_TYPES:
-                return Aggregation.unwind(filterType.value);
+                aggregationOperations.put("organizationSubTypes",Aggregation.unwind("organizationSubTypes"));
+                break;
             default:
                 throw new InvalidRequestException("invalid request");
         }
@@ -98,7 +106,7 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     }
 
     @Override
-    public AggregationResults<FilterQueryResult> getFilterAggregationResult(Aggregation aggregation, FilterGroup filterGroup, String moduleId) {
+    public AggregationResults<FilterCategoryResult> getFilterAggregationResult(Aggregation aggregation, FilterGroup filterGroup, String moduleId) {
 
         List<ModuleIdDTO> moduleIdDto = filterGroup.getAccessModule();
         String domainName = null;
@@ -113,11 +121,11 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
         }
         switch (domainName) {
             case CLAUSE_MODULE_NAME:
-                return mongoTemplate.aggregate(aggregation, Clause.class, FilterQueryResult.class);
+                return mongoTemplate.aggregate(aggregation, Clause.class, FilterCategoryResult.class);
             case ASSET_MODULE_NAME:
-                return mongoTemplate.aggregate(aggregation, MasterAsset.class, FilterQueryResult.class);
+                return mongoTemplate.aggregate(aggregation, MasterAsset.class, FilterCategoryResult.class);
             case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
-                return mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, FilterQueryResult.class);
+                return mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, FilterCategoryResult.class);
             default:
                 throw new DataNotFoundByIdException("data not found by moduleId" + moduleId);
 

@@ -11,6 +11,21 @@ public class CountryDTO {
 
     private Long id;
     private String name;
+    private Long currencyId;
+
+    public CountryDTO(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+
+    public Long getCurrencyId() {
+        return currencyId;
+    }
+
+    public void setCurrencyId(Long currencyId) {
+        this.currencyId = currencyId;
+    }
 
     private String code;
 

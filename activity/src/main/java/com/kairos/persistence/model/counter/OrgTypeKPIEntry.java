@@ -7,13 +7,14 @@ import java.math.BigInteger;
 public class OrgTypeKPIEntry extends MongoBaseEntity {
     private Long orgTypeId;
     private BigInteger kpiId;
-
+    private Long countryId;
     public OrgTypeKPIEntry() {
     }
 
-    public OrgTypeKPIEntry(Long orgTypeId, BigInteger kpiId) {
+    public OrgTypeKPIEntry(Long orgTypeId, BigInteger kpiId,Long countryId) {
         this.orgTypeId = orgTypeId;
         this.kpiId = kpiId;
+        this.countryId=countryId;
     }
 
     public Long getOrgTypeId() {
@@ -30,5 +31,13 @@ public class OrgTypeKPIEntry extends MongoBaseEntity {
 
     public void setKpiId(BigInteger kpiId) {
         this.kpiId = kpiId;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 }

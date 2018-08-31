@@ -8,16 +8,15 @@ import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.*;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
+import com.kairos.rule_validator.Specification;
+import com.kairos.rule_validator.functional_paymment.IsFunctionalPaymentAvailable;
+import com.kairos.rule_validator.functional_paymment.IsGreaterThanStartDate;
+import com.kairos.rule_validator.functional_paymment.IsGreaterThanToday;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.country.experties.FunctionalPaymentMatrixDTO;
 import com.kairos.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.user.country.experties.FunctionsDTO;
 import com.kairos.user.country.experties.SeniorityLevelFunctionDTO;
-import com.kairos.service.UserBaseService;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.rule_validator.functional_paymment.IsFunctionalPaymentAvailable;
-import com.kairos.rule_validator.functional_paymment.IsGreaterThanStartDate;
-import com.kairos.rule_validator.functional_paymment.IsGreaterThanToday;
-import com.kairos.rule_validator.Specification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class FunctionalPaymentService extends UserBaseService {
+public class FunctionalPaymentService{
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private ExpertiseGraphRepository expertiseGraphRepository;
@@ -61,7 +60,7 @@ public class FunctionalPaymentService extends UserBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "expertise", expertiseId);
         }
         FunctionalPayment functionalPayment = validateAndGetDomainObject(functionalPaymentDTO, expertise.get());
-        save(functionalPayment);
+        functionalPaymentGraphRepository.save(functionalPayment);
         functionalPaymentDTO.setId(functionalPayment.getId());
         return functionalPaymentDTO;
     }
@@ -92,7 +91,7 @@ public class FunctionalPaymentService extends UserBaseService {
         }
         functionalPayment.get().setPaymentUnit(functionalPaymentDTO.getPaymentUnit());
         functionalPayment.get().setEndDate(functionalPaymentDTO.getEndDate());
-        save(functionalPayment.get());
+        functionalPaymentGraphRepository.save(functionalPayment.get());
         functionalPaymentDTO.setId(functionalPayment.get().getId());
         return functionalPaymentDTO;
     }
@@ -114,20 +113,20 @@ public class FunctionalPaymentService extends UserBaseService {
             list.add(functionalPaymentMatrix);
         });
         functionalPayment.get().setFunctionalPaymentMatrices(list);
-        save(functionalPayment.get());
+        functionalPaymentGraphRepository.save(functionalPayment.get());
         return functionalPaymentMatrixDTOS;
     }
 
     private FunctionalPaymentMatrix addMatrixInFunctionalPayment(FunctionalPaymentMatrixDTO functionalPaymentMatrixDTO, List<SeniorityLevel> seniorityLevels, List<Function> functions) {
         FunctionalPaymentMatrix functionalPaymentMatrix = new FunctionalPaymentMatrix();
         if (Optional.ofNullable(functionalPaymentMatrixDTO.getPayGroupAreasIds()).isPresent() && !functionalPaymentMatrixDTO.getPayGroupAreasIds().isEmpty()) {
-            List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(functionalPaymentMatrixDTO.getPayGroupAreasIds());
+            List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(functionalPaymentMatrixDTO.getPayGroupAreasIds());
             if (payGroupAreas.size() != functionalPaymentMatrixDTO.getPayGroupAreasIds().size())
                 exceptionService.actionNotPermittedException("message.multipleDataNotFound", "payGroup-areas");
             functionalPaymentMatrix.setPayGroupAreas(new HashSet<>(payGroupAreas));
         }
         functionalPaymentMatrix.setSeniorityLevelFunction(getSeniorityLevelFunction(functionalPaymentMatrixDTO.getSeniorityLevelFunction(), seniorityLevels, functions));
-        save(functionalPaymentMatrix);
+        functionalPaymentMatrixRepository.save(functionalPaymentMatrix);
         return functionalPaymentMatrix;
     }
 
@@ -208,7 +207,7 @@ public class FunctionalPaymentService extends UserBaseService {
 
             functionalPayment.get().setHasDraftCopy(true);
             functionalPaymentCopy.setParentFunctionalPayment(functionalPayment.get());
-            save(functionalPaymentCopy);
+            functionalPaymentGraphRepository.save(functionalPaymentCopy);
             functionalSeniorityLevelDTO.setFunctionalPaymentId(functionalPaymentCopy.getId());
 
         } else {
@@ -226,7 +225,7 @@ public class FunctionalPaymentService extends UserBaseService {
                     if (!payGroupAreaIds.equals(functionalPaymentMatrixDTO.getPayGroupAreasIds())) {
                         // user has updated the payGroupAreas   // remove all payGroup areas and add the new one
                         functionalPaymentGraphRepository.removeAllPayGroupAreas(functionalPaymentMatrix.getId());
-                        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(functionalPaymentMatrixDTO.getPayGroupAreasIds());
+                        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(functionalPaymentMatrixDTO.getPayGroupAreasIds());
                         functionalPaymentMatrix.setPayGroupAreas(new HashSet<>(payGroupAreas));
                     }
 
@@ -237,7 +236,7 @@ public class FunctionalPaymentService extends UserBaseService {
                 list.add(functionalPaymentMatrix);
             });
             functionalPayment.get().setFunctionalPaymentMatrices(list);
-            save(functionalPayment.get());
+            functionalPaymentGraphRepository.save(functionalPayment.get());
         }
         return functionalSeniorityLevelDTO;
     }
@@ -265,7 +264,7 @@ public class FunctionalPaymentService extends UserBaseService {
                 functionalPayment.get().setEndDate(null);
             }
         }
-        save(functionalPayment.get());
+        functionalPaymentGraphRepository.save(functionalPayment.get());
         return parentFunctionalPayment;
 
     }

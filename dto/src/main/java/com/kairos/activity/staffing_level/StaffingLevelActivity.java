@@ -3,13 +3,13 @@ package com.kairos.activity.staffing_level;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
 public class StaffingLevelActivity {
 
     private String name;
-    private Long activityId;
-   // private int noOfStaff;
+    private BigInteger activityId;
     private boolean includeInMin;
     private int minNoOfStaff;
     private int maxNoOfStaff;
@@ -41,35 +41,27 @@ public class StaffingLevelActivity {
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
-    public StaffingLevelActivity(Long activityId, int minNoOfStaff, int maxNoOfStaff) {
-        this.activityId = activityId;
-        this.minNoOfStaff = minNoOfStaff;
-        this.maxNoOfStaff = maxNoOfStaff;
-    }
-
-
-    public StaffingLevelActivity(Long activityId, String name, int minNoOfStaff, int maxNoOfStaff) {
+    public StaffingLevelActivity(BigInteger activityId, String name, int minNoOfStaff, int maxNoOfStaff) {
         this.activityId = activityId;
         this.name = name;
         this.minNoOfStaff = minNoOfStaff;
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
-    public Long getActivityId() {
+    public StaffingLevelActivity(BigInteger activityId, int minNoOfStaff, int maxNoOfStaff) {
+        this.activityId = activityId;
+        this.minNoOfStaff = minNoOfStaff;
+        this.maxNoOfStaff = maxNoOfStaff;
+    }
+
+    public BigInteger getActivityId() {
         return activityId;
     }
 
-    public void setActivityId(Long activityId) {
+    public void setActivityId(BigInteger activityId) {
         this.activityId = activityId;
     }
 
-//    public int getNoOfStaff() {
-//        return noOfStaff;
-//    }
-//
-//    public void setNoOfStaff(int noOfStaff) {
-//        this.noOfStaff = noOfStaff;
-//    }
 
     public boolean isIncludeInMin() {
         return includeInMin;
@@ -97,30 +89,19 @@ public class StaffingLevelActivity {
 
         return new EqualsBuilder()
                 .append(activityId, that.activityId)
-                .append(minNoOfStaff, that.minNoOfStaff)
-                .append(maxNoOfStaff, that.maxNoOfStaff)
                 .isEquals();
     }
 
-    /*@Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(activityId)
-                .append(noOfStaff)
-                .toHashCode();
-    }*/
-
     @Override
     public int hashCode() {
-        return Objects.hash(name, minNoOfStaff,maxNoOfStaff);
+        return Objects.hash(activityId);
     }
 
+    
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("activityId", activityId)
-                .append("minNoOfStaff", minNoOfStaff)
-                .append("maxNoOfStaff",maxNoOfStaff)
                 .toString();
     }
 }

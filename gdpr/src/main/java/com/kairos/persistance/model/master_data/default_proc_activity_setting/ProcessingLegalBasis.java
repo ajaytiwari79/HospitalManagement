@@ -1,21 +1,28 @@
 package com.kairos.persistance.model.master_data.default_proc_activity_setting;
 
 
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Document
 public class ProcessingLegalBasis extends MongoBaseEntity {
 
 
-    @NotNullOrEmpty(message = "error.message.name.cannot.be.null.or.empty")
-    @Pattern(message = "Numbers and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.cannot.be.null.or.empty")
+    @Pattern(message = "Number and Special characters are not allowed for Name",regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     private Long countryId;
+
+    private String suggestedDataStatus=SuggestedDataStatus.ACCEPTED.value;
+
+    public String getSuggestedDataStatus() { return suggestedDataStatus; }
+
+    public void setSuggestedDataStatus(String suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
     public Long getCountryId() {
         return countryId;
@@ -26,11 +33,18 @@ public class ProcessingLegalBasis extends MongoBaseEntity {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+
+
+    public ProcessingLegalBasis(String name) {
+        this.name = name;
+    }
+    public ProcessingLegalBasis() {
+    }
 }

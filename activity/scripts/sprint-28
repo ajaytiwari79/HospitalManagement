@@ -1,0 +1,5 @@
+// To update time from Integer to LocalTime
+db.activities.updateMany({},{$set:{"rulesActivityTab.earliestStartTime":"00:00:00","rulesActivityTab.latestStartTime":"23:59:00"}})
+
+// To update time from Integer to LocalTime in StaffActivitySetting
+db.staffActivitySetting.updateMany({},{$set:{"earliestStartTime":"00:00:00","latestStartTime":"23:59:00"}})

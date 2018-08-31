@@ -2,7 +2,7 @@ package com.kairos.controller.clause;
 
 
 
-import com.kairos.dto.master_data.ClauseDTO;
+import com.kairos.gdpr.master_data.ClauseDTO;
 import com.kairos.service.clause.ClauseService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;

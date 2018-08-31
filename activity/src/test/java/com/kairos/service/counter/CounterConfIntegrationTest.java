@@ -42,9 +42,9 @@ public class CounterConfIntegrationTest {
 
     @Test
     public void addCounterEntries() throws Exception{
-        String baseUrl = getBaseUrl(2567l, null);
+        String baseUrl = getBaseUrl(2567l, 5l);
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/counters/conf/counter/country/5",
+                baseUrl + "/counter/conf/counter",
                 HttpMethod.GET, null, String.class);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
@@ -60,7 +60,7 @@ public class CounterConfIntegrationTest {
                 new ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<Counter>>() {
                 };
         ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<Counter>> response = restTemplate.exchange(
-                baseUrl + "/counters/conf/counter",
+                baseUrl + "/counter/conf/counter",
                 HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
@@ -77,7 +77,7 @@ public class CounterConfIntegrationTest {
                 new ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<FilterCriteria>>>() {
                 };
         ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<List<FilterCriteria>>> response = restTemplate.exchange(
-                baseUrl + "/counters/conf/counter/5",
+                baseUrl + "/counter/conf/counter/5",
                 HttpMethod.PUT, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
@@ -86,15 +86,15 @@ public class CounterConfIntegrationTest {
     @Test
     public void addCategoriesAtCountryLevel() throws Exception {
         List<KPICategory> kpiCategories=new ArrayList<>();
-        kpiCategories.add(new KPICategory("Working Time after update", 1l));
-        kpiCategories.add(new KPICategory("Resting Time after update", 2l));
-        String baseUrl = getBaseUrl(2567l, null);
+        kpiCategories.add(new KPICategory("Working Time after update", null,null,null));
+        kpiCategories.add(new KPICategory("Resting Time after update", null,null,null));
+        String baseUrl = getBaseUrl(2567l, 4l);
         HttpEntity<List<KPICategory>> requestBodyData = new HttpEntity<>(kpiCategories);
         ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> typeReference =
                 new ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>>() {
                 };
         ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> response = restTemplate.exchange(
-                baseUrl+"/counters/conf/country/4/category", HttpMethod.POST, requestBodyData, typeReference);
+                baseUrl+"/counter/conf/category", HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode()+""+kpiCategories);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -102,15 +102,15 @@ public class CounterConfIntegrationTest {
     @Test
     public void addCategoriesAtUnitLevel() throws Exception{
         List<KPICategory> kpiCategories=new ArrayList<>();
-        kpiCategories.add(new KPICategory("Working Time for unit for again ", 1l));
-        kpiCategories.add(new KPICategory("Resting Time for unit for again", 2l));
+        kpiCategories.add(new KPICategory("Working Time for unit for again ", null,null,null));
+        kpiCategories.add(new KPICategory("Resting Time for unit for again", null,null,null));
         String baseUrl = getBaseUrl(2567l, null);
         HttpEntity<List<KPICategory>> requestBodyData = new HttpEntity<>(kpiCategories);
         ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> typeReference =
                 new ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>>() {
                 };
         ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> response = restTemplate.exchange(
-                baseUrl+"/counters/conf/unit/4/category", HttpMethod.POST, requestBodyData, typeReference);
+                baseUrl+"/unit/4/counter/conf/category", HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : " + response.getStatusCode()+""+kpiCategories);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -119,21 +119,21 @@ public class CounterConfIntegrationTest {
     public void updateCategoriesForCountry() throws Exception{
         List<KPICategory> kpiCategories=new ArrayList<>();
         List<KPICategory> kpiCategories1=new ArrayList<>();
-        KPICategory kpiCategory1=new KPICategory("Working Time for Country after update ", 3l);
-        KPICategory kpiCategory2=new KPICategory("Resting Time for Country after update", 4l);
+        KPICategory kpiCategory1=new KPICategory("Working Time for Country after update ", null,null,null);
+        KPICategory kpiCategory2=new KPICategory("Resting Time for Country after update", null,null,null);
         kpiCategory1.setId(BigInteger.valueOf(20));
         kpiCategory2.setId(BigInteger.valueOf(21));
         kpiCategories.add(kpiCategory1);
         kpiCategories.add(kpiCategory2);
-        KPICategory kpiCategory3=new KPICategory("Working Time for Country after update ", 3l);
+        KPICategory kpiCategory3=new KPICategory("", null,null,null);
         kpiCategory3.setId(BigInteger.valueOf(14));
         kpiCategories1.add(kpiCategory3);
         KPICategoryUpdationDTO kpiCategoryUpdationDTO=new KPICategoryUpdationDTO(kpiCategories,kpiCategories1);
-        String baseUrl=getBaseUrl(2567l,null);
+        String baseUrl=getBaseUrl(2567l,4l);
         HttpEntity<KPICategoryUpdationDTO> requestBodyDate=new HttpEntity<>(kpiCategoryUpdationDTO);
         ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> typeReference=new ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>>() {
         };
-        ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> response=restTemplate.exchange(baseUrl+"/counters/conf/country/4/category",HttpMethod.PUT,requestBodyDate,typeReference);
+        ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> response=restTemplate.exchange(baseUrl+"/counter/conf/category",HttpMethod.PUT,requestBodyDate,typeReference);
         logger.info("Status Code : " + response.getStatusCode()+""+kpiCategories);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -142,14 +142,14 @@ public class CounterConfIntegrationTest {
     @Test
     public void updateCategoriesForUnit() throws Exception {
         List<KPICategory> kpiCategories = new ArrayList<>();
-        kpiCategories.add(new KPICategory("Working Time for unit ", 3l));
-        kpiCategories.add(new KPICategory("Resting Time for unit", 4l));
+        kpiCategories.add(new KPICategory("Working Time for unit ", null,null,null));
+        kpiCategories.add(new KPICategory("Resting Time for unit", null,null,null));
         KPICategoryUpdationDTO kpiCategoryUpdationDTO = new KPICategoryUpdationDTO(new ArrayList(), kpiCategories);
         String baseUrl = getBaseUrl(2567l, null);
         HttpEntity<KPICategoryUpdationDTO> requestBodyDate = new HttpEntity<>(kpiCategoryUpdationDTO);
         ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> typeReference = new ParameterizedTypeReference<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>>() {
         };
-        ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> response = restTemplate.exchange(baseUrl + "/counters/conf/unit/4/category", HttpMethod.PUT, requestBodyDate, typeReference);
+        ResponseEntity<com.kairos.client.dto.RestTemplateResponseEnvelope<List<KPICategory>>> response = restTemplate.exchange(baseUrl + "/unit/4/counter/conf/category", HttpMethod.PUT, requestBodyDate, typeReference);
         logger.info("Status Code : " + response.getStatusCode() + "" + kpiCategories);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }

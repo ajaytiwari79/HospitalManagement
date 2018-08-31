@@ -1,5 +1,6 @@
 package com.kairos.activity.activity;
 
+import com.kairos.activity.counter.CounterDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
 
@@ -10,23 +11,26 @@ public class ActivityWithTimeTypeDTO {
     private List<TimeTypeDTO> timeTypeDTOS;
     private List<OpenShiftIntervalDTO> intervals;
     private Integer minOpenShiftHours;
+    private List<CounterDTO> counters;
 
 
     public ActivityWithTimeTypeDTO() {
         //Default Constructor
     }
 
-    public ActivityWithTimeTypeDTO(List<ActivityDTO> activityDTOS, List<TimeTypeDTO> timeTypeDTOS, List<OpenShiftIntervalDTO> intervals) {
+    public ActivityWithTimeTypeDTO(List<ActivityDTO> activityDTOS, List<TimeTypeDTO> timeTypeDTOS, List<OpenShiftIntervalDTO> intervals,List<CounterDTO> counters) {
         this.activityDTOS = activityDTOS;
         this.timeTypeDTOS = timeTypeDTOS;
         this.intervals = intervals;
+        this.counters=counters;
     }
 
-    public ActivityWithTimeTypeDTO(List<ActivityDTO> activityDTOS, List<TimeTypeDTO> timeTypeDTOS, List<OpenShiftIntervalDTO> intervals, Integer minOpenShiftHours) {
+    public ActivityWithTimeTypeDTO(List<ActivityDTO> activityDTOS, List<TimeTypeDTO> timeTypeDTOS, List<OpenShiftIntervalDTO> intervals, Integer minOpenShiftHours,List<CounterDTO> counters) {
         this.activityDTOS = activityDTOS;
         this.timeTypeDTOS = timeTypeDTOS;
         this.intervals = intervals;
         this.minOpenShiftHours = minOpenShiftHours;
+        this.counters=counters;
     }
 
     public List<TimeTypeDTO> getTimeTypeDTOS() {
@@ -59,5 +63,13 @@ public class ActivityWithTimeTypeDTO {
 
     public void setMinOpenShiftHours(Integer minOpenShiftHours) {
         this.minOpenShiftHours = minOpenShiftHours;
+    }
+
+    public List<CounterDTO> getCounters() {
+        return counters;
+    }
+
+    public void setCounters(List<CounterDTO> counters) {
+        this.counters = counters;
     }
 }

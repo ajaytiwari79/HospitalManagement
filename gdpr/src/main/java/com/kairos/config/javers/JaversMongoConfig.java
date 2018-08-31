@@ -3,8 +3,8 @@ package com.kairos.config.javers;
 
 import com.google.common.collect.ImmutableMap;
 import com.kairos.config.mongoEnv.EnvConfig;
-import com.kairos.utils.codec.BigIntegerCodecProvider;
-import com.kairos.utils.codec.BigIntegerTransformer;
+import com.kairos.config.codec.BigIntegerCodecProvider;
+import com.kairos.config.codec.BigIntegerTransformer;
 import com.mongodb.*;
 import org.bson.BSON;
 import org.bson.codecs.configuration.CodecRegistries;
@@ -52,15 +52,12 @@ public class JaversMongoConfig {
     public MongoClient mongo() {
 
         BSON.addEncodingHook(BigInteger.class, new BigIntegerTransformer());
-
         CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
                 CodecRegistries.fromProviders(new BigIntegerCodecProvider()),
                 MongoClient.getDefaultCodecRegistry()
         );
         MongoClientOptions.Builder builder = MongoClientOptions.builder()
                 .codecRegistry(codecRegistry);
-        /*MongoClientOptions settings = MongoClientOptions.builder().readPreference(ReadPreference.nearest())
-                .codecRegistry(codecRegistry).build();*/
         final List<MongoCredential> credentialList = Arrays.asList(MongoCredential.createCredential(environment.getMongoUserName(), environment.getDataBaseName(), environment.getMongoPassword().toCharArray()));
         return new MongoClient(new ServerAddress(environment.getMongoHost(), environment.getMongoPort()), credentialList,builder.build());
 

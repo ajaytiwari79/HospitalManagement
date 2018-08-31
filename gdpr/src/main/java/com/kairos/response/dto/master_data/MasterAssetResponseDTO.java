@@ -1,12 +1,13 @@
 package com.kairos.response.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.OrganizationSubTypeDTO;
-import com.kairos.dto.OrganizationTypeDTO;
-import com.kairos.dto.ServiceCategoryDTO;
-import com.kairos.dto.SubServiceCategoryDTO;
-import com.kairos.utils.custom_annotation.NotNullOrEmpty;
+import com.kairos.gdpr.OrganizationSubType;
+import com.kairos.gdpr.OrganizationType;
+import com.kairos.gdpr.ServiceCategory;
+import com.kairos.gdpr.SubServiceCategory;
+import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
@@ -17,10 +18,10 @@ public class MasterAssetResponseDTO {
     @NotNull
     private BigInteger id;
 
-    @NotNullOrEmpty(message = "Name can't be empty")
-    private  String name;
+    @NotBlank(message = "Name can't be empty")
+    private String name;
 
-    @NotNullOrEmpty(message = "Description can't be empty")
+    @NotBlank(message = "Description can't be empty")
     private String description;
 
     public BigInteger getId() {
@@ -31,23 +32,26 @@ public class MasterAssetResponseDTO {
         this.id = id;
     }
 
-    private List<OrganizationTypeDTO> organizationTypes;
+    private List<OrganizationType> organizationTypes;
 
-    private List <OrganizationSubTypeDTO> organizationSubTypes;
+    private List<OrganizationSubType> organizationSubTypes;
 
-    private List <ServiceCategoryDTO> organizationServices;
+    private List<ServiceCategory> organizationServices;
 
-    private List <SubServiceCategoryDTO> organizationSubServices;
+    private List<SubServiceCategory> organizationSubServices;
 
-    private AssetTypeResponseDTO assetType;
+    private AssetTypeBasicResponseDTO assetType;
 
-    public AssetTypeResponseDTO getAssetType() {
-        return assetType;
-    }
+    public List<AssetTypeBasicResponseDTO> assetSubTypes;
 
-    public void setAssetType(AssetTypeResponseDTO assetType) {
-        this.assetType = assetType;
-    }
+
+    public AssetTypeBasicResponseDTO getAssetType() { return assetType; }
+
+    public void setAssetType(AssetTypeBasicResponseDTO assetType) { this.assetType = assetType; }
+
+    public List<AssetTypeBasicResponseDTO> getAssetSubTypes() { return assetSubTypes; }
+
+    public void setAssetSubTypes(List<AssetTypeBasicResponseDTO> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
 
     public String getName() {
         return name;
@@ -65,35 +69,35 @@ public class MasterAssetResponseDTO {
         this.description = description;
     }
 
-    public List<OrganizationTypeDTO> getOrganizationTypes() {
+    public List<OrganizationType> getOrganizationTypes() {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationTypeDTO> organizationTypes) {
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
         this.organizationTypes = organizationTypes;
     }
 
-    public List<OrganizationSubTypeDTO> getOrganizationSubTypes() {
+    public List<OrganizationSubType> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubTypeDTO> organizationSubTypes) {
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public List<ServiceCategoryDTO> getOrganizationServices() {
+    public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<ServiceCategoryDTO> organizationServices) {
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
-    public List<SubServiceCategoryDTO> getOrganizationSubServices() {
+    public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategoryDTO> organizationSubServices) {
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
         this.organizationSubServices = organizationSubServices;
     }
 

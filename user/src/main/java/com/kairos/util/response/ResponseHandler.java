@@ -1,10 +1,8 @@
 package com.kairos.util.response;
 
-import com.kairos.service.locale.LocaleService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

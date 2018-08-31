@@ -1,19 +1,44 @@
 package com.kairos.persistence.model.counter;
 
+import com.kairos.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.activity.enums.counter.CounterSize;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 
-public class TabKPIConf {
+public class TabKPIConf extends MongoBaseEntity {
     private String tabId;
-    private BigInteger kpiAssignmentId;
+    private BigInteger kpiId;
     private Long countryId;
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
+    private CounterSize counterSize;
+    private KPIPosition kpiPosition;
 
     public TabKPIConf() {
 
+    }
+
+    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+        this.tabId = tabId;
+        this.kpiId = kpiId;
+        this.countryId = countryId;
+        this.unitId = unitId;
+        this.staffId = staffId;
+        this.level = level;
+    }
+
+    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, CounterSize counterSize, KPIPosition kpiPosition) {
+        this.tabId = tabId;
+        this.kpiId = kpiId;
+        this.countryId = countryId;
+        this.unitId = unitId;
+        this.staffId = staffId;
+        this.level = level;
+        this.counterSize = counterSize;
+        this.kpiPosition = kpiPosition;
     }
 
     public String getTabId() {
@@ -24,12 +49,13 @@ public class TabKPIConf {
         this.tabId = tabId;
     }
 
-    public BigInteger getKpiAssignmentId() {
-        return kpiAssignmentId;
+
+    public BigInteger getKpiId() {
+        return kpiId;
     }
 
-    public void setKpiAssignmentId(BigInteger kpiAssignmentId) {
-        this.kpiAssignmentId = kpiAssignmentId;
+    public void setKpiId(BigInteger kpiId) {
+        this.kpiId = kpiId;
     }
 
     public Long getCountryId() {
@@ -62,5 +88,21 @@ public class TabKPIConf {
 
     public void setLevel(ConfLevel level) {
         this.level = level;
+    }
+
+    public CounterSize getCounterSize() {
+        return counterSize;
+    }
+
+    public void setCounterSize(CounterSize counterSize) {
+        this.counterSize = counterSize;
+    }
+
+    public KPIPosition getKpiPosition() {
+        return kpiPosition;
+    }
+
+    public void setKpiPosition(KPIPosition kpiPosition) {
+        this.kpiPosition = kpiPosition;
     }
 }

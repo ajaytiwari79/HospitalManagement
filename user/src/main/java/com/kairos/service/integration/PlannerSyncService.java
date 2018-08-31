@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -78,7 +79,7 @@ public class PlannerSyncService {
 
     private UnitPositionWtaDTO createUnitPositionDTO(UnitPosition unitPosition, EmploymentType employmentType, Long unitId, WTAResponseDTO wtaResponseDTO) {
         if(wtaResponseDTO==null){
-            wtaResponseDTO=workingTimeAgreementRestClient.getWTAById(unitPosition.getWorkingTimeAgreementId());
+            wtaResponseDTO=workingTimeAgreementRestClient.getWTAById(unitPosition.getId());
         }
         UnitPositionWtaDTO unitPositionWtaDTO=new UnitPositionWtaDTO(unitPosition.getId(),unitPosition.getExpertise().getId(),unitPosition.getPositionCode().getId(),unitPosition.getStartDateMillis(),unitPosition.getEndDateMillis(),
                 unitPosition.getTotalWeeklyMinutes(),unitPosition.getTotalWeeklyMinutes()/60,unitPosition.getAvgDailyWorkingHours(),unitPosition.getWorkingDaysInWeek(),
@@ -88,11 +89,11 @@ public class PlannerSyncService {
 
     private List<UnitPositionWtaDTO> createUnitPositionDTOs(Long unitId,List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips) {
         List<UnitPositionWtaDTO> unitPositionWtaDTOS=new ArrayList<>();
-        List<BigInteger> upIds=unitPositionEmploymentTypeRelationShips.stream().map(upr->upr.getUnitPosition().getWorkingTimeAgreementId()).collect(Collectors.toList());
+        List<Long> upIds=unitPositionEmploymentTypeRelationShips.stream().map(upr->upr.getId()).collect(Collectors.toList());
         List<WTAResponseDTO> wtaResponseDTOS=workingTimeAgreementRestClient.getWTAByIds(upIds);
-        Map<BigInteger,WTAResponseDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w->w.getId(), w->w));
+        Map<Long,WTAResponseDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w->w.getUnitPositionId(), w->w));
         unitPositionEmploymentTypeRelationShips.forEach(upr->{
-            unitPositionWtaDTOS.add(createUnitPositionDTO(upr.getUnitPosition(),upr.getEmploymentType(),unitId,wtaResponseDTOMap.get(upr.getUnitPosition().getWorkingTimeAgreementId())));
+            unitPositionWtaDTOS.add(createUnitPositionDTO(upr.getUnitPosition(),upr.getEmploymentType(),unitId,wtaResponseDTOMap.get(upr.getUnitPosition().getId())));
         });
         return unitPositionWtaDTOS;
     }

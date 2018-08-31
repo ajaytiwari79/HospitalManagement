@@ -3,6 +3,7 @@ package com.kairos.persistence.model.staffing_level;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.staffing_level.StaffingLevelSetting;
+import com.kairos.activity.staffing_level.StaffingLevelTemplatePeriod;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.enums.Day;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -16,9 +17,9 @@ import java.util.*;
 public class StaffingLevelTemplate extends MongoBaseEntity{
     private String name;
     private Long unitId;
-    private com.kairos.persistence.model.staffing_level.StaffingLevelTemplatePeriod validity;
-    private List<Long> dayType=new ArrayList<Long>();
-    private List<Day> validDays =new ArrayList<Day>();
+    private StaffingLevelTemplatePeriod validity;
+    private Set<Long> dayType=new HashSet<>();
+    private List<Day> validDays =new ArrayList<>();
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private boolean disabled;
@@ -28,7 +29,7 @@ public class StaffingLevelTemplate extends MongoBaseEntity{
     }
 
     public StaffingLevelTemplate(String name, List<Day> validDayTypes,
-                                 com.kairos.persistence.model.staffing_level.StaffingLevelTemplatePeriod validity, StaffingLevelSetting staffingLevelSetting) {
+                                 StaffingLevelTemplatePeriod validity, StaffingLevelSetting staffingLevelSetting) {
         this.name=name;
         this.validDays = validDayTypes;
         this.validity = validity;
@@ -43,11 +44,11 @@ public class StaffingLevelTemplate extends MongoBaseEntity{
         this.name = name;
     }
 
-    public List<Long> getDayType() {
+    public Set<Long> getDayType() {
         return dayType;
     }
 
-    public void setDayType(List<Long> dayType) {
+    public void setDayType(Set<Long> dayType) {
         this.dayType = dayType;
     }
     public List<Day> getValidDays() {
@@ -58,11 +59,11 @@ public class StaffingLevelTemplate extends MongoBaseEntity{
         this.validDays = validDays;
     }
 
-    public com.kairos.persistence.model.staffing_level.StaffingLevelTemplatePeriod getValidity() {
+    public StaffingLevelTemplatePeriod getValidity() {
         return validity;
     }
 
-    public void setValidity(com.kairos.persistence.model.staffing_level.StaffingLevelTemplatePeriod validity) {
+    public void setValidity(StaffingLevelTemplatePeriod validity) {
         this.validity = validity;
     }
 

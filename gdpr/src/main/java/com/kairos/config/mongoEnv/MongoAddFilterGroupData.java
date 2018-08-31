@@ -1,7 +1,7 @@
 package com.kairos.config.mongoEnv;
 
 
-import com.kairos.dto.master_data.ModuleIdDTO;
+import com.kairos.gdpr.master_data.ModuleIdDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.repository.filter.FilterMongoRepository;
@@ -55,7 +55,7 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
             List<ModuleIdDTO> moduleIdDTOs = new ArrayList<>();
             ModuleIdDTO moduleIdDto = new ModuleIdDTO(CLAUSE_MODULE_NAME, CLAUSE_MODULE_ID, false, true);
             moduleIdDTOs.add(moduleIdDto);
-            List<FilterType> filterTypes = new ArrayList<FilterType>();
+            List<FilterType> filterTypes = new ArrayList<>();
             filterTypes.add(FilterType.ORGANIZATION_TYPES);
             filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
             filterTypes.add(FilterType.ORGANIZATION_SERVICES);
@@ -69,7 +69,7 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
             List<ModuleIdDTO> moduleIdDTOs = new ArrayList<>();
             ModuleIdDTO moduleIdDto = new ModuleIdDTO(ASSET_MODULE_NAME, ASSET_MODULE_ID, false, true);
             moduleIdDTOs.add(moduleIdDto);
-            List<FilterType> filterTypes = new ArrayList<FilterType>();
+            List<FilterType> filterTypes = new ArrayList<>();
             filterTypes.add(FilterType.ORGANIZATION_TYPES);
             filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
             filterTypes.add(FilterType.ORGANIZATION_SERVICES);
@@ -82,7 +82,7 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
             List<ModuleIdDTO> moduleIdDtoList = new ArrayList<>();
             ModuleIdDTO moduleIdDto = new ModuleIdDTO(MASTER_PROCESSING_ACTIVITY_MODULE_NAME, MASTER_PROCESSING_ACTIVITY_MODULE_ID, false, true);
             moduleIdDtoList.add(moduleIdDto);
-            List<FilterType> filterTypes = new ArrayList<FilterType>();
+            List<FilterType> filterTypes = new ArrayList<>();
             filterTypes.add(FilterType.ORGANIZATION_TYPES);
             filterTypes.add(FilterType.ORGANIZATION_SUB_TYPES);
             filterTypes.add(FilterType.ORGANIZATION_SERVICES);
@@ -93,7 +93,7 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
         }
 
         if (createFilterGroups.size() != 0) {
-            filterMongoRepository.saveAll(sequenceGenerator(createFilterGroups));
+            filterMongoRepository.saveAll(getNextSequence(createFilterGroups));
         }
         LOGGER.info("Filter group save Successfully");
 

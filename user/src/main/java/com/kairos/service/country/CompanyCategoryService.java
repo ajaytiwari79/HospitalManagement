@@ -1,13 +1,12 @@
 package com.kairos.service.country;
 
-import com.kairos.persistence.model.country.common.CompanyCategory;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.organization.company.CompanyCategoryResponseDTO;
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.user.organization.company_category.CompanyCategoryDTO;
-import com.kairos.service.UserBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.organization.company_category.CompanyCategoryDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,7 @@ import java.util.Optional;
  */
 @Service
 @Transactional
-public class CompanyCategoryService extends UserBaseService {
+public class CompanyCategoryService{
     @Inject
     CountryGraphRepository countryGraphRepository;
     @Inject
@@ -45,7 +44,7 @@ public class CompanyCategoryService extends UserBaseService {
 
         }
         CompanyCategory companyCategory = new CompanyCategory(companyCategoryDTO.getName().trim(), companyCategoryDTO.getDescription(), country.get());
-        save(companyCategory);
+        companyCategoryGraphRepository.save(companyCategory);
         return new CompanyCategoryDTO(companyCategory.getId(), companyCategory.getName(), companyCategory.getDescription());
     }
 
@@ -73,7 +72,7 @@ public class CompanyCategoryService extends UserBaseService {
         }
         companyCategory.setName(companyCategoryDTO.getName().trim());
         companyCategory.setDescription(companyCategoryDTO.getDescription());
-        save(companyCategory);
+        companyCategoryGraphRepository.save(companyCategory);
         return new CompanyCategoryResponseDTO(companyCategory.getId(), companyCategory.getName(), companyCategory.getDescription());
     }
 
@@ -84,7 +83,7 @@ public class CompanyCategoryService extends UserBaseService {
 
         }
         companyCategory.setDeleted(true);
-        save(companyCategory);
+        companyCategoryGraphRepository.save(companyCategory);
         return true;
     }
 

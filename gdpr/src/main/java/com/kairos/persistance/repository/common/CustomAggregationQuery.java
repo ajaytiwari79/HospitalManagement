@@ -112,21 +112,6 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String addNonDeletedAgreementSectionToAgreementTemplate() {
-        return "{  '$addFields':" +
-                "        {'agreementSections':" +
-                "       {'$filter' : { " +
-                "       'input': '$agreementSections'," +
-                "       'as': 'agreementSections', " +
-                "      'cond': {'$eq': ['$$agreementSections.deleted', false ]}" +
-                "     }}}}";
-
-
-    }
-
-
-
-
     public static String agreementTemplateProjectionBeforeGroupOperationForTemplateTypeAtIndexZero() {
         return "{'$project':{" +
                 "      'templateType':{'$arrayElemAt':['$templateType',0]}," +
@@ -143,41 +128,24 @@ public class CustomAggregationQuery {
 
     }
 
-    public static String agreementTemplateGroupOperation() {
-        return "{'$group':{"+
-                "   '_id':'$_id'," +
-                "   'agreementSections':{'$push':{ '$cond': [ { '$eq': [ '$agreementSections.deleted',false ] }, '$agreementSections', {} ] }}," +
-                "   'templateType':{'$first':'$templateType'}," +
-                "    'name':{'$first':'$name'}," +
-                "    'description':{'$first':'$description'}," +
-                "     'accountTypes':{'$first':'$accountTypes'}, " +
-                "    'organizationTypes':{'$first':'$organizationTypes'}," +
-                "    'organizationSubTypes':{'$first':'$organizationSubTypes'}," +
-                "    'organizationServices':{'$first':'$organizationServices'}," +
-                "    'organizationSubServices':{'$first':'$organizationSubServices'}} } ";
-
-
-    }
-
 
     public static String addNonDeletedTemplateTyeField() {
-        return  " {  '$addFields':" +
+        return " {  '$addFields':" +
                 "                {'templateTypes':" +
                 "                {'$filter' : { " +
                 "                'input': '$templateTypes'," +
                 "                'as': 'templateType', " +
                 "                'cond': {'$eq': ['$$templateType.deleted', false ]}" +
-                "                }}}}" ;
+                "                }}}}";
 
     }
-
-
 
 
     public static String masterAssetProjectionWithAssetType() {
         return " {" +
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "         'assetSubTypes':1," +
                 "         'name':1," +
                 "       'description':1," +
                 "       'organizationSubTypes':1," +
@@ -189,9 +157,6 @@ public class CustomAggregationQuery {
     }
 
 
-
-
-
     public static String assetProjectionWithMetaData() {
         return " {" +
                 "'$project':{" +
@@ -200,6 +165,7 @@ public class CustomAggregationQuery {
                 "'dataDisposal':{$arrayElemAt:['$dataDisposal',0]}," +
                 "'hostingProvider':{$arrayElemAt:['$hostingProvider',0]}," +
                 "  'name':1," +
+                "'assetSubTypes':1," +
                 "  'description':1," +
                 "  'hostingLocation':1," +
                 "  'managingDepartment':1," +
@@ -216,11 +182,51 @@ public class CustomAggregationQuery {
     }
 
 
+    public static String addNonDeletedSubProcessingActivityToProcessingActivity() {
+
+        return "  {'$addFields':" +
+                "                {'subProcessingActivities':         " +
+                "                    {" +
+                "                '$filter' : { " +
+                "                'input': '$subProcessingActivities'," +
+                "                'as': 'activity', " +
+                "                'cond': {'$eq': ['$$activity.deleted', false ]}" +
+                "                }}}}";
 
 
+    }
 
 
+    public static String metaDataGroupInheritParentOrgMetaDataAndOrganizationMetadata() {
+        return "{ $group: {" +
+                "    '_id': { 'name': '$name' },  " +
+                "    'rootObject': { '$addToSet': '$$ROOT' }," +
+                "  } }";
+    }
 
+    public static String metaDataProjectionForRemovingDuplicateInheritedMetaData(Long currentOrganizationId) {
+        return "{ '$project': {" +
+                "          'data':" +
+                "              {" +
+                "           '$cond': { 'if': { $gt: [ { '$size': '$rootObject' }, 1 ] },'then':{'$filter': {" +
+                "           'input': '$rootObject'," +
+                "           'as': 'rootObject'," +
+                "           'cond': { $eq: [ '$$rootObject.organizationId', " + currentOrganizationId + " ] }" +
+                "            }} ,else:'$rootObject' } }}  }";
+    }
+
+
+    public static String metaDataProjectionForAddingFinalDataObject() {
+        return "{ '$project': {" +
+                "          'data':{'$arrayElemAt':['$data',0]}," +
+                "          '_id':0" +
+                "   }}";
+    }
+
+
+    public static String metaDataReplaceRoot() {
+        return "{ '$replaceRoot' : { 'newRoot' : '$data' } }";
+    }
 
 
 }

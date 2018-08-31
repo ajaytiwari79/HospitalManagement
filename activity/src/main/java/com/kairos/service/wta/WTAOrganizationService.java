@@ -1,18 +1,22 @@
 package com.kairos.service.wta;
 
 
+import com.kairos.activity.cta.CTAResponseDTO;
+import com.kairos.activity.cta.CTAWTAWrapper;
 import com.kairos.activity.wta.basic_details.WTADTO;
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.organization.OrganizationDTO;
+import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,8 +50,8 @@ public class WTAOrganizationService extends MongoBaseService {
     @Inject private OrganizationRestClient organizationRestClient;
     @Inject private RuleTemplateService ruleTemplateService;
     @Inject private WTABuilderService wtaBuilderService;
-    @Autowired
-    private ExceptionService exceptionService;
+    @Inject private ExceptionService exceptionService;
+    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
 
     private final Logger logger = LoggerFactory.getLogger(WTAOrganizationService.class);
 
@@ -71,7 +76,7 @@ public class WTAOrganizationService extends MongoBaseService {
 
 
     public WTAResponseDTO updateWtaOfOrganization(Long unitId, BigInteger wtaId, WTADTO updateDTO) {
-        if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
+        if (DateUtils.getLocalDate(updateDTO.getStartDateMillis()).isBefore(LocalDate.now())) {
             exceptionService.actionNotPermittedException("message.wta.start-end-date",wtaId);
         }
         boolean isWTAAlreadyExists = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization(updateDTO.getName(), unitId, wtaId);
@@ -142,13 +147,11 @@ public class WTAOrganizationService extends MongoBaseService {
     }
 
 
-    public List<WTAResponseDTO> getAllWtaOfOrganizationByExpertise(Long unitId,Long expertiseId){
+    public CTAWTAWrapper getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId){
         List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWtaOfOrganizationByExpertise(unitId,expertiseId);
-        List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
-        wtaQueryResultDTOS.forEach(wta->{
-            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta,WTAResponseDTO.class));
-        });
-        return wtaResponseDTOS;
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS,WTAResponseDTO.class);
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getDefaultCTA(unitId,expertiseId);
+        return new CTAWTAWrapper(ctaResponseDTOS,wtaResponseDTOS);
     }
 
 

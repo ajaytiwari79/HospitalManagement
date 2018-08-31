@@ -1,13 +1,14 @@
 package com.kairos.activity.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.activity.activity.ActivityValidationError;
 import com.kairos.enums.Day;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffingLevelTemplateDTO {
     private BigInteger id;
@@ -16,12 +17,12 @@ public class StaffingLevelTemplateDTO {
     private Long unitId;
     private StaffingLevelTemplatePeriod validity;
     @NotNull
-    private List<Long> dayType=new ArrayList<>();
-    private List<Day> validDays =new ArrayList<Day>();
+    private Set<Long> dayType=new HashSet<>();
+    private List<Day> validDays =new ArrayList<>();
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private boolean disabled;
-    private boolean deleted ;
+    private List<ActivityValidationError> errors;
 
     public StaffingLevelTemplateDTO() {
         //default constructor
@@ -40,7 +41,7 @@ public class StaffingLevelTemplateDTO {
     }
 
     public String getName() {
-        return name;
+        return name.trim();
     }
 
     public void setName(String name) {
@@ -62,10 +63,12 @@ public class StaffingLevelTemplateDTO {
     public void setValidity(StaffingLevelTemplatePeriod validity) {
         this.validity = validity;
     }
-    public List<Long> getDayType() {
+
+    public Set<Long> getDayType() {
         return dayType;
     }
-    public void setDayType(List<Long> dayType) {
+
+    public void setDayType(Set<Long> dayType) {
         this.dayType = dayType;
     }
 
@@ -80,15 +83,9 @@ public class StaffingLevelTemplateDTO {
     public boolean isDisabled() {
         return disabled;
     }
+
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
-    }
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 
     public StaffingLevelSetting getStaffingLevelSetting() {
@@ -106,22 +103,11 @@ public class StaffingLevelTemplateDTO {
         this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 
+    public List<ActivityValidationError> getErrors() {
+        return Optional.ofNullable(errors).orElse(new ArrayList<>());
+    }
 
-//
-//    public static StaffingLevelTemplate buildStaffingLevelTemplate(StaffingLevelTemplateDTO staffingLevelTemplateDTO){
-//        StaffingLevelTemplate staffingLevelTemplate=new StaffingLevelTemplate();
-//        BeanUtils.copyProperties(staffingLevelTemplateDTO,staffingLevelTemplate);
-//        return staffingLevelTemplate;
-//
-//    }
-//
-//    public static StaffingLevelTemplate updateStaffingTemplate(BigInteger staffingTemplateId,StaffingLevelTemplateDTO staffingLevelTemplateDTO,
-//         StaffingLevelTemplate staffingLevelTemplate){
-//
-//        BeanUtils.copyProperties(staffingLevelTemplateDTO,staffingLevelTemplate);
-//        staffingLevelTemplate.setId(staffingTemplateId);
-//        return staffingLevelTemplate;
-//
-//    }
-
+    public void setErrors(List<ActivityValidationError> errors) {
+        this.errors = errors;
+    }
 }

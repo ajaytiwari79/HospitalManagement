@@ -3,7 +3,6 @@ package com.kairos.activity.time_bank;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.time.DayOfWeek;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -22,7 +21,7 @@ public class TimeBankIntervalDTO {
     private long paidoutChange;
     private long approvePayOut;
     private long requestPayOut;
-    private long totalDeltaBalanceConrection;
+    private long totalDeltaBalanceCorrection;
     private String phaseName;
     private String title;
     private TimeBankCTADistributionDTO timeBankDistribution;
@@ -30,6 +29,12 @@ public class TimeBankIntervalDTO {
     private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
     private String headerName;
 
+
+    public TimeBankIntervalDTO(long totalScheduledMin, long totalTimeBankDiff, String title) {
+        this.totalScheduledMin = totalScheduledMin;
+        this.totalTimeBankDiff = totalTimeBankDiff;
+        this.title = title;
+    }
 
     public TimeBankCTADistributionDTO getTimeBankDistribution() {
         return timeBankDistribution;
@@ -55,12 +60,12 @@ public class TimeBankIntervalDTO {
         this.totalContractedMin = totalContractedMin;
     }
 
-    public long getTotalDeltaBalanceConrection() {
-        return totalDeltaBalanceConrection;
+    public long getTotalDeltaBalanceCorrection() {
+        return totalDeltaBalanceCorrection;
     }
 
-    public void setTotalDeltaBalanceConrection(long totalDeltaBalanceConrection) {
-        this.totalDeltaBalanceConrection = totalDeltaBalanceConrection;
+    public void setTotalDeltaBalanceCorrection(long totalDeltaBalanceCorrection) {
+        this.totalDeltaBalanceCorrection = totalDeltaBalanceCorrection;
     }
 
     public void setTotalTimeBankDiff(int totalTimeBankDiff) {

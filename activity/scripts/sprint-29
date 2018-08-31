@@ -1,0 +1,83 @@
+// To change the key name in existing counters
+db.counter.updateMany({},{$rename:{"applicableFor":"supportedModuleTypes"}});
+
+//To set supportedModuleTypes in counters
+db.counter.updateMany({},{$set:{"supportedModuleTypes":["OPEN_SHIFT"]}});
+
+
+
+db.wtaBaseRuleTemplate.updateMany({},{$push:{"phaseTemplateValues" :{$each:[ {
+            "phaseId" : NumberLong(5),
+            "phaseName" : "REALTIME",
+            "staffValue" : NumberLong(0),
+            "managementValue" : NumberLong(0),
+            "disabled" : false,
+            "optionalFrequency" : NumberLong(0),
+            "optional" : false,
+            "sequence" : NumberLong(0),
+            "staffCanBeIgnore" : false,
+            "managementCanBeIgnore" : false
+        },
+        {
+            "phaseId" :NumberLong(6),
+            "phaseName" : "TIME & ATTENDANCE",
+            "staffValue" : NumberLong(0),
+            "managementValue" : NumberLong(0),
+            "disabled" : false,
+            "optionalFrequency" :NumberLong(0),
+            "optional" : false,
+            "sequence" : NumberLong(0),
+            "staffCanBeIgnore" : false,
+            "managementCanBeIgnore" : false
+        },
+        {
+            "phaseId" : NumberLong(7),
+            "phaseName" : "TENTATIVE",
+            "staffValue" : NumberLong(0),
+            "managementValue" : NumberLong(0),
+            "disabled" : false,
+            "optionalFrequency" : NumberLong(0),
+            "optional" : false,
+            "sequence" : NumberLong(0),
+            "staffCanBeIgnore" : false,
+            "managementCanBeIgnore" : false
+        },
+        {
+            "phaseId" : NumberLong(8),
+            "phaseName" : "PAYROLL",
+            "staffValue" : NumberLong(0),
+            "managementValue" :NumberLong(0),
+            "disabled" : false,
+            "optionalFrequency" : NumberLong(0),
+            "optional" : false,
+            "sequence" : NumberLong(0),
+            "staffCanBeIgnore" : false,
+            "managementCanBeIgnore" : false
+        }]}}});
+
+db.getCollection('tableSetting').remove({"tableConfigurations.tableId":{$in:["36","35"]}})
+
+
+
+//set phaseEnum in phase table
+
+db.getCollection('phases').updateMany({"name":"REQUEST"},{$set:{"phaseEnum":"REQUEST","flippingDefaultTime":"23:59:59"}})
+db.getCollection('phases').updateMany({"name":"PUZZLE"},{$set:{"phaseEnum":"PUZZLE","flippingDefaultTime":"23:59:59"}})
+db.getCollection('phases').updateMany({"name":"CONSTRUCTION"},{$set:{"phaseEnum":"CONSTRUCTION","flippingDefaultTime":"23:59:59"}})
+db.getCollection('phases').updateMany({"name":"DRAFT"},{$set:{"phaseEnum":"DRAFT","flippingDefaultTime":"23:59:59"}})
+db.getCollection('phases').updateMany({"name":"REALTIME"},{$set:{"phaseEnum":"REALTIME"}})
+db.getCollection('phases').updateMany({"name":"TIME & ATTENDANCE"},{$set:{"phaseEnum":"TIME_ATTENDANCE"}})
+db.getCollection('phases').updateMany({"name":"TENTATIVE"},{$set:{"phaseEnum":"TENTATIVE"}})
+db.getCollection('phases').updateMany({"name":"PAYROLL"},{$set:{"phaseEnum":"PAYROLL"}})
+
+//set flipping time of planning period phase
+db.planningPeriod.find().forEach(function(e){
+    var t=e.phaseFlippingDate;
+    t.forEach(function(e){
+        if(e.flippingDate!=null){
+        e.flippingTime="23:59:59"}
+        });
+db.planningPeriod.update({_id:e._id},{$set:{phaseFlippingDate:t}})})
+
+
+db.workingTimeAgreement.updateMany({"disabled":{"$exists":false}},{$set:{disabled:false}})

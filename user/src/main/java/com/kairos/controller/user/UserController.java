@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.PARENT_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
 /**
@@ -129,6 +130,13 @@ public class UserController {
     @ApiOperation("get staff ids by userid")
     ResponseEntity<Map<String, Object>> getStaffIdsAndReasonCodeByUserId(@PathVariable long userId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdsAndReasonCodeByUserId(userId));
+    }
+
+    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/user/staffId")
+    @ApiOperation("get staffId by userId")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffIdOfLoggedInUser(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdOfLoggedInUser(unitId));
     }
 
 }

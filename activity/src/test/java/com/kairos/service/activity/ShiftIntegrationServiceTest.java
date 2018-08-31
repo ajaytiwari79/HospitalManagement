@@ -36,7 +36,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigInteger;
+import java.util.*;
 import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -149,8 +151,7 @@ public class ShiftIntegrationServiceTest {
         List<BigInteger> shifts = new ArrayList<>();
         shifts.add(new BigInteger("110"));
         shifts.add(new BigInteger("109"));
-
-        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, Collections.singletonList(ShiftStatus.FIXED));
+        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, Arrays.asList(ShiftStatus.FIXED));
 
         HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
 
@@ -171,7 +172,7 @@ public class ShiftIntegrationServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<Map<String, Object>>> response = testRestTemplate.exchange(
-                baseUrlForUnit + "/staff/8771/shifts_and_openshifts?employmentEndDate="+ DateUtils.getCurrentMillis(), HttpMethod.PUT, null, typeReference);
+                baseUrlForUnit + "/staff/8771/shifts_and_openshifts?employmentEndDate="+ DateUtils.getCurrentDayStartMillis(), HttpMethod.PUT, null, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 

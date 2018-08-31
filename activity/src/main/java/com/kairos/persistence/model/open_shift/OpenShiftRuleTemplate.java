@@ -1,16 +1,18 @@
 package com.kairos.persistence.model.open_shift;
 
-import com.kairos.activity.open_shift.Priority;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.enums.AllowedLength;
-import com.kairos.enums.OpenShiftRuleTemplateType;
 import com.kairos.activity.open_shift.ActivitiesPerTimeType;
 import com.kairos.activity.open_shift.PlannerNotificationInfo;
+import com.kairos.activity.open_shift.Priority;
 import com.kairos.activity.open_shift.ShiftAssignmentCriteria;
+import com.kairos.enums.AllowedLength;
+import com.kairos.enums.OpenShiftRuleTemplateType;
+import com.kairos.persistence.model.common.MongoBaseEntity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.List;
 
+@Document
 public class OpenShiftRuleTemplate extends MongoBaseEntity {
 
     private String name;

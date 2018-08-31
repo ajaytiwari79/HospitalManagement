@@ -1,12 +1,12 @@
 package com.kairos.service.country;
+
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.model.country.DayType;
+import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
-import com.kairos.service.UserBaseService;
 import com.kairos.util.DateUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,14 +20,16 @@ import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oodles on 20/9/16.
  */
 @Service
 @Transactional
-public class CountryHolidayCalenderService extends UserBaseService {
+public class CountryHolidayCalenderService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     List<CountryHolidayCalender> countryHolidayCalenderList;
@@ -41,28 +43,6 @@ public class CountryHolidayCalenderService extends UserBaseService {
     private DayTypeGraphRepository dayTypeGraphRepository ;
     @Inject
     private CountryGraphRepository countryGraphRepository;
-
-    /**
-     *
-     * @param id
-     * @return
-     */
-    public CountryHolidayCalender getCountryCalenderById(Long id){
-        return (CountryHolidayCalender) super.findOne(id);
-    }
-
-
-
-
-    /**
-     *
-     * @param countryHolidayCalender
-     * @return
-     */
-    public CountryHolidayCalender createCountryCalender(CountryHolidayCalender countryHolidayCalender){
-        return save(countryHolidayCalender);
-    }
-
 
 
 

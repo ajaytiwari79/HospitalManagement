@@ -20,7 +20,7 @@ public class UnitPositionDTO {
     @NotNull(message = "expertise is required for position")
     @Range(min = 0, message = "expertise is required for position")
     private Long expertiseId;
-
+    private Long id;
     private LocalDate startLocalDate;
     private LocalDate endLocalDate;
     private LocalDate lastWorkingLocalDate;
@@ -34,17 +34,26 @@ public class UnitPositionDTO {
     private int workingDaysInWeek;
     private float hourlyWages;
     private Double salary;
-    @NotNull(message = "employmentTypeId can't be null")
     private Long employmentTypeId;
     @NotNull(message = "employmentTypeCategory can't be null")
     private EmploymentCategory employmentTypeCategory;
     @NotNull(message = "wta can't be null")
     private BigInteger wtaId;
-    private Long ctaId;
+    @NotNull(message = "cta can't be null")
+    private BigInteger ctaId;
     @NotNull(message = "staffId is missing")
     @Range(min = 0, message = "staffId is missing")
     private Long staffId;
     // private Long expiryDate;
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     private Long unionId;
     private Long parentUnitId;
@@ -60,6 +69,7 @@ public class UnitPositionDTO {
     private Long seniorityLevelId;
     private Set<Long> functionIds = new HashSet<>();
     private Long timeCareExternalId;
+    private boolean published;
 
     public Long getAccessGroupIdOnEmploymentEnd() {
         return accessGroupIdOnEmploymentEnd;
@@ -74,6 +84,14 @@ public class UnitPositionDTO {
         //default cons
     }
 
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
 
     public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
                            float avgDailyWorkingHours, float hourlyWages, Double salary, Long employmentTypeId) {
@@ -91,7 +109,7 @@ public class UnitPositionDTO {
 
 
     public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId,
-                           Long staffId, BigInteger wtaId, Long ctaId, Long unitId, Long timeCareExternalId) {
+                           Long staffId, BigInteger wtaId, BigInteger ctaId, Long unitId, Long timeCareExternalId) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.employmentTypeId = employmentTypeId;
@@ -108,6 +126,7 @@ public class UnitPositionDTO {
         this.unitId = unitId;
         this.workingDaysInWeek = workingDaysInWeek;
     }
+
 
 
     public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
@@ -182,11 +201,11 @@ public class UnitPositionDTO {
         this.wtaId = wtaId;
     }
 
-    public Long getCtaId() {
+    public BigInteger getCtaId() {
         return ctaId;
     }
 
-    public void setCtaId(Long ctaId) {
+    public void setCtaId(BigInteger ctaId) {
         this.ctaId = ctaId;
     }
 

@@ -1,9 +1,9 @@
 package com.kairos.service.country;
-import com.kairos.persistence.model.country.common.BusinessType;
+
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +17,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class BusinessTypeService extends UserBaseService {
+public class BusinessTypeService {
 
     @Inject
     private BusinessTypeGraphRepository businessTypeGraphRepository;
@@ -29,7 +29,7 @@ public class BusinessTypeService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         if (country!=null){
             businessType.setCountry(country);
-            save(businessType);
+            businessTypeGraphRepository.save(businessType);
             return businessType.retrieveDetails();
         }
         return null;
@@ -53,7 +53,7 @@ public class BusinessTypeService extends UserBaseService {
         if (currentBusinessType!=null){
             currentBusinessType.setName(businessType.getName());
             currentBusinessType.setDescription(businessType.getDescription());
-             save(currentBusinessType);
+            businessTypeGraphRepository.save(currentBusinessType);
             return currentBusinessType.retrieveDetails();
         }
         return null;
@@ -63,7 +63,7 @@ public class BusinessTypeService extends UserBaseService {
         BusinessType businessType = businessTypeGraphRepository.findOne(businessTypeId);
         if (businessType!=null){
             businessType.setEnabled(false);
-            save(businessType);
+            businessTypeGraphRepository.save(businessType);
             return true;
         }
         return false;
