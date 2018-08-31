@@ -9,11 +9,11 @@ import java.util.Set;
 
 public interface CustomDataCategoryRepository {
 
-    DataCategory findByName(Long countryId, Long organizationId, String name);
+    DataCategory findByName(Long countryId, String name);
 
-    DataCategoryResponseDTO getDataCategoryWithDataElementById(Long countryId, Long organizationId, BigInteger id);
+    DataCategoryResponseDTO getDataCategoryWithDataElementById(Long countryId, BigInteger id);
 
-    List<DataCategoryResponseDTO> getAllDataCategoryWithDataElement(Long countryId, Long organizationId);
+    List<DataCategoryResponseDTO> getAllDataCategoryWithDataElement(Long countryId);
 
     List<DataCategory> findByNamesAndUnitId(Long unitId, Set<String> names);
 
