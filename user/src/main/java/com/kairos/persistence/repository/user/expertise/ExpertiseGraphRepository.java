@@ -22,9 +22,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise, Long> {
 
     @Query("MATCH (country:Country) where id(country)={0}  " +
-            "MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) where  expertise.startDateMillis<={1} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis > {1}) " +
+            "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) " +
             "return expertise")
-    List<Expertise> getAllExpertiseByCountry(long countryId, Long selectedDateMillis);
+    List<Expertise> getAllExpertiseByCountry(long countryId);
 
     @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) return expertise LIMIT 1")
     Expertise getOneDefaultExpertiseByCountry(long countryId);
@@ -71,7 +71,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     Expertise getExpertiesByCountry(Long id);
 
 
-    @Query("MATCH (org:Organization) - [:" + BELONGS_TO + "] -> (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false})  where id(org)={0} return expertise")
+    @Query("MATCH (org:Organization) - [:" + BELONGS_TO + "] -> (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true})  where id(org)={0} return expertise")
     List<Expertise> getAllExpertiseByOrganizationId(long unitId);
 
 
