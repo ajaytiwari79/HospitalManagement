@@ -178,6 +178,8 @@ public class CompanyCreationService {
             }
             organization.setAccountType(accountType);
             //accountType is Changed for parent organization We need to add this account type to child organization as well
+            if(!organization.getChildren().isEmpty())
+
             organizationGraphRepository.updateAccountTypeOfChildOrganization(organization.getId(), accountType.getId());
 
         }
