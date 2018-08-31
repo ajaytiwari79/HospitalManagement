@@ -299,7 +299,7 @@ public class DateUtils {
         Date date ;
         date = localDate != null
                                 ? Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
-                                : Date.from(Instant.from(LocalDate.now().atStartOfDay()));
+                                : Date.from(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC));
         return date;
     }
 
@@ -663,5 +663,8 @@ public class DateUtils {
     public static int getWeekNumberByLocalDate(LocalDate localDate){
         TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         return localDate.get(woy);
+    }
+    public static Date getDateAfterDaysWithTime(short daysAfter,int startHour){
+        return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atStartOfDay().with(LocalTime.of(startHour, 00)).toInstant(ZoneOffset.UTC));
     }
 }

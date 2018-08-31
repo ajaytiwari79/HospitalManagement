@@ -34,7 +34,9 @@ public class Shift extends MongoBaseEntity {
     @Indexed
     private BigInteger activityId;
     private Long staffId;
-    private Phase phase;
+    private Phase phase;// todo REMOVE VIPUL
+    private BigInteger phaseId;
+    private BigInteger planningPeriodId;
     private Integer weekCount;
     @Indexed
     private Long unitId;
@@ -57,6 +59,7 @@ public class Shift extends MongoBaseEntity {
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
     private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
+    private boolean sickShift;
 
     public Shift() {
         //dc
@@ -77,7 +80,17 @@ public class Shift extends MongoBaseEntity {
         this.activityId = activityId;
 
     }
+    public Shift(Date startDate, Date endDate, Long staffId,BigInteger activityId,String name,Long unitPositionId,Long unitId) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.staffId = staffId;
+        this.activityId = activityId;
+        this.name=name;
+        this.unitPositionId=unitPositionId;
+        this.unitId=unitId;
+        this.sickShift=true;
 
+    }
     public List<BigInteger> getBrokenRuleTemplateIds() {
         return brokenRuleTemplateIds;
     }
@@ -376,6 +389,30 @@ public class Shift extends MongoBaseEntity {
 
     public void setPlannedTimeId(BigInteger plannedTimeId) {
         this.plannedTimeId = plannedTimeId;
+    }
+
+    public boolean isSickShift() {
+        return sickShift;
+    }
+
+    public void setSickShift(boolean sickShift) {
+        this.sickShift = sickShift;
+    }
+
+    public BigInteger getPhaseId() {
+        return phaseId;
+    }
+
+    public void setPhaseId(BigInteger phaseId) {
+        this.phaseId = phaseId;
+    }
+
+    public BigInteger getPlanningPeriodId() {
+        return planningPeriodId;
+    }
+
+    public void setPlanningPeriodId(BigInteger planningPeriodId) {
+        this.planningPeriodId = planningPeriodId;
     }
 
     public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, Set<ShiftStatus> status, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {

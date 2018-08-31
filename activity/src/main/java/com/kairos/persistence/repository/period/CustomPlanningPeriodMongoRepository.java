@@ -24,4 +24,5 @@ public interface CustomPlanningPeriodMongoRepository {
     PlanningPeriod findLastPlaningPeriodEndDate(Long unitId);
     List<PlanningPeriod> findAllPeriodsOfUnitByRequestPhaseId(Long unitId, String requestPhaseName);
     List<PeriodDTO> findAllPeriodsByStartDateAndLastDate(Long unitId, LocalDate startDate, LocalDate endDate);
+    PlanningPeriod findCurrentDatePlanningPeriod(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate);
 }
