@@ -2,7 +2,7 @@ package com.kairos.activity.staffing_level;
 
 import java.util.HashSet;
 import java.util.Set;
-@Deprecated
+
 /**
  * Instead use {@link com.kairos.activity.staffing_level.StaffingLevelInterval}
  */

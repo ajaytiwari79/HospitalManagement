@@ -1,17 +1,19 @@
 package com.planner.constants;
 
-/**
- * @author pradeep
- * @date - 28/6/18
- */
+
 
 public class AppConstants {
 
+    /**
+     * @author pradeep
+     * @date - 28/6/18
+     */
     public static final String DROOL_FILE_EXTENTION = ".drl";
     public static final String DROOL_BASE_FILE = "Base_vrp_task_rules";
 
     /**
      * Neo4j Configuration constants
+     *
      * @author mohit
      */
     public static final String NEO4J_URI = "spring.data.neo4j.uri";
@@ -19,5 +21,11 @@ public class AppConstants {
     public static final String NEO4J_PASSWORD = "spring.data.neo4j.password";
     public static final String CONNECTION_POOL_SIZE = "spring.data.neo4j.connection.pool.size";
 
-
+    /**
+     *MongoDb {Collections} Constants for Activity micro-service
+     * @author mohit
+     * @date 31-8-17
+     */
+    public static final String STAFFING_LEVEL="staffing_level";
+    public static final String ACTIVITYIES="activities";
 }
