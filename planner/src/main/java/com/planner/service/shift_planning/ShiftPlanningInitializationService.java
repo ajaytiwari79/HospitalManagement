@@ -23,6 +23,9 @@ public class ShiftPlanningInitializationService {
     @Inject
     private ActivityMongoService activityMongoService;
 
+    @Inject
+    private UserNeo4jService userNeo4jService;
+
     /**
      *Only Method Responsible to prepare shiftPlanningInitialization Data
      */
