@@ -2,7 +2,9 @@ package com.kairos.response.dto.web.staff;
 
 import com.kairos.user.reason_code.ReasonCodeDTO;
 
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 
 public class StaffResultDTO {
@@ -11,8 +13,13 @@ public class StaffResultDTO {
     private String unitName;
     private String timeZone;
     private List<ReasonCodeDTO> reasonCodes;
+    private Set<BigInteger> allowedTimeTypesForSick;  // added by vipul for
     public Long getStaffId() {
         return staffId;
+    }
+
+    public StaffResultDTO() {
+        //dc
     }
 
     public void setStaffId(Long staffId) {
@@ -49,5 +56,13 @@ public class StaffResultDTO {
 
     public void setReasonCodes(List<ReasonCodeDTO> reasonCodes) {
         this.reasonCodes = reasonCodes;
+    }
+
+    public Set<BigInteger> getAllowedTimeTypesForSick() {
+        return allowedTimeTypesForSick;
+    }
+
+    public void setAllowedTimeTypesForSick(Set<BigInteger> allowedTimeTypesForSick) {
+        this.allowedTimeTypesForSick = allowedTimeTypesForSick;
     }
 }

@@ -37,4 +37,7 @@ public class SickController {
     public ResponseEntity<Map<String,Object>> markUserAsFine(){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,null);
     }
+
+
+
 }

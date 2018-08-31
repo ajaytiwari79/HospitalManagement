@@ -11,12 +11,12 @@ import java.util.Set;
 public interface CustomDataSubjectMappingRepository {
 
 
-    DataSubjectMapping findByName(Long countryId, Long organizationId, String name);
+    DataSubjectMapping findByName(Long countryId, String name);
 
 
-    DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, Long organizationId, BigInteger dataSubjectId);
+    DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, BigInteger dataSubjectId);
 
-    List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, Long organizationId);
+    List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId);
 
     List<DataSubjectMapping> findByNameListAndUnitId(Long unitId, Set<String> names);
 

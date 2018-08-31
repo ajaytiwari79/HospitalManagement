@@ -27,7 +27,7 @@ public class SickConfiguration extends UserBaseEntity {
     private Organization organization;
 
     public SickConfiguration() {
-        // dc
+        // DC
     }
 
     public Set<BigInteger> getTimeTypes() {

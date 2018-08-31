@@ -296,9 +296,10 @@ public class DateUtils {
 
 
     public static Date getDateFromLocalDate(LocalDate localDate) {
-        Date date = null;
-        if (localDate != null)
-            date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date date ;
+        date = localDate != null
+                                ? Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                                : Date.from(Instant.from(LocalDate.now().atStartOfDay()));
         return date;
     }
 

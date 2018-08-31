@@ -46,6 +46,7 @@ public class RulesActivityTabDTO {
     private DurationField approvalTimeInAdvance;
     private Float approvalPercentage;
     private LocalTime maximumEndTime;
+    private boolean allowedAutoAbsence;
     private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --
     private byte recurrenceTimes;// -- the  shift of that staff will be entered.
 
@@ -283,11 +284,19 @@ public class RulesActivityTabDTO {
         this.recurrenceTimes = recurrenceTimes;
     }
 
+    public boolean isAllowedAutoAbsence() {
+        return allowedAutoAbsence;
+    }
+
+    public void setAllowedAutoAbsence(boolean allowedAutoAbsence) {
+        this.allowedAutoAbsence = allowedAutoAbsence;
+    }
+
     public RulesActivityTab buildRulesActivityTab() {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
 
                 eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
-                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage,maximumEndTime,cutOffdayValue,cutOffIntervalUnit,cutOffStartFrom,recurrenceDays,recurrenceTimes);
+                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage,maximumEndTime,cutOffdayValue,cutOffIntervalUnit,cutOffStartFrom,recurrenceDays,recurrenceTimes,allowedAutoAbsence);
 
         return rulesActivityTab;
     }
