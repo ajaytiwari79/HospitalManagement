@@ -7,7 +7,9 @@ import com.kairos.activity.period.PeriodPhaseDTO;
 import com.kairos.activity.period.PlanningPeriodDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.SchedulerPanelDTO;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.persistence.model.period.PlanningPeriod;
@@ -323,6 +325,28 @@ public class PlanningPeriodService extends MongoBaseService {
             }
         }
         createPlanningPeriod(unitId, planningPeriodDTO.getStartDate(), planningPeriods, phases, planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
+        save(planningPeriods);
+       // Map<BigInteger,PlanningPeriod>  planningPeriodMap=new HashMap<>();
+        List<SchedulerPanelDTO> schedulerPanelDTOS=new ArrayList<>();
+        planningPeriods.parallelStream().forEach(planningPeriod -> {
+         //   planningPeriodMap.put(planningPeriod.getId(),planningPeriod);
+            planningPeriod.getPhaseFlippingDate().parallelStream().forEach(periodPhaseFlippingDate -> {
+                    schedulerPanelDTOS.add(new SchedulerPanelDTO(JobSubType.PLANNING_PHASE_FLIPPING,true,LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(),periodPhaseFlippingDate.getFlippingTime()),planningPeriod.getId()));
+            });
+        });
+        Map<LocalDateTime,SchedulerPanelDTO> localDateTimeSchedulerPanelDTOHashMap=new HashMap<>();
+        List<SchedulerPanelDTO> schedulerPanelDTOS1=new ArrayList<>();
+        Map<BigInteger,List<SchedulerPanelDTO>> schedulerPanelDTOMap=schedulerPanelDTOS1.parallelStream().collect(Collectors.groupingBy(o -> o.getEntityId(),Collectors.toList()));
+        planningPeriods.parallelStream().forEach(planningPeriod -> {
+            List<SchedulerPanelDTO> schedulerPanelDTO=schedulerPanelDTOMap.get(planningPeriod.getId());
+              schedulerPanelDTO.parallelStream().forEach(schedulerPanelDTO1 -> {
+                  localDateTimeSchedulerPanelDTOHashMap.put(schedulerPanelDTO1.getOneTimeTriggerDate(),schedulerPanelDTO1);
+              });
+        });
+        planningPeriods.parallelStream().flatMap(planningPeriod -> planningPeriod.getPhaseFlippingDate().stream()).forEach(periodPhaseFlippingDate -> {
+            SchedulerPanelDTO schedulerPanelDTO=localDateTimeSchedulerPanelDTOHashMap.get(LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(),periodPhaseFlippingDate.getFlippingTime()));
+                periodPhaseFlippingDate.setSchedulerPanelId(schedulerPanelDTO.getId());
+        });
         save(planningPeriods);
         return getPlanningPeriods(unitId,planningPeriodDTO.getStartDate(),(planningPeriodDTO.getEndDate()!=null)?planningPeriodDTO.getEndDate():null);
     }
