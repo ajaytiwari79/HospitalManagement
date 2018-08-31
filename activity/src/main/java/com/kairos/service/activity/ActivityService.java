@@ -1118,7 +1118,7 @@ public class ActivityService extends MongoBaseService {
         save(activityCopied);
 
         // copying activity and shift status settings of this activity
-        copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId());
+        copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId(),null);
         activityDTO.setId(activityCopied.getId());
         PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
         BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
@@ -1196,12 +1196,14 @@ public class ActivityService extends MongoBaseService {
 
     }
 
-    public void copyActivityAndShiftStatusOfThisActivity(BigInteger activityId,BigInteger newActivityId){
+    public void copyActivityAndShiftStatusOfThisActivity(BigInteger activityId,BigInteger newActivityId,Long unitId){
         List<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findAllByActivityId(activityId);
+        Set<Long> accessGroupIds=activityAndShiftStatusSettings.stream().
 
         if(!activityAndShiftStatusSettings.isEmpty()){
             activityAndShiftStatusSettings.forEach(currentActivityAndShiftStatusSettings->{
                 currentActivityAndShiftStatusSettings.setId(null);
+                currentActivityAndShiftStatusSettings.setUnitId(unitId);
                 currentActivityAndShiftStatusSettings.setActivityId(newActivityId);
             });
             save(activityAndShiftStatusSettings);
