@@ -74,12 +74,13 @@ public class ShiftSickService extends MongoBaseService {
         short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
         List<Shift> shifts = new ArrayList<>();
         while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 1) {
+            shiftNeedsToAddForDays--;
             Date startDate = DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, 9);
             Date endDate = DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, 18);
             shifts.add(new Shift(startDate, endDate, staffId, activityId, activity.getName(), staffUnitPositionDetails.getId(), unitId));
-            shiftNeedsToAddForDays--;
         }
-        save(shifts);
+        if (!shifts.isEmpty())
+            save(shifts);
         return unitId;
     }
 }
