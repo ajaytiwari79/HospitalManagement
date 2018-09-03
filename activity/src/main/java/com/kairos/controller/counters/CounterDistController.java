@@ -80,7 +80,7 @@ public class CounterDistController {
 
     @GetMapping(COUNTER_DIST_URL+"/staff/category")
     public ResponseEntity<Map<String, Object>> getInitialCategoryKPIDistributionDataForStaff(@PathVariable Long organizationId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistDataForStaff(organizationId, ConfLevel.STAFF));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistDataForStaff(organizationId));
     }
 
     //Tab kpi Apis

@@ -2112,8 +2112,8 @@ public class StaffService {
     }
 
     public AccessGroupCounterQueryResult getAccessGroupIdsOfStaff(Long unitId) {
-        Long staffId=getStaffIdOfLoggedInUser(unitId);
         AccessGroupCounterQueryResult accessGroupCounterQueryResult=new AccessGroupCounterQueryResult();
+        Long staffId=getStaffIdOfLoggedInUser(unitId);
         if(staffId==null){
             Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
             staffId= staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
