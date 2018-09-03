@@ -39,10 +39,14 @@ public class ScheduledHoursService implements CounterService {
         shifts.forEach(shift -> { });
         return 0;
     }
-    @Override
-    public Map getCalculatedResults(Map<FilterType, List> availableCriteria) {
-        Map applicableCriteria = getApplicableCriteria(availableCriteria);
 
+    @Override
+    public Map getCalculatedCounter(Map<FilterType, List> providedFiltersMap) {
+        return null;
+    }
+
+    @Override
+    public Map getCalculatedKPI(Map<FilterType, List> providedFilterMap) {
         return null;
     }
 }

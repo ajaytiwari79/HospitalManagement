@@ -32,5 +32,7 @@ public interface CounterService {
         return applicableCriteria;
     }
 
-    Map getCalculatedResults(Map<FilterType, List> providedFiltersMap);
+    Map getCalculatedCounter(Map<FilterType, List> providedFiltersMap);
+
+    Map getCalculatedKPI(Map<FilterType, List> providedFilterMap);
 }
