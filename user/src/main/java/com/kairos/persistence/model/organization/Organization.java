@@ -207,7 +207,7 @@ public class Organization extends UserBaseEntity {
     private String shortCompanyName;
     @Relationship(type = HAS_COMPANY_CATEGORY)
     private CompanyCategory companyCategory;
-    private Integer kairosCompanyId;
+    private String kairosCompanyId;
     private CompanyType companyType;
 
     private String vatId;
@@ -225,16 +225,16 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = HAS_UNIT_TYPE)
     private UnitType unitType;
 
-    private String kairosId;
+
     //set o.nightStartTimeFrom="22:15",o.nightEndTimeTo="07:15"
 
     public Organization() {
     }
 
 
-    public Organization(Long id, String name, String description, boolean isPrekairos, String desiredUrl, String shortCompanyName, Integer kairosCompanyId, CompanyType companyType,
+    public Organization(Long id, String name, String description, boolean isPrekairos, String desiredUrl, String shortCompanyName, String kairosCompanyId, CompanyType companyType,
                         String vatId, List<BusinessType> businessTypes, OrganizationType organizationType, List<OrganizationType> organizationSubTypes, CompanyUnitType companyUnitType,
-                        CompanyCategory companyCategory, ZoneId timeZone, String childLevel, boolean isParentOrganization, Country country, AccountType accountType, boolean boardingCompleted, String kairosId,
+                        CompanyCategory companyCategory, ZoneId timeZone, String childLevel, boolean isParentOrganization, Country country, AccountType accountType, boolean boardingCompleted,
                         List<Group> groupList, List<Organization> children, UnitType unitType) {
         this.name = name;
         this.description = description;
@@ -257,7 +257,7 @@ public class Organization extends UserBaseEntity {
         this.accountType = accountType;
         this.companyType = companyType;
         this.boardingCompleted = boardingCompleted;
-        this.kairosId = kairosId;
+
         this.groupList = groupList;
         this.children = children;
         this.unitType = unitType;
@@ -362,7 +362,7 @@ public class Organization extends UserBaseEntity {
     }
 
     public List<Organization> getChildren() {
-        return children;
+        return java.util.Optional.ofNullable(children).orElse(new ArrayList<>());
 
     }
 
@@ -858,11 +858,11 @@ public class Organization extends UserBaseEntity {
         this.shortCompanyName = shortCompanyName;
     }
 
-    public Integer getKairosCompanyId() {
+    public String getKairosCompanyId() {
         return kairosCompanyId;
     }
 
-    public void setKairosCompanyId(Integer kairosCompanyId) {
+    public void setKairosCompanyId(String kairosCompanyId) {
         this.kairosCompanyId = kairosCompanyId;
     }
 
@@ -944,14 +944,6 @@ public class Organization extends UserBaseEntity {
 
     public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
-    }
-
-    public String getKairosId() {
-        return kairosId;
-    }
-
-    public void setKairosId(String kairosId) {
-        this.kairosId = kairosId;
     }
 
     public UnitType getUnitType() {
