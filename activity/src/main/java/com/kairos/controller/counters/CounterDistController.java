@@ -108,6 +108,7 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
+    //staff will send list of KPITabMappings
     @PostMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addTabKPIsEntryForStaff(@PathVariable Long unitId,@PathVariable Long staffId,@RequestBody TabKPIEntryConfDTO tabKPIEntry){
         counterManagementService.addTabKPIEntries(tabKPIEntry,null,unitId,staffId,ConfLevel.STAFF);
