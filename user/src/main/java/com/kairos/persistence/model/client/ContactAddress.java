@@ -10,7 +10,6 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.springframework.beans.BeanUtils;
 
 import javax.validation.constraints.NotNull;
 
@@ -24,7 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NodeEntity
 public class ContactAddress extends UserBaseEntity implements Cloneable{
 
-    private String street1;
+    private String street;
 
     private int floorNumber;
 
@@ -113,8 +112,8 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
     public ContactAddress() {
     }
 
-    public ContactAddress(String street1, int floorNumber,String houseNumber, ZipCode zipCode) {
-        this.street1 = street1;
+    public ContactAddress(String street, int floorNumber, String houseNumber, ZipCode zipCode) {
+        this.street = street;
         this.floorNumber = floorNumber;
         this.houseNumber = houseNumber;
         this.zipCode = zipCode;
@@ -210,12 +209,12 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
         this.latitude = latitude;
     }
 
-    public String getStreet1() {
-        return street1;
+    public String getStreet() {
+        return street;
     }
 
-    public void setStreet1(String street1) {
-        this.street1 = street1;
+    public void setStreet(String street) {
+        this.street = street;
     }
 
     public int getFloorNumber() {
@@ -332,7 +331,7 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
     }
 
     public ContactAddress copyProperties(ContactAddress source){
-        this.street1 = source.street1;
+        this.street = source.street;
         this.zipCode = source.getZipCode();
         this.city = source.getCity();
         this.floorNumber = source.getFloorNumber();
@@ -340,11 +339,11 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
         this.isVerifiedByVisitour = source.isVerifiedByVisitour;
         return this;
     }
-    public ContactAddress(String houseNumber, Integer floorNumber, String street1, String city, String regionName, String country, Float latitude, Float longitude,
-                             String province, String streetUrl, Boolean addressProtected, Boolean verifiedByVisitour) {
+    public ContactAddress(String houseNumber, Integer floorNumber, String street, String city, String regionName, String country, Float latitude, Float longitude,
+                          String province, String streetUrl, Boolean addressProtected, Boolean verifiedByVisitour) {
         this.houseNumber = houseNumber;
         this.floorNumber = floorNumber;
-        this.street1 = street1;
+        this.street = street;
         this.city = city;
         this.regionName = regionName;
         this.country = country;

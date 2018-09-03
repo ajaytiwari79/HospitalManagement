@@ -30,7 +30,6 @@ public class OrganizationMetadataController {
 
     private static final String localAreaTagUrl = "/localAreaTags";
     private static final String organizationPaymentSettingsUrl = "/organization_payment_settings";
-    private static final String organizationBreakSettingsUrl = "/break_settings";
 
     @ApiOperation(value = "Get Local Area Tag for a unit")
     @RequestMapping(value = localAreaTagUrl, method = RequestMethod.GET)

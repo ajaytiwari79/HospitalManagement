@@ -602,7 +602,7 @@ public class BootDataService {
     }
 */    private void createCountryLevelOrganization() {
 
-        kairosCountryLevel = new Organization();
+        kairosCountryLevel = new OrganizationBuilder().createOrganization();
         kairosCountryLevel.setKairosHub(true);
         kairosCountryLevel.setBoardingCompleted(true);
         kairosCountryLevel.setFormalName("Kairos (HUB)");
@@ -620,7 +620,7 @@ public class BootDataService {
         contactAddress.setZipCode(allegade);
         contactAddress.setFloorNumber(10);
         contactAddress.setHouseNumber("403");
-        contactAddress.setStreet1("Kastanievej 1");
+        contactAddress.setStreet("Kastanievej 1");
         contactAddress.setLongitude(77.026638f);
         contactAddress.setLatitude(28.459497f);
         contactAddress.setMunicipality(frederiksberg);
@@ -763,7 +763,7 @@ public class BootDataService {
     private void createRegionLevelOrganization() {
 
 
-        kairosRegionLevel = new Organization();
+        kairosRegionLevel = new OrganizationBuilder().createOrganization();
         kairosRegionLevel.setFormalName("Kairos");
         kairosRegionLevel.setName("Kairos");
         kairosRegionLevel.setEanNumber("501234567890");
@@ -779,7 +779,7 @@ public class BootDataService {
         contactAddress.setZipCode(allegade);
         contactAddress.setFloorNumber(10);
         contactAddress.setHouseNumber("403");
-        contactAddress.setStreet1("Kastanievej 1");
+        contactAddress.setStreet("Kastanievej 1");
         contactAddress.setLongitude(77.026638f);
         contactAddress.setLatitude(28.459497f);
         contactAddress.setMunicipality(frederiksberg);

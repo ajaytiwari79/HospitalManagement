@@ -384,9 +384,9 @@ public class StaffService {
         organizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
 
         if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
-            expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId(), DateUtil.getCurrentDateMillis());
+            expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
         } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
-            expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId(), DateUtil.getCurrentDateMillis());
+            expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId());
         }
         personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
         personalInfo.put("personalInfo", retrievePersonalInfo(staff));
@@ -850,7 +850,7 @@ public class StaffService {
                         }
                     }
                     contactAddress.setHouseNumber(houseNumber);
-                    contactAddress.setStreet1(fullStreetName.toString());
+                    contactAddress.setStreet(fullStreetName.toString());
                     contactAddress.setCity(row.getCell(25).toString());
                 }
                 return contactAddress;
@@ -1055,7 +1055,10 @@ public class StaffService {
 
 
     public StaffDTO createStaffFromWeb(Long unitId, StaffCreationDTO payload) throws ParseException {
-
+         if(payload.getCprNumber().length()!=10)
+         {
+             exceptionService.invalidSize("message.cprNumber.size");
+         }
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
@@ -1104,16 +1107,16 @@ public class StaffService {
         return staffDTO;
     }
 
-    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData) {
-        User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
+    public User createUnitManagerForNewOrganization(Organization organization, StaffCreationDTO staffCreationData) {
+        User user = userGraphRepository.findByEmail(staffCreationData.getPrivateEmail().trim());
         if (!Optional.ofNullable(user).isPresent()) {
-            SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organizationId);
+            SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organization.getId());
             user = new User();
             user.setUserLanguage(systemLanguage);
-            setBasicDetailsOfUser(user, staffCreationPOJOData);
+            setBasicDetailsOfUser(user, staffCreationData);
             userGraphRepository.save(user);
         }
-        createUnitManagerAndEmployment(organizationId, user, staffCreationPOJOData.getAccessGroupId());
+        setUnitManagerAndEmployment(organization, user, staffCreationData.getAccessGroupId());
         return user;
     }
 
@@ -1121,13 +1124,12 @@ public class StaffService {
         user.setEmail(staffCreationDTO.getPrivateEmail());
         user.setUserName(staffCreationDTO.getPrivateEmail());
         user.setFirstName(staffCreationDTO.getFirstName());
-        user.setGender(CPRUtil.getGenderFromCPRNumber(staffCreationDTO.getCprNumber()));
         user.setLastName(staffCreationDTO.getLastName());
-        String defaultPassword = user.getFirstName().trim() + "@kairos";
-        user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
+        user.setPassword(Optional.ofNullable(user.getFirstName()).isPresent()?new BCryptPasswordEncoder().encode(user.getFirstName().trim() + "@kairos"):null);
         user.setCprNumber(staffCreationDTO.getCprNumber());
         if (!StringUtils.isBlank(staffCreationDTO.getCprNumber())) {
             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffCreationDTO.getCprNumber()));
+            user.setGender(CPRUtil.getGenderFromCPRNumber(staffCreationDTO.getCprNumber()));
         }
     }
 
@@ -1234,45 +1236,60 @@ public class StaffService {
 //        }
     }
 
-    public void createUnitManagerAndEmployment(Long organizationId, User user, Long accessGroupId) {
-
-        Organization organization = organizationGraphRepository.findOne(organizationId);
-        boolean parentOrganization = false;
-        Organization parent;
-        if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organizationId);
-
-        } else {
-            parent = organizationGraphRepository.getParentOfOrganization(organizationId);
+    public void setAccessGroupInUserAccount(User user,Long organizationId, Long accessGroupId) {
+        UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organizationId,user.getId());
+        if (accessGroupId!=null) {
+            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+            if (Optional.ofNullable(accessGroup).isPresent()) {
+                unitPermission.setAccessGroup(accessGroup);
+            }
         }
-        if (!Optional.ofNullable(parent).isPresent()) {
-            parentOrganization = true;
-            parent = organization;
-        }
+        unitPermissionGraphRepository.save(unitPermission);
+    }
 
+    public void setUserAndEmployment(Organization organization , User user, Long accessGroupId) {
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
                 user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
-
         Employment employment = new Employment();
         employment.setStaff(staff);
         staff.setUser(user);
-
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
-        parent.getEmployments().add(employment);
-        organizationGraphRepository.save(parent);
+        organization.getEmployments().add(employment);
+        organizationGraphRepository.save(organization);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(organization);
+        if (accessGroupId!=null) {
+            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+            if (Optional.ofNullable(accessGroup).isPresent()) {
+                unitPermission.setAccessGroup(accessGroup);
+            }
+        }
+        employment.getUnitPermissions().add(unitPermission);
+        employmentGraphRepository.save(employment);
+    }
+    public void setUnitManagerAndEmployment(Organization organization , User user, Long accessGroupId) {
+        Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
+                user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
+        Employment employment = new Employment();
+        employment.setStaff(staff);
+        staff.setUser(user);
+        employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
+        employment.setStaff(staff);
+        employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
+        organization.getEmployments().add(employment);
+        organizationGraphRepository.save(organization);
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (Optional.ofNullable(accessGroup).isPresent()) {
             unitPermission.setAccessGroup(accessGroup);
         }
-
         employment.getUnitPermissions().add(unitPermission);
 
         employmentGraphRepository.save(employment);
-        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(employment.getStaff().getId())),organizationId);
+        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(employment.getStaff().getId())),organization.getId());
 
     }
 
@@ -1813,7 +1830,7 @@ public class StaffService {
             }
         } else {
             contactAddress = new ContactAddress();
-            contactAddress.setStreet1(timeCareStaffDTO.getAddress());
+            contactAddress.setStreet(timeCareStaffDTO.getAddress());
             Pattern pattern = Pattern.compile("(\\d+)");
             Matcher matcher = pattern.matcher(timeCareStaffDTO.getZipCode());
             if (matcher.find()) {
@@ -2079,7 +2096,7 @@ public class StaffService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffs, StaffDTO.class);
     }
 
-    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long UserId,boolean allOrganization) {
+    public List<StaffResultDTO> getStaffIdsAndReasonCodeByUserId(Long UserId) {
         List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getStaffAndUnitTimezoneByUserIdAndReasonCode(UserId, ReasonCodeType.ATTENDANCE);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
 

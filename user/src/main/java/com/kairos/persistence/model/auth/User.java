@@ -389,6 +389,13 @@ public class User extends UserBaseEntity {
         this.age = age;
     }
 
+
+    public User( String cprNumber,String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.cprNumber = cprNumber;
+    }
     /**
      * Constructor for User with CountryList
      *
