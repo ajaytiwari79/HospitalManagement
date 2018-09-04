@@ -19,7 +19,7 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.UNIT_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL;
+import static com.kairos.constants.ApiConstants.ACTIVITY_SHIFT_STATUS_SETTINGS_URL;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_URL)
@@ -31,21 +31,21 @@ public class ActivityShiftStatusSettingsController {
 
     // EndPoints for unit
 
-    @PostMapping(value = UNIT_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL)
+    @PostMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL)
     @ApiOperation("create Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> addActivityAndShiftStatusSetting(@PathVariable Long unitId, @Valid @RequestBody ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true, activityShiftStatusSettingsService.addActivityAndShiftStatusSetting(unitId, activityShiftStatusSettingsDTO));
     }
 
-    @GetMapping(value = UNIT_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL+"/activity/{activityId}")
+    @GetMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL +"/activity/{activityId}")
     @ApiOperation("get All Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> getAllActivityAndShiftStatusSettingsByActivityId(@PathVariable Long unitId,@PathVariable BigInteger activityId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true, activityShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupedByStatus(unitId,activityId));
     }
 
-    @PutMapping(value = UNIT_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL)
+    @PutMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL)
     @ApiOperation("update Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> updateActivityAndShiftStatusSettings(@PathVariable Long unitId,@RequestBody ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO){
