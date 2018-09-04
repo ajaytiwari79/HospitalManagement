@@ -265,7 +265,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "optional match (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) with collect(id(subType)) as organizationSubTypeIds,org,ot\n" +
             "OPTIONAL MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) with organizationSubTypeIds,org,ot,zipCode\n" +
             "OPTIONAL Match (org)-[:"+HAS_ACCOUNT_TYPE+"]-(accountType:AccountType)\n" +
-            "return id(org) as id,org.name as name,org.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId," +
+            "return id(org) as id,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId," +
             "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId")
     List<OrganizationBasicResponse> getAllParentOrganizationOfCountry(Long countryId);
 
@@ -294,7 +294,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             " WITH {children: case when oss is NULL then [] else collect({name:oss.name,id:id(oss)}) end,name:os.name,id:id(os)} as orgServices,bt,organizationTypes,cc,country " +
             " WITH collect(orgServices) as serviceTypes,bt,organizationTypes,cc,country " +
             " OPTIONAL match(country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) with organizationTypes,bt ,cc ,serviceTypes,collect(accountType) as accountTypes \n" +
-            " OPTIONAL match(country)<-[:" + IN_COUNTRY + "]-(unitType:unitType{deleted:false}) with organizationTypes,bt ,cc ,serviceTypes,accountTypes,collect(unitType) as unitTypes \n" +
+            " OPTIONAL match(country)<-[:" + IN_COUNTRY + "]-(unitType:UnitType{deleted:false}) with organizationTypes,bt ,cc ,serviceTypes,accountTypes,collect(unitType) as unitTypes \n" +
             "return organizationTypes,bt as businessTypes,cc as companyCategories,serviceTypes,accountTypes,unitTypes")
     OrganizationCreationData getOrganizationCreationData(long countryId);
 
