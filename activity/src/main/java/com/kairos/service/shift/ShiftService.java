@@ -55,6 +55,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.locale.LocaleService;
+import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -176,6 +177,7 @@ public class ShiftService extends MongoBaseService {
     @Inject private ActivityShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
     @Inject private GenericRestClient genericRestClient;
     @Inject private ActivityService activityService;
+    @Inject private OrganizationActivityService organizationActivityService;
 
 
 
@@ -186,8 +188,7 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivityId());
         }
-        activityService.validateActivityTimeRules(activity.getRulesActivityTab().getEarliestStartTime(),activity.getRulesActivityTab().getLatestStartTime(),
-                activity.getRulesActivityTab().getMaximumEndTime(),activity.getRulesActivityTab().getShortestTime(),activity.getRulesActivityTab().getLongestTime());
+        organizationActivityService.validateShiftTime(shiftDTO.getStaffId(),shiftDTO,activity.getRulesActivityTab());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTO.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
@@ -511,8 +512,7 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivityId());
         }
-        activityService.validateActivityTimeRules(activity.getRulesActivityTab().getEarliestStartTime(),activity.getRulesActivityTab().getLatestStartTime(),
-                activity.getRulesActivityTab().getMaximumEndTime(),activity.getRulesActivityTab().getShortestTime(),activity.getRulesActivityTab().getLongestTime());
+        organizationActivityService.validateShiftTime(shiftDTO.getStaffId(),shiftDTO,activity.getRulesActivityTab());
         Activity activityOld = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTO.getStartDate());
         //copy old state of activity object
@@ -1353,6 +1353,8 @@ public class ShiftService extends MongoBaseService {
         }
         return false;
     }
+
+
 
 
 }
