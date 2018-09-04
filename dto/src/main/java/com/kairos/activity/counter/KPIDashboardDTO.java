@@ -2,7 +2,10 @@ package com.kairos.activity.counter;
 
 import com.kairos.activity.counter.enums.ConfLevel;
 
+import java.math.BigInteger;
+
 public class KPIDashboardDTO {
+    private BigInteger id;
     private String parentModuleId;
     private String moduleId;
     private String name;
@@ -11,6 +14,13 @@ public class KPIDashboardDTO {
     private Long staffId;
     private ConfLevel level;
 
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public String getParentModuleId() {
         return parentModuleId;
