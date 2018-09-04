@@ -557,18 +557,6 @@ public class AccessGroupService {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
         }
-        //TODO need to check the impact of this from vipul
-//        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory())) {
-//            if (accessGroupDTO.getAccountTypeIds().isEmpty()) {
-//                exceptionService.dataNotMatchedException("message.accountType.select");
-//            } else {
-//                List<AccountType> accountTypes = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypeIds());
-//                if (accountTypes.size() != accessGroupDTO.getAccountTypeIds().size()) {
-//                    exceptionService.actionNotPermittedException("message.accountType.notFound");
-//                }
-//                accessGrpToUpdate.get().setAccountType(accountTypes);
-//            }
-//        }
         accessGrpToUpdate.get().setName(accessGroupDTO.getName());
         accessGrpToUpdate.get().setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.get().setLastModificationDate(DateUtil.getCurrentDate().getTime());

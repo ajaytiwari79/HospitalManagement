@@ -967,7 +967,7 @@ public class UnitPositionService {
         }
 
         //WorkingTimeAgreement wta = unitPositionGraphRepository.getOneDefaultWTA(organization.getId(), expertise.getId());
-        CTAResponseDTO cta = genericRestClient.publishRequest(null,organization.getId(),true,IntegrationOperation.GET,GET_DEFAULT_CTA+expertiseId,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAResponseDTO>>() {},expertiseId);
+        CTAResponseDTO cta = genericRestClient.publishRequest(null,organization.getId(),true,IntegrationOperation.GET,GET_DEFAULT_CTA,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAResponseDTO>>() {},expertiseId);
         /*if (wta == null) {
             throw new DataNotFoundByIdException("NO WTA found for organization : " + organization.getId());
         }*/
