@@ -43,7 +43,9 @@ public class RulesActivityTab implements Serializable{
     private DurationField approvalTimeInAdvance;
     private Float approvalPercentage;
     private LocalTime maximumEndTime;// shift can't be extend this time
-
+    private boolean allowedAutoAbsence;
+    private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --
+    private byte recurrenceTimes;// -- the  shift of that staff will be entered.
 
     public LocalDate getCutOffStartFrom() {
         return cutOffStartFrom;
@@ -126,9 +128,8 @@ public class RulesActivityTab implements Serializable{
     }
 
     public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleAgainstTimeRules, boolean lockLengthPresent, boolean eligibleToBeForced,
-
                             List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
-    , LocalTime earliestStartTime, LocalTime latestStartTime, int shortestTime, int longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,DurationField approvalTimeInAdvance,Float approvalPercentage,LocalTime maximumEndTime,Integer cutOffdayValue,CutOffIntervalUnit cutOffIntervalUnit,LocalDate cutOffStartFrom) {
+    , LocalTime earliestStartTime, LocalTime latestStartTime, int shortestTime, int longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,DurationField approvalTimeInAdvance,Float approvalPercentage,LocalTime maximumEndTime,Integer cutOffdayValue,CutOffIntervalUnit cutOffIntervalUnit,LocalDate cutOffStartFrom,byte recurrenceDays,byte recurrenceTimes,boolean allowedAutoAbsence) {
 
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
@@ -155,7 +156,9 @@ public class RulesActivityTab implements Serializable{
         this.cutOffdayValue = cutOffdayValue;
         this.cutOffIntervalUnit = cutOffIntervalUnit;
         this.cutOffStartFrom = cutOffStartFrom;
-
+        this.recurrenceDays=recurrenceDays;
+        this.recurrenceTimes=recurrenceTimes;
+        this.allowedAutoAbsence=allowedAutoAbsence;
     }
 
     public boolean isEligibleForFinalSchedule() {
@@ -309,5 +312,29 @@ public class RulesActivityTab implements Serializable{
 
     public void setMaximumEndTime(LocalTime maximumEndTime) {
         this.maximumEndTime = maximumEndTime;
+    }
+
+    public byte getRecurrenceDays() {
+        return recurrenceDays;
+    }
+
+    public void setRecurrenceDays(byte recurrenceDays) {
+        this.recurrenceDays = recurrenceDays;
+    }
+
+    public byte getRecurrenceTimes() {
+        return recurrenceTimes;
+    }
+
+    public void setRecurrenceTimes(byte recurrenceTimes) {
+        this.recurrenceTimes = recurrenceTimes;
+    }
+
+    public boolean isAllowedAutoAbsence() {
+        return allowedAutoAbsence;
+    }
+
+    public void setAllowedAutoAbsence(boolean allowedAutoAbsence) {
+        this.allowedAutoAbsence = allowedAutoAbsence;
     }
 }
