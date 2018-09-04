@@ -155,7 +155,6 @@ public class AccessGroupService {
                 AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole());
                 accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
                 accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
-                accessGroup.setParentId(countryAccessGroup.getId());
                 accessGroupRepository.save(accessGroup);
                 countryAndOrgAccessGroupIdsMap.put(countryAccessGroup.getId(), accessGroup.getId());
                 accessGroupRepository.setAccessPagePermissionForAccessGroup(countryAccessGroup.getId(), accessGroup.getId());

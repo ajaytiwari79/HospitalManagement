@@ -34,7 +34,6 @@ public class AccessGroup extends UserBaseEntity {
     private AccessGroupRole role;
     @Relationship(type = HAS_ACCOUNT_TYPE)
     private List<AccountType> accountType;
-    private Long parentId;
 
     public AccessGroup() {
         //Default Constructor
@@ -101,13 +100,5 @@ public class AccessGroup extends UserBaseEntity {
 
     public void setAccountType(List<AccountType> accountType) {
         this.accountType = accountType;
-    }
-
-    public Long getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
     }
 }
