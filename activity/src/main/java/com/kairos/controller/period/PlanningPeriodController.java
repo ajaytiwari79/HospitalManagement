@@ -84,17 +84,16 @@ public class PlanningPeriodController {
 
     }
     @ApiOperation(value = "restore shift base planning period and phase id")
-    @PutMapping(value = "/restore_shift")
+    @PutMapping(value = "/period/{periodId}/phase/{phaseId}/reset_phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> restoreShiftsData(@RequestParam("planningPeriodId") BigInteger planningPeriodId, @PathVariable Long unitId,@RequestParam("phaseId") BigInteger phaseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialData(planningPeriodId,phaseId,unitId));
-
+    public ResponseEntity<Map<String, Object>> resetPhaseData(@PathVariable BigInteger periodId, @PathVariable Long unitId,@PathVariable BigInteger phaseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialData(periodId,phaseId,unitId));
     }
 
     @ApiOperation(value = "restore shift data based on shiftIds and phase")
-    @PutMapping(value = "/restore_shift_ids")
+    @PutMapping(value = "/phase/{phaseId}/restore_shifts")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> restoreShiftsDataByShiftIds(@RequestBody List<BigInteger> shiftIds, @PathVariable Long unitId, @RequestParam("phaseId") BigInteger phaseId) {
+    public ResponseEntity<Map<String, Object>> restoreShiftsDataByShiftIds(@RequestBody List<BigInteger> shiftIds, @PathVariable Long unitId,@PathVariable BigInteger phaseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialDataOfShiftIds(shiftIds,phaseId,unitId));
 
     }

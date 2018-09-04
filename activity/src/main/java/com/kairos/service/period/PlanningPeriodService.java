@@ -37,7 +37,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by prerna on 6/4/18.
@@ -491,21 +490,20 @@ public class PlanningPeriodService extends MongoBaseService {
      * for restore shift initial data
      */
     public boolean setShiftsDataToInitialData(BigInteger planningPeriodId, BigInteger phaseId, Long unitId){
-        List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftStateByPlanningPeriodIdAndPhaseId(planningPeriodId,phaseId,unitId);
-        if(!shiftStates.isEmpty()) {
-            saveRestoreShift(shiftStates);
-        }
+        List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(planningPeriodId,phaseId,unitId);
+            restoreShifts(shiftStates);
         return true;
     }
 
     public boolean setShiftsDataToInitialDataOfShiftIds(List<BigInteger> shiftIds, BigInteger phaseId, Long unitId){
-        List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftStateByPlanningPeriodAndPhaseAndUnitAndStaffId(phaseId,unitId,shiftIds);
-        if(!shiftStates.isEmpty()) {
-            saveRestoreShift(shiftStates);
-        }
+        List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(phaseId,unitId,shiftIds);
+            restoreShifts(shiftStates);
         return true;
     }
-    public void saveRestoreShift(List<ShiftState> shiftStates){
+    public void restoreShifts(List<ShiftState> shiftStates){
+        if(shiftStates.isEmpty()){
+            return;
+        }
         List<Shift> shifts=new ArrayList<>();
         shiftStates.stream().forEach(shiftState -> {
             Shift shift=ObjectMapperUtils.copyPropertiesByMapper(shiftState,Shift.class);
