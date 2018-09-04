@@ -27,6 +27,11 @@ public class ShiftAllowedToDelete extends AbstractSpecification<BigInteger> {
     }
 
     @Override
+    public void validateRules(BigInteger bigInteger) {
+
+    }
+
+    @Override
     public List<String> isSatisfiedString(BigInteger phaseId) {
         List<String> errors = new ArrayList<>();
         PhaseTemplateValue currentPhase = null;

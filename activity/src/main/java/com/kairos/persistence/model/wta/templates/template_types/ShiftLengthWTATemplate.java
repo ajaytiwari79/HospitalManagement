@@ -2,11 +2,12 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.PartOfDay;
 import com.kairos.enums.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.util.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.util.TimeInterval;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
+import static com.kairos.util.ShiftValidatorService.*;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -97,7 +98,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         String exception = "";
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)) {
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrappers(), infoWrapper.getShift());
@@ -112,20 +113,23 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
                             if (limitAndCounter[1] != null) {
                                 int counterValue = limitAndCounter[1] - 1;
                                 if (counterValue < 0) {
-                                    exception = getName();
-                                } else {
-                                    infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
-                                    shift.getBrokenRuleTemplateIds().add(getId());
+                                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                                    infoWrapper.getViolatedRules().getWorkTimeAggreements().add(workTimeAgreementRuleViolation);
+                                    ShiftValidatorService.throwException("message.ruleTemplate.broken",this.name);
+                                }else {
+                                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
+                                    infoWrapper.getViolatedRules().getWorkTimeAggreements().add(workTimeAgreementRuleViolation);
                                 }
-                            } else {
-                                exception = getName();
+                            }else {
+                                WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                                infoWrapper.getViolatedRules().getWorkTimeAggreements().add(workTimeAgreementRuleViolation);
+                                ShiftValidatorService.throwException("message.ruleTemplate.broken",this.name);
                             }
                         }
                     }
                 }
             }
         }
-        return exception;
     }
 
     public ShiftLengthWTATemplate(String name, String description, long timeLimit) {

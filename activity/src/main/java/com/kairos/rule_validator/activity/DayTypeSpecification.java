@@ -6,6 +6,7 @@ import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.country.day_type.DayType;
 import com.kairos.util.DateUtils;
+import com.kairos.util.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,6 +35,13 @@ public class DayTypeSpecification extends AbstractSpecification<ShiftWithActivit
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shift) {
         return validDays.contains(DateUtils.asLocalDate(shiftStartDateTime).getDayOfWeek());
+    }
+
+    @Override
+    public void validateRules(ShiftWithActivityDTO shift) {
+        if(!validDays.contains(DateUtils.asLocalDate(shiftStartDateTime).getDayOfWeek())){
+            ShiftValidatorService.throwException("message.activity.dayType");
+        }
     }
 
     @Override

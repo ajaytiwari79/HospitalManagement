@@ -31,7 +31,7 @@ public class RuleTemplateSpecificInfo {
     private ViolatedRulesDTO violatedRules;
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, List<TimeSlotWrapper> timeSlotWrappers, String phase, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, List<DayTypeDTO> dayTypes,UserAccessRoleDTO user,int totalTimeBank,ViolatedRulesDTO violatedRules) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, List<TimeSlotWrapper> timeSlotWrappers, String phase, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, List<DayTypeDTO> dayTypes,UserAccessRoleDTO user,int totalTimeBank) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrappers = timeSlotWrappers;
@@ -41,7 +41,7 @@ public class RuleTemplateSpecificInfo {
         this.dayTypes = dayTypes;
         this.user = user;
         this.totalTimeBank = totalTimeBank;
-        this.violatedRules = violatedRules;
+        this.violatedRules = new ViolatedRulesDTO();
     }
 
 

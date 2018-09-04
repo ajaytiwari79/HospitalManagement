@@ -2,10 +2,11 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.WTATemplateType;
+import com.kairos.util.ShiftValidatorService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
+import static com.kairos.util.ShiftValidatorService.*;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -98,7 +99,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         String exception="";
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && (plannedTimeIds.contains(infoWrapper.getShift().getPlannedTypeId()) && timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))){
             DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
@@ -119,16 +120,21 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
                     if(limitAndCounter[1]!=null) {
                         int counterValue =  limitAndCounter[1] - 1;
                         if(counterValue<0){
-                            exception = getName();                        }else {
-                            infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
-                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                            WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                            infoWrapper.getViolatedRules().getWorkTimeAggreements().add(workTimeAgreementRuleViolation);
+                            ShiftValidatorService.throwException("message.ruleTemplate.broken",this.name);
+                        }else {
+                            WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
+                            infoWrapper.getViolatedRules().getWorkTimeAggreements().add(workTimeAgreementRuleViolation);
                         }
                     }else {
-                        exception = getName();                    }
+                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                        infoWrapper.getViolatedRules().getWorkTimeAggreements().add(workTimeAgreementRuleViolation);
+                        ShiftValidatorService.throwException("message.ruleTemplate.broken",this.name);
+                    }
                 }
             }
         }
-        return exception;
     }
 
     public ZonedDateTime getNextDateOfInterval(ZonedDateTime dateTime){

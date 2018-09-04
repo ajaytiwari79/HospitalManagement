@@ -60,14 +60,12 @@ import com.kairos.service.unit_settings.PhaseSettingsService;
 import com.kairos.service.wta.WTAService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.access_permission.AccessGroupRole;
-import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.user.country.experties.AppliedFunctionDTO;
 import com.kairos.user.staff.staff.StaffAccessRoleDTO;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.WTARuleTemplateValidatorUtility;
 import com.kairos.util.event.ShiftNotificationEvent;
 import com.kairos.util.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.DateWiseShiftResponse;
@@ -81,6 +79,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -96,8 +95,8 @@ import java.util.stream.Collectors;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 import static com.kairos.util.DateUtils.ONLY_DATE;
-import static com.kairos.util.WTARuleTemplateValidatorUtility.getIntervalByRuleTemplates;
-import static com.kairos.util.WTARuleTemplateValidatorUtility.getValidDays;
+import static com.kairos.util.ShiftValidatorService.getIntervalByRuleTemplates;
+import static com.kairos.util.ShiftValidatorService.getValidDays;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
@@ -646,12 +645,12 @@ public class ShiftService extends MongoBaseService {
             Specification<ShiftWithActivityDTO> activityDayTypeSpec = new DayTypeSpecification(validDays, shift.getStartDate());
             activitySpecification.and(activityDayTypeSpec);
         }
-        List<String> messages = activitySpecification.isSatisfiedString(shift);
-        if (!messages.isEmpty()) {
+        activitySpecification.validateRules(shift);
+        /*if (!messages.isEmpty()) {
             List<String> errors = new ArrayList<>(messages);
             exceptionService.actionNotPermittedException(errors.get(0),errors.size()==2 ? errors.get(1) : "");
-        }
-        return null;
+        }*/
+        return ruleTemplateSpecificInfo.getViolatedRules();
     }
 
     private RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(Phase phase,ShiftWithActivityDTO shift, WTAQueryResultDTO wtaQueryResultDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -669,7 +668,7 @@ public class ShiftService extends MongoBaseService {
         Interval interval = new Interval(staffAdditionalInfoDTO.getUnitPosition().getStartDateMillis(), staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis() == null ? endTimeOfInterval.getTime() : staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis());
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes(), staffAdditionalInfoDTO.getUnitPosition().getWorkingDaysInWeek(), DateUtils.asLocalDate(new Date(staffAdditionalInfoDTO.getUnitPosition().getStartDateMillis())), staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis() != null ? DateUtils.asLocalDate(new Date(staffAdditionalInfoDTO.getUnitPosition().getEndDateMillis())) : null);
         int totalTimeBank = -timeBankCalculationService.calculateTimeBankForInterval(interval, unitPositionWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
-        return new RuleTemplateSpecificInfo(shifts, shift, staffAdditionalInfoDTO.getTimeSlotSets(), phase.getName(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, staffAdditionalInfoDTO.getDayTypes(), staffAdditionalInfoDTO.getUser(), totalTimeBank,new ViolatedRulesDTO());
+        return new RuleTemplateSpecificInfo(shifts, shift, staffAdditionalInfoDTO.getTimeSlotSets(), phase.getName(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, staffAdditionalInfoDTO.getDayTypes(), staffAdditionalInfoDTO.getUser(), totalTimeBank);
     }
 
     private void updateWTACounter(RuleTemplateSpecificInfo infoWrapper, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -888,7 +887,7 @@ public class ShiftService extends MongoBaseService {
         for (ShiftDTO shiftDTO : shiftDTOS) {
             ShiftQueryResult shiftQueryResult = createShift(unitId, shiftDTO, "Organization", true).getShifts().get(0);
             shiftDTO.setId(shiftQueryResult.getId());
-            if (shiftDTO.getSubShifts() != null && !shiftDTO.getSubShifts().isEmpty()) {
+            if (CollectionUtils.isEmpty(shiftDTO.getSubShifts())) {
                 addSubShift(unitId, shiftDTO, type);
             }
         }

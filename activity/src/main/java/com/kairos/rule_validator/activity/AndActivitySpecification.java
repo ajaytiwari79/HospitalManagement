@@ -28,6 +28,11 @@ public class AndActivitySpecification<T> extends AbstractSpecification<T> {
     }
 
     @Override
+    public void validateRules(T t) {
+
+    }
+
+    @Override
     public List<String> isSatisfiedString(T t) {
         List<String> messages = new ArrayList<>();
         messages.addAll(specification1.isSatisfiedString(t));

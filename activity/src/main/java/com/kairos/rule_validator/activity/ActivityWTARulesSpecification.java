@@ -42,6 +42,11 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
     }
 
     @Override
+    public void validateRules(Activity activity) {
+
+    }
+
+    @Override
     public List<String> isSatisfiedString(Activity activity) {
         return Collections.emptyList();
     }

@@ -3,6 +3,7 @@ package com.kairos.rule_validator.activity;
 import com.kairos.activity.open_shift.DurationField;
 import com.kairos.rule_validator.activity.AbstractActivitySpecification;
 import com.kairos.util.DateUtils;
+import com.kairos.util.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.time.Duration;
@@ -28,6 +29,13 @@ public class ShiftStartTimeLessThan extends AbstractActivitySpecification<ShiftW
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shiftWithActivityDTO) {
         return false;
+    }
+
+    @Override
+    public void validateRules(ShiftWithActivityDTO shift) {
+        if ((int) Duration.between(DateUtils.getLocalDateTimeFromZoneId(zoneId), DateUtils.asLocalDateTime(shiftStartDateTime)).toHours() < durationField.getValue()) {
+            ShiftValidatorService.throwException("message.shift.plannedTime.less");
+        }
     }
 
     @Override

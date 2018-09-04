@@ -9,7 +9,7 @@ import java.math.BigInteger;
 
 public class WorkTimeAgreementRuleViolation {
 
-    private BigInteger id;
+    private BigInteger ruleTemplateId;
     private String name;
     private int counter;
     private boolean broken;
@@ -19,20 +19,20 @@ public class WorkTimeAgreementRuleViolation {
     public WorkTimeAgreementRuleViolation() {
     }
 
-    public WorkTimeAgreementRuleViolation(BigInteger id, String name, int counter, boolean broken, boolean canBeIgnore) {
-        this.id = id;
+    public WorkTimeAgreementRuleViolation(BigInteger ruleTemplateId, String name, int counter, boolean broken, boolean canBeIgnore) {
+        this.ruleTemplateId = ruleTemplateId;
         this.name = name;
         this.counter = counter;
         this.broken = broken;
         this.canBeIgnore = canBeIgnore;
     }
 
-    public BigInteger getId() {
-        return id;
+    public BigInteger getRuleTemplateId() {
+        return ruleTemplateId;
     }
 
-    public void setId(BigInteger id) {
-        this.id = id;
+    public void setRuleTemplateId(BigInteger ruleTemplateId) {
+        this.ruleTemplateId = ruleTemplateId;
     }
 
     public String getName() {
