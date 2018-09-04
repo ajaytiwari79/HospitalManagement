@@ -27,7 +27,7 @@ public final class ApiConstants {
 
     //RestTemplate URL
     public static final String GET_VERSION_CTA = "/get_versions_cta";
-    public static final String GET_DEFAULT_CTA = "/get_default_cta";
+    public static final String GET_DEFAULT_CTA = "/get_default_cta/";
     public static final String GET_CTA_WTA_BY_EXPERTISE = "/expertise/{expertiseId}/cta_wta";
     public static final String GET_CTA_WTA_BY_UPIDS = "/unitposition-cta-wta";
     public static final String GET_VERSION_WTA = "/wta/versions";

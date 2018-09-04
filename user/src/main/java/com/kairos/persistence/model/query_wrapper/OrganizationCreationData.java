@@ -123,4 +123,5 @@ public class OrganizationCreationData {
     public void setUnitTypes(List<UnitType> unitTypes) {
         this.unitTypes = unitTypes;
     }
+
 }
