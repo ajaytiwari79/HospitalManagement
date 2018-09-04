@@ -291,8 +291,7 @@ public class ExpertiseService {
 
 
     public List<ExpertiseQueryResult> getAllExpertise(long countryId, String selectedDate) {
-        Long selectedDateInLong = (selectedDate != null) ? DateUtil.getIsoDateInLong(selectedDate) : DateUtil.getCurrentDateMillis();
-        return expertiseGraphRepository.getAllExpertiseByCountryId(countryId, selectedDateInLong);
+        return expertiseGraphRepository.getAllExpertiseByCountryId(countryId);
     }
 
 

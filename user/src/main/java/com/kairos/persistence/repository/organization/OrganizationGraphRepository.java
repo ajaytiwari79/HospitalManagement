@@ -265,7 +265,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "optional match (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) with collect(id(subType)) as organizationSubTypeIds,org,ot\n" +
             "OPTIONAL MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) with organizationSubTypeIds,org,ot,zipCode\n" +
             "OPTIONAL Match (org)-[:"+HAS_ACCOUNT_TYPE+"]-(accountType:AccountType)\n" +
-            "return id(org) as id,org.name as name,org.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId," +
+            "return id(org) as id,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId," +
             "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId")
     List<OrganizationBasicResponse> getAllParentOrganizationOfCountry(Long countryId);
 
