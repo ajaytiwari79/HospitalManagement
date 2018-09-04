@@ -20,17 +20,7 @@ public class ActivityAndShiftStatusSettingsRepositoryImpl implements CustomActiv
     @Inject private MongoTemplate mongoTemplate;
 
     @Override
-    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long countryId, BigInteger activityId) {
-        Aggregation aggregation=newAggregation(
-               match(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("activityId").is(activityId)),
-                group("shiftStatus").push("$$ROOT").as("activityAndShiftStatusSettings"),
-                project("activityAndShiftStatusSettings").and("_id").as("status"));
-        AggregationResults<ActivityAndShiftStatusWrapper> result=mongoTemplate.aggregate(aggregation,ActivityAndShiftStatusSettings.class,ActivityAndShiftStatusWrapper.class);
-        return result.getMappedResults();
-    }
-
-    @Override
-    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatusForUnit(Long unitId,BigInteger activityId) {
+    public List<ActivityAndShiftStatusWrapper> getActivityAndShiftStatusSettingsGroupedByStatus(Long unitId, BigInteger activityId) {
         Aggregation aggregation=newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("activityId").is(activityId)),
                 group("shiftStatus").push("$$ROOT").as("activityAndShiftStatusSettings"),

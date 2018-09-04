@@ -135,8 +135,6 @@ public class OrganizationActivityService extends MongoBaseService {
             activity.getRulesActivityTab().setEligibleForSchedules(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             save(activityCopied);
-            // copying activity and shift status settings of this activity
-            activityService.copyActivityAndShiftStatusOfThisActivityForUnit(activityId,activityCopied.getId(),unitId);
         } else {
             activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
             activityCopied.setDeleted(true);

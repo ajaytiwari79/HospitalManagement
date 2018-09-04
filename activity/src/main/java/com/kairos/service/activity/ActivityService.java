@@ -1116,9 +1116,6 @@ public class ActivityService extends MongoBaseService {
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
         save(activityCopied);
-
-        // copying activity and shift status settings of this activity
-        copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId());
         activityDTO.setId(activityCopied.getId());
         PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
         BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
@@ -1207,21 +1204,6 @@ public class ActivityService extends MongoBaseService {
         }
     }
 
-    public void copyActivityAndShiftStatusOfThisActivityForUnit(BigInteger activityId,BigInteger newActivityId,Long unitId){
-        List<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findAllByActivityId(activityId);
-        Set<Long> accessGroupIds =activityAndShiftStatusSettings.stream().flatMap(current->current.getAccessGroupIds().stream()).collect(Collectors.toSet());
-        Set<Long> unitAccessGroupIds=genericRestClient.publishRequest(accessGroupIds, unitId, true, IntegrationOperation.CREATE, "access_group_from_unit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Long>>>() {});
-        if(!activityAndShiftStatusSettings.isEmpty()){
-            activityAndShiftStatusSettings.forEach(currentActivityAndShiftStatusSettings->{
-                currentActivityAndShiftStatusSettings.setId(null);
-                currentActivityAndShiftStatusSettings.setCountryId(null);
-                currentActivityAndShiftStatusSettings.setUnitId(unitId);
-                currentActivityAndShiftStatusSettings.setActivityId(newActivityId);
-                currentActivityAndShiftStatusSettings.setAccessGroupIds(unitAccessGroupIds);
-            });
-            save(activityAndShiftStatusSettings);
-        }
-    }
 
     public void deleteActivityAndShiftStatusOfThisActivity(BigInteger activityId){
         Optional<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityId);
