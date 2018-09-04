@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.activity;
+package com.kairos.persistence.model.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -60,7 +60,7 @@ public class Shift extends MongoBaseEntity {
     private BigInteger planningPeriodId;
     private BigInteger phaseId;
     public Shift() {
-        //dc
+        //Default Constructor
     }
 
 

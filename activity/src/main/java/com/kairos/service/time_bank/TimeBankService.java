@@ -4,10 +4,9 @@ package com.kairos.service.time_bank;
 import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
 import com.kairos.activity.time_bank.*;
-import com.kairos.activity.time_bank.time_bank_basic.time_bank.ScheduledActivitiesDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.constants.AppConstants;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
@@ -36,17 +35,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /*
 * Created By Pradeep singh rajawat

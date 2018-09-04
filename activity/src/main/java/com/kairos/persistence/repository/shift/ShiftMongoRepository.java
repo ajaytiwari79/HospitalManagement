@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.shift;
 
 
 import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
