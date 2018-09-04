@@ -31,11 +31,13 @@ public final class ApiConstants {
     public static final String OPEN_SHIFT_URL = API_V1 + PARENT_ORGANIZATION_URL + UNIT_URL + "/open_shift";
     public static final String COUNTRY_ACTIVITY_CONFIGURATION=COUNTRY_URL+"/activity_configuration";
     public static final String UNIT_ACTIVITY_CONFIGURATION=UNIT_URL+"/activity_configuration";
+    public static final String ACTIVITY_SHIFT_STATUS_SETTINGS_URL =UNIT_URL+"/activity_shift_status_settings";
 
 
     //RestClientURL
     public static final String CTA_BASIC_INFO = COUNTRY_URL+"/cta_basic_info";
     public static final String GET_UNIT_POSITION = "/unit_position/{unitPositionId}";
+
 
 
 

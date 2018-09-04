@@ -24,7 +24,6 @@ public class AccessPageDTO {
     private boolean accessibleForHub;
     private boolean accessibleForUnion;
     private boolean accessibleForOrganization;
-    private List<KPIAccessPageDTO> child;
     private List<OrganizationCategory> accessibleFor = new ArrayList<>();
 
 
@@ -100,14 +99,6 @@ public class AccessPageDTO {
         this.accessibleForOrganization = accessibleForOrganization;
     }
 
-
-    public List<KPIAccessPageDTO> getChild() {
-        return child;
-    }
-
-    public void setChild(List<KPIAccessPageDTO> child) {
-        this.child = child;
-    }
 
     public List<OrganizationCategory> getAccessibleFor() {
         return accessibleFor;

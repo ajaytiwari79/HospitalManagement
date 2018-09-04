@@ -408,7 +408,9 @@ public class CounterDistService extends MongoBaseService {
                categoriesNameMap.put(kpiCategoryDTO.getName(),kpiCategoryDTO.getId());
            });
             List<KPICategory> kpiCategories = kpiCategoryDTOS.stream().map(category -> new KPICategory(category.getName(),null,unitId,ConfLevel.UNIT)).collect(Collectors.toList());
-            save(kpiCategories);
+            if(!kpiCategories.isEmpty()){
+                save(kpiCategories);
+            }
             kpiCategories.stream().forEach(kpiCategory -> {
                categoriesOldAndNewIds.put(categoriesNameMap.get(kpiCategory.getName()),kpiCategory.getId());
         });

@@ -213,13 +213,12 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     AccessPage findByModuleId(String moduleId);
 
     @Query("Match (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
-            "OPTIONAL MATCH (accessPage)-[:SUB_PAGE]-(subPages:AccessPage{active:true,kpiEnabled:true}) with accessPage,subPages\n"+
-            "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage) WHERE id(country)={0} WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage,subPages\n" +
+            "OPTIONAL MATCH (country:Country)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage) WHERE id(country)={0} WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage\n" +
             "RETURN \n" +
             "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active, \n" +
             " CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             " CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
-            " CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization,collect(subPages) as child ORDER BY id(accessPage)")
+            " CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization ORDER BY id(accessPage)")
     List<AccessPageDTO> getMainTabs(Long countryId);
 
     @Query("match (org:Organization) where id(org)={0} with org\n" +

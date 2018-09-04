@@ -1,6 +1,7 @@
 package com.kairos.controller.user;
 
 import com.kairos.persistence.model.auth.User;
+import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.response.ResponseHandler;
@@ -31,10 +32,12 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 @Api(value = API_V1)
 public class UserController {
     @Inject
-    UserService userService;
+    private UserService userService;
 
     @Inject
     private StaffService staffService;
+    @Inject
+    private AccessGroupService accessGroupService;
    /* @Inject
     TaskReportService taskReportService;*/
     /**
@@ -139,10 +142,18 @@ public class UserController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdOfLoggedInUser(unitId));
     }
 
+
     @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/staff/user/accessgroup")
     @ApiOperation("get accessgroup ids and iscountryadmin")
-    public ResponseEntity<Map<String, Object>> getAccessGroupIdsOfStaff(@PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getAccessGroupIdsOfStaffs(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAccessGroupIdsOfStaff(unitId));
+    }
+
+    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/staff/access_groups")
+    @ApiOperation("get accessgroup ids and iscountryadmin")
+    public ResponseEntity<Map<String, Object>> getAccessGroupIdsOfStaff(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessGroupIdsByStaffIdAndUnitId(unitId));
+
     }
 
 }

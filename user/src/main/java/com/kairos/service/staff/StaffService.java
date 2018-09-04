@@ -12,8 +12,8 @@ import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessGroupCounterQueryResult;
 import com.kairos.persistence.model.access_permission.AccessPage;
+import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -608,7 +608,7 @@ public class StaffService {
             return null;
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("allExpertise", expertiseGraphRepository.getAllExpertiseByCountry(countryId, DateUtil.getCurrentDateMillis()));
+        map.put("allExpertise", expertiseGraphRepository.getAllExpertiseByCountry(countryId));
         map.put("myExpertise", staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffId).stream().map(Expertise::getId).collect(Collectors.toList()));
         return map;
     }
@@ -2111,8 +2111,8 @@ public class StaffService {
         return staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
     }
 
-    public AccessGroupCounterQueryResult getAccessGroupIdsOfStaff(Long unitId) {
-        AccessGroupCounterQueryResult accessGroupCounterQueryResult=new AccessGroupCounterQueryResult();
+    public StaffAccessGroupQueryResult getAccessGroupIdsOfStaff(Long unitId) {
+        StaffAccessGroupQueryResult staffAccessGroupQueryResult=new StaffAccessGroupQueryResult();
         Long staffId=getStaffIdOfLoggedInUser(unitId);
         if(staffId==null){
             Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
@@ -2121,11 +2121,11 @@ public class StaffService {
         long loggedinUserId = UserContext.getUserDetails().getId();
        Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
        if(!isCountryAdmin) {
-           accessGroupCounterQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
+           staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
        }
-        accessGroupCounterQueryResult.setStaffId(staffId);
-        accessGroupCounterQueryResult.setCountryAdmin(true);
-        return accessGroupCounterQueryResult;
+        staffAccessGroupQueryResult.setStaffId(staffId);
+        staffAccessGroupQueryResult.setCountryAdmin(true);
+        return staffAccessGroupQueryResult;
     }
 
 

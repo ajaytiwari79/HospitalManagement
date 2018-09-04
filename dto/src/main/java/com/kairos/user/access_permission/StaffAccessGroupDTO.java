@@ -1,25 +1,19 @@
-package com.kairos.persistence.model.access_permission;
-
-import org.springframework.data.neo4j.annotation.QueryResult;
+package com.kairos.user.access_permission;
+/*
+ *Created By Pavan on 31/8/18
+ *
+ */
 
 import java.util.List;
 
-@QueryResult
-public class AccessGroupCounterQueryResult {
+public class StaffAccessGroupDTO {
     private Long staffId;
     private Long countryId;
     private Boolean isCountryAdmin;
     private List<Long> accessGroupIds;
 
-    public AccessGroupCounterQueryResult() {
-
-    }
-
-    public AccessGroupCounterQueryResult(Long staffId, Long countryId, Boolean isCountryAdmin, List<Long> accessGroupIds) {
-        this.staffId = staffId;
-        this.countryId = countryId;
-        this.isCountryAdmin = isCountryAdmin;
-        this.accessGroupIds = accessGroupIds;
+    public StaffAccessGroupDTO() {
+        //Default Constructor
     }
 
     public Long getStaffId() {

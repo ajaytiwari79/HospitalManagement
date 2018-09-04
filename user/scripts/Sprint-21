@@ -7,9 +7,9 @@ CREATE unique (u)-[:HAS_ACCESS_GROUP]->(ag) WITH o,e,u
 CREATE UNIQUE (e)-[:HAS_UNIT_PERMISSIONS]->(u)-[:APPLICABLE_IN_UNIT]->(o)return e,o;
 
 
-2.  // TO CREATE FILTER GROUP ( Filter settings for Self Rostering and Organization->Staff Tab)
+2.  // TO CREATE FILTER GROUP ( Filter settings for Self Rostering and Staff Module)
 CREATE (fg:FilterGroup{filterTypes:["EMPLOYMENT_TYPE", "GENDER", "STAFF_STATUS","ENGINEER_TYPE", "EXPERTISE"],deleted:false}) WITH fg
-MATCH (ap:AccessPage) WHERE ap.moduleId in ["module_7","tab_19"] WITH fg,ap
+MATCH (ap:AccessPage) WHERE ap.moduleId in ["module_7","module_12"] WITH fg,ap
 CREATE UNIQUE (ap)-[:APPLICABLE_FOR]-(fg) return ap,fg;
 
 

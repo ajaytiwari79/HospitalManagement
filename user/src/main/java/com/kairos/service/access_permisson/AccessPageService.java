@@ -410,7 +410,6 @@ public class AccessPageService {
     public AccessPage getOneMainModule(){
         return accessPageRepository.getOneMainModule();
     }
-
     public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){
         List<AccessPage> accessPages = accessPageRepository.getKPITabsList(moduleId);
         List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);

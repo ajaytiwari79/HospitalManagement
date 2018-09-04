@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
 import static com.kairos.constants.AppConstants.HAS_ACCESS_OF_TABS;
@@ -277,12 +278,14 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.role as role, ag.enabled as enabled ")
     List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId);
 
-    @Query("MATCH (staff:Staff),(org:Organization) where id(staff)={0} AND id(org)={1} with org,staff \n" +
-            "match(org)<-[:HAS_SUB_ORGANIZATION*]-(parentOrganization:Organization) with org,parentOrganization,staff  \n"+
-            "match(parentOrganization)-[:" + BELONGS_TO +"] -> (country:Country) with org,staff,country\n"+
-            "match (staff)-[:"+BELONGS_TO+"]-(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(org) with up,country \n" +
+
+    @Query("MATCH (staff:Staff),(org:Organization) where id(staff)={0} AND id(org)={1} with org,staff " +
+            "match(org)<-[:HAS_SUB_ORGANIZATION*]-(parentOrganization:Organization) with org,parentOrganization,staff  "+
+            "match(parentOrganization)-[:" + BELONGS_TO +"] -> (country:Country) with org,staff,country "+
+            "match (staff)-[:"+BELONGS_TO+"]-(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(org) with up,country  " +
             "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag) RETURN Collect(DISTINCT id(ag)) as accessGroupIds ,id(country) as countryId")
-    AccessGroupCounterQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long staffId, Long unitId);
+    StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long staffId, Long unitId);
+
 }
 
 

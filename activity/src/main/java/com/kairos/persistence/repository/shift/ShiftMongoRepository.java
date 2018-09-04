@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.shift;
 
 
 import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -48,5 +48,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     ShiftQueryResult findShiftByStaffIdsAndDate(List<Long> staffids,Date date);
     @Query("{'deleted':false,'unitId':?2, 'isMainShift':true, 'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
     List<Shift> findShiftBetweenDuration(LocalDateTime startDate, LocalDateTime endDate, Long unitId);
+
+    @Query("{deleted:false,planningPeriodId:?0,phaseId:?1,unitId:?2}")
+    List<Shift> findAllShiftsPlanningPeriodAndPhaseId(BigInteger planningPeriodId,BigInteger phaseId,Long unitId);
 
 }
