@@ -10,6 +10,7 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -54,7 +55,7 @@ public class UnitPositionQueryResult {
     private Boolean history;
     private Boolean editable;
     private Boolean published;
-    private float hourlyCost;
+    private BigDecimal hourlyCost;
 
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
@@ -310,11 +311,11 @@ public class UnitPositionQueryResult {
     }
 
 
-    public float getHourlyCost() {
+    public BigDecimal getHourlyCost() {
         return hourlyCost;
     }
 
-    public void setHourlyCost(float hourlyCost) {
+    public void setHourlyCost(BigDecimal hourlyCost) {
         this.hourlyCost = hourlyCost;
     }
 
