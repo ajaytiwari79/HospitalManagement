@@ -3,6 +3,7 @@ package com.kairos.gdpr.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.RiskSeverity;
 import com.kairos.gdpr.ManagingOrganization;
 import com.kairos.gdpr.Staff;
 
@@ -67,6 +68,8 @@ public class AssetDTO {
 
     private Long maxDataSubjectVolume;
 
+    private RiskSeverity riskLevel;
+
     public BigInteger getId() { return id; }
 
     public String getName() { return name.trim(); }
@@ -102,8 +105,10 @@ public class AssetDTO {
 
     public Long getMaxDataSubjectVolume() { return maxDataSubjectVolume; }
 
+    public RiskSeverity getRiskLevel() { return riskLevel; }
 
+    public void setRiskLevel(RiskSeverity riskLevel) { this.riskLevel = riskLevel; }
 
-        public AssetDTO() {
+    public AssetDTO() {
     }
 }

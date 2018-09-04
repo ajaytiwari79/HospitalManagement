@@ -103,7 +103,7 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
 
 
     @Override
-    public BigInteger getMasterQuestionanaireTemplateIdListByTemplateType(Long countryId,QuestionnaireTemplateType templateType) {
+    public BigInteger getMasterQuestionnaireTemplateIdListByTemplateType(Long countryId,QuestionnaireTemplateType templateType) {
         List<BigInteger> assetNames=new ArrayList<>();
         Query query = new Query(Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(countryId).and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE));
        return mongoTemplate.findOne(query,MasterQuestionnaireTemplate.class).getId();

@@ -106,12 +106,12 @@ public class AssetService extends MongoBaseService {
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + assetId);
         }
-        List<ProcessingActivityBasicResponseDTO> linkedProcessingACtivities = processingActivityMongoRepository.findAllProcessingActivityLinkWithAssetById(organizationId, assetId);
+        List<ProcessingActivityBasicResponseDTO> linkedProcessingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkWithAssetById(organizationId, assetId);
         Map<String, Object> result = new HashMap<>();
-        if (!linkedProcessingACtivities.isEmpty()) {
+        if (!linkedProcessingActivities.isEmpty()) {
             result.put(IS_SUCCESS, false);
-            result.put("data", linkedProcessingACtivities);
-            result.put("message", "Asset is linked with Processing Activites");
+            result.put("data", linkedProcessingActivities);
+            result.put("message", "Asset is linked with Processing Activities");
         } else {
             delete(asset);
             result.put(IS_SUCCESS, true);
@@ -251,13 +251,13 @@ public class AssetService extends MongoBaseService {
             processingActivityResponseDTOList = processingActivityMongoRepository.getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(unitId, processingActivitiesIdList);
             Set<BigInteger> subProcessingActivitiesIdsList = asset.getSubProcessingActivities();
 
-            for (ProcessingActivityBasicResponseDTO processingActivityBasicResponsDTO : processingActivityResponseDTOList) {
+            for (ProcessingActivityBasicResponseDTO processingActivityBasicResponseDTO : processingActivityResponseDTOList) {
 
-                List<ProcessingActivityBasicResponseDTO> subProcessingActivites = processingActivityBasicResponsDTO.getSubProcessingActivities();
+                List<ProcessingActivityBasicResponseDTO> subProcessingActivities = processingActivityBasicResponseDTO.getSubProcessingActivities();
                 boolean defaultSelected = true;
                 List<ProcessingActivityBasicResponseDTO> defaultSubProcessingActivityList = new ArrayList<>();
 
-                for (ProcessingActivityBasicResponseDTO subProcessingActivity : subProcessingActivites) {
+                for (ProcessingActivityBasicResponseDTO subProcessingActivity : subProcessingActivities) {
                     if (subProcessingActivitiesIdsList.contains(subProcessingActivity.getId())) {
                         subProcessingActivity.setSelected(true);
                         defaultSelected = false;
@@ -269,7 +269,7 @@ public class AssetService extends MongoBaseService {
                 }
 
                 if (defaultSelected) {
-                    processingActivityBasicResponsDTO.setSubProcessingActivities(defaultSubProcessingActivityList);
+                    processingActivityBasicResponseDTO.setSubProcessingActivities(defaultSubProcessingActivityList);
                 }
             }
         }

@@ -42,7 +42,7 @@ public class OrganizationDataCategoryService extends MongoBaseService {
 
 
     @Inject
-    private DataElementMongoRepository dataElementMognoRepository;
+    private DataElementMongoRepository dataElementMongoRepository;
 
     @Inject
     private DataSubjectMappingRepository dataSubjectMappingRepository;
@@ -70,7 +70,7 @@ public class OrganizationDataCategoryService extends MongoBaseService {
             dataCategoryMongoRepository.saveAll(getNextSequence(dataCategoryList));
 
         } catch (MongoException e) {
-            dataElementMognoRepository.deleteAll((List<DataElement>) result.get(DATA_ELEMENTS_LIST));
+            dataElementMongoRepository.deleteAll((List<DataElement>) result.get(DATA_ELEMENTS_LIST));
             LOGGER.info("data category save method", e.getMessage());
         }
 
@@ -80,9 +80,9 @@ public class OrganizationDataCategoryService extends MongoBaseService {
 
     /**
      * @description -  Map<DataCategory, List<DataElement>> contain list of data elements corresponding to data Category,and
-     * saveDataElementsAndCheckDuplicateyEntry method create Data Elements ,at the end we map data Category with data element and return list of Data Category with data Element
+     * save Data Elements  And Check Duplicate Entry method create Data Elements ,at the end we map data Category with data element and return list of Data Category with data Element
      * @param unitId
-     * @param dataCategoryDTOS List og Data Category Dto which contain data elemnts Dto list
+     * @param dataCategoryDTOS List og Data Category Dto which contain data element Dto list
      * @return method return list of Data Elements and data category
      */
     private Map<String, Object> buildDataCategoryWithDataElements(Long unitId, List<DataCategoryDTO> dataCategoryDTOS) {
@@ -133,7 +133,7 @@ public class OrganizationDataCategoryService extends MongoBaseService {
      *
      * @param unitId  - organization Id
      * @param dataCategoryId - data Category id
-     * @return method  return map with status isSucces true or false on successfull deletion of Data category if
+     * @return method  return map with status is Success true or false on successfull deletion of Data category if
      *         Data Category is Linked with Data Subjects then status is false nad we return list of Data Subjects to which Data Category is linked
      */
     public Map<String, Object> deleteDataCategoryAndDataElement(Long unitId, BigInteger dataCategoryId) {
@@ -148,7 +148,7 @@ public class OrganizationDataCategoryService extends MongoBaseService {
             result.put(IS_SUCCESS, false);
             result.put(DATA_SUBJECT_LIST, dataSubjectLinkedToDataCategory);
         } else {
-            List<DataElement> dataElementList = dataElementMognoRepository.findAllDataElementByUnitIdAndIds(unitId, dataCategory.getDataElements());
+            List<DataElement> dataElementList = dataElementMongoRepository.findAllDataElementByUnitIdAndIds(unitId, dataCategory.getDataElements());
             if (!dataElementList.isEmpty()) {
                 deleteAll(dataElementList);
             }

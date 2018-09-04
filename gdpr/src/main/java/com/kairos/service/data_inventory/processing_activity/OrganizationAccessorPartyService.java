@@ -102,10 +102,10 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
     public Boolean deleteAccessorParty(Long unitId, BigInteger accessorPartyId) {
 
-        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithAccesorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
-        if (!processingActivitiesLinkedWithAccesorParty.isEmpty()) {
+        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithAccessorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
+        if (!processingActivitiesLinkedWithAccessorParty.isEmpty()) {
             StringBuilder processingActivityNames=new StringBuilder();
-            processingActivitiesLinkedWithAccesorParty.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
+            processingActivitiesLinkedWithAccessorParty.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", processingActivityNames);
         }
         AccessorParty accessorParty = accessorPartyMongoRepository.findOrganizationIdAndIdAndNonDeleted(unitId, accessorPartyId);
@@ -148,7 +148,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
         Map<String, List<AccessorParty>> result;
         result = createAccessorParty(organizationId, AccessorPartyDTOS);
-        List<AccessorParty> masterAccessorPartySuggestedByUnit = accessorPartyService.saveSuggestedAccessorPartysFromUnit(countryId, AccessorPartyDTOS);
+        List<AccessorParty> masterAccessorPartySuggestedByUnit = accessorPartyService.saveSuggestedAccessorPartiesFromUnit(countryId, AccessorPartyDTOS);
         if (!masterAccessorPartySuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterAccessorPartySuggestedByUnit);
         }

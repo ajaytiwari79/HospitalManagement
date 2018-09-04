@@ -173,7 +173,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
 
     }
 
-    public Map<String, List<ProcessingLegalBasis>> saveAndSuggestProcessingLegalBasiss(Long countryId, Long organizationId, List<ProcessingLegalBasisDTO> ProcessingLegalBasisDTOS) {
+    public Map<String, List<ProcessingLegalBasis>> saveAndSuggestProcessingLegalBasis(Long countryId, Long organizationId, List<ProcessingLegalBasisDTO> ProcessingLegalBasisDTOS) {
 
         Map<String, List<ProcessingLegalBasis>> result;
         result = createProcessingLegalBasis(organizationId, ProcessingLegalBasisDTOS);

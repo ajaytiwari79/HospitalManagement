@@ -91,7 +91,7 @@ public class AssetController {
     @GetMapping("/asset")
     public ResponseEntity<Object> getAllAssetWithMetaData(@PathVariable Long unitId) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "rganization id can't be Null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllAssetWithMetadata(unitId));
     }

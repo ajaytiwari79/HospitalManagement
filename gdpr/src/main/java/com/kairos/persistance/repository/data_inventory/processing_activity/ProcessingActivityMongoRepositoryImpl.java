@@ -106,7 +106,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
 
 
     @Override
-    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubprocessingActivities(Long unitId) {
+    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubProcessingActivities(Long unitId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
 

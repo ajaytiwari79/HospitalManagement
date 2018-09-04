@@ -164,7 +164,7 @@ public class ProcessingActivityController {
         } else if (assetId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Asset  id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedAssetFromProcessingActivity(unitId, processingActivityId, assetId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removeLinkedAssetFromProcessingActivity(unitId, processingActivityId, assetId));
     }
 
     @ApiOperation(value = "Remove Data Subject from processing activity ")
@@ -176,7 +176,7 @@ public class ProcessingActivityController {
         } else if (processingActivityId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedDataSubjectFromProcessingActivity(unitId, processingActivityId, dataSubjectId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removeLinkedDataSubjectFromProcessingActivity(unitId, processingActivityId, dataSubjectId));
     }
 
 

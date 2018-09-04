@@ -33,7 +33,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<AgreementSectionResponseDTO> getAgreementTemplateAllSectionAndSubSectons(Long countryId, Long unitId, BigInteger agreementTemplateId) {
+    public List<AgreementSectionResponseDTO> getAgreementTemplateAllSectionAndSubSections(Long countryId, Long unitId, BigInteger agreementTemplateId) {
 
         String replaceRoot = "{ '$replaceRoot': { 'newRoot': '$agreementSections' } }";
         String sortAgreementSectionClauses = "{$sort:{'clauses.orderedIndex':-1}}";

@@ -36,7 +36,7 @@ public interface AssetTypeMongoRepository extends MongoBaseRepository<AssetType,
 
 
     @Query("{deleted:false,organizationId:?0,_id:{$in:?1}}")
-    List<AssetType> findAllAssetTypebyIdsAndOrganizationId(Long organizationId,List<BigInteger> ids);
+    List<AssetType> findAllAssetTypeByIdsAndOrganizationId(Long organizationId,List<BigInteger> ids);
 
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")

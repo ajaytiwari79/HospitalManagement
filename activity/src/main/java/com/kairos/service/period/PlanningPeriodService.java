@@ -1,17 +1,17 @@
 package com.kairos.service.period;
 
 
-import com.kairos.activity.period.PeriodDTO;
 import com.kairos.activity.period.FlippingDateDTO;
+import com.kairos.activity.period.PeriodDTO;
 import com.kairos.activity.period.PeriodPhaseDTO;
 import com.kairos.activity.period.PlanningPeriodDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.DurationType;
-import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
