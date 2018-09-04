@@ -2,6 +2,8 @@ package com.kairos.persistence.repository.activity;
 
 
 import com.kairos.activity.time_type.TimeTypeDTO;
+import com.kairos.enums.TimeTypes;
+import com.kairos.enums.unit_settings.TimeTypeEnum;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
@@ -28,6 +30,9 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
 
     @Query("{countryId:?0,deleted : false}")
     List<TimeType> findAllByCountryId(Long countryId);
+
+    @Query("{countryId:?0, deleted : false, timeTypes: ?1}")
+    List<TimeType> findByTimeTypeEnumAndCountryId(Long countryId, TimeTypes timeTypeEnum);
 
     @Query("{id:?0,countryId:?1,deleted : false}")
     TimeType findOneById(BigInteger TimeTypeId, Long countryId);

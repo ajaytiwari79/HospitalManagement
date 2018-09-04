@@ -2,6 +2,7 @@ package com.kairos.activity.counter;
 
 //Created By Pavan on 3/8/18
 
+import com.kairos.activity.counter.data.FilterCriteria;
 import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.activity.enums.counter.ModuleType;
 import java.math.BigInteger;

@@ -1,7 +1,7 @@
 package com.kairos.service.counter;
 
 
-import com.kairos.activity.counter.FilterCriteria;
+import com.kairos.activity.counter.data.FilterCriteria;
 import com.kairos.enums.FilterType;
 
 import java.util.HashMap;
@@ -32,7 +32,7 @@ public interface CounterService {
         return applicableCriteria;
     }
 
-    Map getCalculatedCounter(Map<FilterType, List> providedFiltersMap);
+    Map getCalculatedCounter(List<FilterCriteria> providedFiltersMap);
 
-    Map getCalculatedKPI(Map<FilterType, List> providedFilterMap);
+    Map getCalculatedKPI(List<FilterCriteria> providedFilterMap);
 }

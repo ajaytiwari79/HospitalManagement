@@ -1,13 +1,11 @@
 package com.kairos.service.counter;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.counter.FilterCriteria;
+import com.kairos.activity.counter.data.FilterCriteria;
 import com.kairos.activity.counter.distribution.category.KPICategoryUpdationDTO;
 import com.kairos.activity.counter.enums.CounterType;
-import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.persistence.model.counter.KPICategory;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Test;

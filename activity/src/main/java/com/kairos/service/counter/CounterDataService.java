@@ -357,4 +357,6 @@ public class CounterDataService {
     //public List<ShiftDTO> getShifts
 
     //public void
+
+    //public
 }

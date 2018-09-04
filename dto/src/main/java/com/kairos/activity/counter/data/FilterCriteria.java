@@ -1,4 +1,4 @@
-package com.kairos.activity.counter;
+package com.kairos.activity.counter.data;
 
 import com.kairos.enums.FilterType;
 

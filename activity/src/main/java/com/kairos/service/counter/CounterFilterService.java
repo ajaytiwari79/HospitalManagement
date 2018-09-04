@@ -1,6 +1,6 @@
 package com.kairos.service.counter;
 
-import com.kairos.activity.counter.FilterCriteria;
+import com.kairos.activity.counter.data.FilterCriteria;
 import com.kairos.enums.FilterType;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.stereotype.Service;
