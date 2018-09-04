@@ -436,7 +436,7 @@ public class PlanningPeriodService extends MongoBaseService {
         planningPeriod.setNextPhaseId(Optional.ofNullable(toBeNextPhase).isPresent() && toBeNextPhase.size() > 0 ? toBeNextPhase.get(0).getId() : null);
 
         if(!shifts.isEmpty()) {
-            createShiftState(shifts, planningPeriod.getCurrentPhaseId());
+            flipShiftAndCreateShiftStte(shifts, planningPeriod.getCurrentPhaseId());
         }
         save(planningPeriod);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
@@ -463,25 +463,23 @@ public class PlanningPeriodService extends MongoBaseService {
             planningPeriod.setNextPhaseId(nextPhaseId);
             save(planningPeriod);
         }
-        if(!shifts.isEmpty()) {
-            createShiftState(shifts, planningPeriod.getCurrentPhaseId());
-        }
+        flipShiftAndCreateShiftStte(shifts, planningPeriod.getCurrentPhaseId());
         return true;
     }
 
-    public void createShiftState(List<Shift> shifts,BigInteger currentPhaseId){
+    public void flipShiftAndCreateShiftStte(List<Shift> shifts,BigInteger currentPhaseId){
+        if(shifts.isEmpty()){
+            return;
+        }
         List<ShiftState> shiftStates=new ArrayList<>();
         shifts.stream().forEach(shift ->{
+            shift.setPhaseId(currentPhaseId);
             ShiftState shiftState = ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftState.class);
             shiftState.setShiftId(shift.getId());
             shiftState.setPhaseId(currentPhaseId);
             shiftState.setId(null);
             shiftStates.add(shiftState);
         } );
-        shifts.stream().forEach(shift -> {
-            shift.setPhaseId(currentPhaseId);
-        });
-        if(!shiftStates.isEmpty())
             save(shiftStates);
             save(shifts);
     }
