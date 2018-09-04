@@ -53,6 +53,7 @@ import com.kairos.rest_client.*;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.locale.LocaleService;
 import com.kairos.service.pay_out.PayOutService;
@@ -174,8 +175,12 @@ public class ShiftService extends MongoBaseService {
     @Inject private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
 
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+<<<<<<< HEAD
     @Inject private ActivityAndShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
     @Inject private GenericRestClient genericRestClient;
+=======
+    @Inject private ActivityService activityService;
+>>>>>>> 2e4155c8326d552f5e7d2d3fa633bc0d34bfaec6
 
 
 
@@ -185,6 +190,8 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivityId());
         }
+        activityService.validateActivityTimeRules(activity.getRulesActivityTab().getEarliestStartTime(),activity.getRulesActivityTab().getLatestStartTime(),
+                activity.getRulesActivityTab().getMaximumEndTime(),activity.getRulesActivityTab().getShortestTime(),activity.getRulesActivityTab().getLongestTime());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTO.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
@@ -508,6 +515,8 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivityId());
         }
+        activityService.validateActivityTimeRules(activity.getRulesActivityTab().getEarliestStartTime(),activity.getRulesActivityTab().getLatestStartTime(),
+                activity.getRulesActivityTab().getMaximumEndTime(),activity.getRulesActivityTab().getShortestTime(),activity.getRulesActivityTab().getLongestTime());
         Activity activityOld = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTO.getStartDate());
         //copy old state of activity object

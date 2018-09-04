@@ -560,17 +560,6 @@ public class AccessGroupService {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
         }
-        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory())) {
-            if (accessGroupDTO.getAccountTypeIds().isEmpty()) {
-                exceptionService.dataNotMatchedException("message.accountType.select");
-            } else {
-                List<AccountType> accountTypes = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypeIds());
-                if (accountTypes.size() != accessGroupDTO.getAccountTypeIds().size()) {
-                    exceptionService.actionNotPermittedException("message.accountType.notFound");
-                }
-                accessGrpToUpdate.get().setAccountType(accountTypes);
-            }
-        }
         accessGrpToUpdate.get().setName(accessGroupDTO.getName());
         accessGrpToUpdate.get().setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.get().setLastModificationDate(DateUtil.getCurrentDate().getTime());
@@ -717,11 +706,7 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", countryAccessGroupDTO.getId());
 
         }
-        List<AccountType> accountType = accountTypeGraphRepository.getAllAccountTypeByIds(countryAccessGroupDTO.getAccountTypeIds());
-        if (accountType.size() != countryAccessGroupDTO.getAccountTypeIds().size()) {
-            exceptionService.dataNotMatchedException("message.accountType.notFound");
-        }
-        AccessGroup accessGroup = OrganizationCategory.ORGANIZATION.equals(countryAccessGroupDTO.getOrganizationCategory()) ? new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole(), accountType) : new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole());
+        AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole(),currentAccessGroup.get().getAccountType());
         accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
