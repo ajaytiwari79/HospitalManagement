@@ -4,6 +4,7 @@ import com.kairos.persistance.model.data_inventory.processing_activity.Processin
 import com.kairos.persistance.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
@@ -83,7 +84,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                         .addToSet("subProcessingActivities").as("subProcessingActivities"),
                 unwind("subProcessingActivities"),
                 new CustomAggregationOperation(replaceRootOperation)
-               // sort(Sort.Direction.ASC, "name")
+                // sort(Sort.Direction.ASC, "name")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
@@ -158,5 +159,21 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
         return result.getUniqueMappedResult();
+    }
+
+    @Override
+    public List<AssetBasicResponseDTO> getAllAssetLinkedWithProcessingActivityById(Long unitId, BigInteger processingActivityId) {
+
+        String replaceRoot = "{ '$replaceRoot': { 'newRoot': '$linkedAssets' } }";
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false).and("_id").is(processingActivityId)),
+                lookup("asset", "linkedAssets", "_id", "linkedAssets"),
+                unwind("linkedAssets"),
+                new CustomAggregationOperation(Document.parse(replaceRoot)),
+                match(Criteria.where(DELETED).is(false))
+        );
+        AggregationResults<AssetBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, AssetBasicResponseDTO.class);
+        return result.getMappedResults();
+
     }
 }

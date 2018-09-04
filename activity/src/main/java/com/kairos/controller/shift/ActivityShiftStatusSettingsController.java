@@ -44,7 +44,7 @@ public class ActivityShiftStatusSettingsController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true, activityShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupedByStatus(unitId,activityId));
     }
 
-    @PutMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL+"/id")
+    @PutMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL+"/{id}")
     @ApiOperation("update Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> updateActivityAndShiftStatusSettings(@PathVariable Long unitId,@PathVariable BigInteger id,@RequestBody ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO){
