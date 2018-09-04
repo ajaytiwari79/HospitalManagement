@@ -22,14 +22,14 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
-import com.kairos.persistence.model.shift.ActivityAndShiftStatusSettings;
+import com.kairos.persistence.model.shift.ActivityShiftStatusSettings;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
-import com.kairos.persistence.repository.shift.ActivityAndShiftStatusSettingsRepository;
+import com.kairos.persistence.repository.shift.ActivityShiftStatusSettingsRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.planner.planninginfo.PlannerSyncResponseDTO;
@@ -64,7 +64,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -83,15 +82,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static javafx.scene.input.KeyCode.V;
 import static org.springframework.http.MediaType.APPLICATION_XML;
 
 
@@ -140,7 +136,7 @@ public class ActivityService extends MongoBaseService {
     @Inject
     private GenericIntegrationService genericIntegrationService;
     @Inject private CounterRepository counterRepository;
-    @Inject private ActivityAndShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
+    @Inject private ActivityShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
     @Inject private GenericRestClient genericRestClient;
 
 
@@ -1194,19 +1190,19 @@ public class ActivityService extends MongoBaseService {
     }
 
     public void copyActivityAndShiftStatusOfThisActivity(BigInteger activityId,BigInteger newActivityId){
-        List<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findAllByActivityId(activityId);
-        if(!activityAndShiftStatusSettings.isEmpty()){
-            activityAndShiftStatusSettings.forEach(currentActivityAndShiftStatusSettings->{
+        List<ActivityShiftStatusSettings> activityShiftStatusSettings =activityAndShiftStatusSettingsRepository.findAllByActivityId(activityId);
+        if(!activityShiftStatusSettings.isEmpty()){
+            activityShiftStatusSettings.forEach(currentActivityAndShiftStatusSettings->{
                 currentActivityAndShiftStatusSettings.setId(null);
                 currentActivityAndShiftStatusSettings.setActivityId(newActivityId);
             });
-            save(activityAndShiftStatusSettings);
+            save(activityShiftStatusSettings);
         }
     }
 
 
     public void deleteActivityAndShiftStatusOfThisActivity(BigInteger activityId){
-        Optional<ActivityAndShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityId);
+        Optional<ActivityShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityId);
         if(activityAndShiftStatusSettings.isPresent()){
             activityAndShiftStatusSettings.get().setDeleted(true);
             save(activityAndShiftStatusSettings.get());

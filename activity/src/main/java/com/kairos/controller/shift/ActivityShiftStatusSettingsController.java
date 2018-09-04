@@ -4,8 +4,8 @@ package com.kairos.controller.shift;
  *
  */
 
-import com.kairos.activity.shift.ActivityAndShiftStatusSettingsDTO;
-import com.kairos.service.shift.ActivityAndShiftStatusSettingsService;
+import com.kairos.activity.shift.ActivityShiftStatusSettingsDTO;
+import com.kairos.service.shift.ActivityShiftStatusSettingsService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,32 +24,32 @@ import static com.kairos.constants.ApiConstants.UNIT_ACTIVITY_AND_SHIFT_STATUS_S
 @RestController
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
-public class ActivityAndShiftStatusSettingsController {
+public class ActivityShiftStatusSettingsController {
 
     @Inject
-    private ActivityAndShiftStatusSettingsService activityAndShiftStatusSettingsService;
+    private ActivityShiftStatusSettingsService activityShiftStatusSettingsService;
 
     // EndPoints for unit
 
     @PostMapping(value = UNIT_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL)
     @ApiOperation("create Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> addActivityAndShiftStatusSetting(@PathVariable Long unitId, @Valid @RequestBody ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.addActivityAndShiftStatusSetting(unitId,activityAndShiftStatusSettingsDTO));
+    public ResponseEntity<Map<String,Object>> addActivityAndShiftStatusSetting(@PathVariable Long unitId, @Valid @RequestBody ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true, activityShiftStatusSettingsService.addActivityAndShiftStatusSetting(unitId, activityShiftStatusSettingsDTO));
     }
 
     @GetMapping(value = UNIT_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL+"/activity/{activityId}")
     @ApiOperation("get All Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> getAllActivityAndShiftStatusSettingsByActivityId(@PathVariable Long unitId,@PathVariable BigInteger activityId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupedByStatus(unitId,activityId));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true, activityShiftStatusSettingsService.getActivityAndShiftStatusSettingsGroupedByStatus(unitId,activityId));
     }
 
     @PutMapping(value = UNIT_ACTIVITY_AND_SHIFT_STATUS_SETTINGS_URL)
     @ApiOperation("update Activity and shift status setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> updateActivityAndShiftStatusSettings(@PathVariable Long unitId,@RequestBody ActivityAndShiftStatusSettingsDTO activityAndShiftStatusSettingsDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,activityAndShiftStatusSettingsService.updateActivityAndShiftStatusSettings(unitId,activityAndShiftStatusSettingsDTO));
+    public ResponseEntity<Map<String,Object>> updateActivityAndShiftStatusSettings(@PathVariable Long unitId,@RequestBody ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true, activityShiftStatusSettingsService.updateActivityAndShiftStatusSettings(unitId, activityShiftStatusSettingsDTO));
     }
 
 

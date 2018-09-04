@@ -1,6 +1,5 @@
 package com.kairos.service.shift;
 
-import com.kairos.activity.cta.CTABasicDetailsDTO;
 import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.activity.shift.*;
@@ -16,7 +15,7 @@ import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.shift.ActivityAndShiftStatusSettings;
+import com.kairos.persistence.model.shift.ActivityShiftStatusSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.activity.tabs.CompositeActivity;
 import com.kairos.persistence.model.break_settings.BreakSettings;
@@ -38,7 +37,7 @@ import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
-import com.kairos.persistence.repository.shift.ActivityAndShiftStatusSettingsRepository;
+import com.kairos.persistence.repository.shift.ActivityShiftStatusSettingsRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
@@ -102,7 +101,6 @@ import static com.kairos.constants.AppConstants.*;
 import static com.kairos.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 import static com.kairos.util.DateUtils.ONLY_DATE;
 import static com.kairos.util.WTARuleTemplateValidatorUtility.getIntervalByRuleTemplates;
-import static javafx.scene.input.KeyCode.V;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
@@ -175,12 +173,10 @@ public class ShiftService extends MongoBaseService {
     @Inject private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
 
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
-<<<<<<< HEAD
-    @Inject private ActivityAndShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
+    @Inject private ActivityShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
     @Inject private GenericRestClient genericRestClient;
-=======
     @Inject private ActivityService activityService;
->>>>>>> 2e4155c8326d552f5e7d2d3fa633bc0d34bfaec6
+
 
 
 
@@ -1351,9 +1347,9 @@ public class ShiftService extends MongoBaseService {
 
     private boolean validateAccessGroup(Phase phase,ShiftStatus status,BigInteger activityId){
         if(activityId!=null){
-            ActivityAndShiftStatusSettings activityAndShiftStatusSettings= activityAndShiftStatusSettingsRepository.findByPhaseIdAndActivityIdAndShiftStatus(phase.getId(),activityId,status);
+            ActivityShiftStatusSettings activityShiftStatusSettings = activityAndShiftStatusSettingsRepository.findByPhaseIdAndActivityIdAndShiftStatus(phase.getId(),activityId,status);
             StaffAccessGroupDTO staffAccessGroupDTO=genericRestClient.publishRequest(null, null, true, IntegrationOperation.GET, "/staff/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAccessGroupDTO>>() {});
-            return activityAndShiftStatusSettings!=null && CollectionUtils.containsAny(activityAndShiftStatusSettings.getAccessGroupIds(),staffAccessGroupDTO.getAccessGroupIds());
+            return activityShiftStatusSettings !=null && CollectionUtils.containsAny(activityShiftStatusSettings.getAccessGroupIds(),staffAccessGroupDTO.getAccessGroupIds());
         }
         return false;
     }

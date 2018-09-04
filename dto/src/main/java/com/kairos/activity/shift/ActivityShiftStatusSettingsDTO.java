@@ -1,29 +1,34 @@
-package com.kairos.persistence.model.shift;
-/*
+package com.kairos.activity.shift;/*
  *Created By Pavan on 29/8/18
  *
  */
 
 import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Set;
 
-@CompoundIndex(name = "phase_shiftStatus",def = "{'phaseId','shiftStatus'}",unique = true)
-public class ActivityAndShiftStatusSettings extends MongoBaseEntity {
+public class ActivityShiftStatusSettingsDTO {
+    private BigInteger id;
+    @NotNull
     private BigInteger activityId;
-    @Indexed
+    @NotNull
     private BigInteger phaseId;
-    @Indexed private ShiftStatus shiftStatus;
+    @NotNull
+    private ShiftStatus shiftStatus;
     private Set<Long> accessGroupIds;
-    private Long countryId;
-    private Long unitId;
 
-    public ActivityAndShiftStatusSettings() {
+    public ActivityShiftStatusSettingsDTO() {
         //Default Constructor
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public BigInteger getActivityId() {
@@ -56,21 +61,5 @@ public class ActivityAndShiftStatusSettings extends MongoBaseEntity {
 
     public void setAccessGroupIds(Set<Long> accessGroupIds) {
         this.accessGroupIds = accessGroupIds;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
     }
 }
