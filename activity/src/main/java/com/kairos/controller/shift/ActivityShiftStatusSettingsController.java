@@ -29,7 +29,6 @@ public class ActivityShiftStatusSettingsController {
     @Inject
     private ActivityShiftStatusSettingsService activityShiftStatusSettingsService;
 
-    // EndPoints for unit
 
     @PostMapping(value = ACTIVITY_SHIFT_STATUS_SETTINGS_URL)
     @ApiOperation("create Activity and shift status setting")

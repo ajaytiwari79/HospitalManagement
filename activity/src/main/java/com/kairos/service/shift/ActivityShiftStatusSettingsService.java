@@ -28,7 +28,7 @@ public class ActivityShiftStatusSettingsService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
 
-    // Endpoints methods for unit
+
 
     public ActivityShiftStatusSettingsDTO addActivityAndShiftStatusSetting(Long unitId, ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO){
         ActivityShiftStatusSettings activityShiftStatusSettings =ObjectMapperUtils.copyPropertiesByMapper(activityShiftStatusSettingsDTO,ActivityShiftStatusSettings.class);
