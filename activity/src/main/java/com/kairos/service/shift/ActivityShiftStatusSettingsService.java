@@ -39,10 +39,10 @@ public class ActivityShiftStatusSettingsService extends MongoBaseService {
     }
 
 
-    public ActivityShiftStatusSettingsDTO updateActivityAndShiftStatusSettings(Long unitId, ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO){
-        Optional<ActivityShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityShiftStatusSettingsDTO.getId());
+    public ActivityShiftStatusSettingsDTO updateActivityAndShiftStatusSettings(Long unitId,BigInteger id, ActivityShiftStatusSettingsDTO activityShiftStatusSettingsDTO){
+        Optional<ActivityShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(id);
         if(!activityAndShiftStatusSettings.isPresent()){
-            exceptionService.dataNotFoundException("settings.not.found", activityShiftStatusSettingsDTO.getId());
+            exceptionService.dataNotFoundException("settings.not.found", id);
         }
         ObjectMapperUtils.copyProperties(activityShiftStatusSettingsDTO,activityAndShiftStatusSettings);
         activityAndShiftStatusSettings.get().setUnitId(unitId);
