@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.activity;
+package com.kairos.persistence.model.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -57,9 +57,10 @@ public class Shift extends MongoBaseEntity {
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
     private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
-
+    private BigInteger planningPeriodId;
+    private BigInteger phaseId;
     public Shift() {
-        //dc
+        //Default Constructor
     }
 
 
@@ -200,6 +201,22 @@ public class Shift extends MongoBaseEntity {
 
     public void setAccumulatedTimeBankInMinutes(long accumulatedTimeBankInMinutes) {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
+    }
+
+    public BigInteger getPlanningPeriodId() {
+        return planningPeriodId;
+    }
+
+    public void setPlanningPeriodId(BigInteger planningPeriodId) {
+        this.planningPeriodId = planningPeriodId;
+    }
+
+    public BigInteger getPhaseId() {
+        return phaseId;
+    }
+
+    public void setPhaseId(BigInteger phaseId) {
+        this.phaseId = phaseId;
     }
 
     public int getMinutes() {

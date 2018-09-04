@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.activity.shift.ShiftCountDTO;
 import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;

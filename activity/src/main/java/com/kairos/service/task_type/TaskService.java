@@ -12,7 +12,7 @@ import com.kairos.enums.Day;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.messaging.ReceivedTask;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;

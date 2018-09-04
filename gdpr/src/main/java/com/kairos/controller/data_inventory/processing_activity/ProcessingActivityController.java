@@ -17,6 +17,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
@@ -118,7 +119,7 @@ public class ProcessingActivityController {
 
     @ApiOperation(value = "updated status of processing activity")
     @PutMapping("/processing_activity/{processingActivityId}/status")
-    public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId,@RequestParam boolean active) {
+    public ResponseEntity<Object> updateStatusOfProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestParam boolean active) {
 
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
@@ -146,6 +147,19 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(unitId, processingActivityId));
     }
 
+    @ApiOperation(value = "Remove Data Subject from processing activity ")
+    @DeleteMapping("/processing_activity/{processingActivityId}/data_subject/{dataSubjectId}")
+    public ResponseEntity<Object> removeRelatedDataSubjectFromProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger dataSubjectId) {
+
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        } else if (processingActivityId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedDataSubjectFromProcessingActivity(unitId, processingActivityId, dataSubjectId));
+    }
+
+
 
     @ApiOperation(value = "Link Asset to processing activity")
     @PutMapping("/processing_activity/{processingActivityId}/asset/{assetId}")
@@ -155,6 +169,16 @@ public class ProcessingActivityController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.mapAssetWithProcessingActivity(unitId, processingActivityId, assetId));
     }
+
+    @ApiOperation(value = "get all Asset linked with Perocessing Activity")
+    @GetMapping("/processing_activity/{processingActivityId}/asset")
+    public ResponseEntity<Object> getAllMappedAssetWithProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllAssetLinkedWithProcessingActivity(unitId, processingActivityId));
+    }
+
 
     @ApiOperation(value = "Remove  Asset from Processing Activity ")
     @DeleteMapping("/processing_activity/{processingActivityId}/asset/{assetId}")
@@ -167,17 +191,6 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedAssetFromProcessingActivity(unitId, processingActivityId, assetId));
     }
 
-    @ApiOperation(value = "Remove Data Subject from processing activity ")
-    @DeleteMapping("/processing_activity/{processingActivityId}/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> removeRelatedDataSubjectFromProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger dataSubjectId) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        } else if (processingActivityId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedDataSubjectFromProcessingActivity(unitId, processingActivityId, dataSubjectId));
-    }
 
 
 }

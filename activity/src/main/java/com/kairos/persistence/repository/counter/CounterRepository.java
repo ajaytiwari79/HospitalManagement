@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.counter;
 import com.kairos.activity.counter.ApplicableKPIDTO;
 import com.kairos.activity.counter.CounterDTO;
 import com.kairos.activity.counter.KPICategoryDTO;
+import com.kairos.activity.counter.KPIDashboardDTO;
 import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.activity.counter.distribution.category.CategoryKPIMappingDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
@@ -12,6 +13,7 @@ import com.kairos.activity.counter.enums.CounterType;
 import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.model.counter.chart.KPIDashboard;
 import com.kairos.util.ObjectMapperUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -265,4 +267,19 @@ public class CounterRepository {
         query.fields().include("id").include("title");
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,Counter.class),CounterDTO.class);
     }
+
+    //dashboard tab
+    public List<KPIDashboard> getKPIDashboardByIds(List<BigInteger> dashboardIds, ConfLevel level, Long refId){
+        String queryField =getRefQueryField(level);
+        Query query=new Query(Criteria.where("_id").in(dashboardIds).and(queryField).is(refId));
+        return mongoTemplate.find(query,KPIDashboard.class);
+    }
+
+    public List<KPIDashboardDTO> getKPIDashboard(List<BigInteger> dashBoardIds, ConfLevel level, Long refId){
+        String refQueryField = getRefQueryField(level);
+        Criteria matchCriteria = dashBoardIds == null ? Criteria.where(refQueryField).is(refId) : Criteria.where("_id").in(dashBoardIds).and(refQueryField).is(refId).and("level").is(level);
+        Query query=new Query(matchCriteria);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPIDashboard.class),KPIDashboardDTO.class);
+    }
+
 }

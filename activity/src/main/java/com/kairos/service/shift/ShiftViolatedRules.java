@@ -2,8 +2,8 @@ package com.kairos.service.shift;
 
 import com.kairos.activity.shift.ActivityRuleViolation;
 import com.kairos.activity.shift.WorkTimeAgreementRuleViolation;
-import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.service.MongoBaseService;
 import org.springframework.data.mongodb.core.mapping.Document;
 

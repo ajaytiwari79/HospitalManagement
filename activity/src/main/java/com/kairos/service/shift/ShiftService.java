@@ -9,12 +9,14 @@ import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.enums.Day;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.ActivityShiftStatusSettings;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.activity.tabs.CompositeActivity;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.open_shift.OpenShift;
@@ -45,9 +47,7 @@ import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.response.dto.web.shift.IndividualShiftTemplateDTO;
-import com.kairos.rest_client.CountryRestClient;
-import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.StaffRestClient;
+import com.kairos.rest_client.*;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
 import com.kairos.service.MongoBaseService;
@@ -61,6 +61,7 @@ import com.kairos.service.unit_settings.PhaseSettingsService;
 import com.kairos.service.wta.WTAService;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.access_permission.AccessGroupRole;
+import com.kairos.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.user.country.experties.AppliedFunctionDTO;
 import com.kairos.user.staff.staff.StaffAccessRoleDTO;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
@@ -79,8 +80,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import com.kairos.persistence.repository.shift.ActivityShiftStatusSettingsRepository;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -170,6 +173,8 @@ public class ShiftService extends MongoBaseService {
     @Inject private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
 
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject private ActivityShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
+    @Inject private GenericRestClient genericRestClient;
     @Inject private ActivityService activityService;
 
 
@@ -1045,21 +1050,32 @@ public class ShiftService extends MongoBaseService {
         response.put("error", error);
 
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftPublishDTO.getShiftIds());
+
         if (!shifts.isEmpty()) {
             Set<LocalDate> dates = shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
-            Map<LocalDate, List<ShiftStatus>> phaseListByDate = phaseService.getStatusByDates(unitId, dates);
+            Map<LocalDate, Phase> phaseListByDate = phaseService.getStatusByDates(unitId, dates);
             for (Shift shift : shifts) {
-                List<ShiftStatus> phaseStatuses = phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
-                if (phaseStatuses.containsAll(shiftPublishDTO.getStatus())) {
+                List<ShiftStatus> phaseStatuses = phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate())).getStatus();
+                Phase phase=phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
+                 boolean validAccessGroup= validateAccessGroup(phase,shiftPublishDTO.getStatus().get(0),shift.getActivityId());
+                 boolean validStatus=phaseStatuses.containsAll(shiftPublishDTO.getStatus());
+                if (validStatus && validAccessGroup ) {
                     shift.getStatus().addAll(shiftPublishDTO.getStatus());
                     success.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("message.shift.status.added")), true));
                 } else {
-
                     List<Object> errorMessages = new ArrayList<>();
-                    errorMessages.addAll(shiftPublishDTO.getStatus());
-                    errorMessages.addAll(phaseStatuses);
-                    error.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("error.shift.status", errorMessages.toArray())), false));
+                    List<String> messages=new ArrayList<>();
+                    if(!validStatus) {
+                        errorMessages.addAll(shiftPublishDTO.getStatus());
+                        errorMessages.addAll(phaseStatuses);
+                        messages.add(localeService.getMessage("error.shift.status", errorMessages.toArray()));
+                    }
+                    if(!validAccessGroup){
+                        messages.add(localeService.getMessage("access.group.not.matched"));
+                    }
+                    error.add(new ShiftResponse(shift.getId(), shift.getName(),messages, false));
                 }
+
             }
             save(shifts);
         }
@@ -1342,6 +1358,15 @@ public class ShiftService extends MongoBaseService {
         breakActivityIds.addAll(breakSettings.stream().map(BreakSettings::getUnpaidActivityId).collect(Collectors.toSet()));
         List<Activity> breakActivities=activityRepository.findAllActivitiesByIds(breakActivityIds);
         return breakActivities.stream().collect(Collectors.toMap(Activity::getId,v->v));
+    }
+
+    private boolean validateAccessGroup(Phase phase,ShiftStatus status,BigInteger activityId){
+        if(activityId!=null){
+            ActivityShiftStatusSettings activityShiftStatusSettings = activityAndShiftStatusSettingsRepository.findByPhaseIdAndActivityIdAndShiftStatus(phase.getId(),activityId,status);
+            StaffAccessGroupDTO staffAccessGroupDTO=genericRestClient.publishRequest(null, null, true, IntegrationOperation.GET, "/staff/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAccessGroupDTO>>() {});
+            return activityShiftStatusSettings !=null && CollectionUtils.containsAny(activityShiftStatusSettings.getAccessGroupIds(),staffAccessGroupDTO.getAccessGroupIds());
+        }
+        return false;
     }
 
 

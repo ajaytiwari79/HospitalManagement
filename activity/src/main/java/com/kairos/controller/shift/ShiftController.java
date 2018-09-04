@@ -1,4 +1,4 @@
-package com.kairos.controller.activity;
+package com.kairos.controller.shift;
 
 import com.kairos.activity.shift.*;
 import com.kairos.service.activity.ActivityService;
@@ -36,7 +36,7 @@ public class ShiftController {
 
 
     @Inject
-    ShiftService shiftService;
+    private ShiftService shiftService;
     @Inject
     private ActivityService activityService;
 

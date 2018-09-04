@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -243,6 +244,4 @@ public class AccessGroupController {
     public ResponseEntity<Map<String, Object>> getStaffIdsByUnitIdAndAccessGroupId(@PathVariable Long unitId,@RequestBody List<Long> accessGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId));
     }
-
-
 }
