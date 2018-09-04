@@ -29,7 +29,8 @@ public class AndActivitySpecification<T> extends AbstractSpecification<T> {
 
     @Override
     public void validateRules(T t) {
-
+        specification1.validateRules(t);
+        specification2.validateRules(t);
     }
 
     @Override

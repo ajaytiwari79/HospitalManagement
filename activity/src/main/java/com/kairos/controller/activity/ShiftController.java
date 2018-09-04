@@ -1,8 +1,6 @@
 package com.kairos.controller.activity;
 
-import com.kairos.activity.shift.CopyShiftDTO;
-import com.kairos.activity.shift.ShiftDTO;
-import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.activity.shift.*;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.activity.shift.CopyShiftDTO;
@@ -63,6 +61,13 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, week, unitPositionId, type));
     }
 
+
+    @ApiOperation("save Shift after validation")
+    @PostMapping(value = "/shift/validated")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation(@PathVariable Long organizationId, @PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, type));
+    }
 
     @ApiOperation("update a Shift of a staff")
     @PutMapping(value = "/shift")

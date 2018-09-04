@@ -11,15 +11,15 @@ public class ActivityRuleViolation {
 
     private BigInteger activityId;
     private String name;
-    private boolean canBeIgnore;
+    private int counter;
 
     public ActivityRuleViolation() {
     }
 
-    public ActivityRuleViolation(BigInteger activityId, String name, boolean canBeIgnore) {
+    public ActivityRuleViolation(BigInteger activityId, String name, int counter) {
         this.activityId = activityId;
         this.name = name;
-        this.canBeIgnore = canBeIgnore;
+        this.counter = counter;
     }
 
     public BigInteger getActivityId() {
@@ -38,11 +38,11 @@ public class ActivityRuleViolation {
         this.name = name;
     }
 
-    public boolean isCanBeIgnore() {
-        return canBeIgnore;
+    public int getCounter() {
+        return counter;
     }
 
-    public void setCanBeIgnore(boolean canBeIgnore) {
-        this.canBeIgnore = canBeIgnore;
+    public void setCounter(int counter) {
+        this.counter = counter;
     }
 }

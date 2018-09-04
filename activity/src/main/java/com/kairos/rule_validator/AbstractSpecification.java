@@ -10,6 +10,14 @@ import java.util.List;
  */
 public abstract class AbstractSpecification<T> implements Specification<T> {
 
+    /*@Override
+    public abstract boolean isSatisfied(T t);
+
+    @Override
+    public abstract void validateRules(T t);
+
+    @Override
+    public abstract List<String> isSatisfiedString(T t);*/
 
     @Override
     public Specification<T> and(final Specification<T> specification) {
