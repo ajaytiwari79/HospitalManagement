@@ -164,6 +164,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN case when expertiseCount>0 THEN  true ELSE false END as response")
     Boolean checkExpertiseNameUniqueInOrganizationLevel(Long organizationLevelId, String expertiseName, Long currentExpertise);
 
+
     @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0} \n" +
             "match(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) where id(orgService) IN {1}\n" +
             " match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(l:Level) where id(l) = {2}\n" +
