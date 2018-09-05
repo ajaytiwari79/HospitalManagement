@@ -157,11 +157,11 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
     }
 
 
-    public Map<String, List<OrganizationalSecurityMeasure>> saveAndSuggestOrganizationalSecurityMeasures(Long countryId, Long organizationId, List<OrganizationalSecurityMeasureDTO> OrganizationalSecurityMeasureDTOS) {
+    public Map<String, List<OrganizationalSecurityMeasure>> saveAndSuggestOrganizationalSecurityMeasures(Long countryId, Long organizationId, List<OrganizationalSecurityMeasureDTO> orgSecurityMeasureDTOS) {
 
         Map<String, List<OrganizationalSecurityMeasure>> result;
-        result = createOrganizationalSecurityMeasure(organizationId, OrganizationalSecurityMeasureDTOS);
-        List<OrganizationalSecurityMeasure> masterOrganizationalSecurityMeasureSuggestedByUnit = organizationalSecurityMeasureService.saveSuggestedOrganizationalSecurityMeasuresFromUnit(countryId, OrganizationalSecurityMeasureDTOS);
+        result = createOrganizationalSecurityMeasure(organizationId, orgSecurityMeasureDTOS);
+        List<OrganizationalSecurityMeasure> masterOrganizationalSecurityMeasureSuggestedByUnit = organizationalSecurityMeasureService.saveSuggestedOrganizationalSecurityMeasuresFromUnit(countryId, orgSecurityMeasureDTOS);
         if (!masterOrganizationalSecurityMeasureSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterOrganizationalSecurityMeasureSuggestedByUnit);
         }

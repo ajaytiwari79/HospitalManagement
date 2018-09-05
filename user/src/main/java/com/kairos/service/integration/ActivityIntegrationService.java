@@ -11,6 +11,8 @@ import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class ActivityIntegrationService {
     GenericRestClient genericRestClient;
     @Inject
     RestClientForSchedulerMessages restClientForSchedulerMessages;
+    private Logger logger = LoggerFactory.getLogger(ActivityIntegrationService.class);
 
     public void createDefaultPriorityGroupsFromCountry(long countryId, long unitId) {
         Map<String, Object> countryDetail = new HashMap<>();
@@ -47,6 +50,7 @@ public class ActivityIntegrationService {
         countryDetail.put("parentOrganizationId", parentOrganizationId);
         countryDetail.put("orgTypeIds", orgTypeId);
         countryDetail.put("orgSubTypeIds", orgSubTypeIds);
+        logger.info("Default Data creation organization type %s  organization Sub type %s",orgTypeId,orgSubTypeIds);
         genericRestClient.publish(null, unitId, true, IntegrationOperation.CREATE, "/organization_default_data", countryDetail);
     }
 

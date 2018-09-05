@@ -159,11 +159,11 @@ public class OrganizationStorageFormatService extends MongoBaseService {
     }
 
 
-    public Map<String, List<StorageFormat>> saveAndSuggestStorageFormats(Long countryId, Long organizationId, List<StorageFormatDTO> StorageFormatDTOS) {
+    public Map<String, List<StorageFormat>> saveAndSuggestStorageFormats(Long countryId, Long organizationId, List<StorageFormatDTO> storageFormatDTOS) {
 
         Map<String, List<StorageFormat>> result;
-        result = createStorageFormat(organizationId, StorageFormatDTOS);
-        List<StorageFormat> masterStorageFormatSuggestedByUnit = storageFormatService.saveSuggestedStorageFormatsFromUnit(countryId, StorageFormatDTOS);
+        result = createStorageFormat(organizationId, storageFormatDTOS);
+        List<StorageFormat> masterStorageFormatSuggestedByUnit = storageFormatService.saveSuggestedStorageFormatsFromUnit(countryId, storageFormatDTOS);
         if (!masterStorageFormatSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterStorageFormatSuggestedByUnit);
         }

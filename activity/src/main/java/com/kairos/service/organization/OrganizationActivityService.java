@@ -339,6 +339,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public boolean createDefaultDataForOrganization(Long unitId, Long parentOrganizationId, Long countryId,Long orgTypeIds, List<Long> orgSubTypeIds) {
+        logger.info("I am going to create default data or organization "+unitId);
         unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
         List<Phase> phases = phaseService.createDefaultPhase(unitId, countryId);
         periodSettingsService.createDefaultPeriodSettings(unitId);
@@ -352,6 +353,7 @@ public class OrganizationActivityService extends MongoBaseService {
         if(!existingActivities.isEmpty()) {
             List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
             for (Activity activity : existingActivities) {
+                logger.info("I am act %s",activity.getName());
                 List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
                 for (int i = 0; i < phases.size(); i++) {
                     PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phases.get(i).getId(), phases.get(i).getName(), phases.get(i).getDescription(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(),
