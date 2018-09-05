@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.repository.support.SimpleMongoRepository
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
-import java.util.List;
 
 
 public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Serializable>

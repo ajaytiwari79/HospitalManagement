@@ -146,10 +146,7 @@ public class ProcessingActivityService extends MongoBaseService {
             subProcessingActivities.add(processingActivity);
         }
         subProcessingActivities = processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
-        subProcessingActivities.forEach(processingActivity -> {
-
-            subProcessingActivityIdList.add(processingActivity.getId());
-        });
+        subProcessingActivities.forEach(processingActivity -> subProcessingActivityIdList.add(processingActivity.getId()));
         return subProcessingActivityIdList;
 
     }
@@ -453,9 +450,7 @@ public class ProcessingActivityService extends MongoBaseService {
 
             List<ProcessingActivityRelatedDataCategory> relatedDataCategoriesToDataSubject = relatedDataCategoryMap.get(dataSubjectMappingResponseDTO.getId());
             Map<BigInteger, Set<BigInteger>> dataElementsCoresspondingToDataCategory = new HashMap<>();
-            relatedDataCategoriesToDataSubject.forEach(dataCategory -> {
-                dataElementsCoresspondingToDataCategory.put(dataCategory.getId(), dataCategory.getDataElements());
-            });
+            relatedDataCategoriesToDataSubject.forEach(dataCategory -> dataElementsCoresspondingToDataCategory.put(dataCategory.getId(), dataCategory.getDataElements()));
             List<DataCategoryResponseDTO> dataCategoryResponseDTOS = new ArrayList<>();
             dataSubjectMappingResponseDTO.getDataCategories().forEach(dataCategoryResponseDTO -> {
 

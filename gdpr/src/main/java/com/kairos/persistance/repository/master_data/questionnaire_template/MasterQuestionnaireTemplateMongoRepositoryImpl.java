@@ -6,11 +6,9 @@ import com.kairos.persistance.repository.client_aggregator.CustomAggregationOper
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 import org.bson.Document;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.convert.QueryMapper;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -25,7 +23,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionnaireTemplateRepository {
 

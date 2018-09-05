@@ -1,9 +1,7 @@
 package com.kairos.service.data_inventory.asset;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
@@ -12,7 +10,6 @@ import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -97,9 +94,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         List<BigInteger> subAssetTypesIds = new ArrayList<>();
         try {
             subAssetTypes = assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypes));
-            subAssetTypes.forEach(subAssetType -> {
-                subAssetTypesIds.add(subAssetType.getId());
-            });
+            subAssetTypes.forEach(subAssetType -> subAssetTypesIds.add(subAssetType.getId()));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());

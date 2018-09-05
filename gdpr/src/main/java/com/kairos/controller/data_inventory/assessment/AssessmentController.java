@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -57,7 +56,7 @@ public class AssessmentController {
 
     @ApiOperation(value = "get Assessment  By Id")
     @GetMapping(COUNTRY_URL + "/assessment/{assessmentId}")
-    public ResponseEntity<Object> getAssetAssessmentById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger assessmentId) throws IOException {
+    public ResponseEntity<Object> getAssetAssessmentById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger assessmentId) {
 
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
