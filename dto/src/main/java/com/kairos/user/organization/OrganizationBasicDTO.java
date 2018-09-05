@@ -30,6 +30,7 @@ public class OrganizationBasicDTO {
     private List<Long> subTypeId;
     private AddressDTO contactAddress; // used in case of child organization
     private UnitManagerDTO unitManager;  // Used in case of child organization only
+    private Long unitTypeId;
 
     public Long getId() {
         return id;
@@ -157,5 +158,13 @@ public class OrganizationBasicDTO {
 
     public void setKairosCompanyId(String kairosCompanyId) {
         this.kairosCompanyId = kairosCompanyId;
+    }
+
+    public Long getUnitTypeId() {
+        return unitTypeId;
+    }
+
+    public void setUnitTypeId(Long unitTypeId) {
+        this.unitTypeId = unitTypeId;
     }
 }

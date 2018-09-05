@@ -14,6 +14,7 @@ import com.kairos.persistance.repository.data_inventory.processing_activity.Proc
 import com.kairos.persistance.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
@@ -337,7 +338,7 @@ public class ProcessingActivityService extends MongoBaseService {
     /**
      * @param unitId
      * @param processingActivityId
-     * @param assetId
+     * @param assetId - asset id linked with processing activity
      * @return
      * @description map asset with processing activity (related tab processing activity)
      */
@@ -346,7 +347,9 @@ public class ProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        processingActivity.setAssetId(assetId);
+        List<BigInteger> assetIds=processingActivity.getLinkedAssets();
+        assetIds.add(assetId);
+        processingActivity.setLinkedAssets(assetIds);
         processingActivityMongoRepository.save(processingActivity);
         return true;
 
@@ -409,6 +412,18 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
     /**
+     *
+     * @param unitId
+     * @param processingActivityId
+     * @return
+     */
+    public List<AssetBasicResponseDTO> getAllAssetLinkedWithProcessingActivity(Long unitId,BigInteger processingActivityId)
+    {
+        return processingActivityMongoRepository.getAllAssetLinkedWithProcessingActivityById(unitId,processingActivityId);
+    }
+
+
+    /**
      * @param unitId
      * @param processingActivityId
      * @param assetId
@@ -420,7 +435,7 @@ public class ProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        processingActivity.setAssetId(null);
+        processingActivity.getLinkedAssets().remove(assetId);
         processingActivityMongoRepository.save(processingActivity);
         return true;
 

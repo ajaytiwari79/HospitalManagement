@@ -407,5 +407,11 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("Match(staff:Staff)-[rel:"+STAFF_HAS_EXPERTISE+"]-(exp:Expertise) where id(staff)={0} and id(exp)={1} set rel.expertiseStartDate = {2}  return staff,exp")
     void updateStaffExpertiseRelation(Long staffId,Long expertiseId,Long millis);
 
+    @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} with staff\n" +
+            "match(staff)-[:" + BELONGS_TO + "]-(employment:Employment)-[:" + HAS_EMPLOYMENTS + "]-(org:Organization{deleted:false}) with staff,org\n"+
+            "RETURN id(staff) as staffId,id(org) as unitId,org.name as unitName")
+    List<StaffTimezoneQueryResult> getAllStaffsAndUnitDetailsByUserId(Long userId);
+
+
 }
 
