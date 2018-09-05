@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -26,14 +27,16 @@ public interface DataSourceMongoRepository extends MongoBaseRepository<DataSourc
 
     DataSource findByid(BigInteger id);
 
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<DataSource> getDataSourceListByIds(Long countryId, Set<BigInteger> dataSourceIds);
 
-    @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
-    List<DataSourceResponseDTO> findAllDataSources(Long countryId,String suggestedDataStatus);
+    @Query("{deleted:false,countryId:?0}")
+    List<DataSourceResponseDTO> findAllDataSources(Long countryId);
 
       @Query("{organizationId:?0,deleted:false}")
     List<DataSourceResponseDTO> findAllOrganizationDataSources(Long organizationId);
 
-    @Query("{organizationId:?0,_id:?2,deleted:false}")
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
     DataSource findByOrganizationIdAndId(Long organizationId,BigInteger id);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")

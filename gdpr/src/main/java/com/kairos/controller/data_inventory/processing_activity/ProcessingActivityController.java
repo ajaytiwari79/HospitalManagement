@@ -149,10 +149,13 @@ public class ProcessingActivityController {
 
 
     @ApiOperation(value = "Link Asset to processing activity")
-    @PutMapping("/processing_activity/{processingActivityId}/asset/{assetId}")
-    public ResponseEntity<Object> linkAssetToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger assetId) {
+    @PutMapping("/processing_activity/{processingActivityId}/asset")
+    public ResponseEntity<Object> linkAssetToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestParam(value = "assetId") BigInteger assetId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        }
+        if (assetId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Asset id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.mapAssetWithProcessingActivity(unitId, processingActivityId, assetId));
     }

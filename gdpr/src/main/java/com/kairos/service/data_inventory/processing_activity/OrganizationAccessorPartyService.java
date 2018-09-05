@@ -142,11 +142,11 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
     }
 
-    public Map<String, List<AccessorParty>> saveAndSuggestAccessorParties(Long countryId, Long organizationId, List<AccessorPartyDTO> AccessorPartyDTOS) {
+    public Map<String, List<AccessorParty>> saveAndSuggestAccessorParties(Long countryId, Long organizationId, List<AccessorPartyDTO> accessorPartyDTOS) {
 
         Map<String, List<AccessorParty>> result;
-        result = createAccessorParty(organizationId, AccessorPartyDTOS);
-        List<AccessorParty> masterAccessorPartySuggestedByUnit = accessorPartyService.saveSuggestedAccessorPartiesFromUnit(countryId, AccessorPartyDTOS);
+        result = createAccessorParty(organizationId, accessorPartyDTOS);
+        List<AccessorParty> masterAccessorPartySuggestedByUnit = accessorPartyService.saveSuggestedAccessorPartiesFromUnit(countryId, accessorPartyDTOS);
         if (!masterAccessorPartySuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterAccessorPartySuggestedByUnit);
         }

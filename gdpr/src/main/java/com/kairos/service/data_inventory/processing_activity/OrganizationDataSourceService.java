@@ -151,11 +151,11 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
     }
 
-    public Map<String, List<DataSource>> saveAndSuggestDataSources(Long countryId, Long organizationId, List<DataSourceDTO> DataSourceDTOS) {
+    public Map<String, List<DataSource>> saveAndSuggestDataSources(Long countryId, Long organizationId, List<DataSourceDTO> dataSourceDTOS) {
 
         Map<String, List<DataSource>> result;
-        result = createDataSource(organizationId, DataSourceDTOS);
-        List<DataSource> masterDataSourceSuggestedByUnit = dataSourceService.saveSuggestedDataSourcesFromUnit(countryId, DataSourceDTOS);
+        result = createDataSource(organizationId, dataSourceDTOS);
+        List<DataSource> masterDataSourceSuggestedByUnit = dataSourceService.saveSuggestedDataSourcesFromUnit(countryId, dataSourceDTOS);
         if (!masterDataSourceSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterDataSourceSuggestedByUnit);
         }

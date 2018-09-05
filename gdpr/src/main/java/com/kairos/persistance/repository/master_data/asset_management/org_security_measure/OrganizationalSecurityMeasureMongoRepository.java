@@ -1,7 +1,6 @@
 package com.kairos.persistance.repository.master_data.asset_management.org_security_measure;
 
 
-import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -25,8 +25,12 @@ public interface OrganizationalSecurityMeasureMongoRepository extends MongoBaseR
 
     OrganizationalSecurityMeasure findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
-    List<OrganizationalSecurityMeasureResponseDTO> findAllOrganizationalSecurityMeasures(Long countryId, String suggestedDataStatus);
+    @Query("{deleted:false,countryId:?0}")
+    List<OrganizationalSecurityMeasureResponseDTO> findAllOrganizationalSecurityMeasures(Long countryId);
+
+
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<OrganizationalSecurityMeasure> getOrganizationalSecurityMeasureListByIds(Long countryId, Set<BigInteger> orgSecurityMeasureIds);
 
     @Query("{deleted:false,_id:{$in:?0}}")
     List<OrganizationalSecurityMeasureResponseDTO> findOrganizationalSecurityMeasuresListByIds(List<BigInteger> ids);
