@@ -11,6 +11,7 @@ import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.TimeSlotType;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.auth.User;
@@ -19,7 +20,6 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.country.EngineerType;
-import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.services.organizationServicesAndLevelQueryResult;
@@ -45,7 +45,6 @@ import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -87,7 +86,9 @@ import com.kairos.user.employment.employment_dto.EmploymentOverlapDTO;
 import com.kairos.user.employment.employment_dto.MainEmploymentResultDTO;
 import com.kairos.user.staff.StaffWithSkillDTO;
 import com.kairos.user.staff.client.ClientStaffInfoDTO;
-import com.kairos.user.staff.staff.*;
+import com.kairos.user.staff.staff.StaffChatDetails;
+import com.kairos.user.staff.staff.StaffCreationDTO;
+import com.kairos.user.staff.staff.StaffDTO;
 import com.kairos.user.user.password.PasswordUpdateDTO;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.util.*;
@@ -1282,13 +1283,15 @@ public class StaffService {
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
         organization.getEmployments().add(employment);
         organizationGraphRepository.save(organization);
-        UnitPermission unitPermission = new UnitPermission();
-        unitPermission.setOrganization(organization);
-        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-        if (Optional.ofNullable(accessGroup).isPresent()) {
-            unitPermission.setAccessGroup(accessGroup);
+        if (accessGroupId != null) {
+            UnitPermission unitPermission = new UnitPermission();
+            unitPermission.setOrganization(organization);
+            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+            if (Optional.ofNullable(accessGroup).isPresent()) {
+                unitPermission.setAccessGroup(accessGroup);
+            }
+            employment.getUnitPermissions().add(unitPermission);
         }
-        employment.getUnitPermissions().add(unitPermission);
 
         employmentGraphRepository.save(employment);
         activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(employment.getStaff().getId())), organization.getId());

@@ -77,7 +77,7 @@ public class ShiftSickService extends MongoBaseService {
         staffOriginalShiftsOfDates.forEach(s -> s.setDisabled(true));
 
         List<Shift> shifts = new ArrayList<>();
-        while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 1) {
+        while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 0) {
             shiftNeedsToAddForDays--;
             Date startDate = DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, 9);
             Date endDate = DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, 18);
