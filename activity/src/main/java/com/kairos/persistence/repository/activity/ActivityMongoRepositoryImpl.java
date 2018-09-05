@@ -3,10 +3,12 @@ package com.kairos.persistence.repository.activity;
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.CompositeActivityDTO;
 import com.kairos.activity.break_settings.BreakActivitiesDTO;
+import com.kairos.activity.counter.data.FilterCriteria;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
+import com.kairos.service.counter.ActivityFilterCriteria;
 import com.kairos.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.activity.activity.OrganizationActivityDTO;
@@ -26,10 +28,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
@@ -432,4 +431,30 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<BreakActivitiesDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, BreakActivitiesDTO.class);
         return result.getMappedResults();
     }
+
+    public List<BigInteger> getActivityIdsByFilter(List<FilterCriteria> filters){
+        ActivityFilterCriteria activityCriteria = ActivityFilterCriteria.getInstance();
+        for(FilterCriteria criteria: filters){
+            switch(criteria.getType()){
+                case ACTIVITY_IDS: activityCriteria.setActivityIds(criteria.getValues()); break;
+                case UNIT_IDS: activityCriteria.setUnitId(criteria.getValues()); break;
+                case ACTIVITY_CATEGORY_TYPE: activityCriteria.setCategoryId(criteria.getValues()); break;
+                case EMPLOYMENT_TYPE: activityCriteria.setEmploymentTypes(criteria.getValues()); break;
+                case EXPERTISE: activityCriteria.setExpertiseCriteria(criteria.getValues()); break;
+                case TIME_TYPE: activityCriteria.setTimeTypeList(criteria.getValues()); break;
+                case PLANNED_TIME_TYPE: activityCriteria.setPlanneTimeType(criteria.getValues()); break;
+                case ORGANIZATION_TYPE: activityCriteria.setOrganizationTypes(criteria.getValues()); break;
+                default: break;
+            }
+        }
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(activityCriteria.getFilterCriteria()),
+                group("0").push("$_id").as("activityIds"),
+                project("activities")
+        );
+        AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Activity.class, Map.class);
+        if(result.getMappedResults().isEmpty()) return new ArrayList<>();
+        return (List<BigInteger>)result.getMappedResults().get(0).get("activityIds");
+    }
+
 }

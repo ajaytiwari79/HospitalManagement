@@ -14,6 +14,7 @@ import java.util.List;
 public class ActivityFilterCriteria {
     private Criteria criteria;
 
+
     private  ActivityFilterCriteria(){
         this.criteria = Criteria.where("deleted").is(false);
     }

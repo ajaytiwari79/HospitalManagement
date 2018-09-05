@@ -252,6 +252,4 @@ public class TimeTypeService extends MongoBaseService {
 
         return true;
     }
-
-
 }
