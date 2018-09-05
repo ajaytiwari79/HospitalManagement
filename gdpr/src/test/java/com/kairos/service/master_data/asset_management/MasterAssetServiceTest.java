@@ -49,7 +49,7 @@ public class MasterAssetServiceTest {
 
 
     @Test
-    public void test_createMasterAsset() throws Exception {
+    public void test_createMasterAsset() {
         String baseUrl = getBaseUrl(24L, 4l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AssetTypeResponseDTO>>> assetTypeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AssetTypeResponseDTO>>>() {
@@ -82,7 +82,7 @@ public class MasterAssetServiceTest {
     }
 
     @Test
-    public void test1_getAllMasterAsset() throws Exception {
+    public void test1_getAllMasterAsset() {
         String baseUrl = getBaseUrl(24L, 4l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<MasterAssetResponseDTO>>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<MasterAssetResponseDTO>>>() {
@@ -95,7 +95,7 @@ public class MasterAssetServiceTest {
 
 
     @Test
-    public void test2_getAllMasterAssetById() throws Exception {
+    public void test2_getAllMasterAssetById() {
 
         String baseUrl = getBaseUrl(24L, 4l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<MasterAssetResponseDTO>> typeReference =
@@ -110,7 +110,7 @@ public class MasterAssetServiceTest {
 
 
     @Test
-    public void test3_removeMasterAssetById() throws Exception {
+    public void test3_removeMasterAssetById() {
 
         String baseUrl = getBaseUrl(24L, 4l, null);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/master_asset/delete/" + createdId);

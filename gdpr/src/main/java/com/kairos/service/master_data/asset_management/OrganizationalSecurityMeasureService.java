@@ -175,15 +175,15 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      */
     public List<OrganizationalSecurityMeasure> saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> OrganizationalSecurityMeasureDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
+        Set<String> orgSecurityMeasuresName = new HashSet<>();
         for (OrganizationalSecurityMeasureDTO OrganizationalSecurityMeasure : OrganizationalSecurityMeasureDTOS) {
-            hostingProvoiderNames.add(OrganizationalSecurityMeasure.getName());
+            orgSecurityMeasuresName.add(OrganizationalSecurityMeasure.getName());
         }
-        List<OrganizationalSecurityMeasure> existingOrganizationalSecurityMeasures = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, OrganizationalSecurityMeasure.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingOrganizationalSecurityMeasures, hostingProvoiderNames);
+        List<OrganizationalSecurityMeasure> existingOrganizationalSecurityMeasures = findMetaDataByNamesAndCountryId(countryId, orgSecurityMeasuresName, OrganizationalSecurityMeasure.class);
+        orgSecurityMeasuresName = ComparisonUtils.getNameListForMetadata(existingOrganizationalSecurityMeasures, orgSecurityMeasuresName);
         List<OrganizationalSecurityMeasure> OrganizationalSecurityMeasureList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        if (orgSecurityMeasuresName.size() != 0) {
+            for (String name : orgSecurityMeasuresName) {
 
                 OrganizationalSecurityMeasure OrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name);
                 OrganizationalSecurityMeasure.setCountryId(countryId);

@@ -136,7 +136,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
         }
         technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByid(id);
         if (!Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.datanotFound", "Technical Security Measure", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Technical Security Measure", id);
         }
         technicalSecurityMeasure.setName(technicalSecurityMeasureDTO.getName());
         technicalSecurityMeasureMongoRepository.save(technicalSecurityMeasure);
@@ -175,15 +175,15 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      */
     public List<TechnicalSecurityMeasure> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> TechnicalSecurityMeasureDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
+        Set<String> technicalSecurityMeasureNameList = new HashSet<>();
         for (TechnicalSecurityMeasureDTO TechnicalSecurityMeasure : TechnicalSecurityMeasureDTOS) {
-            hostingProvoiderNames.add(TechnicalSecurityMeasure.getName());
+            technicalSecurityMeasureNameList.add(TechnicalSecurityMeasure.getName());
         }
-        List<TechnicalSecurityMeasure> existingTechnicalSecurityMeasures = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, TechnicalSecurityMeasure.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingTechnicalSecurityMeasures, hostingProvoiderNames);
+        List<TechnicalSecurityMeasure> existingTechnicalSecurityMeasures = findMetaDataByNamesAndCountryId(countryId, technicalSecurityMeasureNameList, TechnicalSecurityMeasure.class);
+        technicalSecurityMeasureNameList = ComparisonUtils.getNameListForMetadata(existingTechnicalSecurityMeasures, technicalSecurityMeasureNameList);
         List<TechnicalSecurityMeasure> TechnicalSecurityMeasureList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        if (technicalSecurityMeasureNameList.size() != 0) {
+            for (String name : technicalSecurityMeasureNameList) {
 
                 TechnicalSecurityMeasure TechnicalSecurityMeasure = new TechnicalSecurityMeasure(name);
                 TechnicalSecurityMeasure.setCountryId(countryId);

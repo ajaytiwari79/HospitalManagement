@@ -147,19 +147,6 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getDataSubjectDataCategoryAndDataElementsMappedWithProcessingActivity(unitId, processingActivityId));
     }
 
-    @ApiOperation(value = "Remove Data Subject from processing activity ")
-    @DeleteMapping("/processing_activity/{processingActivityId}/data_subject/{dataSubjectId}")
-    public ResponseEntity<Object> removeRelatedDataSubjectFromProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger dataSubjectId) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        } else if (processingActivityId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedDataSubjectFromProcessingActivity(unitId, processingActivityId, dataSubjectId));
-    }
-
-
 
     @ApiOperation(value = "Link Asset to processing activity")
     @PutMapping("/processing_activity/{processingActivityId}/asset/{assetId}")
@@ -188,9 +175,20 @@ public class ProcessingActivityController {
         } else if (assetId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Asset  id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removelinkedAssetFromProcessingActivity(unitId, processingActivityId, assetId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removeLinkedAssetFromProcessingActivity(unitId, processingActivityId, assetId));
     }
 
+    @ApiOperation(value = "Remove Data Subject from processing activity ")
+    @DeleteMapping("/processing_activity/{processingActivityId}/data_subject/{dataSubjectId}")
+    public ResponseEntity<Object> removeRelatedDataSubjectFromProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger dataSubjectId) {
+
+        if (unitId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
+        } else if (processingActivityId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removeLinkedDataSubjectFromProcessingActivity(unitId, processingActivityId, dataSubjectId));
+    }
 
 
 }

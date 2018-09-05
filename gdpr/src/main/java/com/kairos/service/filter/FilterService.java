@@ -67,9 +67,7 @@ public class FilterService {
             FilterCategoryResult filterQueryResult = result.getUniqueMappedResult();
 
             if (Optional.ofNullable(filterQueryResult).isPresent()) {
-                filterTypes.forEach(filterType -> {
-                    filterResponseData.add(buildFiltersCategoryResponse(filterQueryResult, filterType));
-                });
+                filterTypes.forEach(filterType -> filterResponseData.add(buildFiltersCategoryResponse(filterQueryResult, filterType)));
                 filterAndFavouriteFilterDto.setAllFilters(filterResponseData);
                 filterAndFavouriteFilterDto.setFavouriteFilters(new ArrayList<>());
             } else {

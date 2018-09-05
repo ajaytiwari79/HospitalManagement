@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.repository.support.SimpleMongoRepository
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
-import java.util.List;
 
 
 public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Serializable>
@@ -24,7 +23,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
     private final MongoOperations mongoOperations;
 
     public MongoBaseRepositoryImpl(MongoEntityInformation<T, ID> entityInformation,
-                                   MongoOperations mongoOperations) throws Exception {
+                                   MongoOperations mongoOperations) {
         super(entityInformation, mongoOperations);
         // Keep the EntityManager around to used from the newly introduced methods.
         this.mongoOperations = mongoOperations;
