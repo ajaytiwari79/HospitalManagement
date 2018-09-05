@@ -85,7 +85,7 @@ public class StorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long countryId) {
-        return storageFormatMongoRepository.findAllStorageFormats(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return storageFormatMongoRepository.findAllStorageFormats(countryId);
     }
 
     /**
@@ -172,29 +172,29 @@ public class StorageFormatService extends MongoBaseService {
     /**
      * @description method save Storage format suggested by unit
      * @param countryId
-     * @param StorageFormatDTOS
+     * @param storageFormatDTOS
      * @return
      */
-    public List<StorageFormat> saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> StorageFormatDTOS) {
+    public List<StorageFormat> saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> storageFormatDTOS) {
 
         Set<String> storageFormatNameList = new HashSet<>();
-        for (StorageFormatDTO StorageFormat : StorageFormatDTOS) {
+        for (StorageFormatDTO StorageFormat : storageFormatDTOS) {
             storageFormatNameList.add(StorageFormat.getName());
         }
         List<StorageFormat> existingStorageFormats = findMetaDataByNamesAndCountryId(countryId, storageFormatNameList, StorageFormat.class);
         storageFormatNameList = ComparisonUtils.getNameListForMetadata(existingStorageFormats, storageFormatNameList);
-        List<StorageFormat> StorageFormatList = new ArrayList<>();
-        if (storageFormatNameList.size() != 0) {
+        List<StorageFormat> storageFormatList = new ArrayList<>();
+        if (!storageFormatNameList.isEmpty()) {
             for (String name : storageFormatNameList) {
 
-                StorageFormat StorageFormat = new StorageFormat(name);
-                StorageFormat.setCountryId(countryId);
-                StorageFormat.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                StorageFormatList.add(StorageFormat);
+                StorageFormat storageFormat = new StorageFormat(name);
+                storageFormat.setCountryId(countryId);
+                storageFormat.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                storageFormatList.add(storageFormat);
             }
 
-            StorageFormatList = storageFormatMongoRepository.saveAll(getNextSequence(StorageFormatList));
+             storageFormatMongoRepository.saveAll(getNextSequence(storageFormatList));
         }
-        return StorageFormatList;
+        return storageFormatList;
     }
 }

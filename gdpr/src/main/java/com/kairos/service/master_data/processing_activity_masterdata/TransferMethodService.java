@@ -84,7 +84,7 @@ public class TransferMethodService extends MongoBaseService {
      * @return list of TransferMethod
      */
     public List<TransferMethodResponseDTO> getAllTransferMethod(Long countryId) {
-        return transferMethodRepository.findAllTransferMethods(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return transferMethodRepository.findAllTransferMethods(countryId);
     }
 
     /**
@@ -166,30 +166,30 @@ public class TransferMethodService extends MongoBaseService {
     /**
      * @description method save TransferMethod suggested by unit
      * @param countryId
-     * @param TransferMethodDTOS
+     * @param transferMethodDTOS - transfer method suggested by unit
      * @return
      */
-    public List<TransferMethod> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> TransferMethodDTOS) {
+    public List<TransferMethod> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> transferMethodDTOS) {
 
         Set<String> transferMethodNameList = new HashSet<>();
-        for (TransferMethodDTO TransferMethod : TransferMethodDTOS) {
+        for (TransferMethodDTO TransferMethod : transferMethodDTOS) {
             transferMethodNameList.add(TransferMethod.getName());
         }
         List<TransferMethod> existingTransferMethods = findMetaDataByNamesAndCountryId(countryId, transferMethodNameList, TransferMethod.class);
         transferMethodNameList = ComparisonUtils.getNameListForMetadata(existingTransferMethods, transferMethodNameList);
-        List<TransferMethod> TransferMethodList = new ArrayList<>();
-        if (transferMethodNameList.size() != 0) {
+        List<TransferMethod> transferMethodList = new ArrayList<>();
+        if (!transferMethodNameList.isEmpty()) {
             for (String name : transferMethodNameList) {
 
-                TransferMethod TransferMethod = new TransferMethod(name);
-                TransferMethod.setCountryId(countryId);
-                TransferMethod.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                TransferMethodList.add(TransferMethod);
+                TransferMethod transferMethod = new TransferMethod(name);
+                transferMethod.setCountryId(countryId);
+                transferMethod.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                transferMethodList.add(transferMethod);
             }
 
-            TransferMethodList = transferMethodRepository.saveAll(getNextSequence(TransferMethodList));
+             transferMethodRepository.saveAll(getNextSequence(transferMethodList));
         }
-        return TransferMethodList;
+        return transferMethodList;
     }
 
 

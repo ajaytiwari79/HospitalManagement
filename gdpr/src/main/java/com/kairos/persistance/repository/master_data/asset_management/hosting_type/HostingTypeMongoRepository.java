@@ -24,8 +24,8 @@ public interface HostingTypeMongoRepository extends MongoBaseRepository<HostingT
     @Query("{deleted:false,_id:?0}")
     HostingTypeResponseDTO findHostingTypeById(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
-    List<HostingTypeResponseDTO> findAllHostingTypes(Long countryId, String suggestedDataStatus);
+    @Query("{deleted:false,countryId:?0}")
+    List<HostingTypeResponseDTO> findAllHostingTypes(Long countryId);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     HostingType findByOrganizationIdAndId(Long organizationId,BigInteger id);

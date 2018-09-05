@@ -76,7 +76,7 @@ public class AccessorPartyService extends MongoBaseService {
 
 
     public List<AccessorPartyResponseDTO> getAllAccessorParty(Long countryId) {
-        return accessorPartyMongoRepository.findAllAccessorParty(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return accessorPartyMongoRepository.findAllAccessorParty(countryId);
     }
 
     /**
@@ -159,30 +159,30 @@ public class AccessorPartyService extends MongoBaseService {
     /**
      * @description method save Accessor Party suggested by unit
      * @param countryId
-     * @param AccessorPartyDTOS
+     * @param accessorPartyDTOS
      * @return
      */
-    public List<AccessorParty> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> AccessorPartyDTOS) {
+    public List<AccessorParty> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
 
-        Set<String> hostingProvidersName = new HashSet<>();
-        for (AccessorPartyDTO AccessorParty : AccessorPartyDTOS) {
-            hostingProvidersName.add(AccessorParty.getName());
+        Set<String> accessorPartyNameList = new HashSet<>();
+        for (AccessorPartyDTO AccessorParty : accessorPartyDTOS) {
+            accessorPartyNameList.add(AccessorParty.getName());
         }
-        List<AccessorParty> existingAccessorParties = findMetaDataByNamesAndCountryId(countryId, hostingProvidersName, AccessorParty.class);
-        hostingProvidersName = ComparisonUtils.getNameListForMetadata(existingAccessorParties, hostingProvidersName);
-        List<AccessorParty> AccessorPartyList = new ArrayList<>();
-        if (hostingProvidersName.size() != 0) {
-            for (String name : hostingProvidersName) {
+        List<AccessorParty> existingAccessorParties = findMetaDataByNamesAndCountryId(countryId, accessorPartyNameList, AccessorParty.class);
+        accessorPartyNameList = ComparisonUtils.getNameListForMetadata(existingAccessorParties, accessorPartyNameList);
+        List<AccessorParty> accessorPartyList = new ArrayList<>();
+        if (!accessorPartyNameList.isEmpty()) {
+            for (String name : accessorPartyNameList) {
 
-                AccessorParty AccessorParty = new AccessorParty(name);
-                AccessorParty.setCountryId(countryId);
-                AccessorParty.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                AccessorPartyList.add(AccessorParty);
+                AccessorParty accessorParty = new AccessorParty(name);
+                accessorParty.setCountryId(countryId);
+                accessorParty.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                accessorPartyList.add(accessorParty);
             }
 
-            AccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(AccessorPartyList));
+           accessorPartyMongoRepository.saveAll(getNextSequence(accessorPartyList));
         }
-        return AccessorPartyList;
+        return accessorPartyList;
     }
 
 

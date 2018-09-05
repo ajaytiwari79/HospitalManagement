@@ -83,7 +83,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long countryId) {
-        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(countryId);
     }
 
 
@@ -170,30 +170,30 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     /**
      * @description method save technical security measure  suggested by unit
      * @param countryId
-     * @param TechnicalSecurityMeasureDTOS
+     * @param technicalSecurityMeasureDTOS
      * @return
      */
-    public List<TechnicalSecurityMeasure> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> TechnicalSecurityMeasureDTOS) {
+    public List<TechnicalSecurityMeasure> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
 
         Set<String> technicalSecurityMeasureNameList = new HashSet<>();
-        for (TechnicalSecurityMeasureDTO TechnicalSecurityMeasure : TechnicalSecurityMeasureDTOS) {
+        for (TechnicalSecurityMeasureDTO TechnicalSecurityMeasure : technicalSecurityMeasureDTOS) {
             technicalSecurityMeasureNameList.add(TechnicalSecurityMeasure.getName());
         }
         List<TechnicalSecurityMeasure> existingTechnicalSecurityMeasures = findMetaDataByNamesAndCountryId(countryId, technicalSecurityMeasureNameList, TechnicalSecurityMeasure.class);
         technicalSecurityMeasureNameList = ComparisonUtils.getNameListForMetadata(existingTechnicalSecurityMeasures, technicalSecurityMeasureNameList);
-        List<TechnicalSecurityMeasure> TechnicalSecurityMeasureList = new ArrayList<>();
-        if (technicalSecurityMeasureNameList.size() != 0) {
+        List<TechnicalSecurityMeasure> technicalSecurityMeasureList = new ArrayList<>();
+        if (!technicalSecurityMeasureNameList.isEmpty()) {
             for (String name : technicalSecurityMeasureNameList) {
 
-                TechnicalSecurityMeasure TechnicalSecurityMeasure = new TechnicalSecurityMeasure(name);
-                TechnicalSecurityMeasure.setCountryId(countryId);
-                TechnicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                TechnicalSecurityMeasureList.add(TechnicalSecurityMeasure);
+                TechnicalSecurityMeasure technicalSecurityMeasure = new TechnicalSecurityMeasure(name);
+                technicalSecurityMeasure.setCountryId(countryId);
+                technicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                technicalSecurityMeasureList.add(technicalSecurityMeasure);
             }
 
-            TechnicalSecurityMeasureList = technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(TechnicalSecurityMeasureList));
+            technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(technicalSecurityMeasureList));
         }
-        return TechnicalSecurityMeasureList;
+        return technicalSecurityMeasureList;
     }
 
 }

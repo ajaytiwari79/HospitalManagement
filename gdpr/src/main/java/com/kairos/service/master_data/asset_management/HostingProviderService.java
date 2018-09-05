@@ -84,7 +84,7 @@ public class HostingProviderService extends MongoBaseService {
      * @return list of HostingProvider
      */
     public List<HostingProviderResponseDTO> getAllHostingProvider(Long countryId) {
-        return hostingProviderMongoRepository.findAllHostingProviders(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return hostingProviderMongoRepository.findAllHostingProviders(countryId);
     }
 
 
@@ -186,12 +186,12 @@ public class HostingProviderService extends MongoBaseService {
         List<HostingProvider> existingHostingProviders = findMetaDataByNamesAndCountryId(countryId, hostingProvidersName, HostingProvider.class);
         hostingProvidersName = ComparisonUtils.getNameListForMetadata(existingHostingProviders, hostingProvidersName);
         List<HostingProvider> hostingProviderList = new ArrayList<>();
-        if (hostingProvidersName.size() != 0) {
+        if (!hostingProvidersName.isEmpty()) {
             for (String name : hostingProvidersName) {
 
                 HostingProvider hostingProvider = new HostingProvider(name);
                 hostingProvider.setCountryId(countryId);
-                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
                 hostingProviderList.add(hostingProvider);
             }
 

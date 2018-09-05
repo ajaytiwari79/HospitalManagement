@@ -81,7 +81,7 @@ public class HostingTypeService extends MongoBaseService {
      * @return list of HostingType
      */
     public List<HostingTypeResponseDTO> getAllHostingType(Long countryId) {
-        return hostingTypeMongoRepository.findAllHostingTypes(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return hostingTypeMongoRepository.findAllHostingTypes(countryId);
     }
 
 
@@ -172,30 +172,30 @@ public class HostingTypeService extends MongoBaseService {
     /**
      * @description method save Hosting type suggested by unit
      * @param countryId
-     * @param HostingTypeDTOS
+     * @param hostingTypeDTOS
      * @return
      */
-    public List<HostingType> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> HostingTypeDTOS) {
+    public List<HostingType> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
 
         Set<String> hostingTypeNameList = new HashSet<>();
-        for (HostingTypeDTO HostingType : HostingTypeDTOS) {
+        for (HostingTypeDTO HostingType : hostingTypeDTOS) {
             hostingTypeNameList.add(HostingType.getName());
         }
         List<HostingType> existingHostingTypes = findMetaDataByNamesAndCountryId(countryId, hostingTypeNameList, HostingType.class);
         hostingTypeNameList = ComparisonUtils.getNameListForMetadata(existingHostingTypes, hostingTypeNameList);
-        List<HostingType> HostingTypeList = new ArrayList<>();
-        if (hostingTypeNameList.size() != 0) {
+        List<HostingType> hostingTypeList = new ArrayList<>();
+        if (!hostingTypeNameList.isEmpty()) {
             for (String name : hostingTypeNameList) {
 
-                HostingType HostingType = new HostingType(name);
-                HostingType.setCountryId(countryId);
-                HostingType.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                HostingTypeList.add(HostingType);
+                HostingType hostingType = new HostingType(name);
+                hostingType.setCountryId(countryId);
+                hostingType.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                hostingTypeList.add(hostingType);
             }
 
-            HostingTypeList = hostingTypeMongoRepository.saveAll(getNextSequence(HostingTypeList));
+             hostingTypeMongoRepository.saveAll(getNextSequence(hostingTypeList));
         }
-        return HostingTypeList;
+        return hostingTypeList;
     }
 }
 

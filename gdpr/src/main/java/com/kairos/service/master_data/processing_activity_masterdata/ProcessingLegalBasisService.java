@@ -89,7 +89,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
      */
 
     public List<ProcessingLegalBasisResponseDTO> getAllProcessingLegalBasis(Long countryId) {
-        return legalBasisMongoRepository.findAllProcessingLegalBases(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return legalBasisMongoRepository.findAllProcessingLegalBases(countryId);
     }
 
     /**
@@ -168,28 +168,33 @@ public class ProcessingLegalBasisService extends MongoBaseService {
     }
 
 
-   
-    public List<ProcessingLegalBasis> saveSuggestedProcessingLegalBasissFromUnit(Long countryId, List<ProcessingLegalBasisDTO> ProcessingLegalBasisDTOS) {
+    /**
+     *
+     * @param countryId  - country id
+     * @param processingLegalBasisDTOS - processing legal basis suggested by Unit
+     * @return
+     */
+    public List<ProcessingLegalBasis> saveSuggestedProcessingLegalBasissFromUnit(Long countryId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
-        for (ProcessingLegalBasisDTO ProcessingLegalBasis : ProcessingLegalBasisDTOS) {
-            hostingProvoiderNames.add(ProcessingLegalBasis.getName());
+        Set<String> processingLegalBasisNameList = new HashSet<>();
+        for (ProcessingLegalBasisDTO ProcessingLegalBasis : processingLegalBasisDTOS) {
+            processingLegalBasisNameList.add(ProcessingLegalBasis.getName());
         }
-        List<ProcessingLegalBasis> existingProcessingLegalBasiss = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, ProcessingLegalBasis.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingProcessingLegalBasiss, hostingProvoiderNames);
-        List<ProcessingLegalBasis> ProcessingLegalBasisList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        List<ProcessingLegalBasis> existingProcessingLegalBasiss = findMetaDataByNamesAndCountryId(countryId, processingLegalBasisNameList, ProcessingLegalBasis.class);
+        processingLegalBasisNameList = ComparisonUtils.getNameListForMetadata(existingProcessingLegalBasiss, processingLegalBasisNameList);
+        List<ProcessingLegalBasis> processingLegalBasisList = new ArrayList<>();
+        if (!processingLegalBasisNameList.isEmpty()) {
+            for (String name : processingLegalBasisNameList) {
 
-                ProcessingLegalBasis ProcessingLegalBasis = new ProcessingLegalBasis(name);
-                ProcessingLegalBasis.setCountryId(countryId);
-                ProcessingLegalBasis.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                ProcessingLegalBasisList.add(ProcessingLegalBasis);
+                ProcessingLegalBasis processingLegalBasis = new ProcessingLegalBasis(name);
+                processingLegalBasis.setCountryId(countryId);
+                processingLegalBasis.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                processingLegalBasisList.add(processingLegalBasis);
             }
 
-            ProcessingLegalBasisList = legalBasisMongoRepository.saveAll(getNextSequence(ProcessingLegalBasisList));
+             legalBasisMongoRepository.saveAll(getNextSequence(processingLegalBasisList));
         }
-        return ProcessingLegalBasisList;
+        return processingLegalBasisList;
     }
 
 }

@@ -77,7 +77,7 @@ public class DataDisposalService extends MongoBaseService {
      * @return list of DataDisposal
      */
     public List<DataDisposalResponseDTO> getAllDataDisposal(Long countryId) {
-        return dataDisposalMongoRepository.findAllDataDisposals(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return dataDisposalMongoRepository.findAllDataDisposals(countryId);
     }
 
 
@@ -176,19 +176,19 @@ public class DataDisposalService extends MongoBaseService {
         }
         List<DataDisposal> existing = findMetaDataByNamesAndCountryId(countryId, dataDisposalsNames, DataDisposal.class);
         dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
-        List<DataDisposal> newDataDisposals = new ArrayList<>();
-        if (dataDisposalsNames.size() != 0) {
+        List<DataDisposal> dataDisposalList = new ArrayList<>();
+        if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
 
-                DataDisposal newDataDisposal = new DataDisposal(name);
-                newDataDisposal.setCountryId(countryId);
-                newDataDisposal.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                newDataDisposals.add(newDataDisposal);
+                DataDisposal dataDisposal = new DataDisposal(name);
+                dataDisposal.setCountryId(countryId);
+                dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                dataDisposalList.add(dataDisposal);
             }
 
-            newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
+            dataDisposalMongoRepository.saveAll(getNextSequence(dataDisposalList));
         }
-        return newDataDisposals;
+        return dataDisposalList;
     }
 }
 

@@ -16,12 +16,11 @@ public class HostingProvider extends MongoBaseEntity {
     private String name;
 
     private Long countryId;
+    private SuggestedDataStatus suggestedDataStatus=SuggestedDataStatus.ACCEPTED;
 
-    private String suggestedDataStatus=SuggestedDataStatus.ACCEPTED.value;
+    public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
 
-    public String getSuggestedDataStatus() { return suggestedDataStatus; }
-
-    public void setSuggestedDataStatus(String suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
+    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
     public Long getCountryId() {
         return countryId;

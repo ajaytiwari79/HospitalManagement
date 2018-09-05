@@ -23,8 +23,8 @@ public interface ProcessingPurposeMongoRepository extends MongoBaseRepository<Pr
 
     ProcessingPurpose findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
-    List<ProcessingPurposeResponseDTO> findAllProcessingPurposes(Long countryId,String suggestedDataStatus);
+    @Query("{deleted:false,countryId:?0}")
+    List<ProcessingPurposeResponseDTO> findAllProcessingPurposes(Long countryId);
 
     @Query("{_id:{$in:?0},deleted:false}")
     List<ProcessingPurposeResponseDTO> findProcessingPurposeByIds(List<BigInteger> processingPurposeIds);

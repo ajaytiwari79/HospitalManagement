@@ -84,7 +84,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long countryId) {
-        return processingPurposeMongoRepository.findAllProcessingPurposes(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return processingPurposeMongoRepository.findAllProcessingPurposes(countryId);
     }
 
     /**
@@ -166,27 +166,33 @@ public class ProcessingPurposeService extends MongoBaseService {
     }
 
 
-    public List<ProcessingPurpose> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> ProcessingPurposeDTOS) {
+    /**
+     *
+     * @param countryId - country id
+     * @param processingPurposeDTOS - processing purpose suggested by unit
+     * @return
+     */
+    public List<ProcessingPurpose> saveSuggestedProcessingPurposesFromUnit(Long countryId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
-        for (ProcessingPurposeDTO ProcessingPurpose : ProcessingPurposeDTOS) {
-            hostingProvoiderNames.add(ProcessingPurpose.getName());
+        Set<String> processingPurposeNameList = new HashSet<>();
+        for (ProcessingPurposeDTO ProcessingPurpose : processingPurposeDTOS) {
+            processingPurposeNameList.add(ProcessingPurpose.getName());
         }
-        List<ProcessingPurpose> existingProcessingPurposes = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, ProcessingPurpose.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingProcessingPurposes, hostingProvoiderNames);
-        List<ProcessingPurpose> ProcessingPurposeList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        List<ProcessingPurpose> existingProcessingPurposes = findMetaDataByNamesAndCountryId(countryId, processingPurposeNameList, ProcessingPurpose.class);
+        processingPurposeNameList = ComparisonUtils.getNameListForMetadata(existingProcessingPurposes, processingPurposeNameList);
+        List<ProcessingPurpose> processingPurposeList = new ArrayList<>();
+        if (!processingPurposeNameList.isEmpty()) {
+            for (String name : processingPurposeNameList) {
 
-                ProcessingPurpose ProcessingPurpose = new ProcessingPurpose(name);
-                ProcessingPurpose.setCountryId(countryId);
-                ProcessingPurpose.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                ProcessingPurposeList.add(ProcessingPurpose);
+                ProcessingPurpose processingPurpose = new ProcessingPurpose(name);
+                processingPurpose.setCountryId(countryId);
+                processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                processingPurposeList.add(processingPurpose);
             }
 
-            ProcessingPurposeList = processingPurposeMongoRepository.saveAll(getNextSequence(ProcessingPurposeList));
+             processingPurposeMongoRepository.saveAll(getNextSequence(processingPurposeList));
         }
-        return ProcessingPurposeList;
+        return processingPurposeList;
     }
 
 }

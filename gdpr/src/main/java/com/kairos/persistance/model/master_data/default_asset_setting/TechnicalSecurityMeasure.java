@@ -16,11 +16,11 @@ public class TechnicalSecurityMeasure extends MongoBaseEntity {
 
     private Long countryId;
 
-    private String suggestedDataStatus=SuggestedDataStatus.ACCEPTED.value;
+    private SuggestedDataStatus suggestedDataStatus=SuggestedDataStatus.ACCEPTED;
 
-    public String getSuggestedDataStatus() { return suggestedDataStatus; }
+    public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
 
-    public void setSuggestedDataStatus(String suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
+    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
     public Long getCountryId() {
         return countryId;
