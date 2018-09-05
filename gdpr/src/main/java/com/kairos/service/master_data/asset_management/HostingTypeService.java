@@ -171,10 +171,10 @@ public class HostingTypeService extends MongoBaseService {
 
 
     /**
-     * @description method save Hosting type suggested by unit
      * @param countryId
      * @param hostingTypeDTOS
      * @return
+     * @description method save Hosting type suggested by unit
      */
     public List<HostingType> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
 
@@ -195,10 +195,28 @@ public class HostingTypeService extends MongoBaseService {
                 hostingTypeList.add(hostingType);
             }
 
-             hostingTypeMongoRepository.saveAll(getNextSequence(hostingTypeList));
+            hostingTypeMongoRepository.saveAll(getNextSequence(hostingTypeList));
         }
         return hostingTypeList;
     }
+
+
+    /**
+     *
+     * @param countryId
+     * @param hostingTypeIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<HostingType> updateSuggestedStatusOfHostingProviders(Long countryId, List<BigInteger> hostingTypeIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<HostingType> hostingTypeList = hostingTypeMongoRepository.getHostingTypeListByIds(countryId, hostingTypeIds);
+        hostingTypeList.forEach(hostingType -> hostingType.setSuggestedDataStatus(suggestedDataStatus));
+        hostingTypeMongoRepository.saveAll(getNextSequence(hostingTypeList));
+        return hostingTypeList;
+    }
+
+
 }
 
     

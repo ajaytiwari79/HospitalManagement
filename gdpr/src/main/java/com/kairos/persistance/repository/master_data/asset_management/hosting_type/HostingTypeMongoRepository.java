@@ -1,6 +1,5 @@
 package com.kairos.persistance.repository.master_data.asset_management.hosting_type;
 
-import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
@@ -26,6 +25,9 @@ public interface HostingTypeMongoRepository extends MongoBaseRepository<HostingT
 
     @Query("{deleted:false,countryId:?0}")
     List<HostingTypeResponseDTO> findAllHostingTypes(Long countryId);
+
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<HostingType> getHostingTypeListByIds(Long countryId, List<BigInteger> hostingTypeIds);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     HostingType findByOrganizationIdAndId(Long organizationId,BigInteger id);

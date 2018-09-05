@@ -26,6 +26,9 @@ public interface ProcessingPurposeMongoRepository extends MongoBaseRepository<Pr
     @Query("{deleted:false,countryId:?0}")
     List<ProcessingPurposeResponseDTO> findAllProcessingPurposes(Long countryId);
 
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<ProcessingPurpose> getProcessingPurposeListByIds(Long countryId, List<BigInteger> processingPurposeIds);
+
     @Query("{_id:{$in:?0},deleted:false}")
     List<ProcessingPurposeResponseDTO> findProcessingPurposeByIds(List<BigInteger> processingPurposeIds);
 

@@ -27,6 +27,9 @@ public interface DataDisposalMongoRepository extends MongoBaseRepository<DataDis
     @Query("{_id:?0,deleted:false}")
     DataDisposalResponseDTO findDataDisposalByid(BigInteger id);
 
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<DataDisposal> getDataDisposalListByIds(Long countryId,List<BigInteger> dataDisposalIds);
+
     @Query("{deleted:false,countryId:?0}")
     List<DataDisposalResponseDTO> findAllDataDisposals(Long countryId);
 

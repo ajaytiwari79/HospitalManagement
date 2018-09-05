@@ -198,4 +198,19 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
         return technicalSecurityMeasureList;
     }
 
+
+    /**
+     *
+     * @param countryId
+     * @param techSecurityMeasureIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<TechnicalSecurityMeasure> updateSuggestedStatusOfTechnicalSecurityMeasures(Long countryId, List<BigInteger> techSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<TechnicalSecurityMeasure> securityMeasureList = technicalSecurityMeasureMongoRepository.getTechnicalSecurityMeasureListByIds(countryId, techSecurityMeasureIds);
+        securityMeasureList.forEach(securityMeasure-> securityMeasure.setSuggestedDataStatus(suggestedDataStatus));
+        technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(securityMeasureList));
+        return securityMeasureList;
+    }
 }

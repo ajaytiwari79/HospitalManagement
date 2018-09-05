@@ -164,10 +164,10 @@ public class DataDisposalService extends MongoBaseService {
     }
 
     /**
-     * @description method save data disposal suggested by unit
      * @param countryId
      * @param dataDisposalDTOS
      * @return
+     * @description method save data disposal suggested by unit
      */
     public List<DataDisposal> saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
 
@@ -192,6 +192,22 @@ public class DataDisposalService extends MongoBaseService {
         }
         return dataDisposalList;
     }
+
+
+    /**
+     * @param countryId
+     * @param dataDisposalIds     - id of data disposal
+     * @param suggestedDataStatus -status to update
+     */
+    public List<DataDisposal> updateSuggestedStatusOfDataDisposals(Long countryId, List<BigInteger> dataDisposalIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<DataDisposal> dataDisposalList = dataDisposalMongoRepository.getDataDisposalListByIds(countryId, dataDisposalIds);
+        dataDisposalList.forEach(dataDisposal -> dataDisposal.setSuggestedDataStatus(suggestedDataStatus));
+        dataDisposalMongoRepository.saveAll(getNextSequence(dataDisposalList));
+        return dataDisposalList;
+    }
+
+
 }
 
 

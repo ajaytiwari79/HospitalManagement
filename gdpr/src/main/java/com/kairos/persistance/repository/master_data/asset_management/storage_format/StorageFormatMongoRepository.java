@@ -27,6 +27,9 @@ public interface StorageFormatMongoRepository extends MongoBaseRepository<Storag
     @Query("{deleted:false,countryId:?0}")
     List<StorageFormatResponseDTO> findAllStorageFormats(Long countryId);
 
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<StorageFormat> getStorageFormatListByIds(Long countryId, List<BigInteger> storageFormatIds);
+
     @Query("{_id:{$in:?0},deleted:false}")
     List<StorageFormatResponseDTO> findStorageFormatByIds(List<BigInteger> ids);
 

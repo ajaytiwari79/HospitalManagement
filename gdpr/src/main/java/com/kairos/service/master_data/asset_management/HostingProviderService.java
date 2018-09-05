@@ -201,4 +201,20 @@ public class HostingProviderService extends MongoBaseService {
         }
         return hostingProviderList;
     }
+
+
+    /**
+     * @param countryId
+     * @param hostingPrividerIds   - ids of hosting providers
+     * @param suggestedDataStatus - status to update
+     * @return
+     */
+    public List<HostingProvider> updateSuggestedStatusOfHostingProviders(Long countryId, List<BigInteger> hostingPrividerIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<HostingProvider> hostingProviderList = hostingProviderMongoRepository.getHostingProviderListByIds(countryId, hostingPrividerIds);
+        hostingProviderList.forEach(hostingProvider -> hostingProvider.setSuggestedDataStatus(suggestedDataStatus));
+        hostingProviderMongoRepository.saveAll(getNextSequence(hostingProviderList));
+        return hostingProviderList;
+    }
+
 }

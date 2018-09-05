@@ -26,6 +26,8 @@ public interface DataSourceMongoRepository extends MongoBaseRepository<DataSourc
 
     DataSource findByid(BigInteger id);
 
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<DataSource> getDataSourceListByIds(Long countryId, List<BigInteger> dataSourceIds);
 
     @Query("{deleted:false,countryId:?0}")
     List<DataSourceResponseDTO> findAllDataSources(Long countryId);

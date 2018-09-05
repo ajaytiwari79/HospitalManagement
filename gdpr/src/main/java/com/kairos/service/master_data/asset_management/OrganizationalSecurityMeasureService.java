@@ -198,4 +198,22 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
         return organizationalSecurityMeasureList;
     }
 
+
+    /**
+     *
+     * @param countryId
+     * @param orgSecurityMeasureIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<OrganizationalSecurityMeasure> updateSuggestedStatusOfOrganizationalSecurityMeasures(Long countryId, List<BigInteger> orgSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<OrganizationalSecurityMeasure> securityMeasureList = organizationalSecurityMeasureMongoRepository.getOrganizationalSecurityMeasureListByIds(countryId, orgSecurityMeasureIds);
+        securityMeasureList.forEach(securityMeasure -> securityMeasure.setSuggestedDataStatus(suggestedDataStatus));
+        organizationalSecurityMeasureMongoRepository.saveAll(getNextSequence(securityMeasureList));
+        return securityMeasureList;
+    }
+
+
+
 }

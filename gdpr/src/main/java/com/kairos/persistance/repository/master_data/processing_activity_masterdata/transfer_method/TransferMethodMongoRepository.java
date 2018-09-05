@@ -26,6 +26,9 @@ public interface TransferMethodMongoRepository extends MongoBaseRepository<Trans
     @Query("{deleted:false,countryId:?0}")
     List<TransferMethodResponseDTO> findAllTransferMethods(Long countryId);
 
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<TransferMethod> getTransferMethodListByIds(Long countryId, List<BigInteger>transferMethodIds);
+
     @Query("{_id:{$in:?0},deleted:false}")
     List<TransferMethodResponseDTO> findTransferMethodByIds(List<BigInteger> transferMethodIds);
 

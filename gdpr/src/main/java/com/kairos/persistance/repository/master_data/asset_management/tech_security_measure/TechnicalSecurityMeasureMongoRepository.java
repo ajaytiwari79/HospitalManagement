@@ -27,6 +27,9 @@ public interface TechnicalSecurityMeasureMongoRepository extends MongoBaseReposi
     @Query("{deleted:false,countryId:?0}")
     List<TechnicalSecurityMeasureResponseDTO> findAllTechnicalSecurityMeasures(Long countryId);
 
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<TechnicalSecurityMeasure> getTechnicalSecurityMeasureListByIds(Long countryId, List<BigInteger> techSecurityMeasureIds);
+
     @Query("{deleted:false,_id:{$in:?0}}")
     List<TechnicalSecurityMeasureResponseDTO> findTechnicalSecurityMeasuresListByIds(List<BigInteger> ids);
 

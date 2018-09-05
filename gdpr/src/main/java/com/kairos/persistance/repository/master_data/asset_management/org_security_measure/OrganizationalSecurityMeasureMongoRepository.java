@@ -1,7 +1,6 @@
 package com.kairos.persistance.repository.master_data.asset_management.org_security_measure;
 
 
-import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
@@ -27,6 +26,10 @@ public interface OrganizationalSecurityMeasureMongoRepository extends MongoBaseR
 
     @Query("{deleted:false,countryId:?0}")
     List<OrganizationalSecurityMeasureResponseDTO> findAllOrganizationalSecurityMeasures(Long countryId);
+
+
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<OrganizationalSecurityMeasure> getOrganizationalSecurityMeasureListByIds(Long countryId, List<BigInteger> orgSecurityMeasureIds);
 
     @Query("{deleted:false,_id:{$in:?0}}")
     List<OrganizationalSecurityMeasureResponseDTO> findOrganizationalSecurityMeasuresListByIds(List<BigInteger> ids);
