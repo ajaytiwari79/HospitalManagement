@@ -28,7 +28,6 @@ public class AssetDTO {
     @NotBlank(message = "description  can't be  Empty ")
     private String description;
 
-
     @NotBlank(message = "Hosting Location can't be Empty")
     private String hostingLocation;
 
