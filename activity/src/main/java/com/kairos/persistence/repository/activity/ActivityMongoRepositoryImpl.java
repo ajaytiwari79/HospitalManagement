@@ -436,7 +436,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityDTO> findAllByTimeTypeIdAndUnitId(Set<BigInteger> timeTypeIds,Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("balanceSettingsActivityTab.timeTypeId").in(timeTypeIds).and("deleted").is(false).and("unitId").is(unitId)),
+                match(Criteria.where("balanceSettingsActivityTab.timeTypeId").in(timeTypeIds).and("rulesActivityTab.allowedAutoAbsence").is(true).and("deleted").is(false).and("unitId").is(unitId)),
                 project().and("id").as("id").and("name").as("name"));
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
