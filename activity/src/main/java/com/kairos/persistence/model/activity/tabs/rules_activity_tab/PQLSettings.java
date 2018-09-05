@@ -1,10 +1,11 @@
-package com.kairos.persistence.model.activity.tabs;
+package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 /*
  *Created By Pavan on 4/9/18
  *Used for Planning Quality level of planner
  */
 
 import com.kairos.activity.open_shift.DurationField;
+import com.kairos.persistence.model.activity.tabs.ApprovalCriteria;
 
 import java.util.Optional;
 
