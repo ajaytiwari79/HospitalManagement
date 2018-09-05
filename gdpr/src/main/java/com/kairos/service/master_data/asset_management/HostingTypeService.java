@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -81,7 +82,7 @@ public class HostingTypeService extends MongoBaseService {
      * @return list of HostingType
      */
     public List<HostingTypeResponseDTO> getAllHostingType(Long countryId) {
-        return hostingTypeMongoRepository.findAllHostingTypes(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return hostingTypeMongoRepository.findAllHostingTypes(countryId);
     }
 
 
@@ -170,33 +171,52 @@ public class HostingTypeService extends MongoBaseService {
 
 
     /**
-     * @description method save Hosting type suggested by unit
      * @param countryId
-     * @param HostingTypeDTOS
+     * @param hostingTypeDTOS
      * @return
+     * @description method save Hosting type suggested by unit
      */
-    public List<HostingType> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> HostingTypeDTOS) {
+    public List<HostingType> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> hostingTypeDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
-        for (HostingTypeDTO HostingType : HostingTypeDTOS) {
-            hostingProvoiderNames.add(HostingType.getName());
+        Set<String> hostingTypeNameList = new HashSet<>();
+        for (HostingTypeDTO HostingType : hostingTypeDTOS) {
+            hostingTypeNameList.add(HostingType.getName());
         }
-        List<HostingType> existingHostingTypes = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, HostingType.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingHostingTypes, hostingProvoiderNames);
-        List<HostingType> HostingTypeList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        List<HostingType> existingHostingTypes = findMetaDataByNamesAndCountryId(countryId, hostingTypeNameList, HostingType.class);
+        hostingTypeNameList = ComparisonUtils.getNameListForMetadata(existingHostingTypes, hostingTypeNameList);
+        List<HostingType> hostingTypeList = new ArrayList<>();
+        if (!hostingTypeNameList.isEmpty()) {
+            for (String name : hostingTypeNameList) {
 
-                HostingType HostingType = new HostingType(name);
-                HostingType.setCountryId(countryId);
-                HostingType.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                HostingTypeList.add(HostingType);
+                HostingType hostingType = new HostingType(name);
+                hostingType.setCountryId(countryId);
+                hostingType.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                hostingType.setSuggestedDate(LocalDate.now());
+                hostingTypeList.add(hostingType);
             }
 
-            HostingTypeList = hostingTypeMongoRepository.saveAll(getNextSequence(HostingTypeList));
+            hostingTypeMongoRepository.saveAll(getNextSequence(hostingTypeList));
         }
-        return HostingTypeList;
+        return hostingTypeList;
     }
+
+
+    /**
+     *
+     * @param countryId
+     * @param hostingTypeIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<HostingType> updateSuggestedStatusOfHostingTypes(Long countryId, Set<BigInteger> hostingTypeIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<HostingType> hostingTypeList = hostingTypeMongoRepository.getHostingTypeListByIds(countryId, hostingTypeIds);
+        hostingTypeList.forEach(hostingType -> hostingType.setSuggestedDataStatus(suggestedDataStatus));
+        hostingTypeMongoRepository.saveAll(getNextSequence(hostingTypeList));
+        return hostingTypeList;
+    }
+
+
 }
 
     

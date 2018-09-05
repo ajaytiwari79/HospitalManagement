@@ -53,7 +53,7 @@ public class OrganizationDataSubjectMappingController {
 
     @ApiOperation(value = "create data Subject with data category and data element")
     @GetMapping("dataSubject_mapping/all")
-    public ResponseEntity<Object> getAllDataSubjectWithDataCaegoryAndDataElementByUnitId(@PathVariable Long unitId) {
+    public ResponseEntity<Object> getAllDataSubjectWithDataCategoryAndDataElementByUnitId(@PathVariable Long unitId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization Id can't be null");
         }
@@ -63,7 +63,7 @@ public class OrganizationDataSubjectMappingController {
 
     @ApiOperation(value = "create data Subject with data category and data element")
     @GetMapping("dataSubject_mapping/{dataSubjectId}")
-    public ResponseEntity<Object> getDataSubjectWithDataCaegoryAndDataElementByUnitId(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId) {
+    public ResponseEntity<Object> getDataSubjectWithDataCategoryAndDataElementByUnitId(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization Id can't be null");
         }
@@ -74,7 +74,7 @@ public class OrganizationDataSubjectMappingController {
 
     @ApiOperation(value = "create data Subject with data category and data element")
     @PutMapping("dataSubject_mapping/update/{dataSubjectId}")
-    public ResponseEntity<Object> getAllDataSubjectWithDataCaegoryAndDataElementByUnitId(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId, @RequestBody @Valid OrganizationDataSubjectBasicDTO dataSubjectMappingDTO) {
+    public ResponseEntity<Object> getAllDataSubjectWithDataCategoryAndDataElementByUnitId(@PathVariable Long unitId, @PathVariable BigInteger dataSubjectId, @RequestBody @Valid OrganizationDataSubjectBasicDTO dataSubjectMappingDTO) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization Id can't be null");
         }

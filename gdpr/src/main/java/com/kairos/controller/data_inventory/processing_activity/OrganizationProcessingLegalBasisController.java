@@ -104,12 +104,12 @@ public class OrganizationProcessingLegalBasisController {
 
 
     @ApiOperation("save processing Legal BasisAnd Suggest To Country admin")
-    @PostMapping(COUNTRY_URL + "/legal_basis")
+    @PostMapping(COUNTRY_URL + "/legal_basis/suggest")
     public ResponseEntity<Object> saveProcessingLegalBasisAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ProcessingLegalBasisDTO> processingLegalBasisDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.saveAndSuggestProcessingLegalBasiss(countryId, unitId, processingLegalBasisDTOs.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.saveAndSuggestProcessingLegalBasis(countryId, unitId, processingLegalBasisDTOs.getRequestBody()));
 
     }
 

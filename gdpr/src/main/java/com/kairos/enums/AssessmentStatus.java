@@ -3,7 +3,7 @@ package com.kairos.enums;
 public enum  AssessmentStatus {
 
 
-    NEW("new"), INPROGRESS("inProgress"), COMPLETED("completed");
+    NEW("new"), IN_PROGRESS("inProgress"), COMPLETED("completed");
 
     public String value;
     AssessmentStatus(String value) {

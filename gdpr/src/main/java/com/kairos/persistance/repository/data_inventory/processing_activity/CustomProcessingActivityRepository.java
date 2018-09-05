@@ -22,7 +22,7 @@ public interface CustomProcessingActivityRepository {
 
     List<ProcessingActivityBasicResponseDTO>  getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(Long unitId, Set<BigInteger> processingActivityIds);
 
-    List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubprocessingActivities(Long unitId);
+    List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubProcessingActivities(Long unitId);
 
     List<DataSubjectMappingResponseDTO> getAllMappedDataSubjectWithDataCategoryAndDataElement(Long unitId,List<BigInteger> dataSubjectIds);
 

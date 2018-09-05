@@ -94,9 +94,7 @@ public class TemplateTypeService extends MongoBaseService {
     public List<TemplateType> getTemplateByIdsList(List<BigInteger> templateIds, Long countryId) {
         List<TemplateType> templates = templateTypeRepository.findTemplateTypeByIdsList(countryId, templateIds);
         List<BigInteger> ids = new ArrayList<>();
-        templates.forEach(templateType -> {
-            ids.add(templateType.getId());
-        });
+        templates.forEach(templateType -> ids.add(templateType.getId()));
         templateIds.removeAll(ids);
         if (!templateIds.isEmpty()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Template type", templateIds.get(0));

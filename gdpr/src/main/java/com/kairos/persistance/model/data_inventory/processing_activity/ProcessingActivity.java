@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Document(collection = "processing_activity")
 public class ProcessingActivity extends MongoBaseEntity {
@@ -28,9 +27,9 @@ public class ProcessingActivity extends MongoBaseEntity {
     @NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
 
-    private List<ProcessingActivityRelatedDataSubject> dataSubjects;
+    private List<ProcessingActivityRelatedDataSubject> dataSubjects =new ArrayList<>();
 
-    private List<BigInteger> linkedAssets;
+    private List<BigInteger> linkedAssets=new ArrayList<>();
 
     private List<BigInteger> processingPurposes;
 

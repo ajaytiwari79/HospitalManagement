@@ -146,10 +146,7 @@ public class ProcessingActivityService extends MongoBaseService {
             subProcessingActivities.add(processingActivity);
         }
         subProcessingActivities = processingActivityMongoRepository.saveAll(getNextSequence(subProcessingActivities));
-        subProcessingActivities.forEach(processingActivity -> {
-
-            subProcessingActivityIdList.add(processingActivity.getId());
-        });
+        subProcessingActivities.forEach(processingActivity -> subProcessingActivityIdList.add(processingActivity.getId()));
         return subProcessingActivityIdList;
 
     }
@@ -313,7 +310,7 @@ public class ProcessingActivityService extends MongoBaseService {
      * @description method return processing activities and SubProcessing Activities with basic detail ,name,description
      */
     public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailsAndWithSubProcess(Long unitId) {
-        return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubprocessingActivities(unitId);
+        return processingActivityMongoRepository.getAllProcessingActivityBasicDetailWithSubProcessingActivities(unitId);
     }
 
 
@@ -390,7 +387,7 @@ public class ProcessingActivityService extends MongoBaseService {
      * @param dataSubjectId
      * @return
      */
-    public boolean removelinkedDataSubjectFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger dataSubjectId) {
+    public boolean removeLinkedDataSubjectFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger dataSubjectId) {
 
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
@@ -430,7 +427,7 @@ public class ProcessingActivityService extends MongoBaseService {
      * @return
      * @description method removed linked asset id from Processing activity
      */
-    public boolean removelinkedAssetFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
+    public boolean removeLinkedAssetFromProcessingActivity(Long unitId, BigInteger processingActivityId, BigInteger assetId) {
         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
@@ -453,9 +450,7 @@ public class ProcessingActivityService extends MongoBaseService {
 
             List<ProcessingActivityRelatedDataCategory> relatedDataCategoriesToDataSubject = relatedDataCategoryMap.get(dataSubjectMappingResponseDTO.getId());
             Map<BigInteger, Set<BigInteger>> dataElementsCoresspondingToDataCategory = new HashMap<>();
-            relatedDataCategoriesToDataSubject.forEach(dataCategory -> {
-                dataElementsCoresspondingToDataCategory.put(dataCategory.getId(), dataCategory.getDataElements());
-            });
+            relatedDataCategoriesToDataSubject.forEach(dataCategory -> dataElementsCoresspondingToDataCategory.put(dataCategory.getId(), dataCategory.getDataElements()));
             List<DataCategoryResponseDTO> dataCategoryResponseDTOS = new ArrayList<>();
             dataSubjectMappingResponseDTO.getDataCategories().forEach(dataCategoryResponseDTO -> {
 

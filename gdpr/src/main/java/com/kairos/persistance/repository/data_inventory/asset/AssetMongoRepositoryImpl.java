@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.DELETED;

@@ -95,9 +95,7 @@ public class AssetTypeService extends MongoBaseService {
         List<BigInteger> subAssetTypesIds = new ArrayList<>();
         try {
             subAssetTypes = assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypes));
-            subAssetTypes.forEach(subAssetType -> {
-                subAssetTypesIds.add(subAssetType.getId());
-            });
+            subAssetTypes.forEach(subAssetType -> subAssetTypesIds.add(subAssetType.getId()));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());

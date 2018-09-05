@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -57,7 +56,7 @@ public class AssessmentController {
 
     @ApiOperation(value = "get Assessment  By Id")
     @GetMapping(COUNTRY_URL + "/assessment/{assessmentId}")
-    public ResponseEntity<Object> getAssetAssessmentById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger assessmentId) throws IOException {
+    public ResponseEntity<Object> getAssetAssessmentById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger assessmentId) {
 
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
@@ -88,7 +87,7 @@ public class AssessmentController {
 
     @ApiOperation(value = "Change Assessment status")
     @PutMapping("/assessment/{assessmentId}/status")
-    public ResponseEntity<Object> changeAssessmentStatusinKanbanView(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @RequestParam(value = "assessmentStatus",required = true) AssessmentStatus assessmentStatus) {
+    public ResponseEntity<Object> changeAssessmentStatusKanbanView(@PathVariable Long unitId, @PathVariable BigInteger assessmentId, @RequestParam(value = "assessmentStatus",required = true) AssessmentStatus assessmentStatus) {
         if (!Optional.ofNullable(assessmentStatus).isPresent())
         {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Assessment Status "+assessmentStatus+" is invalid");
