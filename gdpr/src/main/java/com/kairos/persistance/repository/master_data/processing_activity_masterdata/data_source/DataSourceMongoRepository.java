@@ -36,7 +36,7 @@ public interface DataSourceMongoRepository extends MongoBaseRepository<DataSourc
       @Query("{organizationId:?0,deleted:false}")
     List<DataSourceResponseDTO> findAllOrganizationDataSources(Long organizationId);
 
-    @Query("{organizationId:?0,_id:?2,deleted:false}")
+    @Query("{organizationId:?0,_id:?1,deleted:false}")
     DataSource findByOrganizationIdAndId(Long organizationId,BigInteger id);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
