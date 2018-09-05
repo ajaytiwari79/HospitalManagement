@@ -71,7 +71,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
     /**
-     * @description method retrun policy agreement template with basic details
+     * @description method return policy agreement template with basic details
      * @param countryId
      * @param organizationId
      * @return
@@ -89,7 +89,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @description method return list of Agreement sections with sub sections of policy agreement template
      */
     public List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(Long countryId, Long unitId, BigInteger agreementTemplateId) {
-        return policyAgreementTemplateRepository.getAgreementTemplateAllSectionAndSubSectons(countryId, unitId, agreementTemplateId);
+        return policyAgreementTemplateRepository.getAgreementTemplateAllSectionAndSubSections(countryId, unitId, agreementTemplateId);
     }
 
 

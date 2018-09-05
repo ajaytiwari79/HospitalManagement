@@ -154,11 +154,11 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
 
     }
 
-    public Map<String, List<ProcessingPurpose>> saveAndSuggestProcessingPurposes(Long countryId, Long organizationId, List<ProcessingPurposeDTO> ProcessingPurposeDTOS) {
+    public Map<String, List<ProcessingPurpose>> saveAndSuggestProcessingPurposes(Long countryId, Long organizationId, List<ProcessingPurposeDTO> processingPurposeDTOS) {
 
         Map<String, List<ProcessingPurpose>> result;
-        result = createProcessingPurpose(organizationId, ProcessingPurposeDTOS);
-        List<ProcessingPurpose> masterProcessingPurposeSuggestedByUnit = processingPurposeService.saveSuggestedProcessingPurposesFromUnit(countryId, ProcessingPurposeDTOS);
+        result = createProcessingPurpose(organizationId, processingPurposeDTOS);
+        List<ProcessingPurpose> masterProcessingPurposeSuggestedByUnit = processingPurposeService.saveSuggestedProcessingPurposesFromUnit(countryId, processingPurposeDTOS);
         if (!masterProcessingPurposeSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterProcessingPurposeSuggestedByUnit);
         }

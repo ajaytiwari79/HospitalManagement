@@ -18,4 +18,6 @@ public interface StaffActivitySettingRepository extends MongoBaseRepository<Staf
 
     StaffActivitySettingDTO findByIdAndUnitIdAndDeletedFalse(BigInteger staffActivitySettingId,Long unitId);
 
+    StaffActivitySetting findByStaffIdAndActivityIdAndDeletedFalse(Long staffId,BigInteger activityId);
+
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -24,10 +25,13 @@ public interface ResponsibilityTypeMongoRepository extends MongoBaseRepository<R
     @Query("{_id:?0,deleted:false}")
     ResponsibilityTypeResponseDTO findResponsibilityTypeByid(BigInteger id);
 
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<ResponsibilityType> getResponsibilityTypeListByIds(Long countryId, Set<BigInteger> responsibilityTypeIds);
+
     ResponsibilityType findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
-    List<ResponsibilityTypeResponseDTO> findAllResponsibilityTypes(Long countryId,String suggestedDataStatus);
+    @Query("{deleted:false,countryId:?0}")
+    List<ResponsibilityTypeResponseDTO> findAllResponsibilityTypes(Long countryId);
 
     @Query("{organizationId:?0,deleted:false}")
     List<ResponsibilityTypeResponseDTO> findAllOrganizationResponsibilityTypes(Long organizationId);

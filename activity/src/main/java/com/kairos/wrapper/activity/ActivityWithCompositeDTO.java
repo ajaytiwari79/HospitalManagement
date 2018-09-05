@@ -1,11 +1,10 @@
 package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.activity.CompositeActivityDTO;
 import com.kairos.activity.activity.activity_tabs.TimeCalculationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
-import com.kairos.persistence.model.activity.tabs.RulesActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
 
 import java.math.BigInteger;

@@ -4,7 +4,7 @@ import com.kairos.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.staffing_level.StaffingLevelActivityWithDuration;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.enums.DurationType;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.open_shift.OpenShiftInterval;
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;

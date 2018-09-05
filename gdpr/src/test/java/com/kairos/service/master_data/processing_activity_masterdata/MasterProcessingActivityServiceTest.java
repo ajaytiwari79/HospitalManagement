@@ -50,7 +50,7 @@ public class MasterProcessingActivityServiceTest {
 
 
     @Test
-    public void test_createMasterProcessingActivity() throws Exception {
+    public void test_createMasterProcessingActivity() {
         String baseUrl = getBaseUrl(24L, 4l, null);
 
         MasterProcessingActivityDTO processingActivity = new MasterProcessingActivityDTO();
@@ -75,7 +75,7 @@ public class MasterProcessingActivityServiceTest {
     }
 
     @Test
-    public void test1_getMasterProcessingActivityListWithSubProcessing() throws Exception {
+    public void test1_getMasterProcessingActivityListWithSubProcessing() {
         String baseUrl = getBaseUrl(24L, 4l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<MasterProcessingActivityResponseDTO>>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<MasterProcessingActivityResponseDTO>>>() {
@@ -88,7 +88,7 @@ public class MasterProcessingActivityServiceTest {
 
 
     @Test
-    public void test2_getMasterProcessingActivityWithSubProcessingById() throws Exception {
+    public void test2_getMasterProcessingActivityWithSubProcessingById() {
 
         String baseUrl = getBaseUrl(24L, 4l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<MasterProcessingActivityResponseDTO>> typeReference =
@@ -103,7 +103,7 @@ public class MasterProcessingActivityServiceTest {
 
 
     @Test
-    public void test3_removeProcessingActivity() throws Exception {
+    public void test3_removeProcessingActivity() {
 
         String baseUrl = getBaseUrl(24L, 4l, null);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/master_processing_activity/delete/" + createdId);

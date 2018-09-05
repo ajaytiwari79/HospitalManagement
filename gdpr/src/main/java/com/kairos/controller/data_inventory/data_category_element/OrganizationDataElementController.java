@@ -44,7 +44,7 @@ public class OrganizationDataElementController {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataElementService.getAllDataElementbyUnitId(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataElementService.getAllDataElementByUnitId(unitId));
     }
 
 
@@ -55,7 +55,7 @@ public class OrganizationDataElementController {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataElementService.getDataElementbyUnitIdAndId(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataElementService.getDataElementByUnitIdAndId(unitId, id));
     }
 
 

@@ -2,6 +2,8 @@ package com.kairos.user.staff.staff_settings;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class StaffActivitySettingDTO {
@@ -18,6 +20,7 @@ public class StaffActivitySettingDTO {
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
     private LocalTime maximumEndTime;
+    private List<Long> dayTypeIds= new ArrayList<>();
 
 
     public StaffActivitySettingDTO() {
@@ -137,5 +140,13 @@ public class StaffActivitySettingDTO {
 
     public void setMaximumEndTime(LocalTime maximumEndTime) {
         this.maximumEndTime = maximumEndTime;
+    }
+
+    public List<Long> getDayTypeIds() {
+        return dayTypeIds;
+    }
+
+    public void setDayTypeIds(List<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
     }
 }

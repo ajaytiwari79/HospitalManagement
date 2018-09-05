@@ -16,6 +16,8 @@ public class AppConstants {
     public static final String DELETE = "DELETE";
     public static final String PUT = "PUT";
     public static final String OPTIONS = "OPTIONS";
+    public static final String YES="YES";
+    public static final String NO="NO";
 
     //Swagger
     public static final String SWAGGER_UI_PATH = "/swagger-ui.html";

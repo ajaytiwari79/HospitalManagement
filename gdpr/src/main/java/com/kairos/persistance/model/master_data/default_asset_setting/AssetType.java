@@ -23,7 +23,7 @@ public class AssetType extends MongoBaseEntity {
 
     private boolean hasSubAsset=false;
 
-    private String suggestedDataStatus=SuggestedDataStatus.ACCEPTED.value;
+    private String suggestedDataStatus;
 
     public String getSuggestedDataStatus() { return suggestedDataStatus; }
 

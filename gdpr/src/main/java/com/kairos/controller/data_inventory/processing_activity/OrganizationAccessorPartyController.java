@@ -93,7 +93,7 @@ public class OrganizationAccessorPartyController {
 
 
     @ApiOperation("save accessor party And Suggest To Country admin")
-    @PostMapping(COUNTRY_URL + "/accessor_party")
+    @PostMapping(COUNTRY_URL + "/accessor_party/suggest")
     public ResponseEntity<Object> saveAccessorPartyAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<AccessorPartyDTO> accessorPartyDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
