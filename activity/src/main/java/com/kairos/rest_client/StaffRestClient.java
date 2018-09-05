@@ -1,5 +1,6 @@
 package com.kairos.rest_client;
 
+import com.kairos.activity.shift.StaffUnitPositionDetails;
 import com.kairos.user.access_group.UserAccessRoleDTO;
 import com.kairos.user.staff.ClientStaffInfoDTO;
 import com.kairos.user.staff.StaffDTO;
@@ -270,18 +271,18 @@ public class StaffRestClient {
      * <p>
      * enpoint map in staff controller
      */
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(Long staffId, String type) {
+    public StaffUnitPositionDetails verifyUnitEmploymentOfStaff(Long staffId,Long unitId, String type) {
 
-        final String baseUrl = getBaseUrl(true);
+        final String baseUrl = getBaseUrl(true,unitId);
 
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffUnitPositionDetails>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffUnitPositionDetails>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<StaffUnitPositionDetails>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/staff/{staffId}/verifyUnitEmployment?type=" + type,
                             HttpMethod.GET, null, typeReference, staffId);
-            RestTemplateResponseEnvelope<StaffAdditionalInfoDTO> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<StaffUnitPositionDetails> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
@@ -295,10 +296,7 @@ public class StaffRestClient {
     }
 
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(Long staffId, String type, Long unitEmploymentId) {
-
         final String baseUrl = getBaseUrl(true);
-
-        String activityTimeCalculationDayTypesIds = "";
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
             };

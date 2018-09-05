@@ -7,6 +7,7 @@ import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.activity.shift.CopyShiftDTO;
 import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.service.shift.ShiftSickService;
 import com.kairos.util.DateUtils;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -39,6 +40,11 @@ public class ShiftController {
 
     @Inject
     private ShiftService shiftService;
+
+
+    @Inject
+    private ShiftSickService shiftSickService;
+
     @Inject
     private ActivityService activityService;
 
@@ -164,6 +170,10 @@ public class ShiftController {
         shiftService.deleteShiftsAfterEmploymentEndDate(staffId,unitId,DateUtils.asLocalDate(endDate));
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
-
+    @ApiOperation("API is used to add shift of user when user is sick")
+    @GetMapping("/staff/{staffId}/shift_on_sick")
+    public ResponseEntity<Map<String,Object>> markUserAsSick(@PathVariable Long unitId,@PathVariable Long staffId,@RequestParam ("activitySelected") BigInteger activityId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftSickService.createSicknessShiftsOfStaff(unitId,activityId,staffId));
+    }
 
 }

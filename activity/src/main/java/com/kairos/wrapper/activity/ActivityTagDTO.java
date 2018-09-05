@@ -34,6 +34,7 @@ public class ActivityTagDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private TimeCalculationActivityTab timeCalculationActivityTab;
+    private List<Long> dayTypes= new ArrayList<>();
 
     private Long parentId;
     private ActivityStateEnum state;
@@ -179,7 +180,13 @@ public class ActivityTagDTO {
         this.balanceSettingsActivityTab = balanceSettingsActivityTab;
     }
 
+    public List<Long> getDayTypes() {
+        return dayTypes;
+    }
 
+    public void setDayTypes(List<Long> dayTypes) {
+        this.dayTypes = dayTypes;
+    }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
         this.id = activity.getId();
