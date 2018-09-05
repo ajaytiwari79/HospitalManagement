@@ -49,6 +49,7 @@ import com.kairos.service.unit_settings.UnitSettingService;
 import com.kairos.service.user_service_data.UnitDataService;
 import com.kairos.user.country.day_type.DayType;
 import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
@@ -339,18 +340,18 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityWithTimeTypeDTO;
     }
 
-    public boolean createDefaultDataForOrganization(Long unitId, Long parentOrganizationId, Long countryId,Long orgTypeIds, List<Long> orgSubTypeIds) {
+    public boolean createDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
         logger.info("I am going to create default data or organization "+unitId);
-        unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
-        List<Phase> phases = phaseService.createDefaultPhase(unitId, countryId);
+        //unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
+        List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
         periodSettingsService.createDefaultPeriodSettings(unitId);
         phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
         unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
-        activityConfigurationService.createDefaultSettings(unitId, countryId, phases);
+        activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases);
         TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
         timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
-        priorityGroupService.copyPriorityGroupsForUnit(unitId, countryId);
-        List<Activity>  existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubType(orgTypeIds, orgSubTypeIds);
+        priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
+        List<Activity>  existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubType(orgTypeAndSubTypeDTO.getOrganizationTypeId(),orgTypeAndSubTypeDTO.getSubTypeId());
         if(!existingActivities.isEmpty()) {
             List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
             for (Activity activity : existingActivities) {
