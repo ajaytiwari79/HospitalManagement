@@ -28,4 +28,11 @@ public class AppConstants {
      */
     public static final String STAFFING_LEVEL="staffing_level";
     public static final String ACTIVITYIES="activities";
+
+    /**
+     * Neo4j RelationShip constants
+     */
+    public static final String STAFF_HAS_SKILLS="STAFF_HAS_SKILLS";
+    public static final String BELONGS_TO_STAFF="BELONGS_TO_STAFF";
+    public static final String HAS_EXPERTISE_IN="HAS_EXPERTISE_IN";
 }
