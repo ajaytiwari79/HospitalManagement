@@ -295,11 +295,13 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,AccessGroupKPIEntry.class),AccessGroupMappingDTO.class);
     }
 
-    public List<KPIDTO> getAccessGroupKPIDto(List<Long> accessGroupIds , ConfLevel level, Long refId){
+    public List<KPIDTO> getAccessGroupKPIDto(List<Long> accessGroupIds , ConfLevel level, Long refId,Long staffId){
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
-                Aggregation.lookup("counter","kpiId","_id","kpi"),
+                Aggregation.lookup("applicableKPI","kpiId","activeKpiId","applicableKpi"),
+                Aggregation.match(Criteria.where("applicableKpi.staffId").is(staffId)),
+                Aggregation.lookup("counter","applicableKpi.activeKpiId","_id","kpi"),
                 Aggregation.project().and("kpi._id").as("_id")
                         .and("kpi.title").as("title").and("kpi.treatAsCounter").as("treatAsCounter")
         );

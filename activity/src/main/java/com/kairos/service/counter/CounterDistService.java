@@ -85,7 +85,7 @@ public class CounterDistService extends MongoBaseService {
 //        if(accessGroupPermissionCounterDTO.getCountryAdmin()){
 //             kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,ConfLevel.UNIT);
 //        }else{
-            kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.STAFF,accessGroupPermissionCounterDTO.getStaffId());
+            kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,refId,accessGroupPermissionCounterDTO.getStaffId());
        // }
         kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
         //dont delete
