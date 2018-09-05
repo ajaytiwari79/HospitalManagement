@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -190,6 +191,7 @@ public class HostingTypeService extends MongoBaseService {
                 HostingType hostingType = new HostingType(name);
                 hostingType.setCountryId(countryId);
                 hostingType.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                hostingType.setSuggestedDate(LocalDate.now());
                 hostingTypeList.add(hostingType);
             }
 

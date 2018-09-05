@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -188,6 +189,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
                 TechnicalSecurityMeasure technicalSecurityMeasure = new TechnicalSecurityMeasure(name);
                 technicalSecurityMeasure.setCountryId(countryId);
                 technicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                technicalSecurityMeasure.setSuggestedDate(LocalDate.now());
                 technicalSecurityMeasureList.add(technicalSecurityMeasure);
             }
 

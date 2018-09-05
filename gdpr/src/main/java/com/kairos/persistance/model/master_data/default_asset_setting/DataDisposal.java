@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 
 @Document(collection = "data_disposal")
 public class DataDisposal extends MongoBaseEntity {
@@ -17,6 +18,12 @@ public class DataDisposal extends MongoBaseEntity {
     private Long countryId;
 
     private SuggestedDataStatus suggestedDataStatus=SuggestedDataStatus.ACCEPTED;
+
+    private LocalDate suggestedDate;
+
+    public LocalDate getSuggestedDate() { return suggestedDate; }
+
+    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
 
     public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
 

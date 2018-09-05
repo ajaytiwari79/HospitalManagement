@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -190,6 +191,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
                 ResponsibilityType responsibilityType = new ResponsibilityType(name);
                 responsibilityType.setCountryId(countryId);
                 responsibilityType.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                responsibilityType.setSuggestedDate(LocalDate.now());
                 responsibilityTypeList.add(responsibilityType);
             }
 

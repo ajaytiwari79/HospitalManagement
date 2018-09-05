@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -192,6 +193,7 @@ public class HostingProviderService extends MongoBaseService {
                 HostingProvider hostingProvider = new HostingProvider(name);
                 hostingProvider.setCountryId(countryId);
                 hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                hostingProvider.setSuggestedDate(LocalDate.now());
                 hostingProviderList.add(hostingProvider);
             }
 

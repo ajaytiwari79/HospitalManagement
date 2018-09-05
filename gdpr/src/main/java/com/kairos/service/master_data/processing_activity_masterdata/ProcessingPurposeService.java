@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -187,6 +188,7 @@ public class ProcessingPurposeService extends MongoBaseService {
                 ProcessingPurpose processingPurpose = new ProcessingPurpose(name);
                 processingPurpose.setCountryId(countryId);
                 processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                processingPurpose.setSuggestedDate(LocalDate.now());
                 processingPurposeList.add(processingPurpose);
             }
 

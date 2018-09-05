@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -182,6 +183,7 @@ public class DataSourceService extends MongoBaseService {
                 DataSource dataSource = new DataSource(name);
                 dataSource.setCountryId(countryId);
                 dataSource.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                dataSource.setSuggestedDate(LocalDate.now());
                 dataSourceList.add(dataSource);
             }
 

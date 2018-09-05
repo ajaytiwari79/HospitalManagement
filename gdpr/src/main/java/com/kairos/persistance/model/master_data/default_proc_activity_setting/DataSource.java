@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 
 @Document(collection = "dataSource")
 public class DataSource extends  MongoBaseEntity {
@@ -18,6 +19,12 @@ public class DataSource extends  MongoBaseEntity {
     private Long countryId;
 
     private SuggestedDataStatus suggestedDataStatus=SuggestedDataStatus.ACCEPTED;
+
+    private LocalDate suggestedDate;
+
+    public LocalDate getSuggestedDate() { return suggestedDate; }
+
+    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
 
     public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
 

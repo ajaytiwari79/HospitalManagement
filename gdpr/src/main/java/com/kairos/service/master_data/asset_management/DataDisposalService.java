@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -183,6 +184,7 @@ public class DataDisposalService extends MongoBaseService {
                 DataDisposal dataDisposal = new DataDisposal(name);
                 dataDisposal.setCountryId(countryId);
                 dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                dataDisposal.setSuggestedDate(LocalDate.now());
                 dataDisposalList.add(dataDisposal);
             }
 

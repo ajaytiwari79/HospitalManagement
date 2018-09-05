@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -188,6 +189,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
                 OrganizationalSecurityMeasure organizationalSecurityMeasure = new OrganizationalSecurityMeasure(name);
                 organizationalSecurityMeasure.setCountryId(countryId);
                 organizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                organizationalSecurityMeasure.setSuggestedDate(LocalDate.now());
                 organizationalSecurityMeasureList.add(organizationalSecurityMeasure);
             }
 

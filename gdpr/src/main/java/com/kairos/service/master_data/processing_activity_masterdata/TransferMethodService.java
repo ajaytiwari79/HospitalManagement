@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -184,6 +185,7 @@ public class TransferMethodService extends MongoBaseService {
                 TransferMethod transferMethod = new TransferMethod(name);
                 transferMethod.setCountryId(countryId);
                 transferMethod.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                transferMethod.setSuggestedDate(LocalDate.now());
                 transferMethodList.add(transferMethod);
             }
 
