@@ -117,7 +117,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$name").as("name")
                         .first("$description").as("description")
                         .first("$unitId").as("unitId")
-                        .first("rulesActivityTab.dayTypes").as("dayTypes")
+                        .first("rulesActivityTab.dayTypes").as("rulesActivityTab.dayTypes")
                         .first("$parentId").as("parentId")
                         .first("generalActivityTab").as("generalActivityTab")
                         .first("permissionsActivityTab").as("permissionsActivityTab")
