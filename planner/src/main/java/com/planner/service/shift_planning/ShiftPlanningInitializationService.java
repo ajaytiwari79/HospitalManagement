@@ -1,20 +1,22 @@
 package com.planner.service.shift_planning;
 
 import com.kairos.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
+import com.planner.domain.query_results.StaffQueryResult;
 import com.planner.responseDto.PlanningDto.shiftPlanningDto.ActivityDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * This service will interact with
  * {@link ActivityMongoService}
  * and
- * {}
- * to prepare {}ShiftPlanningInitialization Data}
+ * {@link UserNeo4jService}
+ * to prepare {ShiftPlanningInitialization Data}
  * @author mohit
  */
 @Service
@@ -27,11 +29,18 @@ public class ShiftPlanningInitializationService {
     private UserNeo4jService userNeo4jService;
 
     /**
-     *Only Method Responsible to prepare shiftPlanningInitialization Data
+     *
      */
-    public List<ActivityDTO> shiftPlanningInitialization(Long unitId, Date fromDate, Date toDate) {
-        List<ShiftPlanningStaffingLevelDTO> shiftPlanningStaffingLevelDTOList = activityMongoService.getShiftPlanningStaffingLevelDTOByUnitId(unitId, fromDate, toDate);
-        Set<String> activitiesIds = activityMongoService.getActivitiesIds(shiftPlanningStaffingLevelDTOList);
-        return activityMongoService.getActivitiesByIds(activitiesIds);
+    public List<ActivityDTO> getActivities(Long unitId, Date fromDate, Date toDate) {
+        return activityMongoService.getActivities(unitId,fromDate,toDate);
+    }
+
+    /**
+     * Mehod to get All staffList by ids
+     * @param staffIds
+     * @return
+     */
+    public List<StaffQueryResult> getStaffWithSkills(Long[] staffIds){
+       return userNeo4jService.getStaffWithSkills(staffIds);
     }
 }
