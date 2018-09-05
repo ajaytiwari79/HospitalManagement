@@ -129,7 +129,7 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
                         if (counterValue < 0) {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
                             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                            ShiftValidatorService.throwException("message.ruleTemplate.broken",this.name);
+
                         }else {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
                             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
@@ -137,7 +137,6 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
                     }else {
                         WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
                         infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                        ShiftValidatorService.throwException("message.ruleTemplate.broken",this.name);
                     }
                 }
             }

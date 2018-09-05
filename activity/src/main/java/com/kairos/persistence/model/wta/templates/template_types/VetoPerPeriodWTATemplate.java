@@ -120,7 +120,6 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
             if (!isValid) {
                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
                 infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                ShiftValidatorService.throwException("message.ruleTemplate.broken",this.name);
             }
         }
     }

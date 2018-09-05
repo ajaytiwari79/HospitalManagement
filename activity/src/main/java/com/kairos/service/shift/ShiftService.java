@@ -73,6 +73,7 @@ import com.kairos.util.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -82,9 +83,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import com.kairos.persistence.repository.shift.ActivityShiftStatusSettingsRepository;
 
+import javax.annotation.RegEx;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -252,6 +253,7 @@ public class ShiftService extends MongoBaseService {
         if(violatedRulesDTO.getWorkTimeAgreements().isEmpty()){
             List<ShiftQueryResult> shiftQueryResults = new ArrayList<>(addBreakInShifts(activity, mainShift, staffAdditionalInfoDTO));
             save(mainShift);
+            shiftQueryResult.setId(mainShift.getId());
             shiftQueryResult.setSubShifts(shiftQueryResults);
             setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, mainShift);
@@ -264,7 +266,6 @@ public class ShiftService extends MongoBaseService {
             ShiftViolatedRules shiftViolatedRules = ObjectMapperUtils.copyPropertiesByMapper(violatedRulesDTO,ShiftViolatedRules.class);
             shiftViolatedRules.setShift(mainShift);
             save(shiftViolatedRules);
-            shiftWithViolatedInfoDTO = saveShiftAfterValidation(shiftWithViolatedInfoDTO,type);
             updateWTACounter(staffAdditionalInfoDTO,shiftWithViolatedInfoDTO,mainShift);
         }
         return shiftWithViolatedInfoDTO;
@@ -283,6 +284,12 @@ public class ShiftService extends MongoBaseService {
         }
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>(addBreakInShifts(activity, shift, staffAdditionalInfoDTO));
+        if(CollectionUtils.isNotEmpty(shiftWithViolatedInfo.getShifts().get(0).getSubShifts())){
+            List<Shift> shifts = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftWithViolatedInfo.getShifts().get(0).getSubShifts(),Shift.class);
+            save(shifts);
+            Set<BigInteger> subShiftsIds = shifts.parallelStream().map(Shift::getId).collect(Collectors.toSet());
+            shift.setSubShifts(subShiftsIds);
+        }
         save(shift);
         ShiftQueryResult shiftQueryResult = shift.getShiftQueryResult();
         shiftQueryResult.setSubShifts(shiftQueryResults);
@@ -731,10 +738,18 @@ public class ShiftService extends MongoBaseService {
     private void updateWTACounter(StaffAdditionalInfoDTO staffAdditionalInfoDTO,ShiftWithViolatedInfoDTO shiftWithViolatedInfo,Shift shift) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), DateUtils.asLocalDate(shift.getStartDate()));
         List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()));
-        List<StaffWTACounter> newStaffWTACounter = shiftWithViolatedInfo.getViolatedRules().getWorkTimeAgreements().stream().map(s -> new StaffWTACounter(planningPeriod.getStartDate(), planningPeriod.getEndDate(), s.getRuleTemplateId(), staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO.getUnitId(), s.getCounter()-1)).collect(Collectors.toList());
-        staffWTACounters.addAll(newStaffWTACounter);
-        if (!staffWTACounters.isEmpty()) {
-            save(staffWTACounters);
+        Map<BigInteger,StaffWTACounter> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(k->k.getRuleTemplateId(),v->v));
+        List<StaffWTACounter> updatedStaffCounters = new ArrayList<>();
+
+        shiftWithViolatedInfo.getViolatedRules().getWorkTimeAgreements().forEach(workTimeAgreementRuleViolation -> {
+
+            StaffWTACounter staffWTACounter = staffWTACounterMap.getOrDefault(workTimeAgreementRuleViolation.getRuleTemplateId(),new StaffWTACounter(planningPeriod.getStartDate(), planningPeriod.getEndDate(), workTimeAgreementRuleViolation.getRuleTemplateId(), staffAdditionalInfoDTO.getUnitPosition().getId(), staffAdditionalInfoDTO.getUnitId(), 0));
+            staffWTACounter.setCount(workTimeAgreementRuleViolation.getCounter()-1);
+            updatedStaffCounters.add(staffWTACounter);
+        });
+
+        if (!updatedStaffCounters.isEmpty()) {
+            save(updatedStaffCounters);
         }
     }
 
@@ -828,21 +843,22 @@ public class ShiftService extends MongoBaseService {
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
         ViolatedRulesDTO violatedRulesDTO = validateShiftWithActivity(phase,wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         ShiftQueryResult shiftQueryResult;
-        if (shiftDTO.getSubShifts().size() == 0) {
+        if (CollectionUtils.isNotEmpty(shiftDTO.getSubShifts())) {
             shift = buildShift(shiftDTO);
             shift.setUnitId(unitId);
             shift.setMainShift(true);
-
             shiftQueryResult = shift.getShiftQueryResult();
         } else {
             List<Shift> shifts;
             shifts = verifyCompositeShifts(shiftDTO, shiftDTO.getId(), activity);
-            save(shifts);
-            Set<BigInteger> subShiftsIds = shifts.parallelStream().map(Shift::getId).collect(Collectors.toSet());
             shift = buildShift(shiftDTO);
+            if(violatedRulesDTO.getWorkTimeAgreements().isEmpty()){
+                save(shifts);
+                Set<BigInteger> subShiftsIds = shifts.parallelStream().map(Shift::getId).collect(Collectors.toSet());
+                shift.setSubShifts(subShiftsIds);
+            }
             shift.setMainShift(true);
             shift.setUnitId(unitId);
-            shift.setSubShifts(subShiftsIds);
             shiftQueryResult = geSubShiftResponse(shift, shifts);
         }
         if(violatedRulesDTO.getWorkTimeAgreements().isEmpty()){
@@ -919,9 +935,9 @@ public class ShiftService extends MongoBaseService {
         List<Activity> activities=activityRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger,String> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,Activity::getName));
         List<Shift> shifts = new ArrayList<>(shiftDTO.getSubShifts().size());
-        for (int i = 0; i < shiftDTO.getSubShifts().size(); i++) {
-            Shift subShifts = buildShift(shiftDTO.getSubShifts().get(i));
-            subShifts.setName(activityMap.get(shiftDTO.getSubShifts().get(i).getActivityId()));
+        for (ShiftDTO subShiftDTO : shiftDTO.getSubShifts()) {
+            Shift subShifts = buildShift(subShiftDTO);
+            subShifts.setName(activityMap.get(subShiftDTO.getActivityId()));
             subShifts.setMainShift(false);
             shifts.add(subShifts);
         }
@@ -932,8 +948,8 @@ public class ShiftService extends MongoBaseService {
     private ShiftQueryResult geSubShiftResponse(Shift shift, List<Shift> shifts) {
         ShiftQueryResult shiftQueryResult = shift.getShiftQueryResult();
         List<ShiftQueryResult> subShifts = new ArrayList<>();
-        for (int i = 0; i < shifts.size(); i++) {
-            subShifts.add(shifts.get(i).getShiftQueryResult());
+        for (Shift shift1: shifts) {
+            subShifts.add(shift1.getShiftQueryResult());
         }
         shiftQueryResult.setSubShifts(subShifts);
         return shiftQueryResult;

@@ -12,6 +12,9 @@ public class ShiftWithViolatedInfoDTO {
     private ViolatedRulesDTO violatedRules;
 
 
+    public ShiftWithViolatedInfoDTO() {
+    }
+
     public ShiftWithViolatedInfoDTO(List<ShiftQueryResult> shifts, ViolatedRulesDTO violatedRules) {
         this.shifts = shifts;
         this.violatedRules = violatedRules;
