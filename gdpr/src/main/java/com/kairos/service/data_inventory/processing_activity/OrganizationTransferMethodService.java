@@ -154,11 +154,11 @@ public class OrganizationTransferMethodService extends MongoBaseService {
 
     }
 
-    public Map<String, List<TransferMethod>> saveAndSuggestTransferMethods(Long countryId, Long organizationId, List<TransferMethodDTO> TransferMethodDTOS) {
+    public Map<String, List<TransferMethod>> saveAndSuggestTransferMethods(Long countryId, Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
 
         Map<String, List<TransferMethod>> result;
-        result = createTransferMethod(organizationId, TransferMethodDTOS);
-        List<TransferMethod> masterTransferMethodSuggestedByUnit = transferMethodService.saveSuggestedTransferMethodsFromUnit(countryId, TransferMethodDTOS);
+        result = createTransferMethod(organizationId, transferMethodDTOS);
+        List<TransferMethod> masterTransferMethodSuggestedByUnit = transferMethodService.saveSuggestedTransferMethodsFromUnit(countryId, transferMethodDTOS);
         if (!masterTransferMethodSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterTransferMethodSuggestedByUnit);
         }
