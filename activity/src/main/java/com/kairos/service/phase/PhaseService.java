@@ -48,7 +48,7 @@ public class PhaseService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     public List<Phase> createDefaultPhase(Long unitId, Long countryId) {
-        List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
+        List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(countryId);
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
             Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(),phaseDTO.getPhaseEnum(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
@@ -155,7 +155,7 @@ public class PhaseService extends MongoBaseService {
     }
 
     public List<PhaseDTO> getPhasesByCountryId(Long countryId) {
-        return phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
+        return phaseMongoRepository.findByCountryIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(countryId);
     }
 
     public Map<String, List<PhaseDTO>> getPhasesWithCategoryByCountryId(Long countryId) {
