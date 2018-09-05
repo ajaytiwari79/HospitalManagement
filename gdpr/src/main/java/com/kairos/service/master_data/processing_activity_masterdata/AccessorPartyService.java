@@ -157,22 +157,22 @@ public class AccessorPartyService extends MongoBaseService {
 
 
     /**
-     * @description method save Accesor Party suggested by unit
+     * @description method save Accessor Party suggested by unit
      * @param countryId
      * @param AccessorPartyDTOS
      * @return
      */
-    public List<AccessorParty> saveSuggestedAccessorPartysFromUnit(Long countryId, List<AccessorPartyDTO> AccessorPartyDTOS) {
+    public List<AccessorParty> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> AccessorPartyDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
+        Set<String> hostingProvidersName = new HashSet<>();
         for (AccessorPartyDTO AccessorParty : AccessorPartyDTOS) {
-            hostingProvoiderNames.add(AccessorParty.getName());
+            hostingProvidersName.add(AccessorParty.getName());
         }
-        List<AccessorParty> existingAccessorPartys = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, AccessorParty.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingAccessorPartys, hostingProvoiderNames);
+        List<AccessorParty> existingAccessorParties = findMetaDataByNamesAndCountryId(countryId, hostingProvidersName, AccessorParty.class);
+        hostingProvidersName = ComparisonUtils.getNameListForMetadata(existingAccessorParties, hostingProvidersName);
         List<AccessorParty> AccessorPartyList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        if (hostingProvidersName.size() != 0) {
+            for (String name : hostingProvidersName) {
 
                 AccessorParty AccessorParty = new AccessorParty(name);
                 AccessorParty.setCountryId(countryId);

@@ -175,9 +175,7 @@ public class MongoBaseService {
         Assert.notNull(entities, "Entity must not be null!");
         //  Get class name for sequence class
 
-        entities.forEach(entity -> {
-            entity.setDeleted(true);
-        });
+        entities.forEach(entity -> entity.setDeleted(true));
         mongoTemplate.save(entities);
         return entities;
     }

@@ -177,15 +177,15 @@ public class StorageFormatService extends MongoBaseService {
      */
     public List<StorageFormat> saveSuggestedStorageFormatsFromUnit(Long countryId, List<StorageFormatDTO> StorageFormatDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
+        Set<String> storageFormatNameList = new HashSet<>();
         for (StorageFormatDTO StorageFormat : StorageFormatDTOS) {
-            hostingProvoiderNames.add(StorageFormat.getName());
+            storageFormatNameList.add(StorageFormat.getName());
         }
-        List<StorageFormat> existingStorageFormats = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, StorageFormat.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingStorageFormats, hostingProvoiderNames);
+        List<StorageFormat> existingStorageFormats = findMetaDataByNamesAndCountryId(countryId, storageFormatNameList, StorageFormat.class);
+        storageFormatNameList = ComparisonUtils.getNameListForMetadata(existingStorageFormats, storageFormatNameList);
         List<StorageFormat> StorageFormatList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        if (storageFormatNameList.size() != 0) {
+            for (String name : storageFormatNameList) {
 
                 StorageFormat StorageFormat = new StorageFormat(name);
                 StorageFormat.setCountryId(countryId);

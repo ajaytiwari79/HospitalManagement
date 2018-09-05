@@ -62,7 +62,7 @@ public class Asset extends MongoBaseEntity {
 
     private Long maxDataSubjectVolume;
 
-    private RiskSeverity risk;
+    private RiskSeverity riskLevel;
 
     @NotNull(message = "Status can't be empty")
     private boolean active=true;
@@ -139,9 +139,9 @@ public class Asset extends MongoBaseEntity {
 
     public void setMaxDataSubjectVolume(Long maxDataSubjectVolume) { this.maxDataSubjectVolume = maxDataSubjectVolume; }
 
-    public RiskSeverity getRisk() { return risk; }
+    public RiskSeverity getRiskLevel() { return riskLevel; }
 
-    public void setRisk(RiskSeverity risk) { this.risk = risk; }
+    public void setRiskLevel(RiskSeverity riskLevel) { this.riskLevel = riskLevel; }
 
     public String getHostingLocation() { return hostingLocation; }
 

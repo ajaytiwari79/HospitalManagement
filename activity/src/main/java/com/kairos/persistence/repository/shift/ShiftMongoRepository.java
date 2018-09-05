@@ -2,13 +2,14 @@ package com.kairos.persistence.repository.shift;
 
 
 import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +50,11 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{'deleted':false,'unitId':?2, 'isMainShift':true, 'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
     List<Shift> findShiftBetweenDuration(LocalDateTime startDate, LocalDateTime endDate, Long unitId);
 
+    @Query("{'deleted':false, 'unitId':?2, 'startDate':{$gte:?3}, 'unitPositionId':?0, '$or':[{disabled:true},{sickShift:true}] }")
+    List<Shift> findAllDisabledOrSickShiftsByUnitPositionIdAndUnitId(Long unitPositionId,Long unitId, LocalDate startDate);
+
     @Query("{deleted:false,planningPeriodId:?0,phaseId:?1,unitId:?2}")
     List<Shift> findAllShiftsPlanningPeriodAndPhaseId(BigInteger planningPeriodId,BigInteger phaseId,Long unitId);
+
 
 }

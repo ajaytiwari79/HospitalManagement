@@ -14,9 +14,9 @@ import java.util.List;
 public interface ShiftStateMongoRepository extends MongoBaseRepository<ShiftState, BigInteger> {
 
     @Query("{deleted:false,planningPeriodId:?0,phaseId:?1,unitId:?2}")
-    List<ShiftState> getShiftStateByPlanningPeriodIdAndPhaseId(BigInteger planningPeriodId, BigInteger phaseId,Long unitId);
+    List<ShiftState> getShiftsState(BigInteger planningPeriodId, BigInteger phaseId, Long unitId);
 
     @Query("{deleted:false,phaseId:?0,unitId:?1,shiftId:{'$in':?2}}")
-    List<ShiftState> getShiftStateByPlanningPeriodAndPhaseAndUnitAndStaffId( BigInteger phaseId,Long unitId,List<BigInteger> shifiIds);
+    List<ShiftState> getShiftsState(BigInteger phaseId, Long unitId, List<BigInteger> shifiIds);
 
 }

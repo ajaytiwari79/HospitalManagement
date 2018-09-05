@@ -36,11 +36,11 @@ public class OrganizationDataElementService extends MongoBaseService {
      */
     public List<DataElement> saveDataElementsAndCheckDuplicateyEntry(Long unitId, List<DataElement> dataElementList) {
 
-        Set<String> dataELementNameList = new HashSet<>();
+        Set<String> dataElementNameList = new HashSet<>();
         for (DataElement dataElement : dataElementList) {
-            dataELementNameList.add(dataElement.getName());
+            dataElementNameList.add(dataElement.getName());
         }
-        List<DataElement> previousDataElementList = findMetaDataByNameAndUnitId(unitId, dataELementNameList, DataElement.class);
+        List<DataElement> previousDataElementList = findMetaDataByNameAndUnitId(unitId, dataElementNameList, DataElement.class);
         if (!previousDataElementList.isEmpty()) {
             exceptionService.duplicateDataException("message.duplicate", "Data element ", previousDataElementList.get(0).getName());
         }
@@ -74,12 +74,12 @@ public class OrganizationDataElementService extends MongoBaseService {
     }
 
 
-    public List<DataElementBasicResponseDTO> getAllDataElementbyUnitId(Long unitId) {
+    public List<DataElementBasicResponseDTO> getAllDataElementByUnitId(Long unitId) {
         return dataElementMongoRepository.getAllDataElementByUnitId(unitId);
     }
 
 
-    public DataElementBasicResponseDTO getDataElementbyUnitIdAndId(Long unitId, BigInteger id) {
+    public DataElementBasicResponseDTO getDataElementByUnitIdAndId(Long unitId, BigInteger id) {
         return dataElementMongoRepository.getDataElementByUnitIdAndId(unitId, id);
     }
 

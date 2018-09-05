@@ -117,6 +117,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$name").as("name")
                         .first("$description").as("description")
                         .first("$unitId").as("unitId")
+                        .first("rulesActivityTab").as("rulesActivityTab")
                         .first("$parentId").as("parentId")
                         .first("generalActivityTab").as("generalActivityTab")
                         .first("permissionsActivityTab").as("permissionsActivityTab")
@@ -430,6 +431,14 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 group("$timeType.timeTypes").push(new BasicDBObject("_id","$_id").append("name","$name")).as("activities"),
                 project("activities").and("_id").as("timeType"));
         AggregationResults<BreakActivitiesDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, BreakActivitiesDTO.class);
+        return result.getMappedResults();
+    }
+
+    public List<ActivityDTO> findAllByTimeTypeIdAndUnitId(Set<BigInteger> timeTypeIds,Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("balanceSettingsActivityTab.timeTypeId").in(timeTypeIds).and("deleted").is(false).and("unitId").is(unitId)),
+                project().and("id").as("id").and("name").as("name"));
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }
 }

@@ -171,15 +171,15 @@ public class TransferMethodService extends MongoBaseService {
      */
     public List<TransferMethod> saveSuggestedTransferMethodsFromUnit(Long countryId, List<TransferMethodDTO> TransferMethodDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
+        Set<String> transferMethodNameList = new HashSet<>();
         for (TransferMethodDTO TransferMethod : TransferMethodDTOS) {
-            hostingProvoiderNames.add(TransferMethod.getName());
+            transferMethodNameList.add(TransferMethod.getName());
         }
-        List<TransferMethod> existingTransferMethods = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, TransferMethod.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingTransferMethods, hostingProvoiderNames);
+        List<TransferMethod> existingTransferMethods = findMetaDataByNamesAndCountryId(countryId, transferMethodNameList, TransferMethod.class);
+        transferMethodNameList = ComparisonUtils.getNameListForMetadata(existingTransferMethods, transferMethodNameList);
         List<TransferMethod> TransferMethodList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        if (transferMethodNameList.size() != 0) {
+            for (String name : transferMethodNameList) {
 
                 TransferMethod TransferMethod = new TransferMethod(name);
                 TransferMethod.setCountryId(countryId);

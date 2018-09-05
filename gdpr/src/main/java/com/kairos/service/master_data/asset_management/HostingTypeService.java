@@ -177,15 +177,15 @@ public class HostingTypeService extends MongoBaseService {
      */
     public List<HostingType> saveSuggestedHostingTypesFromUnit(Long countryId, List<HostingTypeDTO> HostingTypeDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
+        Set<String> hostingTypeNameList = new HashSet<>();
         for (HostingTypeDTO HostingType : HostingTypeDTOS) {
-            hostingProvoiderNames.add(HostingType.getName());
+            hostingTypeNameList.add(HostingType.getName());
         }
-        List<HostingType> existingHostingTypes = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, HostingType.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingHostingTypes, hostingProvoiderNames);
+        List<HostingType> existingHostingTypes = findMetaDataByNamesAndCountryId(countryId, hostingTypeNameList, HostingType.class);
+        hostingTypeNameList = ComparisonUtils.getNameListForMetadata(existingHostingTypes, hostingTypeNameList);
         List<HostingType> HostingTypeList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        if (hostingTypeNameList.size() != 0) {
+            for (String name : hostingTypeNameList) {
 
                 HostingType HostingType = new HostingType(name);
                 HostingType.setCountryId(countryId);

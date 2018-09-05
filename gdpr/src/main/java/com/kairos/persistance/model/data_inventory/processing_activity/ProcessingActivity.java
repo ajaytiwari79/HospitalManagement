@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Document(collection = "processing_activity")
 public class ProcessingActivity extends MongoBaseEntity {
@@ -30,7 +29,7 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private List<ProcessingActivityRelatedDataSubject> dataSubjects;
 
-    private BigInteger assetId;
+    private List<BigInteger> linkedAssets;
 
     private List<BigInteger> processingPurposes;
 
@@ -152,9 +151,9 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
 
-    public BigInteger getAssetId() { return assetId; }
+    public List<BigInteger> getLinkedAssets() { return linkedAssets; }
 
-    public void setAssetId(BigInteger assetId) { this.assetId = assetId; }
+    public void setLinkedAssets(List<BigInteger> linkedAssets) { this.linkedAssets = linkedAssets; }
 
     public ProcessingActivity() { }
 

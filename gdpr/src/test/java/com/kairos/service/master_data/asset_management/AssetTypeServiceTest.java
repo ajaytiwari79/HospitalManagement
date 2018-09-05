@@ -46,7 +46,7 @@ public class AssetTypeServiceTest {
 
 
     @Test
-    public void test_createAssetTypeWithSubAssetType() throws Exception {
+    public void test_createAssetTypeWithSubAssetType() {
 
         String baseUrl = getBaseUrl(24L, 4l, null);
         AssetTypeDTO assetTypeDTO = new AssetTypeDTO("asset type1");
@@ -67,7 +67,7 @@ public class AssetTypeServiceTest {
     }
 
     @Test
-    public void test1_getAllAssetType() throws Exception {
+    public void test1_getAllAssetType() {
         String baseUrl = getBaseUrl(24L, 4l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AssetTypeResponseDTO>>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AssetTypeResponseDTO>>>() {
@@ -80,7 +80,7 @@ public class AssetTypeServiceTest {
 
 
     @Test
-    public void test2_getAssetTypebyId() throws Exception {
+    public void test2_getAssetTypebyId() {
 
         String baseUrl = getBaseUrl(24L, 4l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<AssetTypeResponseDTO>> typeReference =
@@ -95,7 +95,7 @@ public class AssetTypeServiceTest {
 
 
     @Test
-    public void test3_removeAssetType() throws Exception {
+    public void test3_removeAssetType() {
 
         createdId=BigInteger.valueOf(36);
         String baseUrl = getBaseUrl(24L, 4l, null);

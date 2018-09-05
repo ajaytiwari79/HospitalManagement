@@ -99,13 +99,13 @@ public class HostingTypeController {
 
     @ApiOperation("update HostingType by id")
     @PutMapping("/hosting_type/update/{id}")
-    public ResponseEntity<Object> updateHostingType(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody HostingTypeDTO hostingtype) {
+    public ResponseEntity<Object> updateHostingType(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody HostingTypeDTO hostingType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(countryId, id, hostingtype));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(countryId, id, hostingType));
 
     }
 

@@ -33,6 +33,7 @@ public class AttendanceSettingController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,attendanceSettingService.updateAttendanceSetting(unitId,reasonCodeId,checkIn));
     }
 
+
 }
 
 
