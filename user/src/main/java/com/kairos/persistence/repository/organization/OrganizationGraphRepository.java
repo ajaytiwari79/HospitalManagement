@@ -269,7 +269,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY org.name")
     List<OrganizationBasicResponse> getAllParentOrganizationOfCountry(Long countryId);
 
-    @Query("MATCH (organization:Organization)-[:"+HAS_SUB_ORGANIZATION+"]-(org:Organization{union:false,deleted:false}) where id(organization)={0}  \n" +
+    @Query("MATCH (organization:Organization)-[:"+HAS_SUB_ORGANIZATION+"]->(org:Organization{union:false,deleted:false}) where id(organization)={0}  \n" +
             "OPTIONAL Match (org)-[:"+HAS_COMPANY_CATEGORY+"]-(companyCategory:CompanyCategory) with companyCategory, org\n"+
             "OPTIONAL Match (org)-[:"+HAS_UNIT_TYPE+"]-(unitType:UnitType) with companyCategory, org,unitType\n"+
             "OPTIONAL Match (org)-[:"+HAS_ACCOUNT_TYPE+"]-(accountType:AccountType) with companyCategory,accountType, org,unitType\n"+
