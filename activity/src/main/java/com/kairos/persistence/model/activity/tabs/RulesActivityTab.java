@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by pawanmandhan on 23/8/17.
@@ -40,12 +41,67 @@ public class RulesActivityTab implements Serializable{
     private int longestTime;
     private boolean eligibleForCopy;
     private DurationField plannedTimeInAdvance;
-    private DurationField approvalTimeInAdvance;
-    private Float approvalPercentage;
     private LocalTime maximumEndTime;// shift can't be extend this time
     private boolean allowedAutoAbsence;
     private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --
     private byte recurrenceTimes;// -- the  shift of that staff will be entered.
+    private PQLSettings pqlSettings;
+
+    public RulesActivityTab() {
+        //Default Constructor
+    }
+
+    //for time care
+    public RulesActivityTab(boolean eligibleForWholeDay,boolean eligibleAgainstTimeRules) {
+        this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
+    }
+
+    public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleAgainstTimeRules, boolean eligibleForAbsence, boolean lockLengthPresent, boolean eligibleToBeForced, List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules) {
+        this.eligibleForFinalSchedule = eligibleForFinalSchedule;
+        this.eligibleForDraftSchedule = eligibleForDraftSchedule;
+        this.eligibleForRequest = eligibleForRequest;
+        this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
+        this.lockLengthPresent = lockLengthPresent;
+        this.eligibleToBeForced = eligibleToBeForced;
+        this.eligibleForStaffingLevel=eligibleForStaffingLevel;
+        this.eligibleForPresence=eligibleForPresence;
+        this.eligibleForAbsence=eligibleForAbsence;
+        this.dayTypes=dayTypes;
+        this.eligibleForSchedules = eligibleForSchedules;
+    }
+
+    public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleAgainstTimeRules, boolean lockLengthPresent, boolean eligibleToBeForced,
+                            List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
+            , LocalTime earliestStartTime, LocalTime latestStartTime, int shortestTime, int longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,PQLSettings pqlSettings,LocalTime maximumEndTime,Integer cutOffdayValue,CutOffIntervalUnit cutOffIntervalUnit,LocalDate cutOffStartFrom,byte recurrenceDays,byte recurrenceTimes,boolean allowedAutoAbsence) {
+
+        this.eligibleForFinalSchedule = eligibleForFinalSchedule;
+        this.eligibleForDraftSchedule = eligibleForDraftSchedule;
+        this.eligibleForRequest = eligibleForRequest;
+        this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
+        this.lockLengthPresent = lockLengthPresent;
+        this.eligibleToBeForced = eligibleToBeForced;
+        this.dayTypes = dayTypes;
+        this.eligibleForSchedules = eligibleForSchedules;
+        this.eligibleForStaffingLevel=eligibleForStaffingLevel;
+        this.eligibleForPresence=eligibleForPresence;
+        this.eligibleForAbsence=eligibleForAbsence;
+        this.breakAllowed = breakAllowed;
+        this.approvalAllowed = approvalAllowed;
+        this.earliestStartTime=earliestStartTime;
+        this.latestStartTime=latestStartTime;
+        this.shortestTime = shortestTime;
+        this.longestTime = longestTime;
+        this.eligibleForCopy=eligibleForCopy;
+        this.plannedTimeInAdvance=plannedTimeInAdvance;
+        this.pqlSettings=pqlSettings;
+        this.maximumEndTime=maximumEndTime;
+        this.cutOffdayValue = cutOffdayValue;
+        this.cutOffIntervalUnit = cutOffIntervalUnit;
+        this.cutOffStartFrom = cutOffStartFrom;
+        this.recurrenceDays=recurrenceDays;
+        this.recurrenceTimes=recurrenceTimes;
+        this.allowedAutoAbsence=allowedAutoAbsence;
+    }
 
     public LocalDate getCutOffStartFrom() {
         return cutOffStartFrom;
@@ -101,64 +157,6 @@ public class RulesActivityTab implements Serializable{
 
     public void setEligibleForAbsence(boolean eligibleForAbsence) {
         this.eligibleForAbsence = eligibleForAbsence;
-    }
-
-    public RulesActivityTab() {
-    }
-
-    public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleAgainstTimeRules, boolean eligibleForAbsence, boolean lockLengthPresent, boolean eligibleToBeForced, List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules) {
-        this.eligibleForFinalSchedule = eligibleForFinalSchedule;
-        this.eligibleForDraftSchedule = eligibleForDraftSchedule;
-        this.eligibleForRequest = eligibleForRequest;
-        this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
-        this.lockLengthPresent = lockLengthPresent;
-        this.eligibleToBeForced = eligibleToBeForced;
-        this.eligibleForStaffingLevel=eligibleForStaffingLevel;
-        this.eligibleForPresence=eligibleForPresence;
-        this.eligibleForAbsence=eligibleForAbsence;
-        this.dayTypes=dayTypes;
-        this.eligibleForSchedules = eligibleForSchedules;
-    }
-
-
-    //for time care
-    public RulesActivityTab(boolean eligibleForWholeDay,boolean eligibleAgainstTimeRules) {
-        this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
-
-    }
-
-    public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleAgainstTimeRules, boolean lockLengthPresent, boolean eligibleToBeForced,
-                            List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
-    , LocalTime earliestStartTime, LocalTime latestStartTime, int shortestTime, int longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,DurationField approvalTimeInAdvance,Float approvalPercentage,LocalTime maximumEndTime,Integer cutOffdayValue,CutOffIntervalUnit cutOffIntervalUnit,LocalDate cutOffStartFrom,byte recurrenceDays,byte recurrenceTimes,boolean allowedAutoAbsence) {
-
-        this.eligibleForFinalSchedule = eligibleForFinalSchedule;
-        this.eligibleForDraftSchedule = eligibleForDraftSchedule;
-        this.eligibleForRequest = eligibleForRequest;
-        this.eligibleAgainstTimeRules = eligibleAgainstTimeRules;
-        this.lockLengthPresent = lockLengthPresent;
-        this.eligibleToBeForced = eligibleToBeForced;
-        this.dayTypes = dayTypes;
-        this.eligibleForSchedules = eligibleForSchedules;
-        this.eligibleForStaffingLevel=eligibleForStaffingLevel;
-        this.eligibleForPresence=eligibleForPresence;
-        this.eligibleForAbsence=eligibleForAbsence;
-        this.breakAllowed = breakAllowed;
-        this.approvalAllowed = approvalAllowed;
-        this.earliestStartTime=earliestStartTime;
-        this.latestStartTime=latestStartTime;
-        this.shortestTime = shortestTime;
-        this.longestTime = longestTime;
-        this.eligibleForCopy=eligibleForCopy;
-        this.plannedTimeInAdvance=plannedTimeInAdvance;
-        this.approvalTimeInAdvance=approvalTimeInAdvance;
-        this.approvalPercentage=approvalPercentage;
-        this.maximumEndTime=maximumEndTime;
-        this.cutOffdayValue = cutOffdayValue;
-        this.cutOffIntervalUnit = cutOffIntervalUnit;
-        this.cutOffStartFrom = cutOffStartFrom;
-        this.recurrenceDays=recurrenceDays;
-        this.recurrenceTimes=recurrenceTimes;
-        this.allowedAutoAbsence=allowedAutoAbsence;
     }
 
     public boolean isEligibleForFinalSchedule() {
@@ -290,22 +288,6 @@ public class RulesActivityTab implements Serializable{
         this.plannedTimeInAdvance = plannedTimeInAdvance;
     }
 
-    public DurationField getApprovalTimeInAdvance() {
-        return approvalTimeInAdvance;
-    }
-
-    public void setApprovalTimeInAdvance(DurationField approvalTimeInAdvance) {
-        this.approvalTimeInAdvance = approvalTimeInAdvance;
-    }
-
-    public Float getApprovalPercentage() {
-        return approvalPercentage;
-    }
-
-    public void setApprovalPercentage(Float approvalPercentage) {
-        this.approvalPercentage = approvalPercentage;
-    }
-
     public LocalTime getMaximumEndTime() {
         return maximumEndTime;
     }
@@ -336,5 +318,13 @@ public class RulesActivityTab implements Serializable{
 
     public void setAllowedAutoAbsence(boolean allowedAutoAbsence) {
         this.allowedAutoAbsence = allowedAutoAbsence;
+    }
+
+    public PQLSettings getPqlSettings() {
+        return pqlSettings=Optional.ofNullable(pqlSettings).orElse(new PQLSettings());
+    }
+
+    public void setPqlSettings(PQLSettings pqlSettings) {
+        this.pqlSettings = pqlSettings;
     }
 }
