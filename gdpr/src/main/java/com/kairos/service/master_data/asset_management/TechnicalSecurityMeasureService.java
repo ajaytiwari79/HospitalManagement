@@ -206,7 +206,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @param suggestedDataStatus
      * @return
      */
-    public List<TechnicalSecurityMeasure> updateSuggestedStatusOfTechnicalSecurityMeasures(Long countryId, List<BigInteger> techSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<TechnicalSecurityMeasure> updateSuggestedStatusOfTechnicalSecurityMeasures(Long countryId, Set<BigInteger> techSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
 
         List<TechnicalSecurityMeasure> securityMeasureList = technicalSecurityMeasureMongoRepository.getTechnicalSecurityMeasureListByIds(countryId, techSecurityMeasureIds);
         securityMeasureList.forEach(securityMeasure-> securityMeasure.setSuggestedDataStatus(suggestedDataStatus));

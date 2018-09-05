@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -28,7 +29,7 @@ public interface DataDisposalMongoRepository extends MongoBaseRepository<DataDis
     DataDisposalResponseDTO findDataDisposalByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<DataDisposal> getDataDisposalListByIds(Long countryId,List<BigInteger> dataDisposalIds);
+    List<DataDisposal> getDataDisposalListByIds(Long countryId,Set<BigInteger> dataDisposalIds);
 
     @Query("{deleted:false,countryId:?0}")
     List<DataDisposalResponseDTO> findAllDataDisposals(Long countryId);

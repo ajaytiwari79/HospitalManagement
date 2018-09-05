@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @JaversSpringDataAuditable
 public interface ProcessingLegalBasisMongoRepository extends MongoBaseRepository<ProcessingLegalBasis, BigInteger>,CustomProcessingLegalBasisRepository {
@@ -22,7 +23,7 @@ public interface ProcessingLegalBasisMongoRepository extends MongoBaseRepository
     ProcessingLegalBasis findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<ProcessingLegalBasis> getProcessingLegalBasisListByIds(Long countryId, List<BigInteger> processingLegalBasisIds);
+    List<ProcessingLegalBasis> getProcessingLegalBasisListByIds(Long countryId, Set<BigInteger> processingLegalBasisIds);
 
     @Query("{_id:{$in:?0},deleted:false}")
     List<ProcessingLegalBasis> findProcessingLegalBasisByIds(List<BigInteger> legalBasisIds);

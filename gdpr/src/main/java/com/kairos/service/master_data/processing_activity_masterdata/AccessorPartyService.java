@@ -188,6 +188,21 @@ public class AccessorPartyService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param accessorPartyIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<AccessorParty> updateSuggestedStatusOfAccessorPartyList(Long countryId, Set<BigInteger> accessorPartyIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<AccessorParty> accessorPartyList = accessorPartyMongoRepository.getAccessorPartyListByIds(countryId, accessorPartyIds);
+        accessorPartyList.forEach(accessorParty-> accessorParty.setSuggestedDataStatus(suggestedDataStatus));
+        accessorPartyMongoRepository.saveAll(getNextSequence(accessorPartyList));
+        return accessorPartyList;
+    }
+
 }
 
 

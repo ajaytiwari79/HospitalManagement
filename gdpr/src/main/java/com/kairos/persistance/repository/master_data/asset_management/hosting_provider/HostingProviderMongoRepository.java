@@ -31,7 +31,7 @@ public interface HostingProviderMongoRepository extends MongoBaseRepository<Host
     List<HostingProviderResponseDTO> findAllHostingProviders(Long countryId);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<HostingProvider> getHostingProviderListByIds(Long countryId, List<BigInteger> hostingProviderIds);
+    List<HostingProvider> getHostingProviderListByIds(Long countryId, Set<BigInteger> hostingProviderIds);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     HostingProvider findByOrganizationIdAndId(Long organizationId,BigInteger id);

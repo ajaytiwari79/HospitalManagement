@@ -209,7 +209,7 @@ public class HostingProviderService extends MongoBaseService {
      * @param suggestedDataStatus - status to update
      * @return
      */
-    public List<HostingProvider> updateSuggestedStatusOfHostingProviders(Long countryId, List<BigInteger> hostingPrividerIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<HostingProvider> updateSuggestedStatusOfHostingProviders(Long countryId, Set<BigInteger> hostingPrividerIds, SuggestedDataStatus suggestedDataStatus) {
 
         List<HostingProvider> hostingProviderList = hostingProviderMongoRepository.getHostingProviderListByIds(countryId, hostingPrividerIds);
         hostingProviderList.forEach(hostingProvider -> hostingProvider.setSuggestedDataStatus(suggestedDataStatus));

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -28,7 +29,7 @@ public interface StorageFormatMongoRepository extends MongoBaseRepository<Storag
     List<StorageFormatResponseDTO> findAllStorageFormats(Long countryId);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<StorageFormat> getStorageFormatListByIds(Long countryId, List<BigInteger> storageFormatIds);
+    List<StorageFormat> getStorageFormatListByIds(Long countryId, Set<BigInteger> storageFormatIds);
 
     @Query("{_id:{$in:?0},deleted:false}")
     List<StorageFormatResponseDTO> findStorageFormatByIds(List<BigInteger> ids);

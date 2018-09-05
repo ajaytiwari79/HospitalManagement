@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
@@ -31,7 +32,7 @@ public interface AccessorPartyMongoRepository extends MongoBaseRepository<Access
     AccessorParty findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<AccessorParty> getAccessorPartyListByIds(Long countryId, List<BigInteger> accessorPartyIds);
+    List<AccessorParty> getAccessorPartyListByIds(Long countryId, Set<BigInteger> accessorPartyIds);
 
     @Query("{deleted:false,countryId:?0}")
     List<AccessorPartyResponseDTO> findAllAccessorParty(Long countryId);

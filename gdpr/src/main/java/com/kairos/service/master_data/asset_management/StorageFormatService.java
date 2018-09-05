@@ -208,7 +208,7 @@ public class StorageFormatService extends MongoBaseService {
      * @param suggestedDataStatus
      * @return
      */
-    public List<StorageFormat> updateSuggestedStatusOfStorageFormatList(Long countryId, List<BigInteger> storageFormatIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<StorageFormat> updateSuggestedStatusOfStorageFormatList(Long countryId, Set<BigInteger> storageFormatIds, SuggestedDataStatus suggestedDataStatus) {
 
         List<StorageFormat> storageFormatList = storageFormatMongoRepository.getStorageFormatListByIds(countryId, storageFormatIds);
         storageFormatList.forEach(storageFormat-> storageFormat.setSuggestedDataStatus(suggestedDataStatus));

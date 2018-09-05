@@ -208,7 +208,7 @@ public class HostingTypeService extends MongoBaseService {
      * @param suggestedDataStatus
      * @return
      */
-    public List<HostingType> updateSuggestedStatusOfHostingProviders(Long countryId, List<BigInteger> hostingTypeIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<HostingType> updateSuggestedStatusOfHostingTypes(Long countryId, Set<BigInteger> hostingTypeIds, SuggestedDataStatus suggestedDataStatus) {
 
         List<HostingType> hostingTypeList = hostingTypeMongoRepository.getHostingTypeListByIds(countryId, hostingTypeIds);
         hostingTypeList.forEach(hostingType -> hostingType.setSuggestedDataStatus(suggestedDataStatus));

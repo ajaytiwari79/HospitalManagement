@@ -197,6 +197,22 @@ public class ProcessingPurposeService extends MongoBaseService {
         return processingPurposeList;
     }
 
+
+    /**
+     *
+     * @param countryId
+     * @param processingPurposeIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<ProcessingPurpose> updateSuggestedStatusOfProcessingPurposeList(Long countryId, Set<BigInteger> processingPurposeIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<ProcessingPurpose> processingPurposeList = processingPurposeMongoRepository.getProcessingPurposeListByIds(countryId, processingPurposeIds);
+        processingPurposeList.forEach(processingPurpose-> processingPurpose.setSuggestedDataStatus(suggestedDataStatus));
+        processingPurposeMongoRepository.saveAll(getNextSequence(processingPurposeList));
+        return processingPurposeList;
+    }
+
 }
 
     

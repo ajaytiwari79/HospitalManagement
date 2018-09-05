@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -29,7 +30,7 @@ public interface OrganizationalSecurityMeasureMongoRepository extends MongoBaseR
 
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<OrganizationalSecurityMeasure> getOrganizationalSecurityMeasureListByIds(Long countryId, List<BigInteger> orgSecurityMeasureIds);
+    List<OrganizationalSecurityMeasure> getOrganizationalSecurityMeasureListByIds(Long countryId, Set<BigInteger> orgSecurityMeasureIds);
 
     @Query("{deleted:false,_id:{$in:?0}}")
     List<OrganizationalSecurityMeasureResponseDTO> findOrganizationalSecurityMeasuresListByIds(List<BigInteger> ids);

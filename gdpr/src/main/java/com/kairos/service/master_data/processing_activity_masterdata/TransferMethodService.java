@@ -195,6 +195,21 @@ public class TransferMethodService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param transferMethodIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<TransferMethod> updateSuggestedStatusOfTransferMethodList(Long countryId, Set<BigInteger> transferMethodIds , SuggestedDataStatus suggestedDataStatus) {
+
+        List<TransferMethod> transferMethodList = transferMethodRepository.getTransferMethodListByIds(countryId, transferMethodIds);
+        transferMethodList.forEach(transferMethod-> transferMethod.setSuggestedDataStatus(suggestedDataStatus));
+        transferMethodRepository.saveAll(getNextSequence(transferMethodList));
+        return transferMethodList;
+    }
+
 }
 
     

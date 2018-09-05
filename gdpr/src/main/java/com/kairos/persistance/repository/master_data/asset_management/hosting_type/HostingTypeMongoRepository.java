@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @JaversSpringDataAuditable
 public interface HostingTypeMongoRepository extends MongoBaseRepository<HostingType,BigInteger>,CustomHostingTypeRepository {
@@ -27,7 +28,7 @@ public interface HostingTypeMongoRepository extends MongoBaseRepository<HostingT
     List<HostingTypeResponseDTO> findAllHostingTypes(Long countryId);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<HostingType> getHostingTypeListByIds(Long countryId, List<BigInteger> hostingTypeIds);
+    List<HostingType> getHostingTypeListByIds(Long countryId, Set<BigInteger> hostingTypeIds);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     HostingType findByOrganizationIdAndId(Long organizationId,BigInteger id);

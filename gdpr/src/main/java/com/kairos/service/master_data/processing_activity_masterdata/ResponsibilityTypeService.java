@@ -200,6 +200,22 @@ public class ResponsibilityTypeService extends MongoBaseService {
         return responsibilityTypeList;
     }
 
+
+    /**
+     *
+     * @param countryId
+     * @param responsibilityTypeIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<ResponsibilityType> updateSuggestedStatusOfResponsibilityTypeList(Long countryId, Set<BigInteger> responsibilityTypeIds , SuggestedDataStatus suggestedDataStatus) {
+
+        List<ResponsibilityType> responsibilityTypes = responsibilityTypeMongoRepository.getResponsibilityTypeListByIds(countryId, responsibilityTypeIds);
+        responsibilityTypes.forEach(responsibilityType-> responsibilityType.setSuggestedDataStatus(suggestedDataStatus));
+        responsibilityTypeMongoRepository.saveAll(getNextSequence(responsibilityTypes));
+        return responsibilityTypes;
+    }
+
 }
 
     

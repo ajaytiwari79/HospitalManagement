@@ -193,6 +193,22 @@ public class DataSourceService extends MongoBaseService {
     }
 
 
+    /**
+     *
+     * @param countryId
+     * @param dataSourceIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<DataSource> updateSuggestedStatusOfDataSourceList(Long countryId, Set<BigInteger> dataSourceIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<DataSource> dataSourceList = dataSourceMongoRepository.getDataSourceListByIds(countryId, dataSourceIds);
+        dataSourceList.forEach(dataSource-> dataSource.setSuggestedDataStatus(suggestedDataStatus));
+        dataSourceMongoRepository.saveAll(getNextSequence(dataSourceList));
+        return dataSourceList;
+    }
+
+
 }
 
     

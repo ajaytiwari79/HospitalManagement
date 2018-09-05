@@ -199,7 +199,7 @@ public class DataDisposalService extends MongoBaseService {
      * @param dataDisposalIds     - id of data disposal
      * @param suggestedDataStatus -status to update
      */
-    public List<DataDisposal> updateSuggestedStatusOfDataDisposals(Long countryId, List<BigInteger> dataDisposalIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<DataDisposal> updateSuggestedStatusOfDataDisposals(Long countryId, Set<BigInteger> dataDisposalIds, SuggestedDataStatus suggestedDataStatus) {
 
         List<DataDisposal> dataDisposalList = dataDisposalMongoRepository.getDataDisposalListByIds(countryId, dataDisposalIds);
         dataDisposalList.forEach(dataDisposal -> dataDisposal.setSuggestedDataStatus(suggestedDataStatus));

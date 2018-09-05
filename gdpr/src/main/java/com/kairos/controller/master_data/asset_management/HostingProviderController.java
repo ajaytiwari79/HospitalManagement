@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.HostingProviderDTO;
 import com.kairos.service.master_data.asset_management.HostingProviderService;
 import com.kairos.utils.ResponseHandler;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
@@ -105,6 +108,18 @@ public class HostingProviderController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(countryId, id, hostingProviderDTO));
 
+    }
+
+    @ApiOperation("update Suggested status of Hosting provider")
+    @PutMapping("/hosting_provider")
+    public ResponseEntity<Object> updateSuggestedStatusOfHostingProviders(@PathVariable Long countryId, @RequestBody Set<BigInteger> hostingProviderIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateSuggestedStatusOfHostingProviders(countryId, hostingProviderIds, suggestedDataStatus));
     }
 
 

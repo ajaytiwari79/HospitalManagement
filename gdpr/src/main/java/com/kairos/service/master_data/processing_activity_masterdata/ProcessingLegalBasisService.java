@@ -199,6 +199,21 @@ public class ProcessingLegalBasisService extends MongoBaseService {
         return processingLegalBasisList;
     }
 
+
+    /**
+     *
+     * @param countryId
+     * @param processingLegalBasisIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<ProcessingLegalBasis> updateSuggestedStatusOfProcessingLegalBasisList(Long countryId, Set<BigInteger> processingLegalBasisIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<ProcessingLegalBasis> processingLegalBasisList = legalBasisMongoRepository.getProcessingLegalBasisListByIds(countryId, processingLegalBasisIds);
+        processingLegalBasisList.forEach(processingLegalBasis-> processingLegalBasis.setSuggestedDataStatus(suggestedDataStatus));
+        legalBasisMongoRepository.saveAll(getNextSequence(processingLegalBasisList));
+        return processingLegalBasisList;
+    }
 }
 
     

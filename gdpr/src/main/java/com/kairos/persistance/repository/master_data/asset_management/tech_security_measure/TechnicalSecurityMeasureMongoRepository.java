@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -28,7 +29,7 @@ public interface TechnicalSecurityMeasureMongoRepository extends MongoBaseReposi
     List<TechnicalSecurityMeasureResponseDTO> findAllTechnicalSecurityMeasures(Long countryId);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<TechnicalSecurityMeasure> getTechnicalSecurityMeasureListByIds(Long countryId, List<BigInteger> techSecurityMeasureIds);
+    List<TechnicalSecurityMeasure> getTechnicalSecurityMeasureListByIds(Long countryId, Set<BigInteger> techSecurityMeasureIds);
 
     @Query("{deleted:false,_id:{$in:?0}}")
     List<TechnicalSecurityMeasureResponseDTO> findTechnicalSecurityMeasuresListByIds(List<BigInteger> ids);
