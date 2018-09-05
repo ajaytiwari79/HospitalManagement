@@ -1,4 +1,5 @@
-package com.kairos.persistence.model.activity.tabs;/*
+package com.kairos.persistence.model.activity.tabs;
+/*
  *Created By Pavan on 5/9/18
  *
  */
