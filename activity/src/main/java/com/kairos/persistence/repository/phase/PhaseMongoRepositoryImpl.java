@@ -32,7 +32,8 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository {
 
     public List<PhaseDTO> getPhasesByUnit(Long unitId, Sort.Direction direction) {
         Query query = Query.query(Criteria.where("organizationId").is(unitId));
-        query.with(new Sort(direction, "sequence"));
+        //query.with(new Sort(direction, "sequence"));
+        query.with(new Sort(Sort.Direction.ASC, "sequence").and(new Sort(Sort.Direction.DESC, "phaseType")));
         return mongoTemplate.find(query, PhaseDTO.class, "phases");
     }
 
