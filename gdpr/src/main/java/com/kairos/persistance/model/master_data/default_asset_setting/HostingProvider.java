@@ -17,7 +17,7 @@ public class HostingProvider extends MongoBaseEntity {
     private String name;
 
     private Long countryId;
-    private SuggestedDataStatus suggestedDataStatus=SuggestedDataStatus.ACCEPTED;
+    private SuggestedDataStatus suggestedDataStatus;
 
     private LocalDate suggestedDate;
 

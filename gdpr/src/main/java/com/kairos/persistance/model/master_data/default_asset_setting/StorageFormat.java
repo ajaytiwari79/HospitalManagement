@@ -17,7 +17,7 @@ public class StorageFormat extends MongoBaseEntity {
 
     private Long countryId;
 
-    private SuggestedDataStatus suggestedDataStatus=SuggestedDataStatus.ACCEPTED;
+    private SuggestedDataStatus suggestedDataStatus;
 
     private LocalDate suggestedDate;
 
