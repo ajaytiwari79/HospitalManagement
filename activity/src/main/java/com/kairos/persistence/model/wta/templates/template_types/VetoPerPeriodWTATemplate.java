@@ -119,7 +119,7 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
             if (!isValid) {
                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                infoWrapper.getViolatedRules().getWorkTimeAggreements().add(workTimeAgreementRuleViolation);
+                infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                 ShiftValidatorService.throwException("message.ruleTemplate.broken",this.name);
             }
         }

@@ -113,15 +113,15 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
                                 int counterValue = limitAndCounter[1] - 1;
                                 if (counterValue < 0) {
                                     WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                                    infoWrapper.getViolatedRules().getWorkTimeAggreements().add(workTimeAgreementRuleViolation);
+                                    infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                                     ShiftValidatorService.throwException("message.ruleTemplate.broken",this.name);
                                 }else {
                                     WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
-                                    infoWrapper.getViolatedRules().getWorkTimeAggreements().add(workTimeAgreementRuleViolation);
+                                    infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                                 }
                             }else {
                                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
-                                infoWrapper.getViolatedRules().getWorkTimeAggreements().add(workTimeAgreementRuleViolation);
+                                infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                                 ShiftValidatorService.throwException("message.ruleTemplate.broken",this.name);
                             }
                         }

@@ -4,10 +4,8 @@ import com.kairos.activity.shift.ActivityRuleViolation;
 import com.kairos.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.service.MongoBaseService;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -18,7 +16,7 @@ import java.util.List;
 public class ShiftViolatedRules extends MongoBaseEntity{
 
     private Shift shift;
-    private List<WorkTimeAgreementRuleViolation> workTimeAggreements;
+    private List<WorkTimeAgreementRuleViolation> workTimeAgreements;
     private List<ActivityRuleViolation> activities;
 
     public Shift getShift() {
@@ -29,12 +27,12 @@ public class ShiftViolatedRules extends MongoBaseEntity{
         this.shift = shift;
     }
 
-    public List<WorkTimeAgreementRuleViolation> getWorkTimeAggreements() {
-        return workTimeAggreements;
+    public List<WorkTimeAgreementRuleViolation> getWorkTimeAgreements() {
+        return workTimeAgreements;
     }
 
-    public void setWorkTimeAggreements(List<WorkTimeAgreementRuleViolation> workTimeAggreements) {
-        this.workTimeAggreements = workTimeAggreements;
+    public void setWorkTimeAgreements(List<WorkTimeAgreementRuleViolation> workTimeAgreements) {
+        this.workTimeAgreements = workTimeAgreements;
     }
 
     public List<ActivityRuleViolation> getActivities() {

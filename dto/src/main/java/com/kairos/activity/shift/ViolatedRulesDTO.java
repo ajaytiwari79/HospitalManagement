@@ -10,15 +10,15 @@ import java.util.List;
 
 public class ViolatedRulesDTO {
 
-    private List<WorkTimeAgreementRuleViolation> workTimeAggreements = new ArrayList<>();
+    private List<WorkTimeAgreementRuleViolation> workTimeAgreements = new ArrayList<>();
     private List<ActivityRuleViolation> activities = new ArrayList<>();
 
-    public List<WorkTimeAgreementRuleViolation> getWorkTimeAggreements() {
-        return workTimeAggreements;
+    public List<WorkTimeAgreementRuleViolation> getWorkTimeAgreements() {
+        return workTimeAgreements;
     }
 
-    public void setWorkTimeAggreements(List<WorkTimeAgreementRuleViolation> workTimeAggreements) {
-        this.workTimeAggreements = workTimeAggreements;
+    public void setWorkTimeAgreements(List<WorkTimeAgreementRuleViolation> workTimeAgreements) {
+        this.workTimeAgreements = workTimeAgreements;
     }
 
     public List<ActivityRuleViolation> getActivities() {
