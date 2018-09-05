@@ -16,6 +16,7 @@ import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.model.counter.chart.KPIDashboard;
+import com.kairos.user.access_page.KPIAccessPageDTO;
 import com.kairos.util.ObjectMapperUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -346,4 +347,18 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPIDashboard.class),KPIDashboardDTO.class);
     }
 
+   public List<KPIAccessPageDTO> getKPIAcceccPage(Long refId,ConfLevel level){
+       String refQueryField = getRefQueryField(level);
+       Aggregation aggregation=Aggregation.newAggregation(
+            Aggregation.match(Criteria.where(refQueryField).is(refId).and("level").is(level)),
+            Aggregation.group("parentModuleId").push("$$ROOT").as("child"),
+            Aggregation.project().and("$_id").as("moduleId").and("child").as("child")
+       );
+       AggregationResults<KPIAccessPageDTO> results=mongoTemplate.aggregate(aggregation,KPIDashboard.class,KPIAccessPageDTO.class);
+       return results.getMappedResults();
+   }
+
+//    public List<KPIAccessPageDTO> getKPIAcceccPageForCountry(Long countryId,ConfLevel level){
+//        String refQueryField = getRefQueryField(level);
+//    }
 }

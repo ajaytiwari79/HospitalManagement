@@ -40,6 +40,14 @@ public class CounterDistController {
 
     private final static Logger logger = LoggerFactory.getLogger(CounterDistController.class);
 
+    @GetMapping(COUNTRY_URL+"/modules")
+    public ResponseEntity<Map<String,Object>> getKPIEnabledTabsForModuleOfCountry(@PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIAccessPageListForCountry(countryId,ConfLevel.COUNTRY));
+    }
+    @GetMapping(UNIT_URL+"/modules")
+    public ResponseEntity<Map<String,Object>> getKPIEnabledTabsForModuleOfUnit(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,counterManagementService.getKPIAccessPageListForUnit(unitId,ConfLevel.UNIT));
+    }
     @GetMapping(COUNTRY_URL+COUNTER_DIST_URL+"/counters")
     public ResponseEntity<Map<String, Object>> getAvailableKPIsListForCountry(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList(countryId, ConfLevel.COUNTRY));

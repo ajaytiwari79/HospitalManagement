@@ -1,20 +1,15 @@
-package com.kairos.user.access_page;
+package com.kairos.persistence.model.access_permission;
+
+import com.kairos.user.access_page.KPIAccessPageDTO;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
 
-public class KPIAccessPageDTO {
+@QueryResult
+public class KPIAccessPageQueryResult {
     private String name;
     private String moduleId;
     private List<KPIAccessPageDTO> child;
-
-    public KPIAccessPageDTO(){
-
-    }
-
-    public KPIAccessPageDTO(String name, String moduleId){
-        this.name = name;
-        this.moduleId = moduleId;
-    }
 
     public String getName() {
         return name;

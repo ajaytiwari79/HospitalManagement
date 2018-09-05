@@ -27,6 +27,7 @@ import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.user.access_page.KPIAccessPageDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -58,6 +59,32 @@ public class CounterDistService extends MongoBaseService {
         BeanUtils.copyProperties(oldEntity, newEntity);
     }
 
+    public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long refId,ConfLevel level){
+        List<KPIAccessPageDTO> kpiAccessPageDTOSOfDashboard=counterRepository.getKPIAcceccPage(refId,level);
+        List<KPIAccessPageDTO> kpiAccessPageDTOS=genericIntegrationService.getKPIEnabledTabsForModuleForUnit(refId);
+        setKPIAccessPage(kpiAccessPageDTOSOfDashboard,kpiAccessPageDTOS);
+        return kpiAccessPageDTOS;
+    }
+
+    public List<KPIAccessPageDTO> getKPIAccessPageListForCountry(Long refId,ConfLevel level){
+        List<KPIAccessPageDTO> kpiAccessPageDTOSOfDashboard=counterRepository.getKPIAcceccPage(refId,level);
+        List<KPIAccessPageDTO> kpiAccessPageDTOS=genericIntegrationService.getKPIEnabledTabsForModuleForCountry(refId);
+        setKPIAccessPage(kpiAccessPageDTOSOfDashboard,kpiAccessPageDTOS);
+        return kpiAccessPageDTOS;
+    }
+
+    public void setKPIAccessPage(List<KPIAccessPageDTO> kpiAccessPages,List<KPIAccessPageDTO> kpiAccessPageDTOS){
+        if(kpiAccessPages.isEmpty()||kpiAccessPageDTOS.isEmpty()) return;
+        Map<String,List<KPIAccessPageDTO>> accessPageMap=new HashMap<>();
+        kpiAccessPages.stream().forEach(kpiAccessPageDTO -> {
+            accessPageMap.put(kpiAccessPageDTO.getModuleId(),kpiAccessPageDTO.getChild());
+        });
+        kpiAccessPageDTOS.stream().forEach(kpiAccessPageDTO -> {
+            if(accessPageMap.get(kpiAccessPageDTO.getModuleId())!=null){
+                kpiAccessPageDTO.setChild(accessPageMap.get(kpiAccessPageDTO.getModuleId()));
+            }
+        });
+    }
 
     public List<KPIDTO> getKPIsList(Long refId, ConfLevel level) {
         if(ConfLevel.STAFF.equals(level)){

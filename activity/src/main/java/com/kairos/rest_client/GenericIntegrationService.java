@@ -85,8 +85,12 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, null, false, IntegrationOperation.GET, "/unit/parent_org_and_country", null), UnitAndParentOrganizationAndCountryDTO.class);
     }
 
-    public List<KPIAccessPageDTO> getKPIEnabledTabsForModule(String moduleId, Long countryId){
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/"+countryId+"/module/"+moduleId+"/kpi_details", null), KPIAccessPageDTO.class);
+    public List<KPIAccessPageDTO> getKPIEnabledTabsForModuleForCountry(Long countryId){
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/{countryId}/kpi_details", null,countryId), KPIAccessPageDTO.class);
+    }
+
+    public List<KPIAccessPageDTO> getKPIEnabledTabsForModuleForUnit(Long unitId){
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/kpi_details", null), KPIAccessPageDTO.class);
     }
 
     public List<OrgTypeDTO> getOrganizationIdsBySubOrgId(List<Long> orgTypeId){

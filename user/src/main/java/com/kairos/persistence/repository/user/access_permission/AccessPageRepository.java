@@ -1,13 +1,10 @@
 package com.kairos.persistence.repository.user.access_permission;
 
-import com.kairos.persistence.model.access_permission.AccessPage;
-import com.kairos.persistence.model.access_permission.AccessPageDTO;
-import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
+import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import com.kairos.persistence.model.access_permission.AccessPageLanguageDTO;
+import com.kairos.user.access_page.KPIAccessPageDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -370,8 +367,17 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
 
-    @Query("MATCH (n:AccessPage) -[:SUB_PAGE *]->(subPages:AccessPage{active:true,kpiEnabled:true}) where n.moduleId={0} RETURN subPages")
-    List<AccessPage> getKPITabsList(String moduleId);
+    @Query("Match (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
+            "MATCH (country:Country)-[:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage) WHERE id(country)={0} with accessPage\n" +
+            "optional MATCH (accessPage) -[: " +SUB_PAGE + "]->(subPages:AccessPage{active:true,kpiEnabled:true}) RETURN accessPage.name as name,accessPage.moduleId as moduleId, collect(distinct subPages) as child ORDER BY accessPage.moduleId")
+    List<KPIAccessPageQueryResult> getKPITabsListForCountry(Long countryId);
+
+    @Query("MATCH (org:Organization) where id(org)={0} with org\n" +
+            "MATCH(org)-[: " + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(accessgroup:AccessGroup{deleted: false}) with accessgroup\n" +
+            "MATCH(accessgroup)-[r:HAS_ACCESS_OF_TABS ]->(accessPage:AccessPage{isModule:true}) with accessPage\n" +
+            "optional MATCH (accessPage) -[: " + SUB_PAGE + "]->(subPages:AccessPage{active:true,kpiEnabled:true}) RETURN \n" +
+            "accessPage.name as name,accessPage.moduleId as moduleId, collect(distinct subPages) as child ORDER BY accessPage.moduleId")
+    List<KPIAccessPageQueryResult> getKPITabsListForUnit(Long unitId);
 
     @Query("Match(accessPage:AccessPage)-[rel:"+ ACCESS_PAGE_HAS_LANGUAGE +"]->(language:SystemLanguage{deleted:false}) WHERE accessPage.moduleId={0} AND id(language)={1} RETURN rel.description as description, id(rel) as id, rel.languageId as languageId, rel.moduleId as moduleId order by rel.creationDate DESC limit 1")
     AccessPageLanguageDTO findLanguageSpecificDataByModuleIdAndLanguageId(String moduleId, Long languageId);
