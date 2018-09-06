@@ -1,5 +1,6 @@
 package com.kairos.activity.counter;
 
+import com.kairos.activity.enums.counter.ChartType;
 import com.kairos.activity.enums.counter.CounterSize;
 
 import java.math.BigInteger;
@@ -9,10 +10,20 @@ public class KPIDTO {
     private String title;
     private boolean treatAsCounter;
     private CounterSize size;
+    private ChartType chart;
 
     public KPIDTO(){
 
     }
+
+    public ChartType getChart() {
+        return chart;
+    }
+
+    public void setChart(ChartType chart) {
+        this.chart = chart;
+    }
+
     public BigInteger getId() {
         return id;
     }

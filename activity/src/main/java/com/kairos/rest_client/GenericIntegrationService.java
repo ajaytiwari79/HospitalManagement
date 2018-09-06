@@ -106,9 +106,9 @@ public class GenericIntegrationService {
 
     public Long getStaffIdByUserId(Long unitId) {
         Integer value = genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null,Long.class);
-        if (value == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.notFound");
-        }
+//        if (value == null) {
+//            exceptionService.dataNotFoundByIdException("message.staff.notFound");
+//        }
         return value.longValue();
     }
 
