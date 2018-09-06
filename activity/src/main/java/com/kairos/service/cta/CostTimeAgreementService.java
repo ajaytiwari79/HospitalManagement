@@ -309,8 +309,12 @@ public class CostTimeAgreementService extends MongoBaseService {
     public CTARuleTemplateCategoryWrapper loadAllCTARuleTemplateByCountry(Long countryId) {
         List<RuleTemplateCategory> ruleTemplateCategories = ruleTemplateCategoryRepository.getRuleTemplateCategoryByCountry(countryId, RuleTemplateCategoryType.CTA);
         List<RuleTemplateCategoryDTO> ctaRuleTemplateCategoryList = ObjectMapperUtils.copyPropertiesOfListByMapper(ruleTemplateCategories, RuleTemplateCategoryDTO.class);
+        Map<BigInteger,RuleTemplateCategoryDTO> ruleTemplateCategoryDTOMap = ctaRuleTemplateCategoryList.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ctaRuleTemplateRepository.findByRuleTemplateCategoryIdInAndCountryAndDeletedFalse(countryId);
-        ctaRuleTemplateDTOS.forEach(c -> c.setRuleTemplateCategory(c.getRuleTemplateCategoryId()));
+        ctaRuleTemplateDTOS.forEach(c -> {
+            c.setRuleTemplateCategory(c.getRuleTemplateCategoryId());
+            c.setRuleTemplateCategoryName(ruleTemplateCategoryDTOMap.get(c.getRuleTemplateCategoryId()).getName());
+        });
         return new CTARuleTemplateCategoryWrapper(ctaRuleTemplateCategoryList, ctaRuleTemplateDTOS);
     }
 
