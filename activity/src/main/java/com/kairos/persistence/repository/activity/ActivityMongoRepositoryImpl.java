@@ -2,20 +2,20 @@ package com.kairos.persistence.repository.activity;
 
 import com.kairos.activity.activity.ActivityDTO;
 import com.kairos.activity.activity.CompositeActivityDTO;
+import com.kairos.activity.activity.OrganizationActivityDTO;
+import com.kairos.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.activity.break_settings.BreakActivitiesDTO;
 import com.kairos.activity.counter.data.FilterCriteria;
 import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.enums.ActivityStateEnum;
+import com.kairos.enums.TimeTypes;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.service.counter.ActivityFilterCriteria;
 import com.kairos.user.staff.staff_settings.StaffActivitySettingDTO;
-import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
-import com.kairos.activity.activity.OrganizationActivityDTO;
-import com.kairos.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
-import com.kairos.enums.TimeTypes;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -116,6 +116,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .first("$name").as("name")
                         .first("$description").as("description")
                         .first("$unitId").as("unitId")
+                        .first("rulesActivityTab").as("rulesActivityTab")
                         .first("$parentId").as("parentId")
                         .first("generalActivityTab").as("generalActivityTab")
                         .first("permissionsActivityTab").as("permissionsActivityTab")
@@ -457,4 +458,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return (List<BigInteger>)result.getMappedResults().get(0).get("activityIds");
     }
 
+    public List<ActivityDTO> findAllByTimeTypeIdAndUnitId(Set<BigInteger> timeTypeIds,Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("balanceSettingsActivityTab.timeTypeId").in(timeTypeIds).and("rulesActivityTab.allowedAutoAbsence").is(true).and("deleted").is(false).and("unitId").is(unitId)),
+                project().and("id").as("id").and("name").as("name"));
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
+    }
 }

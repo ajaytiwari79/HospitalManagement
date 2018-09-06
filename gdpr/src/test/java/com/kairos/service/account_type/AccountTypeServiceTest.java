@@ -36,7 +36,7 @@ public class AccountTypeServiceTest {
 
 
     @Test
-    public void test_getAllAccountType() throws Exception {
+    public void test_getAllAccountType() {
         String baseUrl = getBaseUrl(24L, 4l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AccountType>>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AccountType>>>() {
@@ -49,7 +49,7 @@ public class AccountTypeServiceTest {
 
 
     @Test
-    public void test2_accountTypeById() throws Exception {
+    public void test2_accountTypeById() {
 
         String baseUrl = getBaseUrl(24L, 4l, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<AccountType>> typeReference =

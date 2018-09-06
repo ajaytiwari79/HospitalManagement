@@ -1,12 +1,10 @@
 package com.kairos.service.pay_out;
 
-import com.kairos.persistence.model.activity.Shift;
-import com.kairos.activity.pay_out.CalculatedPayOutByDateDTO;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.activity.pay_out.UnitPositionWithCtaDetailsDTO;
 import com.kairos.util.DateUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.Duration;
 import org.joda.time.Interval;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)

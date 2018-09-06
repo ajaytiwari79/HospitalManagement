@@ -2,11 +2,12 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.PartOfDay;
 import com.kairos.enums.WTATemplateType;
+import com.kairos.util.ShiftValidatorService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.TimeInterval;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
+import static com.kairos.util.ShiftValidatorService.*;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -28,10 +29,8 @@ import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
 
-    private long noOfPartOfDayWorked;
     private long intervalLength;
     private String intervalUnit;
-
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
@@ -97,13 +96,6 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public long getNoOfPartOfDayWorked() {
-        return noOfPartOfDayWorked;
-    }
-
-    public void setNoOfPartOfDayWorked(long noOfPartOfDayWorked) {
-        this.noOfPartOfDayWorked = noOfPartOfDayWorked;
-    }
 
     public long getIntervalLength() {
         return intervalLength;
@@ -114,8 +106,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public NumberOfPartOfDayShiftsWTATemplate(String name, boolean disabled, String description, long noOfPartOfDayWorked) {
-        this.noOfPartOfDayWorked = noOfPartOfDayWorked;
+    public NumberOfPartOfDayShiftsWTATemplate(String name, boolean disabled, String description) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
@@ -126,7 +117,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         String exception = "";
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrappers(),infoWrapper.getShift());
@@ -140,16 +131,21 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
                     if(limitAndCounter[1]!=null) {
                         int counterValue =  limitAndCounter[1] - 1;
                         if(counterValue<0){
-                            exception = getName();                        }else {
-                            infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
-                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                            WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                            infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+
+                        }else {
+                            WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
+                            infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                         }
                     }else {
-                        exception = getName();                    }
+                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+
+                    }
                 }
             }
         }
-        return exception;
     }
 
 

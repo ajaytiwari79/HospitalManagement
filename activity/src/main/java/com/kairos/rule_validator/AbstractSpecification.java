@@ -9,11 +9,15 @@ import java.util.List;
  * Created by vipul on 30/1/18.
  */
 public abstract class AbstractSpecification<T> implements Specification<T> {
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+
+    /*@Override
     public abstract boolean isSatisfied(T t);
+
+    @Override
+    public abstract void validateRules(T t);
+
+    @Override
+    public abstract List<String> isSatisfiedString(T t);*/
 
     @Override
     public Specification<T> and(final Specification<T> specification) {
@@ -24,6 +28,4 @@ public abstract class AbstractSpecification<T> implements Specification<T> {
     public Specification<T> or(final Specification<T> specification) {
         return new OrActivitySpecification<T>(this, specification);
     }
-    @Override
-    public abstract List<String> isSatisfiedString(T t);
 }

@@ -2,15 +2,16 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.WTATemplateType;
+import com.kairos.util.ShiftValidatorService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 
-import static com.kairos.util.WTARuleTemplateValidatorUtility.getValueByPhase;
-import static com.kairos.util.WTARuleTemplateValidatorUtility.isValid;
-import static com.kairos.util.WTARuleTemplateValidatorUtility.isValidForPhase;
+import static com.kairos.util.ShiftValidatorService.getValueByPhase;
+import static com.kairos.util.ShiftValidatorService.isValid;
+import static com.kairos.util.ShiftValidatorService.isValidForPhase;
 
 
 /**
@@ -53,7 +54,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         String exception = "";
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
@@ -62,15 +63,18 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
                 if (limitAndCounter[1] != null) {
                     int counterValue = limitAndCounter[1] - 1;
                     if (counterValue < 0) {
-                        exception = getName();                    } else {
-                        infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
-                        infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                    }else {
+                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
+                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                     }
-                } else {
-                    exception = getName();                }
+                }else {
+                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                    infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                }
             }
         }
-        return exception;
     }
 
     public TimeBankWTATemplate(String name, boolean disabled, String description) {

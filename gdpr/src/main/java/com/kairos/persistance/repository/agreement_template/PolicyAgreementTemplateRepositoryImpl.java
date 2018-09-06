@@ -7,7 +7,6 @@ import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -33,7 +32,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<AgreementSectionResponseDTO> getAgreementTemplateAllSectionAndSubSectons(Long countryId, Long unitId, BigInteger agreementTemplateId) {
+    public List<AgreementSectionResponseDTO> getAgreementTemplateAllSectionAndSubSections(Long countryId, Long unitId, BigInteger agreementTemplateId) {
 
         String replaceRoot = "{ '$replaceRoot': { 'newRoot': '$agreementSections' } }";
         String sortAgreementSectionClauses = "{$sort:{'clauses.orderedIndex':-1}}";

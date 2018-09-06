@@ -19,13 +19,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class TimeBankWTATemplateDTO extends WTABaseRuleTemplateDTO {
-    private TimeBankTypeEnum frequency;
-    private Integer yellowZone;
-    private boolean forbid;
-    private boolean allowExtraActivity;
 
-
-    private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
 
@@ -38,13 +32,6 @@ public class TimeBankWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.minMaxSetting = minMaxSetting;
     }
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
 
     public float getRecommendedValue() {
         return recommendedValue;
@@ -70,41 +57,6 @@ public class TimeBankWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.name=name;
         this.disabled=disabled;
         this.description=description;
-        this.frequency = frequency;
-        this.yellowZone = yellowZone;
-        this.forbid = forbid;
-        this.allowExtraActivity = allowExtraActivity;
     }
 
-    public TimeBankTypeEnum getFrequency() {
-        return frequency;
-    }
-
-    public void setFrequency(TimeBankTypeEnum frequency) {
-        this.frequency = frequency;
-    }
-
-    public Integer getYellowZone() {
-        return yellowZone;
-    }
-
-    public void setYellowZone(Integer yellowZone) {
-        this.yellowZone = yellowZone;
-    }
-
-    public boolean isForbid() {
-        return forbid;
-    }
-
-    public void setForbid(boolean forbid) {
-        this.forbid = forbid;
-    }
-
-    public boolean isAllowExtraActivity() {
-        return allowExtraActivity;
-    }
-
-    public void setAllowExtraActivity(boolean allowExtraActivity) {
-        this.allowExtraActivity = allowExtraActivity;
-    }
 }

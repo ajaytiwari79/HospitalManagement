@@ -20,8 +20,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private long durationBetweenShifts;
-
 
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
@@ -79,22 +77,7 @@ public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO 
     }
 
 
-    public long getDurationBetweenShifts() {
-        return durationBetweenShifts;
-    }
 
-    public void setDurationBetweenShifts(long durationBetweenShifts) {
-        this.durationBetweenShifts = durationBetweenShifts;
-    }
-
-    public DurationBetweenShiftsWTATemplateDTO(String name, boolean disabled,
-                                               String description, long durationBetweenShifts) {
-        this.name = name;
-        this.disabled = disabled;
-        this.description = description;
-        this.durationBetweenShifts = durationBetweenShifts;
-
-    }
     public DurationBetweenShiftsWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
     }

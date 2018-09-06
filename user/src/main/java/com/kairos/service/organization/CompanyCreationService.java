@@ -5,6 +5,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
+import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
@@ -23,6 +24,7 @@ import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepositor
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.LevelGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
@@ -58,7 +60,8 @@ import static com.kairos.util.validator.company.OrganizationDetailsValidator.*;
 @Service
 @Transactional
 public class CompanyCreationService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private static final Logger logger = LoggerFactory.getLogger(CompanyCreationService.class);
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
@@ -98,6 +101,7 @@ public class CompanyCreationService {
     private ActivityIntegrationService activityIntegrationService;
     @Inject
     private TimeSlotGraphRepository timeSlotGraphRepository;
+    @Inject private UnitTypeGraphRepository unitTypeGraphRepository;
 
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId, Long organizationId) {
@@ -132,6 +136,7 @@ public class CompanyCreationService {
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
+        organization.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
         organizationGraphRepository.save(organization);
 
         orgDetails.setId(organization.getId());
@@ -188,6 +193,7 @@ public class CompanyCreationService {
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
+        organization.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
     }
 
     private String validateNameAndDesiredUrlOfOrganization(OrganizationBasicDTO orgDetails) {
@@ -243,7 +249,7 @@ public class CompanyCreationService {
         return orgBasicData;
     }
 
-    public UnitManagerDTO setUserInfoInOrganization(Long unitId, Organization organization, UnitManagerDTO unitManagerDTO, boolean boardingCompleted) {
+    public UnitManagerDTO setUserInfoInOrganization(Long unitId, Organization organization, UnitManagerDTO unitManagerDTO, boolean boardingCompleted,boolean parentOrganization) {
         if (organization == null) {
             organization = organizationGraphRepository.findOne(unitId);
             boardingCompleted = organization.isBoardingCompleted();
@@ -283,7 +289,7 @@ public class CompanyCreationService {
             else {
                  user= new User(unitManagerDTO.getCprNumber(),unitManagerDTO.getFirstName(),unitManagerDTO.getLastName(),unitManagerDTO.getEmail());
                 userGraphRepository.save(user);
-                staffService.setUserAndEmployment(organization, user,unitManagerDTO.getAccessGroupId());
+                staffService.setUserAndEmployment(organization, user,unitManagerDTO.getAccessGroupId(),parentOrganization);
 
             }
         }
@@ -357,7 +363,7 @@ public class CompanyCreationService {
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
         if (organizationBasicDTO.getUnitManager() != null && organizationBasicDTO.getUnitManager().getCprNumber() != null) {
-            setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted());
+            setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(),false);
         }
         //Assign Parent Organization's level to unit
 
@@ -390,7 +396,7 @@ public class CompanyCreationService {
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(organization, organizationBasicDTO, null);
         if (Optional.ofNullable(organizationBasicDTO.getUnitManager()).isPresent()) {
-            setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManager(), organization.isBoardingCompleted());
+            setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManager(), organization.isBoardingCompleted(),false);
         }
         organizationGraphRepository.save(organization);
         return organizationBasicDTO;
@@ -449,8 +455,18 @@ public class CompanyCreationService {
         }
         return companyCategory;
     }
+    private UnitType getUnitType(Long unitTypeId) {
+        UnitType unitType = null;
+        if (unitTypeId != null) {
+            unitType = unitTypeGraphRepository.findOne(unitTypeId, 0);
+            if (!Optional.ofNullable(unitType).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.unitType.id.notFound", unitTypeId);
 
-    public boolean publishOrganization(Long countryId, Long organizationId) throws InterruptedException, ExecutionException {
+            }
+        }
+        return unitType;
+    }
+    public boolean onBoardOrganization(Long countryId, Long organizationId) throws InterruptedException, ExecutionException {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);
@@ -483,9 +499,10 @@ public class CompanyCreationService {
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
+        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(),orgSubTypeIds,organization.getCountry().getId());
 
         CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
-                .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, organization.getOrganizationType().getId(), orgSubTypeIds);
+                .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO);
         CompletableFuture.allOf(hasUpdated).join();
 
         CompletableFuture<Boolean> createdInUnit = companyDefaultDataService

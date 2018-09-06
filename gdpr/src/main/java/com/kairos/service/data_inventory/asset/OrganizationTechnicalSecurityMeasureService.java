@@ -161,11 +161,11 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
     }
 
 
-    public Map<String, List<TechnicalSecurityMeasure>> saveAndSuggestTechnicalSecurityMeasures(Long countryId, Long organizationId, List<TechnicalSecurityMeasureDTO> TechnicalSecurityMeasureDTOS) {
+    public Map<String, List<TechnicalSecurityMeasure>> saveAndSuggestTechnicalSecurityMeasures(Long countryId, Long organizationId, List<TechnicalSecurityMeasureDTO> techSecurityMeasureDTOS) {
 
         Map<String, List<TechnicalSecurityMeasure>> result;
-        result = createTechnicalSecurityMeasure(organizationId, TechnicalSecurityMeasureDTOS);
-        List<TechnicalSecurityMeasure> masterTechnicalSecurityMeasureSuggestedByUnit = technicalSecurityMeasureService.saveSuggestedTechnicalSecurityMeasuresFromUnit(countryId, TechnicalSecurityMeasureDTOS);
+        result = createTechnicalSecurityMeasure(organizationId, techSecurityMeasureDTOS);
+        List<TechnicalSecurityMeasure> masterTechnicalSecurityMeasureSuggestedByUnit = technicalSecurityMeasureService.saveSuggestedTechnicalSecurityMeasuresFromUnit(countryId, techSecurityMeasureDTOS);
         if (!masterTechnicalSecurityMeasureSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterTechnicalSecurityMeasureSuggestedByUnit);
         }

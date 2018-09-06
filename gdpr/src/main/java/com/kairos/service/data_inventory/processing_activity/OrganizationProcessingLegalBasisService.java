@@ -173,11 +173,11 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
 
     }
 
-    public Map<String, List<ProcessingLegalBasis>> saveAndSuggestProcessingLegalBasiss(Long countryId, Long organizationId, List<ProcessingLegalBasisDTO> ProcessingLegalBasisDTOS) {
+    public Map<String, List<ProcessingLegalBasis>> saveAndSuggestProcessingLegalBasis(Long countryId, Long organizationId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
 
         Map<String, List<ProcessingLegalBasis>> result;
-        result = createProcessingLegalBasis(organizationId, ProcessingLegalBasisDTOS);
-        List<ProcessingLegalBasis> masterProcessingLegalBasisSuggestedByUnit = processingLegalBasisService.saveSuggestedProcessingLegalBasissFromUnit(countryId, ProcessingLegalBasisDTOS);
+        result = createProcessingLegalBasis(organizationId, processingLegalBasisDTOS);
+        List<ProcessingLegalBasis> masterProcessingLegalBasisSuggestedByUnit = processingLegalBasisService.saveSuggestedProcessingLegalBasissFromUnit(countryId, processingLegalBasisDTOS);
         if (!masterProcessingLegalBasisSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterProcessingLegalBasisSuggestedByUnit);
         }

@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.service.master_data.processing_activity_masterdata.ResponsibilityTypeService;
 import com.kairos.utils.ResponseHandler;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
@@ -106,6 +109,19 @@ public class ResponsibilityTypeController {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(countryId, id, responsibilityType));
 
+    }
+
+
+    @ApiOperation("update Suggested status of Responsibility Types")
+    @PutMapping("/responsibility_type")
+    public ResponseEntity<Object> updateSuggestedStatusOfResponsibilityTypes(@PathVariable Long countryId, @RequestBody Set<BigInteger> responsibilityTypeIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,responsibilityTypeService.updateSuggestedStatusOfResponsibilityTypeList(countryId, responsibilityTypeIds, suggestedDataStatus));
     }
 
 

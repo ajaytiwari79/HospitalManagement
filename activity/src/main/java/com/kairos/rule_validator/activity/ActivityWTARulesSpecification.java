@@ -2,7 +2,7 @@ package com.kairos.rule_validator.activity;
 
 import com.kairos.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
@@ -39,6 +39,11 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
             exceptionService.actionNotPermittedException("message.wta.expired-unit");
         }
         return true;
+    }
+
+    @Override
+    public void validateRules(Activity activity) {
+
     }
 
     @Override

@@ -1,9 +1,12 @@
 package com.kairos.persistence.model.organization.default_data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
 import java.util.Set;
@@ -14,8 +17,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_UN
  * CreatedBy vipulpandey on 29/8/18
  **/
 @NodeEntity
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SickConfiguration extends UserBaseEntity {
+
     private Set<BigInteger> timeTypes;
+
     @Relationship(type = IN_UNIT)
     private Organization organization;
 

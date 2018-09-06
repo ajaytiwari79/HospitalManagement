@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.persistence.model.activity.tabs.*;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.user.country.day_type.DayType;
 
@@ -22,28 +23,21 @@ public class ActivityTabsWrapper {
     private GeneralActivityTab generalTab;
     private List<ActivityCategory> activityCategories;
     private BalanceSettingsActivityTab balanceSettingsTab;
-
     private RulesActivityTab rulesTab;
     private IndividualPointsActivityTab individualPointsTab;
-
-
     private TimeCalculationActivityTab timeCalculationActivityTab;
     private CompositeActivity compositeActivity;
-
     private NotesActivityTab notesActivityTab;
     private CommunicationActivityTab communicationActivityTab;
     private BonusActivityTab bonusActivityTab;
     private SkillActivityTab skillActivityTab;
-
     private OptaPlannerSettingActivityTab optaPlannerSettingActivityTab;
-
     private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
     private BigInteger activityId;
     private PresenceTypeWithTimeTypeDTO presenceTypeWithTimeType;
     private List<DayType> dayTypes;
-
     private List<TimeTypeDTO> timeTypes;
-    private  LocationActivityTab locationActivityTab;
+    private LocationActivityTab locationActivityTab;
     private PermissionsActivityTab permissionsActivityTab;
     private List<EmploymentTypeDTO> employmentTypes;
 

@@ -363,7 +363,7 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateUnion(unionDTO, unionId, countryId));
     }
 
-    @ApiOperation(value = "Delete Parent Organization")
+    @ApiOperation(value = "Delete Parent Organization or unit ")
     @RequestMapping(value = COUNTRY_URL + "/parent_organization/{parentOrganizationId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteParentOrganization(@PathVariable long parentOrganizationId) {

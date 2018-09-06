@@ -12,7 +12,7 @@ import com.kairos.enums.Day;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.messaging.ReceivedTask;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;
@@ -72,7 +72,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -722,12 +721,11 @@ public class TaskService extends MongoBaseService {
                 shift.setActivityId(activity.getId());
                 shift.setStaffId(staffId);
                 shift.setUnitPositionId(unitPositionDTO.getId());
-                List<Integer> activityDayTypes = new ArrayList<>();
                 if (staffAdditionalInfoDTO.getDayTypes() != null && !staffAdditionalInfoDTO.getDayTypes().isEmpty()) {
-                    activityDayTypes = WTARuleTemplateValidatorUtility.getValidDays(staffAdditionalInfoDTO.getDayTypes(), activity.getTimeCalculationActivityTab().getDayTypes());
-                }
-                if (activityDayTypes.contains(new DateTime(shift.getStartDate()).getDayOfWeek())) {
-                    timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
+                    Set<DayOfWeek> activityDayTypes = ShiftValidatorService.getValidDays(staffAdditionalInfoDTO.getDayTypes(), activity.getTimeCalculationActivityTab().getDayTypes());
+                    if (activityDayTypes.contains(DateUtils.asLocalDate(shift.getStartDate()).getDayOfWeek())) {
+                        timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
+                    }
                 }
                 shiftsToCreate.add(shift);
             }

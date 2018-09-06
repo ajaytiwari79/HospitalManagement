@@ -22,20 +22,20 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.shift.ActivityShiftStatusSettings;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
+import com.kairos.persistence.repository.shift.ActivityShiftStatusSettingsRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.planner.planninginfo.PlannerSyncResponseDTO;
 import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
-import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.OrganizationRestClient;
-import com.kairos.rest_client.SkillRestClient;
-import com.kairos.rest_client.StaffRestClient;
+import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
@@ -83,8 +83,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -139,6 +137,8 @@ public class ActivityService extends MongoBaseService {
     @Inject
     private GenericIntegrationService genericIntegrationService;
     @Inject private CounterRepository counterRepository;
+    @Inject private ActivityShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
+    @Inject private GenericRestClient genericRestClient;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -1106,7 +1106,7 @@ public class ActivityService extends MongoBaseService {
 
 
         Activity activityCopied = new Activity();
-        ObjectMapperUtils.copyPropertiesUsingBeanUtils(activityFromDatabase.get(), activityCopied, "id");
+        ObjectMapperUtils.copyPropertiesExceptSpecific(activityFromDatabase.get(), activityCopied, "id");
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.setState(ActivityStateEnum.DRAFT);
@@ -1190,6 +1190,23 @@ public class ActivityService extends MongoBaseService {
 
     }
 
+    public void copyActivityAndShiftStatusOfThisActivity(BigInteger activityId,BigInteger newActivityId){
+        List<ActivityShiftStatusSettings> activityShiftStatusSettings =activityAndShiftStatusSettingsRepository.findAllByActivityId(activityId);
+        if(!activityShiftStatusSettings.isEmpty()){
+            activityShiftStatusSettings.forEach(currentActivityAndShiftStatusSettings->{
+                currentActivityAndShiftStatusSettings.setId(null);
+                currentActivityAndShiftStatusSettings.setActivityId(newActivityId);
+            });
+            save(activityShiftStatusSettings);
+        }
+    }
 
 
+    public void deleteActivityAndShiftStatusOfThisActivity(BigInteger activityId){
+        Optional<ActivityShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityId);
+        if(activityAndShiftStatusSettings.isPresent()){
+            activityAndShiftStatusSettings.get().setDeleted(true);
+            save(activityAndShiftStatusSettings.get());
+        }
+    }
 }

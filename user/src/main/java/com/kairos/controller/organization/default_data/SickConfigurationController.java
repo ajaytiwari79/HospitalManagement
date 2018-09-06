@@ -33,10 +33,16 @@ public class SickConfigurationController {
 
     @ApiOperation(value = "used to get sick settings of the organization")
     @GetMapping
+    public ResponseEntity<Map<String,Object>> getSickSettingsWithDefaultData(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK  ,true,
+                sickConfigurationService.getSickSettingsAndDefaultDataOfUnit(unitId));
+    }
+
+    @ApiOperation(value = "used to get sick settings of the organization")
+    @GetMapping("/default")
     public ResponseEntity<Map<String,Object>> getSickSettingsOfUnit(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK  ,true,
                 sickConfigurationService.getSickSettingsOfUnit(unitId));
-
     }
 
 }

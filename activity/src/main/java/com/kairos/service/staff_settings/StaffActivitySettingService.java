@@ -107,7 +107,7 @@ public class StaffActivitySettingService extends MongoBaseService {
             staffActivitySetting.setUnitId(unitId);
             staffActivitySetting.setStaffId(staffId);
         });
-        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyProperties(staffActivitySettings,StaffActivitySetting.class);
+        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyPropertiesOfListByMapper(staffActivitySettings,StaffActivitySetting.class);
         save(staffActivitySettingsList);
         return staffActivitySettings;
    }
@@ -134,7 +134,8 @@ public class StaffActivitySettingService extends MongoBaseService {
            }
             StaffActivitySetting currentStaffActivitySetting=new StaffActivitySetting(staffId,staffActivitySetting.getActivityId(),staffActivitySetting.getUnitPositionId(),
                     unitId,staffActivitySetting.getShortestTime(),staffActivitySetting.getLongestTime(),staffActivitySetting.getMinLength(),staffActivitySetting.getMaxThisActivityPerShift(),
-                    staffActivitySetting.isEligibleForMove(),staffActivitySetting.getEarliestStartTime(),staffActivitySetting.getLatestStartTime(),staffActivitySetting.getMaximumEndTime());
+                    staffActivitySetting.isEligibleForMove(),staffActivitySetting.getEarliestStartTime(),staffActivitySetting.getLatestStartTime(),staffActivitySetting.getMaximumEndTime(),
+                    activityMap.get(staffActivitySetting.getActivityId()).getRulesActivityTab().getDayTypes());
             staffActivitySettings.add(currentStaffActivitySetting);
            StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),localeService.getMessage("default.added"));
             success.add(staffActivityResponse);

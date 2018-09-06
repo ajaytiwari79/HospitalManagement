@@ -9,10 +9,7 @@ import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class ShiftAllowedToDelete extends AbstractSpecification<BigInteger> {
 
@@ -30,8 +27,13 @@ public class ShiftAllowedToDelete extends AbstractSpecification<BigInteger> {
     }
 
     @Override
-    public List<String> isSatisfiedString(BigInteger phaseId) {
+    public void validateRules(BigInteger bigInteger) {
 
+    }
+
+    @Override
+    public List<String> isSatisfiedString(BigInteger phaseId) {
+        List<String> errors = new ArrayList<>();
         PhaseTemplateValue currentPhase = null;
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
@@ -46,9 +48,9 @@ public class ShiftAllowedToDelete extends AbstractSpecification<BigInteger> {
             }
                 if ((Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement() && !currentPhase.isManagementCanDelete()) ||
                         (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff() && !currentPhase.isStaffCanDelete())) {
-                    return Collections.singletonList("message.phase.authority.absent");
+                    errors  = Arrays.asList("message.phase.authority.absent");
                 }
             }
-        return Collections.emptyList();
+        return errors;
     }
 }

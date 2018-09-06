@@ -34,6 +34,12 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
     }
 
     @Override
+    public void validateRules(ShiftWithActivityDTO shift) {
+
+    }
+
+
+    @Override
     public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
         return Collections.emptyList();
     }

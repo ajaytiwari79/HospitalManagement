@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -83,7 +84,7 @@ public class DataSourceService extends MongoBaseService {
      * @return list of DataSource
      */
     public List<DataSourceResponseDTO> getAllDataSource(Long countryId) {
-        return dataSourceMongoRepository.findAllDataSources(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return dataSourceMongoRepository.findAllDataSources(countryId);
 
     }
 
@@ -164,30 +165,47 @@ public class DataSourceService extends MongoBaseService {
     /**
      * @description method save Data Source suggested by unit
      * @param countryId
-     * @param DataSourceDTOS
+     * @param dataSourceDTOS
      * @return
      */
-    public List<DataSource> saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> DataSourceDTOS) {
+    public List<DataSource> saveSuggestedDataSourcesFromUnit(Long countryId, List<DataSourceDTO> dataSourceDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
-        for (DataSourceDTO DataSource : DataSourceDTOS) {
-            hostingProvoiderNames.add(DataSource.getName());
+        Set<String> dataSourceNameList = new HashSet<>();
+        for (DataSourceDTO DataSource : dataSourceDTOS) {
+            dataSourceNameList.add(DataSource.getName());
         }
-        List<DataSource> existingDataSources = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, DataSource.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingDataSources, hostingProvoiderNames);
-        List<DataSource> DataSourceList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        List<DataSource> existingDataSources = findMetaDataByNamesAndCountryId(countryId, dataSourceNameList, DataSource.class);
+        dataSourceNameList = ComparisonUtils.getNameListForMetadata(existingDataSources, dataSourceNameList);
+        List<DataSource> dataSourceList = new ArrayList<>();
+        if (!dataSourceNameList.isEmpty()) {
+            for (String name : dataSourceNameList) {
 
-                DataSource DataSource = new DataSource(name);
-                DataSource.setCountryId(countryId);
-                DataSource.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                DataSourceList.add(DataSource);
+                DataSource dataSource = new DataSource(name);
+                dataSource.setCountryId(countryId);
+                dataSource.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                dataSource.setSuggestedDate(LocalDate.now());
+                dataSourceList.add(dataSource);
             }
 
-            DataSourceList = dataSourceMongoRepository.saveAll(getNextSequence(DataSourceList));
+            dataSourceMongoRepository.saveAll(getNextSequence(dataSourceList));
         }
-        return DataSourceList;
+        return dataSourceList;
+    }
+
+
+    /**
+     *
+     * @param countryId
+     * @param dataSourceIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<DataSource> updateSuggestedStatusOfDataSourceList(Long countryId, Set<BigInteger> dataSourceIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<DataSource> dataSourceList = dataSourceMongoRepository.getDataSourceListByIds(countryId, dataSourceIds);
+        dataSourceList.forEach(dataSource-> dataSource.setSuggestedDataStatus(suggestedDataStatus));
+        dataSourceMongoRepository.saveAll(getNextSequence(dataSourceList));
+        return dataSourceList;
     }
 
 
