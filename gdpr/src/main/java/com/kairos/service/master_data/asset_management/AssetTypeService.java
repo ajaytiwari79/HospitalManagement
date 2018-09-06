@@ -73,16 +73,16 @@ public class AssetTypeService extends MongoBaseService {
             subAssetTypeList = buildSubAssetTypesListAndRiskAndLinkedToAssetType(countryId, assetTypeDto.getSubAssetTypes(), riskRelatedToAssetTypeAndSubAssetType);
             assetType.setHasSubAsset(true);
         }
-        Map<AssetType, List<BigInteger>> riskIdsCoresspondingToAssetAndSubAssetType = new HashMap<>();
+        Map<AssetType, List<BigInteger>> riskIdsCoresspondingToAssetAndSubAssetType;
         if (!riskRelatedToAssetTypeAndSubAssetType.isEmpty()) {
             riskIdsCoresspondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevel(countryId, riskRelatedToAssetTypeAndSubAssetType);
-        }
-        for (AssetType subAssetType : subAssetTypeList) {
-            subAssetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(subAssetType));
+            for (AssetType subAssetType : subAssetTypeList) {
+                subAssetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(subAssetType));
+            }
+            assetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(assetType));
         }
         assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
         List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
-        assetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(assetType));
         assetType.setSubAssetTypes(subAssetTypeIds);
         assetTypeMongoRepository.save(assetType);
         assetTypeDto.setId(assetType.getId());
@@ -208,14 +208,15 @@ public class AssetTypeService extends MongoBaseService {
         if (!updateExistingSubAssetTypeDTOs.isEmpty()) {
             subAssetTypeList.addAll(updateSubAssetTypes(countryId, updateExistingSubAssetTypeDTOs, riskRelatedToAssetTypeAndSubAssetType));
         }
-        Map<AssetType, List<BigInteger>> riskIdsRelatedToSubAssetTypeOrAssetType = new HashMap<>();
+        Map<AssetType, List<BigInteger>> riskIdsRelatedToSubAssetTypeOrAssetType;
         if (!riskRelatedToAssetTypeAndSubAssetType.isEmpty()) {
             riskIdsRelatedToSubAssetTypeOrAssetType = riskService.saveRiskAtCountryLevel(countryId, riskRelatedToAssetTypeAndSubAssetType);
+            for (AssetType subAssetType : subAssetTypeList) {
+                subAssetType.setRisks(riskIdsRelatedToSubAssetTypeOrAssetType.get(subAssetType));
+            }
+            assetType.setRisks(riskIdsRelatedToSubAssetTypeOrAssetType.get(assetType));
         }
-        for (AssetType subAssetType : subAssetTypeList) {
-            subAssetType.setRisks(riskIdsRelatedToSubAssetTypeOrAssetType.get(subAssetType));
-        }
-        assetType.setRisks(riskIdsRelatedToSubAssetTypeOrAssetType.get(assetType));
+
         assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
         List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
         assetType.setSubAssetTypes(subAssetTypeIds);
