@@ -92,7 +92,6 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-    //todo uncomment code on integration of asseement with front end
     public void addAttributeNameToQuestion(MasterQuestion masterQuestion, MasterQuestionDTO masterQuestionDTO, QuestionnaireTemplateType templateType) {
 
         if (!Optional.ofNullable(templateType).isPresent()) {

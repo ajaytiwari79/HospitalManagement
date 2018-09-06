@@ -265,17 +265,18 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "optional match (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) with collect(id(subType)) as organizationSubTypeIds,org,ot\n" +
             "OPTIONAL MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) with organizationSubTypeIds,org,ot,zipCode\n" +
             "OPTIONAL Match (org)-[:"+HAS_ACCOUNT_TYPE+"]-(accountType:AccountType)\n" +
-            "return id(org) as id,org.name as name,org.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId," +
-            "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId")
+            "return id(org) as id,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId," +
+            "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY org.name")
     List<OrganizationBasicResponse> getAllParentOrganizationOfCountry(Long countryId);
 
-    @Query("MATCH (organization:Organization)-[:"+HAS_SUB_ORGANIZATION+"]-(org:Organization{union:false,deleted:false}) where id(organization)={0}  \n" +
+    @Query("MATCH (organization:Organization)-[:"+HAS_SUB_ORGANIZATION+"]->(org:Organization{union:false,deleted:false}) where id(organization)={0}  \n" +
             "OPTIONAL Match (org)-[:"+HAS_COMPANY_CATEGORY+"]-(companyCategory:CompanyCategory) with companyCategory, org\n"+
-            "OPTIONAL Match (org)-[:"+HAS_ACCOUNT_TYPE+"]-(accountType:AccountType) with companyCategory,accountType, org\n"+
-            "OPTIONAL MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) with collect(id(businessType)) as businessTypeIds,org,companyCategory,accountType\n" +
-            "OPTIONAL Match (org)-[:"+TYPE_OF+"]-(ot:OrganizationType) with id(ot) as typeId,businessTypeIds,org,companyCategory,accountType\n" +
-            "OPTIONAL match (org)-[:"+SUB_TYPE_OF+"]-(subType:OrganizationType) with  collect(id(subType)) as subTypeIds,typeId,businessTypeIds,org,companyCategory,accountType\n" +
-            "return subTypeIds as sunTypeId ,typeId as typeId ,id(org) as id,org.kairosId as kairosId,id(companyCategory) as companyCategoryId,businessTypeIds as businessTypeIds,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,org.desiredUrl as desiredUrl," +
+            "OPTIONAL Match (org)-[:"+HAS_UNIT_TYPE+"]-(unitType:UnitType) with companyCategory, org,unitType\n"+
+            "OPTIONAL Match (org)-[:"+HAS_ACCOUNT_TYPE+"]-(accountType:AccountType) with companyCategory,accountType, org,unitType\n"+
+            "OPTIONAL MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) with collect(id(businessType)) as businessTypeIds,org,companyCategory,accountType,unitType\n" +
+            "OPTIONAL Match (org)-[:"+TYPE_OF+"]-(ot:OrganizationType) with id(ot) as typeId,businessTypeIds,org,companyCategory,accountType,unitType\n" +
+            "OPTIONAL match (org)-[:"+SUB_TYPE_OF+"]-(subType:OrganizationType) with  collect(id(subType)) as subTypeIds,typeId,businessTypeIds,org,companyCategory,accountType,unitType\n" +
+            "return id(unitType) as unitTypeId,subTypeIds as subTypeId ,typeId as typeId ,id(org) as id,org.kairosId as kairosId,id(companyCategory) as companyCategoryId,businessTypeIds as businessTypeIds,org.name as name,org.description as description,org.boardingCompleted as boardingCompleted,org.desiredUrl as desiredUrl," +
             "id(accountType) as accountTypeId,org.shortCompanyName as shortCompanyName,org.kairosCompanyId as kairosCompanyId,org.companyType as companyType,org.vatId as vatId," +
             "org.companyUnitType as companyUnitType ORDER BY org.name ")
     List<OrganizationBasicResponse> getOrganizationGdprAndWorkCenter(Long organizationId);
@@ -294,7 +295,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             " WITH {children: case when oss is NULL then [] else collect({name:oss.name,id:id(oss)}) end,name:os.name,id:id(os)} as orgServices,bt,organizationTypes,cc,country " +
             " WITH collect(orgServices) as serviceTypes,bt,organizationTypes,cc,country " +
             " OPTIONAL match(country)<-[:" + IN_COUNTRY + "]-(accountType:AccountType{deleted:false}) with organizationTypes,bt ,cc ,serviceTypes,collect(accountType) as accountTypes \n" +
-            " OPTIONAL match(country)<-[:" + IN_COUNTRY + "]-(unitType:unitType{deleted:false}) with organizationTypes,bt ,cc ,serviceTypes,accountTypes,collect(unitType) as unitTypes \n" +
+            " OPTIONAL match(country)<-[:" + IN_COUNTRY + "]-(unitType:UnitType{deleted:false}) with organizationTypes,bt ,cc ,serviceTypes,accountTypes,collect(unitType) as unitTypes \n" +
             "return organizationTypes,bt as businessTypes,cc as companyCategories,serviceTypes,accountTypes,unitTypes")
     OrganizationCreationData getOrganizationCreationData(long countryId);
 

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -23,8 +24,11 @@ public interface TransferMethodMongoRepository extends MongoBaseRepository<Trans
     @Query("{countryId:?0,name:?1,deleted:false}")
     TransferMethod findByName(Long countryId, String name);
 
-    @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
-    List<TransferMethodResponseDTO> findAllTransferMethods(Long countryId, String suggestedDataStatus);
+    @Query("{deleted:false,countryId:?0}")
+    List<TransferMethodResponseDTO> findAllTransferMethods(Long countryId);
+
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<TransferMethod> getTransferMethodListByIds(Long countryId, Set<BigInteger> transferMethodIds);
 
     @Query("{_id:{$in:?0},deleted:false}")
     List<TransferMethodResponseDTO> findTransferMethodByIds(List<BigInteger> transferMethodIds);

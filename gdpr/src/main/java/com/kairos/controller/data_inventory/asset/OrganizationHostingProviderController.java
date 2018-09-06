@@ -93,8 +93,8 @@ public class OrganizationHostingProviderController {
     }
 
     @ApiOperation("save Hosting Provider And Suggest To Country admin")
-    @PostMapping(COUNTRY_URL + "/hosting_provider")
-    public ResponseEntity<Object> savehostingProviderAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
+    @PostMapping(COUNTRY_URL + "/hosting_provider/suggest")
+    public ResponseEntity<Object> saveHostingProviderAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }

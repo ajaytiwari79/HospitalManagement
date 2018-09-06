@@ -91,7 +91,7 @@ public class OrganizationHostingTypeController {
     }
 
     @ApiOperation("save Hosting type And Suggest To Country admin")
-    @PostMapping(COUNTRY_URL + "/hosting_type")
+    @PostMapping(COUNTRY_URL + "/hosting_type/suggest")
     public ResponseEntity<Object> saveHostingTypeAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingTypeDTO> hostingTypeDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");

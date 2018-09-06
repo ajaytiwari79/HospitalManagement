@@ -5,6 +5,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
+import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
@@ -23,6 +24,7 @@ import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepositor
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.LevelGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
@@ -98,12 +100,16 @@ public class CompanyCreationService {
     private ActivityIntegrationService activityIntegrationService;
     @Inject
     private TimeSlotGraphRepository timeSlotGraphRepository;
+    @Inject private UnitTypeGraphRepository unitTypeGraphRepository;
 
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId, Long organizationId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+        }
+        if (StringUtils.isEmpty(orgDetails.getName()) || orgDetails.getName().length()<3){
+                exceptionService.actionNotPermittedException("error.Organization.name.insuffient");
         }
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(orgDetails);
         Organization organization = new OrganizationBuilder()
@@ -129,6 +135,7 @@ public class CompanyCreationService {
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
+        organization.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
         organizationGraphRepository.save(organization);
 
         orgDetails.setId(organization.getId());
@@ -178,11 +185,14 @@ public class CompanyCreationService {
             }
             organization.setAccountType(accountType);
             //accountType is Changed for parent organization We need to add this account type to child organization as well
+            if(!organization.getChildren().isEmpty())
+
             organizationGraphRepository.updateAccountTypeOfChildOrganization(organization.getId(), accountType.getId());
 
         }
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
+        organization.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
     }
 
     private String validateNameAndDesiredUrlOfOrganization(OrganizationBasicDTO orgDetails) {
@@ -444,7 +454,17 @@ public class CompanyCreationService {
         }
         return companyCategory;
     }
+    private UnitType getUnitType(Long unitTypeId) {
+        UnitType unitType = null;
+        if (unitTypeId != null) {
+            unitType = unitTypeGraphRepository.findOne(unitTypeId, 0);
+            if (!Optional.ofNullable(unitType).isPresent()) {
+                exceptionService.dataNotFoundByIdException("message.unitType.id.notFound", unitTypeId);
 
+            }
+        }
+        return unitType;
+    }
     public boolean publishOrganization(Long countryId, Long organizationId) throws InterruptedException, ExecutionException {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
@@ -478,9 +498,10 @@ public class CompanyCreationService {
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
+        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(),orgSubTypeIds,organization.getCountry().getId());
 
         CompletableFuture<Boolean> hasUpdated = companyDefaultDataService
-                .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, organization.getOrganizationType().getId(), orgSubTypeIds);
+                .createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO);
         CompletableFuture.allOf(hasUpdated).join();
 
         CompletableFuture<Boolean> createdInUnit = companyDefaultDataService

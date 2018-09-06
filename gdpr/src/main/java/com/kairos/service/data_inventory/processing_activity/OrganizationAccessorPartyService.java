@@ -1,6 +1,5 @@
 package com.kairos.service.data_inventory.processing_activity;
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
@@ -14,7 +13,6 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -102,10 +100,10 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
     public Boolean deleteAccessorParty(Long unitId, BigInteger accessorPartyId) {
 
-        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithAccesorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
-        if (!processingActivitiesLinkedWithAccesorParty.isEmpty()) {
+        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithAccessorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
+        if (!processingActivitiesLinkedWithAccessorParty.isEmpty()) {
             StringBuilder processingActivityNames=new StringBuilder();
-            processingActivitiesLinkedWithAccesorParty.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
+            processingActivitiesLinkedWithAccessorParty.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
             exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", processingActivityNames);
         }
         AccessorParty accessorParty = accessorPartyMongoRepository.findOrganizationIdAndIdAndNonDeleted(unitId, accessorPartyId);
@@ -144,11 +142,11 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
     }
 
-    public Map<String, List<AccessorParty>> saveAndSuggestAccessorParties(Long countryId, Long organizationId, List<AccessorPartyDTO> AccessorPartyDTOS) {
+    public Map<String, List<AccessorParty>> saveAndSuggestAccessorParties(Long countryId, Long organizationId, List<AccessorPartyDTO> accessorPartyDTOS) {
 
         Map<String, List<AccessorParty>> result;
-        result = createAccessorParty(organizationId, AccessorPartyDTOS);
-        List<AccessorParty> masterAccessorPartySuggestedByUnit = accessorPartyService.saveSuggestedAccessorPartysFromUnit(countryId, AccessorPartyDTOS);
+        result = createAccessorParty(organizationId, accessorPartyDTOS);
+        List<AccessorParty> masterAccessorPartySuggestedByUnit = accessorPartyService.saveSuggestedAccessorPartiesFromUnit(countryId, accessorPartyDTOS);
         if (!masterAccessorPartySuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterAccessorPartySuggestedByUnit);
         }

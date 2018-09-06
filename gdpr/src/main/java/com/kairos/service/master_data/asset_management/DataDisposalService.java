@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -77,7 +78,7 @@ public class DataDisposalService extends MongoBaseService {
      * @return list of DataDisposal
      */
     public List<DataDisposalResponseDTO> getAllDataDisposal(Long countryId) {
-        return dataDisposalMongoRepository.findAllDataDisposals(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return dataDisposalMongoRepository.findAllDataDisposals(countryId);
     }
 
 
@@ -163,10 +164,10 @@ public class DataDisposalService extends MongoBaseService {
     }
 
     /**
-     * @description method save data disposal suggested by unit
      * @param countryId
      * @param dataDisposalDTOS
      * @return
+     * @description method save data disposal suggested by unit
      */
     public List<DataDisposal> saveSuggestedDataDisposalFromUnit(Long countryId, List<DataDisposalDTO> dataDisposalDTOS) {
 
@@ -176,20 +177,37 @@ public class DataDisposalService extends MongoBaseService {
         }
         List<DataDisposal> existing = findMetaDataByNamesAndCountryId(countryId, dataDisposalsNames, DataDisposal.class);
         dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
-        List<DataDisposal> newDataDisposals = new ArrayList<>();
-        if (dataDisposalsNames.size() != 0) {
+        List<DataDisposal> dataDisposalList = new ArrayList<>();
+        if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
 
-                DataDisposal newDataDisposal = new DataDisposal(name);
-                newDataDisposal.setCountryId(countryId);
-                newDataDisposal.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                newDataDisposals.add(newDataDisposal);
+                DataDisposal dataDisposal = new DataDisposal(name);
+                dataDisposal.setCountryId(countryId);
+                dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                dataDisposal.setSuggestedDate(LocalDate.now());
+                dataDisposalList.add(dataDisposal);
             }
 
-            newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
+            dataDisposalMongoRepository.saveAll(getNextSequence(dataDisposalList));
         }
-        return newDataDisposals;
+        return dataDisposalList;
     }
+
+
+    /**
+     * @param countryId
+     * @param dataDisposalIds     - id of data disposal
+     * @param suggestedDataStatus -status to update
+     */
+    public List<DataDisposal> updateSuggestedStatusOfDataDisposals(Long countryId, Set<BigInteger> dataDisposalIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<DataDisposal> dataDisposalList = dataDisposalMongoRepository.getDataDisposalListByIds(countryId, dataDisposalIds);
+        dataDisposalList.forEach(dataDisposal -> dataDisposal.setSuggestedDataStatus(suggestedDataStatus));
+        dataDisposalMongoRepository.saveAll(getNextSequence(dataDisposalList));
+        return dataDisposalList;
+    }
+
+
 }
 
 

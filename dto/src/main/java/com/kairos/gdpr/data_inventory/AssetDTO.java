@@ -68,7 +68,7 @@ public class AssetDTO {
 
     private Long maxDataSubjectVolume;
 
-    private RiskSeverity risk;
+    private RiskSeverity riskLevel;
 
     public BigInteger getId() { return id; }
 
@@ -105,8 +105,10 @@ public class AssetDTO {
 
     public Long getMaxDataSubjectVolume() { return maxDataSubjectVolume; }
 
-    public RiskSeverity getRisk() { return risk; }
+    public RiskSeverity getRiskLevel() { return riskLevel; }
 
-        public AssetDTO() {
+    public void setRiskLevel(RiskSeverity riskLevel) { this.riskLevel = riskLevel; }
+
+    public AssetDTO() {
     }
 }

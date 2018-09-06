@@ -33,6 +33,7 @@ public class OrganizationBasicResponse {
     // Used in case of child
     Map<String, Object> contactAddress;
     private StaffPersonalDetailDTO unitManager;
+    private Long unitTypeId;
 
     public OrganizationBasicResponse() {
     }
@@ -176,5 +177,13 @@ public class OrganizationBasicResponse {
 
     public void setUnitManager(StaffPersonalDetailDTO unitManager) {
         this.unitManager = unitManager;
+    }
+
+    public Long getUnitTypeId() {
+        return unitTypeId;
+    }
+
+    public void setUnitTypeId(Long unitTypeId) {
+        this.unitTypeId = unitTypeId;
     }
 }

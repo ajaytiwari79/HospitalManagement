@@ -273,14 +273,14 @@ public class MasterProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        List<BigInteger> subProcessingActviityIdList = processingActivity.getSubProcessingActivityIds();
+        List<BigInteger> subProcessingActivityIdList = processingActivity.getSubProcessingActivityIds();
         MasterProcessingActivity subProcessingActivity = masterProcessingActivityRepository.findByIdAndCountryIdAndNonDeleted(countryId, organizationId, subProcessingActivityId);
         if (!Optional.ofNullable(subProcessingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub Processing Activity", subProcessingActivityId);
 
         } else {
-            subProcessingActviityIdList.remove(subProcessingActivityId);
-            processingActivity.setSubProcessingActivityIds(subProcessingActviityIdList);
+            subProcessingActivityIdList.remove(subProcessingActivityId);
+            processingActivity.setSubProcessingActivityIds(subProcessingActivityIdList);
             masterProcessingActivityRepository.save(processingActivity);
             delete(subProcessingActivity);
         }

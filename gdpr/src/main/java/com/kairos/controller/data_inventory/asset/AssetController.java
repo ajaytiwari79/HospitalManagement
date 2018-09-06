@@ -10,14 +10,13 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 
@@ -46,9 +45,9 @@ public class AssetController {
     public ResponseEntity<Object> deleteAssetById(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
 
 
-        Map<String, Object> result=assetService.deleteAssetById(unitId, assetId);
-        if((boolean) result.get(IS_SUCCESS)) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true,result);
+        Map<String, Object> result = assetService.deleteAssetById(unitId, assetId);
+        if ((boolean) result.get(IS_SUCCESS)) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, result);
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, result);
 
@@ -56,13 +55,12 @@ public class AssetController {
 
     @ApiOperation(value = "updated status of processing activity")
     @PutMapping("/asset/{assetId}/status")
-    public ResponseEntity<Object> updateStatusOfAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId,@RequestParam boolean active) {
+    public ResponseEntity<Object> updateStatusOfAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestParam(value = "active", required = true) boolean active) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.updateStatusOfAsset(unitId, assetId, active));
     }
-
 
 
     @ApiOperation(value = "update asset basic detail")
@@ -91,7 +89,7 @@ public class AssetController {
     @GetMapping("/asset")
     public ResponseEntity<Object> getAllAssetWithMetaData(@PathVariable Long unitId) {
         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "rganization id can't be Null");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllAssetWithMetadata(unitId));
     }

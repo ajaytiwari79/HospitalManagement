@@ -183,11 +183,11 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
     }
 
 
-    public Map<String, List<ResponsibilityType>> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> ResponsibilityTypeDTOS) {
+    public Map<String, List<ResponsibilityType>> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
         Map<String, List<ResponsibilityType>> result;
-        result = createResponsibilityType(organizationId, ResponsibilityTypeDTOS);
-        List<ResponsibilityType> masterResponsibilityTypeSuggestedByUnit = responsibilityTypeService.saveSuggestedResponsibilityTypesFromUnit(countryId, ResponsibilityTypeDTOS);
+        result = createResponsibilityType(organizationId, responsibilityTypeDTOS);
+        List<ResponsibilityType> masterResponsibilityTypeSuggestedByUnit = responsibilityTypeService.saveSuggestedResponsibilityTypesFromUnit(countryId, responsibilityTypeDTOS);
         if (!masterResponsibilityTypeSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterResponsibilityTypeSuggestedByUnit);
         }
