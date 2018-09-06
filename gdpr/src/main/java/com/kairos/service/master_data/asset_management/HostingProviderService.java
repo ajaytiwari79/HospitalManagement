@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -84,7 +85,7 @@ public class HostingProviderService extends MongoBaseService {
      * @return list of HostingProvider
      */
     public List<HostingProviderResponseDTO> getAllHostingProvider(Long countryId) {
-        return hostingProviderMongoRepository.findAllHostingProviders(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return hostingProviderMongoRepository.findAllHostingProviders(countryId);
     }
 
 
@@ -179,19 +180,20 @@ public class HostingProviderService extends MongoBaseService {
      */
     public List<HostingProvider> saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
+        Set<String> hostingProvidersName = new HashSet<>();
         for (HostingProviderDTO hostingProvider : hostingProviderDTOS) {
-            hostingProvoiderNames.add(hostingProvider.getName());
+            hostingProvidersName.add(hostingProvider.getName());
         }
-        List<HostingProvider> existingHostingProviders = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, HostingProvider.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingHostingProviders, hostingProvoiderNames);
+        List<HostingProvider> existingHostingProviders = findMetaDataByNamesAndCountryId(countryId, hostingProvidersName, HostingProvider.class);
+        hostingProvidersName = ComparisonUtils.getNameListForMetadata(existingHostingProviders, hostingProvidersName);
         List<HostingProvider> hostingProviderList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        if (!hostingProvidersName.isEmpty()) {
+            for (String name : hostingProvidersName) {
 
                 HostingProvider hostingProvider = new HostingProvider(name);
                 hostingProvider.setCountryId(countryId);
-                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
+                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                hostingProvider.setSuggestedDate(LocalDate.now());
                 hostingProviderList.add(hostingProvider);
             }
 
@@ -199,4 +201,20 @@ public class HostingProviderService extends MongoBaseService {
         }
         return hostingProviderList;
     }
+
+
+    /**
+     * @param countryId
+     * @param hostingPrividerIds   - ids of hosting providers
+     * @param suggestedDataStatus - status to update
+     * @return
+     */
+    public List<HostingProvider> updateSuggestedStatusOfHostingProviders(Long countryId, Set<BigInteger> hostingPrividerIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<HostingProvider> hostingProviderList = hostingProviderMongoRepository.getHostingProviderListByIds(countryId, hostingPrividerIds);
+        hostingProviderList.forEach(hostingProvider -> hostingProvider.setSuggestedDataStatus(suggestedDataStatus));
+        hostingProviderMongoRepository.saveAll(getNextSequence(hostingProviderList));
+        return hostingProviderList;
+    }
+
 }

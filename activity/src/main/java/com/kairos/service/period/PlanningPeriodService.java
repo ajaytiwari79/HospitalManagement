@@ -1,17 +1,17 @@
 package com.kairos.service.period;
 
 
-import com.kairos.activity.period.PeriodDTO;
 import com.kairos.activity.period.FlippingDateDTO;
+import com.kairos.activity.period.PeriodDTO;
 import com.kairos.activity.period.PeriodPhaseDTO;
 import com.kairos.activity.period.PlanningPeriodDTO;
 import com.kairos.activity.phase.PhaseDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.DurationType;
-import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
@@ -434,10 +434,7 @@ public class PlanningPeriodService extends MongoBaseService {
         List<Shift> shifts=shiftMongoRepository.findAllShiftsPlanningPeriodAndPhaseId(periodId,planningPeriod.getCurrentPhaseId(),unitId);
         planningPeriod.setCurrentPhaseId(initialNextPhase.getId());
         planningPeriod.setNextPhaseId(Optional.ofNullable(toBeNextPhase).isPresent() && toBeNextPhase.size() > 0 ? toBeNextPhase.get(0).getId() : null);
-
-        if(!shifts.isEmpty()) {
-            createShiftState(shifts, planningPeriod.getCurrentPhaseId());
-        }
+        flipShiftAndCreateShiftState(shifts, planningPeriod.getCurrentPhaseId());
         save(planningPeriod);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
@@ -463,25 +460,22 @@ public class PlanningPeriodService extends MongoBaseService {
             planningPeriod.setNextPhaseId(nextPhaseId);
             save(planningPeriod);
         }
-        if(!shifts.isEmpty()) {
-            createShiftState(shifts, planningPeriod.getCurrentPhaseId());
-        }
+        flipShiftAndCreateShiftState(shifts, planningPeriod.getCurrentPhaseId());
         return true;
     }
 
-    public void createShiftState(List<Shift> shifts,BigInteger currentPhaseId){
+    public void flipShiftAndCreateShiftState(List<Shift> shifts, BigInteger currentPhaseId){
+        if(shifts.isEmpty()){
+            return;
+        }
         List<ShiftState> shiftStates=new ArrayList<>();
         shifts.stream().forEach(shift ->{
+            shift.setPhaseId(currentPhaseId);
             ShiftState shiftState = ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftState.class);
             shiftState.setShiftId(shift.getId());
-            shiftState.setPhaseId(currentPhaseId);
             shiftState.setId(null);
             shiftStates.add(shiftState);
         } );
-        shifts.stream().forEach(shift -> {
-            shift.setPhaseId(currentPhaseId);
-        });
-        if(!shiftStates.isEmpty())
             save(shiftStates);
             save(shifts);
     }

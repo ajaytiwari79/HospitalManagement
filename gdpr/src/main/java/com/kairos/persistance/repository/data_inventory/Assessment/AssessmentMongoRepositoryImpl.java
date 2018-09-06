@@ -39,7 +39,7 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     public List<AssessmentResponseDTO> getAllLaunchedAssessmentAssignToRespondent(Long unitId) {
         List<AssessmentStatus> assessmentStatusList = new ArrayList<>();
         assessmentStatusList.add(AssessmentStatus.NEW);
-        assessmentStatusList.add(AssessmentStatus.INPROGRESS);
+        assessmentStatusList.add(AssessmentStatus.IN_PROGRESS);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("assessmentStatus").in(assessmentStatusList))
 

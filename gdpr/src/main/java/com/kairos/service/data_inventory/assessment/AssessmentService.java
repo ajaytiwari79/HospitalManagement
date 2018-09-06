@@ -28,7 +28,6 @@ import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -59,7 +58,7 @@ public class AssessmentService extends MongoBaseService {
     /**
      * @param unitId        organization id
      * @param assetId       asset id for which assessment is related
-     * @param assessmentDTO Assessment Dto conatin detail about who assign assessment and to whom assessment is assigned
+     * @param assessmentDTO Assessment Dto contain detail about who assign assessment and to whom assessment is assigned
      * @return
      */
     public AssessmentDTO saveAssessmentForAsset(Long unitId, Long countryId, BigInteger assetId, AssessmentDTO assessmentDTO) {
@@ -81,7 +80,7 @@ public class AssessmentService extends MongoBaseService {
     /**
      * @param unitId
      * @param processingActivityId Processing activity id for which assessment is related
-     * @param assessmentDTO        Assessment Dto conatin detail about who assign assessment and to whom assessment is assigned
+     * @param assessmentDTO        Assessment Dto contain detail about who assign assessment and to whom assessment is assigned
      * @return
      */
     public AssessmentDTO saveAssessmentForProcessingActivity(Long unitId, Long countryId, BigInteger processingActivityId, AssessmentDTO assessmentDTO) {
@@ -111,7 +110,7 @@ public class AssessmentService extends MongoBaseService {
             exceptionService.duplicateDataException("message.duplicate", "Assessment", assessmentDTO.getName());
         }
         BigInteger questionnaireTemplateId = masterQuestionnaireTemplateMongoRepository.
-                getMasterQuestionanaireTemplateIdListByTemplateType(countryId, templateType);
+                getMasterQuestionnaireTemplateIdListByTemplateType(countryId, templateType);
         if (!Optional.ofNullable(questionnaireTemplateId).isPresent()) {
             exceptionService.invalidRequestException("message.questionnaire.template.Not.Found.For.Template.Type", templateType);
         }
@@ -130,7 +129,7 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentId
      * @return
      */
-    public List<MasterQuestionnaireSectionResponseDTO> getAssessmentById(Long countryId, Long unitId, BigInteger assessmentId) throws IOException {
+    public List<MasterQuestionnaireSectionResponseDTO> getAssessmentById(Long countryId, Long unitId, BigInteger assessmentId) {
 
         Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
@@ -152,9 +151,8 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentStatus
      * @param assessment
      * @param assessmentQuestionnaireSections
-     * @throws IOException
      */
-    private void getAssetAssessmentQuestionAndValuesById(Long unitId, AssessmentStatus assessmentStatus, Assessment assessment, List<MasterQuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) throws IOException {
+    private void getAssetAssessmentQuestionAndValuesById(Long unitId, AssessmentStatus assessmentStatus, Assessment assessment, List<MasterQuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
 
         switch (assessmentStatus) {
             case NEW:
@@ -172,7 +170,7 @@ public class AssessmentService extends MongoBaseService {
                     }
                 }
                 break;
-            case INPROGRESS:
+            case IN_PROGRESS:
                 List<AssetAssessmentAnswer> assetAssessmentAnswers = assessment.getAssetAssessmentAnswers();
                 Map<AssetAttributeName, Object> assetAttributeNameObjectMap = new HashMap<>();
                 assetAssessmentAnswers.forEach(assetAssessmentAnswer -> assetAttributeNameObjectMap.put(assetAssessmentAnswer.getAssetField(), assetAssessmentAnswer.getValue()));
@@ -198,9 +196,8 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentStatus
      * @param assessment
      * @param assessmentQuestionnaireSections
-     * @throws IOException
      */
-    private void getProcessingActivityAssessmentQuestionAndValuesById(Long unitId, AssessmentStatus assessmentStatus, Assessment assessment, List<MasterQuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) throws IOException {
+    private void getProcessingActivityAssessmentQuestionAndValuesById(Long unitId, AssessmentStatus assessmentStatus, Assessment assessment, List<MasterQuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
 
         switch (assessmentStatus) {
             case NEW:
@@ -217,7 +214,7 @@ public class AssessmentService extends MongoBaseService {
                     }
                 }
                 break;
-            case INPROGRESS:
+            case IN_PROGRESS:
                 List<ProcessingActivityAssessmentAnswer> processingActivityAssessmentAnswers = assessment.getProcessingActivityAssessmentAnswers();
                 Map<ProcessingActivityAttributeName, Object> processingActivityAttributeNameObjectMap = new HashMap<>();
                 processingActivityAssessmentAnswers.forEach(processingActivityAssessmentAnswer -> processingActivityAttributeNameObjectMap.put(processingActivityAssessmentAnswer.getProcessingActivityField(), processingActivityAssessmentAnswer.getValue()));
@@ -249,7 +246,7 @@ public class AssessmentService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
         }
         switch (assessmentStatus) {
-            case INPROGRESS:
+            case IN_PROGRESS:
                 if (assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
                     exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
                 }
@@ -276,7 +273,7 @@ public class AssessmentService extends MongoBaseService {
                 }
                 break;
             case NEW:
-                if (assessment.getAssessmentStatus().equals(AssessmentStatus.INPROGRESS) || assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
+                if (assessment.getAssessmentStatus().equals(AssessmentStatus.IN_PROGRESS) || assessment.getAssessmentStatus().equals(AssessmentStatus.COMPLETED)) {
                     exceptionService.invalidRequestException("message.assessment.invalid.status", assessment.getAssessmentStatus(), assessmentStatus);
                 }
                 break;
@@ -309,7 +306,7 @@ public class AssessmentService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
         }
         if (assessment.getAssessmentStatus().equals(AssessmentStatus.NEW)) {
-            exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.INPROGRESS);
+            exceptionService.invalidRequestException("message.assessment.change.status", AssessmentStatus.IN_PROGRESS);
         }
 
         if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
@@ -325,7 +322,7 @@ public class AssessmentService extends MongoBaseService {
 
     /**
      * @param assetAttributeName  asset field
-     * @param assetAttributeValue asset value corressponding to field
+     * @param assetAttributeValue asset value corresponding to field
      * @param asset               asset to which value Assessment answer were filed by assignee
      */
     public void saveAssessmentAnswerForAsset(AssetAttributeName assetAttributeName, Object assetAttributeValue, Asset asset) {
@@ -369,7 +366,7 @@ public class AssessmentService extends MongoBaseService {
 
     /**
      * @param processingActivityAttributeName  processing activity field
-     * @param processingActivityAttributeValue processing activity  value corressponding to field
+     * @param processingActivityAttributeValue processing activity  value corresponding to field
      * @param processingActivity               processing activity to which value Assessment answer were filed by assignee
      */
     public void saveAssessmentAnswerForProcessingActivity(ProcessingActivityAttributeName processingActivityAttributeName, Object processingActivityAttributeValue, ProcessingActivity processingActivity) {

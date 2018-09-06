@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @JaversSpringDataAuditable
 public interface ProcessingLegalBasisMongoRepository extends MongoBaseRepository<ProcessingLegalBasis, BigInteger>,CustomProcessingLegalBasisRepository {
@@ -19,14 +20,16 @@ public interface ProcessingLegalBasisMongoRepository extends MongoBaseRepository
     @Query("{countryId:?0,name:?1,deleted:false}")
     ProcessingLegalBasis findByName(Long countryId,String name);
 
-
     ProcessingLegalBasis findByid(BigInteger id);
+
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<ProcessingLegalBasis> getProcessingLegalBasisListByIds(Long countryId, Set<BigInteger> processingLegalBasisIds);
 
     @Query("{_id:{$in:?0},deleted:false}")
     List<ProcessingLegalBasis> findProcessingLegalBasisByIds(List<BigInteger> legalBasisIds);
 
-    @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
-    List<ProcessingLegalBasisResponseDTO> findAllProcessingLegalBases(Long countryId,String suggestedDataStatus);
+    @Query("{deleted:false,countryId:?0}")
+    List<ProcessingLegalBasisResponseDTO> findAllProcessingLegalBases(Long countryId);
 
     @Query("{organizationId:?0,deleted:false}")
     List<ProcessingLegalBasisResponseDTO> findAllOrganizationProcessingLegalBases( Long organizationId);

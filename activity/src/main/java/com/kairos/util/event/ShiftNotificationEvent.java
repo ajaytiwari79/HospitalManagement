@@ -1,6 +1,6 @@
 package com.kairos.util.event;
 
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 
 import java.util.Date;
 

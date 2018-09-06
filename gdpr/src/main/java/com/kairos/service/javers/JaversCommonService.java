@@ -224,7 +224,7 @@ public class JaversCommonService {
             case ACCESSOR_PARTY_KEY:
                 fieldValues.add(accessorPartyMongoRepository.findAccessorPartyByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
                 break;
-            case PROCESSING_LEGALBASIS_KEY:
+            case PROCESSING_LEGAL_BASIS_KEY:
                 fieldValues.add(processingLegalBasisMongoRepository.findProcessingLegalBasisByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
                 break;
             case RESPONSIBILITY_TYPE_KEY:
@@ -234,7 +234,7 @@ public class JaversCommonService {
                 fieldValues.add(processingActivityMongoRepository.findAllSubProcessingActivitiesByIds((List<BigInteger>) historyMap.getPropertyValue(field)));
                 break;
             default:
-                fieldValues.add((Object) historyMap.getState().getPropertyValue(field));
+                fieldValues.add(historyMap.getState().getPropertyValue(field));
                 break;
 
         }

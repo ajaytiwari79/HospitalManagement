@@ -62,7 +62,6 @@ public class StaffingLevelActivity {
         this.activityId = activityId;
     }
 
-
     public boolean isIncludeInMin() {
         return includeInMin;
     }

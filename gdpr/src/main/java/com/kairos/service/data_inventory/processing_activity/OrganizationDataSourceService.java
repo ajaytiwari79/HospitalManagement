@@ -1,6 +1,5 @@
 package com.kairos.service.data_inventory.processing_activity;
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
@@ -14,7 +13,6 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.DataSourceService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -153,11 +151,11 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
     }
 
-    public Map<String, List<DataSource>> saveAndSuggestDataSources(Long countryId, Long organizationId, List<DataSourceDTO> DataSourceDTOS) {
+    public Map<String, List<DataSource>> saveAndSuggestDataSources(Long countryId, Long organizationId, List<DataSourceDTO> dataSourceDTOS) {
 
         Map<String, List<DataSource>> result;
-        result = createDataSource(organizationId, DataSourceDTOS);
-        List<DataSource> masterDataSourceSuggestedByUnit = dataSourceService.saveSuggestedDataSourcesFromUnit(countryId, DataSourceDTOS);
+        result = createDataSource(organizationId, dataSourceDTOS);
+        List<DataSource> masterDataSourceSuggestedByUnit = dataSourceService.saveSuggestedDataSourcesFromUnit(countryId, dataSourceDTOS);
         if (!masterDataSourceSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterDataSourceSuggestedByUnit);
         }

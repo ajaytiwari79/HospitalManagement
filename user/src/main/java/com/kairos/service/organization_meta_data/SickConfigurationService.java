@@ -44,13 +44,16 @@ public class SickConfigurationService {
         return true;
     }
 
-    public Map<String, Object> getSickSettingsOfUnit(Long unitId) {
-
-        List<TimeTypeDTO> timeTypes = timeTypeRestClient.getAllTimeTypes(organizationGraphRepository.getCountryId(unitId));
+    public Set<BigInteger> getSickSettingsOfUnit(Long unitId) {
         SickConfiguration sickConfiguration = sickConfigurationRepository.findSickConfigurationOfUnit(unitId);
+        return sickConfiguration != null ? sickConfiguration.getTimeTypes() : Collections.emptySet();
+    }
+
+    public Map<String, Object> getSickSettingsAndDefaultDataOfUnit(Long unitId) {
+        List<TimeTypeDTO> timeTypes = timeTypeRestClient.getAllTimeTypes(organizationGraphRepository.getCountryId(unitId));
         Map<String, Object> response = new HashMap<>();
         response.put("timeTypes", timeTypes);
-        response.put("selectedTimeTypeIds", sickConfiguration!=null?sickConfiguration.getTimeTypes():Collections.emptyList());
+        response.put("selectedTimeTypeIds", getSickSettingsOfUnit(unitId));
         return response;
     }
 
