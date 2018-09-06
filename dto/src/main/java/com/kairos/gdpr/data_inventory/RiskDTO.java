@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.RiskSeverity;
 
 import javax.validation.constraints.NotBlank;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RiskDTO {
 
+    private BigInteger id;
 
     @NotBlank(message = "Name can't be Empty")
     private String name;
@@ -16,6 +18,7 @@ public class RiskDTO {
     @NotBlank(message = "Description can't be Empty")
     private String description;
 
+    @NotBlank(message = "Mention Risk Recommendation")
     private String riskRecommendation;
 
     private LocalDate dueDate;
@@ -26,15 +29,15 @@ public class RiskDTO {
 
     private RiskSeverity riskLevel;
 
-    public String getName() { return name; }
+    public String getName() { return name.trim(); }
 
     public void setName(String name) { this.name = name; }
 
-    public String getDescription() { return description; }
+    public String getDescription() { return description.trim(); }
 
     public void setDescription(String description) { this.description = description; }
 
-    public String getRiskRecommendation() { return riskRecommendation; }
+    public String getRiskRecommendation() { return riskRecommendation.trim(); }
 
     public void setRiskRecommendation(String riskRecommendation) { this.riskRecommendation = riskRecommendation; }
 

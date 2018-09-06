@@ -54,6 +54,14 @@ public class AssetTypeDTO {
         this.name = name;
     }
 
+    public List<RiskDTO> getRisk() {
+        return risk;
+    }
+
+    public void setRisk(List<RiskDTO> risk) {
+        this.risk = risk;
+    }
+
     public AssetTypeDTO() {
     }
 }
