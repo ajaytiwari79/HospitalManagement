@@ -7,14 +7,15 @@ public class OrgTypeAndSubTypeDTO {
     private Long organizationSubTypeId;
     private List<Long> subTypeId; // same as above but its list We will change
     private Long countryId;
-    private  Long parentOrganizationId;
+    private Long parentOrganizationId;
 
     public OrgTypeAndSubTypeDTO() {
         //Default Constructor
     }
 
-    public OrgTypeAndSubTypeDTO(Long countryId) {
+    public OrgTypeAndSubTypeDTO(Long countryId, Long parentOrganizationId) {
         this.countryId = countryId;
+        this.parentOrganizationId = parentOrganizationId;
     }
 
     public OrgTypeAndSubTypeDTO(Long organizationTypeId, Long organizationSubTypeId, Long countryId) {
