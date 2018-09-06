@@ -275,6 +275,9 @@ public class CompanyCreationService {
 
             }
         } else {
+            if (unitManagerDTO.getCprNumber() != null && unitManagerDTO.getCprNumber().length() != 10) {
+                exceptionService.actionNotPermittedException("message.cprNumber.size");
+            }
             // user can fill any random property and we need to fetch
             User user = userGraphRepository.getUserOfOrganization(organization.getId());
             if (user != null) {
@@ -362,7 +365,7 @@ public class CompanyCreationService {
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
-        if (organizationBasicDTO.getUnitManager() != null && organizationBasicDTO.getUnitManager().getCprNumber() != null) {
+        if (organizationBasicDTO.getUnitManager() != null) {
             setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
         }
         //Assign Parent Organization's level to unit
