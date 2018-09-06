@@ -898,11 +898,8 @@ public class UnitPositionService {
 
 
     public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, BigInteger wtaId, BigInteger ctaId, Long unitId) {
-//        Long startDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getStartDate());
-//        LocalDate startDate=DateUtils.asLocalDate(timeCareEmploymentDTO.getStartDate());
         LocalDate startDate=DateUtils.getLocalDateFromISOLocalDate(timeCareEmploymentDTO.getStartDate());
         LocalDate endDate=null;
-        Long endDateMillis = null;
         if (!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")) {
             endDate = DateUtils.getLocalDateFromISOLocalDate(timeCareEmploymentDTO.getEndDate());
         }
