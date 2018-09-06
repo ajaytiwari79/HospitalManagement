@@ -2,10 +2,11 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.WTATemplateType;
+import com.kairos.util.ShiftValidatorService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
@@ -14,7 +15,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
+import static com.kairos.util.ShiftValidatorService.*;
 
 
 /**
@@ -28,8 +29,6 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     private long intervalLength;
     private String intervalUnit;
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
 
 
@@ -49,13 +48,6 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
         this.intervalUnit = intervalUnit;
     }
 
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
-    }
 
     public float getRecommendedValue() {
         return recommendedValue;
@@ -87,13 +79,6 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
     }
 
-    public List<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
@@ -104,8 +89,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        String exception="";
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues)){
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts(), null);
@@ -113,18 +97,22 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
             shifts = sortShifts(shifts);
             int maxRestingTime = getMaxRestingTime(shifts);
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
-            if (!isValid(minMaxSetting, limitAndCounter[0], maxRestingTime/60)) {
+            if (!isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], maxRestingTime/60)) {
                 if (limitAndCounter[1] != null) {
                     int counterValue = limitAndCounter[1] - 1;
                     if (counterValue < 0) {
-                        exception = getName();                        infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
-                        infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                    }else {
+                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
+                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                     }
-                } else {
-                    exception = getName();                }
+                }else {
+                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                    infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                }
             }
         }
-        return exception;
     }
 
 

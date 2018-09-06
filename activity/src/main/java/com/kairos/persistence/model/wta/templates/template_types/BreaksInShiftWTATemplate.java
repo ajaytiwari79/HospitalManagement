@@ -41,8 +41,8 @@ public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate{
 
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        return "";
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
+
     }
 
     public BreaksInShiftWTATemplate(String name,  boolean disabled, String description, List<BreakTemplateValue> breakTemplateValues) {

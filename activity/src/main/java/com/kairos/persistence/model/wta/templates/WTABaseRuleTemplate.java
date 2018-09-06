@@ -108,9 +108,7 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
         return target;
     }
 
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper){
-        return "";
-    }
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper){}
 
     public Integer getStaffCanIgnoreCounter() {
         return staffCanIgnoreCounter;

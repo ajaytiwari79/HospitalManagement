@@ -336,13 +336,7 @@ public class DateUtils {
     }
 
     public static Date onlyDate(Date date) {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.setTime(date);
-        calendar.set(Calendar.MILLISECOND, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        return calendar.getTime();
+        return getDateByZoneDateTime(getZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
     }
 
     public static Date addMinutes(final Date date, final int amount) {

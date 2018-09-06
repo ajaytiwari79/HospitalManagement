@@ -73,8 +73,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        return "";
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
     }
 
     public ChildCareDaysCheckWTATemplate(String name, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activityIds,

@@ -127,6 +127,11 @@ public class ValidNightShiftSpecification extends AbstractActivitySpecification<
     }
 
     @Override
+    public void validateRules(ShiftAndExpertiseNightWorkerSettingDTO shiftAndExpertiseNightWorkerSettingDTO) {
+
+    }
+
+    @Override
     public List<String> isSatisfiedString(ShiftAndExpertiseNightWorkerSettingDTO shiftAndExpertiseNightWorkerSettingDTO) {
         return Collections.EMPTY_LIST;
     }

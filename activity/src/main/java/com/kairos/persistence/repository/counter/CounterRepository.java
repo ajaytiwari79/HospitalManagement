@@ -265,7 +265,7 @@ public class CounterRepository {
     public List<CounterDTO> getAllCounterBySupportedModule(ModuleType supportedModuleType){
         Query query = new Query(Criteria.where("supportedModuleTypes").in(supportedModuleType).and("deleted").is(false));
         query.fields().include("id").include("title");
-        return ObjectMapperUtils.copyProperties(mongoTemplate.find(query,Counter.class),CounterDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,Counter.class),CounterDTO.class);
     }
 
     //dashboard tab
