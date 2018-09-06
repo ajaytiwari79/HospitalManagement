@@ -422,6 +422,12 @@ public class AccessPageService {
         return kpiTabs;
     }
 
+    public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){
+        List<AccessPage> accessPages = accessPageRepository.getKPITabsList(moduleId);
+        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
+        return kpiTabs;
+    }
+
     public AccessPageLanguageDTO assignLanguageToAccessPage(String moduleId, AccessPageLanguageDTO accessPageLanguageDTO){
         if(Optional.ofNullable(accessPageLanguageDTO.getId()).isPresent()){
             Optional<AccessPageLanguageRelationShip> accessPageLanguageRelationShip= accessPageLanguageRelationShipRepository.findById(accessPageLanguageDTO.getId());
