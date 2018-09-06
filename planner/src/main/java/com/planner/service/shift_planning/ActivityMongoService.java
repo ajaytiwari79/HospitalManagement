@@ -25,6 +25,20 @@ public class ActivityMongoService {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
 
+/**************************************************************************************/
+    /**
+     *
+     * @param unitId
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    public List<ActivityDTO> getActivities(Long unitId, Date fromDate, Date toDate) {
+        List<ShiftPlanningStaffingLevelDTO> shiftPlanningStaffingLevelDTOList = getShiftPlanningStaffingLevelDTOByUnitId(unitId, fromDate, toDate);
+        Set<String> activitiesIds = getActivitiesIds(shiftPlanningStaffingLevelDTOList);
+        return getActivitiesByIds(activitiesIds);
+    }
+
 /************************************************************************************/
     /**
      * @param unitId
@@ -37,7 +51,7 @@ public class ActivityMongoService {
     }
 /************************************************************************************/
     /**
-     * Here we return activitiesId as String
+     * Here we return activitiesIds as String
      *
      * @param shiftPlanningStaffingLevelDTOList
      * @return
