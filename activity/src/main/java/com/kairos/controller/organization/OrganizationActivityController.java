@@ -6,6 +6,7 @@ import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.organization.OrganizationActivityService;
+import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.wrapper.activity.RulesActivityTabDTO;
 import com.kairos.wrapper.activity.SkillActivityDTO;
@@ -348,10 +349,9 @@ public class OrganizationActivityController {
     @ApiOperation(value = "Create default data for  Organization")
     @RequestMapping(value = "/organization_default_data", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createDefaultDataForOrganization(@PathVariable long unitId, @RequestParam Long countryId, @RequestParam Long parentOrganizationId,
-                                                                                @RequestParam Long orgTypeIds, @RequestParam List<Long> orgSubTypeIds) {
+    public ResponseEntity<Map<String, Object>> createDefaultDataForOrganization(@PathVariable long unitId, @RequestBody OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationActivityService.createDefaultDataForOrganization(unitId, parentOrganizationId, countryId,orgTypeIds, orgSubTypeIds));
+                organizationActivityService.createDefaultDataForOrganization(unitId, orgTypeAndSubTypeDTO));
     }
 
 }

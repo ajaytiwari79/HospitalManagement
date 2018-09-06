@@ -98,7 +98,7 @@ public class OrganizationProcessingPurposeController {
 
 
     @ApiOperation("save processing purpose And Suggest To Country admin")
-    @PostMapping(COUNTRY_URL + "/processing_purpose")
+    @PostMapping(COUNTRY_URL + "/processing_purpose/suggest")
     public ResponseEntity<Object> saveProcessingPurposeBasisAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ProcessingPurposeDTO> processingPurposeDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");

@@ -92,7 +92,7 @@ public class OrganizationTechnicalSecurityController {
 
 
     @ApiOperation("save technical security And Suggest To Country admin")
-    @PostMapping(COUNTRY_URL + "/technical_security")
+    @PostMapping(COUNTRY_URL + "/technical_security/suggest")
     public ResponseEntity<Object> saveTechnicalSecurityAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> technicalSecurityDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");

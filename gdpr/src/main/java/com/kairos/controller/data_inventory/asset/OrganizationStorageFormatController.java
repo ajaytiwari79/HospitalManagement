@@ -93,7 +93,7 @@ public class OrganizationStorageFormatController {
 
 
     @ApiOperation("save Storage Format And Suggest To Country admin")
-    @PostMapping(COUNTRY_URL + "/storage_format")
+    @PostMapping(COUNTRY_URL + "/storage_format/suggest")
     public ResponseEntity<Object> saveStorageFormatAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormatDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");

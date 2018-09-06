@@ -1,5 +1,6 @@
 package com.kairos.persistance.repository.master_data.asset_management.hosting_provider;
 
+import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
@@ -26,13 +27,11 @@ public interface HostingProviderMongoRepository extends MongoBaseRepository<Host
 
     HostingProvider findByid(BigInteger id);
 
-    @Query("{countryId:?0,deleted:false,suggestedDataStatus:?1}")
-    List<HostingProviderResponseDTO> findAllHostingProviders(Long countryId, String suggestedDataStatus);
+    @Query("{countryId:?0,deleted:false}")
+    List<HostingProviderResponseDTO> findAllHostingProviders(Long countryId);
 
-
-    @Query("{countryId:?0,,name:{$in:?1},deleted:false}")
-    List<HostingProvider>  findByCountryAndNameList(Long countryId,Set<String> name);
-
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<HostingProvider> getHostingProviderListByIds(Long countryId, Set<BigInteger> hostingProviderIds);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     HostingProvider findByOrganizationIdAndId(Long organizationId,BigInteger id);

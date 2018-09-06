@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -83,7 +84,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @return list of OrganizationalSecurityMeasure
      */
     public List<OrganizationalSecurityMeasureResponseDTO> getAllOrganizationalSecurityMeasure(Long countryId) {
-        return organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures(countryId);
     }
 
 
@@ -170,30 +171,49 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
     /**
      * @description method save Organizational security measure suggested by unit
      * @param countryId
-     * @param OrganizationalSecurityMeasureDTOS
+     * @param organizationalSecurityMeasureDTOS
      * @return
      */
-    public List<OrganizationalSecurityMeasure> saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> OrganizationalSecurityMeasureDTOS) {
+    public List<OrganizationalSecurityMeasure> saveSuggestedOrganizationalSecurityMeasuresFromUnit(Long countryId, List<OrganizationalSecurityMeasureDTO> organizationalSecurityMeasureDTOS) {
 
         Set<String> orgSecurityMeasuresName = new HashSet<>();
-        for (OrganizationalSecurityMeasureDTO OrganizationalSecurityMeasure : OrganizationalSecurityMeasureDTOS) {
+        for (OrganizationalSecurityMeasureDTO OrganizationalSecurityMeasure : organizationalSecurityMeasureDTOS) {
             orgSecurityMeasuresName.add(OrganizationalSecurityMeasure.getName());
         }
         List<OrganizationalSecurityMeasure> existingOrganizationalSecurityMeasures = findMetaDataByNamesAndCountryId(countryId, orgSecurityMeasuresName, OrganizationalSecurityMeasure.class);
         orgSecurityMeasuresName = ComparisonUtils.getNameListForMetadata(existingOrganizationalSecurityMeasures, orgSecurityMeasuresName);
-        List<OrganizationalSecurityMeasure> OrganizationalSecurityMeasureList = new ArrayList<>();
-        if (orgSecurityMeasuresName.size() != 0) {
+        List<OrganizationalSecurityMeasure> organizationalSecurityMeasureList = new ArrayList<>();
+        if (!orgSecurityMeasuresName.isEmpty()) {
             for (String name : orgSecurityMeasuresName) {
 
-                OrganizationalSecurityMeasure OrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name);
-                OrganizationalSecurityMeasure.setCountryId(countryId);
-                OrganizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                OrganizationalSecurityMeasureList.add(OrganizationalSecurityMeasure);
+                OrganizationalSecurityMeasure organizationalSecurityMeasure = new OrganizationalSecurityMeasure(name);
+                organizationalSecurityMeasure.setCountryId(countryId);
+                organizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                organizationalSecurityMeasure.setSuggestedDate(LocalDate.now());
+                organizationalSecurityMeasureList.add(organizationalSecurityMeasure);
             }
 
-            OrganizationalSecurityMeasureList = organizationalSecurityMeasureMongoRepository.saveAll(getNextSequence(OrganizationalSecurityMeasureList));
+            organizationalSecurityMeasureMongoRepository.saveAll(getNextSequence(organizationalSecurityMeasureList));
         }
-        return OrganizationalSecurityMeasureList;
+        return organizationalSecurityMeasureList;
     }
+
+
+    /**
+     *
+     * @param countryId
+     * @param orgSecurityMeasureIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<OrganizationalSecurityMeasure> updateSuggestedStatusOfOrganizationalSecurityMeasures(Long countryId, Set<BigInteger> orgSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<OrganizationalSecurityMeasure> securityMeasureList = organizationalSecurityMeasureMongoRepository.getOrganizationalSecurityMeasureListByIds(countryId, orgSecurityMeasureIds);
+        securityMeasureList.forEach(securityMeasure -> securityMeasure.setSuggestedDataStatus(suggestedDataStatus));
+        organizationalSecurityMeasureMongoRepository.saveAll(getNextSequence(securityMeasureList));
+        return securityMeasureList;
+    }
+
+
 
 }

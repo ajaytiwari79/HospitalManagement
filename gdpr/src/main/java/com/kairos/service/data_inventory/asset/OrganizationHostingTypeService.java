@@ -161,11 +161,11 @@ public class OrganizationHostingTypeService extends MongoBaseService {
     }
 
 
-    public Map<String, List<HostingType>> saveAndSuggestHostingTypes(Long countryId, Long organizationId, List<HostingTypeDTO> HostingTypeDTOS) {
+    public Map<String, List<HostingType>> saveAndSuggestHostingTypes(Long countryId, Long organizationId, List<HostingTypeDTO> hostingTypeDTOS) {
 
         Map<String, List<HostingType>> result;
-        result = createHostingType(organizationId, HostingTypeDTOS);
-        List<HostingType> masterHostingTypeSuggestedByUnit = hostingTypeService.saveSuggestedHostingTypesFromUnit(countryId, HostingTypeDTOS);
+        result = createHostingType(organizationId, hostingTypeDTOS);
+        List<HostingType> masterHostingTypeSuggestedByUnit = hostingTypeService.saveSuggestedHostingTypesFromUnit(countryId, hostingTypeDTOS);
         if (!masterHostingTypeSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterHostingTypeSuggestedByUnit);
         }

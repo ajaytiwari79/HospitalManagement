@@ -27,9 +27,9 @@ public class ProcessingActivity extends MongoBaseEntity {
     @NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
 
-    private List<ProcessingActivityRelatedDataSubject> dataSubjects;
+    private List<ProcessingActivityRelatedDataSubject> dataSubjects =new ArrayList<>();
 
-    private List<BigInteger> linkedAssets;
+    private List<BigInteger> linkedAssets=new ArrayList<>();
 
     private List<BigInteger> processingPurposes;
 
