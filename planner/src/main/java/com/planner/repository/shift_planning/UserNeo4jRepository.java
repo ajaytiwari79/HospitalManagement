@@ -1,5 +1,6 @@
 package com.planner.repository.shift_planning;
 
+import com.kairos.util.ObjectMapperUtils;
 import org.bouncycastle.util.Arrays;
 import org.neo4j.ogm.model.Property;
 
@@ -20,6 +21,7 @@ import static com.planner.constants.AppConstants.STAFF_HAS_SKILLS;
 /**
  * @author mohit
  */
+@Deprecated
 @Repository
 public class UserNeo4jRepository {
 
@@ -31,7 +33,7 @@ public class UserNeo4jRepository {
      * @param staffIds
      */
 
-    public List<Map> getStaffByIdsAndSkillAndUnitPositionAndExpertise(Long[] staffIds)
+    public String getStaffByIdsAndSkillAndUnitPositionAndExpertise(Long[] staffIds)
     {
         String cypherQuery="Match(staff:Staff)  where id(staff) in {staffIds} with staff " +
                            "Optional Match(skill:Skill{isEnabled:true})<-[:"+STAFF_HAS_SKILLS+"]-(staff) " +
@@ -47,8 +49,8 @@ public class UserNeo4jRepository {
                            "} as resultMap";
         Map<String,Object> map=new HashMap<>();
         map.put("staffIds",staffIds);
-        Iterable<Map> result = session.query(Map.class,cypherQuery,map);
-        List<Map> list=(List<Map>)result;
-        return  list;
+        Iterable<HashMap> result = session.query(HashMap.class,cypherQuery,map);
+        List<HashMap> list=(List<HashMap>)result;
+        return ObjectMapperUtils.objectToJsonString(list);
     }
 }
