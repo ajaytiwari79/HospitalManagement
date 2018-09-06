@@ -492,7 +492,7 @@ public class ShiftService extends MongoBaseService {
         }
         if (!shifts.isEmpty())
             save(shifts);
-        if (breakActivity.getName().equalsIgnoreCase(UNPAID_BREAK)) {
+        if (!paid) {
             mainShift.setScheduledMinutes(mainShift.getScheduledMinutes() - totalBreakAllotedInMinute.intValue());
         }
         mainShift.setSubShifts(shifts.stream().map(Shift::getId).collect(Collectors.toSet()));
