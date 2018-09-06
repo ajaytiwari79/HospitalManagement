@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.time_type.TimeTypeDTO;
 import com.kairos.persistence.model.activity.tabs.*;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.user.country.day_type.DayType;
 

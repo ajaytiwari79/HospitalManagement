@@ -96,11 +96,14 @@ public class StaffingLevelActivity {
         return Objects.hash(activityId);
     }
 
-    
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("activityId", activityId)
                 .toString();
     }
+
+
+
 }

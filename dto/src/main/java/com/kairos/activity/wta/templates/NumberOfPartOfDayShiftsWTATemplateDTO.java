@@ -20,7 +20,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private long noOfPartOfDayWorked;
     private long intervalLength;
     private String intervalUnit;
 
@@ -88,13 +87,6 @@ public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDT
     }
 
 
-    public long getNoOfPartOfDayWorked() {
-        return noOfPartOfDayWorked;
-    }
-
-    public void setNoOfPartOfDayWorked(long noOfPartOfDayWorked) {
-        this.noOfPartOfDayWorked = noOfPartOfDayWorked;
-    }
 
     public long getIntervalLength() {
         return intervalLength;
@@ -105,12 +97,6 @@ public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDT
     }
 
 
-    public NumberOfPartOfDayShiftsWTATemplateDTO(String name, boolean disabled, String description, long noOfPartOfDayWorked) {
-        this.noOfPartOfDayWorked = noOfPartOfDayWorked;
-        this.name = name;
-        this.disabled = disabled;
-        this.description = description;
-    }
     public NumberOfPartOfDayShiftsWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.NUMBER_OF_PARTOFDAY;
     }
