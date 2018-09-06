@@ -109,11 +109,11 @@ public class CounterDistService extends MongoBaseService {
         List<BigInteger> kpiIds=null;
         List<KPIDTO> kpidtos=null;
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
-//        if(accessGroupPermissionCounterDTO.getCountryAdmin()){
-//             kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,ConfLevel.UNIT);
-//        }else{
+        if(accessGroupPermissionCounterDTO.getCountryAdmin()){
+             kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(accessGroupPermissionCounterDTO.getCountryId(),ConfLevel.COUNTRY);
+        }else{
             kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,refId,accessGroupPermissionCounterDTO.getStaffId());
-       // }
+        }
         kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
         //dont delete
        // counterRepository.removeApplicableKPI(Arrays.asList(accessGroupPermissionCounterDTO.getStaffId()),kpiIds,refId,ConfLevel.STAFF);

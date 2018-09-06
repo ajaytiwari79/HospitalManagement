@@ -79,8 +79,8 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     Boolean checkIfUserIsCountryAdmin(Long userId, String accessGroupName);
 
     @Query("Match (u:User) WHERE id(u)={0} " +
-            "MATCH (u)<-[:"+BELONGS_TO+"]-(s:Staff)<-[:"+BELONGS_TO+"]-(e:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization)-[:"+COUNTRY+"]->(c:Country) return c")
-    Country getCountryOfUser(Long userId);
+            "MATCH (u)<-[:"+BELONGS_TO+"]-(s:Staff)<-[:"+BELONGS_TO+"]-(e:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization)-[:"+COUNTRY+"]->(c:Country) return id(c)")
+    Long  getCountryOfUser(Long userId);
 
     @Query("Match(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) where id(user)={0} return id(userLanguage)")
     Long getUserSelectedLanguageId(Long userId);
