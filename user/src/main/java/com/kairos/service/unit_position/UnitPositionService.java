@@ -67,6 +67,7 @@ import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.wrapper.PositionWrapper;
 import com.kairos.wrapper.cta.CTATableSettingWrapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.joda.time.Interval;
@@ -932,17 +933,18 @@ public class UnitPositionService {
 
         }
 
-        //WorkingTimeAgreement wta = unitPositionGraphRepository.getOneDefaultWTA(organization.getId(), expertise.getId());
-        CTAResponseDTO cta = genericRestClient.publishRequest(null,organization.getId(),true,IntegrationOperation.GET,GET_DEFAULT_CTA,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAResponseDTO>>() {},expertiseId);
-        /*if (wta == null) {
-            throw new DataNotFoundByIdException("NO WTA found for organization : " + organization.getId());
-        }*/
 
-        if (cta == null) {
+
+
+        CTAWTAWrapper ctawtaWrapper = workingTimeAgreementRestClient.getWTAByExpertise(expertise.getId());
+        if (CollectionUtils.isNotEmpty(ctawtaWrapper.getCta()) || CollectionUtils.isNotEmpty(ctawtaWrapper.getWta())) {
             exceptionService.dataNotFoundByIdException("message.organization.cta.notfound", organization.getId());
 
         }
-        CTAWTAWrapper ctawtaWrapper = workingTimeAgreementRestClient.getWTAByExpertise(expertise.getId());
+        if (CollectionUtils.isNotEmpty(ctawtaWrapper.getWta())) {
+            exceptionService.dataNotFoundByIdException("message.wta.notFound", organization.getId());
+
+        }
         PositionCode positionCode = positionCodeGraphRepository.getOneDefaultPositionCodeByUnitId(parentOrganization.getId());
         if (positionCode == null) {
             exceptionService.dataNotFoundByIdException("message.positioncode.organization.notexist", parentOrganization.getId());
