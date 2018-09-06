@@ -22,6 +22,11 @@ public class StaffExpertiseSpecification extends AbstractSpecification<StaffDTO>
     }
 
     @Override
+    public void validateRules(StaffDTO staffDTO) {
+
+    }
+
+    @Override
     public List<String> isSatisfiedString(StaffDTO staffDTO) {
         List<String> errorMessages = new ArrayList<>();
         if (!CollectionUtils.containsAny(activity.getExpertises(), staffDTO.getExpertiseIds())) {

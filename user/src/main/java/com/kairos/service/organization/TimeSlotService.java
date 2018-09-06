@@ -464,7 +464,7 @@ public class TimeSlotService {
     public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(Organization organization) {
         List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(organization.getId(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
-        List<TimeSlotDTO> timeSlotDTOS = ObjectMapperUtils.copyProperties(timeSlotWrappers, TimeSlotDTO.class);
+        List<TimeSlotDTO> timeSlotDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, TimeSlotDTO.class);
         return timeSlotDTOS;
     }
 

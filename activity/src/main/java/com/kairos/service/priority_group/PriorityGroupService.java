@@ -57,7 +57,7 @@ public class PriorityGroupService extends MongoBaseService {
         if(isPriorityGroupsAlreadyExists){
             exceptionService.actionNotPermittedException("priorityGroup.already.exists",countryId);
         }
-        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTO, PriorityGroup.class);
+        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroupDTO, PriorityGroup.class);
         save(priorityGroups);
         return true;
     }
@@ -179,14 +179,14 @@ public class PriorityGroupService extends MongoBaseService {
             priorityGroupDTO.setId(null);
 
         });
-        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTOs, PriorityGroup.class);
+        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroupDTOs, PriorityGroup.class);
         save(priorityGroups);
 
         return ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroups,PriorityGroupDTO.class);
         //return  priorityGroupDTOs;
     }
     public List<PriorityGroupDTO> updatePriorityGroupsForOrder(List<PriorityGroupDTO> priorityGroupDTOs) {
-        List<PriorityGroup> priorityGroups= ObjectMapperUtils.copyProperties(priorityGroupDTOs,PriorityGroup.class);
+        List<PriorityGroup> priorityGroups= ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroupDTOs,PriorityGroup.class);
         save(priorityGroups);
         return priorityGroupDTOs;
     }

@@ -21,7 +21,6 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     private PartOfDay sequenceShiftFrom;
     private PartOfDay sequenceShiftTo;
 
-    private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
 
    /* public int getNightShiftSequence() {
@@ -74,14 +73,7 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     public NoOfSequenceShiftWTATemplate() {
         wtaTemplateType=WTATemplateType.NO_OF_SEQUENCE_SHIFT;
     }
-
-    public List<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
+    
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
@@ -92,8 +84,8 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        return "";
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
+
     }
 
     public NoOfSequenceShiftWTATemplate(String name, boolean disabled, String description,  PartOfDay sequenceShiftFrom, PartOfDay sequenceShiftTo) {
