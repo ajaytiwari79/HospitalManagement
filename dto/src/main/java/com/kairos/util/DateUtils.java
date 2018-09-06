@@ -316,6 +316,7 @@ public class DateUtils {
 
     public static LocalDate asLocalDate(String receivedDate) {
         LocalDate date = LocalDate.parse(receivedDate, DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDate date1= LocalDate.parse(receivedDate);
         return date;
     }
 
@@ -666,5 +667,14 @@ public class DateUtils {
     }
     public static Date getDateAfterDaysWithTime(short daysAfter,int startHour){
         return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atStartOfDay().with(LocalTime.of(startHour, 00)).toInstant(ZoneOffset.UTC));
+    }
+
+    public static LocalDate getLocalDateFromISOLocalDate(String receivedDate) {
+        Instant instant = Instant.parse(receivedDate);
+        LocalDateTime result = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+
+        LocalDate result1 = ZonedDateTime.parse(receivedDate, DateTimeFormatter.ISO_DATE_TIME).toLocalDate();
+        return result.toLocalDate();
+
     }
 }
