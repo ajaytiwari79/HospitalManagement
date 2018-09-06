@@ -327,6 +327,7 @@ public class RuleTemplateService extends MongoBaseService {
 
         }
         WTABaseRuleTemplate wtaBaseRuleTemplate = WTABuilderService.copyRuleTemplate(wtaRuleTemplateDTO, true);
+        wtaBaseRuleTemplate.setCountryId(countryId);
         wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         save(wtaBaseRuleTemplate);
         wtaRuleTemplateDTO.setId(wtaBaseRuleTemplate.getId());
