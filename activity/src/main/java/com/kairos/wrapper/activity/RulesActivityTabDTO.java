@@ -2,18 +2,21 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.open_shift.DurationField;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.PQLSettings;
 import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
-import com.kairos.persistence.model.activity.tabs.RulesActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by pawanmandhan on 23/8/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class RulesActivityTabDTO {
 
     private BigInteger activityId;
@@ -43,12 +46,11 @@ public class RulesActivityTabDTO {
     private boolean eligibleForCopy;
 
     private DurationField plannedTimeInAdvance;
-    private DurationField approvalTimeInAdvance;
-    private Float approvalPercentage;
     private LocalTime maximumEndTime;
     private boolean allowedAutoAbsence;
     private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --
     private byte recurrenceTimes;// -- the  shift of that staff will be entered.
+    private PQLSettings pqlSettings;
 
 
 
@@ -244,22 +246,6 @@ public class RulesActivityTabDTO {
         this.plannedTimeInAdvance = plannedTimeInAdvance;
     }
 
-    public DurationField getApprovalTimeInAdvance() {
-        return approvalTimeInAdvance;
-    }
-
-    public void setApprovalTimeInAdvance(DurationField approvalTimeInAdvance) {
-        this.approvalTimeInAdvance = approvalTimeInAdvance;
-    }
-
-    public Float getApprovalPercentage() {
-        return approvalPercentage;
-    }
-
-    public void setApprovalPercentage(Float approvalPercentage) {
-        this.approvalPercentage = approvalPercentage;
-    }
-
     public LocalTime getMaximumEndTime() {
         return maximumEndTime;
     }
@@ -292,11 +278,18 @@ public class RulesActivityTabDTO {
         this.allowedAutoAbsence = allowedAutoAbsence;
     }
 
+    public PQLSettings getPqlSettings() {
+        return pqlSettings=Optional.ofNullable(pqlSettings).orElse(new PQLSettings());
+    }
+
+    public void setPqlSettings(PQLSettings pqlSettings) {
+        this.pqlSettings = pqlSettings;
+    }
+
     public RulesActivityTab buildRulesActivityTab() {
         RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
-
                 eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
-                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,approvalTimeInAdvance,approvalPercentage,maximumEndTime,cutOffdayValue,cutOffIntervalUnit,cutOffStartFrom,recurrenceDays,recurrenceTimes,allowedAutoAbsence);
+                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,pqlSettings,maximumEndTime,cutOffdayValue,cutOffIntervalUnit,cutOffStartFrom,recurrenceDays,recurrenceTimes,allowedAutoAbsence);
 
         return rulesActivityTab;
     }

@@ -44,14 +44,10 @@ public class ActivityIntegrationService {
         return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/orders_and_activities", null), OrderAndActivityDTO.class);
     }
 
-    public void crateDefaultDataForOrganization(Long unitId, Long parentOrganizationId, Long countryId, Long orgTypeId, List<Long> orgSubTypeIds) {
-        Map<String, Object> countryDetail = new HashMap<>();
-        countryDetail.put("countryId", countryId);
-        countryDetail.put("parentOrganizationId", parentOrganizationId);
-        countryDetail.put("orgTypeIds", orgTypeId);
-        countryDetail.put("orgSubTypeIds", orgSubTypeIds);
-        logger.info("Default Data creation organization type %s  organization Sub type %s",orgTypeId,orgSubTypeIds);
-        genericRestClient.publish(null, unitId, true, IntegrationOperation.CREATE, "/organization_default_data", countryDetail);
+    public void crateDefaultDataForOrganization(Long unitId, Long parentOrganizationId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
+
+
+        genericRestClient.publish(orgTypeAndSubTypeDTO, unitId, true, IntegrationOperation.CREATE, "/organization_default_data",null);
     }
 
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypes(long countryId) {
