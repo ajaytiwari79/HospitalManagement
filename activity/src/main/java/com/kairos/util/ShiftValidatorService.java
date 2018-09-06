@@ -19,6 +19,8 @@ import com.kairos.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -38,11 +40,16 @@ import static com.kairos.constants.AppConstants.*;
  * @author pradeep
  * @date - 10/5/18
  */
-@Service
+@Component
 public class ShiftValidatorService {
 
-    @Inject
+
     private static ExceptionService exceptionService;
+
+    @Autowired
+    public void setExceptionService(ExceptionService exceptionService) {
+        this.exceptionService = exceptionService;
+    }
 
     public static int getConsecutiveDaysInDate(List<LocalDate> localDates) {
         if (localDates.size() < 2) return 0;
