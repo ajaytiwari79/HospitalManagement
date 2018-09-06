@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.RiskSeverity;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
 
@@ -27,6 +28,7 @@ public class RiskDTO {
 
     private int daysToReminderBefore;
 
+    @NotNull(message = "Risk Level can't be empty")
     private RiskSeverity riskLevel;
 
     public String getName() { return name.trim(); }
@@ -56,4 +58,12 @@ public class RiskDTO {
     public RiskSeverity getRiskLevel() { return riskLevel; }
 
     public void setRiskLevel(RiskSeverity riskLevel) { this.riskLevel = riskLevel; }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 }

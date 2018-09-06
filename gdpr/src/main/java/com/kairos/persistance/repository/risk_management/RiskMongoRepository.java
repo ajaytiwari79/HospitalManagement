@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.List;
 
 
 @Repository
@@ -20,6 +21,9 @@ public interface RiskMongoRepository extends MongoBaseRepository<Risk,BigInteger
 
     @Query("{deleted:false,_id:?0}")
     Risk findByIdAndNonDeleted(BigInteger riskId);
+
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<Risk> findRiskByCountryIdAndIds(Long countryId, List<BigInteger> riskIds);
 
 
 

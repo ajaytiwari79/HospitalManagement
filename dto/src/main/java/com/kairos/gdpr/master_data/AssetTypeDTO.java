@@ -21,7 +21,7 @@ public class AssetTypeDTO {
     private String name;
 
     @Valid
-    private List<RiskDTO> risk;
+    private List<RiskDTO> risk = new ArrayList<>();
 
     @Valid
     private List<AssetTypeDTO> subAssetTypes = new ArrayList<>();
