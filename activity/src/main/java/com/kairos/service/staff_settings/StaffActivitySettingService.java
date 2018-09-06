@@ -107,7 +107,7 @@ public class StaffActivitySettingService extends MongoBaseService {
             staffActivitySetting.setUnitId(unitId);
             staffActivitySetting.setStaffId(staffId);
         });
-        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyProperties(staffActivitySettings,StaffActivitySetting.class);
+        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyPropertiesOfListByMapper(staffActivitySettings,StaffActivitySetting.class);
         save(staffActivitySettingsList);
         return staffActivitySettings;
    }

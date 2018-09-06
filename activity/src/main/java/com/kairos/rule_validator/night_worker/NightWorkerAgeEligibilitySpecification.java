@@ -30,6 +30,11 @@ public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpec
     }
 
     @Override
+    public void validateRules(StaffDTO staffDTO) {
+
+    }
+
+    @Override
     public List<String> isSatisfiedString(StaffDTO staffDTO) {
         return Collections.emptyList();
     }

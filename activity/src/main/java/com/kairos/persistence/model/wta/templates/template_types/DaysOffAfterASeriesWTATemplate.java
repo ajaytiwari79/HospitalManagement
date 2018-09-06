@@ -69,8 +69,8 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        return "";
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
+
     }
 
     public DaysOffAfterASeriesWTATemplate(String name, boolean disabled, String description, long intervalLength, String intervalUnit, int nightShiftSequence) {

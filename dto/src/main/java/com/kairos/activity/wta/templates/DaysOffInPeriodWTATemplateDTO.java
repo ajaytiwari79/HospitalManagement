@@ -20,7 +20,8 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private MinMaxSetting minMaxSetting;
     private boolean restingTimeAllowed;
     private int restingTime;
-    protected float recommendedValue;
+    private float recommendedValue;
+
     public float getRecommendedValue() {
         return recommendedValue;
     }

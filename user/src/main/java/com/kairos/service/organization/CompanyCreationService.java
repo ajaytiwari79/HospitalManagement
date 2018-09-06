@@ -60,7 +60,8 @@ import static com.kairos.util.validator.company.OrganizationDetailsValidator.*;
 @Service
 @Transactional
 public class CompanyCreationService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private static final Logger logger = LoggerFactory.getLogger(CompanyCreationService.class);
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
@@ -465,7 +466,7 @@ public class CompanyCreationService {
         }
         return unitType;
     }
-    public boolean publishOrganization(Long countryId, Long organizationId) throws InterruptedException, ExecutionException {
+    public boolean onBoardOrganization(Long countryId, Long organizationId) throws InterruptedException, ExecutionException {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", organizationId);

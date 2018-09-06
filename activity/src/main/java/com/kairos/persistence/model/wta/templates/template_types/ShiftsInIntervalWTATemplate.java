@@ -2,11 +2,12 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.MinMaxSetting;
 import com.kairos.enums.PartOfDay;
 import com.kairos.enums.WTATemplateType;
+import com.kairos.util.ShiftValidatorService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.TimeInterval;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
+import static com.kairos.util.ShiftValidatorService.*;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -118,8 +119,7 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        String exception = "";
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && (plannedTimeIds.contains(infoWrapper.getShift().getPlannedTypeId()) && timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))){
             TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrappers(),infoWrapper.getShift());
             if(timeInterval!=null) {
@@ -132,15 +132,18 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
                     if(limitAndCounter[1]!=null) {
                         int counterValue =  limitAndCounter[1] - 1;
                         if(counterValue<0){
-                            exception = getName();                        }else {
-                            infoWrapper.getCounterMap().put(getId(), infoWrapper.getCounterMap().getOrDefault(getId(), 0) + 1);
-                            infoWrapper.getShift().getBrokenRuleTemplateIds().add(getId());
+                            WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                            infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                        }else {
+                            WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,limitAndCounter[1],true,true);
+                            infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                         }
                     }else {
-                        exception = getName();                    }
+                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                    }
                 }
             }
         }
-        return exception;
     }
 }

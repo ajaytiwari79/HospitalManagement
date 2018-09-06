@@ -79,7 +79,7 @@ public class UnitSettingService extends MongoBaseService {
 
     public boolean createDefaultOpenShiftPhaseSettings(Long unitId,List<Phase> phases){
         if (!Optional.ofNullable(phases).isPresent()){
-            phases=ObjectMapperUtils.copyProperties(phaseService.getPhasesByUnit(unitId),Phase.class);
+            phases=ObjectMapperUtils.copyPropertiesOfListByMapper(phaseService.getPhasesByUnit(unitId),Phase.class);
         }
         List<UnitSettingDTO> openShiftPhaseSettings=unitSettingRepository.getOpenShiftPhaseSettings(unitId);
         if(openShiftPhaseSettings.size()>0){

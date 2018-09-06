@@ -19,8 +19,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private boolean checkAgainstTimeRules;
-    private long limitCount;//no of days
 
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
@@ -98,21 +96,7 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
 
-    public boolean isCheckAgainstTimeRules() {
-        return checkAgainstTimeRules;
-    }
 
-    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-    }
-
-    public long getLimitCount() {
-        return limitCount;
-    }
-
-    public void setLimitCount(long limitCount) {
-        this.limitCount = limitCount;
-    }
 
     public ConsecutiveWorkWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
@@ -126,9 +110,4 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.consecutiveDays = consecutiveDays;
     }
 
-    public ConsecutiveWorkWTATemplateDTO(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {
-        super(name, description);
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-        this.limitCount = limitCount;
-    }
 }

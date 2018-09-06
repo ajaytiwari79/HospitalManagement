@@ -31,7 +31,18 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 public class ObjectMapperUtils {
     public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");
 
-    public static <T,E extends Object> List<E> copyProperties(List<T> objects1,Class className) {
+    private static ObjectMapper mapper;
+
+    static {
+        mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
+        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
+        mapper.registerModule(javaTimeModule);
+    }
+
+    /*public static <T,E extends Object> List<E> copyProperties(List<T> objects1, Class className) {
         List<E> objects = new ArrayList<>();
         for (int i = 0; i < objects1.size(); i++) {
             try {
@@ -43,49 +54,9 @@ public class ObjectMapperUtils {
         }
         return objects;
     }
-
-    /*private static <E> List<E> assignBlankObject(int size, List<E> objects) {
-        List<E> objects = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            try {
-                objects.add(t.getClass().newInstance());
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-
-        }
-        return objects;
-    }*/
-
-    public static <T> List<T> copyList(Class<T> klazz) {
-        List<T> list = new ArrayList<>();
-        Object actuallyT = new Object();
-        list.add(klazz.cast(actuallyT));
-        try {
-            list.add(klazz.getConstructor().newInstance()); // If default constructor
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
+*/
 
     public static <T extends Object,E extends Object> List<E> copyPropertiesOfListByMapper(List<T> objects, Class className) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        //mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
-        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
-        mapper.registerModule(javaTimeModule);
         try {
             return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
                     List.class, className));
@@ -99,16 +70,9 @@ public class ObjectMapperUtils {
 
 
     public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object,Class<T> valueType){
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
-        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
-        objectMapper.registerModule(javaTimeModule);
         try {
-            //
-            String json = objectMapper.writeValueAsString(object);
-            return objectMapper.readValue(json, valueType);
+            String json = mapper.writeValueAsString(object);
+            return mapper.readValue(json, valueType);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -116,15 +80,9 @@ public class ObjectMapperUtils {
     }
 
     public static <T> String objectToJsonString(T object){
-        ObjectMapper objectMapper = new ObjectMapper();
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
-        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
-        objectMapper.registerModule(javaTimeModule);
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        //objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         try {
-            return objectMapper.writeValueAsString(object);
+            return mapper.writeValueAsString(object);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -132,13 +90,8 @@ public class ObjectMapperUtils {
     }
 
     public static <T> T JsonStringToObject(String jsonString,Class<T> valueType){
-        ObjectMapper objectMapper = new ObjectMapper();
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
-        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
-        objectMapper.registerModule(javaTimeModule);
         try {
-            return objectMapper.readValue(jsonString, valueType);
+            return mapper.readValue(jsonString, valueType);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -158,12 +111,10 @@ public class ObjectMapperUtils {
     }
 
     public  static ObjectMapper getObjectMapper(){
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;
     }
 
-     public static void copyPropertiesUsingBeanUtils(Object source,Object destination,String ...ignoreProperties) {
+     public static void copyPropertiesExceptSpecific(Object source, Object destination, String ...ignoreProperties) {
               BeanUtils.copyProperties(source,destination,ignoreProperties);
         }
 
