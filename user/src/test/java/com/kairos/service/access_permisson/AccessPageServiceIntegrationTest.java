@@ -10,7 +10,6 @@ import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.service.country.CountryService;
-import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
@@ -40,7 +39,7 @@ import java.util.List;
 @SpringBootTest(classes = UserServiceApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class AccessPageServiceIntegrationTest {
 
-    private Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
+    private Logger logger = LoggerFactory.getLogger(AccessPageServiceIntegrationTest.class);
 
     @Value("${server.host.http.url}")
     private String url ;

@@ -21,8 +21,8 @@ public class UserNeo4jService {
      * @param staffIds
      * @return
      */
-    public List<StaffQueryResult> getStaffWithSkills(Long[] staffIds)
-    {   return  userNeo4jRepo.getStaffDataWithSkills(staffIds);
+    public List<StaffQueryResult> getStaffWithSkillsAndUnitPostionIds(Long unitId,Long[] staffIds)
+    {   return  userNeo4jRepo.getStaffWithSkillsAndUnitPostionIds(unitId,staffIds);
 
     }
 

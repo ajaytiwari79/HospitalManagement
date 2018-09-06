@@ -40,7 +40,7 @@ public class ShiftPlanningInitializationService {
      * @param staffIds
      * @return
      */
-    public List<StaffQueryResult> getStaffWithSkills(Long[] staffIds){
-       return userNeo4jService.getStaffWithSkills(staffIds);
+    public List<StaffQueryResult> getStaffWithSkillsAndUnitPostionIds(Long unitId,Long[] staffIds){
+       return userNeo4jService.getStaffWithSkillsAndUnitPostionIds(unitId,staffIds);
     }
 }
