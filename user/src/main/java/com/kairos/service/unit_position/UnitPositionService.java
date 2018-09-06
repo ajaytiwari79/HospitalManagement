@@ -899,13 +899,13 @@ public class UnitPositionService {
     public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, BigInteger wtaId, BigInteger ctaId, Long unitId) {
 //        Long startDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getStartDate());
 //        LocalDate startDate=DateUtils.asLocalDate(timeCareEmploymentDTO.getStartDate());
-        LocalDate startDate1=DateUtils.getLocalDateFromISOLocalDate(timeCareEmploymentDTO.getStartDate());
+        LocalDate startDate=DateUtils.getLocalDateFromISOLocalDate(timeCareEmploymentDTO.getStartDate());
         LocalDate endDate=null;
         Long endDateMillis = null;
         if (!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")) {
-            endDate = DateUtils.asLocalDate(timeCareEmploymentDTO.getEndDate());
+            endDate = DateUtils.getLocalDateFromISOLocalDate(timeCareEmploymentDTO.getEndDate());
         }
-        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(positionCodeId, expertiseId, startDate1, endDate, Integer.parseInt(timeCareEmploymentDTO.getWeeklyHours()), employmentTypeId, staffId, wtaId, ctaId, unitId, new Long(timeCareEmploymentDTO.getId()));
+        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(positionCodeId, expertiseId, startDate, endDate, Integer.parseInt(timeCareEmploymentDTO.getWeeklyHours()), employmentTypeId, staffId, wtaId, ctaId, unitId, new Long(timeCareEmploymentDTO.getId()));
         return unitPositionDTO;
     }
 
@@ -987,8 +987,7 @@ public class UnitPositionService {
         if (!Optional.ofNullable(staffSelectedExpertise).isPresent() || !Optional.ofNullable(currentExpertise).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staff.expertise.notassigned");
 
-
-        }
+            }
 
         Integer experienceInMonth = (int) ChronoUnit.MONTHS.between(DateUtil.asLocalDate(staffSelectedExpertise.getExpertiseStartDate()), LocalDate.now());
         logger.info("user has current experience in months :{}", experienceInMonth);

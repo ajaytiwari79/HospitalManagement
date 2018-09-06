@@ -670,11 +670,19 @@ public class DateUtils {
     }
 
     public static LocalDate getLocalDateFromISOLocalDate(String receivedDate) {
-        Instant instant = Instant.parse(receivedDate);
-        LocalDateTime result = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+//        Instant instant = Instant.parse(receivedDate);
+//        LocalDateTime result = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
 
-        LocalDate result1 = ZonedDateTime.parse(receivedDate, DateTimeFormatter.ISO_DATE_TIME).toLocalDate();
-        return result.toLocalDate();
+        SimpleDateFormat format = new SimpleDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+        format.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
+        LocalDate result1 = null;
+        try {
+            result1 = DateUtils.asLocalDate(format.parse(receivedDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return result1;
 
     }
 }
