@@ -1172,9 +1172,10 @@ public class ActivityService extends MongoBaseService {
 
 
     public void validateActivityTimeRules(LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, Short shortestTime, Short longestTime){
-        if(shortestTime!=null && longestTime!=null && shortestTime>longestTime){
-            exceptionService.actionNotPermittedException("shortest.time.greater.longest");
-        }
+        //TODO Please don't remove this commented code as we need it
+//        if(shortestTime!=null && longestTime!=null && shortestTime>longestTime){
+//            exceptionService.actionNotPermittedException("shortest.time.greater.longest");
+//        }
         if(Optional.ofNullable(earliestStartTime).isPresent() &&
                 Optional.ofNullable(latestStartTime).isPresent() &&
                 earliestStartTime.isAfter(latestStartTime)){
