@@ -843,13 +843,13 @@ public class ShiftService extends MongoBaseService {
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
         ViolatedRulesDTO violatedRulesDTO = validateShiftWithActivity(phase,wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         ShiftQueryResult shiftQueryResult;
-        if (CollectionUtils.isNotEmpty(shiftDTO.getSubShifts())) {
+        List<Shift> shifts = null;
+        if (CollectionUtils.isEmpty(shiftDTO.getSubShifts())) {
             shift = buildShift(shiftDTO);
             shift.setUnitId(unitId);
             shift.setMainShift(true);
             shiftQueryResult = shift.getShiftQueryResult();
         } else {
-            List<Shift> shifts;
             shifts = verifyCompositeShifts(shiftDTO, shiftDTO.getId(), activity);
             shift = buildShift(shiftDTO);
             if(violatedRulesDTO.getWorkTimeAgreements().isEmpty()){
@@ -862,6 +862,10 @@ public class ShiftService extends MongoBaseService {
             shiftQueryResult = geSubShiftResponse(shift, shifts);
         }
         if(violatedRulesDTO.getWorkTimeAgreements().isEmpty()){
+            if(CollectionUtils.isNotEmpty(shifts)){
+                save(shifts);
+                shift.setSubShifts(shifts.stream().map(s->s.getId()).collect(Collectors.toSet()));
+            }
             save(shift);
             setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
@@ -1084,28 +1088,17 @@ public class ShiftService extends MongoBaseService {
             Set<LocalDate> dates = shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
             Map<LocalDate, Phase> phaseListByDate = phaseService.getStatusByDates(unitId, dates);
             for (Shift shift : shifts) {
-                List<ShiftStatus> phaseStatuses = phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate())).getStatus();
                 Phase phase=phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
                  boolean validAccessGroup= validateAccessGroup(phase,shiftPublishDTO.getStatus().get(0),shift.getActivityId());
-                 boolean validStatus=phaseStatuses.containsAll(shiftPublishDTO.getStatus());
-                if (validStatus && validAccessGroup ) {
+                if (validAccessGroup ) {
                     shift.getStatus().addAll(shiftPublishDTO.getStatus());
                     success.add(new ShiftResponse(shift.getId(), shift.getName(), Collections.singletonList(localeService.getMessage("message.shift.status.added")), true));
                 } else {
-                    List<Object> errorMessages = new ArrayList<>();
                     List<String> messages=new ArrayList<>();
-                    if(!validStatus) {
-                        errorMessages.addAll(shiftPublishDTO.getStatus());
-                        errorMessages.addAll(phaseStatuses);
-                        messages.add(localeService.getMessage("error.shift.status", errorMessages.toArray()));
-                    }
-                    if(!validAccessGroup){
-                        messages.add(localeService.getMessage("access.group.not.matched"));
-                    }
+                    messages.add(localeService.getMessage("access.group.not.matched"));
                     error.add(new ShiftResponse(shift.getId(), shift.getName(),messages, false));
                 }
-
-            }
+                }
             save(shifts);
         }
         return response;
