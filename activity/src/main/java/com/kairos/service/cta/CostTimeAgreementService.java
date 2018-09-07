@@ -30,7 +30,6 @@ import com.kairos.util.user_context.UserContext;
 import com.kairos.wrapper.cta.CTATableSettingWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +45,6 @@ import java.util.stream.Collectors;
 import static com.kairos.activity.cta.CalculateValueType.FIXED_VALUE;
 import static com.kairos.constants.ApiConstants.GET_UNIT_POSITION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
-import static javax.management.timer.Timer.ONE_DAY;
 
 /**
  * @author pradeep
@@ -309,8 +307,12 @@ public class CostTimeAgreementService extends MongoBaseService {
     public CTARuleTemplateCategoryWrapper loadAllCTARuleTemplateByCountry(Long countryId) {
         List<RuleTemplateCategory> ruleTemplateCategories = ruleTemplateCategoryRepository.getRuleTemplateCategoryByCountry(countryId, RuleTemplateCategoryType.CTA);
         List<RuleTemplateCategoryDTO> ctaRuleTemplateCategoryList = ObjectMapperUtils.copyPropertiesOfListByMapper(ruleTemplateCategories, RuleTemplateCategoryDTO.class);
-        List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ctaRuleTemplateRepository.findByRuleTemplateCategoryIdInAndCountryAndDeletedFalse(countryId);
-        ctaRuleTemplateDTOS.forEach(c -> c.setRuleTemplateCategory(c.getRuleTemplateCategoryId()));
+        Map<BigInteger,RuleTemplateCategoryDTO> ruleTemplateCategoryDTOMap = ctaRuleTemplateCategoryList.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ctaRuleTemplateRepository.findByCountryIdAndDeletedFalse(countryId);
+        ctaRuleTemplateDTOS.forEach(c -> {
+            c.setRuleTemplateCategory(c.getRuleTemplateCategoryId());
+            c.setRuleTemplateCategoryName(ruleTemplateCategoryDTOMap.get(c.getRuleTemplateCategoryId()).getName());
+        });
         return new CTARuleTemplateCategoryWrapper(ctaRuleTemplateCategoryList, ctaRuleTemplateDTOS);
     }
 

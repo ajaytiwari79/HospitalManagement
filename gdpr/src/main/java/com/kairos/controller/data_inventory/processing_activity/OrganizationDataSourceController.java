@@ -64,18 +64,6 @@ public class OrganizationDataSourceController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getAllDataSource(unitId));
     }
 
-    @ApiOperation("get dataSource by name")
-    @GetMapping("/data_source/name")
-    public ResponseEntity<Object> getDataSourceByName(@PathVariable Long unitId, @RequestParam String name) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSourceByName(unitId, name));
-
-    }
-
 
     @ApiOperation("delete dataSource  by id")
     @DeleteMapping("/data_source/delete/{id}")
@@ -105,7 +93,7 @@ public class OrganizationDataSourceController {
 
 
     @ApiOperation("save data Source And Suggest To Country admin")
-    @PostMapping(COUNTRY_URL + "/data_source")
+    @PostMapping(COUNTRY_URL + "/data_source/suggest")
     public ResponseEntity<Object> saveDataSourceAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSourceDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -60,8 +61,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
             List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
             if (!techSecurityMeasureNames.isEmpty()) {
                 for (String name : techSecurityMeasureNames) {
-                    TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure(name);
-                    newTechnicalSecurityMeasure.setCountryId(countryId);
+                    TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure(name,countryId,SuggestedDataStatus.APPROVED);
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
 
                 }
@@ -83,7 +83,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long countryId) {
-        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(countryId);
     }
 
 
@@ -136,7 +136,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
         }
         technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByid(id);
         if (!Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.datanotFound", "Technical Security Measure", id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Technical Security Measure", id);
         }
         technicalSecurityMeasure.setName(technicalSecurityMeasureDTO.getName());
         technicalSecurityMeasureMongoRepository.save(technicalSecurityMeasure);
@@ -170,30 +170,46 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     /**
      * @description method save technical security measure  suggested by unit
      * @param countryId
-     * @param TechnicalSecurityMeasureDTOS
+     * @param technicalSecurityMeasureDTOS
      * @return
      */
-    public List<TechnicalSecurityMeasure> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> TechnicalSecurityMeasureDTOS) {
+    public List<TechnicalSecurityMeasure> saveSuggestedTechnicalSecurityMeasuresFromUnit(Long countryId, List<TechnicalSecurityMeasureDTO> technicalSecurityMeasureDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
-        for (TechnicalSecurityMeasureDTO TechnicalSecurityMeasure : TechnicalSecurityMeasureDTOS) {
-            hostingProvoiderNames.add(TechnicalSecurityMeasure.getName());
+        Set<String> technicalSecurityMeasureNameList = new HashSet<>();
+        for (TechnicalSecurityMeasureDTO TechnicalSecurityMeasure : technicalSecurityMeasureDTOS) {
+            technicalSecurityMeasureNameList.add(TechnicalSecurityMeasure.getName());
         }
-        List<TechnicalSecurityMeasure> existingTechnicalSecurityMeasures = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, TechnicalSecurityMeasure.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingTechnicalSecurityMeasures, hostingProvoiderNames);
-        List<TechnicalSecurityMeasure> TechnicalSecurityMeasureList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        List<TechnicalSecurityMeasure> existingTechnicalSecurityMeasures = findMetaDataByNamesAndCountryId(countryId, technicalSecurityMeasureNameList, TechnicalSecurityMeasure.class);
+        technicalSecurityMeasureNameList = ComparisonUtils.getNameListForMetadata(existingTechnicalSecurityMeasures, technicalSecurityMeasureNameList);
+        List<TechnicalSecurityMeasure> technicalSecurityMeasureList = new ArrayList<>();
+        if (!technicalSecurityMeasureNameList.isEmpty()) {
+            for (String name : technicalSecurityMeasureNameList) {
 
-                TechnicalSecurityMeasure TechnicalSecurityMeasure = new TechnicalSecurityMeasure(name);
-                TechnicalSecurityMeasure.setCountryId(countryId);
-                TechnicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                TechnicalSecurityMeasureList.add(TechnicalSecurityMeasure);
+                TechnicalSecurityMeasure technicalSecurityMeasure = new TechnicalSecurityMeasure(name);
+                technicalSecurityMeasure.setCountryId(countryId);
+                technicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                technicalSecurityMeasure.setSuggestedDate(LocalDate.now());
+                technicalSecurityMeasureList.add(technicalSecurityMeasure);
             }
 
-            TechnicalSecurityMeasureList = technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(TechnicalSecurityMeasureList));
+            technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(technicalSecurityMeasureList));
         }
-        return TechnicalSecurityMeasureList;
+        return technicalSecurityMeasureList;
     }
 
+
+    /**
+     *
+     * @param countryId
+     * @param techSecurityMeasureIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<TechnicalSecurityMeasure> updateSuggestedStatusOfTechnicalSecurityMeasures(Long countryId, Set<BigInteger> techSecurityMeasureIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<TechnicalSecurityMeasure> securityMeasureList = technicalSecurityMeasureMongoRepository.getTechnicalSecurityMeasureListByIds(countryId, techSecurityMeasureIds);
+        securityMeasureList.forEach(securityMeasure-> securityMeasure.setSuggestedDataStatus(suggestedDataStatus));
+        technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(securityMeasureList));
+        return securityMeasureList;
+    }
 }

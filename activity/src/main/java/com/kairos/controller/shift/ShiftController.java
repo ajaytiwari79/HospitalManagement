@@ -1,12 +1,11 @@
-package com.kairos.controller.activity;
+package com.kairos.controller.shift;
 
-import com.kairos.activity.shift.CopyShiftDTO;
-import com.kairos.activity.shift.ShiftDTO;
-import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.activity.shift.*;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.activity.shift.CopyShiftDTO;
 import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.service.shift.ShiftSickService;
 import com.kairos.util.DateUtils;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -38,7 +37,12 @@ public class ShiftController {
 
 
     @Inject
-    ShiftService shiftService;
+    private ShiftService shiftService;
+
+
+    @Inject
+    private ShiftSickService shiftSickService;
+
     @Inject
     private ActivityService activityService;
 
@@ -63,6 +67,13 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, week, unitPositionId, type));
     }
 
+
+    @ApiOperation("save Shift after validation")
+    @PostMapping(value = "/shift/validated")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation(@PathVariable Long organizationId, @PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, type));
+    }
 
     @ApiOperation("update a Shift of a staff")
     @PutMapping(value = "/shift")
@@ -164,6 +175,10 @@ public class ShiftController {
         shiftService.deleteShiftsAfterEmploymentEndDate(staffId,unitId,DateUtils.asLocalDate(endDate));
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
-
+    @ApiOperation("API is used to add shift of user when user is sick")
+    @GetMapping("/staff/{staffId}/shift_on_sick")
+    public ResponseEntity<Map<String,Object>> markUserAsSick(@PathVariable Long unitId,@PathVariable Long staffId,@RequestParam ("activitySelected") BigInteger activityId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftSickService.createSicknessShiftsOfStaff(unitId,activityId,staffId));
+    }
 
 }

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -63,8 +64,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
             if (!responsibilityTypeNames.isEmpty()) {
                 for (String name : responsibilityTypeNames) {
 
-                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name);
-                    newResponsibilityType.setCountryId(countryId);
+                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name,countryId,SuggestedDataStatus.APPROVED);
                     newResponsibilityTypes.add(newResponsibilityType);
 
                 }
@@ -87,7 +87,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
      * @return list of ResponsibilityType
      */
     public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long countryId) {
-        return responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return responsibilityTypeMongoRepository.findAllResponsibilityTypes(countryId);
     }
 
     /**
@@ -172,30 +172,47 @@ public class ResponsibilityTypeService extends MongoBaseService {
     /**
      * @description method save ResponsibilityType suggested by unit
      * @param countryId
-     * @param ResponsibilityTypeDTOS
+     * @param responsibilityTypeDTOS - Responsibility type suggested by unit
      * @return
      */
-    public List<ResponsibilityType> saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> ResponsibilityTypeDTOS) {
+    public List<ResponsibilityType> saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
-        for (ResponsibilityTypeDTO ResponsibilityType : ResponsibilityTypeDTOS) {
-            hostingProvoiderNames.add(ResponsibilityType.getName());
+        Set<String> responsibilitytTypeNameList = new HashSet<>();
+        for (ResponsibilityTypeDTO ResponsibilityType : responsibilityTypeDTOS) {
+            responsibilitytTypeNameList.add(ResponsibilityType.getName());
         }
-        List<ResponsibilityType> existingResponsibilityTypes = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, ResponsibilityType.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingResponsibilityTypes, hostingProvoiderNames);
-        List<ResponsibilityType> ResponsibilityTypeList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        List<ResponsibilityType> existingResponsibilityTypes = findMetaDataByNamesAndCountryId(countryId, responsibilitytTypeNameList, ResponsibilityType.class);
+        responsibilitytTypeNameList = ComparisonUtils.getNameListForMetadata(existingResponsibilityTypes, responsibilitytTypeNameList);
+        List<ResponsibilityType> responsibilityTypeList = new ArrayList<>();
+        if (!responsibilitytTypeNameList.isEmpty()) {
+            for (String name : responsibilitytTypeNameList) {
 
-                ResponsibilityType ResponsibilityType = new ResponsibilityType(name);
-                ResponsibilityType.setCountryId(countryId);
-                ResponsibilityType.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                ResponsibilityTypeList.add(ResponsibilityType);
+                ResponsibilityType responsibilityType = new ResponsibilityType(name);
+                responsibilityType.setCountryId(countryId);
+                responsibilityType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                responsibilityType.setSuggestedDate(LocalDate.now());
+                responsibilityTypeList.add(responsibilityType);
             }
 
-            ResponsibilityTypeList = responsibilityTypeMongoRepository.saveAll(getNextSequence(ResponsibilityTypeList));
+            responsibilityTypeMongoRepository.saveAll(getNextSequence(responsibilityTypeList));
         }
-        return ResponsibilityTypeList;
+        return responsibilityTypeList;
+    }
+
+
+    /**
+     *
+     * @param countryId
+     * @param responsibilityTypeIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<ResponsibilityType> updateSuggestedStatusOfResponsibilityTypeList(Long countryId, Set<BigInteger> responsibilityTypeIds , SuggestedDataStatus suggestedDataStatus) {
+
+        List<ResponsibilityType> responsibilityTypes = responsibilityTypeMongoRepository.getResponsibilityTypeListByIds(countryId, responsibilityTypeIds);
+        responsibilityTypes.forEach(responsibilityType-> responsibilityType.setSuggestedDataStatus(suggestedDataStatus));
+        responsibilityTypeMongoRepository.saveAll(getNextSequence(responsibilityTypes));
+        return responsibilityTypes;
     }
 
 }

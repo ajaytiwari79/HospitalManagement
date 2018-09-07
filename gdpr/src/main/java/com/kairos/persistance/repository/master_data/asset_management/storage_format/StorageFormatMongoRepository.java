@@ -1,6 +1,5 @@
 package com.kairos.persistance.repository.master_data.asset_management.storage_format;
 
-import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -25,8 +25,11 @@ public interface StorageFormatMongoRepository extends MongoBaseRepository<Storag
 
     StorageFormat findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,suggestedDataStatus:?1}")
-    List<StorageFormatResponseDTO> findAllStorageFormats(Long countryId, String suggestedDataStatus);
+    @Query("{deleted:false,countryId:?0}")
+    List<StorageFormatResponseDTO> findAllStorageFormats(Long countryId);
+
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<StorageFormat> getStorageFormatListByIds(Long countryId, Set<BigInteger> storageFormatIds);
 
     @Query("{_id:{$in:?0},deleted:false}")
     List<StorageFormatResponseDTO> findStorageFormatByIds(List<BigInteger> ids);

@@ -28,9 +28,9 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     private MongoTemplate mongoTemplate;
 
     @Override
-    public DataSubjectMapping findByName(Long countryId, Long organizationId, String name) {
+    public DataSubjectMapping findByName(Long countryId, String name) {
         Query query = new Query();
-        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("name").is(name));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, DataSubjectMapping.class);
@@ -62,13 +62,13 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     }
 
     @Override
-    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, Long organizationId, BigInteger dataSubjectId) {
+    public DataSubjectMappingResponseDTO getDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, BigInteger dataSubjectId) {
 
         String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter=Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(dataSubjectId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(dataSubjectId).and(DELETED).is(false)),
                 lookup("data_category", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
                 lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),
@@ -89,13 +89,13 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
     }
 
     @Override
-    public List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId, Long organizationId)
+    public List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategoryAndDataElementByCountryId(Long countryId)
     {
 
         String addFields=CustomAggregationQuery.dataSubjectAddNonDeletedDataElementAddFields();
         Document addToFieldOperationFilter=Document.parse(addFields);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("data_category", "dataCategories", "_id", "dataCategories"),
                 unwind("dataCategories"),
                 lookup("data_element", "dataCategories.dataElements", "_id", "dataCategories.dataElements"),

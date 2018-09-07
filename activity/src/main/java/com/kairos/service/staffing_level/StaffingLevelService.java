@@ -11,7 +11,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.messaging.wshandlers.StaffingLevelGraphStompClientWebSocketHandler;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.activity.tabs.ActivityCategory;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;

@@ -193,7 +193,7 @@ public class OrganizationAddressService {
         contactAddress.setVerifiedByVisitour(true);
         contactAddress.setStreetUrl(addressDTO.getStreetUrl());
         // Native Details
-        contactAddress.setStreet1(addressDTO.getStreet1());
+        contactAddress.setStreet(addressDTO.getStreet());
         contactAddress.setHouseNumber(addressDTO.getHouseNumber());
         contactAddress.setFloorNumber(addressDTO.getFloorNumber());
         contactAddress.setCity(zipCode.getName());
@@ -296,7 +296,7 @@ public class OrganizationAddressService {
         billingAddress.setVerifiedByVisitour(true);
         billingAddress.setStreetUrl(addressDTO.getStreetUrl());
         // Native Details
-        billingAddress.setStreet1(addressDTO.getStreet1());
+        billingAddress.setStreet(addressDTO.getStreet());
         billingAddress.setHouseNumber(addressDTO.getHouseNumber());
         billingAddress.setFloorNumber(addressDTO.getFloorNumber());
         billingAddress.setCity(zipCode.getName());
@@ -324,7 +324,7 @@ public class OrganizationAddressService {
         response.put("region", billingAddress.getRegionName());
         response.put("municipalityId", billingAddress.getMunicipality().getId());
         response.put("city", billingAddress.getCity());
-        response.put("street1", billingAddress.getStreet1());
+        response.put("street1", billingAddress.getStreet());
         response.put("houseNumber", billingAddress.getHouseNumber());
         response.put("floorNumber", billingAddress.getFloorNumber());
         response.put("streetUrl", billingAddress.getStreetUrl());
@@ -354,7 +354,7 @@ public class OrganizationAddressService {
             logger.info("New address " + addressMap);
             address.setHouseNumber((String) (addressMap.get("houseNumber")));
             address.setFloorNumber(Integer.parseInt(String.valueOf(addressMap.get("floorNumber"))));
-            address.setStreet1((String) (addressMap.get("street1")));
+            address.setStreet((String) (addressMap.get("street1")));
             address.setCity((String) addressMap.get("city"));
             address.setLatitude(Float.parseFloat((String) addressMap.get("latitude")));
             address.setLongitude(Float.parseFloat((String) addressMap.get("longitude")));

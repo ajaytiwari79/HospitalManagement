@@ -7,13 +7,17 @@ public class AppConstants {
     private AppConstants() {
     }
     public static final String TIMEZONE_UTC = "UTC";
-
+    public static final String HYPHEN = "-";
+    public static final String KAI = "KAI-";
+    public static final String ONE = "1";
     // Request methods
     public static final String GET = "GET";
     public static final String POST = "POST";
     public static final String DELETE = "DELETE";
     public static final String PUT = "PUT";
     public static final String OPTIONS = "OPTIONS";
+    public static final String YES="YES";
+    public static final String NO="NO";
 
     //Swagger
     public static final String SWAGGER_UI_PATH = "/swagger-ui.html";

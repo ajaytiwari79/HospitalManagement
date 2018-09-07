@@ -15,19 +15,19 @@ public class OrganizationResponseDTO {
     private  boolean kairosHub;
     private  String description;
     private  List<Long> businessTypeIds;
-    private  List<Long> typeId;
+    private  Long typeId;
     private  List<Long> subTypeId;
     private  String externalId;
     private ContactAddressDTO contactAddress;
     private  Long levelId;
-
+    private String kairosId;
     private Boolean union;
     private String desiredUrl;
     private String shortCompanyName;
     private Long companyCategoryId;
-    private Integer kairosCompanyId;
+    private String kairosCompanyId;
     private CompanyType companyType;
-
+    private Long accountTypeId;
     private String vatId;
     private boolean costCenter;
     private Integer costCenterId;
@@ -84,11 +84,11 @@ public class OrganizationResponseDTO {
         this.businessTypeIds = businessTypeIds;
     }
 
-    public List<Long> getTypeId() {
+    public Long getTypeId() {
         return typeId;
     }
 
-    public void setTypeId(List<Long> typeId) {
+    public void setTypeId(Long typeId) {
         this.typeId = typeId;
     }
 
@@ -156,11 +156,11 @@ public class OrganizationResponseDTO {
         this.companyCategoryId = companyCategoryId;
     }
 
-    public Integer getKairosCompanyId() {
+    public String getKairosCompanyId() {
         return kairosCompanyId;
     }
 
-    public void setKairosCompanyId(Integer kairosCompanyId) {
+    public void setKairosCompanyId(String kairosCompanyId) {
         this.kairosCompanyId = kairosCompanyId;
     }
 
@@ -218,5 +218,21 @@ public class OrganizationResponseDTO {
 
     public void setUnitManager(UnitManagerDTO unitManager) {
         this.unitManager = unitManager;
+    }
+
+    public String getKairosId() {
+        return kairosId;
+    }
+
+    public void setKairosId(String kairosId) {
+        this.kairosId = kairosId;
+    }
+
+    public Long getAccountTypeId() {
+        return accountTypeId;
+    }
+
+    public void setAccountTypeId(Long accountTypeId) {
+        this.accountTypeId = accountTypeId;
     }
 }

@@ -82,5 +82,5 @@ public class TagDTO {
         this.masterDataType = masterDataType;
     }
 
-    TagDTO(){}
+    public TagDTO(){}
 }

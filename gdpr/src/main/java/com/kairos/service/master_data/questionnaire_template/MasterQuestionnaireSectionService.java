@@ -120,9 +120,7 @@ public class MasterQuestionnaireSectionService extends MongoBaseService {
         }
         try {
             masterQuestionnaireSections = masterQuestionnaireSectionRepository.saveAll(getNextSequence(masterQuestionnaireSections));
-            masterQuestionnaireSections.forEach(masterQuestionnaireSection -> {
-                questionSectionIds.add(masterQuestionnaireSection.getId());
-            });
+            masterQuestionnaireSections.forEach(masterQuestionnaireSection -> questionSectionIds.add(masterQuestionnaireSection.getId()));
         } catch (MongoException e) {
             LOGGER.info(e.getMessage());
             masterQuestionMongoRepository.deleteAll(questionList);

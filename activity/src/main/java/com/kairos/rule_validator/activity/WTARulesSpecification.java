@@ -34,16 +34,21 @@ public class WTARulesSpecification extends AbstractSpecification<ShiftWithActivi
     }
 
     @Override
+    public void validateRules(ShiftWithActivityDTO shift) {
+        ruleTemplates.forEach(ruleTemplate -> ruleTemplate.validateRules(ruleTemplateSpecificInfo));
+    }
+
+    @Override
     public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
-        List<String> exceptionMessages = new ArrayList<>();
+        List<String> exceptionMessages = new ArrayList<>();/*
         for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
-            String exceptionMessage = ruleTemplate.isSatisfied(ruleTemplateSpecificInfo);
+            String exceptionMessage = ;
             if(!exceptionMessage.isEmpty()){
                 exceptionMessages.add("message.ruleTemplate.broken");
                 exceptionMessages.add(exceptionMessage);
                 break;
             }
-        }
+        }*/
         return exceptionMessages;
     }
 

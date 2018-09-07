@@ -42,7 +42,7 @@ public class ClientExceptionServiceIntegrationTest {
        /* AddressDTO addressDTO = new AddressDTO();
         addressDTO.setZipCodeValue(2000);
         addressDTO.setHouseNumber("23");
-        addressDTO.setStreet1("Smallegade");
+        addressDTO.setStreet("Smallegade");
         addressDTO.setMunicipalityId(59L);
         clientExceptionDTO.setTempAddress(addressDTO);*/
 
@@ -70,7 +70,7 @@ public class ClientExceptionServiceIntegrationTest {
        /* AddressDTO addressDTO = new AddressDTO();
         addressDTO.setZipCodeValue(2000);
         addressDTO.setHouseNumber("23");
-        addressDTO.setStreet1("Smallegade");
+        addressDTO.setStreet("Smallegade");
         addressDTO.setMunicipalityId(59L);
         clientExceptionDTO.setTempAddress(addressDTO);*/
 

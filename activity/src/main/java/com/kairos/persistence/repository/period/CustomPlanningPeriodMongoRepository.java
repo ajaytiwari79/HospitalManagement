@@ -1,10 +1,10 @@
 package com.kairos.persistence.repository.period;
 
-import com.kairos.persistence.model.period.PlanningPeriod;
+import com.kairos.activity.period.PeriodDTO;
 import com.kairos.activity.period.PlanningPeriodDTO;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.mongodb.client.result.UpdateResult;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -23,4 +23,6 @@ public interface CustomPlanningPeriodMongoRepository {
     boolean checkIfPeriodsExistsOrOverlapWithStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate);
     PlanningPeriod findLastPlaningPeriodEndDate(Long unitId);
     List<PlanningPeriod> findAllPeriodsOfUnitByRequestPhaseId(Long unitId, String requestPhaseName);
+    List<PeriodDTO> findAllPeriodsByStartDateAndLastDate(Long unitId, LocalDate startDate, LocalDate endDate);
+    PlanningPeriod findCurrentDatePlanningPeriod(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate);
 }

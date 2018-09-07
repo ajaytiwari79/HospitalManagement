@@ -56,11 +56,15 @@ public class AppConstant {
     public static final String DATA_SOURCE_KEY = "dataSources";
     public static final String TRANSFER_METHOD_KEY = "transferMethods";
     public static final String ACCESSOR_PARTY_KEY = "accessorParties";
-    public static final String PROCESSING_LEGALBASIS_KEY = "processingLegalBasis";
+    public static final String PROCESSING_LEGAL_BASIS_KEY = "processingLegalBasis";
     public static final String RESPONSIBILITY_TYPE_KEY ="responsibilityType" ;
     public static final String SUB_PROCESSING_ACTIVITY_KEY = "subProcessingActivities";
 
 
+//Risk constant for asset type and Sub types
+
+    public static final String ASSET_TYPE_Risk_LIST= "assetType";
+    public static final String SUB_ASSET_TYPE_Risk_LIST= "subsAssetType";
 
 
 

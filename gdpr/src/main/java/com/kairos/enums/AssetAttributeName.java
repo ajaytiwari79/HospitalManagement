@@ -3,10 +3,10 @@ package com.kairos.enums;
 public enum AssetAttributeName {
 
 
-    NAME("Name"), DESCRIPTION("Description"), HOSTINGLOCATION("Hosting Location"), MANAGINGDEPARTMENT("Managing Department"), ASSETOWNER("Asset Owner"), STORAGEFORMATS("Storage Format"),
-    ORGSECURITYMEASURES("Organization Security Measures"), TECHNICALSECURITYMEASURES("Technical Security Measure"), PROCESSINGACTIVITIES("Processing Activities"), HOSTINGPROVIDER("Hosting Provider"),
-    HOSTINGTYPE("Hosting Type"), DATADISPOSAL("Data Disposal"), ASSETTYPE("Asset Type"), ASSETSUBTYPES("Sub Asset Type"), MINDATASUBJECTVOLUME("Minimum Data Subject Volume"),
-    MAXDATASUBJECTVOLUME("Max Data Subject Volume"), DATARETENTIONPERIOD("Data Retention Period");
+    NAME("name"), DESCRIPTION("description"), HOSTING_LOCATION("hostingLocation"), MANAGING_DEPARTMENT("managingDepartment"), ASSET_OWNER("assetOwner"), STORAGE_FORMAT("storageFormats"),
+    ORGANIZATION_SECURITY_MEASURES("orgSecurityMeasures"), TECHNICAL_SECURITY_MEASURES("technicalSecurityMeasures"), PROCESSING_ACTIVITIES("Processing Activities"), HOSTING_PROVIDER("hostingProvider"),
+    HOSTING_TYPE("hostingType"), DATA_DISPOSAL("dataDisposal"), ASSET_TYPE("assetType"), ASSET_SUB_TYPE("assetSubTypes"), MIN_DATA_SUBJECT_VOLUME("minDataSubjectVolume"),
+    MAX_DATA_SUBJECT_VOLUME("maxDataSubjectVolume"), DATA_RETENTION_PERIOD("dataRetentionPeriod");
 
     public String value;
     AssetAttributeName(String value) {

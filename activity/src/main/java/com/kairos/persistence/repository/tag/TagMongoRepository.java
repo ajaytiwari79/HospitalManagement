@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.tag;
 
+import com.kairos.activity.tags.TagDTO;
 import com.kairos.persistence.model.tag.Tag;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -47,5 +48,6 @@ public interface TagMongoRepository extends MongoRepository<Tag,BigInteger>,Cust
 
     Tag findTagByOrganizationIdAndNameAndMasterDataTypeAndDeletedAndCountryTagFalse(Long orgId, String name, String masterDataTypeEnum,boolean deleted);
 
+    List<TagDTO> findAllTagsByIdIn(List<Long> tagIds);
 }
 

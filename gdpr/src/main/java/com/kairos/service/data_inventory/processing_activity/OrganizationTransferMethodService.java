@@ -1,14 +1,15 @@
 package com.kairos.service.data_inventory.processing_activity;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.metadata.TransferMethodDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.TransferMethod;
+import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.TransferMethodService;
@@ -39,6 +40,9 @@ public class OrganizationTransferMethodService extends MongoBaseService {
 
     @Inject
     private TransferMethodService transferMethodService;
+
+    @Inject
+    private ProcessingActivityMongoRepository processingActivityMongoRepository;
 
     /**
      * @param organizationId
@@ -107,15 +111,20 @@ public class OrganizationTransferMethodService extends MongoBaseService {
     }
 
 
-    public Boolean deleteTransferMethod(Long organizationId, BigInteger id) {
+    public Boolean deleteTransferMethod(Long unitId, BigInteger transferMethodId) {
 
-        TransferMethod transferMethod = transferMethodRepository.findByOrganizationIdAndId(organizationId, id);
-        if (!Optional.ofNullable(transferMethod).isPresent()) {
-            throw new DataNotFoundByIdException("data not exist for id ");
-        } else {
-            delete(transferMethod);
-            return true;
+        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithTransferMethod = processingActivityMongoRepository.findAllProcessingActivityLinkedWithTransferMethod(unitId, transferMethodId);
+        if (!processingActivitiesLinkedWithTransferMethod.isEmpty()) {
+            StringBuilder processingActivityNames=new StringBuilder();
+            processingActivitiesLinkedWithTransferMethod.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Transfer Method", processingActivityNames);
         }
+        TransferMethod transferMethod = transferMethodRepository.findByOrganizationIdAndId(unitId, transferMethodId);
+        if (!Optional.ofNullable(transferMethod).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", transferMethodId);
+        }
+        delete(transferMethod);
+        return true;
     }
 
     /***
@@ -132,7 +141,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
             if (id.equals(transferMethod.getId())) {
                 return transferMethodDTO;
             }
-            throw new DuplicateDataException("data  exist for  " + transferMethodDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate", "Transfer Method", transferMethod.getName());
         }
         transferMethod = transferMethodRepository.findByid(id);
         if (!Optional.ofNullable(transferMethod).isPresent()) {
@@ -145,30 +154,11 @@ public class OrganizationTransferMethodService extends MongoBaseService {
 
     }
 
-    /**
-     * @param organizationId
-     * @param name           name of TransferMethod
-     * @return TransferMethod object fetch on basis of  name
-     * @throws DataNotExists throw exception if TransferMethod not exist for given name
-     */
-        public TransferMethod getTransferMethodByName(Long organizationId, String name) {
-        if (!StringUtils.isBlank(name)) {
-            TransferMethod exist = transferMethodRepository.findByOrganizationIdAndName(organizationId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
-
-    public Map<String, List<TransferMethod>> saveAndSuggestTransferMethods(Long countryId, Long organizationId, List<TransferMethodDTO> TransferMethodDTOS) {
+    public Map<String, List<TransferMethod>> saveAndSuggestTransferMethods(Long countryId, Long organizationId, List<TransferMethodDTO> transferMethodDTOS) {
 
         Map<String, List<TransferMethod>> result;
-        result = createTransferMethod(organizationId, TransferMethodDTOS);
-        List<TransferMethod> masterTransferMethodSuggestedByUnit = transferMethodService.saveSuggestedTransferMethodsFromUnit(countryId, TransferMethodDTOS);
+        result = createTransferMethod(organizationId, transferMethodDTOS);
+        List<TransferMethod> masterTransferMethodSuggestedByUnit = transferMethodService.saveSuggestedTransferMethodsFromUnit(countryId, transferMethodDTOS);
         if (!masterTransferMethodSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterTransferMethodSuggestedByUnit);
         }

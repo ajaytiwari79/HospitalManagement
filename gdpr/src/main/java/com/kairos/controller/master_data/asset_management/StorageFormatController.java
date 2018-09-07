@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.StorageFormatDTO;
 import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ResponseHandler;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
@@ -106,6 +109,19 @@ public class StorageFormatController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateStorageFormat(countryId, id, storageFormat));
 
+    }
+
+
+    @ApiOperation("update Suggested status of Storage Format ")
+    @PutMapping("/storage_format")
+    public ResponseEntity<Object> updateSuggestedStatusOfStorageFormats(@PathVariable Long countryId, @RequestBody Set<BigInteger> storageFormatIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateSuggestedStatusOfStorageFormatList(countryId, storageFormatIds, suggestedDataStatus));
     }
 
 

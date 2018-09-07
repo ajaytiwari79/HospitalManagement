@@ -3,10 +3,13 @@ package com.kairos.service.attendence_setting;
 import com.kairos.activity.shift.ShiftQueryResult;
 
 import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
+import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
+import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.response.dto.web.attendance.AttendanceDuration;
 import com.kairos.response.dto.web.attendance.AttendanceDTO;
 import com.kairos.response.dto.web.attendance.AttendanceDurationDTO;
+import com.kairos.response.dto.web.attendance.SickSettingsDTO;
 import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
@@ -39,10 +42,12 @@ public class AttendanceSettingService extends MongoBaseService {
 
     @Inject
     private ExceptionService exceptionService;
+    @Inject private SickSettingsRepository sickSettingsRepository;
 
     public AttendanceDTO getAttendanceSetting() {
         AttendanceSetting attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
-        return (Optional.ofNullable(attendanceSetting).isPresent())?new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration())):null;
+        SickSettingsDTO sickSettings=sickSettingsRepository.checkUserIsSick(UserContext.getUserDetails().getId());
+        return (Optional.ofNullable(attendanceSetting).isPresent())?new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()),sickSettings):new AttendanceDTO(null,sickSettings);
     }
 
     public AttendanceDTO updateAttendanceSetting(Long unitId, Long reasonCodeId,boolean checkIn) {
@@ -56,7 +61,7 @@ public class AttendanceSettingService extends MongoBaseService {
         attendanceSetting = (checkIn) ? checkInAttendanceSetting(unitId,reasonCodeId,staffAndOrganizationIds):checkOutAttendanceSetting(staffAndOrganizationIds);
         if(Optional.ofNullable(attendanceSetting).isPresent()) {
             save(attendanceSetting);
-            attendanceDTO = new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()));
+            attendanceDTO = new AttendanceDTO(getAttendanceDTOObject(attendanceSetting.getAttendanceDuration()),null);
         } else {
             List<OrganizationCommonDTO> unitIdAndNames = staffAndOrganizationIds.stream().map(s -> new OrganizationCommonDTO(s.getUnitId(), s.getUnitName())).collect(Collectors.toList());
             Set<ReasonCodeDTO> reasonCode=staffAndOrganizationIds.stream().flatMap(s->s.getReasonCodes().stream()).collect(Collectors.toSet());

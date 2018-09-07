@@ -33,6 +33,7 @@ import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,11 +113,14 @@ public class WTAService extends MongoBaseService {
         wta = new WorkingTimeAgreement();
         // Link tags to WTA
         Date startDate = (wtaDTO.getStartDateMillis() == 0) ? DateUtils.getCurrentDate() : new Date(wtaDTO.getStartDateMillis());
+        startDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(startDate).truncatedTo(ChronoUnit.DAYS));
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {
             if (startDate.getTime() > wtaDTO.getEndDateMillis()) {
                 exceptionService.invalidRequestException("message.wta.start-end-date");
             }
-            wta.setEndDate(new Date(wtaDTO.getEndDateMillis()));
+            Date endDate = new Date(wtaDTO.getEndDateMillis());
+            endDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(endDate).truncatedTo(ChronoUnit.DAYS));
+            wta.setEndDate(endDate);
         }
         WTABasicDetailsDTO wtaBasicDetailsDTO = wtaDetailRestClient.getWtaRelatedInfo(wtaDTO.getExpertiseId(), wtaDTO.getOrganizationSubType(), countryId, 0l, wtaDTO.getOrganizationType());
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getCountryDTO()).isPresent()) {
@@ -163,7 +168,6 @@ public class WTAService extends MongoBaseService {
 
         wtaBasicDetailsDTO.getOrganizations().forEach(organization ->
         {
-            if (!organization.isKairosHub()) {
                 WorkingTimeAgreement workingTimeAgreement = new WorkingTimeAgreement();
                 wtaBuilderService.getWtaObject(wta, workingTimeAgreement);
                 workingTimeAgreement.setCountryParentWTA(wta.getId());
@@ -180,7 +184,6 @@ public class WTAService extends MongoBaseService {
                 workingTimeAgreement.setCountryParentWTA(wta.getId());
                 workingTimeAgreement.setOrganization(new Organization(organization.getId(), organization.getName(), organization.getDescription()));
                 workingTimeAgreements.add(workingTimeAgreement);
-            }
         });
         if (!workingTimeAgreements.isEmpty()) {
             save(workingTimeAgreements);
@@ -452,20 +455,25 @@ public class WTAService extends MongoBaseService {
 
     private WTAResponseDTO assignWTATOUnitPosition(Long unitPositionId,BigInteger wtaId){
         WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wtaId);
-        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
-        if (!Optional.ofNullable(wtaResponseDTO).isPresent()) {
+        if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
             exceptionService.duplicateDataException("message.wta.id", wtaId);
         }
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
         WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-        if (wtaResponseDTO.getRuleTemplates().size() > 0) {
+        if (CollectionUtils.isNotEmpty(wtaResponseDTO.getRuleTemplates())) {
             ruleTemplates = wtaBuilderService.copyRuleTemplates(wtaResponseDTO.getRuleTemplates(), true);
             save(ruleTemplates);
             List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
             workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
         }
         workingTimeAgreement.setUnitPositionId(unitPositionId);
-        workingTimeAgreement.setStartDate(new Date());
+        Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(wtaQueryResultDTO.getStartDate()).truncatedTo(ChronoUnit.DAYS));
+        if(wtaQueryResultDTO.getEndDate()!=null){
+            Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(wtaQueryResultDTO.getEndDate()).truncatedTo(ChronoUnit.DAYS));
+            workingTimeAgreement.setEndDate(endDate);
+        }
+        workingTimeAgreement.setStartDate(startDate);
         workingTimeAgreement.setId(null);
         workingTimeAgreement.setOrganization(null);
         workingTimeAgreement.setOrganizationParentWTA(wtaResponseDTO.getId());

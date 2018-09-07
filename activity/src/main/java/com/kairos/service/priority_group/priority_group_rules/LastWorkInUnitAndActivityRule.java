@@ -1,7 +1,7 @@
 package com.kairos.service.priority_group.priority_group_rules;
 
 import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.util.DateTimeInterval;
@@ -23,49 +23,56 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
     @Override
     public void filter(Map<BigInteger, List<StaffUnitPositionQueryResult>> openShiftStaffMap, PriorityGroupDTO priorityGroupDTO) {
 
-        int lastWorkingDaysWithUnit = priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysInUnit();
         for (Map.Entry<BigInteger, List<StaffUnitPositionQueryResult>> entry : openShiftStaffMap.entrySet()) {
             BigInteger activityId = null;
-
-            Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
             LocalDate openShiftDate = DateUtils.asLocalDate(openShiftMap.get(entry.getKey()).getStartDate());
-            Date filterStartDate = DateUtils.getDateFromLocalDate(openShiftDate.minusDays(lastWorkingDaysWithUnit));
+            Date unitFilterStartDate;
             Date filterEndDate = DateUtils.getDateFromLocalDate(openShiftDate);
-            DateTimeInterval dateTimeInterval = new DateTimeInterval(filterStartDate.getTime(),filterEndDate.getTime());
+            Date activityFilterStartDate;
+            DateTimeInterval unitDateTimeInterval = null;
+            DateTimeInterval activityDateTimeInterval = null;
             if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysInUnit()).isPresent()) {
-                activityId = null;
+                unitFilterStartDate = DateUtils.getDateFromLocalDate(openShiftDate.minusDays(priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysInUnit()));
+                unitDateTimeInterval = new DateTimeInterval(unitFilterStartDate.getTime(),filterEndDate.getTime());
             }
-            else if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysWithActivity()).isPresent()) {
+            if(Optional.ofNullable(priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysWithActivity()).isPresent()) {
+                activityFilterStartDate = DateUtils.getDateFromLocalDate(openShiftDate.minusDays(priorityGroupDTO.getStaffExcludeFilter().getLastWorkingDaysWithActivity()));
+                activityDateTimeInterval = new DateTimeInterval(activityFilterStartDate.getTime(),filterEndDate.getTime());
                 activityId = openShiftMap.get(entry.getKey()).getActivityId();
             }
-            removeStaffFromList(staffUnitPositionIterator,dateTimeInterval,activityId);
+            Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator = entry.getValue().iterator();
+
+            removeStaffFromList(staffUnitPositionIterator,unitDateTimeInterval,activityDateTimeInterval,activityId);
         }
     }
 
-    private void removeStaffFromList(Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator, DateTimeInterval dateTimeInterval, BigInteger activityId) {
-        int shiftCount = 0;
-        while(staffUnitPositionIterator.hasNext()) {
+    private void removeStaffFromList(Iterator<StaffUnitPositionQueryResult> staffUnitPositionIterator, DateTimeInterval unitDateTimeInterval,DateTimeInterval activityDateTimeInterval, BigInteger activityId) {
+                while(staffUnitPositionIterator.hasNext()) {
+            int shiftCountUnit = 0;
+            int shiftCountActivity = 0;
             StaffUnitPositionQueryResult staffUnitPositionQueryResult = staffUnitPositionIterator.next();
             List<Shift> shifts = shiftUnitPositionsMap.get(staffUnitPositionQueryResult.getUnitPositionId());
-            shiftCount = 0;
             if(Optional.ofNullable(shifts).isPresent()&&!shifts.isEmpty()) {
                 for (Shift shift : shifts) {
-                    if (dateTimeInterval.overlaps(shift.getInterval())) {
-                        if (Optional.ofNullable(activityId).isPresent() && shift.getActivityId().equals(activityId)) {
-                            shiftCount++;
-                            break;
-                        } else if (!Optional.ofNullable(activityId).isPresent()) {
-                            shiftCount++;
+                    if (Optional.ofNullable(unitDateTimeInterval).isPresent()&&unitDateTimeInterval.overlaps(shift.getInterval())) {
+                            shiftCountUnit++;
+                            if(shiftCountActivity>0){
+                                break;
+                            }
+                        }
+                    if(Optional.ofNullable(activityDateTimeInterval).isPresent()&&shift.getActivityId().equals(activityId)&&(activityDateTimeInterval.overlaps(shift.getInterval()))) {
+                            shiftCountActivity++;
+                        if(shiftCountUnit>0){
                             break;
                         }
-
+                        }
                     }
                 }
-            }
-            if(shiftCount==0){
+            if(Optional.ofNullable(unitDateTimeInterval).isPresent()&&shiftCountUnit==0||(Optional.ofNullable(activityDateTimeInterval).isPresent()&&shiftCountActivity==0)){
                 staffUnitPositionIterator.remove();
 
             }
+                }
         }
     }
-}
+

@@ -4,29 +4,30 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
+import java.util.List;
 
 public class StaffActivitySetting extends MongoBaseEntity {
     private Long staffId;
     private BigInteger activityId;
     private Long unitPositionId;
     private Long unitId;
-    private int shortestTime;
-    private int longestTime;
+    private Short shortestTime;
+    private Short longestTime;
     private Integer minLength;
     private Integer maxThisActivityPerShift;
     private boolean eligibleForMove;
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
     private LocalTime maximumEndTime;
-
+    private List<Long> dayTypeIds;
 
     public StaffActivitySetting() {
         //Default Constructor
     }
 
     public StaffActivitySetting(Long staffId, BigInteger activityId, Long unitPositionId, Long unitId,
-                                int shortestTime, int longestTime, Integer minLength, Integer maxThisActivityPerShift,
-                                boolean eligibleForMove,LocalTime earliestStartTime,LocalTime latestStartTime,LocalTime maximumEndTime) {
+                                Short shortestTime, Short longestTime, Integer minLength, Integer maxThisActivityPerShift,
+                                boolean eligibleForMove,LocalTime earliestStartTime,LocalTime latestStartTime,LocalTime maximumEndTime,List<Long> dayTypeIds) {
         this.staffId = staffId;
         this.activityId = activityId;
         this.unitPositionId = unitPositionId;
@@ -39,6 +40,7 @@ public class StaffActivitySetting extends MongoBaseEntity {
         this.earliestStartTime=earliestStartTime;
         this.latestStartTime=latestStartTime;
         this.maximumEndTime=maximumEndTime;
+        this.dayTypeIds=dayTypeIds;
     }
 
     public Long getStaffId() {
@@ -73,19 +75,19 @@ public class StaffActivitySetting extends MongoBaseEntity {
         this.unitId = unitId;
     }
 
-    public int getShortestTime() {
+    public Short getShortestTime() {
         return shortestTime;
     }
 
-    public void setShortestTime(int shortestTime) {
+    public void setShortestTime(Short shortestTime) {
         this.shortestTime = shortestTime;
     }
 
-    public int getLongestTime() {
+    public Short getLongestTime() {
         return longestTime;
     }
 
-    public void setLongestTime(int longestTime) {
+    public void setLongestTime(Short longestTime) {
         this.longestTime = longestTime;
     }
 
@@ -135,5 +137,13 @@ public class StaffActivitySetting extends MongoBaseEntity {
 
     public void setMaximumEndTime(LocalTime maximumEndTime) {
         this.maximumEndTime = maximumEndTime;
+    }
+
+    public List<Long> getDayTypeIds() {
+        return dayTypeIds;
+    }
+
+    public void setDayTypeIds(List<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
     }
 }

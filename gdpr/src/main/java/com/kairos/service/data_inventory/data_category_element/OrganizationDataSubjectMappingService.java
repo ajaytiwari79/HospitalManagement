@@ -50,7 +50,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
      * @description  -method uses buildDataSubjectWithDataCategoriesAndDataElement to build Data Subject Object and Map Data Categories With Data Subject,
      * Method check for Duplicate name of Data Subject
      * @param unitId -organization id
-     * @param dataSubjectDTOS Data Subject List conatin Set<String> names of data Subject and list of  Data Category corresponding to Data Subject
+     * @param dataSubjectDTOS Data Subject List contain Set<String> names of data Subject and list of  Data Category corresponding to Data Subject
      * @return method return list of Data Subject
      */
 
@@ -120,7 +120,7 @@ public class OrganizationDataSubjectMappingService extends MongoBaseService {
      *
      * @param unitId - organization id
      * @param dataSubjectId - Data Subject id
-     * @return return true on successfull deletion of data Subject
+     * @return return true on success full deletion of data Subject
      */
     public Boolean deleteDataSubjectById(Long unitId, BigInteger dataSubjectId) {
 

@@ -32,28 +32,38 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<AgreementSectionResponseDTO> getAgreementTemplateAllSectionAndSubSectons(Long countryId, Long unitId, BigInteger agreementTemplateId) {
+    public List<AgreementSectionResponseDTO> getAgreementTemplateAllSectionAndSubSections(Long countryId, Long unitId, BigInteger agreementTemplateId) {
 
         String replaceRoot = "{ '$replaceRoot': { 'newRoot': '$agreementSections' } }";
-        String groupSubSections = "{$group:{_id: '$_id', subSections:{'$addToSet': '$subSections'},clauses:{$first:'$clauses'},title:{$first:'$title' }}}";
-        String addNonDeletedSubSections = "{  '$addFields':{'subSections': {'$filter' : {'input': '$subSections', 'as': 'subSections','cond': {'$eq': ['$$subSections.deleted', false ]}}}}} ";
+        String sortAgreementSectionClauses = "{$sort:{'clauses.orderedIndex':-1}}";
+        String sortSubSections = " {$sort:{'subSections.orderedIndex':-1}}";
+        String sortAgreementSection = "{$sort:{'orderedIndex':-1}}";
+
+        String groupSubSections = "{$group:{_id: '$_id', subSections:{'$addToSet':'$subSections'},clauses:{$first:'$clauses'},orderedIndex:{$first:'$orderedIndex'},title:{$first:'$title' }}}";
+        String clauseGroupAggregation = "{$group:{_id: '$_id', clauses:{'$addToSet': '$clauses'},subSections:{$first:'$subSections'},orderedIndex:{$first:'$orderedIndex'},title:{$first:'$title' }}}";
 
         Document replaceRootOperation = Document.parse(replaceRoot);
         Document groupOperation = Document.parse(groupSubSections);
-        Document subSectionNonDeletedOperation = Document.parse(addNonDeletedSubSections);
+        Document sortAgreementSectionClausesOperation = Document.parse(sortAgreementSectionClauses);
+        Document sortSubSectionsOperation = Document.parse(sortSubSections);
+        Document clauseGroupOperation = Document.parse(clauseGroupAggregation);
+
+
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(COUNTRY_ID).is(countryId).and("_id").is(agreementTemplateId).and(DELETED).is(false)),
                 lookup("agreement_section", "agreementSections", "_id", "agreementSections"),
                 unwind("agreementSections"),
-                match(Criteria.where("agreementSections.deleted").is(false)),
-                lookup("clause", "agreementSections.clauses", "_id", "agreementSections.clauses"),
-                lookup("agreement_section", "agreementSections.subSections", "_id", "agreementSections.subSections"),
-                unwind("agreementSections.subSections", true),
-                lookup("clause", "agreementSections.subSections.clauses", "_id", "agreementSections.subSections.clauses"),
                 new CustomAggregationOperation(replaceRootOperation),
+                lookup("clause", "clauses", "_id", "clauses"),
+                unwind("clauses", true),
+                new CustomAggregationOperation(sortAgreementSectionClausesOperation),
+                new CustomAggregationOperation(clauseGroupOperation),
+                lookup("agreement_section", "subSections", "_id", "subSections"),
+                unwind("subSections", true),
+                lookup("clause", "subSections.clauses", "_id", "subSections.clauses"),
+                new CustomAggregationOperation(sortSubSectionsOperation),
                 new CustomAggregationOperation(groupOperation),
-                new CustomAggregationOperation(subSectionNonDeletedOperation)
-
+                new CustomAggregationOperation(Document.parse(sortAgreementSection))
 
         );
 

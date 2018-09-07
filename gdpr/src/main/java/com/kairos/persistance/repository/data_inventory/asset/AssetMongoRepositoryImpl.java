@@ -79,4 +79,5 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
         AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);
         return results.getMappedResults();
     }
+
 }

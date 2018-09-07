@@ -23,16 +23,7 @@ public class ShortestAndAverageDailyRestWTATemplateDTO extends WTABaseRuleTempla
     private List<BigInteger> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
-
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
-    }
 
     public List<BigInteger> getPlannedTimeIds() {
         return plannedTimeIds;

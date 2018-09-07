@@ -30,8 +30,6 @@ public class ProcessingActivityResponseDTO {
     @NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
 
-    private AssetBasicResponseDTO asset;
-
     private List<ProcessingPurposeResponseDTO> processingPurposes;
 
     private List<DataSourceResponseDTO> dataSources;
@@ -56,9 +54,11 @@ public class ProcessingActivityResponseDTO {
 
     private Integer dataRetentionPeriod;
 
-    public AssetBasicResponseDTO getAsset() { return asset; }
+    private boolean active;
 
-    public void setAsset(AssetBasicResponseDTO asset) { this.asset = asset; }
+    public boolean isActive() { return active; }
+
+    public void setActive(boolean active) { this.active = active; }
 
     public List<ResponsibilityTypeResponseDTO> getResponsibilityType() { return responsibilityType; }
 

@@ -26,8 +26,6 @@ import java.util.Map;
  * */
 
 
-
-
 @ControllerAdvice
 @Order(1)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -36,16 +34,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        logger.error("error in gdpr service ",ex);
+        logger.error("error in gdpr service ", ex);
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
         List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
         List<FieldErrorDTO> errors = new ArrayList<>(fieldErrors.size() + globalErrors.size());
         for (FieldError fieldError : fieldErrors) {
-            FieldErrorDTO error=new FieldErrorDTO(fieldError.getField(),fieldError.getDefaultMessage());
+            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(), fieldError.getDefaultMessage());
             errors.add(error);
         }
         for (ObjectError objectError : globalErrors) {
-            FieldErrorDTO error=new FieldErrorDTO(objectError.getObjectName(),objectError.getDefaultMessage());
+            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), objectError.getDefaultMessage());
             errors.add(error);
         }
         ResponseEnvelope errorMessage = new ResponseEnvelope();
@@ -56,24 +54,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
-    @ExceptionHandler(value = {DuplicateDataException.class,DataNotExists.class,DataNotFoundByIdException.class,InvalidRequestException.class})
+    @ExceptionHandler(value = {DuplicateDataException.class, DataNotExists.class, DataNotFoundByIdException.class,
+            InvalidRequestException.class, MetaDataLinkedWithAssetException.class, MetaDataLinkedWithProcessingActivityException.class})
     @ResponseBody
-    protected ResponseEntity<Object> exceptionHandler(RuntimeException ex , HttpServletRequest request)
-    {
+    protected ResponseEntity<Object> exceptionHandler(RuntimeException ex, HttpServletRequest request) {
 
-        Map<String,Object> result=new HashMap<>();
-        result.put("message",ex.getMessage());
-        result.put("cause",ex.getCause());
-        result.put("request URl",request.getRequestURI());
-        return new ResponseEntity<>(result,HttpStatus.BAD_REQUEST);
+        Map<String, Object> result = new HashMap<>();
+        result.put("message", ex.getMessage());
+        result.put("cause", ex.getCause());
+        result.put("request URl", request.getRequestURI());
+        return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
 
     }
-
-
-
-
-
-
 
 
 }

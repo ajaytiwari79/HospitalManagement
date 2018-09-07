@@ -71,13 +71,13 @@ public class AddressVerificationService {
             zipCode = Integer.valueOf(contactAddress.getZipCodeId().toString());
         }
         logger.debug("Verifying with Information \n house: " + contactAddress.getHouseNumber() + "\n City:" + contactAddress.getCity() + "\n ZipCode: " + zipCode +
-                "\n Street: " + contactAddress.getStreet1());
+                "\n Street: " + contactAddress.getStreet());
 
         Map<String, Object> addressToVerify = new HashMap<>();
         addressToVerify.put("country", "DK");
         addressToVerify.put("zip", zipCode);
         addressToVerify.put("city", contactAddress.getCity());
-        addressToVerify.put("street", contactAddress.getStreet1());
+        addressToVerify.put("street", contactAddress.getStreet());
         addressToVerify.put("hnr", contactAddress.getHouseNumber());
         Map<String, Object> geoCodeResponse = scheduler.getGeoCode(addressToVerify, flsCredentials);
 
@@ -114,13 +114,13 @@ public class AddressVerificationService {
                 contactAddress.getHouseNumber() + "\n City:" +
                 contactAddress.getMunicipalityName() +
                 "\n ZipCode: " + zipCode.getName() +
-                "\n Street: " + contactAddress.getStreet1());
+                "\n Street: " + contactAddress.getStreet());
 
         Map<String, Object> addressToVerify = new HashMap<>();
         addressToVerify.put("country", "DK");
         addressToVerify.put("zip", zipCode.getZipCode());
         addressToVerify.put("city", municipalityName);
-        addressToVerify.put("street", contactAddress.getStreet1());
+        addressToVerify.put("street", contactAddress.getStreet());
         addressToVerify.put("hnr", contactAddress.getHouseNumber());
         Map<String, Object> geoCodeResponse = scheduler.getGeoCode(addressToVerify, flsCredentials);
 
@@ -139,13 +139,13 @@ public class AddressVerificationService {
     public Map<String, Object> verifyAddressSheet(AddressDTO contactAddress, long unitId) {
 //        int zipCode = zipCodeGraphRepository.findOne(contactAddress.getZipCodeId()).getZipCode();
        /* logger.debug("Verifying with Information \n house: " + contactAddress.getHouseNumber() + "\n City:" + contactAddress.getCity() + "\n ZipCode: " + contactAddress.getZipCodeValue() +
-                "\n Street: " + contactAddress.getStreet1());
+                "\n Street: " + contactAddress.getStreet());
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         Map<String, Object> addressToVerify = new HashMap<>();
         addressToVerify.put("country", "DK");
         addressToVerify.put("zip", contactAddress.getZipCodeValue());
         addressToVerify.put("city", contactAddress.getCity());
-        addressToVerify.put("street", contactAddress.getStreet1());
+        addressToVerify.put("street", contactAddress.getStreet());
         addressToVerify.put("hnr", contactAddress.getHouseNumber());
         Map<String, Object> geoCodeResponse = scheduler.getGeoCode(addressToVerify, flsCredentials);
 

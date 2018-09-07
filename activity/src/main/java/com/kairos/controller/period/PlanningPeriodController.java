@@ -14,6 +14,8 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -46,6 +48,11 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPlanningPeriods(unitId, null, null));
     }
 
+    @ApiOperation(value = "Get Planning Period with phase for self roastering")
+    @GetMapping(value="/period_of_interval")
+    public ResponseEntity<Map<String, Object>> getPlanningPeriodOfInterval(@PathVariable Long unitId, @RequestParam(required = true, value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam(required = true, value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPeriodOfInterval(unitId, startDate,endDate));
+    }
 
     @ApiOperation(value = "update period by unit Id and Period Id")
     @PutMapping(value = "/period/{periodId}")
@@ -72,11 +79,24 @@ public class PlanningPeriodController {
     @ApiOperation(value = "update period's flipping Date")
     @PutMapping(value = "/period/{periodId}/flip_phase/{date}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable BigInteger periodId, @PathVariable Long unitId, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+    public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable BigInteger periodId, @PathVariable Long unitId, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updateFlippingDate(periodId, unitId, date));
 
     }
+    @ApiOperation(value = "restore shift base planning period and phase id")
+    @PutMapping(value = "/period/{periodId}/phase/{phaseId}/reset_phase")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> resetPhaseData(@PathVariable BigInteger periodId, @PathVariable Long unitId,@PathVariable BigInteger phaseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialData(periodId,phaseId,unitId));
+    }
 
+    @ApiOperation(value = "restore shift data based on shiftIds and phase")
+    @PutMapping(value = "/phase/{phaseId}/restore_shifts")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> restoreShiftsDataByShiftIds(@RequestBody List<BigInteger> shiftIds, @PathVariable Long unitId,@PathVariable BigInteger phaseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialDataOfShiftIds(shiftIds,phaseId,unitId));
+
+    }
     @ApiOperation(value = "Migrate Planning Period")
     @PostMapping(value="/migrate_planning_period")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

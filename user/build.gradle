@@ -25,6 +25,7 @@ buildscript {
 
 }
 apply plugin: 'java'
+apply plugin: 'groovy'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: "io.spring.dependency-management"
@@ -97,12 +98,19 @@ dependencies {
 	compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.9.RELEASE'
 
     compile group: 'log4j', name: 'log4j', version: '1.2.17'
-    compile 'org.springframework.kafka:spring-kafka:2.1.7.RELEASE'
+    compile (('org.springframework.kafka:spring-kafka:2.1.7.RELEASE'))
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.springframework.security:spring-security-test')
     //compile('org.springframework.boot:spring-boot-starter-webflux')
-
+    // https://mvnrepository.com/artifact/org.mockito/mockito-core
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.21.0'
+    // https://mvnrepository.com/artifact/org.spockframework/spock-core
+    testCompile group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
+    // https://mvnrepository.com/artifact/com.athaydes/spock-reports
+    testCompile ('com.athaydes:spock-reports:1.6.0'){
+        transitive = false // this avoids affecting your version of Groovy/Spock
+    }
 }
 
 dependencyManagement {
@@ -137,3 +145,8 @@ bootRun {
         classpath = files("$buildDir/classes/java/main", "$buildDir/resources/main", pathingJar.archivePath)
     }
 }*/
+def spockReports() {
+    // set all properties at once
+    set( [ 'com.athaydes.spockframework.report.showCodeBlocks': true,
+           'com.athaydes.spockframework.report.outputDir': 'target/spock-reports' ] )
+}

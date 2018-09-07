@@ -39,10 +39,8 @@ public class OrganizationHostingTypeController {
 
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.createHostingType(unitId, hostingTypeDTOs.getRequestBody()));
-
     }
 
 
@@ -69,19 +67,6 @@ public class OrganizationHostingTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getAllHostingType(unitId));
     }
 
-
-    @ApiOperation("get HostingType by name")
-    @GetMapping("/hosting_type/name")
-    public ResponseEntity<Object> getHostingTypeByName(@PathVariable Long unitId, @RequestParam String name) {
-
-         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingTypeByName(unitId, name));
-
-    }
-
-
     @ApiOperation("delete HostingType  by id")
     @DeleteMapping("/hosting_type/delete/{id}")
     public ResponseEntity<Object> deleteHostingType(@PathVariable Long unitId, @PathVariable BigInteger id) {
@@ -106,7 +91,7 @@ public class OrganizationHostingTypeController {
     }
 
     @ApiOperation("save Hosting type And Suggest To Country admin")
-    @PostMapping(COUNTRY_URL + "/hosting_type")
+    @PostMapping(COUNTRY_URL + "/hosting_type/suggest")
     public ResponseEntity<Object> saveHostingTypeAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingTypeDTO> hostingTypeDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -114,5 +99,5 @@ public class OrganizationHostingTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.saveAndSuggestHostingTypes(countryId, unitId, hostingTypeDTOs.getRequestBody()));
 
     }
-    
+
 }

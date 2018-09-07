@@ -31,9 +31,9 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
 
 
     @Override
-    public DataCategory findByName(Long countryId, Long organizationId, String name) {
+    public DataCategory findByName(Long countryId, String name) {
         Query query = new Query();
-        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
+        query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("name").is(name));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, DataCategory.class);
@@ -41,13 +41,13 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
     }
 
     @Override
-    public DataCategoryResponseDTO getDataCategoryWithDataElementById(Long countryId, Long organizationId, BigInteger id) {
+    public DataCategoryResponseDTO getDataCategoryWithDataElementById(Long countryId, BigInteger id) {
 
         String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
         Document projectionOperation = Document.parse(projection);
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false)),
                 lookup("data_element", "dataElements", "_id", "dataElements"),
                 new CustomAggregationOperation(projectionOperation)
         );
@@ -58,13 +58,13 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
     }
 
     @Override
-    public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElement(Long countryId, Long organizationId) {
+    public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElement(Long countryId) {
 
         String projection = CustomAggregationQuery.dataCategoryWithDataElementProjectionData();
         Document projectionOperation = Document.parse(projection);
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("data_element", "dataElements", "_id", "dataElements"),
                 new CustomAggregationOperation(projectionOperation)
         );

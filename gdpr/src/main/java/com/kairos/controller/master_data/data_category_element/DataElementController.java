@@ -32,105 +32,81 @@ public class DataElementController {
 
     @ApiOperation("create  data Element ")
     @PostMapping("/data_element/add")
-    public ResponseEntity<Object> addDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @Valid @RequestBody ValidateRequestBodyList<DataElementDTO> dataElements) {
+    public ResponseEntity<Object> addDataElement(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataElementDTO> dataElements) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        } else if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.createDataElements(countryId, organizationId, dataElements.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.createDataElements(countryId, dataElements.getRequestBody()));
 
     }
 
 
     @ApiOperation("get data Element by id")
-    @GetMapping("/data_element/{id}")
-    public ResponseEntity<Object> getDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
+    @GetMapping("/data_element/{dataElementId}")
+    public ResponseEntity<Object> getDataElement(@PathVariable Long countryId, @PathVariable BigInteger dataElementId) {
+
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getDataElement(countryId, organizationId, id));
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getDataElementById(countryId, dataElementId));
 
     }
 
     @ApiOperation("get All data Element ")
     @GetMapping("/data_element/all")
-    public ResponseEntity<Object> getAllDataElement(@PathVariable Long countryId, @PathVariable Long organizationId) {
+    public ResponseEntity<Object> getAllDataElement(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        } else if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getAllDataElements(countryId, organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getAllDataElements(countryId));
 
     }
 
     @ApiOperation("deleted  data element by id ")
-    @DeleteMapping("/data_element/delete/{id}")
-    public ResponseEntity<Object> deleteDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
+    @DeleteMapping("/data_element/delete/{dataElementId}")
+    public ResponseEntity<Object> deleteDataElement(@PathVariable Long countryId, @PathVariable BigInteger dataElementId) {
+
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.deleteDataElement(countryId, organizationId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.deleteDataElement(countryId, dataElementId));
 
     }
 
 
     @ApiOperation("update  data Element ")
-    @PutMapping("/data_element/update/{id}")
-    public ResponseEntity<Object> updateDataElement(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @Valid @RequestBody DataElementDTO dataElementDTO) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
+    @PutMapping("/data_element/update/{dataElementId}")
+    public ResponseEntity<Object> updateDataElement(@PathVariable Long countryId, @PathVariable BigInteger dataElementId, @Valid @RequestBody DataElementDTO dataElementDTO) {
+
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.updateDataElement(countryId, organizationId, id, dataElementDTO));
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.updateDataElement(countryId, dataElementId, dataElementDTO));
     }
 
     @ApiOperation("get data Element of unit by id")
-    @GetMapping(UNIT_URL+"/data_element/{id}")
-    public ResponseEntity<Object> getDataElementOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
+    @GetMapping(UNIT_URL + "/data_element/{id}")
+    public ResponseEntity<Object> getDataElementOfUnitById(@PathVariable Long unitId, @PathVariable BigInteger id) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getDataElement(countryId, unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getDataElementByIdOnLeftHierarchySelection(unitId, id));
 
     }
 
     @ApiOperation("get All data Element of unit ")
-    @GetMapping(UNIT_URL+"/data_element/all")
-    public ResponseEntity<Object> getAllDataElementOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        } else if (unitId == null) {
+    @GetMapping(UNIT_URL + "/data_element/all")
+    public ResponseEntity<Object> getAllDataElementOfUnit(@PathVariable Long unitId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getAllDataElements(countryId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataElementService.getAllDataElementOnLeftHierarchySelection(unitId));
 
     }
 

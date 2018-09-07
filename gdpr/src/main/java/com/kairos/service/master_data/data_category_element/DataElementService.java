@@ -4,6 +4,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.gdpr.master_data.DataElementDTO;
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
 import com.kairos.persistance.repository.master_data.data_category_element.DataElementMongoRepository;
+import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -34,18 +35,15 @@ public class DataElementService extends MongoBaseService {
 
     /**@decription method create new Data Elements throw exception if data element already exist
      * @param countryId
-     * @param organizationId
      * @param dataElementsDto request body for creating New Data Elements
      * @return map of Data Elements  List  and new Data Elements ids
      */
-    public Map<String, Object> createDataElements(Long countryId, Long organizationId, List<DataElementDTO> dataElementsDto) {
+    public Map<String, Object> createDataElements(Long countryId, List<DataElementDTO> dataElementsDto) {
 
         checkForDuplicacyInName(dataElementsDto);
         List<String> dataElementNames = new ArrayList<>();
-        dataElementsDto.forEach(dataElement -> {
-            dataElementNames.add(dataElement.getName().trim());
-        });
-        List<DataElement> existingDataElement = dataElementMongoRepository.findByCountryIdAndNames(countryId, organizationId, dataElementNames);
+        dataElementsDto.forEach(dataElement -> dataElementNames.add(dataElement.getName().trim()));
+        List<DataElement> existingDataElement = dataElementMongoRepository.findByCountryIdAndNames(countryId, dataElementNames);
         if (existingDataElement.size() != 0) {
             exceptionService.duplicateDataException("message.duplicate", "data element", existingDataElement.iterator().next().getName());
         }
@@ -53,14 +51,11 @@ public class DataElementService extends MongoBaseService {
         List<BigInteger> dataElementIdList = new ArrayList<>();
         for (String name : dataElementNames) {
             DataElement newDataElement = new DataElement(name,countryId);
-            newDataElement.setOrganizationId(organizationId);
             dataElementList.add(newDataElement);
         }
         try {
             dataElementList = dataElementMongoRepository.saveAll(getNextSequence(dataElementList));
-            dataElementList.forEach(dataElement -> {
-                dataElementIdList.add(dataElement.getId());
-            });
+            dataElementList.forEach(dataElement -> dataElementIdList.add(dataElement.getId()));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -72,8 +67,8 @@ public class DataElementService extends MongoBaseService {
 
     }
 
-    public DataElement getDataElement(Long countryId, Long organizationId, BigInteger id) {
-        DataElement dataElement = dataElementMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+    public DataElement getDataElementById(Long countryId, BigInteger id) {
+        DataElement dataElement = dataElementMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(dataElement).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", id);
         }
@@ -81,13 +76,43 @@ public class DataElementService extends MongoBaseService {
 
     }
 
-    public List<DataElement> getAllDataElements(Long countryId, Long organizationId) {
-        return dataElementMongoRepository.getAllDataElement(countryId, organizationId);
+    /**
+     *
+     * @param countryId
+     * @return
+     */
+    public List<DataElement> getAllDataElements(Long countryId) {
+        return dataElementMongoRepository.getAllDataElement(countryId);
+    }
+
+    /**
+     *
+     * @param unitId
+     * @return
+     */
+    public List<DataElementBasicResponseDTO> getAllDataElementOnLeftHierarchySelection(Long unitId) {
+        return dataElementMongoRepository.getAllDataElementByUnitId(unitId);
     }
 
 
-    public Boolean deleteDataElement(Long countryId, Long organizationId, BigInteger id) {
-        DataElement exist = dataElementMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+    /**
+     *
+     * @param unitId
+     * @param id
+     * @return
+     */
+    public DataElementBasicResponseDTO getDataElementByIdOnLeftHierarchySelection(Long unitId, BigInteger id) {
+        DataElementBasicResponseDTO dataElement = dataElementMongoRepository.getDataElementByUnitIdAndId(unitId, id);
+        if (!Optional.ofNullable(dataElement).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", id);
+        }
+        return dataElement;
+
+    }
+
+
+    public Boolean deleteDataElement(Long countryId, BigInteger id) {
+        DataElement exist = dataElementMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element ", id);
         }
@@ -97,9 +122,9 @@ public class DataElementService extends MongoBaseService {
     }
 
 
-    public DataElementDTO updateDataElement(Long countryId, Long organizationId, BigInteger id, DataElementDTO dataElementDTO) {
+    public DataElementDTO updateDataElement(Long countryId, BigInteger id, DataElementDTO dataElementDTO) {
 
-        DataElement dataElement = dataElementMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        DataElement dataElement = dataElementMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (!Optional.ofNullable(dataElement).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data element", id);
         }
@@ -111,11 +136,10 @@ public class DataElementService extends MongoBaseService {
     /**
      * @desciption method create new data Data elements and update data Element if data element already exist.
      * @param countryId
-     * @param organizationId
      * @param dataElementsDto request body contain list Of Existing Data Elements which needs to be Update and List of New Data Elements
      * @return map of Data Element ids and ,List of  updated and new Data Elements
      */
-    public Map<String, Object> updateDataElementAndCreateNewDataElement(Long countryId, Long organizationId, List<DataElementDTO> dataElementsDto) {
+    public Map<String, Object> updateDataElementAndCreateNewDataElement(Long countryId, List<DataElementDTO> dataElementsDto) {
 
         checkForDuplicacyInName(dataElementsDto);
         List<DataElementDTO> updateDataElementsDto = new ArrayList<>();
@@ -131,12 +155,12 @@ public class DataElementService extends MongoBaseService {
         List<BigInteger> dataElementsIds = new ArrayList<>();
         List<DataElement> dataElementList = new ArrayList<>();
         if (createNewDataElementsDto.size() != 0) {
-            Map<String, Object> newDataElements = createDataElements(countryId, organizationId, createNewDataElementsDto);
+            Map<String, Object> newDataElements = createDataElements(countryId, createNewDataElementsDto);
             dataElementsIds.addAll((List<BigInteger>) newDataElements.get(IDS_LIST));
             dataElementList.addAll((List<DataElement>) newDataElements.get(DATA_ELEMENTS_LIST));
         }
         if (updateDataElementsDto.size() != 0) {
-            updatedDataElements = updateDataElementsList(countryId, organizationId, updateDataElementsDto);
+            updatedDataElements = updateDataElementsList(countryId, updateDataElementsDto);
             dataElementsIds.addAll((List<BigInteger>) updatedDataElements.get(IDS_LIST));
             dataElementList.addAll((List<DataElement>) updatedDataElements.get(DATA_ELEMENTS_LIST));
         }
@@ -151,11 +175,10 @@ public class DataElementService extends MongoBaseService {
      * @desciption update list of Existing Data elements,
      * dataElementsDtoMap   contain data element corresponding to its id
      * @param countryId
-     * @param organizationId
      * @param dataElementsDto request body for updating Existing Data Elements List
      * @return  map of Data Elements contain ids List and updated  Data Elements List
      */
-    public Map<String, Object> updateDataElementsList(Long countryId, Long organizationId, List<DataElementDTO> dataElementsDto) {
+    public Map<String, Object> updateDataElementsList(Long countryId, List<DataElementDTO> dataElementsDto) {
 
         Map<BigInteger, DataElementDTO> dataElementsDtoMap = new HashMap<>();
         List<BigInteger> dataElementsIds = new ArrayList<>();
@@ -165,8 +188,8 @@ public class DataElementService extends MongoBaseService {
             dataElementsIds.add(dataElementDto.getId());
             dataElementsNames.add(dataElementDto.getName());
         });
-        checkDuplicateInsertionOnUpdatingDataElements(countryId, organizationId, dataElementsDtoMap, dataElementsNames);
-        List<DataElement> dataElementList = dataElementMongoRepository.getAllDataElementListByIds(countryId, organizationId, dataElementsIds);
+        checkDuplicateInsertionOnUpdatingDataElements(countryId, dataElementsDtoMap, dataElementsNames);
+        List<DataElement> dataElementList = dataElementMongoRepository.getAllDataElementListByIds(countryId, dataElementsIds);
         dataElementList.forEach(dataElement -> {
             DataElementDTO darElementDto = dataElementsDtoMap.get(dataElement.getId());
             dataElement.setName(darElementDto.getName());
@@ -203,9 +226,9 @@ public class DataElementService extends MongoBaseService {
      * @param dataElementDtoMap map contain dataElement corresponding to id
      * @param dataElementNames  list of data elements names which we need to check if duplicate data present on updating existing Data elements
      */
-    public void checkDuplicateInsertionOnUpdatingDataElements(Long countryId, Long orgId, Map<BigInteger, DataElementDTO> dataElementDtoMap, List<String> dataElementNames) {
+    public void checkDuplicateInsertionOnUpdatingDataElements(Long countryId, Map<BigInteger, DataElementDTO> dataElementDtoMap, List<String> dataElementNames) {
 
-        List<DataElement> dataElementList = dataElementMongoRepository.findByCountryIdAndNames(countryId, orgId, dataElementNames);
+        List<DataElement> dataElementList = dataElementMongoRepository.findByCountryIdAndNames(countryId, dataElementNames);
         dataElementList.forEach(dataElement -> {
             if (!dataElementDtoMap.containsKey(dataElement.getId())) {
                 exceptionService.duplicateDataException("message.duplicate", "data element", dataElement.getName());
