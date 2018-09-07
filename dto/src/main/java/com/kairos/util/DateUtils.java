@@ -667,17 +667,17 @@ public class DateUtils {
         return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atStartOfDay().with(LocalTime.of(startHour, 00)).toInstant(ZoneOffset.UTC));
     }
 
-    public static LocalDate getLocalDateFromISOLocalDate(String receivedDate) {
+    public static LocalDate getLocalDateFromString(String receivedDate) {
         SimpleDateFormat format = new SimpleDateFormat(
                 "yyyy-MM-dd'T'HH:mm:ss", Locale.US);
         format.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
-        LocalDate result1 = null;
+        LocalDate result = null;
         try {
-            result1 = DateUtils.asLocalDate(format.parse(receivedDate));
+            result = DateUtils.asLocalDate(format.parse(receivedDate));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return result1;
+        return result;
 
     }
 }

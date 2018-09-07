@@ -61,7 +61,6 @@ import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.user.organization.position_code.PositionCodeDTO;
 import com.kairos.user.staff.unit_position.UnitPositionDTO;
-import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
 import com.kairos.util.DateUtils;
 import com.kairos.util.ObjectMapperUtils;
@@ -898,10 +897,10 @@ public class UnitPositionService {
 
 
     public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, BigInteger wtaId, BigInteger ctaId, Long unitId) {
-        LocalDate startDate=DateUtils.getLocalDateFromISOLocalDate(timeCareEmploymentDTO.getStartDate());
+        LocalDate startDate=DateUtils.getLocalDateFromString(timeCareEmploymentDTO.getStartDate());
         LocalDate endDate=null;
         if (!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")) {
-            endDate = DateUtils.getLocalDateFromISOLocalDate(timeCareEmploymentDTO.getEndDate());
+            endDate = DateUtils.getLocalDateFromString(timeCareEmploymentDTO.getEndDate());
         }
         UnitPositionDTO unitPositionDTO = new UnitPositionDTO(positionCodeId, expertiseId, startDate, endDate, Integer.parseInt(timeCareEmploymentDTO.getWeeklyHours()), employmentTypeId, staffId, wtaId, ctaId, unitId, new Long(timeCareEmploymentDTO.getId()));
         return unitPositionDTO;
