@@ -2,6 +2,7 @@ package com.kairos.gdpr.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.gdpr.data_inventory.RiskDTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -18,6 +19,9 @@ public class AssetTypeDTO {
     @NotBlank(message = "Name cannot be empty ")
     @Pattern(message = "Number and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
+
+    @Valid
+    private List<RiskDTO> risks = new ArrayList<>();
 
     @Valid
     private List<AssetTypeDTO> subAssetTypes = new ArrayList<>();
@@ -49,6 +53,10 @@ public class AssetTypeDTO {
     public AssetTypeDTO(String name) {
         this.name = name;
     }
+
+    public List<RiskDTO> getRisks() { return risks; }
+
+    public void setRisks(List<RiskDTO> risks) { this.risks = risks; }
 
     public AssetTypeDTO() {
     }

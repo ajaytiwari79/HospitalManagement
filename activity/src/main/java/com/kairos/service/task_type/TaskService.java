@@ -721,12 +721,11 @@ public class TaskService extends MongoBaseService {
                 shift.setActivityId(activity.getId());
                 shift.setStaffId(staffId);
                 shift.setUnitPositionId(unitPositionDTO.getId());
-                List<Integer> activityDayTypes = new ArrayList<>();
                 if (staffAdditionalInfoDTO.getDayTypes() != null && !staffAdditionalInfoDTO.getDayTypes().isEmpty()) {
-                    activityDayTypes = WTARuleTemplateValidatorUtility.getValidDays(staffAdditionalInfoDTO.getDayTypes(), activity.getTimeCalculationActivityTab().getDayTypes());
-                }
-                if (activityDayTypes.contains(new DateTime(shift.getStartDate()).getDayOfWeek())) {
-                    timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
+                    Set<DayOfWeek> activityDayTypes = ShiftValidatorService.getValidDays(staffAdditionalInfoDTO.getDayTypes(), activity.getTimeCalculationActivityTab().getDayTypes());
+                    if (activityDayTypes.contains(DateUtils.asLocalDate(shift.getStartDate()).getDayOfWeek())) {
+                        timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
+                    }
                 }
                 shiftsToCreate.add(shift);
             }

@@ -3,6 +3,7 @@ package com.kairos.rule_validator.activity;
 import com.kairos.activity.shift.EmploymentType;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.util.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.util.*;
@@ -15,7 +16,6 @@ public class EmploymentTypeSpecification extends AbstractSpecification<ShiftWith
 
     private Set<Long> employmentTypeIds = new HashSet<>();
     private EmploymentType employmentType;
-    ExceptionService exceptionService;
 
     public EmploymentTypeSpecification(EmploymentType employmentType) {
         this.employmentType = employmentType;
@@ -37,5 +37,15 @@ public class EmploymentTypeSpecification extends AbstractSpecification<ShiftWith
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shift) {
         return false;
+    }
+
+    @Override
+    public void validateRules(ShiftWithActivityDTO shift) {
+        if (Optional.ofNullable(shift.getActivity().getEmploymentTypes()).isPresent() && !shift.getActivity().getEmploymentTypes().isEmpty()) {
+            employmentTypeIds.addAll(shift.getActivity().getEmploymentTypes());
+            if (!employmentTypeIds.contains(employmentType.getId())) {
+                ShiftValidatorService.throwException("message.activity.employement-type-match");
+            }
+        }
     }
 }

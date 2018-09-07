@@ -16,6 +16,11 @@ public class StaffNonPregnancySpecification extends AbstractActivitySpecificatio
     }
 
     @Override
+    public void validateRules(StaffDTO staffDTO) {
+
+    }
+
+    @Override
     public List<String> isSatisfiedString(StaffDTO staffDTO) {
         return null;
     }

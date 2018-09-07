@@ -1249,7 +1249,7 @@ public class StaffService {
         unitPermissionGraphRepository.save(unitPermission);
     }
 
-    public void setUserAndEmployment(Organization organization, User user, Long accessGroupId) {
+    public void setUserAndEmployment(Organization organization, User user, Long accessGroupId, boolean parentOrganization) {
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
                 user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
         Employment employment = new Employment();
@@ -1258,7 +1258,16 @@ public class StaffService {
         employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
-        organization.getEmployments().add(employment);
+        // if the organization is not parent organization then adding employment in parent organization.
+        if (!parentOrganization) {
+            Organization
+            mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
+            mainOrganization.getEmployments().add(employment);
+            organizationGraphRepository.save(mainOrganization);
+        } else {
+            organization.getEmployments().add(employment);
+        }
+
         organizationGraphRepository.save(organization);
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);

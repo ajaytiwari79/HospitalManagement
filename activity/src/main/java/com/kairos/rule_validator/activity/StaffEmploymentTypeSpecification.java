@@ -22,6 +22,11 @@ public class StaffEmploymentTypeSpecification extends AbstractSpecification<Staf
     }
 
     @Override
+    public void validateRules(StaffDTO staffDTO) {
+
+    }
+
+    @Override
     public List<String> isSatisfiedString(StaffDTO staffDTO) {
         List<String> errorMessages = new ArrayList<>();
         if (!Optional.ofNullable(staffDTO.getEmploymentTypeId()).isPresent()) {

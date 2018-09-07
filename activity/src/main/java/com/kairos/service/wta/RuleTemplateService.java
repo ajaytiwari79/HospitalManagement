@@ -106,7 +106,7 @@ public class RuleTemplateService extends MongoBaseService {
         shiftLengthWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(shiftLengthWTATemplate);
 
-        ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive days", true, "Maximum number of consecutive days", true, daysCount);
+        ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive days",  "Maximum number of consecutive days");
         consecutiveWorking.setCountryId(countryDTO.getId());
         consecutiveWorking.setIntervalLength(12);
         consecutiveWorking.setIntervalUnit(week);
@@ -114,14 +114,13 @@ public class RuleTemplateService extends MongoBaseService {
         consecutiveWorking.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(consecutiveWorking);
 
-        ConsecutiveRestPartOfDayWTATemplate restInConsecutiveDays = new ConsecutiveRestPartOfDayWTATemplate("Minimum rest after consecutive days worked", false, "Minimum rest after consecutive days worked", timeInMins, daysCount);
+        ConsecutiveRestPartOfDayWTATemplate restInConsecutiveDays = new ConsecutiveRestPartOfDayWTATemplate("Minimum rest after consecutive days worked", false, "Minimum rest after consecutive days worked");
         restInConsecutiveDays.setCountryId(countryDTO.getId());
         restInConsecutiveDays.setPhaseTemplateValues(phaseTemplateValues);
         restInConsecutiveDays.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(restInConsecutiveDays);
 
-        NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = new NumberOfPartOfDayShiftsWTATemplate("Maximum number of shifts per interval", false, "Maximum number of shifts per interval", daysCount);
-        //numberOfPartOfDayShiftsWTATemplate.setValidationStartDate(dateInMillis);
+        NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = new NumberOfPartOfDayShiftsWTATemplate("Maximum number of shifts per interval", false, "Maximum number of shifts per interval");
         numberOfPartOfDayShiftsWTATemplate.setIntervalLength(1);
         numberOfPartOfDayShiftsWTATemplate.setIntervalUnit(week);
         numberOfPartOfDayShiftsWTATemplate.setCountryId(countryDTO.getId());
@@ -328,6 +327,7 @@ public class RuleTemplateService extends MongoBaseService {
 
         }
         WTABaseRuleTemplate wtaBaseRuleTemplate = WTABuilderService.copyRuleTemplate(wtaRuleTemplateDTO, true);
+        wtaBaseRuleTemplate.setCountryId(countryId);
         wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         save(wtaBaseRuleTemplate);
         wtaRuleTemplateDTO.setId(wtaBaseRuleTemplate.getId());

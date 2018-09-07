@@ -108,7 +108,7 @@ public class UnitPositionDTO {
     }
 
 
-    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId,
+    public UnitPositionDTO(Long positionCodeId, Long expertiseId, LocalDate startLocalDate, LocalDate endLocalDate, int totalWeeklyHours, Long employmentTypeId,
                            Long staffId, BigInteger wtaId, BigInteger ctaId, Long unitId, Long timeCareExternalId) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
@@ -116,15 +116,12 @@ public class UnitPositionDTO {
         this.staffId = staffId;
         this.wtaId = wtaId;
         this.ctaId = ctaId;
-        //this.startDateMillis = startDateMillis;
-        //this.endDateMillis = endDateMillis;
+        this.startLocalDate = startLocalDate;
+        this.endLocalDate = endLocalDate;
         this.totalWeeklyHours = totalWeeklyHours;
         this.timeCareExternalId = timeCareExternalId;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.hourlyWages = hourlyWages;
-        this.salary = salary;
         this.unitId = unitId;
-        this.workingDaysInWeek = workingDaysInWeek;
+
     }
 
 

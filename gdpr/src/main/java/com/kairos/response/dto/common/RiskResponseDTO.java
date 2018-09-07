@@ -1,14 +1,17 @@
-package com.kairos.persistance.model;
+package com.kairos.response.dto.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.persistance.model.common.MongoBaseEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
-@Document
-public class Risk extends MongoBaseEntity {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class RiskResponseDTO {
+
+    private BigInteger id;
 
     @NotBlank(message = "Name can't be Empty")
     private String name;
@@ -16,15 +19,22 @@ public class Risk extends MongoBaseEntity {
     @NotBlank(message = "Description can't be Empty")
     private String description;
 
+    @NotBlank(message = "Mention Risk Recommendation")
     private String riskRecommendation;
 
-    private LocalDate  dueDate;
+    private LocalDate dueDate;
 
     private boolean isReminderActive;
 
     private int daysToReminderBefore;
 
+    @NotNull(message = "Risk Level can't be empty")
     private RiskSeverity riskLevel;
+
+
+    public BigInteger getId() { return id; }
+
+    public void setId(BigInteger id) { this.id = id; }
 
     public String getName() { return name; }
 

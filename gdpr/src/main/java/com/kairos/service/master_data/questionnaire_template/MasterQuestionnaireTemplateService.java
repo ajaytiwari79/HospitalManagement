@@ -106,7 +106,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
             case ASSET_TYPE:
                 if (assetTypeId == null) {
                     exceptionService.invalidRequestException("message.invalid.request", "asset type is null");
-                } else if (assetTypeMongoRepository.findByIdAndNonDeleted(UserContext.getCountryId(), assetTypeId) != null) {
+                } else if (assetTypeMongoRepository.findByIdAndCountryId(UserContext.getCountryId(), assetTypeId) != null) {
                     questionnaireTemplate.setTemplateType(templateType);
                     questionnaireTemplate.setAssetType(assetTypeId);
                 } else {

@@ -25,6 +25,8 @@ public class AssetType extends MongoBaseEntity {
 
     private String suggestedDataStatus;
 
+    private List<BigInteger> risks;
+
     public String getSuggestedDataStatus() { return suggestedDataStatus; }
 
     public void setSuggestedDataStatus(String suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
@@ -57,5 +59,17 @@ public class AssetType extends MongoBaseEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<BigInteger> getRisks() { return risks; }
+
+    public void setRisks(List<BigInteger> risks) { this.risks = risks; }
+
+    public AssetType(@NotBlank(message = "Name can't be empty or null") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
+        this.name = name;
+        this.countryId = countryId;
+    }
+
+    public AssetType() {
     }
 }
