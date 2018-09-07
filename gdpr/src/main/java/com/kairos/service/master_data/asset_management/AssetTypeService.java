@@ -78,9 +78,11 @@ public class AssetTypeService extends MongoBaseService {
             }
             assetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(assetType));
         }
-        assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
-        List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
-        assetType.setSubAssetTypes(subAssetTypeIds);
+        if (!subAssetTypeList.isEmpty()) {
+            assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
+            List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
+            assetType.setSubAssetTypes(subAssetTypeIds);
+        }
         assetTypeMongoRepository.save(assetType);
         assetTypeDto.setId(assetType.getId());
         return assetTypeDto;
@@ -214,9 +216,11 @@ public class AssetTypeService extends MongoBaseService {
             assetType.setRisks(riskIdsRelatedToSubAssetTypeOrAssetType.get(assetType));
         }
 
-        assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
-        List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
-        assetType.setSubAssetTypes(subAssetTypeIds);
+        if (!subAssetTypeList.isEmpty()) {
+            assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
+            List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
+            assetType.setSubAssetTypes(subAssetTypeIds);
+        }
         assetTypeMongoRepository.save(assetType);
         return assetTypeDto;
 
@@ -224,7 +228,6 @@ public class AssetTypeService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param assetTypeId
      * @param riskId
