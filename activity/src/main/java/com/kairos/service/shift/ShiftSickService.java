@@ -72,7 +72,7 @@ public class ShiftSickService extends MongoBaseService {
         }
         short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
         //This method is used to fetch the shift of the days specified and marked them as disabled as the user is sick.
-        List<Shift> staffOriginalShiftsOfDates = shiftMongoRepository.findAllShiftsByStaffIds(Arrays.asList(staffId), DateUtils.getDate(), DateUtils.addDays(DateUtils.getDate(), shiftNeedsToAddForDays - 1));
+        List<Shift> staffOriginalShiftsOfDates = shiftMongoRepository.findAllShiftsByStaffIds(Collections.singletonList(staffId), DateUtils.getDate(), DateUtils.addDays(DateUtils.getDate(), shiftNeedsToAddForDays - 1));
         logger.info(staffOriginalShiftsOfDates.size() + "", " shifts found for days");
         staffOriginalShiftsOfDates.forEach(s -> s.setDisabled(true));
 

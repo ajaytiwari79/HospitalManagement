@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
-import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 
@@ -32,6 +31,6 @@ public class SickSettingsRepository {
                 match(Criteria.where("userId").is(userId).and("startDate").lte(DateUtils.getCurrentLocalDate()).and("endDate").is(null))
         );
         AggregationResults<SickSettingsDTO> results = mongoTemplate.aggregate(aggregation, SickSettings.class, SickSettingsDTO.class);
-        return (results.getMappedResults() != null && results.getMappedResults().size() > 0) ? results.getMappedResults().get(0) : null;
+        return results.getMappedResults().size() > 0 ? results.getMappedResults().get(0) : null;
     }
 }

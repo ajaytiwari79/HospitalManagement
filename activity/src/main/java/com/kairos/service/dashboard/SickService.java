@@ -1,22 +1,17 @@
 package com.kairos.service.dashboard;
 
 import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.cta.CTABasicDetailsDTO;
 import com.kairos.activity.dashboard.UserSickDataWrapper;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftSickService;
-import com.kairos.user.organization.OrganizationCommonDTO;
 import com.kairos.util.user_context.UserContext;
-import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -25,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * CreatedBy vipulpandey on 30/8/18

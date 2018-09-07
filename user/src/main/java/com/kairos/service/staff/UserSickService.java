@@ -1,7 +1,6 @@
 package com.kairos.service.staff;
 
 import com.kairos.persistence.model.staff.StaffTimezoneQueryResult;
-import com.kairos.persistence.repository.organization.default_data.SickConfigurationRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.staff.StaffResultDTO;
 import com.kairos.service.organization_meta_data.SickConfigurationService;
