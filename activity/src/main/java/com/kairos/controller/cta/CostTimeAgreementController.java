@@ -258,7 +258,7 @@ public class CostTimeAgreementController {
     }
 
     @ApiOperation(value = "get default cta")
-    @GetMapping(value = UNIT_URL + "/get_default_cta/{expertiseId}")
+    @GetMapping(value = UNIT_URL + "/get_default_cta/expertise/{expertiseId}")
     public ResponseEntity<Map<String, Object>> getDefaultCTA(@PathVariable Long unitId,@PathVariable Long expertiseId)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getDefaultCTA(unitId,expertiseId));
     }
