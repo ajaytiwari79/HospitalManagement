@@ -563,12 +563,22 @@ public class OrganizationService {
 
     public boolean deleteOrganization(long organizationId) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
-        if (organization != null) {
+        boolean success = false;
+
+        if (organization != null && organization.isBoardingCompleted()) {
             organization.setEnable(false);
+            organization.setDeleted(true);
             organizationGraphRepository.save(organization);
-            return true;
+            success = true;
+        } else {
+            List<Long> organizationIdsToDelete = new ArrayList<>();
+            organizationIdsToDelete.add(organization.getId());
+            organizationIdsToDelete.addAll(organization.getChildren().stream().map(child -> child.getId()).collect(Collectors.toList()));
+            organizationGraphRepository.removeOrganizationCompletely(organizationIdsToDelete);
+            success = true;
+
         }
-        return false;
+        return success;
     }
 
     public List<Map<String, Object>> getUnits(long organizationId) {
@@ -1119,7 +1129,7 @@ public class OrganizationService {
 
 
     public Long getOrganization(Long id, String type) {
-        Organization organization = getOrganizationDetail( id,type);
+        Organization organization = getOrganizationDetail(id, type);
         return organization.getId();
     }
 
@@ -1350,7 +1360,7 @@ public class OrganizationService {
         List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId, ReasonCodeType.ORDER);
         List<com.kairos.persistence.model.country.DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         return new OrderDefaultDataWrapper(orderAndActivityDTO.getOrders(), orderAndActivityDTO.getActivities(),
-                skills, expertise, staffList, plannedTypes, functions, reasonCodes, dayTypes, orderAndActivityDTO.getMinOpenShiftHours(),orderAndActivityDTO.getCounters());
+                skills, expertise, staffList, plannedTypes, functions, reasonCodes, dayTypes, orderAndActivityDTO.getMinOpenShiftHours(), orderAndActivityDTO.getCounters());
     }
 
     public PlannerSyncResponseDTO initialOptaplannerSync(Long organizationId, Long unitId) {
@@ -1376,7 +1386,7 @@ public class OrganizationService {
         ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = activityIntegrationService.getAllActivitiesAndTimeTypes(countryId);
 
         return new RuleTemplateDefaultData(organizationTypeAndSubTypes, skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(), activityWithTimeTypeDTOS.getIntervals(),
-                priorityGroupDefaultData1.getEmploymentTypes(), priorityGroupDefaultData1.getExpertises(),activityWithTimeTypeDTOS.getCounters());
+                priorityGroupDefaultData1.getEmploymentTypes(), priorityGroupDefaultData1.getExpertises(), activityWithTimeTypeDTOS.getCounters());
     }
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId) {
@@ -1407,7 +1417,7 @@ public class OrganizationService {
         ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = activityIntegrationService.getAllActivitiesAndTimeTypesByUnit(unitId, countryId);
         PriorityGroupDefaultData priorityGroupDefaultData1 = employmentTypeService.getExpertiseAndEmployment(countryId, false);
         RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData(skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(), activityWithTimeTypeDTOS.getIntervals(),
-                priorityGroupDefaultData1.getEmploymentTypes(), priorityGroupDefaultData1.getExpertises(), activityWithTimeTypeDTOS.getMinOpenShiftHours(),activityWithTimeTypeDTOS.getCounters());
+                priorityGroupDefaultData1.getEmploymentTypes(), priorityGroupDefaultData1.getExpertises(), activityWithTimeTypeDTOS.getMinOpenShiftHours(), activityWithTimeTypeDTOS.getCounters());
         return ruleTemplateDefaultData;
     }
 

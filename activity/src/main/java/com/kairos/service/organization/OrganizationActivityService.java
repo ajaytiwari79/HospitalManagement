@@ -119,8 +119,10 @@ public class OrganizationActivityService extends MongoBaseService {
     private TimeAttendanceGracePeriodService timeAttendanceGracePeriodService;
     @Inject
     private PriorityGroupService priorityGroupService;
-    @Inject private CounterRepository counterRepository;
-    @Inject private StaffActivitySettingRepository staffActivitySettingRepository;
+    @Inject
+    private CounterRepository counterRepository;
+    @Inject
+    private StaffActivitySettingRepository staffActivitySettingRepository;
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -311,7 +313,7 @@ public class OrganizationActivityService extends MongoBaseService {
         save(activityCopied);
 
         // copying activity and shift status settings of this activity
-        activityService.copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId());
+        activityService.copyActivityAndShiftStatusOfThisActivity(activityId, activityCopied.getId());
         activityDTO.setId(activityCopied.getId());
         PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
         BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
@@ -333,15 +335,15 @@ public class OrganizationActivityService extends MongoBaseService {
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
         UnitSettingDTO minOpenShiftHours = unitSettingRepository.getMinOpenShiftHours(unitId);
-        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
+        List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
 
         ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals,
-                minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours(),counters);
+                minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours(), counters);
         return activityWithTimeTypeDTO;
     }
 
     public boolean createDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
-        logger.info("I am going to create default data or organization "+unitId);
+        logger.info("I am going to create default data or organization " + unitId);
         //unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
         List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
         periodSettingsService.createDefaultPeriodSettings(unitId);
@@ -351,11 +353,16 @@ public class OrganizationActivityService extends MongoBaseService {
         TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
         timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
-        List<Activity>  existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubType(orgTypeAndSubTypeDTO.getOrganizationTypeId(),orgTypeAndSubTypeDTO.getSubTypeId());
-        if(!existingActivities.isEmpty()) {
+        List<Activity> existingActivities;
+        if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
+            existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubType(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
+        } else {
+            existingActivities= activityMongoRepository.findAllByUnitIdAndDeletedFalse(orgTypeAndSubTypeDTO.getParentOrganizationId());
+        }
+        if (!existingActivities.isEmpty()) {
             List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
             for (Activity activity : existingActivities) {
-                logger.info("I am act %s",activity.getName());
+                logger.info("I am act {}", activity.getName());
                 List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
                 for (int i = 0; i < phases.size(); i++) {
                     PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phases.get(i).getId(), phases.get(i).getName(), phases.get(i).getDescription(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(),
@@ -372,10 +379,11 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     /**
-     * @Auther Pavan
      * @param staffId
      * @param shiftDTO
+     * @Auther Pavan
      */
+
     public void validateShiftTime(Long staffId, ShiftDTO shiftDTO,RulesActivityTab rulesActivityTab){
               LocalTime earliestStartTime;
               LocalTime latestStartTime;

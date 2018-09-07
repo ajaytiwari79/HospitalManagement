@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Created by prerna on 7/11/17.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true,value={ "valid" })
 @QueryResult
 public class EmploymentTypeDTO {
     private Long id;
@@ -24,6 +24,10 @@ public class EmploymentTypeDTO {
     private boolean allowedForFlexPool;
     private Set<EmploymentCategory> employmentCategories;
     private PaidOutFrequencyEnum paymentFrequency;
+
+    public EmploymentTypeDTO() {
+        //Default Constructor
+    }
 
     public Long getId() {
         return id;
@@ -91,7 +95,7 @@ public class EmploymentTypeDTO {
 
     @AssertTrue(message = "At least one role should be selected")
     public boolean isValid() {
-        return (employmentCategories.isEmpty())?false:true;
+        return (!employmentCategories.isEmpty());
     }
 
 }
