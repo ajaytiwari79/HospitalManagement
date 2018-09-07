@@ -981,6 +981,7 @@ public class StaffingLevelService extends MongoBaseService {
             Phase phase = phaseService.getPhaseCurrentByUnit(unitId, DateUtils.asDate(currentDate.getLocalDate()));
             staffingLevel.setPhaseId(phase.getId());
             staffingLevel.setUnitId(unitId);
+            staffingLevel.setCurrentDate(DateUtils.asDate(currentDate.getLocalDate()));
         }
         return staffingLevel;
     }

@@ -6,6 +6,7 @@ import com.kairos.persistance.repository.client_aggregator.CustomAggregationOper
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -68,7 +69,8 @@ public class MasterQuestionnaireTemplateMongoRepositoryImpl implements CustomQue
                 lookup("question", "sections.questions", "_id", "questions"),
                 new CustomAggregationOperation(questionsAddFieldOperation),
                 new CustomAggregationOperation(projectionOperation),
-                new CustomAggregationOperation(groupDataOperation)
+                new CustomAggregationOperation(groupDataOperation),
+                sort(Sort.Direction.DESC,"id")
         );
 
 
