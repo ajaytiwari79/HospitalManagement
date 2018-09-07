@@ -61,8 +61,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
             List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
             if (!techSecurityMeasureNames.isEmpty()) {
                 for (String name : techSecurityMeasureNames) {
-                    TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure(name);
-                    newTechnicalSecurityMeasure.setCountryId(countryId);
+                    TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure(name,countryId,SuggestedDataStatus.APPROVED);
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
 
                 }
@@ -188,7 +187,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
                 TechnicalSecurityMeasure technicalSecurityMeasure = new TechnicalSecurityMeasure(name);
                 technicalSecurityMeasure.setCountryId(countryId);
-                technicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                technicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 technicalSecurityMeasure.setSuggestedDate(LocalDate.now());
                 technicalSecurityMeasureList.add(technicalSecurityMeasure);
             }

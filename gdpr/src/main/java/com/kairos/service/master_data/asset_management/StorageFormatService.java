@@ -58,11 +58,10 @@ public class StorageFormatService extends MongoBaseService {
             storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
             List<StorageFormat> newStorageFormats = new ArrayList<>();
-            if (storageFormatNames.size() != 0) {
+            if (!storageFormatNames.isEmpty()) {
                 for (String name : storageFormatNames) {
 
-                    StorageFormat newStorageFormat = new StorageFormat(name);
-                    newStorageFormat.setCountryId(countryId);
+                    StorageFormat newStorageFormat = new StorageFormat(name,countryId,SuggestedDataStatus.APPROVED);
                     newStorageFormats.add(newStorageFormat);
 
                 }
@@ -190,7 +189,7 @@ public class StorageFormatService extends MongoBaseService {
 
                 StorageFormat storageFormat = new StorageFormat(name);
                 storageFormat.setCountryId(countryId);
-                storageFormat.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                storageFormat.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 storageFormat.setSuggestedDate(LocalDate.now());
                 storageFormatList.add(storageFormat);
             }

@@ -62,8 +62,7 @@ public class DataSourceService extends MongoBaseService {
             if (!dataSourceNames.isEmpty()) {
                 for (String name : dataSourceNames) {
 
-                    DataSource newDataSource = new DataSource(name);
-                    newDataSource.setCountryId(countryId);
+                    DataSource newDataSource = new DataSource(name,countryId,SuggestedDataStatus.APPROVED);
                     newDataSources.add(newDataSource);
 
                 }
@@ -182,7 +181,7 @@ public class DataSourceService extends MongoBaseService {
 
                 DataSource dataSource = new DataSource(name);
                 dataSource.setCountryId(countryId);
-                dataSource.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                dataSource.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 dataSource.setSuggestedDate(LocalDate.now());
                 dataSourceList.add(dataSource);
             }

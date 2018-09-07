@@ -41,8 +41,8 @@ public class RulesActivityTabDTO {
     // in Minutes
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
-    private int shortestTime;
-    private int longestTime;
+    private Short shortestTime;
+    private Short longestTime;
     private boolean eligibleForCopy;
 
     private DurationField plannedTimeInAdvance;
@@ -214,19 +214,19 @@ public class RulesActivityTabDTO {
         this.latestStartTime = latestStartTime;
     }
 
-    public int getShortestTime() {
+    public Short getShortestTime() {
         return shortestTime;
     }
 
-    public void setShortestTime(int shortestTime) {
+    public void setShortestTime(Short shortestTime) {
         this.shortestTime = shortestTime;
     }
 
-    public int getLongestTime() {
+    public Short getLongestTime() {
         return longestTime;
     }
 
-    public void setLongestTime(int longestTime) {
+    public void setLongestTime(Short longestTime) {
         this.longestTime = longestTime;
     }
 

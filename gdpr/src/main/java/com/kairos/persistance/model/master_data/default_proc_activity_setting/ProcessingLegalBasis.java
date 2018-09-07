@@ -47,6 +47,12 @@ public class ProcessingLegalBasis extends MongoBaseEntity {
         this.name = name;
     }
 
+    public ProcessingLegalBasis(@NotBlank(message = "error.message.name.cannot.be.null.or.empty")String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
+        this.countryId = countryId;
+        this.suggestedDataStatus = suggestedDataStatus;
+    }
+
     public ProcessingLegalBasis(String name) {
         this.name = name;
     }

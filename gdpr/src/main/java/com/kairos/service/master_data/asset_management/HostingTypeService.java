@@ -60,8 +60,7 @@ public class HostingTypeService extends MongoBaseService {
             List<HostingType> newHostingTypes = new ArrayList<>();
             if (!hostingTypeNames.isEmpty()) {
                 for (String name : hostingTypeNames) {
-                    HostingType newHostingType = new HostingType(name);
-                    newHostingType.setCountryId(countryId);
+                    HostingType newHostingType = new HostingType(name,countryId,SuggestedDataStatus.APPROVED);
                     newHostingTypes.add(newHostingType);
                 }
                 newHostingTypes = hostingTypeMongoRepository.saveAll(getNextSequence(newHostingTypes));
@@ -190,7 +189,7 @@ public class HostingTypeService extends MongoBaseService {
 
                 HostingType hostingType = new HostingType(name);
                 hostingType.setCountryId(countryId);
-                hostingType.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                hostingType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 hostingType.setSuggestedDate(LocalDate.now());
                 hostingTypeList.add(hostingType);
             }

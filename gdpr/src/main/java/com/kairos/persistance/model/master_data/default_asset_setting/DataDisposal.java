@@ -49,6 +49,12 @@ public class DataDisposal extends MongoBaseEntity {
         this.name = name;
     }
 
+    public DataDisposal(@NotBlank(message = "Name can't be empty") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
+        this.countryId = countryId;
+        this.suggestedDataStatus = suggestedDataStatus;
+    }
+
     public DataDisposal() {
     }
 }
