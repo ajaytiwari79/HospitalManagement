@@ -103,7 +103,7 @@ public class ShiftSickService extends MongoBaseService {
         if (!Optional.ofNullable(staffUnitPositionDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staffUnitPosition.notFound");
         }
-        List<Shift> shifts = shiftMongoRepository.findAllDisabledOrSickShiftsOfStaff(staffUnitPositionDetails.getId(), staffId, unitId,DateUtils.getCurrentLocalDate());
+        List<Shift> shifts = shiftMongoRepository.findAllDisabledOrSickShiftsByUnitPositionIdAndUnitId(staffUnitPositionDetails.getId(),  unitId,DateUtils.getCurrentLocalDate());
         shifts.forEach(s -> {
             if (s.isSickShift()) {
                 s.setDeleted(true);// delete the sick shift.

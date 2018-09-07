@@ -51,7 +51,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     List<Shift> findShiftBetweenDuration(LocalDateTime startDate, LocalDateTime endDate, Long unitId);
 
     @Query("{'deleted':false, 'unitId':?2, 'startDate':{$gte:?3}, 'unitPositionId':?0, '$or':[{disabled:true},{sickShift:true}] }")
-    List<Shift> findAllDisabledOrSickShiftsOfStaff(Long unitPositionId, Long staffId, Long unitId, LocalDate startDate);
+    List<Shift> findAllDisabledOrSickShiftsByUnitPositionIdAndUnitId(Long unitPositionId,Long unitId, LocalDate startDate);
 
     @Query("{deleted:false,planningPeriodId:?0,phaseId:?1,unitId:?2}")
     List<Shift> findAllShiftsPlanningPeriodAndPhaseId(BigInteger planningPeriodId,BigInteger phaseId,Long unitId);
