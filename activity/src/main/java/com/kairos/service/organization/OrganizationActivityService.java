@@ -50,7 +50,6 @@ import com.kairos.service.user_service_data.UnitDataService;
 import com.kairos.user.country.day_type.DayType;
 import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.util.DateTimeInterval;
 import com.kairos.util.ObjectMapperUtils;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
@@ -385,9 +384,6 @@ public class OrganizationActivityService extends MongoBaseService {
      * @Auther Pavan
      */
     public void validateShiftTime(Long staffId, ShiftDTO shiftDTO, RulesActivityTab rulesActivityTab) {
-        if (shiftDTO.getStartDate().after(shiftDTO.getEndDate())) {
-            exceptionService.invalidRequestException("message.date.startandend");
-        }
         LocalTime earliestStartTime;
         LocalTime latestStartTime;
         LocalTime maximumEndTime;
@@ -417,10 +413,10 @@ public class OrganizationActivityService extends MongoBaseService {
         if (maximumEndTime != null && maximumEndTime.isBefore(shiftDTO.getEndTime())) {
             exceptionService.actionNotPermittedException("error.end_time.less_than.maximum_end_time");
         }
-        if (longestTime < new DateTimeInterval(shiftDTO.getStartDate(),shiftDTO.getEndDate()).getMinutes()) {
+        if (longestTime < (shiftDTO.getEndDate().getTime() - shiftDTO.getStartDate().getTime()) / ONE_MINUTE) {
             exceptionService.actionNotPermittedException("error.shift.duration_exceeds_longest_time");
         }
-        if (shortestTime > new DateTimeInterval(shiftDTO.getStartDate(),shiftDTO.getEndDate()).getMinutes()) {
+        if (shortestTime > (shiftDTO.getEndDate().getTime() - shiftDTO.getStartDate().getTime()) / ONE_MINUTE) {
             exceptionService.actionNotPermittedException("error.shift.duration.less_than.shortest_time");
         }
     }

@@ -57,7 +57,6 @@ public class ShiftDTO {
     private LocalTime endTime;
     private Long allowedBreakDurationInMinute;
     private List<ShiftDTO> subShifts = new ArrayList<>();
-    private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger templateId;
     private String timeType;
     private Set<ShiftStatus> status = new HashSet<>();
@@ -94,30 +93,6 @@ public class ShiftDTO {
         this.subShifts=subShifts;
     }
 
-
-    public BigInteger getPlannedTimeId() {
-        return plannedTimeId;
-    }
-
-    public void setPlannedTimeId(BigInteger plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
-    }
-
-    public Set<ShiftStatus> getStatus() {
-        return status;
-    }
-
-    public void setStatus(Set<ShiftStatus> status) {
-        this.status = status;
-    }
-
-    public List<ShiftActivity> getActivities() {
-        return activities;
-    }
-
-    public void setActivities(List<ShiftActivity> activities) {
-        this.activities = activities;
-    }
 
     public LocalDate getStartLocalDate() {
         return startLocalDate;
