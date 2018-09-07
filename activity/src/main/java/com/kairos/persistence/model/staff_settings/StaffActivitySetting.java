@@ -11,8 +11,8 @@ public class StaffActivitySetting extends MongoBaseEntity {
     private BigInteger activityId;
     private Long unitPositionId;
     private Long unitId;
-    private int shortestTime;
-    private int longestTime;
+    private Short shortestTime;
+    private Short longestTime;
     private Integer minLength;
     private Integer maxThisActivityPerShift;
     private boolean eligibleForMove;
@@ -26,7 +26,7 @@ public class StaffActivitySetting extends MongoBaseEntity {
     }
 
     public StaffActivitySetting(Long staffId, BigInteger activityId, Long unitPositionId, Long unitId,
-                                int shortestTime, int longestTime, Integer minLength, Integer maxThisActivityPerShift,
+                                Short shortestTime, Short longestTime, Integer minLength, Integer maxThisActivityPerShift,
                                 boolean eligibleForMove,LocalTime earliestStartTime,LocalTime latestStartTime,LocalTime maximumEndTime,List<Long> dayTypeIds) {
         this.staffId = staffId;
         this.activityId = activityId;
@@ -75,19 +75,19 @@ public class StaffActivitySetting extends MongoBaseEntity {
         this.unitId = unitId;
     }
 
-    public int getShortestTime() {
+    public Short getShortestTime() {
         return shortestTime;
     }
 
-    public void setShortestTime(int shortestTime) {
+    public void setShortestTime(Short shortestTime) {
         this.shortestTime = shortestTime;
     }
 
-    public int getLongestTime() {
+    public Short getLongestTime() {
         return longestTime;
     }
 
-    public void setLongestTime(int longestTime) {
+    public void setLongestTime(Short longestTime) {
         this.longestTime = longestTime;
     }
 
