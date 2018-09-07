@@ -59,6 +59,7 @@ public class ShiftDTO {
     private LocalTime endTime;
     private Long allowedBreakDurationInMinute;
     private List<ShiftDTO> subShifts = new ArrayList<>();
+    private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger templateId;
     private String timeType;
 
@@ -91,6 +92,14 @@ public class ShiftDTO {
         this.startTime=startTime;
         this.endTime=endTime;
         this.subShifts=subShifts;
+    }
+
+    public List<ShiftActivity> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<ShiftActivity> activities) {
+        this.activities = activities;
     }
 
     public LocalDate getStartLocalDate() {
