@@ -175,10 +175,10 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,TabKPIConf.class),TabKPIMappingDTO.class);
     }
 
-    public List<TabKPIDTO> getTabKPIForStaffByTabAndStaffId(List<String> tabIds,List<BigInteger> kpiIds,Long staffId,ConfLevel level){
+    public List<TabKPIDTO> getTabKPIForStaffByTabAndStaffId(List<String> tabIds,List<BigInteger> kpiIds,Long staffId,Long unitId,ConfLevel level){
         Criteria criteria;
         if(kpiIds.isEmpty()) {
-            criteria=Criteria.where("tabId").in(tabIds).and("staffId").is(staffId).and("level").is(level);
+            criteria=Criteria.where("tabId").in(tabIds).and("staffId").is(staffId).and("unitId").is(unitId).and("level").is(level);
         }else{
             criteria=Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level);
         }
@@ -193,8 +193,8 @@ public class CounterRepository {
         return aggregationResults.getMappedResults();
     };
 
-    public List<TabKPIConf> findTabKPIConfigurationByTabIds(List<String> tabIds,Long staffId,ConfLevel level){
-        Query query=new Query(Criteria.where("tabId").in(tabIds).and("staffId").is(staffId).and("level").is(level));
+    public List<TabKPIConf> findTabKPIConfigurationByTabIds( String tabId,List<BigInteger> kpiIds,Long staffId,ConfLevel level){
+        Query query=new Query(Criteria.where("tabId").is(tabId).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level));
         return mongoTemplate.find(query,TabKPIConf.class);
     }
 

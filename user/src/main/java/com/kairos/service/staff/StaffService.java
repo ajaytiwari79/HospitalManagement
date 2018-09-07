@@ -2113,22 +2113,23 @@ public class StaffService {
 
     public Long getStaffIdOfLoggedInUser(Long unitId) {
         Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-        Long staffId= staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
-        return (staffId!=null)?staffId:staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
+        return staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
     }
 
     public StaffAccessGroupQueryResult getAccessGroupIdsOfStaff(Long unitId) {
-        StaffAccessGroupQueryResult staffAccessGroupQueryResult=new StaffAccessGroupQueryResult();
+        StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         Long staffId=getStaffIdOfLoggedInUser(unitId);
         long loggedinUserId = UserContext.getUserDetails().getId();
-       Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
-       if(!isCountryAdmin) {
-           staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
+       Boolean isCountryAdmin=false;
+       staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
+       if(!Optional.ofNullable(staffAccessGroupQueryResult).isPresent()){
+           staffAccessGroupQueryResult=new StaffAccessGroupQueryResult();
+           isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
+           Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+           staffId=staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
        }
         staffAccessGroupQueryResult.setCountryAdmin(isCountryAdmin);
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;
     }
-
-
 }

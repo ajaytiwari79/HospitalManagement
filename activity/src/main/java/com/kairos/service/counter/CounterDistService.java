@@ -157,32 +157,34 @@ public class CounterDistService extends MongoBaseService {
     }
 
     public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId,Long unitId, ConfLevel level){
-        Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
-        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(Arrays.asList(moduleId),new ArrayList<>(),staffId,level);
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+       // Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
+        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(Arrays.asList(moduleId),new ArrayList<>(),accessGroupPermissionCounterDTO.getStaffId(),unitId,level);
         return tabKPIDTOS;
     }
 
     public List<TabKPIDTO> addTabKPIEntriesOfStaff(List<TabKPIMappingDTO> tabKPIMappingDTOS,Long unitId,ConfLevel level){
-        Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+      //  Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
         List<TabKPIConf> entriesToSave = new ArrayList<>();
         List<String> tabIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getTabId()).collect(toList());
         List<BigInteger> kpiIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(toList());
-        Map<String, Map<BigInteger, BigInteger>> tabKpiMap=setTabKPIEntries(tabIds,kpiIds,entriesToSave,null,null,staffId,level);
+        Map<String, Map<BigInteger, BigInteger>> tabKpiMap=setTabKPIEntries(tabIds,kpiIds,entriesToSave,null,null,accessGroupPermissionCounterDTO.getStaffId(),level,accessGroupPermissionCounterDTO.getCountryAdmin());
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
             if(tabKpiMap.get(tabKPIMappingDTO.getTabId()).get(tabKPIMappingDTO.getKpiId())==null){
-                entriesToSave.add(new TabKPIConf(tabKPIMappingDTO.getTabId(),tabKPIMappingDTO.getKpiId(),null,null,staffId,level,tabKPIMappingDTO.getPosition()));
+                entriesToSave.add(new TabKPIConf(tabKPIMappingDTO.getTabId(),tabKPIMappingDTO.getKpiId(),null,unitId,accessGroupPermissionCounterDTO.getStaffId(),level,tabKPIMappingDTO.getPosition()));
             }
         });
         if (entriesToSave.isEmpty()) {
             exceptionService.invalidRequestException("error.kpi.invalidData");
         }
         save(entriesToSave);
-        return counterRepository.getTabKPIForStaffByTabAndStaffId(tabIds,kpiIds,staffId,level);
+        return counterRepository.getTabKPIForStaffByTabAndStaffId(tabIds,kpiIds,accessGroupPermissionCounterDTO.getStaffId(),unitId,level);
     }
 
     public void addTabKPIEntries(TabKPIEntryConfDTO tabKPIEntries,Long countryId,Long unitId,Long staffId, ConfLevel level) {
         List<TabKPIConf> entriesToSave = new ArrayList<>();
-        Map<String, Map<BigInteger, BigInteger>> tabKpiMap=setTabKPIEntries(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),entriesToSave,countryId,unitId,staffId,level);
+        Map<String, Map<BigInteger, BigInteger>> tabKpiMap=setTabKPIEntries(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),entriesToSave,countryId,unitId,staffId,level,false);
         tabKPIEntries.getTabIds().forEach(tabId->{tabKPIEntries.getKpiIds().forEach(kpiId->{
             if(tabKpiMap.get(tabId).get(kpiId)==null){
                 entriesToSave.add(new TabKPIConf(tabId,kpiId,countryId,unitId,staffId,level,null));
@@ -193,15 +195,17 @@ public class CounterDistService extends MongoBaseService {
         }
         save(entriesToSave);
     }
-    public Map<String, Map<BigInteger, BigInteger>> setTabKPIEntries(List<String> tabIds,List<BigInteger> kpiIds,List<TabKPIConf> entriesToSave,Long countryId,Long unitId,Long staffId, ConfLevel level){
+    public Map<String, Map<BigInteger, BigInteger>> setTabKPIEntries(List<String> tabIds,List<BigInteger> kpiIds,List<TabKPIConf> entriesToSave,Long countryId,Long unitId,Long staffId, ConfLevel level,boolean isCountryAdmin){
         Long refId = ConfLevel.COUNTRY.equals(level) ? countryId : unitId;
         if(ConfLevel.STAFF.equals(level)){
             refId=staffId;
         }
         List<TabKPIMappingDTO> tabKPIMappingDTOS = counterRepository.getTabKPIConfigurationByTabIds(tabIds,kpiIds,refId,level);
-        List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(kpiIds,refId,level);
-        if (kpiIds.size() != applicableKPIS.size()) {
-            exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
+        if(!isCountryAdmin) {
+            List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(kpiIds, refId, level);
+            if (kpiIds.size() != applicableKPIS.size()) {
+                exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
+            }
         }
         Map<String, Map<BigInteger, BigInteger>> tabKpiMap = new HashMap<>();
         tabIds.forEach(tabKpiId -> {
@@ -213,8 +217,10 @@ public class CounterDistService extends MongoBaseService {
         return  tabKpiMap;
     }
     public void updateTabKPIEntries(List<TabKPIMappingDTO> tabKPIMappingDTOS,String tabId,Long unitId, ConfLevel level) {
-        Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
-        List<TabKPIConf> tabKPIConfs=counterRepository.findTabKPIConfigurationByTabIds(Arrays.asList(tabId),staffId,level);
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+//        Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
+        List<BigInteger> kpiIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
+        List<TabKPIConf> tabKPIConfs=counterRepository.findTabKPIConfigurationByTabIds(tabId,kpiIds,accessGroupPermissionCounterDTO.getStaffId(),level);
         Map<BigInteger,TabKPIMappingDTO> tabKPIMappingDTOMap=new HashMap<>();
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
             tabKPIMappingDTOMap.put(tabKPIMappingDTO.getId(),tabKPIMappingDTO);
@@ -229,7 +235,8 @@ public class CounterDistService extends MongoBaseService {
 
     public void removeTabKPIEntries(TabKPIMappingDTO tabKPIMappingDTO,Long refId,ConfLevel level) {
         if(ConfLevel.STAFF.equals(level)){
-            refId=genericIntegrationService.getStaffIdByUserId(refId);
+            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
+            refId=accessGroupPermissionCounterDTO.getStaffId();
         }
        counterRepository.removeTabKPIConfiguration(tabKPIMappingDTO,refId,level);
     }
@@ -282,7 +289,7 @@ public class CounterDistService extends MongoBaseService {
         });
         staffids.forEach(staffId ->{accessGroupKPIConf.getKpiIds().forEach(kpiId->{
             if(staffIdKpiMap.get(staffId).get(kpiId)==null){
-                applicableKPISToSave.add(new ApplicableKPI(kpiId,kpiId,null, staffId, null, ConfLevel.STAFF));
+                applicableKPISToSave.add(new ApplicableKPI(kpiId,kpiId,null, null, staffId, ConfLevel.STAFF));
                 staffIdKpiMap.get(staffId).put(kpiId,kpiId);
             }
         });});
