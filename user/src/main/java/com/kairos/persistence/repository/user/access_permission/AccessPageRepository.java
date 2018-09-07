@@ -1,13 +1,10 @@
 package com.kairos.persistence.repository.user.access_permission;
 
-import com.kairos.persistence.model.access_permission.AccessPage;
-import com.kairos.persistence.model.access_permission.AccessPageDTO;
-import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
+import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import com.kairos.persistence.model.access_permission.AccessPageLanguageDTO;
+import com.kairos.user.access_page.KPIAccessPageDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -218,7 +215,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active, \n" +
             " CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
             " CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
-            " CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization")
+            " CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization ORDER BY id(accessPage)")
     List<AccessPageDTO> getMainTabs(Long countryId);
 
     @Query("match (org:Organization) where id(org)={0} with org\n" +
@@ -367,6 +364,19 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "return id(org) as unitId,org.isParentOrganization as parentOrganization, permissions as permission")
     List<UserPermissionQueryResult> fetchStaffPermission(Long userId);
 
+
+
+    @Query("Match (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
+            "MATCH (country:Country)-[:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]-(accessPage) WHERE id(country)={0} with accessPage\n" +
+            "optional MATCH (accessPage) -[: " +SUB_PAGE + "]->(subPages:AccessPage{active:true,kpiEnabled:true}) RETURN accessPage.name as name,accessPage.moduleId as moduleId, collect(distinct subPages) as child ORDER BY accessPage.moduleId")
+    List<KPIAccessPageQueryResult> getKPITabsListForCountry(Long countryId);
+
+    @Query("MATCH (org:Organization) where id(org)={0} with org\n" +
+            "MATCH(org)-[: " + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(accessgroup:AccessGroup{deleted: false}) with accessgroup\n" +
+            "MATCH(accessgroup)-[r:HAS_ACCESS_OF_TABS ]->(accessPage:AccessPage{isModule:true}) with accessPage\n" +
+            "optional MATCH (accessPage) -[: " + SUB_PAGE + "]->(subPages:AccessPage{active:true,kpiEnabled:true}) RETURN \n" +
+            "accessPage.name as name,accessPage.moduleId as moduleId, collect(distinct subPages) as child ORDER BY accessPage.moduleId")
+    List<KPIAccessPageQueryResult> getKPITabsListForUnit(Long unitId);
 
 
     @Query("MATCH (n:AccessPage) -[:SUB_PAGE *]->(subPages:AccessPage{active:true,kpiEnabled:true}) where n.moduleId={0} RETURN subPages")

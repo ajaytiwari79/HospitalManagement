@@ -14,6 +14,7 @@ import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPage;
+import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -2127,5 +2128,20 @@ public class StaffService {
         return staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
     }
 
-
+    public StaffAccessGroupQueryResult getAccessGroupIdsOfStaff(Long unitId) {
+        StaffAccessGroupQueryResult staffAccessGroupQueryResult;
+        Long staffId=getStaffIdOfLoggedInUser(unitId);
+        long loggedinUserId = UserContext.getUserDetails().getId();
+       Boolean isCountryAdmin=false;
+       staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
+       if(!Optional.ofNullable(staffAccessGroupQueryResult).isPresent()){
+           staffAccessGroupQueryResult=new StaffAccessGroupQueryResult();
+           isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
+           Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+           staffId=staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
+       }
+        staffAccessGroupQueryResult.setCountryAdmin(isCountryAdmin);
+        staffAccessGroupQueryResult.setStaffId(staffId);
+        return staffAccessGroupQueryResult;
+    }
 }

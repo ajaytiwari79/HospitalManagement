@@ -1,5 +1,6 @@
 package com.kairos.rest_client;
 
+import com.kairos.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.activity.open_shift.PriorityGroupDefaultData;
@@ -84,8 +85,12 @@ public class GenericIntegrationService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, null, false, IntegrationOperation.GET, "/unit/parent_org_and_country", null), UnitAndParentOrganizationAndCountryDTO.class);
     }
 
-    public List<KPIAccessPageDTO> getKPIEnabledTabsForModule(String moduleId, Long countryId){
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/"+countryId+"/module/"+moduleId+"/kpi_details", null), KPIAccessPageDTO.class);
+    public List<KPIAccessPageDTO> getKPIEnabledTabsForModuleForCountry(Long countryId){
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/country/{countryId}/kpi_details", null,countryId), KPIAccessPageDTO.class);
+    }
+
+    public List<KPIAccessPageDTO> getKPIEnabledTabsForModuleForUnit(Long unitId){
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/kpi_details", null), KPIAccessPageDTO.class);
     }
 
     public List<OrgTypeDTO> getOrganizationIdsBySubOrgId(List<Long> orgTypeId){
@@ -105,5 +110,9 @@ public class GenericIntegrationService {
             exceptionService.dataNotFoundByIdException("message.staff.notFound");
         }
         return value.longValue();
+    }
+
+    public AccessGroupPermissionCounterDTO getAccessGroupIdsAndCountryAdmin(Long unitId){
+            return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/staff/user/accessgroup",null),AccessGroupPermissionCounterDTO.class);
     }
 }

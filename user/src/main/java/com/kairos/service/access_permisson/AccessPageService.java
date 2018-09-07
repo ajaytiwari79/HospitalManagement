@@ -411,6 +411,17 @@ public class AccessPageService {
         return accessPageRepository.getOneMainModule();
     }
 
+    public List<KPIAccessPageDTO> getKPIAccessPageListForCountry(Long countryId){
+        List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForCountry(countryId);
+        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
+        return kpiTabs;
+    }
+    public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long unitId){
+        List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForUnit(unitId);
+        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
+        return kpiTabs;
+    }
+
     public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){
         List<AccessPage> accessPages = accessPageRepository.getKPITabsList(moduleId);
         List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);

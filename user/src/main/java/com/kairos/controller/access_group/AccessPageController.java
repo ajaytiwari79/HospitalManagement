@@ -18,9 +18,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 /**
  * Created by prabjot on 3/1/17.
@@ -83,6 +81,16 @@ public class AccessPageController {
     public ResponseEntity<Map<String,Object>> setPermissionsToPage(){
         accessPageService.setPermissionToAccessPage();
         return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
+    }
+
+    @GetMapping(value = COUNTRY_URL+"/kpi_details")
+    public ResponseEntity<Map<String, Object>> getKPITabsDataForModuleForCountry(@PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getKPIAccessPageListForCountry(countryId));
+    }
+
+    @GetMapping(value = UNIT_URL+"/kpi_details")
+    public ResponseEntity<Map<String, Object>> getKPITabsDataForModuleForUnit(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getKPIAccessPageListForUnit(unitId));
     }
 
     @GetMapping(value = "/module/{moduleId}/kpi_details")

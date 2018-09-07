@@ -12,7 +12,7 @@ public class CounterDTO {
     private BigInteger id;
     private CounterType type;
     private String title;
-    private boolean treatAsCounter;
+    private boolean counter;
     private BigInteger primaryCounter;
     private BigInteger categoryId;
     private List<FilterCriteria> criteriaList;
@@ -46,12 +46,12 @@ public class CounterDTO {
         this.title = title;
     }
 
-    public boolean isTreatAsCounter() {
-        return treatAsCounter;
+    public boolean isCounter() {
+        return counter;
     }
 
-    public void setTreatAsCounter(boolean treatAsCounter) {
-        this.treatAsCounter = treatAsCounter;
+    public void setCounter(boolean counter) {
+        this.counter = counter;
     }
 
     public BigInteger getPrimaryCounter() {
