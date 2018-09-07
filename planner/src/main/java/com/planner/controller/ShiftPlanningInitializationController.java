@@ -49,4 +49,10 @@ private ActivityMongoRepository activityMongoRepository;
         Long[] unitPositionIds = {35682L,35681L};
         return ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, activityMongoRepository.getCTARuleTemplateByUnitPositionIds(unitPositionIds));
     }
+
+    @RequestMapping("/getWTA")
+    ResponseEntity<Map<String, Object>> getWTA() {
+        Long[] unitPositionIds = {35682L,35681L};
+        return ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, activityMongoRepository.getWTARuleTemplateByUnitPositionIds(unitPositionIds));
+    }
 }

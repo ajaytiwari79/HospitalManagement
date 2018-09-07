@@ -30,6 +30,8 @@ public class AppConstants {
     public static final String ACTIVITYIES="activities";
     public static final String COST_TIME_AGGREMENET="costTimeAgreement";
     public static final String CTA_RULE_TEMPLATE="cTARuleTemplate";
+    public static final String Working_Time_AGREEMENT="workingTimeAgreement";
+    public static final String WTABASE_TEMPLATE="wtaBaseRuleTemplate";
 
     /**
      * Neo4j RelationShip constants

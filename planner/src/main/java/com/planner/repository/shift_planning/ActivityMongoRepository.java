@@ -83,8 +83,8 @@ public class ActivityMongoRepository {
     public List<WorkingTimeAgreement> getWTARuleTemplateByUnitPositionIds(Long[] unitPositionIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitPositionId").in(Arrays.asList(unitPositionIds))),
-                lookup(CTA_RULE_TEMPLATE, "ruleTemplateIds", "_id", "ruleTemplates"));
-        AggregationResults<WorkingTimeAgreement> aggregationResults = mongoTemplate.aggregate(aggregation, COST_TIME_AGGREMENET, WorkingTimeAgreement.class);
+                lookup(WTABASE_TEMPLATE, "ruleTemplateIds", "_id", "ruleTemplates"));
+        AggregationResults<WorkingTimeAgreement> aggregationResults = mongoTemplate.aggregate(aggregation, Working_Time_AGREEMENT, WorkingTimeAgreement.class);
 
         return aggregationResults.getMappedResults();
     }
