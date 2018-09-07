@@ -11,7 +11,7 @@ import com.kairos.activity.time_bank.time_bank_basic.time_bank.CTADistributionDT
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.model.pay_out.PayOutCTADistribution;
 import com.kairos.user.country.agreement.cta.CalculationFor;
@@ -19,13 +19,11 @@ import com.kairos.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.time.DayOfWeek;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;

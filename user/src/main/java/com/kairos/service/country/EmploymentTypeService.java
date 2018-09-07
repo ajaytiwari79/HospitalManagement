@@ -211,8 +211,7 @@ public class EmploymentTypeService {
         // Set employment type
         organizationMappingDTO.setEmploymentTypes(getEmploymentTypeList(countryId, false));
         // set Expertise
-        Long selectedDateInLong = (selectedDate != null) ? DateUtil.getIsoDateInLong(selectedDate) : DateUtil.getCurrentDateMillis();
-        organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByCountry(countryId,selectedDateInLong));
+        organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByCountry(countryId));
         //set levels
         organizationMappingDTO.setLevels(countryGraphRepository.getLevelsByCountry(countryId));
         // set regions

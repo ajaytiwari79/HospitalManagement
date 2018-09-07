@@ -343,7 +343,7 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable Long organizationId,
                                                                         @PathVariable long countryId,
-                                                                        @RequestBody OrganizationBasicDTO organizationBasicDTO) {
+                                                                        @Valid @RequestBody OrganizationBasicDTO organizationBasicDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, companyCreationService.createCompany(organizationBasicDTO, countryId, organizationId));
     }
 

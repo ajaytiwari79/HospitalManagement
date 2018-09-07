@@ -1,6 +1,7 @@
 package com.kairos.controller.user;
 
 import com.kairos.persistence.model.auth.User;
+import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.staff.UserSickService;
@@ -16,9 +17,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.PARENT_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 
 /**
@@ -32,12 +31,17 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 @Api(value = API_V1)
 public class UserController {
     @Inject
-    UserService userService;
+    private UserService userService;
 
     @Inject
     private StaffService staffService;
+
    @Inject
     private UserSickService userSickService;
+    @Inject
+    private AccessGroupService accessGroupService;
+   /* @Inject
+    TaskReportService taskReportService;*/
     /**
      * @return List of Users- All Users in db
      */
@@ -140,7 +144,6 @@ public class UserController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdOfLoggedInUser(unitId));
     }
 
-
     @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/unit_sick_settings")
     @ApiOperation("get staff ans sick activities of a user")
     ResponseEntity<Map<String, Object>> getStaffAndUnitSickSettings(@PathVariable long userId,@RequestParam String sickSettingsRequired) {
@@ -148,4 +151,9 @@ public class UserController {
     }
 
 
+    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/staff/access_groups")
+    @ApiOperation("get accessgroup ids and iscountryadmin")
+    public ResponseEntity<Map<String, Object>> getAccessGroupIdsOfStaff(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessGroupIdsByStaffIdAndUnitId(unitId));
+    }
 }

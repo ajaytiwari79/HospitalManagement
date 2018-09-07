@@ -1,14 +1,12 @@
 package com.kairos.service.shift;
 
 import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.dashboard.UserSickDataWrapper;
-import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.activity.Shift;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.period.PlanningPeriod;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
@@ -17,7 +15,6 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.util.DateUtils;
 import com.kairos.util.user_context.UserContext;
 import org.slf4j.Logger;
@@ -26,8 +23,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;

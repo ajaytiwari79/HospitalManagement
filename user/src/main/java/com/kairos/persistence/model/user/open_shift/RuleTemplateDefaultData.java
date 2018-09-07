@@ -19,7 +19,6 @@ public class RuleTemplateDefaultData {
     private List<EmploymentTypeDTO> employmentTypes;
     private List<ExpertiseResponseDTO> expertises;
     private Integer minOpenShiftHours;
-
     private List<CounterDTO> counters ;
     public RuleTemplateDefaultData() {
         //Default Constructor

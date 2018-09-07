@@ -14,12 +14,11 @@ import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
-import com.kairos.persistence.model.time_bank.ShiftTimeBank;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutTransaction;
@@ -512,7 +511,7 @@ public class TimeBankCalculationService {
             String title = byMonth ? localDate.getDayOfMonth()+" "+localDate.getMonth() : localDate.getDayOfWeek().toString();
             TimeBankIntervalDTO timeBankIntervalDTO = new TimeBankIntervalDTO(0,0,title);
             if(Optional.ofNullable(dailyTimeBankEntry).isPresent()){
-                long scheduledMin = dailyTimeBankEntry.getScheduledMin()+(dailyTimeBankEntry.getTimeBankMinWithoutCta()-dailyTimeBankEntry.getTimeBankMinWithCta());
+                long scheduledMin = dailyTimeBankEntry.getScheduledMin()+dailyTimeBankEntry.getTimeBankMinWithCta();
                 long totalTimeBankChange = dailyTimeBankEntry.getTotalTimeBankMin()<0 ? 0 : dailyTimeBankEntry.getTotalTimeBankMin();
                 timeBankIntervalDTO = new TimeBankIntervalDTO(scheduledMin,totalTimeBankChange,title);
             }

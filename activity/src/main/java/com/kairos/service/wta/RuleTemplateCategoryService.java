@@ -143,13 +143,22 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
             excpExceptionService.actionNotPermittedException("message.ruletemplatecategory.delete", templateCategoryId);
         }
-        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(templateCategoryId);
-        RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
-        wtaBaseRuleTemplates.forEach(rt -> {
-            rt.setRuleTemplateCategoryId(noneRuleTemplateCategory.getId());
-        });
-        if (!wtaBaseRuleTemplates.isEmpty()) {
-            save(wtaBaseRuleTemplates);
+        if(RuleTemplateCategoryType.WTA.equals(ruleTemplateCategory.getRuleTemplateCategoryType())){
+            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(templateCategoryId);
+            RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
+            wtaBaseRuleTemplates.forEach(rt -> {
+                rt.setRuleTemplateCategoryId(noneRuleTemplateCategory.getId());
+            });
+            if (!wtaBaseRuleTemplates.isEmpty()) {
+                save(wtaBaseRuleTemplates);
+            }
+        }else {
+           List<CTARuleTemplate> ctaRuleTemplates =  ctaRuleTemplateRepository.findAllByCategoryId(ruleTemplateCategory.getId());
+            RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
+            ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setRuleTemplateCategoryId(noneRuleTemplateCategory.getId()));
+            if(!ctaRuleTemplates.isEmpty()){
+                save(ctaRuleTemplates);
+            }
         }
         ruleTemplateCategory.setDeleted(true);
         save(ruleTemplateCategory);

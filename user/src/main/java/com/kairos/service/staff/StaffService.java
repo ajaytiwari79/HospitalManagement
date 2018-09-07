@@ -610,7 +610,7 @@ public class StaffService {
             return null;
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("allExpertise", expertiseGraphRepository.getAllExpertiseByCountry(countryId, DateUtil.getCurrentDateMillis()));
+        map.put("allExpertise", expertiseGraphRepository.getAllExpertiseByCountry(countryId));
         map.put("myExpertise", staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffId).stream().map(Expertise::getId).collect(Collectors.toList()));
         return map;
     }
