@@ -1,21 +1,18 @@
 package com.kairos.service.master_data.asset_management;
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.gdpr.data_inventory.RiskDTO;
 import com.kairos.gdpr.master_data.AssetTypeDTO;
-import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.model.risk_management.Risk;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.MasterAssetMongoRepository;
+import com.kairos.persistance.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.risk_management.RiskService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,9 +21,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.kairos.constants.AppConstant.IDS_LIST;
-import static com.kairos.constants.AppConstant.ASSET_TYPES_LIST;
 
 
 @Service
@@ -46,6 +40,9 @@ public class AssetTypeService extends MongoBaseService {
 
     @Inject
     private RiskService riskService;
+
+    @Inject
+    private RiskMongoRepository riskMongoRepository;
 
 
     /**
@@ -162,7 +159,7 @@ public class AssetTypeService extends MongoBaseService {
 
 
     public Boolean deleteAssetType(Long countryId, BigInteger assetTypeId) {
-        AssetType existingAssetType = assetTypeMongoRepository.findByIdAndNonDeleted(countryId, assetTypeId);
+        AssetType existingAssetType = assetTypeMongoRepository.findByIdAndCountryId(countryId, assetTypeId);
         if (!Optional.ofNullable(existingAssetType).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + assetTypeId);
         }
@@ -186,7 +183,7 @@ public class AssetTypeService extends MongoBaseService {
         if (Optional.ofNullable(assetType).isPresent() && !id.equals(assetType.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
-        assetType = assetTypeMongoRepository.findByIdAndNonDeleted(countryId, id);
+        assetType = assetTypeMongoRepository.findByIdAndCountryId(countryId, id);
         assetType.setName(assetTypeDto.getName());
         List<AssetTypeDTO> newSubAssetTypeDTOs = new ArrayList<>();
         List<AssetTypeDTO> updateExistingSubAssetTypeDTOs = new ArrayList<>();
@@ -225,30 +222,34 @@ public class AssetTypeService extends MongoBaseService {
 
     }
 
+
     /**
+     *
      * @param countryId
-     * @param
-     * @param name      name of asset types
-     * @return return basic object of asset type
-     * @throws DataNotExists if Asset type not found for given name
+     * @param assetTypeId
+     * @param riskId
+     * @return
      */
-    public AssetType getAssetTypeByName(Long countryId, String name) {
-        if (!StringUtils.isBlank(name)) {
-            AssetType exist = assetTypeMongoRepository.findByNameAndCountryId(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
+    public boolean unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(Long countryId, BigInteger assetTypeId, BigInteger riskId) {
 
+        AssetType assetType = assetTypeMongoRepository.findByIdAndCountryId(countryId, assetTypeId);
+        if (!Optional.ofNullable(assetType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetTypeId);
+        }
+        assetType.getRisks().remove(riskId);
+        Risk risk = riskMongoRepository.findByIdAndCountryId(countryId, riskId);
+        if (!Optional.ofNullable(risk).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Risk", risk);
+        }
+        delete(risk);
+        assetTypeMongoRepository.save(assetType);
+        return true;
     }
-
 
     /**
      * @param assetTypeDTOs check for duplicates in name of Asset types
      */
-    public void checkForDuplicacyInNameOfAssetType(List<AssetTypeDTO> assetTypeDTOs) {
+    private void checkForDuplicacyInNameOfAssetType(List<AssetTypeDTO> assetTypeDTOs) {
         List<String> names = new ArrayList<>();
         for (AssetTypeDTO assetTypeDTO : assetTypeDTOs) {
             if (names.contains(assetTypeDTO.getName().toLowerCase())) {
