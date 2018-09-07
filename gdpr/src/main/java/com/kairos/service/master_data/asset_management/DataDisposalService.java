@@ -56,13 +56,10 @@ public class DataDisposalService extends MongoBaseService {
         List<DataDisposal> existing = findMetaDataByNamesAndCountryId(countryId, dataDisposalsNames, DataDisposal.class);
         dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
         List<DataDisposal> newDataDisposals = new ArrayList<>();
-        if (dataDisposalsNames.size() != 0) {
+        if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
-
-                DataDisposal newDataDisposal = new DataDisposal(name);
-                newDataDisposal.setCountryId(countryId);
+                DataDisposal newDataDisposal = new DataDisposal(name,countryId,SuggestedDataStatus.APPROVED);
                 newDataDisposals.add(newDataDisposal);
-
             }
 
             newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
@@ -183,7 +180,7 @@ public class DataDisposalService extends MongoBaseService {
 
                 DataDisposal dataDisposal = new DataDisposal(name);
                 dataDisposal.setCountryId(countryId);
-                dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 dataDisposal.setSuggestedDate(LocalDate.now());
                 dataDisposalList.add(dataDisposal);
             }

@@ -47,8 +47,13 @@ public class TransferMethod extends MongoBaseEntity {
         this.name = name;
     }
 
+    public TransferMethod(@NotBlank(message = "Name can't be empty")  String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
+        this.countryId = countryId;
+        this.suggestedDataStatus = suggestedDataStatus;
+    }
 
-    public TransferMethod( String name) {
+    public TransferMethod(String name) {
         this.name = name;
     }
     public TransferMethod() {

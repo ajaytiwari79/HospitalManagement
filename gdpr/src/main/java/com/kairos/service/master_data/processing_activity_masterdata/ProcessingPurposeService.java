@@ -62,8 +62,7 @@ public class ProcessingPurposeService extends MongoBaseService {
             if (!processingPurposesNames.isEmpty()) {
                 for (String name : processingPurposesNames) {
 
-                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name);
-                    newProcessingPurpose.setCountryId(countryId);
+                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name,countryId,SuggestedDataStatus.APPROVED);
                     newProcessingPurposes.add(newProcessingPurpose);
 
                 }
@@ -187,7 +186,7 @@ public class ProcessingPurposeService extends MongoBaseService {
 
                 ProcessingPurpose processingPurpose = new ProcessingPurpose(name);
                 processingPurpose.setCountryId(countryId);
-                processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 processingPurpose.setSuggestedDate(LocalDate.now());
                 processingPurposeList.add(processingPurpose);
             }

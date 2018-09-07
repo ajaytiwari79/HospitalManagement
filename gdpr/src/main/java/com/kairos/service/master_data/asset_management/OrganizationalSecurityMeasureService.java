@@ -62,8 +62,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
             if (!orgSecurityMeasureNames.isEmpty()) {
                 for (String name : orgSecurityMeasureNames) {
 
-                    OrganizationalSecurityMeasure newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name);
-                    newOrganizationalSecurityMeasure.setCountryId(countryId);
+                    OrganizationalSecurityMeasure newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name,countryId,SuggestedDataStatus.APPROVED);
                     newOrgSecurityMeasures.add(newOrganizationalSecurityMeasure);
 
                 }
@@ -188,7 +187,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
                 OrganizationalSecurityMeasure organizationalSecurityMeasure = new OrganizationalSecurityMeasure(name);
                 organizationalSecurityMeasure.setCountryId(countryId);
-                organizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                organizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 organizationalSecurityMeasure.setSuggestedDate(LocalDate.now());
                 organizationalSecurityMeasureList.add(organizationalSecurityMeasure);
             }
