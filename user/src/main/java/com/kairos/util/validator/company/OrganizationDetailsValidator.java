@@ -44,7 +44,7 @@ public class OrganizationDetailsValidator {
 
     public static void validateUserDetails(List<StaffPersonalDetailDTO> staffPersonalDetailDTOS, ExceptionService exceptionService) {
         staffPersonalDetailDTOS.forEach(staffPersonalDetailDTO -> {
-            if (!Optional.ofNullable(staffPersonalDetailDTO.getCprNumber()).isPresent()) {
+            if (!Optional.ofNullable(staffPersonalDetailDTO.getCprNumber()).isPresent()|| staffPersonalDetailDTO.getCprNumber().length()!=10) {
                 exceptionService.invalidRequestException("error.cprnumber.notnull", staffPersonalDetailDTO.getOrganizationId());
             }
             if (!Optional.ofNullable(staffPersonalDetailDTO.getFirstName()).isPresent()) {
