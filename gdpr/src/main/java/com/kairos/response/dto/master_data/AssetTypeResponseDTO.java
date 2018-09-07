@@ -51,6 +51,10 @@ public class AssetTypeResponseDTO {
         return hasSubAsset;
     }
 
+    public List<RiskResponseDTO> getRisks() { return risks; }
+
+    public void setRisks(List<RiskResponseDTO> risks) { this.risks = risks; }
+
     public void setHasSubAsset(Boolean hasSubAsset) {
         this.hasSubAsset = hasSubAsset;
     }
