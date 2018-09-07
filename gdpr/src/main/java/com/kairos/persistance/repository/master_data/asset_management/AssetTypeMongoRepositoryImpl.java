@@ -5,6 +5,7 @@ import com.kairos.persistance.repository.client_aggregator.CustomAggregationOper
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -49,7 +50,18 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("subAsset").is(false).and(DELETED).is(false)),
+                lookup("risk","risks","_id","risks"),
                 lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
+                unwind("subAssetTypes",true),
+                sort(Sort.Direction.ASC,"subAssetTypes.name"),
+                lookup("risk","subAssetTypes.risks","_id","subAssetTypes.risks"),
+                group("$id")
+                .addToSet("subAssetTypes").as("subAssetTypes")
+                .first("risks").as("risks")
+                .first("hasSubAsset").as("hasSubAsset")
+                .first("name").as("name")
+                .first("subAsset").as("subAsset"),
+                sort(Sort.Direction.ASC,"name"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
 
