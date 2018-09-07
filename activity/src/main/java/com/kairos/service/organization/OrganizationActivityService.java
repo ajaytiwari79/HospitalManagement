@@ -380,8 +380,8 @@ public class OrganizationActivityService extends MongoBaseService {
               LocalTime earliestStartTime;
               LocalTime latestStartTime;
               LocalTime maximumEndTime;
-              int longestTime;
-              int shortestTime;
+              Short longestTime;
+              Short shortestTime;
               StaffActivitySetting staffActivitySetting=staffActivitySettingRepository.findByStaffIdAndActivityIdAndDeletedFalse(staffId,shiftDTO.getActivityId());
               if(staffActivitySetting!=null){
                   earliestStartTime=staffActivitySetting.getEarliestStartTime();
@@ -407,10 +407,10 @@ public class OrganizationActivityService extends MongoBaseService {
               if(maximumEndTime!=null && maximumEndTime.isBefore(shiftDTO.getEndTime())){
                   exceptionService.actionNotPermittedException("error.end_time.less_than.maximum_end_time");
               }
-              if(longestTime< (shiftDTO.getEndDate().getTime() - shiftDTO.getStartDate().getTime()) / ONE_MINUTE){
+              if(longestTime!=null && longestTime< (shiftDTO.getEndDate().getTime() - shiftDTO.getStartDate().getTime()) / ONE_MINUTE){
                   exceptionService.actionNotPermittedException("error.shift.duration_exceeds_longest_time");
               }
-              if(shortestTime > (shiftDTO.getEndDate().getTime() - shiftDTO.getStartDate().getTime()) / ONE_MINUTE){
+              if(shortestTime!=null && shortestTime > (shiftDTO.getEndDate().getTime() - shiftDTO.getStartDate().getTime()) / ONE_MINUTE){
                   exceptionService.actionNotPermittedException("error.shift.duration.less_than.shortest_time");
               }
     }

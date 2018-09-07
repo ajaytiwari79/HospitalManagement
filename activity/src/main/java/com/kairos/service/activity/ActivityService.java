@@ -1171,8 +1171,8 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    public void validateActivityTimeRules(LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, int shortestTime, int longestTime){
-        if(shortestTime>longestTime){
+    public void validateActivityTimeRules(LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, Short shortestTime, Short longestTime){
+        if(shortestTime!=null && longestTime!=null && shortestTime>longestTime){
             exceptionService.actionNotPermittedException("shortest.time.greater.longest");
         }
         if(Optional.ofNullable(earliestStartTime).isPresent() &&
@@ -1182,7 +1182,7 @@ public class ActivityService extends MongoBaseService {
         }
 
         if(Optional.ofNullable(earliestStartTime).isPresent() &&
-                Optional.ofNullable(latestStartTime).isPresent() && Optional.ofNullable(maximumEndTime).isPresent() &&
+                Optional.ofNullable(latestStartTime).isPresent() && Optional.ofNullable(maximumEndTime).isPresent() && Optional.ofNullable(longestTime).isPresent() &&
                 earliestStartTime.plusMinutes(longestTime).isAfter(maximumEndTime)) {
             exceptionService.actionNotPermittedException("longest.duration.exceed.limit");
         }
