@@ -1685,8 +1685,9 @@ public class StaffService {
 
     public com.kairos.activity.shift.StaffUnitPositionDetails getUnitPositionOfStaff(long staffId, long unitId) {
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionOfStaff(staffId, unitId, DateUtils.getCurrentDayStartMillis());
-        com.kairos.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.activity.shift.StaffUnitPositionDetails();
+        com.kairos.activity.shift.StaffUnitPositionDetails unitPositionDetails = null;
         if (Optional.ofNullable(unitPosition).isPresent()) {
+            unitPositionDetails = new com.kairos.activity.shift.StaffUnitPositionDetails();
             unitPositionService.convertUnitPositionObject(unitPosition, unitPositionDetails);
         }
         return unitPositionDetails;

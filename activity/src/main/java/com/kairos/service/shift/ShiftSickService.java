@@ -1,13 +1,16 @@
 package com.kairos.service.shift;
 
 import com.kairos.activity.cta.CTAResponseDTO;
+import com.kairos.activity.dashboard.UserSickDataWrapper;
 import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.shift.StaffUnitPositionDetails;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -16,16 +19,16 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.util.DateUtils;
+import com.kairos.util.user_context.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 
@@ -46,9 +49,11 @@ public class ShiftSickService extends MongoBaseService {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private SickSettingsRepository sickSettingsRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ShiftSickService.class);
 
 
-    public Long createSicknessShiftsOfStaff(Long unitId, BigInteger activityId, Long staffId) {
+    public Map<String,Long> createSicknessShiftsOfStaff(Long unitId, BigInteger activityId, Long staffId) {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(activityId);
         Activity activity = activityWrapper.getActivity();
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -57,7 +62,7 @@ public class ShiftSickService extends MongoBaseService {
         if (!activity.getRulesActivityTab().isAllowedAutoAbsence()) {
             exceptionService.actionNotPermittedException("activity.notEligible.for.absence", activity.getName());
         }
-        StaffUnitPositionDetails staffUnitPositionDetails = staffRestClient.verifyUnitEmploymentOfStaff(staffId, ORGANIZATION);
+        StaffUnitPositionDetails staffUnitPositionDetails = staffRestClient.verifyUnitEmploymentOfStaff(staffId, unitId, ORGANIZATION);
         if (!Optional.ofNullable(staffUnitPositionDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staffUnitPosition.notFound");
         }
@@ -66,12 +71,16 @@ public class ShiftSickService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.cta.notFound");
         }
         staffUnitPositionDetails.setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findCurrentDatePlanningPeriod(unitId, DateUtils.getCurrentLocalDate(), DateUtils.getCurrentLocalDate());
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
             exceptionService.actionNotPermittedException("message.periodsetting.notFound");
         }
         short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
+        //This method is used to fetch the shift of the days specified and marked them as disabled as the user is sick.
+        List<Shift> staffOriginalShiftsOfDates = shiftMongoRepository.findAllShiftsByStaffIds(Arrays.asList(staffId), DateUtils.getDate(), DateUtils.addDays(DateUtils.getDate(), shiftNeedsToAddForDays - 1));
+        logger.info(staffOriginalShiftsOfDates.size() + "", " shifts found for days");
+        staffOriginalShiftsOfDates.forEach(s -> s.setDisabled(true));
+
         List<Shift> shifts = new ArrayList<>();
         while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 1) {
             shiftNeedsToAddForDays--;
@@ -79,8 +88,37 @@ public class ShiftSickService extends MongoBaseService {
             Date endDate = DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, 18);
             shifts.add(new Shift(startDate, endDate, staffId, activityId, activity.getName(), staffUnitPositionDetails.getId(), unitId));
         }
+        // Adding all shifts to the same.
+        shifts.addAll(staffOriginalShiftsOfDates);
         if (!shifts.isEmpty())
             save(shifts);
-        return unitId;
+
+        SickSettings sickSettings = new SickSettings(staffId, unitId, UserContext.getUserDetails().getId(), activityId, DateUtils.getCurrentLocalDate());
+        save(sickSettings);
+        Map<String,Long> response= new HashMap<>();
+        response.put("unitId",unitId);
+        response.put("staffId",staffId);
+        return response;
+
+    }
+
+    public void disableSicknessShiftsOfStaff(Long staffId, Long unitId) {
+
+        StaffUnitPositionDetails staffUnitPositionDetails = staffRestClient.verifyUnitEmploymentOfStaff(staffId, unitId, ORGANIZATION);
+        if (!Optional.ofNullable(staffUnitPositionDetails).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.staffUnitPosition.notFound");
+        }
+        List<Shift> shifts = shiftMongoRepository.findAllDisabledOrSickShiftsOfStaff(staffUnitPositionDetails.getId(), staffId, unitId,DateUtils.getCurrentLocalDate());
+        shifts.forEach(s -> {
+            if (s.isSickShift()) {
+                s.setDeleted(true);// delete the sick shift.
+            }
+            else if (s.isDisabled()) {
+                s.setDisabled(false);
+            }
+        });
+        if (!shifts.isEmpty())
+            save(shifts);
+
     }
 }

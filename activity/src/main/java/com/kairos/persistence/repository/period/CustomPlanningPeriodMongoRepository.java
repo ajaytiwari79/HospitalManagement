@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.period;
 
 import com.kairos.activity.period.PeriodDTO;
-import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.activity.period.PlanningPeriodDTO;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.mongodb.client.result.UpdateResult;
 
 import java.time.LocalDate;

@@ -271,9 +271,9 @@ public class StaffRestClient {
      * <p>
      * enpoint map in staff controller
      */
-    public StaffUnitPositionDetails verifyUnitEmploymentOfStaff(Long staffId, String type) {
+    public StaffUnitPositionDetails verifyUnitEmploymentOfStaff(Long staffId,Long unitId, String type) {
 
-        final String baseUrl = getBaseUrl(true);
+        final String baseUrl = getBaseUrl(true,unitId);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffUnitPositionDetails>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffUnitPositionDetails>>() {

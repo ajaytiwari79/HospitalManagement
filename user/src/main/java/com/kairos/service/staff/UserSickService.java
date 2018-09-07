@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kairos.constants.AppConstants.YES;
+
 /**
  * CreatedBy vipulpandey on 30/8/18
  **/
@@ -27,18 +29,16 @@ public class UserSickService {
     @Inject
     private SickConfigurationService sickConfigurationService;
 
-    public List<StaffResultDTO> getStaffAndUnitSickSettings(Long UserId) {
+    public List<StaffResultDTO> getStaffAndUnitSickSettings(Long UserId, String sickSettingsRequired) {
         List<StaffTimezoneQueryResult> staffUnitWrappers = staffGraphRepository.getAllStaffsAndUnitDetailsByUserId(UserId);
-        List<StaffResultDTO> staffResults;
+        List<StaffResultDTO> staffResults = new ArrayList<>();
         if (Optional.ofNullable(staffUnitWrappers).isPresent()) {
             staffResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
             // if the size id one then also calculating allowed time type for sick
-            if (staffUnitWrappers.size() == 1) {
+            if (staffUnitWrappers.size() == 1 && YES.equals(sickSettingsRequired)) {
                 Set<BigInteger> allowedTimeTypes = sickConfigurationService.getSickSettingsOfUnit(staffUnitWrappers.get(0).getUnitId());
                 staffResults.get(0).setAllowedTimeTypesForSick(allowedTimeTypes);
             }
-        } else {
-            staffResults = new ArrayList<>();
         }
         return staffResults;
 

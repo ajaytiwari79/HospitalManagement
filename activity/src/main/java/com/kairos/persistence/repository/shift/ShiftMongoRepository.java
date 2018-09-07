@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -48,5 +49,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     ShiftQueryResult findShiftByStaffIdsAndDate(List<Long> staffids,Date date);
     @Query("{'deleted':false,'unitId':?2, 'isMainShift':true, 'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
     List<Shift> findShiftBetweenDuration(LocalDateTime startDate, LocalDateTime endDate, Long unitId);
+
+    @Query("{'deleted':false, 'unitId':?2, 'startDate':{$gte:?3}, 'unitPositionId':?0, '$or':[{disabled:true},{sickShift:true}] }")
+    List<Shift> findAllDisabledOrSickShiftsOfStaff(Long unitPositionId, Long staffId, Long unitId, LocalDate startDate);
 
 }
