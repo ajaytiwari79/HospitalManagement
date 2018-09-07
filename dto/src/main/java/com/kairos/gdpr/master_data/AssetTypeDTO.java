@@ -21,7 +21,7 @@ public class AssetTypeDTO {
     private String name;
 
     @Valid
-    private List<RiskDTO> risk = new ArrayList<>();
+    private List<RiskDTO> risks = new ArrayList<>();
 
     @Valid
     private List<AssetTypeDTO> subAssetTypes = new ArrayList<>();
@@ -54,13 +54,9 @@ public class AssetTypeDTO {
         this.name = name;
     }
 
-    public List<RiskDTO> getRisk() {
-        return risk;
-    }
+    public List<RiskDTO> getRisks() { return risks; }
 
-    public void setRisk(List<RiskDTO> risk) {
-        this.risk = risk;
-    }
+    public void setRisks(List<RiskDTO> risks) { this.risks = risks; }
 
     public AssetTypeDTO() {
     }

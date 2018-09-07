@@ -63,8 +63,8 @@ public class AssetTypeService extends MongoBaseService {
         AssetType assetType = new AssetType(assetTypeDto.getName(), countryId);
         Map<AssetType, List<RiskDTO>> riskRelatedToAssetTypeAndSubAssetType = new HashMap<>();
         List<AssetType> subAssetTypeList = new ArrayList<>();
-        if (!assetTypeDto.getRisk().isEmpty()) {
-            riskRelatedToAssetTypeAndSubAssetType.put(assetType, assetTypeDto.getRisk());
+        if (!assetTypeDto.getRisks().isEmpty()) {
+            riskRelatedToAssetTypeAndSubAssetType.put(assetType, assetTypeDto.getRisks());
         }
         if (!assetTypeDto.getSubAssetTypes().isEmpty()) {
             subAssetTypeList = buildSubAssetTypesListAndRiskAndLinkedToAssetType(countryId, assetTypeDto.getSubAssetTypes(), riskRelatedToAssetTypeAndSubAssetType);
@@ -98,8 +98,8 @@ public class AssetTypeService extends MongoBaseService {
         for (AssetTypeDTO subAssetTypeDto : subAssetTypesDto) {
             AssetType assetSubType = new AssetType(subAssetTypeDto.getName(), countryId);
             assetSubType.setSubAsset(true);
-            if (!subAssetTypeDto.getRisk().isEmpty()) {
-                riskRelatedToSubAssetTypes.put(assetSubType, subAssetTypeDto.getRisk());
+            if (!subAssetTypeDto.getRisks().isEmpty()) {
+                riskRelatedToSubAssetTypes.put(assetSubType, subAssetTypeDto.getRisks());
             }
             subAssetTypes.add(assetSubType);
         }
@@ -124,8 +124,8 @@ public class AssetTypeService extends MongoBaseService {
         List<AssetType> subAssetTypesList = assetTypeMongoRepository.findAllAssetTypeByIds(countryId, subAssetTypesIds);
         subAssetTypesList.forEach(subAssetType -> {
             AssetTypeDTO subAssetTypeDto = subAssetTypeDtoCorrespondingToIds.get(subAssetType.getId());
-            if (!subAssetTypeDto.getRisk().isEmpty()) {
-                riskRelatedToSubAssetTypes.put(subAssetType, subAssetTypeDto.getRisk());
+            if (!subAssetTypeDto.getRisks().isEmpty()) {
+                riskRelatedToSubAssetTypes.put(subAssetType, subAssetTypeDto.getRisks());
             }
             subAssetType.setName(subAssetTypeDto.getName());
         });
@@ -196,8 +196,8 @@ public class AssetTypeService extends MongoBaseService {
         });
         Map<AssetType, List<RiskDTO>> riskRelatedToAssetTypeAndSubAssetType = new HashMap<>();
         List<AssetType> subAssetTypeList = new ArrayList<>();
-        if (!assetTypeDto.getRisk().isEmpty()) {
-            riskRelatedToAssetTypeAndSubAssetType.put(assetType, assetTypeDto.getRisk());
+        if (!assetTypeDto.getRisks().isEmpty()) {
+            riskRelatedToAssetTypeAndSubAssetType.put(assetType, assetTypeDto.getRisks());
         }
         if (!newSubAssetTypeDTOs.isEmpty()) {
             subAssetTypeList.addAll(buildSubAssetTypesListAndRiskAndLinkedToAssetType(countryId, newSubAssetTypeDTOs, riskRelatedToAssetTypeAndSubAssetType));
