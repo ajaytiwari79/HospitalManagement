@@ -3,6 +3,7 @@ package com.kairos.activity.shift;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.util.DateUtils;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
@@ -12,10 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by vipul on 30/8/17.
@@ -61,6 +59,8 @@ public class ShiftDTO {
     private List<ShiftDTO> subShifts = new ArrayList<>();
     private BigInteger templateId;
     private String timeType;
+    private Set<ShiftStatus> status = new HashSet<>();
+    private BigInteger plannedTimeId;
 
     public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
         this.activityId = activityId;
@@ -262,6 +262,26 @@ public class ShiftDTO {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public ShiftQueryResult getQueryResults(){
+        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id, this.name,
+                this.startDate,
+                this.endDate,
+                this.bid,
+                this.pId,
+                this.bonusTimeBank,
+                this.amount,
+                this.probability,
+                this.accumulatedTimeBankInMinutes,
+                this.remarks,
+                this.activityId, this.staffId, this.unitId, this.unitPositionId);
+        shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
+        shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
+        shiftQueryResult.setStatus(this.status);
+        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
+        shiftQueryResult.setPlannedTimeId(this.plannedTimeId);
+        return shiftQueryResult;
     }
 
     @Override

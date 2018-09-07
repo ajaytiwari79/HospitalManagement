@@ -843,13 +843,13 @@ public class ShiftService extends MongoBaseService {
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
         ViolatedRulesDTO violatedRulesDTO = validateShiftWithActivity(phase,wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         ShiftQueryResult shiftQueryResult;
-        if (CollectionUtils.isNotEmpty(shiftDTO.getSubShifts())) {
+        List<Shift> shifts = null;
+        if (CollectionUtils.isEmpty(shiftDTO.getSubShifts())) {
             shift = buildShift(shiftDTO);
             shift.setUnitId(unitId);
             shift.setMainShift(true);
             shiftQueryResult = shift.getShiftQueryResult();
         } else {
-            List<Shift> shifts;
             shifts = verifyCompositeShifts(shiftDTO, shiftDTO.getId(), activity);
             shift = buildShift(shiftDTO);
             if(violatedRulesDTO.getWorkTimeAgreements().isEmpty()){
@@ -862,6 +862,10 @@ public class ShiftService extends MongoBaseService {
             shiftQueryResult = geSubShiftResponse(shift, shifts);
         }
         if(violatedRulesDTO.getWorkTimeAgreements().isEmpty()){
+            if(CollectionUtils.isNotEmpty(shifts)){
+                save(shifts);
+                shift.setSubShifts(shifts.stream().map(s->s.getId()).collect(Collectors.toSet()));
+            }
             save(shift);
             setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);
