@@ -8,7 +8,7 @@ import java.math.BigInteger;
 public class KPIDTO {
     private BigInteger id;
     private String title;
-    private boolean treatAsCounter;
+    private boolean counter;
     private CounterSize size;
     private ChartType chart;
 
@@ -40,12 +40,12 @@ public class KPIDTO {
         this.title = title;
     }
 
-    public boolean isTreatAsCounter() {
-        return treatAsCounter;
+    public boolean isCounter() {
+        return counter;
     }
 
-    public void setTreatAsCounter(boolean treatAsCounter) {
-        this.treatAsCounter = treatAsCounter;
+    public void setCounter(boolean counter) {
+        this.counter = counter;
     }
 
     public CounterSize getSize() {

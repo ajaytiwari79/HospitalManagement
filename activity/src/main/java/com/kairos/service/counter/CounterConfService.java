@@ -136,7 +136,7 @@ public class CounterConfService extends MongoBaseService {
 
     public void addEntries(Long countryId){
         List<KPI> kpis = new ArrayList<>();
-        /// String title, BaseChart chart, CounterSize size, CounterType type, boolean treatAsCounter, BigInteger primaryCounter
+        /// String title, BaseChart chart, CounterSize size, CounterType type, boolean counter, BigInteger primaryCounter
         //verification for availability
         List<Counter> availableCounters = counterRepository.getCounterByTypes(Arrays.asList(CounterType.values()));
         if(availableCounters.size() == CounterType.values().length) exceptionService.duplicateDataException("error.counterType.duplicate", "Duplicate Available");

@@ -86,7 +86,7 @@ public class CounterRepository {
           Aggregation.match(Criteria.where(refQueryField).is(refId).and("level").is(level)),
           Aggregation.lookup("counter","activeKpiId","_id","kpi"),
            Aggregation.project().and("kpi._id").as("_id")
-                   .and("kpi.title").as("title").and("kpi.treatAsCounter").as("treatAsCounter")
+                   .and("kpi.title").as("title").and("kpi.counter").as("counter")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,ApplicableKPI.class,KPIDTO.class);
         return results.getMappedResults();
@@ -187,7 +187,7 @@ public class CounterRepository {
           Aggregation.lookup("counter","kpiId","_id","kpis"),
           Aggregation.project("tabId","position","id").and("kpis").arrayElementAt(0).as("kpis"),
           Aggregation.project("tabId","position","id").and("kpis.title").as("kpi.title").
-                  and("kpis._id").as("kpi._id").and("kpis.treatAsCounter").as("kpi.treatAsCounter")
+                  and("kpis._id").as("kpi._id").and("kpis.counter").as("kpi.counter")
         );
         AggregationResults<TabKPIDTO> aggregationResults=mongoTemplate.aggregate(aggregation,TabKPIConf.class,TabKPIDTO.class);
         return aggregationResults.getMappedResults();
@@ -304,7 +304,7 @@ public class CounterRepository {
                 Aggregation.match(Criteria.where("applicableKpi.staffId").is(staffId)),
                 Aggregation.lookup("counter","applicableKpi.activeKpiId","_id","kpi"),
                 Aggregation.project().and("kpi._id").as("_id")
-                        .and("kpi.title").as("title").and("kpi.treatAsCounter").as("treatAsCounter")
+                        .and("kpi.title").as("title").and("kpi.counter").as("counter")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,KPIDTO.class);
         return results.getMappedResults();
