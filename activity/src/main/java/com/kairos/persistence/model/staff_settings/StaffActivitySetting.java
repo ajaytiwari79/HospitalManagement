@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.staff_settings;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.apache.catalina.LifecycleState;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
