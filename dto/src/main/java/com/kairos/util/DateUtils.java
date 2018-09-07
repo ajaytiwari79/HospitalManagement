@@ -668,8 +668,7 @@ public class DateUtils {
     }
 
     public static LocalDate getLocalDateFromString(String receivedDate) {
-        SimpleDateFormat format = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+        SimpleDateFormat format = new SimpleDateFormat(ISO_FORMAT, Locale.US);
         format.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
         LocalDate result = null;
         try {
