@@ -670,13 +670,13 @@ public class DateUtils {
     public static LocalDate getLocalDateFromString(String receivedDate) {
         SimpleDateFormat format = new SimpleDateFormat(ISO_FORMAT, Locale.US);
         format.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
-        LocalDate result = null;
+        LocalDate localDate = null;
         try {
-            result = DateUtils.asLocalDate(format.parse(receivedDate));
+            localDate = DateUtils.asLocalDate(format.parse(receivedDate));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return result;
+        return localDate;
 
     }
 }
