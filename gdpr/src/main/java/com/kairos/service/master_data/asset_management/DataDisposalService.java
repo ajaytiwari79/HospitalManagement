@@ -56,7 +56,7 @@ public class DataDisposalService extends MongoBaseService {
         List<DataDisposal> existing = findMetaDataByNamesAndCountryId(countryId, dataDisposalsNames, DataDisposal.class);
         dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
         List<DataDisposal> newDataDisposals = new ArrayList<>();
-        if (dataDisposalsNames.size() != 0) {
+        if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
                 DataDisposal newDataDisposal = new DataDisposal(name,countryId,SuggestedDataStatus.APPROVED);
                 newDataDisposals.add(newDataDisposal);
