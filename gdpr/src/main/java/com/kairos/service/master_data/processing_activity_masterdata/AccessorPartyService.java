@@ -60,8 +60,7 @@ public class AccessorPartyService extends MongoBaseService {
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();
             if (!accessorPartyNames.isEmpty()) {
                 for (String name : accessorPartyNames) {
-                    AccessorParty newAccessorParty = new AccessorParty(name);
-                    newAccessorParty.setCountryId(countryId);
+                    AccessorParty newAccessorParty = new AccessorParty(name,countryId,SuggestedDataStatus.APPROVED);
                     newAccessorPartyList.add(newAccessorParty);
                 }
                 newAccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(newAccessorPartyList));
@@ -177,7 +176,7 @@ public class AccessorPartyService extends MongoBaseService {
 
                 AccessorParty accessorParty = new AccessorParty(name);
                 accessorParty.setCountryId(countryId);
-                accessorParty.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                accessorParty.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 accessorParty.setSuggestedDate(LocalDate.now());
                 accessorPartyList.add(accessorParty);
             }

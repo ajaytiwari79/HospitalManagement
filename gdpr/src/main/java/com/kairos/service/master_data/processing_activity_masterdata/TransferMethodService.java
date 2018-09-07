@@ -63,8 +63,7 @@ public class TransferMethodService extends MongoBaseService {
             List<TransferMethod> newTransferMethods = new ArrayList<>();
             if (!transferMethodNames.isEmpty()) {
                 for (String name : transferMethodNames) {
-                    TransferMethod newTransferMethod = new TransferMethod(name);
-                    newTransferMethod.setCountryId(countryId);
+                    TransferMethod newTransferMethod = new TransferMethod(name,countryId,SuggestedDataStatus.APPROVED);
                     newTransferMethods.add(newTransferMethod);
                 }
 
@@ -184,7 +183,7 @@ public class TransferMethodService extends MongoBaseService {
 
                 TransferMethod transferMethod = new TransferMethod(name);
                 transferMethod.setCountryId(countryId);
-                transferMethod.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                transferMethod.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 transferMethod.setSuggestedDate(LocalDate.now());
                 transferMethodList.add(transferMethod);
             }

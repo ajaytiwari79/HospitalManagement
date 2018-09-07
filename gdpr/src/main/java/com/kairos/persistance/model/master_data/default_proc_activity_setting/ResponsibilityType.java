@@ -47,7 +47,13 @@ public class ResponsibilityType extends MongoBaseEntity {
         this.name = name;
     }
 
-    public ResponsibilityType( String name) {
+    public ResponsibilityType(@NotBlank(message = "error.message.name.cannot.be.null.or.empty")  String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
+        this.countryId = countryId;
+        this.suggestedDataStatus = suggestedDataStatus;
+    }
+
+    public ResponsibilityType(String name) {
         this.name = name;
     }
     public ResponsibilityType() {

@@ -64,8 +64,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
             if (!responsibilityTypeNames.isEmpty()) {
                 for (String name : responsibilityTypeNames) {
 
-                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name);
-                    newResponsibilityType.setCountryId(countryId);
+                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name,countryId,SuggestedDataStatus.APPROVED);
                     newResponsibilityTypes.add(newResponsibilityType);
 
                 }
@@ -190,7 +189,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
                 ResponsibilityType responsibilityType = new ResponsibilityType(name);
                 responsibilityType.setCountryId(countryId);
-                responsibilityType.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                responsibilityType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 responsibilityType.setSuggestedDate(LocalDate.now());
                 responsibilityTypeList.add(responsibilityType);
             }

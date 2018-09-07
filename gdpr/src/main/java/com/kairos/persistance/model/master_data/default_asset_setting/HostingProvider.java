@@ -39,5 +39,11 @@ public class HostingProvider extends MongoBaseEntity {
 
     public HostingProvider(String name) { this.name = name; }
 
+    public HostingProvider(@NotBlank(message = "Name can't be empty ") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
+        this.countryId = countryId;
+        this.suggestedDataStatus = suggestedDataStatus;
+    }
+
     public HostingProvider() { }
 }

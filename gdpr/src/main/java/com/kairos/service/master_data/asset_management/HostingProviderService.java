@@ -60,11 +60,8 @@ public class HostingProviderService extends MongoBaseService {
             if (!hostingProviderNames.isEmpty()) {
                 for (String name : hostingProviderNames) {
 
-                    HostingProvider newHostingProvider = new HostingProvider();
-                    newHostingProvider.setName(name);
-                    newHostingProvider.setCountryId(countryId);
+                    HostingProvider newHostingProvider = new HostingProvider(name, countryId, SuggestedDataStatus.APPROVED);
                     newHostingProviders.add(newHostingProvider);
-
                 }
 
                 newHostingProviders = hostingProviderMongoRepository.saveAll(getNextSequence(newHostingProviders));
@@ -140,7 +137,7 @@ public class HostingProviderService extends MongoBaseService {
         }
         hostingProvider = hostingProviderMongoRepository.findByid(id);
         if (!Optional.ofNullable(hostingProvider).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","Hosting Provider",id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Provider", id);
         }
         hostingProvider.setName(hostingProviderDTO.getName());
         hostingProviderMongoRepository.save(hostingProvider);
@@ -171,12 +168,11 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-
     /**
-     * @description method save Hosting provider suggested by unit
      * @param countryId
      * @param hostingProviderDTOS
      * @return
+     * @description method save Hosting provider suggested by unit
      */
     public List<HostingProvider> saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
 
@@ -192,7 +188,7 @@ public class HostingProviderService extends MongoBaseService {
 
                 HostingProvider hostingProvider = new HostingProvider(name);
                 hostingProvider.setCountryId(countryId);
-                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 hostingProvider.setSuggestedDate(LocalDate.now());
                 hostingProviderList.add(hostingProvider);
             }
@@ -205,7 +201,7 @@ public class HostingProviderService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param hostingPrividerIds   - ids of hosting providers
+     * @param hostingPrividerIds  - ids of hosting providers
      * @param suggestedDataStatus - status to update
      * @return
      */
