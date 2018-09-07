@@ -88,4 +88,20 @@ public class ActivityMongoRepository {
 
         return aggregationResults.getMappedResults();
     }
+
+    /**
+     *
+     * @param unitPositionIds
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    public Object getAllShiftsByUnitPositionIds(Long[] unitPositionIds, Date fromDate, Date toDate){
+        Aggregation aggregation=Aggregation.newAggregation(
+                match(Criteria.where("unitPositionId").in(Arrays.asList(unitPositionIds)).and("startDate").gte(fromDate).and("endDate").lte(toDate))
+                //project()
+        );
+        AggregationResults<Object> aggregationResults =mongoTemplate.aggregate(aggregation,SHIFTS,Object.class);
+        return aggregationResults.getMappedResults();
+    }
 }

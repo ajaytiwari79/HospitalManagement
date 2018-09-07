@@ -55,4 +55,10 @@ private ActivityMongoRepository activityMongoRepository;
         Long[] unitPositionIds = {35682L,35681L};
         return ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, activityMongoRepository.getWTARuleTemplateByUnitPositionIds(unitPositionIds));
     }
+
+    @RequestMapping("/getShifts")
+    ResponseEntity<Map<String, Object>> getShifts() {
+        Long[] unitPositionIds = {35682L,35681L};
+        return ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, activityMongoRepository.getAllShiftsByUnitPositionIds(unitPositionIds, new Date(1530383400000l), new Date(1532975400000l)));
+    }
 }
