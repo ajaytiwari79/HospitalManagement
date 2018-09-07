@@ -93,7 +93,6 @@ public class ShiftDTO {
         this.subShifts=subShifts;
     }
 
-
     public LocalDate getStartLocalDate() {
         return startLocalDate;
     }
