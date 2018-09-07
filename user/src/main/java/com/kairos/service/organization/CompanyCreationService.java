@@ -249,7 +249,7 @@ public class CompanyCreationService {
         return orgBasicData;
     }
 
-    public UnitManagerDTO setUserInfoInOrganization(Long unitId, Organization organization, UnitManagerDTO unitManagerDTO, boolean boardingCompleted) {
+    public UnitManagerDTO setUserInfoInOrganization(Long unitId, Organization organization, UnitManagerDTO unitManagerDTO, boolean boardingCompleted,boolean parentOrganization) {
         if (organization == null) {
             organization = organizationGraphRepository.findOne(unitId);
             boardingCompleted = organization.isBoardingCompleted();
@@ -289,7 +289,7 @@ public class CompanyCreationService {
             else {
                  user= new User(unitManagerDTO.getCprNumber(),unitManagerDTO.getFirstName(),unitManagerDTO.getLastName(),unitManagerDTO.getEmail());
                 userGraphRepository.save(user);
-                staffService.setUserAndEmployment(organization, user,unitManagerDTO.getAccessGroupId());
+                staffService.setUserAndEmployment(organization, user,unitManagerDTO.getAccessGroupId(),parentOrganization);
 
             }
         }
@@ -363,7 +363,7 @@ public class CompanyCreationService {
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
         if (organizationBasicDTO.getUnitManager() != null && organizationBasicDTO.getUnitManager().getCprNumber() != null) {
-            setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted());
+            setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(),false);
         }
         //Assign Parent Organization's level to unit
 
@@ -396,7 +396,7 @@ public class CompanyCreationService {
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(organization, organizationBasicDTO, null);
         if (Optional.ofNullable(organizationBasicDTO.getUnitManager()).isPresent()) {
-            setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManager(), organization.isBoardingCompleted());
+            setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManager(), organization.isBoardingCompleted(),false);
         }
         organizationGraphRepository.save(organization);
         return organizationBasicDTO;
