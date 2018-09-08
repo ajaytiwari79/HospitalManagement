@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.shift;
 
 
+import com.kairos.activity.shift.ShiftDTO;
 import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
@@ -21,7 +22,7 @@ import java.util.List;
 public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInteger>, CustomShiftMongoRepository {
 
     @Query(value = "{unitPositionId:?0,deleted:false,disabled:false,isMainShift:true,startDate:{$gte:?1,$lte:?2}}", fields = "{ 'startDate' : 1, 'endDate' : 1,'unitPositionId':1}")
-    List<ShiftQueryResult> findAllShiftBetweenDuration(Long unitPositionId, Date startDate, Date endDate);
+    List<ShiftDTO> findAllShiftBetweenDuration(Long unitPositionId, Date startDate, Date endDate);
 
     Long countByActivityId(BigInteger activityId);
 

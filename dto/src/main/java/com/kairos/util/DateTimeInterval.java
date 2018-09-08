@@ -12,6 +12,8 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalUnit;
 import java.util.Date;
 
+import static javax.management.timer.Timer.ONE_MINUTE;
+
 /**
  * @author pradeep
  * @date - 14/5/18
@@ -187,8 +189,8 @@ public class DateTimeInterval {
         return this.start<=interval.getStartMillis() && this.end>=interval.getEndMillis();
     }
 
-    public int getMinutes(){
-        return (int) (this.end - this.start)/60000;
+    public long getMinutes(){
+        return (this.end - this.start)/ONE_MINUTE;
     }
 
     public int getHours(){

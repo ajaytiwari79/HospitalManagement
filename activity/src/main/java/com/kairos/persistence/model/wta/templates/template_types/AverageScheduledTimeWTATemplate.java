@@ -138,7 +138,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                 int totalMin = 0;
                 for (ShiftWithActivityDTO shift : shifts) {
                     if(dateTimeInterval.overlaps(shift.getDateTimeInterval())){
-                        totalMin +=dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
+                        totalMin += (int) dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
                     }
                 }
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin/(60*(int)dateTimeInterval.getDays()));

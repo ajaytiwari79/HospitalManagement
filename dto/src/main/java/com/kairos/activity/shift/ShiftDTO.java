@@ -21,6 +21,7 @@ import java.util.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftDTO {
+
     private BigInteger id;
     private String name;
     private Date startDate;
@@ -60,6 +61,7 @@ public class ShiftDTO {
     private BigInteger templateId;
     private String timeType;
     private Set<ShiftStatus> status = new HashSet<>();
+    private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger plannedTimeId;
 
     public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
@@ -91,6 +93,31 @@ public class ShiftDTO {
         this.startTime=startTime;
         this.endTime=endTime;
         this.subShifts=subShifts;
+    }
+
+
+    public Set<ShiftStatus> getStatus() {
+        return status;
+    }
+
+    public void setStatus(Set<ShiftStatus> status) {
+        this.status = status;
+    }
+
+    public List<ShiftActivity> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<ShiftActivity> activities) {
+        this.activities = activities;
+    }
+
+    public BigInteger getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(BigInteger plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
     }
 
     public LocalDate getStartLocalDate() {
@@ -217,7 +244,7 @@ public class ShiftDTO {
     }
 
     public Duration getDuration() {
-        return new Interval(this.getStartDate().getTime(), this.getEndDate().getTime()).toDuration();
+        return new Interval(this.getMergedStartDate().getTime(), this.getMergedEndDate().getTime()).toDuration();
     }
 
     public String getRemarks() {
@@ -249,6 +276,10 @@ public class ShiftDTO {
     }
 
     public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getMergedStartDate(){
         return startLocalDate != null && startTime != null ? DateUtils.getDateByLocalDateAndLocalTime(startLocalDate, startTime) : null;
     }
 
@@ -257,6 +288,10 @@ public class ShiftDTO {
     }
 
     public Date getEndDate() {
+        return endDate;
+    }
+
+    public Date getMergedEndDate(){
         return startLocalDate != null && startTime != null ? DateUtils.getDateByLocalDateAndLocalTime(endLocalDate, endTime) : null;
     }
 

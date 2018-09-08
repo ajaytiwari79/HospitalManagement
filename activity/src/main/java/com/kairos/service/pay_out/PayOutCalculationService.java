@@ -76,7 +76,7 @@ public class PayOutCalculationService {
                                 for (CompensationTableInterval ctaIntervalDTO : ruleTemplate.getCompensationTable().getCompensationTableInterval()) {
                                     DateTimeInterval ctaInterval = getCTAInterval(ctaIntervalDTO, interval.getStart());
                                     if (ctaInterval.overlaps(shiftInterval)) {
-                                        int overlapTimeInMin = ctaInterval.overlap(shiftInterval).getMinutes();
+                                        int overlapTimeInMin = (int)ctaInterval.overlap(shiftInterval).getMinutes();
                                         if (ctaIntervalDTO.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
                                             ctaPayOutMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaIntervalDTO.getValue();
                                             totalPayOut += ctaPayOutMin;

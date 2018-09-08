@@ -2,6 +2,7 @@ package com.kairos.persistence.model.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.activity.shift.ShiftActivity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.activity.shift.ShiftQueryResult;
@@ -46,6 +47,7 @@ public class Shift extends MongoBaseEntity {
 
     private boolean isMainShift = true;
     private Set<BigInteger> subShifts;
+    private List<ShiftActivity> activities;
     //time care id
     private String externalId;
 
@@ -92,6 +94,15 @@ public class Shift extends MongoBaseEntity {
         this.sickShift=true;
 
     }
+
+    public List<ShiftActivity> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<ShiftActivity> activities) {
+        this.activities = activities;
+    }
+
     public List<BigInteger> getBrokenRuleTemplateIds() {
         return brokenRuleTemplateIds;
     }
@@ -217,7 +228,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public int getMinutes() {
-        return getInterval().getMinutes();
+        return (int)getInterval().getMinutes();
     }
 
     public String getRemarks() {

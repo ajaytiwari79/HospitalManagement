@@ -109,10 +109,10 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
             List<DateTimeInterval> intervals = getIntervals(interval);
             Integer[] limitAndCounter = getValueByPhase(infoWrapper,phaseTemplateValues,this);
             for (DateTimeInterval dateTimeInterval : intervals) {
-                int totalMin = dateTimeInterval.getMinutes();
+                int totalMin = (int)dateTimeInterval.getMinutes();
                 for (ShiftWithActivityDTO shift : shifts) {
                     if(dateTimeInterval.overlaps(shift.getDateTimeInterval())){
-                        totalMin -=dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
+                        totalMin -= (int)dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
                     }
                 }
                 boolean isValid = isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], totalMin/(60*(int)dateTimeInterval.getDays()));
