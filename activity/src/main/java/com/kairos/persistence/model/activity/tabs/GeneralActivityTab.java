@@ -2,7 +2,6 @@ package com.kairos.persistence.model.activity.tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.user.country.tag.TagDTO;
 
 import java.io.Serializable;
 import java.math.BigInteger;

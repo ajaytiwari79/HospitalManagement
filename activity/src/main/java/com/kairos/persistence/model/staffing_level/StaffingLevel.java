@@ -2,8 +2,8 @@ package com.kairos.persistence.model.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.activity.staffing_level.StaffingLevelSetting;
+import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
+import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;

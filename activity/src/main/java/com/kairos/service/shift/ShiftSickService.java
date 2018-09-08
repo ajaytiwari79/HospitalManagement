@@ -1,7 +1,7 @@
 package com.kairos.service.shift;
 
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
@@ -15,8 +15,8 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.DateUtils;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

@@ -3,7 +3,7 @@ package com.kairos.response.dto.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.gdpr.ManagingOrganization;
+import com.kairos.dto.gdpr.ManagingOrganization;
 
 import java.math.BigInteger;
 

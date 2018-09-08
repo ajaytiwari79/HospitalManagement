@@ -1,16 +1,16 @@
 package com.kairos.controller.counters;
 
-import com.kairos.activity.counter.DefaultKPISettingDTO;
-import com.kairos.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
-import com.kairos.activity.counter.distribution.access_group.AccessGroupMappingDTO;
-import com.kairos.activity.counter.distribution.category.CategoryKPIsDTO;
-import com.kairos.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
-import com.kairos.activity.counter.distribution.org_type.OrgTypeMappingDTO;
-import com.kairos.activity.counter.distribution.tab.TabKPIEntryConfDTO;
-import com.kairos.activity.counter.distribution.tab.TabKPIMappingDTO;
-import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
+import com.kairos.dto.activity.counter.distribution.category.CategoryKPIsDTO;
+import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
+import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
+import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
+import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.service.counter.CounterDistService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

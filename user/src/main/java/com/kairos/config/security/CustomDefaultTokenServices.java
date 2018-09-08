@@ -1,16 +1,14 @@
 package com.kairos.config.security;
 
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.auth.UserPrincipal;
 import com.kairos.service.auth.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;

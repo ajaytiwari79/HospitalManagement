@@ -2,16 +2,15 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.shift.WorkTimeAgreementRuleViolation;
-import com.kairos.enums.MinMaxSetting;
-import com.kairos.enums.WTATemplateType;
-import com.kairos.util.ShiftValidatorService;
+import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
+import com.kairos.enums.wta.MinMaxSetting;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 
-import static com.kairos.util.ShiftValidatorService.getValueByPhase;
-import static com.kairos.util.ShiftValidatorService.isValid;
-import static com.kairos.util.ShiftValidatorService.isValidForPhase;
+import static com.kairos.utils.ShiftValidatorService.getValueByPhase;
+import static com.kairos.utils.ShiftValidatorService.isValid;
+import static com.kairos.utils.ShiftValidatorService.isValidForPhase;
 
 
 /**

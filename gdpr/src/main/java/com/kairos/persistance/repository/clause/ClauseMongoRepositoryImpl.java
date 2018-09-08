@@ -1,8 +1,8 @@
 package com.kairos.persistance.repository.clause;
 
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.gdpr.FilterSelection;
-import com.kairos.gdpr.FilterSelectionDTO;
+import com.kairos.dto.gdpr.FilterSelection;
+import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;

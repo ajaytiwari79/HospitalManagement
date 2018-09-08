@@ -5,8 +5,8 @@ import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.activity.unit_settings.PhaseSettingsDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.unit_settings.PhaseSettingsDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

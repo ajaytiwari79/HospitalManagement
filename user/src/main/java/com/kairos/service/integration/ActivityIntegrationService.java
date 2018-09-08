@@ -1,16 +1,16 @@
 package com.kairos.service.integration;
 
-import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.activity.counter.DefaultKPISettingDTO;
-import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
-import com.kairos.client.dto.TableConfiguration;
+import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
+import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
+import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
+import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
-import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
 import com.kairos.rest_client.priority_group.GenericRestClient;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,6 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 

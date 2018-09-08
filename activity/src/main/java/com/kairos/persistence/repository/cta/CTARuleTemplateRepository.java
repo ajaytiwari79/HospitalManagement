@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.cta;
 
-import com.kairos.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;

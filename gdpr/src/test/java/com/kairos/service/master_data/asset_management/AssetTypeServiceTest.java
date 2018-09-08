@@ -1,8 +1,8 @@
 package com.kairos.service.master_data.asset_management;
 
 import com.kairos.KairosGdprApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.gdpr.master_data.AssetTypeDTO;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import org.junit.Assert;

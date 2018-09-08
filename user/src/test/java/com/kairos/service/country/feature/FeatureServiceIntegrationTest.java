@@ -1,13 +1,13 @@
 package com.kairos.service.country.feature;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.country.feature.Feature;
 import com.kairos.persistence.model.country.feature.FeatureQueryResult;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.resources.Vehicle;
-import com.kairos.user.country.feature.FeatureDTO;
-import com.kairos.user.country.feature.VehicleFeaturesDTO;
+import com.kairos.dto.user.country.feature.FeatureDTO;
+import com.kairos.dto.user.country.feature.VehicleFeaturesDTO;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

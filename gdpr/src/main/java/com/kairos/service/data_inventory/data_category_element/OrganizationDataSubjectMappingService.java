@@ -1,9 +1,9 @@
 package com.kairos.service.data_inventory.data_category_element;
 
 
-import com.kairos.gdpr.data_inventory.OrganizationDataSubjectDTO;
-import com.kairos.gdpr.master_data.DataCategoryDTO;
-import com.kairos.gdpr.data_inventory.OrganizationDataSubjectBasicDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationDataSubjectDTO;
+import com.kairos.dto.gdpr.master_data.DataCategoryDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationDataSubjectBasicDTO;
 import com.kairos.persistance.model.master_data.data_category_element.DataCategory;
 import com.kairos.persistance.model.master_data.data_category_element.DataElement;
 import com.kairos.persistance.model.master_data.data_category_element.DataSubjectMapping;

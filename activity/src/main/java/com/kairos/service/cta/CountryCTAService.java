@@ -1,8 +1,8 @@
 package com.kairos.service.cta;
 
-import com.kairos.activity.cta.CTABasicDetailsDTO;
-import com.kairos.activity.cta.CTARuleTemplateDTO;
-import com.kairos.activity.cta.CollectiveTimeAgreementDTO;
+import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
@@ -15,8 +15,8 @@ import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.organization.OrganizationBasicDTO;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.dto.user.organization.OrganizationBasicDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;

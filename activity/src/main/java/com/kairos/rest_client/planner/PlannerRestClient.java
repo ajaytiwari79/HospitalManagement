@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import static com.kairos.util.RestClientUrlUtil.getPlannerBaseUrl;
+import static com.kairos.utils.RestClientUrlUtil.getPlannerBaseUrl;
 @Service
 public class PlannerRestClient {
     private Logger logger = LoggerFactory.getLogger(com.kairos.rest_client.planner.PlannerRestClient.class);

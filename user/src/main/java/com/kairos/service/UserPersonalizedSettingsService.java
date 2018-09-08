@@ -4,8 +4,8 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.user_personalized_settings.*;
 import com.kairos.persistence.repository.user.UserPersonalizedSettingsRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.user.user.user_personalized_settings.SelfRosteringViewDto;
-import com.kairos.user.user.user_personalized_settings.UserPersonalizedSettingsDto;
+import com.kairos.dto.user.user.user_personalized_settings.SelfRosteringViewDto;
+import com.kairos.dto.user.user.user_personalized_settings.UserPersonalizedSettingsDto;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

@@ -1,6 +1,6 @@
 package com.kairos.controller.country;
 
-import com.kairos.activity.shift.FunctionDTO;
+import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.persistence.model.country.*;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
@@ -25,13 +25,13 @@ import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
-import com.kairos.user.country.experties.CountryExpertiseDTO;
-import com.kairos.user.country.experties.ExpertiseUpdateDTO;
-import com.kairos.user.country.skill.OrgTypeSkillDTO;
-import com.kairos.user.country.skill.SkillDTO;
-import com.kairos.user.organization.OrganizationBasicDTO;
-import com.kairos.user.organization.OrganizationTypeDTO;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.dto.user.country.experties.CountryExpertiseDTO;
+import com.kairos.dto.user.country.experties.ExpertiseUpdateDTO;
+import com.kairos.dto.user.country.skill.OrgTypeSkillDTO;
+import com.kairos.dto.user.country.skill.SkillDTO;
+import com.kairos.dto.user.organization.OrganizationBasicDTO;
+import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.UpdateOrganizationTypeDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

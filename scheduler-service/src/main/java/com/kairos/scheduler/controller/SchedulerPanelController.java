@@ -1,7 +1,6 @@
 package com.kairos.scheduler.controller;
 
-import com.kairos.dto.SchedulerPanelDTO;
-import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
+import com.kairos.dto.scheduler.SchedulerPanelDTO;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
 import com.kairos.scheduler.utils.ResponseHandler;
 import io.swagger.annotations.Api;

@@ -4,7 +4,7 @@ import com.kairos.KairosActivityApplication;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.user.country.tag.TagDTO;
+import com.kairos.dto.user.country.tag.TagDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

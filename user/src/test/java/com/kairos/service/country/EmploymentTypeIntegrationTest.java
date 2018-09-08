@@ -2,7 +2,7 @@ package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
-import com.kairos.util.DateUtil;
+import com.kairos.utils.DateUtil;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

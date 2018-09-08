@@ -1,8 +1,8 @@
 package com.kairos.controller.staffing_level;
 
-import com.kairos.activity.staffing_level.StaffingLevelTemplateDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelTemplateDTO;
 import com.kairos.service.staffing_level.StaffingLevelTemplateService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL + "/staffing_level_template")

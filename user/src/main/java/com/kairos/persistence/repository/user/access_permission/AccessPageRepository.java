@@ -4,7 +4,6 @@ import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.StaffPermissionQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import com.kairos.user.access_page.KPIAccessPageDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 

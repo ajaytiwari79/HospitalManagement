@@ -1,10 +1,7 @@
 package com.kairos.persistence.model.organization;
 
-import com.kairos.persistence.model.country.default_data.BusinessType;
-import com.kairos.persistence.model.country.default_data.CompanyCategory;
-import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
-import com.kairos.user.organization.CompanyType;
+import com.kairos.dto.user.organization.CompanyType;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.kairos.service.kafka;
 
-import com.kairos.dto.KairosSchedulerExecutorDTO;
+import com.kairos.dto.scheduler.KairosSchedulerExecutorDTO;
 
 public interface JobQueueExecutor {
 

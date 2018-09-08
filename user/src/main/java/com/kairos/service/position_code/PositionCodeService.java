@@ -16,7 +16,7 @@ import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepo
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.wrapper.PositionCodeUnionWrapper;
-import com.kairos.user.organization.position_code.PositionCodeDTO;
+import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;

@@ -4,7 +4,7 @@ package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
  *Used for Planning Quality level of planner
  */
 
-import com.kairos.activity.open_shift.DurationField;
+import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.persistence.model.activity.tabs.ApprovalCriteria;
 
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package com.kairos.controller.client;
 
-import com.kairos.client.dto.ClientExceptionDTO;
-import com.kairos.client.dto.TaskDemandRequestWrapper;
+import com.kairos.dto.user.client.ClientExceptionDTO;
+import com.kairos.dto.activity.task.TaskDemandRequestWrapper;
 import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.client.relationships.ClientRelativeRelation;
@@ -12,9 +12,9 @@ import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientExtendedService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.mail.MailService;
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.user.staff.ContactPersonDTO;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.dto.user.organization.AddressDTO;
+import com.kairos.dto.user.staff.ContactPersonDTO;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

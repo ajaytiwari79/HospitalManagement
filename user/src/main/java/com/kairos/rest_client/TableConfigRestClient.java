@@ -1,7 +1,7 @@
 package com.kairos.rest_client;
 
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.client.dto.TableConfiguration;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

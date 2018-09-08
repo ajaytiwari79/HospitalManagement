@@ -1,9 +1,9 @@
 package com.kairos.wrapper.phase;
-import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
-import com.kairos.activity.phase.PhaseDTO;
-import com.kairos.activity.phase.PhaseWeeklyDTO;
-import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.user.country.day_type.DayType;
+import com.kairos.dto.activity.shift.ShiftTemplateDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 
 

@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.task_type;
 
-import com.kairos.activity.task_type.TaskTypeDTO;
+import com.kairos.dto.activity.task_type.TaskTypeDTO;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;

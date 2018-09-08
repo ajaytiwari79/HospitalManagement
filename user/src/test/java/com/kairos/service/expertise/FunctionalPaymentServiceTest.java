@@ -1,7 +1,7 @@
 package com.kairos.service.expertise;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.service.exception.ExceptionService;

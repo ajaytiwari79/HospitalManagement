@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.shift;/*
  *
  */
 
-import com.kairos.activity.shift.ActivityAndShiftStatusWrapper;
+import com.kairos.dto.activity.shift.ActivityAndShiftStatusWrapper;
 import com.kairos.persistence.model.shift.ActivityShiftStatusSettings;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;

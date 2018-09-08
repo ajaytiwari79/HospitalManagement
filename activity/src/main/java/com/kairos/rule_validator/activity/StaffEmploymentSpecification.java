@@ -2,14 +2,13 @@ package com.kairos.rule_validator.activity;
 
 
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.util.ShiftValidatorService;
+import com.kairos.utils.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

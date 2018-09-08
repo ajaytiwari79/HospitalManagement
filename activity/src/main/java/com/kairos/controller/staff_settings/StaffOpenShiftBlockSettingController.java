@@ -1,8 +1,8 @@
 package com.kairos.controller.staff_settings;
 
 import com.kairos.service.staff_settings.StaffOpenShiftBlockSettingService;
-import com.kairos.user.staff.staff.StaffPreferencesDTO;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.dto.user.staff.staff.StaffPreferencesDTO;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

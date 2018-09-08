@@ -1,6 +1,6 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
-import com.kairos.gdpr.metadata.TransferMethodDTO;
+import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
 import com.kairos.service.data_inventory.processing_activity.OrganizationTransferMethodService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

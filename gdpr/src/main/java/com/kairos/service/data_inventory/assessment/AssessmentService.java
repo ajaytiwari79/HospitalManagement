@@ -6,7 +6,7 @@ import com.kairos.enums.AssessmentStatus;
 import com.kairos.enums.AssetAttributeName;
 import com.kairos.enums.ProcessingActivityAttributeName;
 import com.kairos.enums.QuestionnaireTemplateType;
-import com.kairos.gdpr.data_inventory.AssessmentDTO;
+import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
 import com.kairos.persistance.model.data_inventory.assessment.Assessment;
 import com.kairos.persistance.model.data_inventory.assessment.AssessmentAnswerValueObject;
 import com.kairos.persistance.model.data_inventory.assessment.AssetAssessmentAnswer;

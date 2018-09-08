@@ -27,7 +27,7 @@ public class DateUtils {
     public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String ONLY_DATE = "yyyy-MM-dd";
 
-    private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(com.kairos.commons.utils.DateUtils.class);
 
     public static Date getEndOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -94,7 +94,7 @@ public class DateUtils {
 
     public static Date getFirstDayOfCurrentWeek() {
         Calendar c = Calendar.getInstance();
-        c.setTime(DateUtils.getDate());
+        c.setTime(com.kairos.commons.utils.DateUtils.getDate());
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         return c.getTime();
     }

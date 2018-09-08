@@ -6,7 +6,7 @@ import com.kairos.persistence.model.organization.company.CompanyCategoryResponse
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.organization.company_category.CompanyCategoryDTO;
+import com.kairos.dto.user.organization.company_category.CompanyCategoryDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

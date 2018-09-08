@@ -1,13 +1,11 @@
 package com.kairos.persistence.model.counter;
 
-import com.kairos.activity.enums.counter.ModuleType;
-import com.kairos.activity.counter.enums.CounterType;
-import com.kairos.activity.enums.counter.CounterSize;
+import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.counter.CounterSize;
 import com.kairos.persistence.model.counter.chart.BaseChart;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.util.Set;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com

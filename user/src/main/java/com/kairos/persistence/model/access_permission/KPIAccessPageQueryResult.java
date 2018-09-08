@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.access_permission;
 
-import com.kairos.user.access_page.KPIAccessPageDTO;
+import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

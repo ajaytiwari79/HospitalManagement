@@ -1,11 +1,11 @@
 package com.kairos.service.kafka;
 
-import com.kairos.dto.KairosScheduleJobDTO;
+import com.kairos.dto.scheduler.KairosScheduleJobDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
-import com.kairos.kafka.producer.KafkaProducer;
-import com.kairos.util.DateUtils;
+import com.kairos.dto.scheduler.kafka.producer.KafkaProducer;
+import com.kairos.commons.utils.DateUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

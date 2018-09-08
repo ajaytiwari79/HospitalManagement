@@ -3,13 +3,13 @@ package com.kairos.service.client_exception;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.rest_client.ClientRestClient;
 import com.kairos.rest_client.IntegrationRestClient;
-import com.kairos.user.client.Client;
-import com.kairos.user.client.ClientExceptionCountWrapper;
-import com.kairos.user.client.ClientTemporaryAddress;
+import com.kairos.dto.user.client.Client;
+import com.kairos.dto.user.client.ClientExceptionCountWrapper;
+import com.kairos.dto.user.client.ClientTemporaryAddress;
 import com.kairos.persistence.model.client_aggregator.ClientAggregator;
 import com.kairos.persistence.model.client_aggregator.FourWeekFrequency;
 import com.kairos.persistence.model.client_exception.ClientException;
-import com.kairos.activity.client_exception.ClientExceptionCount;
+import com.kairos.dto.activity.client_exception.ClientExceptionCount;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
 import com.kairos.persistence.model.client_exception.ClientExceptionType;
 import com.kairos.persistence.model.task.Task;
@@ -31,8 +31,8 @@ import com.kairos.service.planner.TaskExceptionService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.rule_validator.task.TaskLocationSpecification;
 import com.kairos.rule_validator.TaskSpecification;
-import com.kairos.util.DateUtils;
-import com.kairos.util.functional_interface.PerformCalculation;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.functional_interface.PerformCalculation;
 import com.kairos.wrapper.task.TaskGanttDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.GenericValidator;
@@ -57,8 +57,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.*;
 import static com.kairos.persistence.model.constants.TaskConstants.*;
-import static com.kairos.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;
-import static com.kairos.util.DateUtils.ONLY_DATE;
+import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
+import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 
 /**
  * Created by oodles on 7/2/17.

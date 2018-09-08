@@ -1,8 +1,8 @@
 package com.kairos.service.fls_visitour.wsclient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.webservice_config.WebServiceMessageSenderWithAuth;
-import com.kairos.util.FlsUrlPaths;
-import com.kairos.util.IPAddressUtil;
+import com.kairos.utils.FlsUrlPaths;
+import com.kairos.utils.IPAddressUtil;
 import de.tourenserver.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,13 +1,13 @@
 package com.kairos.service.time_bank;
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.time_bank.time_bank_basic.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.util.DateUtils;
-import com.kairos.util.time_bank.TimeBankCalculationService;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;

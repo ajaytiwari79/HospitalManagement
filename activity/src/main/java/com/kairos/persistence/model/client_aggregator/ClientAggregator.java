@@ -1,5 +1,5 @@
 package com.kairos.persistence.model.client_aggregator;
-import com.kairos.activity.client_exception.ClientExceptionCount;
+import com.kairos.dto.activity.client_exception.ClientExceptionCount;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.task.UnhandledTaskCount;
 import org.springframework.data.mongodb.core.index.Indexed;

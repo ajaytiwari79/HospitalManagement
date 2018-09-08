@@ -1,9 +1,9 @@
 package com.planner.service.config;
 
-import com.kairos.enums.WTATemplateType;
-import com.kairos.planner.solverconfig.ConstraintValueDTO;
-import com.kairos.planner.solverconfig.SolverConfigDTO;
-import com.kairos.planner.solverconfig.SolverConfigWTADTO;
+import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.dto.planner.solverconfig.ConstraintValueDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigWTADTO;
 import com.kairos.planner.vrp.taskplanning.model.constraint.*;
 import com.planner.commonUtil.StaticField;
 import com.planner.domain.solverconfig.SolverConfig;

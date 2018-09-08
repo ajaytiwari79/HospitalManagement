@@ -2,7 +2,7 @@ package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.ProcessingPurposeDTO;
+import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingPurposeService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

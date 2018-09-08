@@ -1,9 +1,8 @@
 package com.kairos.rule_validator.activity;
 
-import com.kairos.activity.shift.EmploymentType;
+import com.kairos.dto.activity.shift.EmploymentType;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.ShiftValidatorService;
+import com.kairos.utils.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.util.*;
