@@ -2,7 +2,7 @@ package com.kairos.shiftplanning.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.enums.IntervalUnit;
+import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.shiftplanning.domain.*;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;

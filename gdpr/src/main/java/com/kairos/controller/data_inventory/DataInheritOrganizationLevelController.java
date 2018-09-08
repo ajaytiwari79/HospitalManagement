@@ -1,7 +1,7 @@
 package com.kairos.controller.data_inventory;
 
 
-import com.kairos.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.service.common.DataInheritOrganizationLevelService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.ApiOperation;

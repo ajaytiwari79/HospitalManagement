@@ -1,9 +1,9 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.counter.CounterDTO;
-import com.kairos.activity.open_shift.OrderResponseDTO;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.counter.CounterDTO;
+import com.kairos.dto.activity.open_shift.OrderResponseDTO;
 
 import java.util.List;
 

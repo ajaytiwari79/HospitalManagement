@@ -1,7 +1,7 @@
 package com.planner.util.wta;
 
-import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
 
 import com.planner.domain.wta.WTABaseRuleTemplate;
 import com.planner.domain.wta.templates.*;

@@ -1,10 +1,14 @@
 package com.kairos.service.time_bank;
 
 
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.shift.StaffUnitPositionDetails;
-import com.kairos.activity.time_bank.*;
-import com.kairos.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+
+import com.kairos.dto.activity.time_bank.TimeBankAndPayoutDTO;
+import com.kairos.dto.activity.time_bank.TimeBankDTO;
+import com.kairos.dto.activity.time_bank.TimeBankVisualViewDTO;
+import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.activity.TimeType;
@@ -21,10 +25,10 @@ import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.pay_out.PayOutTransaction;
-import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.util.DateTimeInterval;
-import com.kairos.util.DateUtils;
-import com.kairos.util.time_bank.TimeBankCalculationService;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;

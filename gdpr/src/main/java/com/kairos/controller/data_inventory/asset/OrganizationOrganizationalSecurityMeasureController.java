@@ -1,7 +1,7 @@
 package com.kairos.controller.data_inventory.asset;
 
 
-import com.kairos.gdpr.metadata.OrganizationalSecurityMeasureDTO;
+import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.service.data_inventory.asset.OrganizationOrganizationalSecurityMeasureService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

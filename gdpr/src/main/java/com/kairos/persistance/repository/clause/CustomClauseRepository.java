@@ -1,7 +1,7 @@
 package com.kairos.persistance.repository.clause;
 
-import com.kairos.gdpr.FilterSelection;
-import com.kairos.gdpr.FilterSelectionDTO;
+import com.kairos.dto.gdpr.FilterSelection;
+import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
 import com.kairos.response.dto.clause.ClauseResponseDTO;

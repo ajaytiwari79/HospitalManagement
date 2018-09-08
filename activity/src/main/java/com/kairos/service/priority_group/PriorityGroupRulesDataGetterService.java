@@ -1,9 +1,10 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
-import com.kairos.activity.open_shift.priority_group.StaffIncludeFilter;
-import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
-import com.kairos.activity.shift.ShiftCountDTO;
+import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilter;
+import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.dto.activity.shift.ShiftCountDTO;
+import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
@@ -14,10 +15,10 @@ import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
-import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.time_bank.TimeBankCalculationService;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
@@ -140,7 +141,7 @@ public class PriorityGroupRulesDataGetterService {
                 Long endDate = DateUtils.getLongFromLocalDate(openShiftDate);
                 Long endDateDeltaWeek = DateUtils.getISOEndOfWeekDate(openShiftDate).getTime();
                 Long startDateDeltaWeek = DateUtils.getISOStartOfWeek(openShiftDate);
-                com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO(staffUnitPositionQueryResult.getUnitPositionId(),
+                UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(staffUnitPositionQueryResult.getUnitPositionId(),
                         Optional.ofNullable(staffUnitPositionQueryResult.getContractedMinByWeek()).isPresent()?staffUnitPositionQueryResult.getContractedMinByWeek():0,
                         Optional.ofNullable(staffUnitPositionQueryResult.getWorkingDaysPerWeek()).isPresent()?staffUnitPositionQueryResult.getWorkingDaysPerWeek():0,
                         DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getStartDate()), DateUtils.getDateFromEpoch(staffUnitPositionQueryResult.getEndDate()));

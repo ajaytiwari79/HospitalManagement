@@ -1,8 +1,8 @@
 package com.kairos.service.activity;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.shift.ShiftPublishDTO;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
@@ -12,7 +12,7 @@ import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -39,7 +39,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.ArrayList;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

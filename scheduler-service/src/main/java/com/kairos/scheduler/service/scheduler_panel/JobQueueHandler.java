@@ -1,6 +1,6 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
-import com.kairos.dto.KairosScheduleJobDTO;
+import com.kairos.dto.scheduler.KairosScheduleJobDTO;
 
 public interface JobQueueHandler {
 

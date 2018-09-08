@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-import static com.kairos.util.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
 public class OrganizationServiceRestClient {

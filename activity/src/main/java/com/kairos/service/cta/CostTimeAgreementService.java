@@ -1,8 +1,9 @@
 package com.kairos.service.cta;
 
-import com.kairos.activity.cta.*;
-import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
-import com.kairos.client.dto.TableConfiguration;
+
+import com.kairos.dto.activity.cta.*;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.enums.FixedValueType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.RuleTemplateCategoryType;
@@ -21,13 +22,13 @@ import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
-import com.kairos.user.country.basic_details.CountryDTO;
-import com.kairos.user.country.experties.ExpertiseResponseDTO;
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.user.organization.OrganizationTypeDTO;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.user_context.UserContext;
-import com.kairos.wrapper.cta.CTATableSettingWrapper;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -42,7 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.activity.cta.CalculateValueType.FIXED_VALUE;
+import static com.kairos.dto.activity.cta.CalculateValueType.FIXED_VALUE;
 import static com.kairos.constants.ApiConstants.GET_UNIT_POSITION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
 

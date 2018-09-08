@@ -2,8 +2,8 @@ package com.kairos.service.filter;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.gdpr.FilterSelectionDTO;
-import com.kairos.gdpr.master_data.ModuleIdDTO;
+import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;

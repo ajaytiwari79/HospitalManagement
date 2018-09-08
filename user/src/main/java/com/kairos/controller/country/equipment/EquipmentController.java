@@ -1,9 +1,9 @@
 package com.kairos.controller.country.equipment;
 
-import com.kairos.user.equipment.EquipmentDTO;
-import com.kairos.user.equipment.VehicleEquipmentDTO;
+import com.kairos.dto.user.equipment.EquipmentDTO;
+import com.kairos.dto.user.equipment.VehicleEquipmentDTO;
 import com.kairos.service.country.equipment.EquipmentService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

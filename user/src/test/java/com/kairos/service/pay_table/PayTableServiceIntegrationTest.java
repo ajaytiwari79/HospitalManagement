@@ -1,15 +1,15 @@
 package com.kairos.service.pay_table;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.country.pay_table.PayTableResponseWrapper;
 import com.kairos.persistence.model.pay_table.OrganizationLevelPayGroupAreaDTO;
 import com.kairos.persistence.model.pay_table.PayTableResponse;
-import com.kairos.user.country.pay_table.PayTableDTO;
-import com.kairos.user.country.pay_table.PayTableUpdateDTO;
-import com.kairos.util.DateUtil;
+import com.kairos.dto.user.country.pay_table.PayTableDTO;
+import com.kairos.dto.user.country.pay_table.PayTableUpdateDTO;
+import com.kairos.utils.DateUtil;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +29,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import static com.kairos.util.DateUtil.ONLY_DATE;
+import static com.kairos.utils.DateUtil.ONLY_DATE;
 
 /**
  * Created by vipul on 15/3/18.

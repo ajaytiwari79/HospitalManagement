@@ -2,7 +2,7 @@ package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.TransferMethodDTO;
+import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
 import com.kairos.service.master_data.processing_activity_masterdata.TransferMethodService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

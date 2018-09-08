@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.response.dto.web.shift.IndividualShiftTemplateDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

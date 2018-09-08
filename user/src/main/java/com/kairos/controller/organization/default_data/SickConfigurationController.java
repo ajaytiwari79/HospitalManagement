@@ -1,7 +1,7 @@
 package com.kairos.controller.organization.default_data;
 
 import com.kairos.service.organization_meta_data.SickConfigurationService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

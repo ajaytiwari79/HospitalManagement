@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.DataDisposalDTO;
+import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
 import com.kairos.service.master_data.asset_management.DataDisposalService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 

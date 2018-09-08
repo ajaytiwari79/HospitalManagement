@@ -1,7 +1,7 @@
 package com.planner.controller;
 
-import com.kairos.planner.planninginfo.PlanningSubmissionDTO;
-import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
+import com.kairos.dto.planner.planninginfo.PlanningSubmissionDTO;
+import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.commonUtil.OptaNotFoundException;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.commonUtil.StaticField;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
 
 import static com.planner.constants.ApiConstants.API_UNIT_URL;

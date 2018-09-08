@@ -1,7 +1,7 @@
 package com.kairos.service.common;
 
 
-import com.kairos.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;

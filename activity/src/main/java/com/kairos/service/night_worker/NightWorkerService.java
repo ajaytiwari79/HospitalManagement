@@ -1,8 +1,8 @@
 package com.kairos.service.night_worker;
 
-import com.kairos.activity.night_worker.NightWorkerGeneralResponseDTO;
-import com.kairos.activity.night_worker.QuestionAnswerDTO;
-import com.kairos.activity.night_worker.QuestionnaireAnswerResponseDTO;
+import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
+import com.kairos.dto.activity.night_worker.QuestionAnswerDTO;
+import com.kairos.dto.activity.night_worker.QuestionnaireAnswerResponseDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.night_worker.QuestionAnswerPair;
@@ -17,10 +17,10 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.night_worker.NightWorkerAgeEligibilitySpecification;
 import com.kairos.rule_validator.night_worker.StaffNonPregnancySpecification;
-import com.kairos.user.staff.StaffDTO;
-import com.kairos.user.staff.staff.UnitStaffResponseDTO;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

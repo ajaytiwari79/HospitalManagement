@@ -1,7 +1,7 @@
 package com.kairos.rest_client;
 
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.user.staff.client.ClientExceptionTypesDTO;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.user.staff.client.ClientExceptionTypesDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

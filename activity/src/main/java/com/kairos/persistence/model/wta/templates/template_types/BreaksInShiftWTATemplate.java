@@ -2,8 +2,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.WTATemplateType;
-import com.kairos.activity.wta.templates.BreakTemplateValue;
+import com.kairos.dto.activity.wta.templates.BreakTemplateValue;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 

@@ -1,14 +1,14 @@
 package com.kairos.service.country.pay_level;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.pay_group_area.PayGroupAreaDTO;
-import com.kairos.util.DateUtil;
+import com.kairos.dto.user.country.pay_group_area.PayGroupAreaDTO;
+import com.kairos.utils.DateUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

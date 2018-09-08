@@ -1,10 +1,10 @@
 package com.kairos.wrapper.wta;
 
-import com.kairos.activity.shift.ViolatedRulesDTO;
-import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.user.country.time_slot.TimeSlotWrapper;
-import com.kairos.util.DateTimeInterval;
+import com.kairos.dto.activity.shift.ViolatedRulesDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;

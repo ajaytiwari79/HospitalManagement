@@ -1,8 +1,8 @@
 package com.kairos.controller.priority_group;
 
 import com.kairos.service.priority_group.PriorityGroupService;
-import com.kairos.util.response.ResponseHandler;
-import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.utils.response.ResponseHandler;
+import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

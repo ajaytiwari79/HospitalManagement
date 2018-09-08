@@ -1,11 +1,11 @@
 package com.kairos.service.table_settings;
 
 
-import com.kairos.client.dto.TableConfiguration;
+import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.persistence.model.table_settings.TableSetting;
 import com.kairos.persistence.repository.table_settings.TableSettingMongoRepository;
 import com.kairos.service.MongoBaseService;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

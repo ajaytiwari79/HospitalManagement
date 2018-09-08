@@ -1,7 +1,7 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.activity.enums.counter.ModuleType;
-import com.kairos.activity.counter.CounterDTO;
+import com.kairos.dto.activity.counter.ModuleType;
+import com.kairos.dto.activity.counter.CounterDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -9,15 +9,15 @@ import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRe
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.persistence.model.priority_group.*;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
-import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.mail.MailService;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.activity.open_shift.PriorityGroupDefaultData;
-import com.kairos.activity.open_shift.PriorityGroupWrapper;
-import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
+import com.kairos.dto.activity.open_shift.PriorityGroupWrapper;
+import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;

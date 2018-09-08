@@ -1,5 +1,7 @@
 package com.kairos.service.organization;
 
+import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
@@ -33,10 +35,9 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.user.organization.*;
-import com.kairos.user.organization.UnitManagerDTO;
-import com.kairos.user.staff.staff.StaffCreationDTO;
-import com.kairos.util.FormatUtil;
+
+import com.kairos.dto.user.staff.staff.StaffCreationDTO;
+import com.kairos.utils.FormatUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.util.validator.company.OrganizationDetailsValidator.*;
+import static com.kairos.utils.validator.company.OrganizationDetailsValidator.*;
 
 /**
  * CreatedBy vipulpandey on 17/8/18

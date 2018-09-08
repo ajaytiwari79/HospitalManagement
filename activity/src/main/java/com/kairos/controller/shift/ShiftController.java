@@ -1,13 +1,14 @@
 package com.kairos.controller.shift;
 
-import com.kairos.activity.shift.*;
+import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.activity.shift.CopyShiftDTO;
-import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.dto.activity.shift.CopyShiftDTO;
+import com.kairos.dto.activity.shift.ShiftPublishDTO;
 import com.kairos.service.shift.ShiftSickService;
-import com.kairos.util.DateUtils;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,8 +20,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;

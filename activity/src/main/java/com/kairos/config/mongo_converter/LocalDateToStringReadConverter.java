@@ -1,12 +1,11 @@
 package com.kairos.config.mongo_converter;
 
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
-import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.Date;
+
 @ReadingConverter
 public class LocalDateToStringReadConverter  implements Converter<String, LocalDate>  {
 

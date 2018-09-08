@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.unit_settings;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.activity.unit_settings.activity_configuration.AbsencePlannedTime;
-import com.kairos.activity.unit_settings.activity_configuration.PresencePlannedTime;
+import com.kairos.dto.activity.unit_settings.activity_configuration.AbsencePlannedTime;
+import com.kairos.dto.activity.unit_settings.activity_configuration.PresencePlannedTime;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 public class ActivityConfiguration extends MongoBaseEntity {

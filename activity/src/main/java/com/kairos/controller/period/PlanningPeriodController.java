@@ -1,8 +1,8 @@
 package com.kairos.controller.period;
 
 import com.kairos.service.period.PlanningPeriodService;
-import com.kairos.util.response.ResponseHandler;
-import com.kairos.activity.period.PlanningPeriodDTO;
+import com.kairos.utils.response.ResponseHandler;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;

@@ -1,7 +1,7 @@
 package com.planner.domain.wta;
 
-import com.kairos.activity.wta.templates.PhaseTemplateValue;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.enums.wta.WTATemplateType;
 import com.planner.domain.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 

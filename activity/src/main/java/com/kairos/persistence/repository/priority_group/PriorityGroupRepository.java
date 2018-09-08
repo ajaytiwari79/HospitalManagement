@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.priority_group;
 
 import com.kairos.persistence.model.priority_group.PriorityGroup;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;

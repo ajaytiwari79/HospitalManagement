@@ -2,8 +2,8 @@ package com.kairos.service.master_data.asset_management;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.gdpr.data_inventory.RiskDTO;
-import com.kairos.gdpr.master_data.AssetTypeDTO;
+import com.kairos.dto.gdpr.data_inventory.RiskDTO;
+import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.model.risk_management.Risk;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;

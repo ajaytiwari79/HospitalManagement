@@ -1,6 +1,6 @@
 package com.kairos.messaging.wshandlers;
 
-import com.kairos.activity.staffing_level.StaffingLevelGraphDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelGraphDTO;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 

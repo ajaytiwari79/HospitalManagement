@@ -2,7 +2,7 @@ package com.kairos.controller.country;
 import com.kairos.service.country.CountryHolidayCalenderService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.google_calender.GoogleCalenderService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

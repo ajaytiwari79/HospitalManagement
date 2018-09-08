@@ -1,10 +1,10 @@
 package com.kairos.response.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.gdpr.OrganizationSubType;
-import com.kairos.gdpr.OrganizationType;
-import com.kairos.gdpr.ServiceCategory;
-import com.kairos.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubType;
+import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.ServiceCategory;
+import com.kairos.dto.gdpr.SubServiceCategory;
 import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
 
 import javax.validation.constraints.NotBlank;

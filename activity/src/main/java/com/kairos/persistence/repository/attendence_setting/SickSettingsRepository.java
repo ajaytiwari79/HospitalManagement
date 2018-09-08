@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.attendence_setting;
 
 import com.kairos.persistence.model.attendence_setting.SickSettings;
-import com.kairos.response.dto.web.attendance.SickSettingsDTO;
-import com.kairos.util.DateUtils;
+import com.kairos.dto.activity.attendance.SickSettingsDTO;
+import com.kairos.commons.utils.DateUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;

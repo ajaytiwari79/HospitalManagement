@@ -3,7 +3,7 @@ package com.kairos.controller.client_exception;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
 import com.kairos.persistence.model.client_exception.ClientExceptionType;
 import com.kairos.service.client_exception.ClientExceptionService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

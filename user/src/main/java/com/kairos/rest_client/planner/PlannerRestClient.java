@@ -1,10 +1,10 @@
 package com.kairos.rest_client.planner;
 
-import com.kairos.activity.wta.UnitPositionWtaDTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.dto.activity.wta.UnitPositionWtaDTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.user.staff.staff.Staff;
+import com.kairos.dto.user.staff.staff.Staff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,11 +1,11 @@
 package com.kairos.rest_client;
 
-import com.kairos.activity.shift.StaffUnitPositionDetails;
-import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.user.staff.ClientStaffInfoDTO;
-import com.kairos.user.staff.StaffDTO;
-import com.kairos.user.staff.staff.UnitStaffResponseDTO;
-import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.staff.ClientStaffInfoDTO;
+import com.kairos.dto.user.staff.staff.StaffDTO;
+import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.util.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
 public class StaffRestClient {
@@ -70,18 +70,18 @@ public class StaffRestClient {
      * <p>
      * enpoint map in staff controller
      */
-    public StaffDTO getStaff(Long staffId) {
+    public com.kairos.dto.user.staff.StaffDTO getStaff(Long staffId) {
 
         final String baseUrl = getBaseUrl(true);
 
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<com.kairos.dto.user.staff.StaffDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<com.kairos.dto.user.staff.StaffDTO>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<StaffDTO>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<com.kairos.dto.user.staff.StaffDTO>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/staff/{staffId}",
                             HttpMethod.GET, null, typeReference, staffId);
-            RestTemplateResponseEnvelope<StaffDTO> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<com.kairos.dto.user.staff.StaffDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
@@ -176,18 +176,18 @@ public class StaffRestClient {
     }
 
 
-    public List<com.kairos.user.staff.staff.StaffDTO> getStaffListByUnit() {
+    public List<StaffDTO> getStaffListByUnit() {
 
         final String baseUrl = getBaseUrl(true);
 
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<com.kairos.user.staff.staff.StaffDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<com.kairos.user.staff.staff.StaffDTO>>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<List<com.kairos.user.staff.staff.StaffDTO>>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<List<StaffDTO>>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/staff/get_Staff_By_Unit",
                             HttpMethod.GET, null, typeReference);
-            RestTemplateResponseEnvelope<List<com.kairos.user.staff.staff.StaffDTO>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<List<StaffDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
@@ -324,18 +324,18 @@ public class StaffRestClient {
      * <p>
      * enpoint map in staff controller
      */
-    public StaffDTO getStaffByUser(Long userId) {
+    public com.kairos.dto.user.staff.StaffDTO getStaffByUser(Long userId) {
 
         final String baseUrl = getBaseUrl(true);
 
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffDTO>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<com.kairos.dto.user.staff.StaffDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<com.kairos.dto.user.staff.StaffDTO>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<StaffDTO>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<com.kairos.dto.user.staff.StaffDTO>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/staff/current_user/{userId}",
                             HttpMethod.GET, null, typeReference, userId);
-            RestTemplateResponseEnvelope<StaffDTO> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<com.kairos.dto.user.staff.StaffDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
@@ -348,21 +348,21 @@ public class StaffRestClient {
         }
     }
 
-    public List<StaffDTO> getStaffInfo(Long unitId,List<Long> expertiesId){
+    public List<com.kairos.dto.user.staff.StaffDTO> getStaffInfo(Long unitId, List<Long> expertiesId){
         final String baseUrl=getBaseUrl(true);
 
         HttpEntity<List> request = new HttpEntity(expertiesId);
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {};
-            ResponseEntity<RestTemplateResponseEnvelope<List<StaffDTO>>> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<com.kairos.dto.user.staff.StaffDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<com.kairos.dto.user.staff.StaffDTO>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<List<com.kairos.dto.user.staff.StaffDTO>>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/staff/getStaffByExperties",
                             HttpMethod.POST,
                             request, typeReference, unitId);
-            RestTemplateResponseEnvelope<List<StaffDTO>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<List<com.kairos.dto.user.staff.StaffDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
 
-                List<StaffDTO> staffDTOList =  response.getData();
+                List<com.kairos.dto.user.staff.StaffDTO> staffDTOList =  response.getData();
                 return staffDTOList;
             } else {
                 throw new RuntimeException(response.getMessage());

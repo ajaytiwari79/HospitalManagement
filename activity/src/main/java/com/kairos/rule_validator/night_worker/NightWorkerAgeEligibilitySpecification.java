@@ -1,7 +1,7 @@
 package com.kairos.rule_validator.night_worker;
 
 import com.kairos.rule_validator.activity.AbstractActivitySpecification;
-import com.kairos.user.staff.StaffDTO;
+import com.kairos.dto.user.staff.StaffDTO;
 
 import java.time.LocalDate;
 import java.time.Period;

@@ -1,10 +1,9 @@
 package com.kairos.persistence.repository.priority_group;
 
-import com.kairos.activity.open_shift.OpenShiftResponseDTO;
+import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 
 public class PriorityGroupRepositoryImpl implements CustomPriorityGroupRepository {
 

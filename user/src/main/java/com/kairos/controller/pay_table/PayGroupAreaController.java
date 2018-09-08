@@ -1,8 +1,8 @@
 package com.kairos.controller.pay_table;
 
-import com.kairos.user.country.pay_group_area.PayGroupAreaDTO;
+import com.kairos.dto.user.country.pay_group_area.PayGroupAreaDTO;
 import com.kairos.service.pay_group_area.PayGroupAreaService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

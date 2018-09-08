@@ -12,7 +12,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import com.kairos.wrapper.task.TaskGanttDTO;
 import org.bson.Document;
@@ -36,7 +36,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static com.kairos.util.DateUtils.ISO_FORMAT;
+import static com.kairos.commons.utils.DateUtils.ISO_FORMAT;
 import static java.time.ZoneId.systemDefault;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 

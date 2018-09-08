@@ -1,11 +1,11 @@
 package com.kairos.rule_validator.activity;
 
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

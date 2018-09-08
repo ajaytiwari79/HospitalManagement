@@ -1,17 +1,17 @@
 package com.kairos.service.dashboard;
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.dashboard.UserSickDataWrapper;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
-import com.kairos.response.dto.web.staff.StaffResultDTO;
+import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftSickService;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.utils.user_context.UserContext;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;

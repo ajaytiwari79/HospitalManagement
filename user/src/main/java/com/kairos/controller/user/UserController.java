@@ -5,7 +5,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.staff.UserSickService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

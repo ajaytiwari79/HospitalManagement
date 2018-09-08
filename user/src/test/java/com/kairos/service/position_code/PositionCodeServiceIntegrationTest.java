@@ -1,7 +1,7 @@
 package com.kairos.service.position_code;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.user.position_code.PositionCode;
@@ -31,7 +31,7 @@ import javax.inject.Inject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import static com.kairos.util.DateUtil.ONLY_DATE;
+import static com.kairos.utils.DateUtil.ONLY_DATE;
 
 /**
  * Created by vipul on 12/1/18.

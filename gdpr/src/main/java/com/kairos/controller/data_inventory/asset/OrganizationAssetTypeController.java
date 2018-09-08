@@ -1,7 +1,7 @@
 package com.kairos.controller.data_inventory.asset;
 
 
-import com.kairos.gdpr.master_data.AssetTypeDTO;
+import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.service.data_inventory.asset.OrganizationAssetTypeService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;

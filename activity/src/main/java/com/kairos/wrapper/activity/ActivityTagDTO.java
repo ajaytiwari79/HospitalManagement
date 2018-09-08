@@ -6,13 +6,12 @@ import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
-import com.kairos.user.country.tag.TagDTO;
+import com.kairos.dto.user.country.tag.TagDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by prerna on 16/12/17.

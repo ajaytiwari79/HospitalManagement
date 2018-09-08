@@ -1,7 +1,7 @@
 package com.kairos.controller.data_inventory.data_category_element;
 
 
-import com.kairos.gdpr.master_data.DataCategoryDTO;
+import com.kairos.dto.gdpr.master_data.DataCategoryDTO;
 import com.kairos.service.data_inventory.data_category_element.OrganizationDataCategoryService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

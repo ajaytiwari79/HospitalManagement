@@ -4,7 +4,7 @@ import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.FormatUtil;
+import com.kairos.utils.FormatUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

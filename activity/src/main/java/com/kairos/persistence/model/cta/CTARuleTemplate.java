@@ -1,13 +1,10 @@
 package com.kairos.persistence.model.cta;
 
-import com.kairos.activity.cta.*;
-import com.kairos.activity.shift.EmploymentType;
+
+import com.kairos.dto.activity.cta.*;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.user.country.agreement.cta.CalculateValueIfPlanned;
-import com.kairos.user.country.agreement.cta.CalculationFor;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
+import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 
 import java.math.BigInteger;
 import java.util.*;

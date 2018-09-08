@@ -2,11 +2,11 @@ package com.planner.service.vrpService;
 
 import com.kairos.planner.vrp.taskplanning.model.*;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.vrp.vrpPlanning.EmployeeDTO;
-import com.kairos.vrp.vrpPlanning.ShiftDTO;
-import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.planner.vrp.vrpPlanning.EmployeeDTO;
+import com.kairos.dto.planner.vrp.vrpPlanning.ShiftDTO;
+import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.domain.tomtomResponse.Matrix;
 import com.planner.service.config.SolverConfigService;

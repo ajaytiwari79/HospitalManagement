@@ -1,11 +1,11 @@
 package com.kairos.service.unit_settings;
 
-import com.kairos.activity.presence_type.PresenceTypeDTO;
-import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.activity.unit_settings.activity_configuration.AbsencePlannedTime;
-import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
-import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationWrapper;
-import com.kairos.activity.unit_settings.activity_configuration.PresencePlannedTime;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.AbsencePlannedTime;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationWrapper;
+import com.kairos.dto.activity.unit_settings.activity_configuration.PresencePlannedTime;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
@@ -15,8 +15,8 @@ import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepo
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.agreement.cta.cta_response.PhaseResponseDTO;
-import com.kairos.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

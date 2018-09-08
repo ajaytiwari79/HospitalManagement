@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.task_type;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.user.organization.skill.Skill;
+import com.kairos.dto.user.organization.skill.Skill;
 
 
 /**

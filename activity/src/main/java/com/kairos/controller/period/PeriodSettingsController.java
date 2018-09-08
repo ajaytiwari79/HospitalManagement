@@ -1,8 +1,8 @@
 package com.kairos.controller.period;
 
 import com.kairos.service.period.PeriodSettingsService;
-import com.kairos.util.response.ResponseHandler;
-import com.kairos.activity.period.PeriodSettingsDTO;
+import com.kairos.utils.response.ResponseHandler;
+import com.kairos.dto.activity.period.PeriodSettingsDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

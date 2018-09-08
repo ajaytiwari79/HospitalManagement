@@ -2,16 +2,15 @@ package com.kairos.persistence.model.user.resources;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.DateUtil;
+import com.kairos.utils.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.inject.Inject;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
+import static com.kairos.utils.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
 /**
  * Created by arvind on 6/10/16.
