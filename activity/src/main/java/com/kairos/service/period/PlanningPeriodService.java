@@ -1,14 +1,16 @@
 package com.kairos.service.period;
 
 
+import com.kairos.dto.activity.cta.UnitPositionDTO;
 import com.kairos.dto.activity.period.FlippingDateDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PeriodPhaseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.constants.AppConstants;
-import com.kairos.dto.SchedulerPanelDTO;
+import com.kairos.dto.scheduler.SchedulerPanelDTO;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.persistence.model.period.PlanningPeriod;
@@ -19,7 +21,9 @@ import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
+import com.kairos.rest_client.GenericRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
@@ -27,11 +31,13 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -65,7 +71,8 @@ public class PlanningPeriodService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private ShiftStateMongoRepository shiftStateMongoRepository;
-
+    @Inject
+    private GenericRestClient genericRestClient;
     // To get list of phases with duration in days
     public List<PhaseDTO> getPhasesWithDurationInDays(Long unitId) {
         List<PhaseDTO> phases = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);
@@ -331,12 +338,12 @@ public class PlanningPeriodService extends MongoBaseService {
         planningPeriods.parallelStream().forEach(planningPeriod -> {
          //   planningPeriodMap.put(planningPeriod.getId(),planningPeriod);
             planningPeriod.getPhaseFlippingDate().parallelStream().forEach(periodPhaseFlippingDate -> {
-                    schedulerPanelDTOS.add(new SchedulerPanelDTO(JobSubType.PLANNING_PHASE_FLIPPING,true,LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(),periodPhaseFlippingDate.getFlippingTime()),planningPeriod.getId()));
+                    schedulerPanelDTOS.add(new SchedulerPanelDTO(JobSubType.FLIP_PHASE,true,LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(),periodPhaseFlippingDate.getFlippingTime()),planningPeriod.getId()));
             });
         });
         Map<LocalDateTime,SchedulerPanelDTO> localDateTimeSchedulerPanelDTOHashMap=new HashMap<>();
-        List<SchedulerPanelDTO> schedulerPanelDTOS1=new ArrayList<>();
-        Map<BigInteger,List<SchedulerPanelDTO>> schedulerPanelDTOMap=schedulerPanelDTOS1.parallelStream().collect(Collectors.groupingBy(o -> o.getEntityId(),Collectors.toList()));
+        List<SchedulerPanelDTO> schedulerPanelRestDTOS=genericRestClient.publishRequest(schedulerPanelDTOS,unitId,true, IntegrationOperation.CREATE,"",null , new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>(){},null);
+        Map<BigInteger,List<SchedulerPanelDTO>> schedulerPanelDTOMap=schedulerPanelRestDTOS.parallelStream().collect(Collectors.groupingBy(o -> o.getEntityId(),Collectors.toList()));
         planningPeriods.parallelStream().forEach(planningPeriod -> {
             List<SchedulerPanelDTO> schedulerPanelDTO=schedulerPanelDTOMap.get(planningPeriod.getId());
               schedulerPanelDTO.parallelStream().forEach(schedulerPanelDTO1 -> {
@@ -362,16 +369,19 @@ public class PlanningPeriodService extends MongoBaseService {
                 case 4: {
                     phaseFlippingDate.setFlippingDate(planningPeriodDTO.getConstructionToDraftDate().getDate());
                     phaseFlippingDate.setFlippingTime(LocalTime.of(planningPeriodDTO.getConstructionToDraftDate().getHours(),planningPeriodDTO.getConstructionToDraftDate().getMinutes()));
+                    updateSchedularFlippingDateById(phaseFlippingDate.getSchedulerPanelId(),unitId,phaseFlippingDate.getFlippingDate(),phaseFlippingDate.getFlippingTime());
                     break;
                 }
                 case 3: {
                     phaseFlippingDate.setFlippingDate(planningPeriodDTO.getPuzzleToConstructionDate().getDate());
                     phaseFlippingDate.setFlippingTime(LocalTime.of(planningPeriodDTO.getPuzzleToConstructionDate().getHours(),planningPeriodDTO.getPuzzleToConstructionDate().getMinutes()));
+                    updateSchedularFlippingDateById(phaseFlippingDate.getSchedulerPanelId(),unitId,phaseFlippingDate.getFlippingDate(),phaseFlippingDate.getFlippingTime());
                     break;
                 }
                 case 2: {
                     phaseFlippingDate.setFlippingDate(planningPeriodDTO.getRequestToPuzzleDate().getDate());
                     phaseFlippingDate.setFlippingTime(LocalTime.of(planningPeriodDTO.getRequestToPuzzleDate().getHours(),planningPeriodDTO.getRequestToPuzzleDate().getMinutes()));
+                    updateSchedularFlippingDateById(phaseFlippingDate.getSchedulerPanelId(),unitId,phaseFlippingDate.getFlippingDate(),phaseFlippingDate.getFlippingTime());
                     break;
                 }
             }
@@ -379,6 +389,10 @@ public class PlanningPeriodService extends MongoBaseService {
         return planningPeriod;
     }
 
+    public void updateSchedularFlippingDateById(BigInteger schedulerPanelId,Long unitId,LocalDate localDate,LocalTime localTime){
+            SchedulerPanelDTO schedulerPanelDTO=new SchedulerPanelDTO(schedulerPanelId,LocalDateTime.of(localDate,localTime));
+            SchedulerPanelDTO schedulerPanelDto=genericRestClient.publishRequest(schedulerPanelDTO, unitId, true, IntegrationOperation.UPDATE, "/{schedulerPanelId}", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<SchedulerPanelDTO>>(){},schedulerPanelDTO,null);
+    }
 
     public List<PlanningPeriodDTO> updatePlanningPeriod(Long unitId, BigInteger periodId, PlanningPeriodDTO planningPeriodDTO) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findOne(periodId);

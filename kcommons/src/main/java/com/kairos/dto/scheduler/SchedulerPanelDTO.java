@@ -65,6 +65,11 @@ public class SchedulerPanelDTO {
         this.entityId = entityId;
     }
 
+    public SchedulerPanelDTO(BigInteger id, LocalDateTime oneTimeTriggerDate) {
+        this.id = id;
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
+    }
+
     public BigInteger getId() {
         return id;
     }
