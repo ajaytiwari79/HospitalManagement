@@ -6,6 +6,7 @@ import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.response.dto.web.attendance.AttendanceDuration;
 import com.kairos.response.dto.web.attendance.AttendanceDTO;
 import com.kairos.response.dto.web.attendance.AttendanceDurationDTO;
@@ -43,6 +44,7 @@ public class AttendanceSettingService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
     @Inject private SickSettingsRepository sickSettingsRepository;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
 
     public AttendanceDTO getAttendanceSetting() {
         AttendanceSetting attendanceSetting = attendanceSettingRepository.findMaxAttendanceCheckIn(UserContext.getUserDetails().getId(), DateUtils.getDateFromLocalDate(LocalDate.now().minusDays(1)));
@@ -58,6 +60,10 @@ public class AttendanceSettingService extends MongoBaseService {
         if (!Optional.ofNullable(staffAndOrganizationIds).isPresent()) {
             exceptionService.actionNotPermittedException("message.staff.notfound");
         }
+        ShiftQueryResult shiftQueryResults = (unitId==null)?shiftService.getShiftByStaffIdAndDate(staffAndOrganizationIds.stream().map(StaffResultDTO::getStaffId).collect(Collectors.toList()), DateUtils.getCurrentDate()):
+                shiftMongoRepository.findByStaffIdAndUnitIdAndDeletedFalseAndGreaterThanStartDate(staffAndOrganizationIds.get(0).getStaffId(),unitId,DateUtils.getCurrentDate());
+
+
         attendanceSetting = (checkIn) ? checkInAttendanceSetting(unitId,reasonCodeId,staffAndOrganizationIds):checkOutAttendanceSetting(staffAndOrganizationIds);
         if(Optional.ofNullable(attendanceSetting).isPresent()) {
             save(attendanceSetting);

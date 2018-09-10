@@ -17,4 +17,11 @@ public interface UnitSettingRepository extends MongoBaseRepository<UnitSetting,B
 
     @Query(value = "{'deleted' : false, 'unitId':?0}",fields = "{'openShiftPhaseSetting.minOpenShiftHours': 1}")
     UnitSettingDTO getMinOpenShiftHours(Long unitId);
+
+    @Query(value = "{'deleted' : false, 'unitId':?0}",fields = "{'flexibleTimeSettings': 1}")
+    UnitSettingDTO getFlexibleTimingByUnit(Long unitId);
+
+    UnitSetting findByUnitIdAndDeletedFalse(Long unitId);
+
+
 }

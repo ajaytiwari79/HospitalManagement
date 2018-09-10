@@ -5,6 +5,7 @@ import java.math.BigInteger;
 public class UnitSettingDTO {
     private BigInteger id;
     private OpenShiftPhaseSetting openShiftPhaseSetting;
+    private FlexibleTimeSettingDTO flexibleTimeSettings;
 
     public UnitSettingDTO() {
         //Default Constructor
@@ -24,5 +25,13 @@ public class UnitSettingDTO {
 
     public void setOpenShiftPhaseSetting(OpenShiftPhaseSetting openShiftPhaseSetting) {
         this.openShiftPhaseSetting = openShiftPhaseSetting;
+    }
+
+    public FlexibleTimeSettingDTO getFlexibleTimeSettings() {
+        return flexibleTimeSettings;
+    }
+
+    public void setFlexibleTimeSettings(FlexibleTimeSettingDTO flexibleTimeSettings) {
+        this.flexibleTimeSettings = flexibleTimeSettings;
     }
 }

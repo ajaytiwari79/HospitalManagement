@@ -6,6 +6,7 @@ import com.kairos.activity.unit_settings.OpenShiftPhaseSetting;
 
 public class UnitSetting extends MongoBaseEntity {
     private OpenShiftPhaseSetting openShiftPhaseSetting;
+    private FlexibleTimeSettings flexibleTimeSettings;
     private Long unitId;
 
     public UnitSetting() {
@@ -31,5 +32,13 @@ public class UnitSetting extends MongoBaseEntity {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public FlexibleTimeSettings getFlexibleTimeSettings() {
+        return flexibleTimeSettings;
+    }
+
+    public void setFlexibleTimeSettings(FlexibleTimeSettings flexibleTimeSettings) {
+        this.flexibleTimeSettings = flexibleTimeSettings;
     }
 }

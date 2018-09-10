@@ -1,5 +1,6 @@
 package com.kairos.controller.unit_settings;
 
+import com.kairos.activity.unit_settings.FlexibleTimeSettingDTO;
 import com.kairos.service.unit_settings.UnitSettingService;
 import com.kairos.service.user_service_data.UnitDataService;
 import com.kairos.util.response.ResponseHandler;
@@ -70,5 +71,19 @@ public class UnitSettingController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addParentOrganizationAndCountryIdForAllUnits() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitDataService.addParentOrganizationAndCountryIdForAllUnits());
+    }
+
+    //Flexible Time Settings
+
+    @ApiOperation("Get Flexible time settings")
+    @GetMapping("/flexible_time")
+    public ResponseEntity<Map<String,Object>> getFlexibleTime(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,unitSettingService.getFlexibleTime(unitId));
+    }
+
+    @ApiOperation("Update Flexible time setting")
+    @PutMapping("/flexible_time")
+    public ResponseEntity<Map<String,Object>> updateFlexibleTime(@PathVariable Long unitId, @RequestBody FlexibleTimeSettingDTO flexibleTimeSettingDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,unitSettingService.updateFlexibleTime(unitId,flexibleTimeSettingDTO));
     }
 }
