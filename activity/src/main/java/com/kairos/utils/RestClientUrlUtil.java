@@ -14,6 +14,7 @@ public class RestClientUrlUtil {
 
     private static  String userServiceUrl;
     private static  String plannerServiceUrl;
+    private static String schedulerServiceUrl;
     @Value("${gateway.plannerservice.url}")
     public void setPlannerServiceUrl(String plannerServiceUrl) {
         RestClientUrlUtil.plannerServiceUrl = plannerServiceUrl;
@@ -24,6 +25,10 @@ public class RestClientUrlUtil {
         RestClientUrlUtil.userServiceUrl = userServiceUrl;
     }
 
+    @Value("${gateway.schedulerservice.url}")
+    public void setSchedulerServiceUrl(String schedulerServiceUrl) {
+        RestClientUrlUtil.schedulerServiceUrl = schedulerServiceUrl;
+    }
 
     public static final String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){
@@ -71,6 +76,16 @@ public class RestClientUrlUtil {
             return baseUrl;
         } else {
             String baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).toString();
+            return baseUrl;
+        }
+    }
+
+    public final static String getSchedulerBaseUrl(boolean hasUnitInUrl, Long id) {
+        if (hasUnitInUrl) {
+            String baseUrl = new StringBuilder(schedulerServiceUrl + "organization/").append(UserContext.getOrgId()).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+            return baseUrl;
+        } else {
+            String baseUrl = new StringBuilder(schedulerServiceUrl + "organization/").append(UserContext.getOrgId()).toString();
             return baseUrl;
         }
     }
