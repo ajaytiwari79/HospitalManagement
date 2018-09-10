@@ -3,10 +3,13 @@ package com.planner.service.shift_planning;
 import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
+import org.joda.time.chrono.ZonedChronology;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -83,8 +86,8 @@ public class CTAService {
      * @return
      */
     public Map<LocalDate, CTAResponseDTO> getInitialMapWithAllIntervals(Date fromPlanningDate, Date toPlanningDate) {
-        LocalDate fromPlanningLocalDate = LocalDate.ofEpochDay(fromPlanningDate.toInstant().getEpochSecond());
-        LocalDate toPlanningLocalDate = LocalDate.ofEpochDay(toPlanningDate.toInstant().getEpochSecond());
+        LocalDate fromPlanningLocalDate = ZonedDateTime.ofInstant(fromPlanningDate.toInstant(), ZoneId.systemDefault()).toLocalDate();
+        LocalDate toPlanningLocalDate = ZonedDateTime.ofInstant(toPlanningDate.toInstant(), ZoneId.systemDefault()).toLocalDate();
         ;
         Map<LocalDate, CTAResponseDTO> localDateCTAResponseDTOMap = new HashMap<>();
         while (!fromPlanningLocalDate.equals(toPlanningLocalDate)) {
