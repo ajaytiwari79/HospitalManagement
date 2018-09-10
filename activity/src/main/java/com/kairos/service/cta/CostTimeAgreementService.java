@@ -533,6 +533,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         costTimeAgreement.setCreatedBy(UserContext.getUserDetails().getId());
         costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
         save(costTimeAgreement);
+
         return costTimeAgreementRepository.getOneCtaById(costTimeAgreement.getId());
     }
 
