@@ -1,9 +1,9 @@
 package com.kairos.scheduler.service;
 
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
 import com.kairos.scheduler.persistence.repository.custom_repository.MongoSequenceRepository;
-import com.kairos.commons.utils.DateUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;
@@ -24,12 +24,13 @@ import java.util.List;
 public class MongoBaseService {
 
     @Inject
-    MongoSequenceRepository mongoSequenceRepository;
+    private MongoSequenceRepository mongoSequenceRepository;
 
     @Inject
-    MongoTemplate mongoTemplate;
+    private MongoTemplate mongoTemplate;
     @Inject
-    DB database;
+    private DB database;
+
 
     private static final Logger logger = LoggerFactory.getLogger(MongoBaseService.class);
 
@@ -160,4 +161,7 @@ public class MongoBaseService {
             return null;
         }
     }
+
+
+
 }
