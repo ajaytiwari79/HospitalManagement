@@ -173,18 +173,12 @@ public class MasterProcessingActivityController {
 
 
     @ApiOperation(value = "get MasterProcessingActivity of unit by id")
-    @GetMapping(UNIT_URL + "/master_processing_activity/{id}")
-    public ResponseEntity<Object> getMasterProcessingActivityOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+    @GetMapping(UNIT_URL + "/master_processing_activity/{processingActivityId}")
+    public ResponseEntity<Object> getMasterProcessingActivityOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
+        if (processingActivityId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Processing Activity id can't be null");
         }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId  can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithSubProcessing(countryId, unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithSubProcessing(countryId, unitId, processingActivityId));
     }
 
     @ApiOperation(value = "get MasterProcessingActivity list with SubProcessing Activity of unit ")
