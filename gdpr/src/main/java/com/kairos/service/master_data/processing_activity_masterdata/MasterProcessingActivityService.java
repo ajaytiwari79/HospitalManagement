@@ -2,12 +2,17 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.dto.gdpr.MasterProcessingActivityRiskDTO;
+import com.kairos.dto.gdpr.data_inventory.RiskDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
+import com.kairos.persistance.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
+import com.kairos.response.dto.master_data.MasterProcessingActivityRiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.risk_management.RiskService;
 import com.mongodb.MongoClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+
 
 import static com.kairos.constants.AppConstant.IDS_LIST;
 import static com.kairos.constants.AppConstant.PROCESSING_ACTIVITIES;
@@ -32,6 +38,12 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
     @Inject
     private ExceptionService exceptionService;
+
+    @Inject
+    private RiskService riskService;
+
+    @Inject
+    private RiskMongoRepository riskMongoRepository;
 
 
     /**
@@ -131,7 +143,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
         } else {
-            Map<String, Object> subProcessingActivity = new HashMap<>();
+            Map<String, Object> subProcessingActivity;
             if (!masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
                 subProcessingActivity = updateExistingAndCreateNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto);
                 processingActivity.setSubProcessingActivityIds((List<BigInteger>) subProcessingActivity.get(IDS_LIST));
@@ -145,7 +157,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             processingActivity.setDescription(masterProcessingActivityDto.getDescription());
             processingActivity.setName(masterProcessingActivityDto.getName());
             try {
-                processingActivity = masterProcessingActivityRepository.save(processingActivity);
+                masterProcessingActivityRepository.save(processingActivity);
 
             } catch (MongoClientException e) {
                 LOGGER.info(e.getMessage());
@@ -299,7 +311,93 @@ public class MasterProcessingActivityService extends MongoBaseService {
     }
 
 
-    public void checkForDuplicacyInName(List<MasterProcessingActivityDTO> processingActivityDTOs) {
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param processingActivityId
+     * @param processingActivityRiskDTO
+     * @return
+     */
+    public MasterProcessingActivityRiskDTO createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(Long countryId, Long organizationId, BigInteger processingActivityId, MasterProcessingActivityRiskDTO processingActivityRiskDTO) {
+
+
+        MasterProcessingActivity masterProcessingActivity = masterProcessingActivityRepository.findByIdAndCountryIdAndNonDeleted(countryId, organizationId, processingActivityId);
+        if (!Optional.ofNullable(masterProcessingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("meassge.dataNotFound", "Processing Activity", processingActivityId);
+        }
+        List<MasterProcessingActivity> processingActivityList = new ArrayList<>();
+        processingActivityList.add(masterProcessingActivity);
+        Map<MasterProcessingActivity, List<RiskDTO>> riskListCoresspondingToProcessingActivity = new HashMap<>();
+        if (!processingActivityRiskDTO.getRisks().isEmpty()) {
+            riskListCoresspondingToProcessingActivity.put(masterProcessingActivity, processingActivityRiskDTO.getRisks());
+
+        }
+        if (!processingActivityRiskDTO.getSubProcessingActivities().isEmpty()) {
+            List<BigInteger> subProcessingActivityIds = new ArrayList<>();
+            Map<BigInteger, List<RiskDTO>> subProcessingActivityAndRiskDtoListMap = new HashMap<>();
+            processingActivityRiskDTO.getSubProcessingActivities().forEach(subProcessingActivityRiskDTO -> {
+                subProcessingActivityIds.add(subProcessingActivityRiskDTO.getId());
+                subProcessingActivityAndRiskDtoListMap.put(subProcessingActivityRiskDTO.getId(), subProcessingActivityRiskDTO.getRisks());
+            });
+            List<MasterProcessingActivity> subProcessingActivityList = masterProcessingActivityRepository.getAllMasterSubProcessingActivityByIds(countryId, organizationId, subProcessingActivityIds);
+            for (MasterProcessingActivity subProcessingActivity : subProcessingActivityList) {
+                if (!subProcessingActivityAndRiskDtoListMap.get(subProcessingActivity.getId()).isEmpty()) {
+                    riskListCoresspondingToProcessingActivity.put(subProcessingActivity, subProcessingActivityAndRiskDtoListMap.get(subProcessingActivity.getId()));
+                }
+            }
+            processingActivityList.addAll(subProcessingActivityList);
+        }
+        if (!riskListCoresspondingToProcessingActivity.isEmpty()) {
+            Map<MasterProcessingActivity, List<BigInteger>> riskIdListCoressponsingProcessingActivities = riskService.saveRiskAtCountryLevel(countryId, riskListCoresspondingToProcessingActivity);
+            processingActivityList.forEach(processingActivity -> processingActivity.setRisks(riskIdListCoressponsingProcessingActivities.get(processingActivity)));
+        }
+        masterProcessingActivityRepository.saveAll(getNextSequence(processingActivityList));
+        return processingActivityRiskDTO;
+    }
+
+
+    /**
+     * @param countryId
+     * @param organizationId
+     * @param processingActivityId
+     * @return
+     */
+    public Boolean deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(Long countryId, Long organizationId, BigInteger processingActivityId, BigInteger riskId) {
+        MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByIdAndCountryIdAndNonDeleted(countryId, organizationId, processingActivityId);
+        if (!Optional.ofNullable(processingActivity).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
+
+        }
+        processingActivity.getRisks().remove(riskId);
+        riskMongoRepository.findByIdAndSaveDelete(riskId);
+        masterProcessingActivityRepository.save(processingActivity);
+        return true;
+
+    }
+
+
+    /**
+     * @param countryId
+     * @param unitId
+     * @return -method return list of Processing Activity and Risks linked with them
+     */
+    public List<MasterProcessingActivityRiskResponseDTO> getAllMasterProcessingActivityAndLinkedRisks(Long countryId, Long unitId) {
+        return masterProcessingActivityRepository.getAllProcessingActivityWithLinkedRisks(countryId, unitId);
+    }
+
+
+    /**
+     * @param countryId
+     * @param unitId               - organization Id
+     * @param processingActivityId processing Activity id
+     * @return - method return list of Subprocessing Activity of Master Processing Activity with risks
+     */
+    public List<MasterProcessingActivityRiskResponseDTO> getAllSubProcessingActivityAndLinkedRisksByProcessingActivityId(Long countryId, Long unitId, BigInteger processingActivityId) {
+        return masterProcessingActivityRepository.getAllSubProcessingActivityWithLinkedRisksByProcessingActivityId(countryId, unitId, processingActivityId);
+    }
+
+
+    private void checkForDuplicacyInName(List<MasterProcessingActivityDTO> processingActivityDTOs) {
         List<String> names = new ArrayList<>();
         processingActivityDTOs.forEach(dataElementDto -> {
             if (names.contains(dataElementDto.getName())) {

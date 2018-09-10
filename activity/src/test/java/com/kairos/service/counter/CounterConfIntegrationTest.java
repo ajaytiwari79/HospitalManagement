@@ -2,7 +2,7 @@ package com.kairos.service.counter;
 
 import com.kairos.KairosActivityApplication;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.dto.activity.counter.FilterCriteria;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryUpdationDTO;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.counter.Counter;

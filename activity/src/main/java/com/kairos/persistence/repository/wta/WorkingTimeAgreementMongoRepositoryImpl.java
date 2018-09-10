@@ -204,10 +204,10 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     public List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> upIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitPositionId").in(upIds).and("deleted").is(false).and("disabled").is(true)),
-                graphLookup("workingTimeAgreement").startWith("parentWTA").connectFrom("parentWTA").connectTo("_id").as("versions"),
-                unwind("versions"),
-                project("versions").andExclude("_id"),
-                replaceRoot("versions"),
+                //graphLookup("workingTimeAgreement").startWith("parentWTA").connectFrom("parentWTA").connectTo("_id").as("versions"),
+               // unwind("versions"),
+               // project("versions").andExclude("_id"),
+               // replaceRoot("versions"),
                 lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
