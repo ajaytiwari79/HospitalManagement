@@ -184,10 +184,10 @@ public class ShiftService extends MongoBaseService {
 
 
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
-        ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivityId());
+        ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
         Activity activity = activityWrapper.getActivity();
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException("message.activity.id", shiftDTO.getActivities().get(0).getActivityId());
         }
         organizationActivityService.validateShiftTime(shiftDTO.getStaffId(),shiftDTO,activity.getRulesActivityTab());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
@@ -250,16 +250,16 @@ public class ShiftService extends MongoBaseService {
         mainShift.setMainShift(true);
         mainShift.setPlannedTimeId(shiftWithActivityDTO.getPlannedTypeId());
         validateStaffingLevel(phase,mainShift, activityWrapper.getActivity(), true, staffAdditionalInfoDTO);
-        ShiftQueryResult shiftQueryResult = mainShift.getShiftQueryResult();
+        shiftDTO = mainShift.getShiftDTO();
 
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(Arrays.asList(shiftQueryResult),violatedRulesDTO);
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(Arrays.asList(shiftDTO),violatedRulesDTO);
         if(violatedRulesDTO.getWorkTimeAgreements().isEmpty()){
-            List<ShiftQueryResult> shiftQueryResults = addBreakInShifts(activityWrapper.getActivity(), mainShift, staffAdditionalInfoDTO);
+            List<ShiftDTO> shiftDTOS = addBreakInShifts(activityWrapper.getActivity(), mainShift, staffAdditionalInfoDTO);
             save(mainShift);
-            shiftQueryResult.setId(mainShift.getId());
-            shiftQueryResult.setSubShifts(shiftQueryResults);
+            shiftDTO.setId(mainShift.getId());
+            shiftDTO.setSubShifts(shiftDTOS);
             setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
-            shiftQueryResult.setTimeType(activityWrapper.getTimeType());
+            shiftDTO.setTimeType(activityWrapper.getTimeType());
             updateTimeBankAndPayOutAndPublishNotification(activityWrapper,mainShift,staffAdditionalInfoDTO);
             ShiftViolatedRules shiftViolatedRules = ObjectMapperUtils.copyPropertiesByMapper(violatedRulesDTO,ShiftViolatedRules.class);
             shiftViolatedRules.setShift(mainShift);
@@ -279,6 +279,26 @@ public class ShiftService extends MongoBaseService {
         }
     }
 
+    private void saveShiftWithActivity(Shift shift){
+        int i=0;
+        for (ShiftActivity shiftActivity : shift.getActivities()) {
+            shiftActivity.setOrder(i);
+            i++;
+        }
+        save(shift);
+    }
+
+    private void saveShiftWithActivity(List<Shift> shifts){
+        int i=0;
+        for (Shift shift:shifts){
+            for (ShiftActivity shiftActivity : shift.getActivities()) {
+                shiftActivity.setOrder(i);
+                i++;
+            }
+        }
+        save(shifts);
+    }
+
     public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo,String type){
         Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftWithViolatedInfo.getShifts().get(0),Shift.class);
         //Todo Remove this when frontend will refactor
@@ -287,7 +307,7 @@ public class ShiftService extends MongoBaseService {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
         Activity activity = activityWrapper.getActivity();
         //Todo Remove this when frontend will refactor
-        shift.getActivities().get(0).setActivityName(activity.getName());
+        shift.getActivities().get(0).setActivityname(activity.getName());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shift.getStaffId(), type, shift.getUnitPositionId());
         Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftStartDate);
@@ -402,7 +422,7 @@ public class ShiftService extends MongoBaseService {
 
     }
 
-    private List<ShiftDTO> addBreakInShifts(Activity activity, Shift mainShift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    private List<ShiftActivity> addBreakInShifts(Activity activity, Shift mainShift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         logger.info("break Allowed = {}", activity.getRulesActivityTab().isBreakAllowed());
         List<ShiftDTO> shiftDTOS = new ArrayList<>();
         if (activity.getRulesActivityTab().isBreakAllowed()) {

@@ -34,9 +34,6 @@ public class ShiftDTO {
     private long accumulatedTimeBankInMinutes;
     private String remarks;
     private BigInteger parentOpenShiftId;
-    @Range(min = 0)
-    @NotNull(message = "error.ShiftDTO.activityId.notnull")
-    private BigInteger activityId;
     private Long unitId;
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.staffId.notnull")
@@ -44,8 +41,6 @@ public class ShiftDTO {
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
     private Long unitPositionId;
-    private int scheduledMinutes;
-    private int durationMinutes;
     @JsonFormat(pattern = "YYYY-MM-DD")
     private LocalDate shiftDate;
     @JsonFormat(pattern = "YYYY-MM-DD")
@@ -64,15 +59,15 @@ public class ShiftDTO {
     private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger plannedTimeId;
 
-    public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
-        this.activityId = activityId;
+    public ShiftDTO(List<ShiftActivity> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
+        this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
         this.unitPositionId = unitPositionId;
     }
 
-    public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId,LocalDate startLocalDate,LocalDate endLocalDate,LocalTime startTime,LocalTime endTime) {
-        this.activityId = activityId;
+    public ShiftDTO(List<ShiftActivity> activities, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId,LocalDate startLocalDate,LocalDate endLocalDate,LocalTime startTime,LocalTime endTime) {
+        this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
         this.unitPositionId = unitPositionId;
@@ -82,9 +77,9 @@ public class ShiftDTO {
         this.endTime=endTime;
     }
 
-    public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
+    public ShiftDTO(List<ShiftActivity> activities, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
             Long unitPositionId,LocalDate startLocalDate,LocalDate endLocalDate,LocalTime startTime,LocalTime endTime,List<ShiftDTO> subShifts) {
-        this.activityId = activityId;
+        this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
         this.unitPositionId = unitPositionId;
@@ -95,6 +90,23 @@ public class ShiftDTO {
         this.subShifts=subShifts;
     }
 
+    public ShiftDTO(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
+        this.id = id;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.bid = bid;
+        this.pId = pId;
+        this.bonusTimeBank = bonusTimeBank;
+        this.amount = amount;
+        this.probability = probability;
+        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
+        this.remarks = remarks;
+        this.activities = activities;
+        this.staffId = staffId;
+        this.unitId = unitId;
+        this.unitPositionId = unitPositionId;
+    }
 
     public Set<ShiftStatus> getStatus() {
         return status;
@@ -160,21 +172,7 @@ public class ShiftDTO {
         this.shiftDate = shiftDate;
     }
 
-    public int getScheduledMinutes() {
-        return scheduledMinutes;
-    }
 
-    public void setScheduledMinutes(int scheduledMinutes) {
-        this.scheduledMinutes = scheduledMinutes;
-    }
-
-    public int getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
 
 
 
@@ -255,13 +253,6 @@ public class ShiftDTO {
         this.remarks = remarks;
     }
 
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
 
     public Long getStaffId() {
         return staffId;
@@ -310,9 +301,7 @@ public class ShiftDTO {
                 this.probability,
                 this.accumulatedTimeBankInMinutes,
                 this.remarks,
-                this.activityId, this.staffId, this.unitId, this.unitPositionId);
-        shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
-        shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
+                this.activities, this.staffId, this.unitId, this.unitPositionId);
         shiftQueryResult.setStatus(this.status);
         shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
         shiftQueryResult.setPlannedTimeId(this.plannedTimeId);
@@ -333,7 +322,6 @@ public class ShiftDTO {
                 ", probability=" + probability +
                 ", accumulatedTimeBankInMinutes=" + accumulatedTimeBankInMinutes +
                 ", remarks='" + remarks + '\'' +
-                ", activityId=" + activityId +
                 ", unitId=" + unitId +
                 ", staffId=" + staffId +
                 '}';

@@ -2,7 +2,9 @@ package com.kairos.persistence.model.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.shift.ShiftActivity;
+
+import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
@@ -42,11 +44,8 @@ public class Shift extends MongoBaseEntity {
     @Indexed
     private Long unitId;
 
-    private int scheduledMinutes;
-    private int durationMinutes;
 
     private boolean isMainShift = true;
-    private Set<BigInteger> subShifts;
     private List<ShiftActivity> activities;
     //time care id
     private String externalId;
@@ -96,6 +95,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public List<ShiftActivity> getActivities() {
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         return activities;
     }
 
@@ -129,22 +129,6 @@ public class Shift extends MongoBaseEntity {
         this.unitId = unitId;
         this.unitPositionId = unitPositionId;
 
-    }
-
-    public int getScheduledMinutes() {
-        return scheduledMinutes;
-    }
-
-    public void setScheduledMinutes(int scheduledMinutes) {
-        this.scheduledMinutes = scheduledMinutes;
-    }
-
-    public int getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
     }
 
     public String getName() {
@@ -316,14 +300,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-    public Set<BigInteger> getSubShifts() {
-        return subShifts;
-    }
-
-    public void setSubShifts(Set<BigInteger> subShifts) {
-        this.subShifts = subShifts;
-    }
-
 
     public ShiftQueryResult getShiftQueryResult() {
         ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id, this.name,
@@ -336,14 +312,32 @@ public class Shift extends MongoBaseEntity {
                 this.probability,
                 this.accumulatedTimeBankInMinutes,
                 this.remarks,
-                this.activityId, this.staffId, this.unitId, this.unitPositionId);
-        shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
-        shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
+                this.activities, this.staffId, this.unitId, this.unitPositionId);
         shiftQueryResult.setStatus(this.getStatus());
         shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
         shiftQueryResult.setPlannedTimeId(this.plannedTimeId);
         return shiftQueryResult;
     }
+
+    public ShiftDTO getShiftDTO() {
+        ShiftDTO shiftDTO = new ShiftDTO(this.id, this.name,
+                this.startDate,
+                this.endDate,
+                this.bid,
+                this.pId,
+                this.bonusTimeBank,
+                this.amount,
+                this.probability,
+                this.accumulatedTimeBankInMinutes,
+                this.remarks,
+                this.activities, this.staffId, this.unitId, this.unitPositionId);
+        shiftDTO.setStatus(this.getStatus());
+        shiftDTO.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
+        shiftDTO.setPlannedTimeId(this.plannedTimeId);
+        return shiftDTO;
+    }
+
+
 
     public String getExternalId() {
         return externalId;
@@ -436,8 +430,6 @@ public class Shift extends MongoBaseEntity {
         this.staffId = staffId;
         this.phase = phase;
         this.unitId = unitId;
-        this.scheduledMinutes = scheduledMinutes;
-        this.durationMinutes = durationMinutes;
         this.isMainShift = isMainShift;
         this.externalId = externalId;
         this.unitPositionId = unitPositionId;
