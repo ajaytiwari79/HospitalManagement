@@ -4,9 +4,9 @@ package com.kairos.controller.shift;
  *
  */
 
-import com.kairos.activity.shift.ActivityShiftStatusSettingsDTO;
+import com.kairos.dto.activity.shift.ActivityShiftStatusSettingsDTO;
 import com.kairos.service.shift.ActivityShiftStatusSettingsService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

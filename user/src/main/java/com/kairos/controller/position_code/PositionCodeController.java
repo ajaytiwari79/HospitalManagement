@@ -1,9 +1,9 @@
 package com.kairos.controller.position_code;
 
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.user.organization.position_code.PositionCodeDTO;
+import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.service.position_code.PositionCodeService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

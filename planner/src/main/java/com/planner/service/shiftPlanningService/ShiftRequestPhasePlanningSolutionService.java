@@ -3,8 +3,8 @@ package com.planner.service.shiftPlanningService;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.staffing_level.StaffingLevelDto;
-import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.StaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.shiftplanning.domain.*;
 import com.kairos.shiftplanning.domain.activityConstraint.ActivityConstraints;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;

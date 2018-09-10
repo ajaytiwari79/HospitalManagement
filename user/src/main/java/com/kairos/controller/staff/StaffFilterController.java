@@ -2,7 +2,7 @@ package com.kairos.controller.staff;
 
 import com.kairos.persistence.model.staff.StaffFilterDTO;
 import com.kairos.service.staff.StaffFilterService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

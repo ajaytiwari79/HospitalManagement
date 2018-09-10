@@ -1,23 +1,23 @@
 package com.kairos.service.pay_out;
 
-import com.kairos.activity.cta.CTARuleTemplateDTO;
-import com.kairos.activity.cta.CompensationTableInterval;
-import com.kairos.activity.pay_out.PayOutCTADistributionDTO;
-import com.kairos.activity.pay_out.PayOutDTO;
-import com.kairos.activity.pay_out.PayOutIntervalDTO;
-import com.kairos.activity.shift.StaffUnitPositionDetails;
-import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;
-import com.kairos.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.activity.cta.CompensationTableInterval;
+import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
+import com.kairos.dto.activity.pay_out.PayOutDTO;
+import com.kairos.dto.activity.pay_out.PayOutIntervalDTO;
+import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.model.pay_out.PayOutCTADistribution;
-import com.kairos.user.country.agreement.cta.CalculationFor;
-import com.kairos.user.country.agreement.cta.CompensationMeasurementType;
-import com.kairos.util.DateTimeInterval;
-import com.kairos.util.DateUtils;
+import com.kairos.dto.user.country.agreement.cta.CalculationFor;
+import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.activity.cta.AccountType.PAID_OUT;
+import static com.kairos.dto.activity.cta.AccountType.PAID_OUT;
 import static com.kairos.constants.AppConstants.*;
 
 

@@ -1,6 +1,6 @@
 package com.planner.domain.solverconfig;
 
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.planner.vrp.taskplanning.model.constraint.Constraint;
 import com.planner.domain.MongoBaseEntity;
 

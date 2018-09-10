@@ -1,12 +1,12 @@
 package com.kairos.persistence.model.wta.templates;
 
-import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.service.MongoBaseService;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

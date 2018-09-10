@@ -26,12 +26,12 @@ import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.persistence.model.access_permission.AccessPageLanguageDTO;
-import com.kairos.user.access_page.KPIAccessPageDTO;
-import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
-import com.kairos.user.staff.permission.StaffPermissionDTO;
-import com.kairos.user.staff.permission.StaffTabPermission;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
+import com.kairos.dto.user.staff.permission.StaffPermissionDTO;
+import com.kairos.dto.user.staff.permission.StaffTabPermission;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.user_context.UserContext;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -409,6 +409,17 @@ public class AccessPageService {
     // For Test Cases
     public AccessPage getOneMainModule(){
         return accessPageRepository.getOneMainModule();
+    }
+
+    public List<KPIAccessPageDTO> getKPIAccessPageListForCountry(Long countryId){
+        List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForCountry(countryId);
+        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
+        return kpiTabs;
+    }
+    public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long unitId){
+        List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForUnit(unitId);
+        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
+        return kpiTabs;
     }
 
     public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){

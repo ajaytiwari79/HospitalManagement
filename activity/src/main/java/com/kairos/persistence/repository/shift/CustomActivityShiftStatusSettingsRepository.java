@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.shift;/*
  *
  */
 
-import com.kairos.activity.shift.ActivityAndShiftStatusWrapper;
+import com.kairos.dto.activity.shift.ActivityAndShiftStatusWrapper;
 
 import java.math.BigInteger;
 import java.util.List;

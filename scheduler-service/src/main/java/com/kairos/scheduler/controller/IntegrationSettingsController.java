@@ -1,6 +1,6 @@
 package com.kairos.scheduler.controller;
 
-import com.kairos.dto.IntegrationSettingsDTO;
+import com.kairos.dto.scheduler.IntegrationSettingsDTO;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.service.scheduler_panel.IntegrationConfigurationService;
 import com.kairos.scheduler.utils.ResponseHandler;
@@ -12,7 +12,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.Map;
 import static com.kairos.scheduler.constants.ApiConstants.API_V1;
 

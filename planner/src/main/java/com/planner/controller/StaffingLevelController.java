@@ -1,6 +1,6 @@
 package com.planner.controller;
 
-import com.kairos.activity.staffing_level.StaffingLevelPlanningDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelPlanningDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.staffinglevel.StaffingLevelService;
 import io.swagger.annotations.ApiOperation;
@@ -21,7 +21,7 @@ import static com.planner.constants.ApiConstants.API_UNIT_URL;
 @RestController
 @RequestMapping(API_UNIT_URL + "/staffing_level")
 public class StaffingLevelController {
-    private Logger logger= LoggerFactory.getLogger(StaffingLevelController.class);
+    /*private Logger logger= LoggerFactory.getLogger(StaffingLevelController.class);
     @Autowired
     private StaffingLevelService staffingLevelService;
     @RequestMapping(value = "/", method = RequestMethod.POST)
@@ -48,4 +48,4 @@ public class StaffingLevelController {
 
     }
 
-}
+*/}

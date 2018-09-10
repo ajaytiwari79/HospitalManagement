@@ -7,8 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
-import com.kairos.util.user_context.SchedulerUserContextInterceptor;
-import com.kairos.util.user_context.UserContextInterceptor;
+import com.kairos.utils.user_context.SchedulerUserContextInterceptor;
+import com.kairos.utils.user_context.UserContextInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +18,10 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.context.annotation.*;
-import org.springframework.data.neo4j.annotation.EnableNeo4jAuditing;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -30,7 +32,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -45,10 +48,11 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableTransactionManagement(proxyTargetClass=true)
 @EnableResourceServer
 @EnableAspectJAutoProxy(proxyTargetClass = true)
+
 @EnableNeo4jRepositories(basePackages = {"com.kairos.persistence.repository"},repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
 @EnableCircuitBreaker
 @EnableKafka
-public class UserServiceApplication extends WebMvcConfigurerAdapter{
+public class UserServiceApplication implements WebMvcConfigurer {
 
 	public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");
 	public static final Logger logger = LoggerFactory.getLogger(UserServiceApplication.class);
@@ -97,7 +101,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 	}
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-		super.configureMessageConverters(converters);
+	//	super.configureMessageConverters(converters);
 		converters.add(mappingJackson2HttpMessageConverter());
 		converters.add(mappingJackson2XmlHttpMessageConverter());
 

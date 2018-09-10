@@ -2,12 +2,12 @@ package com.kairos.controller.access_group;
 
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.user.access_permission.AccessGroupPermissionDTO;
-import com.kairos.user.access_permission.AccessPermissionDTO;
-import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
+import com.kairos.dto.user.access_permission.AccessGroupPermissionDTO;
+import com.kairos.dto.user.access_permission.AccessPermissionDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.service.access_permisson.AccessGroupService;
-import com.kairos.user.access_group.CountryAccessGroupDTO;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 

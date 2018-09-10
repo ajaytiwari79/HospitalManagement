@@ -2,10 +2,10 @@ package com.kairos.controller.organization;
 
 import com.kairos.service.organization.CompanyCreationService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.user.organization.OrganizationBasicDTO;
-import com.kairos.user.organization.UnitManagerDTO;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.dto.user.organization.AddressDTO;
+import com.kairos.dto.user.organization.OrganizationBasicDTO;
+import com.kairos.dto.user.organization.UnitManagerDTO;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

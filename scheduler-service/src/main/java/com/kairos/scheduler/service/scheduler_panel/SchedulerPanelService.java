@@ -1,9 +1,8 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
-import com.kairos.dto.KairosSchedulerLogsDTO;
-import com.kairos.dto.SchedulerPanelDTO;
+import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
+import com.kairos.dto.scheduler.SchedulerPanelDTO;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
-import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.persistence.model.scheduler_panel.jobDetails.JobDetails;
@@ -15,8 +14,8 @@ import com.kairos.scheduler.persistence.repository.UnitTimeZoneMappingRepository
 import com.kairos.scheduler.service.MongoBaseService;
 
 import com.kairos.scheduler.service.exception.ExceptionService;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;

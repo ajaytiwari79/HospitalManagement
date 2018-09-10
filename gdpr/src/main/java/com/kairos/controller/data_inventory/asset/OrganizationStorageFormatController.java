@@ -2,7 +2,7 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.controller.master_data.asset_management.StorageFormatController;
-import com.kairos.gdpr.metadata.StorageFormatDTO;
+import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
 import com.kairos.service.data_inventory.asset.OrganizationStorageFormatService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

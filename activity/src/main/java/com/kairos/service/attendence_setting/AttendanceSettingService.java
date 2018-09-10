@@ -1,24 +1,23 @@
 package com.kairos.service.attendence_setting;
 
-import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.dto.activity.shift.ShiftQueryResult;
 
 import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
-import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.repository.attendence_setting.AttendanceSettingRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
-import com.kairos.response.dto.web.attendance.AttendanceDuration;
-import com.kairos.response.dto.web.attendance.AttendanceDTO;
-import com.kairos.response.dto.web.attendance.AttendanceDurationDTO;
-import com.kairos.response.dto.web.attendance.SickSettingsDTO;
-import com.kairos.response.dto.web.staff.StaffResultDTO;
+import com.kairos.dto.activity.attendance.AttendanceDuration;
+import com.kairos.dto.activity.attendance.AttendanceDTO;
+import com.kairos.dto.activity.attendance.AttendanceDurationDTO;
+import com.kairos.dto.activity.attendance.SickSettingsDTO;
+import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.user.organization.OrganizationCommonDTO;
-import com.kairos.user.reason_code.ReasonCodeDTO;
-import com.kairos.util.DateUtils;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.dto.user.organization.OrganizationCommonDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalDate;

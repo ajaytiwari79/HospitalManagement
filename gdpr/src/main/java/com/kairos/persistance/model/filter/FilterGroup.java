@@ -1,7 +1,7 @@
 package com.kairos.persistance.model.filter;
 
 
-import com.kairos.gdpr.master_data.ModuleIdDTO;
+import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.enums.FilterType;
 import org.springframework.data.mongodb.core.mapping.Document;

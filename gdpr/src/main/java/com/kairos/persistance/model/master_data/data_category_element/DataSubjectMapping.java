@@ -1,8 +1,8 @@
 package com.kairos.persistance.model.master_data.data_category_element;
 
 
-import com.kairos.gdpr.OrganizationSubType;
-import com.kairos.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.OrganizationSubType;
+import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 

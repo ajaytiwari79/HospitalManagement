@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.staff;
 
-import com.kairos.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

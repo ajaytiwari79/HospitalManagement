@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.wta;
 
-import com.kairos.activity.wta.version.WTAVersionDTO;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 

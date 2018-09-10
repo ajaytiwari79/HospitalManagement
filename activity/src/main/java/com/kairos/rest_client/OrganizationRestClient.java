@@ -1,13 +1,13 @@
 package com.kairos.rest_client;
 
-import com.kairos.activity.activity.activity_tabs.OrganizationMappingActivityDTO;
-import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.user.organization.OrganizationSkillAndOrganizationTypesDTO;
-import com.kairos.user.organization.OrganizationTypeAndSubTypeDTO;
-import com.kairos.user.staff.OrganizationStaffWrapper;
-import com.kairos.util.RestClientUrlUtil;
+import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingActivityDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.OrganizationSkillAndOrganizationTypesDTO;
+import com.kairos.dto.user.organization.OrganizationTypeAndSubTypeDTO;
+import com.kairos.dto.user.staff.OrganizationStaffWrapper;
+import com.kairos.utils.RestClientUrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,8 @@
 package com.kairos.persistence.repository.solver_config;
 
-import com.kairos.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 
 import java.math.BigInteger;
-import java.util.List;
 
 /**
  * @author pradeep

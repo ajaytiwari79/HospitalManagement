@@ -1,7 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.user.staff.staff.StaffChatDetails;
+import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;

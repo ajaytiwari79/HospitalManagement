@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.phase;
 
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

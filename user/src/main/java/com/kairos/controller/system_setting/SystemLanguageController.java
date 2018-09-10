@@ -1,8 +1,8 @@
 package com.kairos.controller.system_setting;
 
-import com.kairos.user.country.system_setting.SystemLanguageDTO;
+import com.kairos.dto.user.country.system_setting.SystemLanguageDTO;
 import com.kairos.service.system_setting.SystemLanguageService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

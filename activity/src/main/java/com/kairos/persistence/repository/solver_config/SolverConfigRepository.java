@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.solver_config;
 
 import com.kairos.persistence.model.solver_config.SolverConfig;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

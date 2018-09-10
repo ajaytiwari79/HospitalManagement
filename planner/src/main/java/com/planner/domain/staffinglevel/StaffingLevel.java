@@ -1,15 +1,13 @@
 package com.planner.domain.staffinglevel;
 
-import com.kairos.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.activity.staffing_level.StaffingLevelSetting;
+import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
+import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
 import com.planner.domain.MongoBaseEntity;
-import com.planner.domain.common.BaseEntity;
 ////import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 public class StaffingLevel extends MongoBaseEntity {
     private  BigInteger unitId;

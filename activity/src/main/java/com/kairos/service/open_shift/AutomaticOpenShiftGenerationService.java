@@ -1,8 +1,8 @@
 package com.kairos.service.open_shift;
 
-import com.kairos.activity.staffing_level.StaffingLevelActivity;
-import com.kairos.activity.staffing_level.StaffingLevelActivityWithDuration;
-import com.kairos.activity.staffing_level.StaffingLevelInterval;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
+import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.open_shift.OpenShiftInterval;
@@ -13,8 +13,8 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.staffing_level.StaffingLevelService;
-import com.kairos.util.DateTimeInterval;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import java.util.Collections;
 import org.springframework.stereotype.Component;
 
