@@ -4,7 +4,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.AssetAttributeName;
 import com.kairos.enums.ProcessingActivityAttributeName;
 import com.kairos.enums.QuestionnaireTemplateType;
-import com.kairos.gdpr.master_data.MasterQuestionDTO;
+import com.kairos.dto.gdpr.master_data.MasterQuestionDTO;
 import com.kairos.enums.QuestionType;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestion;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireSection;

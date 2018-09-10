@@ -1,8 +1,7 @@
 package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 
-import com.kairos.activity.open_shift.DurationField;
+import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.PQLSettings;
 import com.kairos.wrapper.activity.CutOffInterval;
 import com.kairos.wrapper.activity.CutOffIntervalUnit;
 

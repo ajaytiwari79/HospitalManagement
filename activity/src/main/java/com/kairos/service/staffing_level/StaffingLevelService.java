@@ -1,12 +1,12 @@
 package com.kairos.service.staffing_level;
 
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.activity.ActivityValidationError;
-import com.kairos.activity.phase.PhaseDTO;
-import com.kairos.activity.staffing_level.*;
-import com.kairos.activity.staffing_level.absence.AbsenceStaffingLevelDto;
-import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.ActivityValidationError;
+import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.staffing_level.*;
+import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.messaging.wshandlers.StaffingLevelGraphStompClientWebSocketHandler;
@@ -26,13 +26,13 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.user.organization.OrganizationSkillAndOrganizationTypesDTO;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.event.ShiftNotificationEvent;
-import com.kairos.util.service_util.StaffingLevelUtil;
-import com.kairos.util.external_plateform_shift.Transstatus;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.organization.OrganizationSkillAndOrganizationTypesDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.event.ShiftNotificationEvent;
+import com.kairos.utils.service_util.StaffingLevelUtil;
+import com.kairos.utils.external_plateform_shift.Transstatus;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity_category.ActivityCategoryListDTO;
 import org.apache.commons.csv.CSVFormat;
@@ -86,8 +86,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.KETTLE_EXECUTE_TRANS;
-import static com.kairos.util.DateUtils.asLocalDate;
-import static com.kairos.util.DateUtils.getWeekNumberByLocalDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.getWeekNumberByLocalDate;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
 import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 import static org.springframework.http.MediaType.APPLICATION_XML;
@@ -981,6 +981,7 @@ public class StaffingLevelService extends MongoBaseService {
             Phase phase = phaseService.getPhaseCurrentByUnit(unitId, DateUtils.asDate(currentDate.getLocalDate()));
             staffingLevel.setPhaseId(phase.getId());
             staffingLevel.setUnitId(unitId);
+            staffingLevel.setCurrentDate(DateUtils.asDate(currentDate.getLocalDate()));
         }
         return staffingLevel;
     }

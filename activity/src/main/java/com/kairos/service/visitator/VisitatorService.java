@@ -1,13 +1,13 @@
 package com.kairos.service.visitator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.task_type.TaskTypeDTO;
+import com.kairos.dto.activity.task_type.TaskTypeDTO;
 import com.kairos.rest_client.ClientRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.OrganizationServiceRestClient;
 import com.kairos.rest_client.StaffRestClient;
-import com.kairos.user.staff.ClientStaffInfoDTO;
-import com.kairos.user.client.Client;
+import com.kairos.dto.user.staff.ClientStaffInfoDTO;
+import com.kairos.dto.user.client.Client;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskPackage;
 import com.kairos.persistence.model.task_demand.TaskDemand;
@@ -25,7 +25,7 @@ import com.kairos.service.planner.TasksMergingService;
 import com.kairos.service.task_type.TaskDemandService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.task_type.TaskTypeService;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.wrapper.task.TaskDemandDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;

@@ -1,13 +1,13 @@
 package com.kairos.rest_client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.user.staff.ClientStaffInfoDTO;
-import com.kairos.client.dto.OrganizationClientWrapper;
+import com.kairos.dto.user.staff.ClientStaffInfoDTO;
+import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.controller.exception_handler.ResponseEnvelope;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
-import com.kairos.user.client.Client;
-import com.kairos.user.client.ClientOrganizationIds;
-import com.kairos.user.client.ClientTemporaryAddress;
+import com.kairos.dto.user.client.Client;
+import com.kairos.dto.user.client.ClientOrganizationIds;
+import com.kairos.dto.user.client.ClientTemporaryAddress;
 import com.kairos.wrapper.task_demand.TaskDemandRequestWrapper;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.util.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
 public class ClientRestClient {

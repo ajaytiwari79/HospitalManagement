@@ -18,11 +18,11 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.region.RegionService;
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.user.patient.PatientRelative;
-import com.kairos.user.patient.PatientWrapper;
-import com.kairos.user.staff.CurrentAddress;
-import com.kairos.util.DateUtil;
+import com.kairos.dto.user.organization.AddressDTO;
+import com.kairos.dto.user.patient.PatientRelative;
+import com.kairos.dto.user.patient.PatientWrapper;
+import com.kairos.dto.user.staff.CurrentAddress;
+import com.kairos.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

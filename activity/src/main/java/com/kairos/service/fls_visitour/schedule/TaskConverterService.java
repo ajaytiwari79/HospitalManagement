@@ -2,14 +2,14 @@ package com.kairos.service.fls_visitour.schedule;
 
 import com.kairos.rest_client.ClientRestClient;
 import com.kairos.rest_client.IntegrationRestClient;
-import com.kairos.user.client.Client;
+import com.kairos.dto.user.client.Client;
 import com.kairos.persistence.model.task.SkillExpertise;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskStatus;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import de.tourenserver.ArrayOfFixedCall;
 import de.tourenserver.FixScheduleResponse;
 import de.tourenserver.FixedCall;

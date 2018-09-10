@@ -1,6 +1,6 @@
 package com.kairos.service.organization_meta_data;
 
-import com.kairos.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.default_data.SickConfiguration;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;

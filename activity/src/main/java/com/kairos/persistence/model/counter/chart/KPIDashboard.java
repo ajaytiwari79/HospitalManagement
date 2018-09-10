@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.counter.chart;
 
-import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 public class KPIDashboard extends MongoBaseEntity{

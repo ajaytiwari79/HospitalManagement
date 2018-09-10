@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.task_type;
 
-import com.kairos.activity.task_type.TaskTypeSettingDTO;
+import com.kairos.dto.activity.task_type.TaskTypeSettingDTO;
 import com.kairos.persistence.model.task_type.TaskTypeSetting;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;

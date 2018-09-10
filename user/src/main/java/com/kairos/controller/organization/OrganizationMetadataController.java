@@ -1,9 +1,9 @@
 package com.kairos.controller.organization;
 
-import com.kairos.user.organization.PaymentSettingsDTO;
+import com.kairos.dto.user.organization.PaymentSettingsDTO;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.service.organization_meta_data.OrganizationMetadataService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

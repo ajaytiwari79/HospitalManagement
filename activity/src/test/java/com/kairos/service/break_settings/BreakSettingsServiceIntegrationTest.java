@@ -2,7 +2,7 @@ package com.kairos.service.break_settings;
 
 import com.kairos.KairosActivityApplication;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.activity.break_settings.BreakSettingsDTO;
+import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;

@@ -1,10 +1,7 @@
 package com.kairos.service.data_inventory.processing_activity;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.enums.ProcessingActivityAttributeName;
-import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
-import com.kairos.persistance.model.data_inventory.assessment.Assessment;
+import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivityRelatedDataCategory;
 import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
@@ -15,15 +12,11 @@ import com.kairos.persistance.repository.master_data.data_category_element.DataS
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
-import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionBasicResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireSectionResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
@@ -32,8 +25,6 @@ import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
-
-import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 import javax.inject.Inject;
 import java.math.BigInteger;

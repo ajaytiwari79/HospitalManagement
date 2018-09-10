@@ -1,12 +1,12 @@
 package com.kairos.persistance.model.agreement_template;
 
 
-import com.kairos.gdpr.OrganizationSubType;
-import com.kairos.gdpr.OrganizationType;
-import com.kairos.gdpr.ServiceCategory;
-import com.kairos.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubType;
+import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.ServiceCategory;
+import com.kairos.dto.gdpr.SubServiceCategory;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.user.country.system_setting.AccountTypeDTO;
+import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;

@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.wta.templates.template_types;
 
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 

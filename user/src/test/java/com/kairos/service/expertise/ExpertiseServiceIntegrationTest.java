@@ -1,17 +1,17 @@
 package com.kairos.service.expertise;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.country.experties.UnionServiceWrapper;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.experties.CopyExpertiseDTO;
-import com.kairos.user.country.experties.CountryExpertiseDTO;
-import com.kairos.user.country.experties.SeniorityLevelDTO;
-import com.kairos.util.DateUtil;
+import com.kairos.dto.user.country.experties.CopyExpertiseDTO;
+import com.kairos.dto.user.country.experties.CountryExpertiseDTO;
+import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
+import com.kairos.utils.DateUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;

@@ -1,6 +1,6 @@
 package com.planner.controller;
 
-import com.kairos.activity.activity.activity_tabs.ActivityNoTabsDTO;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityNoTabsDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.activity.ActivityService;
 import io.swagger.annotations.ApiOperation;

@@ -3,7 +3,6 @@ package com.kairos.service.task;
 import com.kairos.KairosActivityApplication;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.util.DateUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

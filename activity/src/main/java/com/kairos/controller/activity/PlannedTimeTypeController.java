@@ -1,8 +1,8 @@
 package com.kairos.controller.activity;
 
 import com.kairos.service.activity.PlannedTimeTypeService;
-import com.kairos.util.response.ResponseHandler;
-import com.kairos.activity.presence_type.PresenceTypeDTO;
+import com.kairos.utils.response.ResponseHandler;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

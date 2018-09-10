@@ -13,8 +13,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
-import static com.kairos.util.RestClientUrlUtil.getBaseUrl;
-import static com.kairos.util.RestClientUrlUtil.getDefaultSchedulerUrl;
+import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.utils.RestClientUrlUtil.getDefaultSchedulerUrl;
 
 
 /**

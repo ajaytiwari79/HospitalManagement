@@ -4,10 +4,9 @@ package com.kairos.controller.resources;
  * Created by oodles on 17/10/16.
  */
 
-import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.service.resources.ResourceService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_RESOURCE_URL;
-import static com.kairos.constants.ApiConstants.API_V1;
 
 
 /**

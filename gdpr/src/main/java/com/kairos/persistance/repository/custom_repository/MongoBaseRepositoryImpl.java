@@ -2,7 +2,7 @@ package com.kairos.persistance.repository.custom_repository;
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
-import com.kairos.utils.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoOperations;

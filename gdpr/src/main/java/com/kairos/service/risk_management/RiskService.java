@@ -1,13 +1,13 @@
 package com.kairos.service.risk_management;
 
 
-import com.kairos.gdpr.data_inventory.RiskDTO;
+import com.kairos.dto.gdpr.data_inventory.RiskDTO;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.model.risk_management.Risk;
 import com.kairos.persistance.repository.risk_management.RiskMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 

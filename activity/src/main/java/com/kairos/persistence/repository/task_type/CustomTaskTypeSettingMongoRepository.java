@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.task_type;
 
 
 
-import com.kairos.activity.task_type.TaskTypeSettingDTO;
+import com.kairos.dto.activity.task_type.TaskTypeSettingDTO;
 
 import java.util.List;
 

@@ -1,23 +1,13 @@
 package com.kairos.planner.vrp.taskplanning.solver;
 
-import com.google.common.reflect.Reflection;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.planner.vrp.taskplanning.model.LocationsDistanceMatrix;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
 import org.junit.Test;
-import org.mvel2.util.ReflectionUtil;
-import org.reflections.ReflectionUtils;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.junit.Assert.*;
 
 public class VrpTaskPlanningSolverTest {
 

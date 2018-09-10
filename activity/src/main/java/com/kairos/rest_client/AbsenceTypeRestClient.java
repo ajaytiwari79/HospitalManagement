@@ -1,6 +1,6 @@
 package com.kairos.rest_client;
 
-import com.kairos.util.RestClientUrlUtil;
+import com.kairos.utils.RestClientUrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

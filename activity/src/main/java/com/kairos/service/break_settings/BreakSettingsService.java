@@ -1,18 +1,19 @@
 package com.kairos.service.break_settings;
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.break_settings.BreakSettingAndActivitiesWrapper;
-import com.kairos.activity.break_settings.BreakActivitiesDTO;
-import com.kairos.activity.unit_settings.FlexibleTimeSettingDTO;
-import com.kairos.activity.unit_settings.UnitSettingDTO;
+
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.break_settings.BreakSettingAndActivitiesWrapper;
+import com.kairos.dto.activity.break_settings.BreakActivitiesDTO;
+import com.kairos.dto.activity.unit_settings.FlexibleTimeSettingDTO;
+import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.activity.break_settings.BreakSettingsDTO;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

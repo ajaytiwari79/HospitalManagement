@@ -2,7 +2,7 @@ package com.kairos.service.user_service_data;
 
 import com.kairos.persistence.model.user_service_data.UnitAndParentOrganizationAndCountryIds;
 import com.kairos.persistence.repository.user_service_data.UnitAndParentOrganizationAndCountryIdsMongoRepository;
-import com.kairos.response.dto.web.organization.UnitAndParentOrganizationAndCountryDTO;
+import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;

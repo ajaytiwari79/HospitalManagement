@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.wta.templates;
 
-import com.kairos.activity.wta.templates.PhaseTemplateValue;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.springframework.beans.BeanUtils;

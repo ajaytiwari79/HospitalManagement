@@ -2,13 +2,13 @@ package com.kairos.persistance.model.clause;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.gdpr.OrganizationSubType;
-import com.kairos.gdpr.OrganizationType;
-import com.kairos.gdpr.ServiceCategory;
-import com.kairos.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubType;
+import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.ServiceCategory;
+import com.kairos.dto.gdpr.SubServiceCategory;
 import com.kairos.persistance.model.clause_tag.ClauseTag;
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.user.country.system_setting.AccountTypeDTO;
+import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
 import org.javers.core.metamodel.annotation.*;
 
 import javax.validation.constraints.NotBlank;

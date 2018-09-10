@@ -3,7 +3,7 @@ package com.kairos.rule_validator.functional_paymment;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.DateUtil;
+import com.kairos.utils.DateUtil;
 
 import java.time.LocalDate;
 import java.util.Optional;

@@ -1,8 +1,6 @@
 package com.kairos.response.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.gdpr.data_inventory.RiskDTO;
-import com.kairos.persistance.model.risk_management.Risk;
 import com.kairos.response.dto.common.RiskResponseDTO;
 
 import java.math.BigInteger;

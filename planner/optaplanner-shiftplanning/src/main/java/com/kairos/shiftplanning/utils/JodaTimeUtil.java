@@ -1,6 +1,6 @@
 package com.kairos.shiftplanning.utils;
 
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 

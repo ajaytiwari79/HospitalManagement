@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.period;
 
-import com.kairos.activity.period.PeriodDTO;
+import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.persistence.model.period.PlanningPeriod;
-import com.kairos.util.DateUtils;
-import com.kairos.activity.period.PlanningPeriodDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -137,7 +137,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
         );
 
-        AggregationResults<com.kairos.activity.period.PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, com.kairos.activity.period.PlanningPeriodDTO.class);
+        AggregationResults<PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
         return result.getMappedResults();
     }*/
 
@@ -163,7 +163,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
         );
 
-        AggregationResults<com.kairos.activity.period.PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, com.kairos.activity.period.PlanningPeriodDTO.class);
+        AggregationResults<PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
         return result.getMappedResults();
     }
 

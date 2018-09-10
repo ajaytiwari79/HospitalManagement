@@ -1,11 +1,11 @@
 package com.kairos.controller.unit_settings;
 
-import com.kairos.activity.unit_settings.FlexibleTimeSettingDTO;
+import com.kairos.dto.activity.unit_settings.FlexibleTimeSettingDTO;
 import com.kairos.service.unit_settings.UnitSettingService;
 import com.kairos.service.user_service_data.UnitDataService;
-import com.kairos.util.response.ResponseHandler;
-import com.kairos.activity.unit_settings.UnitAgeSettingDTO;
-import com.kairos.activity.unit_settings.UnitSettingDTO;
+import com.kairos.utils.response.ResponseHandler;
+import com.kairos.dto.activity.unit_settings.UnitAgeSettingDTO;
+import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

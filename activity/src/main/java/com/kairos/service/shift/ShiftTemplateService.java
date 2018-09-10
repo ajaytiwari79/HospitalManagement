@@ -6,12 +6,12 @@ import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
-import com.kairos.response.dto.web.shift.IndividualShiftTemplateDTO;
-import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
+import com.kairos.dto.activity.shift.IndividualShiftTemplateDTO;
+import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

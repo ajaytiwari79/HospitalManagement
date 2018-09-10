@@ -1,12 +1,13 @@
 package com.kairos.service.shift;
 
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.open_shift.OpenShiftResponseDTO;
-import com.kairos.activity.shift.*;
-import com.kairos.activity.staffing_level.StaffingLevelActivity;
-import com.kairos.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO;
-import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
+
+import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
+import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
+import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.enums.Day;
 import com.kairos.enums.IntegrationOperation;
@@ -46,7 +47,7 @@ import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepo
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-import com.kairos.response.dto.web.shift.IndividualShiftTemplateDTO;
+import com.kairos.dto.activity.shift.IndividualShiftTemplateDTO;
 import com.kairos.rest_client.*;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
@@ -60,17 +61,17 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.unit_settings.PhaseSettingsService;
 import com.kairos.service.wta.WTAService;
-import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.user.access_permission.AccessGroupRole;
-import com.kairos.user.access_permission.StaffAccessGroupDTO;
-import com.kairos.user.country.experties.AppliedFunctionDTO;
-import com.kairos.user.staff.staff.StaffAccessRoleDTO;
-import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.util.DateTimeInterval;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.event.ShiftNotificationEvent;
-import com.kairos.util.time_bank.TimeBankCalculationService;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
+import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
+import com.kairos.dto.user.staff.staff.StaffAccessRoleDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.event.ShiftNotificationEvent;
+import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
@@ -86,7 +87,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import com.kairos.persistence.repository.shift.ActivityShiftStatusSettingsRepository;
 
-import javax.annotation.RegEx;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -99,10 +99,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.util.DateUtils.MONGODB_QUERY_DATE_FORMAT;
-import static com.kairos.util.DateUtils.ONLY_DATE;
-import static com.kairos.util.ShiftValidatorService.getIntervalByRuleTemplates;
-import static com.kairos.util.ShiftValidatorService.getValidDays;
+import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
+import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
+import static com.kairos.utils.ShiftValidatorService.getIntervalByRuleTemplates;
+import static com.kairos.utils.ShiftValidatorService.getValidDays;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
@@ -843,13 +843,13 @@ public class ShiftService extends MongoBaseService {
         Phase phase = phaseService.getPhaseCurrentByUnit(shift.getUnitId(), shift.getStartDate());
         ViolatedRulesDTO violatedRulesDTO = validateShiftWithActivity(phase,wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         ShiftQueryResult shiftQueryResult;
-        if (CollectionUtils.isNotEmpty(shiftDTO.getSubShifts())) {
+        List<Shift> shifts = null;
+        if (CollectionUtils.isEmpty(shiftDTO.getSubShifts())) {
             shift = buildShift(shiftDTO);
             shift.setUnitId(unitId);
             shift.setMainShift(true);
             shiftQueryResult = shift.getShiftQueryResult();
         } else {
-            List<Shift> shifts;
             shifts = verifyCompositeShifts(shiftDTO, shiftDTO.getId(), activity);
             shift = buildShift(shiftDTO);
             if(violatedRulesDTO.getWorkTimeAgreements().isEmpty()){
@@ -862,6 +862,10 @@ public class ShiftService extends MongoBaseService {
             shiftQueryResult = geSubShiftResponse(shift, shifts);
         }
         if(violatedRulesDTO.getWorkTimeAgreements().isEmpty()){
+            if(CollectionUtils.isNotEmpty(shifts)){
+                save(shifts);
+                shift.setSubShifts(shifts.stream().map(s->s.getId()).collect(Collectors.toSet()));
+            }
             save(shift);
             setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
             timeBankService.saveTimeBank(staffAdditionalInfoDTO, shift);

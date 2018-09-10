@@ -4,7 +4,7 @@ package com.kairos.controller.pay_out;
 import com.kairos.constants.ApiConstants;
 import com.kairos.controller.task.TaskController;
 import com.kairos.service.pay_out.PayOutService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

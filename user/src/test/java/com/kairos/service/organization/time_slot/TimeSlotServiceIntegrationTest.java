@@ -1,11 +1,11 @@
 package com.kairos.service.organization.time_slot;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.time_slot.TimeSlotDTO;
-import com.kairos.user.country.time_slot.TimeSlotSetDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.kairos.enums.time_slot.TimeSlotMode.ADVANCE;
-import static com.kairos.util.DateUtil.ONLY_DATE;
+import static com.kairos.utils.DateUtil.ONLY_DATE;
 
 /**
  * Created by prabjot on 6/12/17.

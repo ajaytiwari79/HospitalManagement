@@ -1,7 +1,7 @@
 package com.kairos.service.staff;
 
 import com.kairos.enums.OrganizationLevel;
-import com.kairos.user.organization.AddressDTO;
+import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -9,8 +9,8 @@ import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.util.external_plateform_shift.GetEmploymentByIdResponse;
-import com.kairos.util.external_plateform_shift.GetEmploymentByIdResult;
+import com.kairos.utils.external_plateform_shift.GetEmploymentByIdResponse;
+import com.kairos.utils.external_plateform_shift.GetEmploymentByIdResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

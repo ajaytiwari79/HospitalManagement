@@ -2,12 +2,12 @@ package com.kairos.persistence.model.open_shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.open_shift.Priority;
+import com.kairos.dto.activity.open_shift.Priority;
 import com.kairos.enums.AllowedLength;
 import com.kairos.enums.OpenShiftRuleTemplateType;
-import com.kairos.activity.open_shift.ActivitiesPerTimeType;
-import com.kairos.activity.open_shift.PlannerNotificationInfo;
-import com.kairos.activity.open_shift.ShiftAssignmentCriteria;
+import com.kairos.dto.activity.open_shift.ActivitiesPerTimeType;
+import com.kairos.dto.activity.open_shift.PlannerNotificationInfo;
+import com.kairos.dto.activity.open_shift.ShiftAssignmentCriteria;
 
 import java.math.BigInteger;
 import java.util.List;

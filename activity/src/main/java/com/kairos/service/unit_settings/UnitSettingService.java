@@ -1,8 +1,8 @@
 package com.kairos.service.unit_settings;
 
 
-import com.kairos.activity.unit_settings.*;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.unit_settings.*;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.FlexibleTimeSettings;
 import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
@@ -12,7 +12,8 @@ import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.util.ObjectMapperUtils;
+
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

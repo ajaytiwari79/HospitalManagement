@@ -1,15 +1,15 @@
 package com.kairos.service.integration;
 
 
-import com.kairos.activity.wta.UnitPositionWtaDTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.activity.wta.UnitPositionWtaDTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.planner.PlannerRestClient;
-import com.kairos.user.staff.staff.Staff;
+import com.kairos.dto.user.staff.staff.Staff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +18,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
