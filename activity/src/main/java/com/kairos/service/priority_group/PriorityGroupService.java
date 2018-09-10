@@ -1,7 +1,7 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.dto.activity.counter.ModuleType;
-import com.kairos.dto.activity.counter.CounterDTO;
+import com.kairos.dto.activity.counter.enums.ModuleType;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.persistence.repository.counter.CounterRepository;
