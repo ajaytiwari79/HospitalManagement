@@ -5,7 +5,7 @@ package com.kairos.persistence.model.counter.chart;
  * @dated: Jun/27/2018
  */
 
-import com.kairos.dto.activity.counter.ChartType;
+import com.kairos.dto.activity.counter.enums.ChartType;
 
 public class BaseChart {
     private ChartType type;

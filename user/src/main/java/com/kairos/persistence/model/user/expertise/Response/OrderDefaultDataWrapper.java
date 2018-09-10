@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.expertise.Response;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.counter.CounterDTO;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.open_shift.OrderResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
