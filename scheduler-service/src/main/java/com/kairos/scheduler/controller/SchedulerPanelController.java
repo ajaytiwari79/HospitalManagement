@@ -1,6 +1,5 @@
 package com.kairos.scheduler.controller;
 
-import com.kairos.dto.scheduler.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.SchedulerPanelDTO;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
 import com.kairos.scheduler.utils.ResponseHandler;
@@ -15,7 +14,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Map;
-import java.util.List;
+
 import static com.kairos.scheduler.constants.ApiConstants.API_SCHEDULER_URL;
 
 @RestController
@@ -45,21 +44,17 @@ public class SchedulerPanelController {
 
     @PostMapping("")
     @ApiOperation("Create Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@PathVariable  long unitId,
-                                                                 @RequestBody List<SchedulerPanelDTO> schedulerPanelDTOs) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTOs));
+    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@RequestParam(value = "integrationConfigurationId", required = false)
+                                                                             BigInteger integrationConfigurationId, @PathVariable  long unitId,
+                                                                 @RequestBody SchedulerPanelDTO schedulerPanelDTO) throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTO,
+                integrationConfigurationId));
     }
 
     @PutMapping("/{schedulerPanelId}")
     @ApiOperation("Update Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> updateSchedulerPanel(@RequestBody SchedulerPanelDTO schedulerPanelDTO,@PathVariable BigInteger schedulerPanelId) throws IOException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanel(schedulerPanelDTO,schedulerPanelId));
-    }
-
-    @PutMapping("/update_date_only")
-    @ApiOperation("Update Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> updateSchedulerPanelOneTimeTriggerDate(@RequestBody List<LocalDateTimeIdDTO> localDateTimeIdDTOs, @PathVariable Long unitId) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelsOneTimeTriggerDate(localDateTimeIdDTOs,unitId));
     }
 
     @GetMapping("/jobDetails/{schedulerPanelId}")
