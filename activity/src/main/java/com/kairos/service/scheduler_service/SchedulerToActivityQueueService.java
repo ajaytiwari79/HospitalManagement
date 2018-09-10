@@ -5,12 +5,14 @@ import com.kairos.dto.scheduler.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.kafka.JobQueueExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
+@Service
 public class SchedulerToActivityQueueService implements JobQueueExecutor {
 
-    private static Logger logger = LoggerFactory.getLogger(SchedulerToActivityQueueService.class);
+    private static final Logger logger = LoggerFactory.getLogger(SchedulerToActivityQueueService.class);
 
     public void execute(KairosSchedulerExecutorDTO job) {
 

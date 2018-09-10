@@ -1,4 +1,4 @@
-package com.kairos.custom_exception;
+package com.kairos.scheduler.custom_exception;
 
 /**
  * Created by prabjot on 22/11/16.

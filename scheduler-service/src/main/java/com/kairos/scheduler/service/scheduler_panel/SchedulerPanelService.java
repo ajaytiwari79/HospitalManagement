@@ -84,6 +84,9 @@ public class SchedulerPanelService extends MongoBaseService {
 
         //logger.info("integrationConfigurationId-----> "+integrationConfigurationId);
 
+        if(schedulerPanelDTOs.isEmpty()) {
+            exceptionService.invalidRequestException("request.invalid");
+        }
         List<SchedulerPanel> schedulerPanels =  new ArrayList<>();
         for(SchedulerPanelDTO schedulerPanelDTO:schedulerPanelDTOs) {
             SchedulerPanel schedulerPanel = new SchedulerPanel();
@@ -344,6 +347,9 @@ public class SchedulerPanelService extends MongoBaseService {
 
     public Boolean deleteJob(Set<BigInteger> schedulerPanelIds){
         try {
+            if(schedulerPanelIds.isEmpty()) {
+                exceptionService.invalidRequestException("request.invalid");
+            }
             List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByIdsIn(schedulerPanelIds);
             Set<BigInteger> schedulerPanelIdsDB = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getId()).collect(Collectors.toSet());
             for(BigInteger schedulerPanelId:schedulerPanelIds) {
@@ -356,7 +362,6 @@ public class SchedulerPanelService extends MongoBaseService {
                 schedulerPanel.setDeleted(true);
                 dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanel.getId());
                 schedulerPanel.setActive(false);
-                schedulerPanel.setDeleted(true);
             }
             save(schedulerPanels);
             return true;
