@@ -1,9 +1,7 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
-
 import com.kairos.dto.gdpr.MasterProcessingActivityRiskDTO;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
-
 import com.kairos.service.master_data.processing_activity_masterdata.MasterProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -118,8 +116,7 @@ public class MasterProcessingActivityController {
 
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-       else if (organizationId == null) {
+        } else if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(countryId, organizationId, processingActivityId, masterProcessingActivityRiskDTO));
@@ -128,30 +125,51 @@ public class MasterProcessingActivityController {
 
     @ApiOperation(value = "unlink risk from Processing Activity ")
     @DeleteMapping("/master_processing_activity/{processingActivityId}/risk/{riskId}")
-    public ResponseEntity<Object> unlinkRiskFromProcessingActivityAndDeletedRisk(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger processingActivityId,@PathVariable BigInteger riskId) {
+    public ResponseEntity<Object> unlinkRiskFromProcessingActivityAndDeletedRisk(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
 
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
+        } else if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(countryId, organizationId, processingActivityId,riskId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(countryId, organizationId, processingActivityId, riskId));
     }
 
 
     @ApiOperation(value = "unlink risk from Sub Processing Activity ")
     @DeleteMapping("/master_processing_activity/sub_Process/{subProcessingActivityId}/risk/{riskId}")
-    public ResponseEntity<Object> unlinkRiskFromSubProcessingActivityAndDeleteRisk(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger subProcessingActivityId,@PathVariable BigInteger riskId) {
+    public ResponseEntity<Object> unlinkRiskFromSubProcessingActivityAndDeleteRisk(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger subProcessingActivityId, @PathVariable BigInteger riskId) {
 
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
+        } else if (organizationId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(countryId, organizationId, subProcessingActivityId,riskId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(countryId, organizationId, subProcessingActivityId, riskId));
     }
+
+
+    @ApiOperation(value = "get All Processing Activity And linked risk ")
+    @GetMapping("/master_processing_activity/risk")
+    public ResponseEntity<Object> getMasterProcessingActivityAndLinkedRisks(@PathVariable Long countryId, @PathVariable Long organizationId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getAllMasterProcessingActivityAndLinkedRisks(countryId, organizationId));
+    }
+
+
+    @ApiOperation(value = "get All Sub Processing Activity of Processing Activity And  risks linked with sub processing activity ")
+    @GetMapping("/master_processing_activity/{processingActivityId}/sub_Process/risk")
+    public ResponseEntity<Object> getAllSubProcessingActivityWithLinkedRisks(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable(required = true) BigInteger processingActivityId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }else if (processingActivityId==null)
+        { return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Processing Activity id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getAllSubProcessingActivityAndLinkedRisksByProcessingActivityId(countryId, organizationId,processingActivityId));
+    }
+
 
 
     @ApiOperation(value = "get MasterProcessingActivity of unit by id")

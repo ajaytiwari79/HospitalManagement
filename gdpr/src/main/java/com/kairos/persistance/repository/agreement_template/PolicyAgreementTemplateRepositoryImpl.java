@@ -7,6 +7,7 @@ import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -92,7 +93,8 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
                 lookup("template_type", "templateType", "_id", "templateType"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
-                new CustomAggregationOperation(projectionForTemplateTypeElementAtIndexZeroOperation)
+                new CustomAggregationOperation(projectionForTemplateTypeElementAtIndexZeroOperation),
+                sort(Sort.Direction.DESC,"id")
         );
 
         AggregationResults<PolicyAgreementTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, PolicyAgreementTemplateResponseDTO.class);

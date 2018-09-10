@@ -10,6 +10,7 @@ import com.kairos.persistance.model.risk_management.Risk;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.persistance.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
+import com.kairos.response.dto.master_data.MasterProcessingActivityRiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.risk_management.RiskService;
@@ -21,8 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+
 
 import static com.kairos.constants.AppConstant.IDS_LIST;
 import static com.kairos.constants.AppConstant.PROCESSING_ACTIVITIES;
@@ -381,6 +381,31 @@ public class MasterProcessingActivityService extends MongoBaseService {
         return true;
 
     }
+
+
+    /**
+     * @param countryId
+     * @param unitId
+     * @return -method return list of Processing Activity and Risks linked with them
+     */
+    public  List<MasterProcessingActivityRiskResponseDTO> getAllMasterProcessingActivityAndLinkedRisks(Long countryId,Long unitId)
+    {
+        return masterProcessingActivityRepository.getAllProcessingActivityWithLinkedRisks(countryId,unitId);
+    }
+
+
+    /**
+     *
+     * @param countryId
+     * @param unitId - organization Id
+     * @param processingActivityId processing Activity id
+     * @return - method return list of Subprocessing Activity of Master Processing Activity with risks
+     */
+    public  List<MasterProcessingActivityRiskResponseDTO> getAllSubProcessingActivityAndLinkedRisksByProcessingActivityId(Long countryId,Long unitId,BigInteger processingActivityId)
+    {
+        return masterProcessingActivityRepository.getAllSubProcessingActivityWithLinkedRisksByProcessingActivityId(countryId,unitId,processingActivityId);
+    }
+
 
 
     private void checkForDuplicacyInName(List<MasterProcessingActivityDTO> processingActivityDTOs) {
