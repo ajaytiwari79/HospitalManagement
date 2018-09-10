@@ -313,7 +313,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param organizationId
      * @param processingActivityId
@@ -359,24 +358,19 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param organizationId
      * @param processingActivityId
      * @return
      */
-    public Boolean deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(Long countryId, Long organizationId, BigInteger processingActivityId,BigInteger riskId) {
+    public Boolean deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(Long countryId, Long organizationId, BigInteger processingActivityId, BigInteger riskId) {
         MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByIdAndCountryIdAndNonDeleted(countryId, organizationId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-           exceptionService.dataNotFoundByIdException("message.dataNotFound","Processing Activity",processingActivityId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
 
         }
         processingActivity.getRisks().remove(riskId);
-        Risk risk=riskMongoRepository.findByIdAndCountryId(countryId,riskId);
-        if (!Optional.ofNullable(risk).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","Risk",riskId);
-        }
-        delete(risk);
+        riskMongoRepository.findByIdAndDelete(riskId);
         masterProcessingActivityRepository.save(processingActivity);
         return true;
 
@@ -388,24 +382,20 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @param unitId
      * @return -method return list of Processing Activity and Risks linked with them
      */
-    public  List<MasterProcessingActivityRiskResponseDTO> getAllMasterProcessingActivityAndLinkedRisks(Long countryId,Long unitId)
-    {
-        return masterProcessingActivityRepository.getAllProcessingActivityWithLinkedRisks(countryId,unitId);
+    public List<MasterProcessingActivityRiskResponseDTO> getAllMasterProcessingActivityAndLinkedRisks(Long countryId, Long unitId) {
+        return masterProcessingActivityRepository.getAllProcessingActivityWithLinkedRisks(countryId, unitId);
     }
 
 
     /**
-     *
      * @param countryId
-     * @param unitId - organization Id
+     * @param unitId               - organization Id
      * @param processingActivityId processing Activity id
      * @return - method return list of Subprocessing Activity of Master Processing Activity with risks
      */
-    public  List<MasterProcessingActivityRiskResponseDTO> getAllSubProcessingActivityAndLinkedRisksByProcessingActivityId(Long countryId,Long unitId,BigInteger processingActivityId)
-    {
-        return masterProcessingActivityRepository.getAllSubProcessingActivityWithLinkedRisksByProcessingActivityId(countryId,unitId,processingActivityId);
+    public List<MasterProcessingActivityRiskResponseDTO> getAllSubProcessingActivityAndLinkedRisksByProcessingActivityId(Long countryId, Long unitId, BigInteger processingActivityId) {
+        return masterProcessingActivityRepository.getAllSubProcessingActivityWithLinkedRisksByProcessingActivityId(countryId, unitId, processingActivityId);
     }
-
 
 
     private void checkForDuplicacyInName(List<MasterProcessingActivityDTO> processingActivityDTOs) {

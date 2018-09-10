@@ -1,16 +1,21 @@
 package com.kairos.persistance.repository.custom_repository;
 
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
 import com.kairos.commons.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 
 public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Serializable>
@@ -55,4 +60,15 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
         return entity;
     }
 
+
+    @Override
+    public boolean findByIdAndDelete(ID id) {
+        Assert.notNull(id, "The given id must not be null!");
+        Query query = new Query(Criteria.where("_id").is(id));
+        T entity = mongoOperations.findAndModify(query, new Update().set("deleted",true), entityInformation.getJavaType());
+        if (!Optional.ofNullable(entity).isPresent()) {
+            throw new DataNotFoundByIdException("invalid request " + entityInformation.getJavaType().getName() + " id " + id);
+        }
+        return true;
+    }
 }
