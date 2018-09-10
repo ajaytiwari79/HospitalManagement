@@ -22,6 +22,7 @@ public class RestingHoursCalculationService implements CounterService{
     @Inject
     ActivityMongoRepositoryImpl activityMongoRepository;
 
+    //TODO: To be updated.
 //    private List<BigInteger> getFilterredActivities(List<FilterCriteria> filters){
 //        ActivityFilterCriteria activityCriteria = ActivityFilterCriteria.getInstance();
 //        for(FilterCriteria criteria: filters){
