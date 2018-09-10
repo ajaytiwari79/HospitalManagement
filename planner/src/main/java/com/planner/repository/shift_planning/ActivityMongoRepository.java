@@ -66,9 +66,11 @@ public class ActivityMongoRepository {
      * @param unitPositionIds
      * @return
      */
-    public List<CTAResponseDTO> getCTARuleTemplateByUnitPositionIds(Long[] unitPositionIds) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitPositionId").in(Arrays.asList(unitPositionIds))),
+    public List<CTAResponseDTO> getCTARuleTemplateByUnitPositionIds(List<Long> unitPositionIds,Date fromPlanningDate,Date toPlanningDate) {
+       Criteria endDateCriteria1=Criteria.where("endDate").exists(false);
+       Criteria endDateCriteria2=Criteria.where("endDate").gte(fromPlanningDate);
+       Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitPositionId").in(unitPositionIds).and("startDate").lte(toPlanningDate).orOperator(endDateCriteria1,endDateCriteria2)),
                 lookup(CTA_RULE_TEMPLATE, "ruleTemplateIds", "_id", "ruleTemplates"));
         AggregationResults<CTAResponseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, COST_TIME_AGGREMENET, CTAResponseDTO.class);
 

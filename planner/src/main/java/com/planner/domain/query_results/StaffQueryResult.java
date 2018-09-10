@@ -10,7 +10,7 @@ public class StaffQueryResult {
 
     private Long staffId ;
      private String staffName;
-     private Long[] unitPositionsId;
+     private Long unitPositionsId;
      private Set<SkillQueryResult> staffSkills;
      private List<ExpertiseQueryResult> unitPositionExpertise;
 
@@ -30,11 +30,11 @@ public class StaffQueryResult {
         this.staffName = staffName;
     }
 
-    public Long[] getStaffUnitPositions() {
+    public Long getStaffUnitPositions() {
         return unitPositionsId;
     }
 
-    public void setStaffUnitPositions(Long[] staffUnitPositions) {
+    public void setStaffUnitPositions(Long staffUnitPositions) {
         this.unitPositionsId = staffUnitPositions;
     }
 

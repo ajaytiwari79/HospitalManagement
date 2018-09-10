@@ -1,8 +1,10 @@
 package com.planner.service.shift_planning;
 
+import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
 import com.kairos.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.planner.domain.wta.templates.WorkingTimeAgreement;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.responseDto.PlanningDto.shiftPlanningDto.ActivityDTO;
 import org.springframework.stereotype.Service;
@@ -16,8 +18,8 @@ import java.util.stream.Collectors;
 /**
  * This service is used to interact with or have logic to collect data
  * from kairos mongodb
- * @author mohit
  *
+ * @author mohit
  */
 @Service
 public class ActivityMongoService {
@@ -27,7 +29,6 @@ public class ActivityMongoService {
 
 /**************************************************************************************/
     /**
-     *
      * @param unitId
      * @param fromDate
      * @param toDate
@@ -68,5 +69,29 @@ public class ActivityMongoService {
      */
     public List<ActivityDTO> getActivitiesByIds(Set<String> acivitiesIds) {
         return activityMongoRepository.getActivitiesById(acivitiesIds);
+    }
+
+    /************************************************************************************/
+    /**
+     * @param unitPositionIds
+     * @return
+     */
+    public List<WorkingTimeAgreement> getWTARuleTemplateByUnitPositionIds(Long[] unitPositionIds) {
+        return activityMongoRepository.getWTARuleTemplateByUnitPositionIds(unitPositionIds);
+    }
+
+
+    /**
+     * @param unitPositionIds
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    public Object getAllShiftsByUnitPositionIds(Long[] unitPositionIds, Date fromDate, Date toDate) {
+        return activityMongoRepository.getAllShiftsByUnitPositionIds(unitPositionIds, fromDate, toDate);
+    }
+
+    public  List<CTAResponseDTO>  getCTARuleTemplateByUnitPositionIds(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate) {
+        return  activityMongoRepository.getCTARuleTemplateByUnitPositionIds(unitPositionIds, fromPlanningDate, toPlanningDate);
     }
 }
