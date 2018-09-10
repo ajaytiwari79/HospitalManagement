@@ -17,7 +17,6 @@ import com.kairos.scheduler.service.MongoBaseService;
 import com.kairos.scheduler.service.exception.ExceptionService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -342,17 +341,23 @@ public class SchedulerPanelService extends MongoBaseService {
         return jobDetailsRepository.findAllBySchedulerPanelIdOrderByStartedDesc(schedulerPanelId);
     }
 
-    public Boolean deleteJob(BigInteger schedulerPanelId){
+    public Boolean deleteJob(Set<BigInteger> schedulerPanelIds){
         try {
-            Optional<SchedulerPanel> panelOptional = schedulerPanelRepository.findById(schedulerPanelId);
-            if(!panelOptional.isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
+            List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByIdsIn(schedulerPanelIds);
+            Set<BigInteger> schedulerPanelIdsDB = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getId()).collect(Collectors.toSet());
+            for(BigInteger schedulerPanelId:schedulerPanelIds) {
+                if(!schedulerPanelIdsDB.contains(schedulerPanelId)){
+                    exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
+                }
             }
-            SchedulerPanel panel = panelOptional.get();
-            dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
-            panel.setActive(false);
-            panel.setDeleted(true);
-            schedulerPanelRepository.save(panel);
+
+            for(SchedulerPanel schedulerPanel:schedulerPanels) {
+                schedulerPanel.setDeleted(true);
+                dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanel.getId());
+                schedulerPanel.setActive(false);
+                schedulerPanel.setDeleted(true);
+            }
+            save(schedulerPanels);
             return true;
         }catch (Exception exception){
             return false;
