@@ -1,4 +1,4 @@
-package com.kairos.dto.activity.counter;
+package com.kairos.dto.activity.counter.enums;
 
 //Created By Pavan on 3/8/18
 

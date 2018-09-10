@@ -1,7 +1,10 @@
 package com.kairos.service.counter;
 
 
-import com.kairos.dto.activity.counter.FilterCriteria;
+import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.activity.counter.data.RepresentationDTO;
 import com.kairos.enums.FilterType;
 
 import java.util.HashMap;
@@ -32,5 +35,6 @@ public interface CounterService {
         return applicableCriteria;
     }
 
-    Map getCalculatedResults(Map<FilterType, List> providedFiltersMap);
+    //map -> { data: [ {} ] }
+    RepresentationDTO getCalculatedCounter(FilterCriteriaDTO filterCriteria, BasicRequirementDTO representationRequirement);
 }

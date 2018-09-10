@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.open_shift;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.counter.CounterDTO;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.persistence.model.user.skill.Skill;

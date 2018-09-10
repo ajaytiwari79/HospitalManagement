@@ -1,4 +1,4 @@
-package com.kairos.dto.activity.counter;
+package com.kairos.dto.activity.counter.distribution.dashboard;
 
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 
