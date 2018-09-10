@@ -12,6 +12,6 @@ import java.util.List;
 public interface MongoBaseRepository<T extends MongoBaseEntity, ID extends Serializable> extends MongoRepository<T, ID> {
     // T findOne(ID id);
 
-     boolean findByIdAndDelete(ID id);
+     boolean findByIdAndSaveDelete(ID id);
 
 }

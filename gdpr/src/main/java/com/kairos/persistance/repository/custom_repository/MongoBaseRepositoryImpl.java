@@ -62,12 +62,14 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 
 
     @Override
-    public boolean findByIdAndDelete(ID id) {
+    public boolean findByIdAndSaveDelete(ID id) {
         Assert.notNull(id, "The given id must not be null!");
-        Query query = new Query(Criteria.where("_id").is(id));
-        T entity = mongoOperations.findAndModify(query, new Update().set("deleted",true), entityInformation.getJavaType());
+        Query query = new Query(Criteria.where("_id").is(id).and("deleted").is(false));
+        Update update = new Update().set("deleted", true);
+        update.set("updatedAt", DateUtils.getDate());
+        T entity = mongoOperations.findAndModify(query, update, entityInformation.getJavaType());
         if (!Optional.ofNullable(entity).isPresent()) {
-            throw new DataNotFoundByIdException("invalid request " + entityInformation.getJavaType().getName() + " id " + id);
+            throw new DataNotFoundByIdException("invalid request " + entityInformation.getJavaType().getSimpleName() + " id " + id);
         }
         return true;
     }

@@ -6,7 +6,6 @@ import com.kairos.dto.gdpr.MasterProcessingActivityRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.RiskDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
-import com.kairos.persistance.model.risk_management.Risk;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.persistance.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
@@ -370,7 +369,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
         }
         processingActivity.getRisks().remove(riskId);
-        riskMongoRepository.findByIdAndDelete(riskId);
+        riskMongoRepository.findByIdAndSaveDelete(riskId);
         masterProcessingActivityRepository.save(processingActivity);
         return true;
 
