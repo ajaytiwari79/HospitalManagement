@@ -4,7 +4,7 @@ import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.task_type.TaskReportMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.mail.MailService;
-import com.kairos.util.external_plateform_shift.TaskReportWrapper;
+import com.kairos.utils.external_plateform_shift.TaskReportWrapper;
 import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

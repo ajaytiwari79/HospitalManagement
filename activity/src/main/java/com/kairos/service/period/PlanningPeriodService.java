@@ -1,11 +1,11 @@
 package com.kairos.service.period;
 
 
-import com.kairos.activity.period.FlippingDateDTO;
-import com.kairos.activity.period.PeriodDTO;
-import com.kairos.activity.period.PeriodPhaseDTO;
-import com.kairos.activity.period.PlanningPeriodDTO;
-import com.kairos.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.period.FlippingDateDTO;
+import com.kairos.dto.activity.period.PeriodDTO;
+import com.kairos.dto.activity.period.PeriodPhaseDTO;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.period.PeriodPhaseFlippingDate;
@@ -21,8 +21,8 @@ import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;

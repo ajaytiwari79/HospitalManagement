@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.unit_settings;
 
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
-import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 
 import java.math.BigInteger;
 import java.util.List;

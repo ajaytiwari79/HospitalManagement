@@ -1,13 +1,13 @@
 package com.kairos.service.phase;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.util.DateUtils;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.commons.utils.DateUtils;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;

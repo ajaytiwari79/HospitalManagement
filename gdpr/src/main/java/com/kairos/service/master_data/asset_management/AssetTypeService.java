@@ -2,8 +2,8 @@ package com.kairos.service.master_data.asset_management;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.gdpr.data_inventory.RiskDTO;
-import com.kairos.gdpr.master_data.AssetTypeDTO;
+import com.kairos.dto.gdpr.data_inventory.RiskDTO;
+import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.model.risk_management.Risk;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
@@ -78,9 +78,11 @@ public class AssetTypeService extends MongoBaseService {
             }
             assetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(assetType));
         }
-        assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
-        List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
-        assetType.setSubAssetTypes(subAssetTypeIds);
+        if (!subAssetTypeList.isEmpty()) {
+            assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
+            List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
+            assetType.setSubAssetTypes(subAssetTypeIds);
+        }
         assetTypeMongoRepository.save(assetType);
         assetTypeDto.setId(assetType.getId());
         return assetTypeDto;
@@ -214,9 +216,11 @@ public class AssetTypeService extends MongoBaseService {
             assetType.setRisks(riskIdsRelatedToSubAssetTypeOrAssetType.get(assetType));
         }
 
-        assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
-        List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
-        assetType.setSubAssetTypes(subAssetTypeIds);
+        if (!subAssetTypeList.isEmpty()) {
+            assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypeList));
+            List<BigInteger> subAssetTypeIds = subAssetTypeList.stream().map(AssetType::getId).collect(Collectors.toList());
+            assetType.setSubAssetTypes(subAssetTypeIds);
+        }
         assetTypeMongoRepository.save(assetType);
         return assetTypeDto;
 
@@ -224,7 +228,6 @@ public class AssetTypeService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param assetTypeId
      * @param riskId

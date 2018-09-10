@@ -1,18 +1,15 @@
 package com.kairos.service.kafka;
 
-import java.util.List;
-import com.kairos.dto.KairosSchedulerExecutorDTO;
+import com.kairos.dto.scheduler.KairosSchedulerExecutorDTO;
 import com.kairos.service.scheduler.IntegrationJobsExecutorService;
 import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.unit_position.UnitPositionService;
-import com.kairos.util.DateUtil;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 
 @Service
 public class SchedulerToUserQueueService implements JobQueueExecutor {

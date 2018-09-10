@@ -3,7 +3,7 @@ package com.kairos.service.common;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.repository.common.MongoSequenceRepository;
-import com.kairos.utils.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;

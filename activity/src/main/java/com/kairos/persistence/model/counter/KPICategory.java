@@ -1,9 +1,7 @@
 package com.kairos.persistence.model.counter;
 
-import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-
-import java.math.BigInteger;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com

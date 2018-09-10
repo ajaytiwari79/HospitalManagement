@@ -1,14 +1,10 @@
 package com.kairos.scheduler.utils;
 
-import com.kairos.util.DateUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import com.kairos.commons.utils.DateUtils;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 

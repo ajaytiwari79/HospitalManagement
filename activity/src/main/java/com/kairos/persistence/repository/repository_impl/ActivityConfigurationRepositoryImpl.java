@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.unit_settings.CustomActivityConfigurationRepository;
-import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;

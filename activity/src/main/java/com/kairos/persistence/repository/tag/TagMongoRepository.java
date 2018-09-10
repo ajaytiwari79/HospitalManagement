@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.tag;
 
-import com.kairos.activity.tags.TagDTO;
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.persistence.model.tag.Tag;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

@@ -1,11 +1,9 @@
 package com.kairos.controller.cta;
 
-import com.kairos.activity.cta.CTARuleTemplateDTO;
-import com.kairos.activity.cta.CollectiveTimeAgreementDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.service.cta.CostTimeAgreementService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +15,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * @author pradeep

@@ -2,8 +2,8 @@ package com.kairos.persistance.model.data_inventory.processing_activity;
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.gdpr.ManagingOrganization;
-import com.kairos.gdpr.Staff;
+import com.kairos.dto.gdpr.ManagingOrganization;
+import com.kairos.dto.gdpr.Staff;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;

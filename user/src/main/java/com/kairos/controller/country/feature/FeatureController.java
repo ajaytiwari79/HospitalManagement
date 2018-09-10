@@ -1,9 +1,9 @@
 package com.kairos.controller.country.feature;
 
-import com.kairos.user.country.feature.FeatureDTO;
-import com.kairos.user.country.feature.VehicleFeaturesDTO;
+import com.kairos.dto.user.country.feature.FeatureDTO;
+import com.kairos.dto.user.country.feature.VehicleFeaturesDTO;
 import com.kairos.service.country.feature.FeatureService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

@@ -2,8 +2,8 @@ package com.kairos.controller.country.default_data;
 
 
 import com.kairos.service.country.default_data.AccountTypeService;
-import com.kairos.user.country.system_setting.AccountTypeDTO;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

@@ -1,7 +1,7 @@
 package com.kairos.service.client;
 import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.repository.user.client.ClientOrganizationRelationGraphRepository;
-import com.kairos.util.BadgeGenerator;
+import com.kairos.utils.BadgeGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

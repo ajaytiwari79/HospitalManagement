@@ -1,8 +1,8 @@
 package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.activity.shift.FunctionDTO;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.dto.activity.shift.FunctionDTO;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;

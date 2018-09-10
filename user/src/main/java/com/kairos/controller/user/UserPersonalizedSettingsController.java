@@ -1,8 +1,8 @@
 package com.kairos.controller.user;
 
-import com.kairos.user.user.user_personalized_settings.UserPersonalizedSettingsDto;
+import com.kairos.dto.user.user.user_personalized_settings.UserPersonalizedSettingsDto;
 import com.kairos.service.UserPersonalizedSettingsService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

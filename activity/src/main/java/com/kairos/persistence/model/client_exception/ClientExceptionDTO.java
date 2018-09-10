@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.client_exception;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.address.AddressDTO;
+import com.kairos.dto.activity.address.AddressDTO;
 
 import java.util.ArrayList;
 import java.util.List;

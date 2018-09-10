@@ -43,7 +43,7 @@ subprojects{
         mavenCentral()
     }
     dependencies {
-        //compile(project(":dto"))
+        //compile(project(":kcommons"))
         testCompile group: 'junit', name: 'junit', version: '4.12'
         compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
         compile( group: 'commons-beanutils', name: 'commons-beanutils', version: '1.8.3'){

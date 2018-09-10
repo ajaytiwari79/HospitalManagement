@@ -1,13 +1,13 @@
 package com.kairos.rule_validator.night_shift;
 
-import com.kairos.activity.night_worker.ExpertiseNightWorkerSettingDTO;
-import com.kairos.activity.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
-import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
+import com.kairos.dto.activity.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
+import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.enums.DurationType;
 import com.kairos.rule_validator.activity.AbstractActivitySpecification;
-import com.kairos.user.country.time_slot.TimeSlot;
-import com.kairos.util.DateTimeInterval;
-import com.kairos.util.DateUtils;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 
 import javax.management.timer.Timer;
 import java.time.LocalDate;

@@ -5,7 +5,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.staff.UserSickService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -144,6 +144,14 @@ public class UserController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffIdOfLoggedInUser(unitId));
     }
 
+
+    @GetMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL+"/staff/user/accessgroup")
+    @ApiOperation("get accessgroup ids and iscountryadmin")
+    public ResponseEntity<Map<String, Object>> getAccessGroupIdsOfStaffs(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAccessGroupIdsOfStaff(unitId));
+    }
+
+
     @GetMapping(value =PARENT_ORGANIZATION_URL+ "/user/{userId}/unit_sick_settings")
     @ApiOperation("get staff ans sick activities of a user")
     ResponseEntity<Map<String, Object>> getStaffAndUnitSickSettings(@PathVariable long userId,@RequestParam String sickSettingsRequired) {
@@ -155,5 +163,6 @@ public class UserController {
     @ApiOperation("get accessgroup ids and iscountryadmin")
     public ResponseEntity<Map<String, Object>> getAccessGroupIdsOfStaff(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessGroupIdsByStaffIdAndUnitId(unitId));
+
     }
 }

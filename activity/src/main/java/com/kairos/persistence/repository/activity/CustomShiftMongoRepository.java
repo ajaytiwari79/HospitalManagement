@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.activity;
 
 
-import com.kairos.activity.shift.ShiftCountDTO;
-import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.dto.activity.shift.ShiftCountDTO;
+import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 

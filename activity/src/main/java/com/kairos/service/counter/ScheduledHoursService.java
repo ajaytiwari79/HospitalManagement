@@ -1,7 +1,7 @@
 package com.kairos.service.counter;
 
-import com.kairos.activity.counter.enums.CounterType;
-import com.kairos.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.counter.Counter;

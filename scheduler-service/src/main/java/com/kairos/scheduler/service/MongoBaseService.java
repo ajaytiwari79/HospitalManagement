@@ -3,7 +3,7 @@ package com.kairos.scheduler.service;
 
 import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
 import com.kairos.scheduler.persistence.repository.custom_repository.MongoSequenceRepository;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;

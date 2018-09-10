@@ -17,7 +17,7 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.kairos.util.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Service
 public class UserRestClient {

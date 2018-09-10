@@ -1,19 +1,15 @@
 package com.kairos.rule_validator.activity;
 
 import com.kairos.enums.Day;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ShiftValidatorService;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.DayOfWeek;
 import java.util.*;
-
-import static com.kairos.enums.Day.*;
 
 /**
  * Created by oodles on 30/11/17.

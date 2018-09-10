@@ -2,11 +2,10 @@ package com.kairos.shiftplanning.domain.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.IntervalUnit;
+import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.shiftplanning.domain.Shift;
 import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
 import com.kairos.shiftplanning.utils.JodaIntervalConverter;
-import com.kairos.shiftplanning.utils.JodaLocalDateConverter;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import org.joda.time.Interval;

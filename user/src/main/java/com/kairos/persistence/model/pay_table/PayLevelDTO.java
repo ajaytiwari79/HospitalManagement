@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.pay_table;
 
-import com.kairos.user.country.pay_table.FutureDate;
+import com.kairos.dto.user.country.pay_table.FutureDate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;

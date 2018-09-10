@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.enums.FilterType;
-import com.kairos.user.staff.client.ClientFilterDTO;
+import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.session.Session;

@@ -1,9 +1,9 @@
 package com.kairos.rule_validator.activity;
 
-import com.kairos.activity.shift.Expertise;
+import com.kairos.dto.activity.shift.Expertise;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.ShiftValidatorService;
+import com.kairos.utils.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -1,10 +1,10 @@
 package com.kairos.controller.wta;
 
 
-import com.kairos.activity.wta.basic_details.WTADTO;
+import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.service.wta.WTAOrganizationService;
 import com.kairos.service.wta.WTAService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

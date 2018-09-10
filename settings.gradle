@@ -16,7 +16,7 @@ include 'services:webservice'
 */
 
 rootProject.name = 'kairos-user'
-include 'dto'
+include 'kcommons'
 include 'user'
 include 'activity'
 include 'scheduler-service'
@@ -28,4 +28,5 @@ include "planner:responseWrapper"
 include 'gdpr'
 include 'planner:optaplanner-vrp-taskplanning'
 findProject(':planner:optaplanner-vrp-taskplanning')?.name = 'optaplanner-vrp-taskplanning'
+include 'kcommons'
 

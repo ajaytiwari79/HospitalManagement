@@ -2,7 +2,7 @@
 
     import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.service.organization.TeamService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
