@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.List;
+import java.util.Set;
+
 import static com.kairos.scheduler.constants.ApiConstants.API_SCHEDULER_URL;
 
 @RestController
@@ -68,10 +70,10 @@ public class SchedulerPanelController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getJobDetails(schedulerPanelId));
     }
 
-    @DeleteMapping("/{schedulerPanelId}")
+    @DeleteMapping("")
     @ApiOperation("Delete Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> deleteJob(@PathVariable BigInteger schedulerPanelId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelId));
+    public ResponseEntity<Map<String, Object>> deleteJob(@RequestBody Set<BigInteger> schedulerPanelIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelIds));
     }
 
     /**
