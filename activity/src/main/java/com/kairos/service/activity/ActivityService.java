@@ -1172,21 +1172,22 @@ public class ActivityService extends MongoBaseService {
 
 
     public void validateActivityTimeRules(LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, Short shortestTime, Short longestTime){
-        //TODO Please don't remove this commented code as we need it
-//        if(shortestTime!=null && longestTime!=null && shortestTime>longestTime){
-//            exceptionService.actionNotPermittedException("shortest.time.greater.longest");
-//        }
-        if(Optional.ofNullable(earliestStartTime).isPresent() &&
-                Optional.ofNullable(latestStartTime).isPresent() &&
-                earliestStartTime.isAfter(latestStartTime)){
-            exceptionService.actionNotPermittedException("earliest.start.time.less.latest");
-        }
 
-        if(Optional.ofNullable(earliestStartTime).isPresent() &&
-                Optional.ofNullable(latestStartTime).isPresent() && Optional.ofNullable(maximumEndTime).isPresent() && Optional.ofNullable(longestTime).isPresent() &&
-                earliestStartTime.plusMinutes(longestTime).isAfter(maximumEndTime)) {
-            exceptionService.actionNotPermittedException("longest.duration.exceed.limit");
+        if(shortestTime!=null && longestTime!=null && shortestTime>longestTime){
+            exceptionService.actionNotPermittedException("shortest.time.greater.longest");
         }
+        //TODO Please don't remove this commented code as we need it
+//        if(Optional.ofNullable(earliestStartTime).isPresent() &&
+//                Optional.ofNullable(latestStartTime).isPresent() &&
+//                earliestStartTime.isAfter(latestStartTime)){
+//            exceptionService.actionNotPermittedException("earliest.start.time.less.latest");
+//        }
+//
+//        if(Optional.ofNullable(earliestStartTime).isPresent() &&
+//                Optional.ofNullable(latestStartTime).isPresent() && Optional.ofNullable(maximumEndTime).isPresent() && Optional.ofNullable(longestTime).isPresent() &&
+//                earliestStartTime.plusMinutes(longestTime).isAfter(maximumEndTime)) {
+//            exceptionService.actionNotPermittedException("longest.duration.exceed.limit");
+//        }
 
 
     }
