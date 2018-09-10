@@ -2,7 +2,7 @@ package com.kairos.dto.scheduler.kafka.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.scheduler.KairosSchedulerExecutorDTO;
-import scheduler.JobQueueExecutor;
+import com.kairos.dto.scheduler.kafka.JobQueueExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
