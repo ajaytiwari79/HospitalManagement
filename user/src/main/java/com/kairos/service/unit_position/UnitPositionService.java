@@ -1192,10 +1192,7 @@ public class UnitPositionService {
             unitPosition.setId(null);
             unitPositions.add(unitPosition);
         }
-
         unitPositionGraphRepository.saveAll(unitPositions);
         unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(unitPositionEmploymentTypeRelationShips);
-
-
     }
 }
