@@ -19,7 +19,6 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
@@ -28,7 +27,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -53,9 +51,6 @@ public class CounterDistService extends MongoBaseService {
 
     private final static Logger logger = LoggerFactory.getLogger(CounterDistService.class);
 
-    private void overrideOldObject(MongoBaseEntity newEntity, MongoBaseEntity oldEntity) {
-        BeanUtils.copyProperties(oldEntity, newEntity);
-    }
 
     public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long refId,ConfLevel level){
         List<KPIAccessPageDTO> kpiAccessPageDTOSOfDashboard=counterRepository.getKPIAcceccPage(refId,level);
@@ -88,7 +83,7 @@ public class CounterDistService extends MongoBaseService {
         if(ConfLevel.STAFF.equals(level)){
             refId=genericIntegrationService.getStaffIdByUserId(refId);
         }
-        List<KPIDTO> kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,level);
+        List<KPIDTO> kpidtos=counterRepository.getCounterListForReferenceId(refId,level);
         if(kpidtos.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
         }
@@ -108,7 +103,7 @@ public class CounterDistService extends MongoBaseService {
         List<KPIDTO> kpidtos=null;
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
         if(accessGroupPermissionCounterDTO.getCountryAdmin()){
-             kpidtos=counterRepository.getCounterListForCountryOrUnitOrStaff(refId,ConfLevel.UNIT);
+             kpidtos=counterRepository.getCounterListForReferenceId(refId,ConfLevel.UNIT);
         }else{
             kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,refId,accessGroupPermissionCounterDTO.getStaffId());
         }

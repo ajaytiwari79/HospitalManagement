@@ -40,6 +40,14 @@ public class CounterRepository {
     @Inject
     private MongoTemplate mongoTemplate;
 
+    private String getRefQueryField(ConfLevel level){
+        switch(level){
+            case UNIT: return "unitId";
+            case STAFF: return "staffId";
+            default: return "countryId";
+        }
+    }
+
     //get counter by type
     public Counter getCounterByType(CounterType type) {
         Query query = new Query(Criteria.where("type").is(type));
@@ -79,7 +87,7 @@ public class CounterRepository {
 
     //test cases..
     //getCounterListByType for testcases
-    public List<KPIDTO> getCounterListForCountryOrUnitOrStaff(Long refId, ConfLevel level){
+    public List<KPIDTO> getCounterListForReferenceId(Long refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation=Aggregation.newAggregation(
           Aggregation.match(Criteria.where(refQueryField).is(refId).and("level").is(level)),
@@ -91,15 +99,6 @@ public class CounterRepository {
         return results.getMappedResults();
         }
 
-    private String getRefQueryField(ConfLevel level){
-        switch(level){
-            case COUNTRY: return "countryId";
-            case UNIT: return "unitId";
-            case STAFF: return "staffId";
-            case DEFAULT: return "countryId";
-            default: return "countryId";
-        }
-    }
 
     //KPI  CRUD
     public List<ApplicableKPI> getApplicableKPI(List<BigInteger> kpiIds, ConfLevel level, Long refId){
@@ -111,14 +110,14 @@ public class CounterRepository {
     //category CRUD
 
     public List<KPICategory> getKPICategoryByIds(List<BigInteger> categoryIds, ConfLevel level, Long refId){
-        String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
+        String queryField =  getRefQueryField(level);
         Query query=new Query(Criteria.where("_id").in(categoryIds).and(queryField).is(refId));
         return mongoTemplate.find(query,KPICategory.class);
 
     }
 
     public List<KPICategoryDTO> getKPICategory(List<BigInteger> categoryIds, ConfLevel level, Long refId){
-        String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
+        String queryField = getRefQueryField(level);
         Criteria matchCriteria = categoryIds == null ? Criteria.where(queryField).is(refId) : Criteria.where("_id").in(categoryIds).and(queryField).is(refId);
         Query query=new Query(matchCriteria);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPICategory.class),KPICategoryDTO.class);
@@ -203,12 +202,6 @@ public class CounterRepository {
         mongoTemplate.remove(query, TabKPIConf.class);
     }
 
-    public void removeTabKPIConfigurationForStaff(List<BigInteger> kpiIds,Long refId,ConfLevel level){
-        String refQueryField = getRefQueryField(level);
-        Query query = new Query(Criteria.where(refQueryField).is(refId).and("level").is(level).and("kpiId").nin(kpiIds));
-        mongoTemplate.remove(query, TabKPIConf.class);
-    }
-
 
     //accessGroupKPI distribution crud
 
@@ -285,7 +278,7 @@ public class CounterRepository {
     }
 
     public List<AccessGroupMappingDTO> getAccessGroupKPIEntryAccessGroupIds(List<Long> accessGroupIds ,List<BigInteger> kpiIds, ConfLevel level, Long refId){
-        String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
+        String queryField = getRefQueryField(level);
         Query query=null;
         if(kpiIds.isEmpty()){
             query=new Query(Criteria.where("accessGroupId").in(accessGroupIds).and(queryField).is(refId));
@@ -357,7 +350,4 @@ public class CounterRepository {
        return results.getMappedResults();
    }
 
-//    public List<KPIAccessPageDTO> getKPIAcceccPageForCountry(Long countryId,ConfLevel level){
-//        String refQueryField = getRefQueryField(level);
-//    }
 }
