@@ -2,7 +2,7 @@ package com.kairos.service;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;

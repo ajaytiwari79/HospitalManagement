@@ -1,10 +1,10 @@
 package com.kairos.controller.wta;
 
 
-import com.kairos.activity.wta.basic_details.WTADTO;
+import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.service.wta.WTAOrganizationService;
 import com.kairos.service.wta.WTAService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -193,7 +193,7 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByUpIds(upIds));
     }
 
-    @ApiOperation(value = "assing wta to unitPosition")
+    @ApiOperation(value = "assing wta and cta to unitPosition")
     @PostMapping(value = UNIT_URL + "/unitPosition/{unitPositionId}/wta/{wtaId}/cta/{ctaId}")
     public ResponseEntity<Map<String, Object>> assignWTAToUnitPosition(@PathVariable Long unitPositionId,@PathVariable BigInteger wtaId,@PathVariable BigInteger ctaId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToUnitPosition(unitPositionId,wtaId,ctaId));

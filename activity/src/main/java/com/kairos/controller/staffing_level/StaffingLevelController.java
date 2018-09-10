@@ -1,13 +1,13 @@
 package com.kairos.controller.staffing_level;
 
-import com.kairos.activity.staffing_level.StaffingLevelFromTemplateDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelFromTemplateDTO;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.activity.staffing_level.absence.AbsenceStaffingLevelDto;
-import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.constants.ApiConstants;
 import com.kairos.service.staffing_level.StaffingLevelService;
-import com.kairos.util.Message;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.Message;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

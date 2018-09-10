@@ -1,6 +1,6 @@
 package com.planner.service.activity;
 
-import com.kairos.activity.activity.activity_tabs.ActivityNoTabsDTO;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityNoTabsDTO;
 import com.planner.domain.activity.Activity;
 import com.planner.repository.activity.ActivityRepository;
 import org.springframework.beans.factory.annotation.Autowired;

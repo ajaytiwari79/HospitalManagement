@@ -2,7 +2,7 @@ package com.kairos.service.data_inventory.asset;
 
 
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.gdpr.master_data.AssetTypeDTO;
+import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;

@@ -7,7 +7,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
 import com.kairos.persistence.repository.activity.TimeTypeMongoRepository;
-import com.kairos.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;

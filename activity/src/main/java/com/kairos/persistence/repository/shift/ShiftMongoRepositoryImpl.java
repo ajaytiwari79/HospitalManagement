@@ -1,10 +1,10 @@
 package com.kairos.persistence.repository.shift;
 
 
-import com.kairos.activity.counter.data.FilterCriteria;
-import com.kairos.activity.shift.ShiftCountDTO;
-import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.activity.shift.ShiftTimeDTO;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.shift.ShiftCountDTO;
+import com.kairos.dto.activity.shift.ShiftQueryResult;
+import com.kairos.dto.activity.shift.ShiftTimeDTO;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.service.counter.ShiftFilterCriteria;

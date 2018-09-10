@@ -1,19 +1,19 @@
 package com.kairos.service.activity;
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.activity.activity.CompositeActivityDTO;
-import com.kairos.activity.activity.OrganizationActivityDTO;
-import com.kairos.activity.activity.activity_tabs.*;
-import com.kairos.activity.counter.CounterDTO;
-import com.kairos.activity.enums.counter.ModuleType;
-import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
-import com.kairos.activity.phase.PhaseDTO;
-import com.kairos.activity.phase.PhaseWeeklyDTO;
-import com.kairos.activity.presence_type.PresenceTypeDTO;
-import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
-import com.kairos.activity.staffing_level.StaffingLevelPlanningDTO;
-import com.kairos.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
+import com.kairos.dto.activity.activity.CompositeActivityDTO;
+import com.kairos.dto.activity.activity.OrganizationActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.*;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
+import com.kairos.dto.activity.counter.enums.ModuleType;
+import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelPlanningDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.ActivityStateEnum;
@@ -33,8 +33,8 @@ import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.shift.ActivityShiftStatusSettingsRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
-import com.kairos.planner.planninginfo.PlannerSyncResponseDTO;
-import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
+import com.kairos.dto.planner.planninginfo.PlannerSyncResponseDTO;
+import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -43,19 +43,19 @@ import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftTemplateService;
-import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
-import com.kairos.user.country.tag.TagDTO;
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.user.organization.OrganizationTypeAndSubTypeDTO;
-import com.kairos.user.organization.skill.Skill;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.external_plateform_shift.GetAllActivitiesResponse;
-import com.kairos.util.external_plateform_shift.TimeCareActivity;
-import com.kairos.util.external_plateform_shift.Transstatus;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.country.tag.TagDTO;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.OrganizationTypeAndSubTypeDTO;
+import com.kairos.dto.user.organization.skill.Skill;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
+import com.kairos.utils.external_plateform_shift.TimeCareActivity;
+import com.kairos.utils.external_plateform_shift.Transstatus;
 import com.kairos.wrapper.activity.*;
 import com.kairos.wrapper.phase.PhaseActivityDTO;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
@@ -1171,10 +1171,11 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    public void validateActivityTimeRules(LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, int shortestTime, int longestTime){
-        if(shortestTime>longestTime){
-            exceptionService.actionNotPermittedException("shortest.time.greater.longest");
-        }
+    public void validateActivityTimeRules(LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, Short shortestTime, Short longestTime){
+        //TODO Please don't remove this commented code as we need it
+//        if(shortestTime!=null && longestTime!=null && shortestTime>longestTime){
+//            exceptionService.actionNotPermittedException("shortest.time.greater.longest");
+//        }
         if(Optional.ofNullable(earliestStartTime).isPresent() &&
                 Optional.ofNullable(latestStartTime).isPresent() &&
                 earliestStartTime.isAfter(latestStartTime)){
@@ -1182,7 +1183,7 @@ public class ActivityService extends MongoBaseService {
         }
 
         if(Optional.ofNullable(earliestStartTime).isPresent() &&
-                Optional.ofNullable(latestStartTime).isPresent() && Optional.ofNullable(maximumEndTime).isPresent() &&
+                Optional.ofNullable(latestStartTime).isPresent() && Optional.ofNullable(maximumEndTime).isPresent() && Optional.ofNullable(longestTime).isPresent() &&
                 earliestStartTime.plusMinutes(longestTime).isAfter(maximumEndTime)) {
             exceptionService.actionNotPermittedException("longest.duration.exceed.limit");
         }

@@ -1,10 +1,10 @@
 package com.kairos.controller.cta;
 
-import com.kairos.activity.cta.CTARuleTemplateDTO;
-import com.kairos.activity.cta.CollectiveTimeAgreementDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.activity.cta.CollectiveTimeAgreementDTO;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.cta.CountryCTAService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,6 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
@@ -258,7 +257,7 @@ public class CostTimeAgreementController {
     }
 
     @ApiOperation(value = "get default cta")
-    @GetMapping(value = UNIT_URL + "/get_default_cta/{expertiseId}")
+    @GetMapping(value = UNIT_URL + "/get_default_cta/expertise/{expertiseId}")
     public ResponseEntity<Map<String, Object>> getDefaultCTA(@PathVariable Long unitId,@PathVariable Long expertiseId)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getDefaultCTA(unitId,expertiseId));
     }

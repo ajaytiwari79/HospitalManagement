@@ -1,15 +1,15 @@
 package com.kairos.controller.task;
 
-import com.kairos.activity.task.BulDeleteTaskDTO;
-import com.kairos.activity.task.TaskActiveUpdationDTO;
-import com.kairos.user.staff.ImportShiftDTO;
+import com.kairos.dto.activity.task.BulDeleteTaskDTO;
+import com.kairos.dto.activity.task.TaskActiveUpdationDTO;
+import com.kairos.dto.user.staff.ImportShiftDTO;
 import com.kairos.constants.ApiConstants;
 import com.kairos.service.external_service.AuthService;
 import com.kairos.service.planner.PlannerService;
 import com.kairos.service.planner.TaskExceptionService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.util.response.ResponseHandler;
-import com.kairos.vrp.task.VRPTaskDTO;
+import com.kairos.utils.response.ResponseHandler;
+import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.util.DateUtils.ONLY_DATE;
+import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 
 
 /**

@@ -1,18 +1,15 @@
 package com.kairos.service.counter;
 
-import com.kairos.activity.counter.KPICategoryDTO;
-import com.kairos.activity.counter.KPIDashboardDTO;
-import com.kairos.activity.counter.distribution.category.KPIDashboardUpdationDTO;
-import com.kairos.activity.counter.enums.ConfLevel;
-import com.kairos.persistence.model.counter.CategoryKPIConf;
-import com.kairos.persistence.model.counter.KPICategory;
+import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
+import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.counter.chart.KPIDashboard;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

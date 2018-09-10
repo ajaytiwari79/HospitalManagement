@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.table_settings;
 
-import com.kairos.client.dto.TableConfiguration;
+import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 

@@ -3,7 +3,7 @@ package com.kairos.persistence.model.task_type;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.kairos.activity.task_type.TaskTypeDTO;
+import com.kairos.dto.activity.task_type.TaskTypeDTO;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.view_handler.json_view_handler.TaskTypeViewHandler;

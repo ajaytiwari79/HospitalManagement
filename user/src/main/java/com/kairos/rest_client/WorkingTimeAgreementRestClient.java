@@ -1,11 +1,10 @@
 package com.kairos.rest_client;
 
-import com.kairos.activity.cta.CTAWTAWrapper;
-import com.kairos.activity.wta.basic_details.WTADTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.activity.wta.version.WTATableSettingWrapper;
-import com.kairos.activity.wta.version.WTAVersionDTO;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.dto.activity.cta.CTAWTAWrapper;
+import com.kairos.dto.activity.wta.basic_details.WTADTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 
 import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
@@ -36,18 +34,18 @@ public class WorkingTimeAgreementRestClient {
     @Inject
     private RestTemplate restTemplate;
 
-    public List<WTAResponseDTO> getWTAByExpertise(Long expertiseId) {
+    public CTAWTAWrapper getWTAByExpertise(Long expertiseId) {
         String baseUrl = getBaseUrl(true);
         try {
             //HttpEntity<Long> request = new HttpEntity<>(expertiseId);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<CTAWTAWrapper>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/expertise/{expertiseId}/cta_wta",
                             HttpMethod.GET, null, typeReference, expertiseId);
 
-            RestTemplateResponseEnvelope<List<WTAResponseDTO>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<CTAWTAWrapper> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {

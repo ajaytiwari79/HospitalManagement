@@ -1,7 +1,7 @@
 package com.kairos.service;
 
 import com.kairos.service.logging.AppLog;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 

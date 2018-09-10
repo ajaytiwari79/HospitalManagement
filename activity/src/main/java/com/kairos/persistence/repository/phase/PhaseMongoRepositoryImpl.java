@@ -1,10 +1,10 @@
 package com.kairos.persistence.repository.phase;
 
 
-import com.kairos.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.user.country.agreement.cta.cta_response.PhaseResponseDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;

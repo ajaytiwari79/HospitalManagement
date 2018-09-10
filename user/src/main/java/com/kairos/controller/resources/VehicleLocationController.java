@@ -3,7 +3,7 @@ package com.kairos.controller.resources;
 
 import com.kairos.persistence.model.user.resources.VehicleLocation;
 import com.kairos.service.resources.VehicleLocationService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

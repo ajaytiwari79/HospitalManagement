@@ -3,12 +3,11 @@ package com.kairos.response.dto.master_data.data_mapping;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.gdpr.OrganizationSubType;
-import com.kairos.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.OrganizationSubType;
+import com.kairos.dto.gdpr.OrganizationType;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)

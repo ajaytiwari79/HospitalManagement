@@ -1,11 +1,10 @@
 package com.kairos.controller.counters;
 
-import com.kairos.activity.counter.KPIDashboardDTO;
-import com.kairos.activity.counter.distribution.category.KPIDashboardUpdationDTO;
-import com.kairos.activity.counter.enums.ConfLevel;
-import com.kairos.persistence.model.counter.chart.KPIDashboard;
+import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
+import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.service.counter.DynamicTabService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

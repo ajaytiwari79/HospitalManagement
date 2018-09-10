@@ -1,13 +1,13 @@
 package com.kairos.service.counter;
 
-import com.kairos.activity.counter.data.BasicRequirementDTO;
-import com.kairos.activity.counter.data.FilterCriteriaDTO;
-import com.kairos.activity.counter.data.RepresentationDTO;
-import com.kairos.activity.counter.enums.CounterType;
-import com.kairos.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.activity.counter.data.RepresentationDTO;
+import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
-import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.counter.Counter;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 

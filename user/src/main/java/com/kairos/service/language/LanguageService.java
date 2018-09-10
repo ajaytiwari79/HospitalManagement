@@ -4,7 +4,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
-import com.kairos.util.FormatUtil;
+import com.kairos.utils.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

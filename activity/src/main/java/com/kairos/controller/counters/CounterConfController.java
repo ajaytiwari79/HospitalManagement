@@ -1,12 +1,12 @@
 package com.kairos.controller.counters;
 
-import com.kairos.activity.counter.data.FilterCriteria;
-import com.kairos.activity.counter.KPICategoryDTO;
-import com.kairos.activity.counter.distribution.category.KPICategoryUpdationDTO;
-import com.kairos.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
+import com.kairos.dto.activity.counter.distribution.category.KPICategoryUpdationDTO;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.service.counter.CounterConfService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

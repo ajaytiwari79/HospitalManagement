@@ -1,9 +1,9 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.activity.open_shift.FibonacciCounter;
-import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.dto.activity.open_shift.FibonacciCounter;
+import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.service.priority_group.priority_group_rules.*;
-import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import org.springframework.stereotype.Component;
 

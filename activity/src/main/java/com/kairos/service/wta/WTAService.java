@@ -1,16 +1,15 @@
 package com.kairos.service.wta;
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.cta.CTAWTAWrapper;
-import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
-import com.kairos.activity.wta.basic_details.WTADTO;
-import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.activity.wta.version.WTATableSettingWrapper;
-import com.kairos.activity.wta.version.WTAVersionDTO;
-import com.kairos.client.dto.TableConfiguration;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.cta.CTAWTAWrapper;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
+import com.kairos.dto.activity.wta.basic_details.WTADTO;
+import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
+import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
@@ -31,8 +30,8 @@ import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.solver_config.SolverConfigService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
-import static javax.management.timer.Timer.ONE_DAY;
 
 
 /**

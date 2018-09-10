@@ -1,13 +1,10 @@
 package com.kairos.service.country.default_data;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.country.default_data.UnitTypeQueryResult;
-import com.kairos.service.country.equipment.EquipmentService;
-import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.system_setting.UnitTypeDTO;
-import com.kairos.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.country.system_setting.UnitTypeDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -30,9 +27,6 @@ import org.springframework.test.context.ActiveProfiles;
 import javax.inject.Inject;
 
 import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.*;
 
 @RunWith(OrderTestRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

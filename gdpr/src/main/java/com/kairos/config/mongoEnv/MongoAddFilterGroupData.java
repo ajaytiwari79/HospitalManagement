@@ -1,7 +1,7 @@
 package com.kairos.config.mongoEnv;
 
 
-import com.kairos.gdpr.master_data.ModuleIdDTO;
+import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
 import com.kairos.persistance.repository.filter.FilterMongoRepository;

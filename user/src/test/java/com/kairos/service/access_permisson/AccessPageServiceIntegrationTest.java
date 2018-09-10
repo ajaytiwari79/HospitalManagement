@@ -1,7 +1,7 @@
 package com.kairos.service.access_permisson;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.enums.OrganizationCategory;
@@ -13,7 +13,7 @@ import com.kairos.service.country.CountryService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
+import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

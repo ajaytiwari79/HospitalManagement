@@ -1,9 +1,9 @@
 package com.kairos.service.time_bank;
 
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.activity.time_bank.time_bank_basic.time_bank.UnitPositionWithCtaDetailsDTO;
-import com.kairos.util.DateUtils;
-import com.kairos.util.time_bank.TimeBankCalculationService;
+import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.time_bank.TimeBankCalculationService;
 import org.joda.time.*;
 
 import org.junit.Test;

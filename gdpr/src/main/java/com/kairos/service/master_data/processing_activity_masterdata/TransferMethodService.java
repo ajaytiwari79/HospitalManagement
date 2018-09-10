@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.TransferMethodDTO;
+import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.TransferMethod;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
@@ -63,8 +63,7 @@ public class TransferMethodService extends MongoBaseService {
             List<TransferMethod> newTransferMethods = new ArrayList<>();
             if (!transferMethodNames.isEmpty()) {
                 for (String name : transferMethodNames) {
-                    TransferMethod newTransferMethod = new TransferMethod(name);
-                    newTransferMethod.setCountryId(countryId);
+                    TransferMethod newTransferMethod = new TransferMethod(name,countryId,SuggestedDataStatus.APPROVED);
                     newTransferMethods.add(newTransferMethod);
                 }
 
@@ -184,7 +183,7 @@ public class TransferMethodService extends MongoBaseService {
 
                 TransferMethod transferMethod = new TransferMethod(name);
                 transferMethod.setCountryId(countryId);
-                transferMethod.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                transferMethod.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 transferMethod.setSuggestedDate(LocalDate.now());
                 transferMethodList.add(transferMethod);
             }

@@ -3,7 +3,7 @@ package com.kairos.controller.skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.skill.SkillCategoryService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

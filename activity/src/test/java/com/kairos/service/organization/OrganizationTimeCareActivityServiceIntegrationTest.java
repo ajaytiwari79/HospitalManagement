@@ -1,8 +1,8 @@
 package com.kairos.service.organization;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.shift.ShiftDTO;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import org.junit.Assert;
 import org.junit.Before;

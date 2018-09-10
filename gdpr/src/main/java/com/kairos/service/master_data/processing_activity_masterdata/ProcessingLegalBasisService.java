@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.ProcessingLegalBasisDTO;
+import com.kairos.dto.gdpr.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
@@ -65,8 +65,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
             if (!legalBasisNames.isEmpty()) {
                 for (String name : legalBasisNames) {
 
-                    ProcessingLegalBasis newProcessingLegalBasis = new ProcessingLegalBasis(name);
-                    newProcessingLegalBasis.setCountryId(countryId);
+                    ProcessingLegalBasis newProcessingLegalBasis = new ProcessingLegalBasis(name,countryId,SuggestedDataStatus.APPROVED);
                     newProcessingLegalBasisList.add(newProcessingLegalBasis);
 
                 }
@@ -189,7 +188,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
                 ProcessingLegalBasis processingLegalBasis = new ProcessingLegalBasis(name);
                 processingLegalBasis.setCountryId(countryId);
-                processingLegalBasis.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                processingLegalBasis.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 processingLegalBasis.setSuggestedDate(LocalDate.now());
                 processingLegalBasisList.add(processingLegalBasis);
             }

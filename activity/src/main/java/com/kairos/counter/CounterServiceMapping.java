@@ -1,6 +1,6 @@
 package com.kairos.counter;
 
-import com.kairos.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.service.counter.CounterService;
 import com.kairos.service.counter.RestingHoursCalculationService;
 import org.slf4j.Logger;

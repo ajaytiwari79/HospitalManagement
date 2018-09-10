@@ -1,19 +1,19 @@
 package com.kairos.persistence.repository.activity;
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.activity.CompositeActivityDTO;
-import com.kairos.activity.activity.OrganizationActivityDTO;
-import com.kairos.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
-import com.kairos.activity.break_settings.BreakActivitiesDTO;
-import com.kairos.activity.counter.data.FilterCriteria;
-import com.kairos.activity.time_type.TimeTypeAndActivityIdDTO;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.CompositeActivityDTO;
+import com.kairos.dto.activity.activity.OrganizationActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
+import com.kairos.dto.activity.break_settings.BreakActivitiesDTO;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
+import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.service.counter.ActivityFilterCriteria;
-import com.kairos.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.mongodb.BasicDBObject;

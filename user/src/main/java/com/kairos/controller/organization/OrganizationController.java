@@ -1,6 +1,7 @@
 package com.kairos.controller.organization;
 
-import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
+import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
+import com.kairos.dto.user.organization.*;
 import com.kairos.persistence.model.client.ClientStaffDTO;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Organization;
@@ -28,14 +29,14 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.service.unit_position.UnitPositionService;
-import com.kairos.user.country.time_slot.TimeSlotDTO;
-import com.kairos.user.country.time_slot.TimeSlotSetDTO;
-import com.kairos.user.country.time_slot.TimeSlotsDeductionDTO;
-import com.kairos.user.organization.*;
-import com.kairos.user.staff.client.ClientFilterDTO;
-import com.kairos.util.response.ResponseHandler;
-import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
+
+import com.kairos.dto.user.staff.client.ClientFilterDTO;
+import com.kairos.utils.response.ResponseHandler;
+import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.utils.user_context.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

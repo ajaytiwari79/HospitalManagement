@@ -1,7 +1,7 @@
 package com.kairos.service.staff;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.staff.employment.Employment;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;

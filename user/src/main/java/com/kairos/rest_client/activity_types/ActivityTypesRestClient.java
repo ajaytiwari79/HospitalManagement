@@ -1,8 +1,8 @@
 package com.kairos.rest_client.activity_types;
 
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
-import com.kairos.user.country.agreement.cta.cta_response.ActivityTypeDTO;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityTypeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;

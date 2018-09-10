@@ -1,18 +1,17 @@
 package com.kairos.controller.organization;
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.activity.activity_tabs.*;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.organization.OrganizationActivityService;
-import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.activity.RulesActivityTabDTO;
 import com.kairos.wrapper.activity.SkillActivityDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +21,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

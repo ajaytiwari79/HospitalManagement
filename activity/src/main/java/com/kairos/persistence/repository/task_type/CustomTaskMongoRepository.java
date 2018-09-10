@@ -5,7 +5,7 @@ import com.kairos.wrapper.EscalatedTasksWrapper;
 import com.kairos.wrapper.task.StaffAssignedTasksWrapper;
 import com.kairos.wrapper.TaskCountWithAssignedUnit;
 import com.kairos.wrapper.TaskWrapper;
-import com.kairos.vrp.task.VRPTaskDTO;
+import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 

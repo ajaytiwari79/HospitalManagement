@@ -1,9 +1,9 @@
 package com.kairos.controller.request_component;
 
-import com.kairos.activity.response.RequestComponent;
+import com.kairos.dto.activity.response.RequestComponent;
 import com.kairos.enums.RequestType;
 import com.kairos.service.request_component.RequestComponentService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

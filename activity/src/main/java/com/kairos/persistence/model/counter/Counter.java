@@ -1,12 +1,13 @@
 package com.kairos.persistence.model.counter;
 
-import com.kairos.activity.enums.counter.ModuleType;
-import com.kairos.activity.counter.data.FilterCriteria;
-import com.kairos.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -17,7 +18,7 @@ public class Counter extends MongoBaseEntity {
 
     private CounterType type;
     private String title;
-    private boolean treatAsCounter;
+    private boolean counter;
     private BigInteger primaryCounter; //to directly identify the base counters child
     private BigInteger parentCounter;  //to identify parent counter
     private BigInteger categoryId;
@@ -31,8 +32,8 @@ public class Counter extends MongoBaseEntity {
         this.type = type;
     }
 
-    public Counter(String title, CounterType type, boolean treatAsCounter, BigInteger primaryCounter) {
-        this.treatAsCounter = treatAsCounter;
+    public Counter(String title, CounterType type, boolean counter, BigInteger primaryCounter) {
+        this.counter = counter;
         this.primaryCounter = primaryCounter;
         this.type = type;
         this.title = title;
@@ -59,12 +60,12 @@ public class Counter extends MongoBaseEntity {
         this.criteriaList = criteriaList;
     }
 
-    public boolean isTreatAsCounter() {
-        return treatAsCounter;
+    public boolean isCounter() {
+        return counter;
     }
 
-    public void setTreatAsCounter(boolean treatAsCounter) {
-        this.treatAsCounter = treatAsCounter;
+    public void setCounter(boolean counter) {
+        this.counter = counter;
     }
 
     public BigInteger getPrimaryCounter() {

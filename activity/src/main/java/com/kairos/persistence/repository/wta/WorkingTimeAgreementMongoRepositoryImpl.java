@@ -1,10 +1,7 @@
 package com.kairos.persistence.repository.wta;
 
-import com.kairos.activity.wta.version.WTAVersionDTO;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
-import com.kairos.persistence.repository.common.CustomAggregationOperation;
-import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -14,9 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -209,10 +204,10 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     public List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> upIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitPositionId").in(upIds).and("deleted").is(false).and("disabled").is(true)),
-                graphLookup("workingTimeAgreement").startWith("parentWTA").connectFrom("parentWTA").connectTo("_id").as("versions"),
-                unwind("versions"),
-                project("versions").andExclude("_id"),
-                replaceRoot("versions"),
+                //graphLookup("workingTimeAgreement").startWith("parentWTA").connectFrom("parentWTA").connectTo("_id").as("versions"),
+               // unwind("versions"),
+               // project("versions").andExclude("_id"),
+               // replaceRoot("versions"),
                 lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);

@@ -1,13 +1,13 @@
 package com.kairos.service.staffing_level;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.staffing_level.Duration;
-import com.kairos.activity.staffing_level.StaffingLevelSetting;
-import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
-import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.dto.activity.staffing_level.Duration;
+import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
+import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.staffing_level.StaffingLevelTemplate;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -29,7 +29,6 @@ import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

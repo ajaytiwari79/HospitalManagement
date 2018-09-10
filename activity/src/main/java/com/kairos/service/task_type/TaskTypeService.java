@@ -2,12 +2,14 @@ package com.kairos.service.task_type;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
-import com.kairos.activity.task_type.*;
+
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.task_type.*;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task_type.*;
+import com.kairos.persistence.model.task_type.TaskTypeSkill;
 import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
@@ -17,19 +19,19 @@ import com.kairos.persistence.repository.task_type.TaskTypeSlaConfigMongoReposit
 import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.basic_details.CountryDTO;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.user.country.tag.TagDTO;
-import com.kairos.user.country.time_slot.TimeSlotWrapper;
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.user.organization.OrganizationLevel;
-import com.kairos.user.organization.OrganizationTypeHierarchyQueryResult;
-import com.kairos.user.organization.TimeSlot;
-import com.kairos.user.organization.skill.Skill;
-import com.kairos.util.DateUtils;
-import com.kairos.util.FileUtil;
-import com.kairos.util.external_plateform_shift.GetAllActivitiesResponse;
-import com.kairos.util.external_plateform_shift.TimeCareActivity;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.tag.TagDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.OrganizationLevel;
+import com.kairos.dto.user.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.dto.user.organization.TimeSlot;
+import com.kairos.dto.user.organization.skill.Skill;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.FileUtil;
+import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
+import com.kairos.utils.external_plateform_shift.TimeCareActivity;
 import com.kairos.wrapper.task_type.TaskTypeResourceDTO;
 import org.apache.commons.validator.GenericValidator;
 import org.slf4j.Logger;
@@ -47,7 +49,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.util.FileUtil.createDirectory;
+import static com.kairos.utils.FileUtil.createDirectory;
 
 /**
  * Created by prabjot on 4/10/16.
@@ -1280,7 +1282,7 @@ public class TaskTypeService extends MongoBaseService {
         return taskTypeSettingDTO;
     }*/
 
-    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForStaff(Long staffId,TaskTypeSettingDTO taskTypeSettingDTO){
+    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForStaff(Long staffId, TaskTypeSettingDTO taskTypeSettingDTO){
         TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByStaffIdAndTaskType(staffId,taskTypeSettingDTO.getTaskTypeId());
         if(taskTypeSetting ==null){
             taskTypeSetting = new TaskTypeSetting(staffId,taskTypeSettingDTO.getTaskTypeId(),taskTypeSettingDTO.getEfficiency());
