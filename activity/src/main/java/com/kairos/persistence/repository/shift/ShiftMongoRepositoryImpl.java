@@ -1,13 +1,19 @@
 package com.kairos.persistence.repository.shift;
 
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
+import com.mongodb.DBObject;
 import com.mongodb.client.result.UpdateResult;
+import org.mortbay.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +27,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -51,6 +56,21 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
         logger.info(query.toString() + " " + updateResult.toString());
 
+    }
+
+    public List<Shift> findAllShiftByDynamicQuery(List<SickSettings> sickSettings, Map<BigInteger, Activity> activityMap) {
+        LocalDate currentLocalDate = DateUtils.getCurrentLocalDate();
+        Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false);
+        List<Criteria> dynamicCriteria = new ArrayList<Criteria>();
+        sickSettings.forEach(sickSettings1 -> {
+            dynamicCriteria.add(new Criteria().and("staffId").is(sickSettings1.getStaffId())
+                    .and("startDate").gte(currentLocalDate)
+                    .lte(DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activityMap.get(sickSettings1.getActivityId()).getRulesActivityTab().getRecurrenceDays() - 1)));
+        });
+
+        criteria.orOperator(dynamicCriteria.toArray(new Criteria[dynamicCriteria.size()]));
+        Query query = new Query(criteria);
+        return mongoTemplate.find(query, Shift.class);
     }
 
     public List<ShiftQueryResult> findAllShiftsBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId) {

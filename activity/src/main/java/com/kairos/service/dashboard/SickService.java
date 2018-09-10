@@ -1,11 +1,16 @@
 package com.kairos.service.dashboard;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
+import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.attendence_setting.SickSettings;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
-import com.kairos.dto.user.staff.staff.StaffResultDTO;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
@@ -13,13 +18,18 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftSickService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * CreatedBy vipulpandey on 30/8/18
@@ -27,6 +37,7 @@ import java.util.*;
 @Service
 @Transactional
 public class SickService {
+    private static final Logger logger = LoggerFactory.getLogger(SickService.class);
     @Inject
     private GenericIntegrationService genericIntegrationService;
     @Inject
@@ -39,6 +50,8 @@ public class SickService {
     private SickSettingsRepository sickSettingsRepository;
     @Inject
     private ShiftSickService shiftSickService;
+    @Inject
+    private ShiftMongoRepository shiftMongoRepository;
 
     public UserSickDataWrapper markUserAsSick(Long unitId) {
         UserSickDataWrapper userSickDataWrapper = new UserSickDataWrapper();
@@ -66,8 +79,8 @@ public class SickService {
         return userSickDataWrapper;
     }
 
-    public Map<String,Long> markUserAsFine(Long staffId, Long unitId) {
-        Map<String,Long> response= new HashMap<>();
+    public Map<String, Long> markUserAsFine(Long staffId, Long unitId) {
+        Map<String, Long> response = new HashMap<>();
         UserSickDataWrapper userSickDataWrapper = new UserSickDataWrapper();
         if (unitId == null) {
             Long userId = UserContext.getUserDetails().getId();
@@ -88,8 +101,44 @@ public class SickService {
             shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId);
             sickSettingsRepository.markUserAsFine(staffId, unitId);  //set end date of user sick table.
         }
-        response.put("unitId",unitId);
-        response.put("staffId",staffId);
+        response.put("unitId", unitId);
+        response.put("staffId", staffId);
         return response;
+    }
+
+    public boolean checkStatusOfUserAndUpdateStatus(Long unitId) {
+
+        List<SickSettings> sickSettings = sickSettingsRepository.findAllSickUsersOfUnit(unitId);
+        Set<BigInteger> activityIds = sickSettings.stream().map(sickSetting -> sickSetting.getActivityId()).collect(Collectors.toSet());
+        List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
+        Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(activity -> activity.getId(), Function.identity()));
+        LocalDate currentLocalDate = DateUtils.getCurrentLocalDate();
+
+        List<Shift> shifts = shiftMongoRepository.findAllShiftByDynamicQuery(sickSettings, activityMap);
+        Map<Long, List<Shift>> staffWiseShiftMap = shifts.stream().collect(Collectors.groupingBy(s -> s.getStaffId(), Collectors.toList()));
+        logger.info("Total number of shifts found {} and map is {}", shifts.size(), staffWiseShiftMap);
+
+        sickSettings.forEach(currentSickSettings -> {
+            Activity activity = activityMap.get(currentSickSettings.getActivityId());
+            int datesDifference = DateUtils.getDifferenceBetweenDatesInDays(currentSickSettings.getStartDate(), currentLocalDate);
+
+            String currentQuery = "{staffId:" + currentSickSettings.getStaffId() + ", 'disabled':false, startDate:{$gte:" + currentLocalDate + ",$lte:" + DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activity.getRulesActivityTab().getRecurrenceDays() - 1) + "}}";
+            //  dynamicQuery.add(currentQuery);
+
+            List<Integer> validaCombinationDays = new ArrayList<>();
+            if (!activity.getRulesActivityTab().isAllowedAutoAbsence() || datesDifference <= 0) {
+                logger.info("either activity is not allowed for break  {} or days is in -ve {}", activity.getRulesActivityTab().isAllowedAutoAbsence(), datesDifference);
+                return;
+            }
+
+            for (byte recurrenceTimes = activity.getRulesActivityTab().getRecurrenceTimes(); recurrenceTimes > 0; recurrenceTimes--) {
+                validaCombinationDays.add((recurrenceTimes * activity.getRulesActivityTab().getRecurrenceDays()) - 1);
+            }
+            if (validaCombinationDays.contains(datesDifference)) {
+                logger.info("The current user is still sick so we need to add more shifts {}", datesDifference);
+            }
+
+        });
+        return true;
     }
 }

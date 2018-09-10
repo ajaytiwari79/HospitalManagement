@@ -44,11 +44,12 @@ public class ShiftSickService extends MongoBaseService {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     PlanningPeriodMongoRepository planningPeriodMongoRepository;
-    @Inject private SickSettingsRepository sickSettingsRepository;
+    @Inject
+    private SickSettingsRepository sickSettingsRepository;
     private static final Logger logger = LoggerFactory.getLogger(ShiftSickService.class);
 
 
-    public Map<String,Long> createSicknessShiftsOfStaff(Long unitId, BigInteger activityId, Long staffId) {
+    public Map<String, Long> createSicknessShiftsOfStaff(Long unitId, BigInteger activityId, Long staffId) {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(activityId);
         Activity activity = activityWrapper.getActivity();
         if (!Optional.ofNullable(activity).isPresent()) {
@@ -70,10 +71,21 @@ public class ShiftSickService extends MongoBaseService {
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
             exceptionService.actionNotPermittedException("message.periodsetting.notFound");
         }
-        short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
+
+        List<Shift> staffOriginalShiftsOfDates = shiftMongoRepository.findAllShiftsByStaffIds(Collections.singletonList(staffId), DateUtils.getDateFromLocalDate(null), DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activity.getRulesActivityTab().getRecurrenceDays() - 1));
         //This method is used to fetch the shift of the days specified and marked them as disabled as the user is sick.
-        // TODO vipul change the function name
-        List<Shift> staffOriginalShiftsOfDates = shiftMongoRepository.findAllShiftsByStaffIds(Collections.singletonList(staffId), DateUtils.getDateFromLocalDate(null), DateUtils.addDays(DateUtils.getDateFromLocalDate(null), shiftNeedsToAddForDays - 1));
+        createSicknessShiftsOfStaff(staffId, unitId, activity, staffUnitPositionDetails.getId(), staffOriginalShiftsOfDates);
+        SickSettings sickSettings = new SickSettings(staffId, unitId, UserContext.getUserDetails().getId(), activityId, DateUtils.getCurrentLocalDate());
+        save(sickSettings);
+        Map<String, Long> response = new HashMap<>();
+        response.put("unitId", unitId);
+        response.put("staffId", staffId);
+        return response;
+
+    }
+
+    public void createSicknessShiftsOfStaff(Long staffId, Long unitId, Activity activity, Long unitPositionId, List<Shift> staffOriginalShiftsOfDates) {
+        short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
         logger.info(staffOriginalShiftsOfDates.size() + "", " shifts found for days");
         staffOriginalShiftsOfDates.forEach(s -> s.setDisabled(true));
 
@@ -82,19 +94,12 @@ public class ShiftSickService extends MongoBaseService {
             shiftNeedsToAddForDays--;
             Date startDate = DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, 9);
             Date endDate = DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, 18);
-            shifts.add(new Shift(startDate, endDate, staffId, activityId, activity.getName(), staffUnitPositionDetails.getId(), unitId));
+            shifts.add(new Shift(startDate, endDate, staffId, activity.getId(), activity.getName(), unitPositionId, unitId));
         }
         // Adding all shifts to the same.
         shifts.addAll(staffOriginalShiftsOfDates);
         if (!shifts.isEmpty())
             save(shifts);
-
-        SickSettings sickSettings = new SickSettings(staffId, unitId, UserContext.getUserDetails().getId(), activityId, DateUtils.getCurrentLocalDate());
-        save(sickSettings);
-        Map<String,Long> response= new HashMap<>();
-        response.put("unitId",unitId);
-        response.put("staffId",staffId);
-        return response;
 
     }
 
@@ -104,17 +109,16 @@ public class ShiftSickService extends MongoBaseService {
         if (!Optional.ofNullable(staffUnitPositionDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.staffUnitPosition.notFound");
         }
-        List<Shift> shifts = shiftMongoRepository.findAllDisabledOrSickShiftsByUnitPositionIdAndUnitId(staffUnitPositionDetails.getId(),  unitId,DateUtils.getCurrentLocalDate());
+        List<Shift> shifts = shiftMongoRepository.findAllDisabledOrSickShiftsByUnitPositionIdAndUnitId(staffUnitPositionDetails.getId(), unitId, DateUtils.getCurrentLocalDate());
         shifts.forEach(s -> {
             if (s.isSickShift()) {
                 s.setDeleted(true);// delete the sick shift.
-            }
-            else if (s.isDisabled()) {
+            } else if (s.isDisabled()) {
                 s.setDisabled(false);
             }
         });
         if (!shifts.isEmpty())
             save(shifts);
-
     }
+
 }
