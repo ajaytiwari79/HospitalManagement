@@ -33,17 +33,7 @@ public class CounterServiceMapping {
     }
 
 
-
-
-//    private void prepareStore(){
-//        if(counters != null) return;
-//        counters = new HashMap<CounterType, CounterService>();
-//       // counters.put(CounterType.RESTING_HOURS_PER_PRESENCE_DAY, xCounterService);
-//    }
-
     public CounterService getService(CounterType counterType){
-//        this.prepareStore();
-        //logger.debug("delta: "+(CounterService) this.counters.get(counterType));
         return (CounterService) this.counters.get(counterType);
     }
 }
