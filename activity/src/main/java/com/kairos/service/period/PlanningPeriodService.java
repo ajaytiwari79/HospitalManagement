@@ -494,12 +494,12 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public boolean updateFlippingDate(BigInteger periodId, Long unitId, BigInteger schedulerPanelId) {
-        List<Shift> shifts=null;
+        List<Shift> shifts=new ArrayList<>();
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
         boolean updateCurrentAndNextPhases = false;
         BigInteger nextPhaseId = null;
         for (PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()) {
-            if (phaseFlippingDate.getSchedulerPanelId()==schedulerPanelId) {
+            if (phaseFlippingDate.getSchedulerPanelId().equals(schedulerPanelId)) {
                 shifts=shiftMongoRepository.findAllShiftsPlanningPeriodAndPhaseId(planningPeriod.getId(),planningPeriod.getCurrentPhaseId(),unitId);
                 planningPeriod.setCurrentPhaseId(phaseFlippingDate.getPhaseId());
                 updateCurrentAndNextPhases = true;
