@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.counter.distribution.tab;
 
-import com.kairos.dto.activity.counter.KPIDTO;
+import com.kairos.dto.activity.counter.configuration.KPIDTO;
 
 import java.math.BigInteger;
 

@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.counter.chart;
 
-import com.kairos.dto.activity.counter.ChartType;
-import com.kairos.dto.activity.counter.RepresentationUnit;
+import com.kairos.dto.activity.counter.enums.ChartType;
+import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com

@@ -1,7 +1,7 @@
 package com.kairos.service.counter;
 
 
-import com.kairos.dto.activity.counter.FilterCriteria;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.enums.FilterType;
 
 import java.util.HashMap;
