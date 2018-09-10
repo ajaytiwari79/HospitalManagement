@@ -20,16 +20,13 @@ import java.util.Map;
 
 @Component
 public class CounterServiceMapping {
-    @Inject
-    RestingHoursCalculationService restingHoursCalculationService;
-
     private final static Logger logger = LoggerFactory.getLogger(CounterServiceMapping.class);
     private Map<CounterType, CounterService> counters = new HashMap();
 
-    @Autowired
+    @Inject
     public void setCounterService(RestingHoursCalculationService restingHoursCalculationService) {
         this.counters.put(CounterType.RESTING_HOURS_PER_PRESENCE_DAY, restingHoursCalculationService);
-        System.out.println("Enum mapping: "+this.counters);
+        logger.info("Enum mapping: "+this.counters);
     }
 
 

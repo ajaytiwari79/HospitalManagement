@@ -173,7 +173,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     public List<ShiftTimeDTO> getShiftTimeDTO(List<FilterCriteria> filters){
-        ShiftFilterCriteria shiftFilterCriteria = ShiftFilterCriteria.getInstance(false);
+        ShiftFilterCriteria shiftFilterCriteria = ShiftFilterCriteria.getInstance();
         for(FilterCriteria filter: filters){
             switch (filter.getType()){
                 case STAFF_IDS: shiftFilterCriteria.setStaffIds(filter.getValues()); break;
