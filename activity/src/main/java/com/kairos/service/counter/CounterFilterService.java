@@ -22,6 +22,7 @@ public class CounterFilterService {
         return filters.stream().collect(Collectors.toMap(filter-> filter.getType(), filter-> filter.getValues()));
     }
 
+    //TODO: to be implemented
 //    public AggregationOperation getFilteredActivities(Map<FilterType, List> filtersMap){
 //        ActivityFilterCriteria activityCriteria = ActivityFilterCriteria.getInstance();
 //        return activityCriteria
@@ -38,17 +39,17 @@ public class CounterFilterService {
 
     public List<AggregationOperation> getShiftFilterCriteria(Map<FilterType, List> filtersMap){
         return ShiftFilterCriteria
-                .getInstance(true)
-                .setTimeTypeList(filtersMap.get(FilterType.TIME_TYPE))
-                .setEmploymentTypes(filtersMap.get(FilterType.EMPLOYMENT_TYPE))
-                .setOrganizationTypes(filtersMap.get(FilterType.ORGANIZATION_TYPE))
-                .setPlanneTimeType(filtersMap.get(FilterType.PLANNED_TIME_TYPE))
-                .setUnitId(filtersMap.get(FilterType.UNIT_IDS))
-                .setCategoryId(filtersMap.get(FilterType.ACTIVITY_CATEGORY_TYPE))
-                .setExpertiseCriteria(filtersMap.get(FilterType.EXPERTISE))
-                .setActivityIds(filtersMap.get(FilterType.ACTIVITY_IDS))
-                .setStaffIds(filtersMap.get(FilterType.STAFF_IDS))
-                .setTimeInterval(filtersMap.get(FilterType.TIME_INTERVAL))
+                .getInstance()
+//                .setTimeTypeList(filtersMap.get(FilterType.TIME_TYPE))
+//                .setEmploymentTypes(filtersMap.get(FilterType.EMPLOYMENT_TYPE))
+//                .setOrganizationTypes(filtersMap.get(FilterType.ORGANIZATION_TYPE))
+//                .setPlanneTimeType(filtersMap.get(FilterType.PLANNED_TIME_TYPE))
+//                .setUnitId(filtersMap.get(FilterType.UNIT_IDS))
+//                .setCategoryId(filtersMap.get(FilterType.ACTIVITY_CATEGORY_TYPE))
+//                .setExpertiseCriteria(filtersMap.get(FilterType.EXPERTISE))
+//                .setActivityIds(filtersMap.get(FilterType.ACTIVITY_IDS))
+//                .setStaffIds(filtersMap.get(FilterType.STAFF_IDS))
+//                .setTimeInterval(filtersMap.get(FilterType.TIME_INTERVAL))
                 .getMatchOperations();
     }
 }

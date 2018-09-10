@@ -5,24 +5,24 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
-import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.CounterSize;
+import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
-import com.kairos.persistence.model.shift.Shift;
+import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
+import com.kairos.dto.planner.vrp.vrpPlanning.EmployeeDTO;
+import com.kairos.dto.planner.vrp.vrpPlanning.TaskDTO;
+import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.counter.chart.BaseChart;
 import com.kairos.persistence.model.counter.chart.PieChart;
 import com.kairos.persistence.model.counter.chart.PieDataUnit;
 import com.kairos.persistence.model.counter.chart.SingleNumberChart;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.task_type.TaskService;
-import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
-import com.kairos.dto.planner.vrp.vrpPlanning.EmployeeDTO;
-import com.kairos.dto.planner.vrp.vrpPlanning.TaskDTO;
-import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -353,5 +353,9 @@ public class CounterDataService {
         return durationMillis;
     }
 
+    //public List<ShiftDTO> getShifts
+
     //public void
+
+    //  public
 }
