@@ -54,7 +54,7 @@ import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.PlannerSyncService;
-import scheduler.UserToSchedulerQueueService;
+import com.kairos.service.kafka.UserToSchedulerQueueService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.EmploymentService;
