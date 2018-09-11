@@ -2,6 +2,7 @@ package com.kairos.service.activity;
 
 
 import com.kairos.enums.TimeTypes;
+import com.kairos.enums.unit_settings.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
@@ -191,6 +192,12 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeDTOS;
     }
 
+    public List<BigInteger> getTimeTypesByTimeTypesAndByCountryId(Long countryId, TimeTypes timeType){
+        List<TimeType> timeTypeList = timeTypeMongoRepository.findByTimeTypeEnumAndCountryId(countryId, timeType);
+        if(timeTypeList.isEmpty()) return new ArrayList<>();
+        return timeTypeList.parallelStream().map(timeType1 -> timeType1.getId()).collect(Collectors.toList());
+    }
+
     public List<TimeTypeDTO> getLowerLevelTimeTypeDTOs(BigInteger timeTypeId, BigInteger upperlevelTimeTypeId, List<TimeType> timeTypes) {
         List<TimeTypeDTO> lowerLevelTimeTypeDTOS = new ArrayList<>();
         timeTypes.forEach(timeType -> {
@@ -245,6 +252,4 @@ public class TimeTypeService extends MongoBaseService {
 
         return true;
     }
-
-
 }

@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.open_shift;
 
-import com.kairos.dto.activity.counter.CounterDTO;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 

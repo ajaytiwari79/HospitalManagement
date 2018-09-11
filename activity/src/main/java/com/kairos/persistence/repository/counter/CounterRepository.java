@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.counter;
 
-import com.kairos.dto.activity.counter.CounterDTO;
-import com.kairos.dto.activity.counter.KPICategoryDTO;
-import com.kairos.dto.activity.counter.KPIDTO;
-import com.kairos.dto.activity.counter.KPIDashboardDTO;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
+import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
+import com.kairos.dto.activity.counter.configuration.KPIDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIMappingDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
@@ -11,7 +11,7 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
-import com.kairos.dto.activity.counter.ModuleType;
+import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.model.counter.chart.KPIDashboard;

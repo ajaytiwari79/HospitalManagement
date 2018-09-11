@@ -3,7 +3,7 @@ package com.kairos.service.counter;
 
 import com.kairos.KairosActivityApplication;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
-import com.kairos.dto.activity.counter.KPIDTO;
+import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIsDTO;
@@ -13,7 +13,7 @@ import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
-import com.kairos.dto.activity.counter.CounterSize;
+import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;

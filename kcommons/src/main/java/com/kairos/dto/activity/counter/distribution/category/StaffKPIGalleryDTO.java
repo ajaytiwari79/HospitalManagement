@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.counter.distribution.category;
 
-import com.kairos.dto.activity.counter.KPIDTO;
+import com.kairos.dto.activity.counter.configuration.KPIDTO;
 
 import java.util.List;
 

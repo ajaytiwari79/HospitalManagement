@@ -45,7 +45,7 @@ import java.util.Optional;
 
 public class AccessGroupServiceIntegrationTest {
 
-    private Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
+    private Logger logger = LoggerFactory.getLogger(AccessGroupServiceIntegrationTest.class);
 
     @Value("${server.host.http.url}")
     private String url ;

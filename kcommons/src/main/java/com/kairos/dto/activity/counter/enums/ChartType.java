@@ -1,4 +1,4 @@
-package com.kairos.dto.activity.counter;
+package com.kairos.dto.activity.counter.enums;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com

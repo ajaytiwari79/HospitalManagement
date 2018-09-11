@@ -15,7 +15,7 @@ import static com.kairos.constants.AppConstants.SCHEDULER_TO_ACTIVITY_QUEUE_TOPI
 public class SchedulerToActivityQueueListener {
     private static final Logger logger = LoggerFactory.getLogger(SchedulerToActivityQueueListener.class);
     @Inject
-    private JobQueueExecutor schedulerToUserQueueService;
+    private JobQueueExecutor schedulerToActivityQueueService;
 
     @KafkaListener(topics=SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC)
     public void processMessage(String message) {
@@ -23,7 +23,7 @@ public class SchedulerToActivityQueueListener {
         try {
             KairosSchedulerExecutorDTO job = objectMapper.readValue(message,KairosSchedulerExecutorDTO.class);
             logger.info("received content = '{}'", job.toString());
-            schedulerToUserQueueService.execute(job);
+            schedulerToActivityQueueService.execute(job);
         }
         catch(Exception e) {
             logger.error(e.getMessage(),e);

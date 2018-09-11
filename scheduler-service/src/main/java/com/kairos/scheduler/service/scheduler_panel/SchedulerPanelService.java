@@ -84,6 +84,9 @@ public class SchedulerPanelService extends MongoBaseService {
 
         //logger.info("integrationConfigurationId-----> "+integrationConfigurationId);
 
+        if(schedulerPanelDTOs.isEmpty()) {
+            exceptionService.invalidRequestException("request.invalid");
+        }
         List<SchedulerPanel> schedulerPanels =  new ArrayList<>();
         for(SchedulerPanelDTO schedulerPanelDTO:schedulerPanelDTOs) {
             SchedulerPanel schedulerPanel = new SchedulerPanel();
@@ -342,17 +345,25 @@ public class SchedulerPanelService extends MongoBaseService {
         return jobDetailsRepository.findAllBySchedulerPanelIdOrderByStartedDesc(schedulerPanelId);
     }
 
-    public Boolean deleteJob(BigInteger schedulerPanelId){
+    public Boolean deleteJob(Set<BigInteger> schedulerPanelIds){
         try {
-            Optional<SchedulerPanel> panelOptional = schedulerPanelRepository.findById(schedulerPanelId);
-            if(!panelOptional.isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
+            if(schedulerPanelIds.isEmpty()) {
+                exceptionService.invalidRequestException("request.invalid");
             }
-            SchedulerPanel panel = panelOptional.get();
-            dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
-            panel.setActive(false);
-            panel.setDeleted(true);
-            schedulerPanelRepository.save(panel);
+            List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByIdsIn(schedulerPanelIds);
+            Set<BigInteger> schedulerPanelIdsDB = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getId()).collect(Collectors.toSet());
+            for(BigInteger schedulerPanelId:schedulerPanelIds) {
+                if(!schedulerPanelIdsDB.contains(schedulerPanelId)){
+                    exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
+                }
+            }
+
+            for(SchedulerPanel schedulerPanel:schedulerPanels) {
+                schedulerPanel.setDeleted(true);
+                dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanel.getId());
+                schedulerPanel.setActive(false);
+            }
+            save(schedulerPanels);
             return true;
         }catch (Exception exception){
             return false;
