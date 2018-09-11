@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
 import com.kairos.dto.activity.pay_out.PayOutDTO;
+import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 
 import com.kairos.dto.activity.time_bank.*;
@@ -127,18 +128,18 @@ public class TimeBankCalculationService {
 
     /**
      *
-     * @param shift
+     * @param shiftActivity
      * @param activity
      * @param unitPosition
      */
-    public void calculateScheduleAndDurationHour(Shift shift, Activity activity, StaffUnitPositionDetails unitPosition) {
+    public void calculateScheduleAndDurationHour(ShiftActivity shiftActivity, Activity activity, StaffUnitPositionDetails unitPosition) {
         int scheduledMinutes = 0;
         int duration = 0;
         int weeklyMinutes;
 
         switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
             case ENTERED_MANUALLY:
-                duration = shift.getDurationMinutes();
+                duration = shiftActivity.getDurationMinutes();
                 scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 break;
             case FIXED_TIME:
@@ -146,7 +147,7 @@ public class TimeBankCalculationService {
                 scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 break;
             case ENTERED_TIMES:
-                duration = (int) new Interval(shift.getStartDate().getTime(), shift.getEndDate().getTime()).toDuration().getStandardMinutes();
+                duration = (int) new Interval(shiftActivity.getStartDate().getTime(), shiftActivity.getEndDate().getTime()).toDuration().getStandardMinutes();
                 scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 break;
 
@@ -165,20 +166,10 @@ public class TimeBankCalculationService {
                 scheduledMinutes = duration;
                 break;
         }
-        shift.setDurationMinutes(duration);
-        shift.setScheduledMinutes(scheduledMinutes);
+        shiftActivity.setDurationMinutes(duration);
+        shiftActivity.setScheduledMinutes(scheduledMinutes);
     }
 
-    /**
-     *
-     * @param shift
-     * @param activity
-     */
-    private void calculateEnteredManually(Shift shift, Activity activity) {
-        int duration = (int) new Interval(shift.getStartDate().getTime(), shift.getEndDate().getTime()).toDuration().getStandardMinutes();
-        shift.setDurationMinutes(duration);
-        shift.setScheduledMinutes(new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue());
-    }
 
     /**
      *

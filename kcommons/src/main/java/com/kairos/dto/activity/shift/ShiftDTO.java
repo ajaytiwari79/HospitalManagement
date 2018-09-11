@@ -52,7 +52,6 @@ public class ShiftDTO {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
     private Long allowedBreakDurationInMinute;
-    private List<ShiftDTO> subShifts = new ArrayList<>();
     private BigInteger templateId;
     private String timeType;
     private Set<ShiftStatus> status = new HashSet<>();
@@ -77,18 +76,6 @@ public class ShiftDTO {
         this.endTime=endTime;
     }
 
-    public ShiftDTO(List<ShiftActivity> activities, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
-            Long unitPositionId,LocalDate startLocalDate,LocalDate endLocalDate,LocalTime startTime,LocalTime endTime,List<ShiftDTO> subShifts) {
-        this.activities = activities;
-        this.unitId = unitId;
-        this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
-        this.startLocalDate=startLocalDate;
-        this.endLocalDate=endLocalDate;
-        this.startTime=startTime;
-        this.endTime=endTime;
-        this.subShifts=subShifts;
-    }
 
     public ShiftDTO(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
         this.id = id;
@@ -327,13 +314,6 @@ public class ShiftDTO {
                 '}';
     }
 
-    public List<ShiftDTO> getSubShifts() {
-        return subShifts;
-    }
-
-    public void setSubShifts(List<ShiftDTO> subShifts) {
-        this.subShifts = subShifts;
-    }
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;

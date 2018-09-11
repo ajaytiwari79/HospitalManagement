@@ -105,31 +105,7 @@ public class VRPPlanningService extends MongoBaseService{
     }
 
 
-    public void createShift(){
-        List<Long> staffs = Arrays.asList(5728l, 3361l, 3374l, 3122l, 5217l);
-        List<Shift> shifts = new ArrayList<>();
-        /*staffs.forEach(s->{
-            IntStream.range(0,4).forEachOrdered(i->{
-                Date startDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY)).plusDays(i).with(LocalTime.of(07,00)).toInstant());
-                Date endDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY)).plusDays(i).with(LocalTime.of(16,00)).plusDays(0).toInstant());
-                shifts.add(new Shift(startDate,endDate,s,new BigInteger("145")));
-            });
-            Date startDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.FRIDAY)).with(LocalTime.of(07,00)).toInstant());
-            Date endDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.FRIDAY)).with(LocalTime.of(12,30)).plusDays(0).toInstant());
-            shifts.add(new Shift(startDate,endDate,s,new BigInteger("145")));
 
-        });*/
-        LocalDate weekStart= LocalDate.of(2018,Month.JULY,16);
-        staffs.forEach(s->{
-            IntStream.range(0,5).forEachOrdered(i->{
-                Date startDate = Date.from(weekStart.plusDays(i).atStartOfDay().with(LocalTime.of(07,00)).toInstant(ZoneOffset.UTC));
-                Date endDate = Date.from(weekStart.plusDays(i).atStartOfDay().with(i==4?LocalTime.of(12,30):LocalTime.of(16,00)).toInstant(ZoneOffset.UTC));
-                shifts.add(new Shift(startDate,endDate,s,new BigInteger("145")));
-            });
-
-        });
-        save(shifts);
-    }
     public Boolean planningCompleted(Long unitId,BigInteger solverConfigId){
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.COMPLETED);

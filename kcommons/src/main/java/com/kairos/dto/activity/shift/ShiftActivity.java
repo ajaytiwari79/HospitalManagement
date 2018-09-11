@@ -9,29 +9,58 @@ import java.util.Date;
  */
 
 public class ShiftActivity {
+
+
     private BigInteger activityId;
     private Date startDate;
     private Date endDate;
     private int scheduledMinutes;
     private int durationMinutes;
-    private String activityname;
-    private int order;
+    private String activityName;
+    private long bid;
+    private long pId;
+    private String remarks;
+    private BigInteger id;
 
 
     public ShiftActivity( String activityname,Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.activityname = activityname;
+        this.activityName = activityname;
     }
 
 
-    public int getOrder() {
-        return order;
+    public long getBid() {
+        return bid;
     }
 
-    public void setOrder(int order) {
-        this.order = order;
+    public void setBid(long bid) {
+        this.bid = bid;
+    }
+
+    public long getpId() {
+        return pId;
+    }
+
+    public void setpId(long pId) {
+        this.pId = pId;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public BigInteger getActivityId() {
@@ -74,11 +103,11 @@ public class ShiftActivity {
         this.durationMinutes = durationMinutes;
     }
 
-    public String getActivityname() {
-        return activityname;
+    public String getActivityName() {
+        return activityName;
     }
 
-    public void setActivityname(String activityname) {
-        this.activityname = activityname;
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
     }
 }

@@ -34,8 +34,6 @@ public class Shift extends MongoBaseEntity {
     private long probability = 0;
     private long accumulatedTimeBankInMinutes = 0;
     private String remarks;
-    @Indexed
-    private BigInteger activityId;
     private Long staffId;
     private Phase phase;// todo REMOVE VIPUL
     private BigInteger phaseId;
@@ -43,7 +41,8 @@ public class Shift extends MongoBaseEntity {
     private Integer weekCount;
     @Indexed
     private Long unitId;
-
+    private int scheduledMinutes;
+    private int durationMinutes;
 
     private boolean isMainShift = true;
     private List<ShiftActivity> activities;
@@ -52,7 +51,6 @@ public class Shift extends MongoBaseEntity {
 
     private Long unitPositionId;
     private Set<ShiftStatus> status;
-    private List<BigInteger> brokenRuleTemplateIds;
 
     private BigInteger parentOpenShiftId;
     private Long allowedBreakDurationInMinute;
@@ -75,18 +73,12 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-    public Shift(Date startDate, Date endDate, Long staffId,BigInteger activityId) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.staffId = staffId;
-        this.activityId = activityId;
 
-    }
-    public Shift(Date startDate, Date endDate, Long staffId,BigInteger activityId,String name,Long unitPositionId,Long unitId) {
+    public Shift(Date startDate, Date endDate, Long staffId,List<ShiftActivity> activities,String name,Long unitPositionId,Long unitId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.staffId = staffId;
-        this.activityId = activityId;
+        this.activities = activities;
         this.name=name;
         this.unitPositionId=unitPositionId;
         this.unitId=unitId;
@@ -95,24 +87,21 @@ public class Shift extends MongoBaseEntity {
     }
 
     public List<ShiftActivity> getActivities() {
+        return activities;
+    }
+
+    public List<ShiftActivity> getSortedActvities(){
         activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         return activities;
     }
+
 
     public void setActivities(List<ShiftActivity> activities) {
         this.activities = activities;
     }
 
-    public List<BigInteger> getBrokenRuleTemplateIds() {
-        return brokenRuleTemplateIds;
-    }
-
-    public void setBrokenRuleTemplateIds(List<BigInteger> brokenRuleTemplateIds) {
-        this.brokenRuleTemplateIds = brokenRuleTemplateIds;
-    }
-
     public Shift(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
-                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitId, Long unitPositionId) {
+                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
         this.name = name;
         this.id = id;
         this.startDate = startDate;
@@ -124,7 +113,7 @@ public class Shift extends MongoBaseEntity {
         this.probability = probability;
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
         this.remarks = remarks;
-        this.activityId = activityId;
+        this.activities = activities;
         this.staffId = staffId;
         this.unitId = unitId;
         this.unitPositionId = unitPositionId;
@@ -223,14 +212,6 @@ public class Shift extends MongoBaseEntity {
         this.remarks = remarks;
     }
 
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
-
     public Long getStaffId() {
         return staffId;
     }
@@ -262,7 +243,6 @@ public class Shift extends MongoBaseEntity {
                 ", probability=" + probability +
                 ", accumulatedTimeBankInMinutes=" + accumulatedTimeBankInMinutes +
                 ", remarks='" + remarks + '\'' +
-                ", activityId=" + activityId +
                 ", staffId=" + staffId +
                 ", phase=" + phase +
                 ", weekCount=" + weekCount +
@@ -421,12 +401,12 @@ public class Shift extends MongoBaseEntity {
         this.planningPeriodId = planningPeriodId;
     }
 
-    public Shift(String name, Date startDate, Date endDate, String remarks, BigInteger activityId, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, Set<ShiftStatus> status, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
+    public Shift(String name, Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, Set<ShiftStatus> status, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.remarks = remarks;
-        this.activityId = activityId;
+        this.activities = activities;
         this.staffId = staffId;
         this.phase = phase;
         this.unitId = unitId;
@@ -437,6 +417,8 @@ public class Shift extends MongoBaseEntity {
         this.parentOpenShiftId = parentOpenShiftId;
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
         this.copiedFromShiftId = copiedFromShiftId;
+        this.scheduledMinutes = scheduledMinutes;
+        this.durationMinutes = durationMinutes;
     }
 
     public DateTimeInterval getInterval() {
