@@ -104,6 +104,15 @@ public class Risk extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
+    public Risk(@NotBlank(message = "Name can't be Empty") String name, @NotBlank(message = "Description can't be Empty") String description,
+                @NotBlank(message = "Mention Recommendation") String riskRecommendation, @NotNull(message = "Risk Level can't be null") RiskSeverity riskLevel,LocalDate dueDates) {
+        this.name = name;
+        this.description = description;
+        this.riskRecommendation = riskRecommendation;
+        this.riskLevel = riskLevel;
+        this.dueDate=dueDates;
+    }
+
     public Risk() {
     }
 }

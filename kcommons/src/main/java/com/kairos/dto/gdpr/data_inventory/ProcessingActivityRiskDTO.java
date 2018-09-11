@@ -16,9 +16,6 @@ public class ProcessingActivityRiskDTO {
     private BigInteger id;
     @Valid
     private List<OrganizationLevelRiskDTO> risks=new ArrayList<>();
-    @Valid
-    private List<ProcessingActivityRiskDTO>  subProcessingActivities;
-
 
     public BigInteger getId() { return id; }
 
@@ -28,7 +25,4 @@ public class ProcessingActivityRiskDTO {
 
     public void setRisks(List<OrganizationLevelRiskDTO> risks) { this.risks = risks; }
 
-    public List<ProcessingActivityRiskDTO> getSubProcessingActivities() { return subProcessingActivities; }
-
-    public void setSubProcessingActivities(List<ProcessingActivityRiskDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 }

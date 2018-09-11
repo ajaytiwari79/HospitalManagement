@@ -73,7 +73,7 @@ public class AssetTypeService extends MongoBaseService {
         }
         Map<AssetType, List<BigInteger>> riskIdsCoresspondingToAssetAndSubAssetType;
         if (!riskRelatedToAssetTypeAndSubAssetType.isEmpty()) {
-            riskIdsCoresspondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevel(countryId, riskRelatedToAssetTypeAndSubAssetType);
+            riskIdsCoresspondingToAssetAndSubAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId,false, riskRelatedToAssetTypeAndSubAssetType);
             for (AssetType subAssetType : subAssetTypeList) {
                 subAssetType.setRisks(riskIdsCoresspondingToAssetAndSubAssetType.get(subAssetType));
             }
@@ -220,7 +220,7 @@ public class AssetTypeService extends MongoBaseService {
         }
         Map<AssetType, List<BigInteger>> riskIdsRelatedToSubAssetTypeOrAssetType;
         if (!riskRelatedToAssetTypeAndSubAssetType.isEmpty()) {
-            riskIdsRelatedToSubAssetTypeOrAssetType = riskService.saveRiskAtCountryLevel(countryId, riskRelatedToAssetTypeAndSubAssetType);
+            riskIdsRelatedToSubAssetTypeOrAssetType = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId,false, riskRelatedToAssetTypeAndSubAssetType);
             for (AssetType subAssetType : subAssetTypeList) {
                 subAssetType.setRisks(riskIdsRelatedToSubAssetTypeOrAssetType.get(subAssetType));
             }

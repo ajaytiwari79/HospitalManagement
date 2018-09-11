@@ -348,7 +348,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             processingActivityList.addAll(subProcessingActivityList);
         }
         if (!riskListCorrespondingToProcessingActivity.isEmpty()) {
-            Map<MasterProcessingActivity, List<BigInteger>> riskIdListCorresponsingProcessingActivities = riskService.saveRiskAtCountryLevel(countryId, riskListCorrespondingToProcessingActivity);
+            Map<MasterProcessingActivity, List<BigInteger>> riskIdListCorresponsingProcessingActivities = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId,false,riskListCorrespondingToProcessingActivity);
             processingActivityList.forEach(processingActivity -> processingActivity.setRisks(riskIdListCorresponsingProcessingActivities.get(processingActivity)));
         }
         masterProcessingActivityRepository.saveAll(getNextSequence(processingActivityList));
@@ -369,7 +369,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
         }
         processingActivity.getRisks().remove(riskId);
-        riskMongoRepository.findByIdAndSaveDelete(riskId);
+        riskMongoRepository.findByIdAndSafeDelete(riskId);
         masterProcessingActivityRepository.save(processingActivity);
         return true;
 

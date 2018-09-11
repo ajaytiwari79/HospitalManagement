@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationLevelRiskDTO  extends BasicRiskDTO {
 
-    @NotNull(message = "Mention Due date")
+    @NotNull(message = "error.message.risk.due.date")
     private LocalDate dueDate;
     private boolean isReminderActive;
     private int daysToReminderBefore;
