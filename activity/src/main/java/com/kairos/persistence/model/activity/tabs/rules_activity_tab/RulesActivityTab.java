@@ -1,9 +1,10 @@
 package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 
+import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
 import com.kairos.dto.activity.open_shift.DurationField;
-import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
-import com.kairos.wrapper.activity.CutOffInterval;
-import com.kairos.wrapper.activity.CutOffIntervalUnit;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 
 import java.io.Serializable;
 import java.time.LocalDate;

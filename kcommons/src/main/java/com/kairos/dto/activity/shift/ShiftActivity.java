@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.shift;
 
+import com.kairos.dto.activity.activity.ActivityDTO;
+
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -21,6 +23,10 @@ public class ShiftActivity {
     private long pId;
     private String remarks;
     private BigInteger id;
+    private String timeType;
+
+    //This field is only for validation
+    private transient ActivityDTO activity;
 
 
     public ShiftActivity( String activityname,Date startDate, Date endDate,BigInteger activityId) {
@@ -30,6 +36,31 @@ public class ShiftActivity {
         this.activityName = activityname;
     }
 
+
+    public ShiftActivity(BigInteger activityId, String activityName) {
+        this.activityId = activityId;
+        this.activityName = activityName;
+    }
+
+    public ShiftActivity() {
+    }
+
+
+    public String getTimeType() {
+        return timeType;
+    }
+
+    public void setTimeType(String timeType) {
+        this.timeType = timeType;
+    }
+
+    public ActivityDTO getActivity() {
+        return activity;
+    }
+
+    public void setActivity(ActivityDTO activity) {
+        this.activity = activity;
+    }
 
     public long getBid() {
         return bid;

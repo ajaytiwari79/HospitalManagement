@@ -5,6 +5,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.activity_tabs.GeneralActivityTabDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PermissionsActivityTabDTO;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
@@ -65,8 +66,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.*;
-
-import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
  * Created by vipul on 5/12/17.

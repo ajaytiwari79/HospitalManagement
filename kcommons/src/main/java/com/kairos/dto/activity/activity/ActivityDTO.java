@@ -2,10 +2,7 @@ package com.kairos.dto.activity.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.activity.activity_tabs.BalanceSettingActivityTabDTO;
-import com.kairos.dto.activity.activity.activity_tabs.GeneralActivityTabDTO;
-import com.kairos.dto.activity.activity.activity_tabs.PermissionsActivityTabDTO;
-import com.kairos.dto.activity.activity.activity_tabs.TimeCalculationActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 
 import java.math.BigInteger;
@@ -31,6 +28,7 @@ public class ActivityDTO {
     private boolean isParentActivity = true;
     private GeneralActivityTabDTO generalActivityTab;
     private TimeCalculationActivityDTO timeCalculationActivityTab;
+    private RulesActivityTabDTO rulesActivityTab;
     private List<ActivityDTO> compositeActivities;
 
     private BalanceSettingActivityTabDTO balanceSettingsActivityTab;
@@ -49,6 +47,14 @@ public class ActivityDTO {
         //default constructor
     }
 
+
+    public RulesActivityTabDTO getRulesActivityTab() {
+        return rulesActivityTab;
+    }
+
+    public void setRulesActivityTab(RulesActivityTabDTO rulesActivityTab) {
+        this.rulesActivityTab = rulesActivityTab;
+    }
 
     public BigInteger getParentId() {
         return parentId;

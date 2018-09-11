@@ -1,4 +1,4 @@
-package com.kairos.wrapper.activity;
+package com.kairos.dto.activity.activity.activity_tabs;
 
 import java.time.LocalDate;
 

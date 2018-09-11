@@ -43,8 +43,6 @@ public class Shift extends MongoBaseEntity {
     private Long unitId;
     private int scheduledMinutes;
     private int durationMinutes;
-
-    private boolean isMainShift = true;
     private List<ShiftActivity> activities;
     //time care id
     private String externalId;
@@ -73,8 +71,23 @@ public class Shift extends MongoBaseEntity {
     }
 
 
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
 
-    public Shift(Date startDate, Date endDate, Long staffId,List<ShiftActivity> activities,String name,Long unitPositionId,Long unitId) {
+    public void setDurationMinutes(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
+    }
+
+    public int getScheduledMinutes() {
+        return scheduledMinutes;
+    }
+
+    public void setScheduledMinutes(int scheduledMinutes) {
+        this.scheduledMinutes = scheduledMinutes;
+    }
+
+    public Shift(Date startDate, Date endDate, Long staffId, List<ShiftActivity> activities, String name, Long unitPositionId, Long unitId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.staffId = staffId;
@@ -216,17 +229,11 @@ public class Shift extends MongoBaseEntity {
         return staffId;
     }
 
-    public boolean isMainShift() {
-        return isMainShift;
-    }
 
     public DateTimeInterval getDateTimeInterval() {
         return new DateTimeInterval(this.startDate.getTime(), this.getEndDate().getTime());
     }
 
-    public void setMainShift(boolean mainShift) {
-        isMainShift = mainShift;
-    }
 
 
     @Override
@@ -401,7 +408,7 @@ public class Shift extends MongoBaseEntity {
         this.planningPeriodId = planningPeriodId;
     }
 
-    public Shift(String name, Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, boolean isMainShift, String externalId, Long unitPositionId, Set<ShiftStatus> status, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
+    public Shift(String name, Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId, Set<ShiftStatus> status, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -410,7 +417,6 @@ public class Shift extends MongoBaseEntity {
         this.staffId = staffId;
         this.phase = phase;
         this.unitId = unitId;
-        this.isMainShift = isMainShift;
         this.externalId = externalId;
         this.unitPositionId = unitPositionId;
         this.status = status;
