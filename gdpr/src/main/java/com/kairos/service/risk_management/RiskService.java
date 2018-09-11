@@ -1,7 +1,7 @@
 package com.kairos.service.risk_management;
 
 
-import com.kairos.dto.gdpr.data_inventory.RiskDTO;
+import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import com.kairos.persistance.model.risk_management.Risk;
 import com.kairos.persistance.repository.risk_management.RiskMongoRepository;
@@ -34,17 +34,17 @@ public class RiskService extends MongoBaseService {
      * @param <T>                  T { Asset type,Asset Sub type, Processing Activity and Asset Object}
      * @return method return  T { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and List of Risk Ids generated after save operation
      */
-    public <T extends MongoBaseEntity> Map<T, List<BigInteger>> saveRiskAtCountryLevel(Long countryId, Map<T, List<RiskDTO>> risksRelatedToObject) {
+    public <T extends MongoBaseEntity> Map<T, List<BigInteger>> saveRiskAtCountryLevel(Long countryId, Map<T, List<BasicRiskDTO>> risksRelatedToObject) {
 
         Assert.notEmpty(risksRelatedToObject, "list can' t be empty");
         List<Risk> risks = new ArrayList<>();
         Map<T, List<Risk>> riskListRelatedToObjectMap = new HashMap<>();
         List<BigInteger> existingRiskIds = new ArrayList<>();
-        Map<T, List<RiskDTO>> existingRisksRelatedToObject = new HashMap<>();
+        Map<T, List<BasicRiskDTO>> existingRisksRelatedToObject = new HashMap<>();
 
         risksRelatedToObject.forEach((objectToWhichRiskRelated, riskDTOList) -> {
-            List<RiskDTO> existingRiskDTOS = new ArrayList<>();
-            List<RiskDTO> newRisk = new ArrayList<>();
+            List<BasicRiskDTO> existingRiskDTOS = new ArrayList<>();
+            List<BasicRiskDTO> newRisk = new ArrayList<>();
             riskDTOList.forEach(riskDTO -> {
                 if (Optional.ofNullable(riskDTO.getId()).isPresent()) {
                     existingRiskDTOS.add(riskDTO);
@@ -76,7 +76,7 @@ public class RiskService extends MongoBaseService {
     }
 
 
-    private <T extends MongoBaseEntity> List<Risk> updateExistingRisk(Long countryId, List<BigInteger> riskIds, Map<T, List<RiskDTO>> existingRisksRelatedToObject, Map<T, List<Risk>> riskListRelatedToObjectMap) {
+    private <T extends MongoBaseEntity> List<Risk> updateExistingRisk(Long countryId, List<BigInteger> riskIds, Map<T, List<BasicRiskDTO>> existingRisksRelatedToObject, Map<T, List<Risk>> riskListRelatedToObjectMap) {
         Assert.notEmpty(riskIds, "List can't be empty");
         List<Risk> riskList = riskMongoRepository.findRiskByCountryIdAndIds(countryId, riskIds);
         Map<BigInteger, Risk> riskMap = riskList.stream().collect(Collectors.toMap(Risk::getId, risk -> risk));
@@ -99,11 +99,11 @@ public class RiskService extends MongoBaseService {
      * @param riskDTOS  list of Risk Dto
      * @return
      */
-    private List<Risk> buildRiskAtCountryLevel(Long countryId, List<RiskDTO> riskDTOS) {
+    private List<Risk> buildRiskAtCountryLevel(Long countryId, List<BasicRiskDTO> riskDTOS) {
 
         checkForDuplicateNames(riskDTOS);
         List<Risk> riskList = new ArrayList<>();
-        for (RiskDTO riskDTO : riskDTOS) {
+        for (BasicRiskDTO riskDTO : riskDTOS) {
             Risk risk = new Risk(countryId, riskDTO.getName(), riskDTO.getDescription(),
                     riskDTO.getRiskRecommendation(), riskDTO.getRiskLevel());
             riskList.add(risk);
@@ -112,10 +112,10 @@ public class RiskService extends MongoBaseService {
 
     }
 
-    private void checkForDuplicateNames(List<RiskDTO> riskDTOS) {
+    private void checkForDuplicateNames(List<BasicRiskDTO> riskDTOS) {
 
         List<String> riskNames = new ArrayList<>();
-        for (RiskDTO riskDTO : riskDTOS) {
+        for (BasicRiskDTO riskDTO : riskDTOS) {
             if (riskNames.contains(riskDTO.getName().toLowerCase())) {
                 exceptionService.duplicateDataException("message.duplicate", "Risk", riskDTO.getName());
             }

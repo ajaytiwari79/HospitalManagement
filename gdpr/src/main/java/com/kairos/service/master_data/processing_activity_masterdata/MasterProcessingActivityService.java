@@ -3,7 +3,7 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.MasterProcessingActivityRiskDTO;
-import com.kairos.dto.gdpr.data_inventory.RiskDTO;
+import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
@@ -327,14 +327,14 @@ public class MasterProcessingActivityService extends MongoBaseService {
         }
         List<MasterProcessingActivity> processingActivityList = new ArrayList<>();
         processingActivityList.add(masterProcessingActivity);
-        Map<MasterProcessingActivity, List<RiskDTO>> riskListCorrespondingToProcessingActivity = new HashMap<>();
+        Map<MasterProcessingActivity, List<BasicRiskDTO>> riskListCorrespondingToProcessingActivity = new HashMap<>();
         if (!processingActivityRiskDTO.getRisks().isEmpty()) {
             riskListCorrespondingToProcessingActivity.put(masterProcessingActivity, processingActivityRiskDTO.getRisks());
 
         }
         if (!processingActivityRiskDTO.getSubProcessingActivities().isEmpty()) {
             List<BigInteger> subProcessingActivityIds = new ArrayList<>();
-            Map<BigInteger, List<RiskDTO>> subProcessingActivityAndRiskDtoListMap = new HashMap<>();
+            Map<BigInteger, List<BasicRiskDTO>> subProcessingActivityAndRiskDtoListMap = new HashMap<>();
             processingActivityRiskDTO.getSubProcessingActivities().forEach(subProcessingActivityRiskDTO -> {
                 subProcessingActivityIds.add(subProcessingActivityRiskDTO.getId());
                 subProcessingActivityAndRiskDtoListMap.put(subProcessingActivityRiskDTO.getId(), subProcessingActivityRiskDTO.getRisks());

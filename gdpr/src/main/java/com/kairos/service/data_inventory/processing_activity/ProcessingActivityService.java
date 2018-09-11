@@ -326,7 +326,7 @@ public class ProcessingActivityService extends MongoBaseService {
     /**
      * @param unitId
      * @param processingActivityId
-     * @param assetId - asset id linked with processing activity
+     * @param assetId              - asset id linked with processing activity
      * @return
      * @description map asset with processing activity (related tab processing activity)
      */
@@ -335,7 +335,7 @@ public class ProcessingActivityService extends MongoBaseService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
-        List<BigInteger> assetIds=processingActivity.getLinkedAssets();
+        List<BigInteger> assetIds = processingActivity.getLinkedAssets();
         assetIds.add(assetId);
         processingActivity.setLinkedAssets(assetIds);
         processingActivityMongoRepository.save(processingActivity);
@@ -400,14 +400,12 @@ public class ProcessingActivityService extends MongoBaseService {
 
 
     /**
-     *
      * @param unitId
      * @param processingActivityId
      * @return
      */
-    public List<AssetBasicResponseDTO> getAllAssetLinkedWithProcessingActivity(Long unitId,BigInteger processingActivityId)
-    {
-        return processingActivityMongoRepository.getAllAssetLinkedWithProcessingActivityById(unitId,processingActivityId);
+    public List<AssetBasicResponseDTO> getAllAssetLinkedWithProcessingActivity(Long unitId, BigInteger processingActivityId) {
+        return processingActivityMongoRepository.getAllAssetLinkedWithProcessingActivityById(unitId, processingActivityId);
     }
 
 
@@ -461,8 +459,6 @@ public class ProcessingActivityService extends MongoBaseService {
         }
 
     }
-
-
 
 
 }
