@@ -12,6 +12,7 @@ import com.kairos.dto.activity.counter.distribution.category.CategoryKPIMappingD
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.dto.activity.counter.distribution.category.InitialKPICategoryDistDataDTO;
 import com.kairos.dto.activity.counter.distribution.category.StaffKPIGalleryDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.*;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
@@ -380,6 +381,61 @@ public class CounterDistService extends MongoBaseService {
         counterRepository.removeApplicableKPI(unitIds,Arrays.asList(orgTypeKPIEntry.getKpiId()),null,ConfLevel.UNIT);
         counterRepository.removeEntityById(orgTypeKPIEntry.getId(),OrgTypeKPIEntry.class);
     }
+
+  //dashboard setting for all level
+
+    public InitailKPIDashboardDistDataDTO getInitialDashboardKPIDistData(Long refId, ConfLevel level) {
+        List<KPIDashboardDTO> dashboards = counterRepository.getKPIDashboard(null, level, refId);
+        List<BigInteger> dashboardIds = dashboards.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(toList());
+        List<DashboardKPIMappingDTO> dashboardKPIMapping = counterRepository.getKPIsMappingForDashboards(dashboardIds);
+        return new InitailKPIDashboardDistDataDTO(dashboards, dashboardKPIMapping);
+    }
+
+    public List<DashboardKPIDTO> getInitialDashboardKPIDataConfForStaff(String moduleId,Long unitId, ConfLevel level){
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+        List<DashboardKPIDTO> dashboardKPIDTOS=counterRepository.getDashboardKPIForStaffByTabAndStaffId(Arrays.asList(moduleId),new ArrayList<>(),accessGroupPermissionCounterDTO.getStaffId(),unitId,level);
+        return dashboardKPIDTOS;
+    }
+
+    public void addDashboradKPIsDistribution(DashboardKPIsDTO dashboardKPIsDTO, ConfLevel level, Long refId) {
+      Long countryId = ConfLevel.COUNTRY.equals(level) ? refId : null;
+      Long unitId = ConfLevel.UNIT.equals(level) ? refId : null;
+      if(ConfLevel.STAFF.equals(level)){
+          AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
+          refId=accessGroupPermissionCounterDTO.getStaffId();
+      }
+      List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(dashboardKPIsDTO.getKpiIds(), level, refId);
+      if (applicableKPIS.isEmpty()) {
+          exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
+      }
+      List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
+      List<BigInteger> dashboardIds = kpiDashboardDTOS.stream().map(kpiDashboardDTO -> kpiDashboardDTO.getId()).collect(Collectors.toList());
+      if (!dashboardIds.contains(dashboardKPIsDTO.getDashboartId())) {
+          exceptionService.dataNotFoundByIdException("error.kpi_category.availability");
+      }
+      List<DashboardKPIConf> dashboardKPIConfs = counterRepository.getDashboardKPIConfs(dashboardKPIsDTO.getKpiIds(), dashboardIds);
+      List<BigInteger> availableDashboardIds = dashboardKPIConfs.stream().map(dashboardKPIConf -> dashboardKPIConf.getDashboardId()).collect(toList());
+      if (availableDashboardIds.contains(dashboardKPIsDTO.getDashboartId())) {
+          exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
+      }
+      List<DashboardKPIConf> newDashboardKPIConf = new ArrayList<>();
+      applicableKPIS.parallelStream().forEach(applicableKPI -> newDashboardKPIConf.add(new DashboardKPIConf(applicableKPI.getActiveKpiId(), dashboardKPIsDTO.getDashboartId(), countryId, unitId, null, level)));
+      if (!newDashboardKPIConf.isEmpty()) {
+          save(newDashboardKPIConf);
+          counterRepository.removeDashboardKPIEntries(availableDashboardIds, dashboardKPIsDTO.getKpiIds());
+      }
+  }
+      public void removeDashboradKPIEntries(DashboardKPIMappingDTO dashboardKPIMappingDTO,Long refId,ConfLevel level) {
+          if(ConfLevel.STAFF.equals(level)){
+              AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
+              refId=accessGroupPermissionCounterDTO.getStaffId();
+          }
+          counterRepository.removeDashboardKPIConfiguration(dashboardKPIMappingDTO,refId,level);
+      }
+
+
+
+  //default setting
 
     public void createDefaultStaffKPISetting(Long unitId, DefaultKPISettingDTO defaultKPISettingDTO) {
         List<ApplicableKPI> applicableKPISForUnit = counterRepository.getApplicableKPIByReferenceId(new ArrayList<>(),Arrays.asList(unitId), ConfLevel.UNIT);

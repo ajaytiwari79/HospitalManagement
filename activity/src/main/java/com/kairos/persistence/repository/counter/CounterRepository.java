@@ -3,6 +3,8 @@ package com.kairos.persistence.repository.counter;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIMappingDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIMappingDTO;
@@ -14,7 +16,7 @@ import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
-import com.kairos.persistence.model.counter.chart.KPIDashboard;
+import com.kairos.persistence.model.counter.KPIDashboard;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -346,6 +348,40 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPIDashboard.class),KPIDashboardDTO.class);
     }
 
+    public List<DashboardKPIConf> getDashboardKPIConfs(List<BigInteger> kpiIds,List<BigInteger> dashboardIds){
+        Query query = new Query(Criteria.where("kpiId").in(kpiIds).and("dashboardId").in(dashboardIds));
+        return mongoTemplate.find(query, DashboardKPIConf.class);
+    }
+
+    public List<DashboardKPIDTO> getDashboardKPIForStaffByTabAndStaffId(List<String> tabIds, List<BigInteger> kpiIds, Long staffId, Long unitId, ConfLevel level){
+        Criteria criteria;
+        if(kpiIds.isEmpty()) {
+            criteria=Criteria.where("dashboardId").in(tabIds).and("staffId").is(staffId).and("unitId").is(unitId).and("level").is(level);
+        }else{
+            criteria=Criteria.where("dashboardId").in(tabIds).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level);
+        }
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(criteria),
+                Aggregation.lookup("counter","kpiId","_id","kpis"),
+                Aggregation.project("dashboardId","position","id").and("kpis").arrayElementAt(0).as("kpis"),
+                Aggregation.project("dashboardId","position","id").and("kpis.title").as("kpi.title").
+                        and("kpis._id").as("kpi._id").and("kpis.counter").as("kpi.counter")
+        );
+        AggregationResults<DashboardKPIDTO> aggregationResults=mongoTemplate.aggregate(aggregation,DashboardKPIConf.class,DashboardKPIDTO.class);
+        return aggregationResults.getMappedResults();
+    };
+
+    public void removeDashboardKPIEntries(List<BigInteger> dashboardIds,List<BigInteger> kpiIds){
+        Query query=new Query(Criteria.where("dashboardId").in(dashboardIds).and("kpiId").in(kpiIds));
+        mongoTemplate.remove(query, DashboardKPIConf.class);
+    }
+
+    public void removeDashboardKPIConfiguration(DashboardKPIMappingDTO entry, Long refId, ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("dashboardId").is(entry.getDashboardId()).and("kpiId").is(entry.getKpiId()).and(refQueryField).is(refId).and("level").is(level));
+        mongoTemplate.remove(query, DashboardKPIConf.class);
+    }
+
    public List<KPIAccessPageDTO> getKPIAcceccPage(Long refId,ConfLevel level){
        String refQueryField = getRefQueryField(level);
        Aggregation aggregation=Aggregation.newAggregation(
@@ -357,6 +393,15 @@ public class CounterRepository {
        return results.getMappedResults();
    }
 
+    public List<DashboardKPIMappingDTO> getKPIsMappingForDashboards(List<BigInteger> dashboardIds){
+        Aggregation ag = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("dashboardId").in(dashboardIds))
+                , Aggregation.group("dashboardId").push("kpiId").as("kpiIds")
+                , Aggregation.project().and("_id").as("categoryId").and("kpiIds").as("kpiId")
+        );
+        AggregationResults<DashboardKPIMappingDTO> results = mongoTemplate.aggregate(ag, DashboardKPIConf.class, DashboardKPIMappingDTO.class);
+        return results.getMappedResults();
+    }
 //    public List<KPIAccessPageDTO> getKPIAcceccPageForCountry(Long countryId,ConfLevel level){
 //        String refQueryField = getRefQueryField(level);
 //    }
