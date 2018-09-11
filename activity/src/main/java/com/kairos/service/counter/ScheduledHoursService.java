@@ -1,10 +1,13 @@
 package com.kairos.service.counter;
 
+import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.activity.counter.data.RepresentationDTO;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
-import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.counter.Counter;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 
@@ -39,10 +42,9 @@ public class ScheduledHoursService implements CounterService {
         shifts.forEach(shift -> { });
         return 0;
     }
-    @Override
-    public Map getCalculatedResults(Map<FilterType, List> availableCriteria) {
-        Map applicableCriteria = getApplicableCriteria(availableCriteria);
 
+    @Override
+    public RepresentationDTO getCalculatedCounter(FilterCriteriaDTO filterCriteria, BasicRequirementDTO representationRequirement) {
         return null;
     }
 }

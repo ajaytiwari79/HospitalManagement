@@ -1,8 +1,10 @@
-package com.kairos.dto.activity.counter;
+package com.kairos.dto.activity.counter.configuration;
 
 //Created By Pavan on 3/8/18
 
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.counter.enums.ModuleType;
 
 import java.math.BigInteger;
 import java.util.List;

@@ -18,11 +18,11 @@ public class ProcessingActivityDTO {
 
     private BigInteger id;
 
-    @NotBlank(message = "Name can't be empty")
-    @Pattern(message = "Numbers and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotBlank(message = "Description can't be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     @NotNull(message = "Managing department can't be null")

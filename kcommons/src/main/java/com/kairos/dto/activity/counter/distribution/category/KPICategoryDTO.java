@@ -1,4 +1,4 @@
-package com.kairos.dto.activity.counter;
+package com.kairos.dto.activity.counter.distribution.category;
 
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.commons.utils.NotNullOrEmpty;
