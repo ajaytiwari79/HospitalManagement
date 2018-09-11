@@ -107,7 +107,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
                     ShiftWithActivityDTO shift = shiftWithActivityDTOS.get(0);
                     if (isValidForDay(dayTypeIds, infoWrapper)) {
                         Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
-                        boolean isValid = isValid(minMaxSetting, limitAndCounter[0] * 60, shift.getMinutes());
+                        boolean isValid = isValid(minMaxSetting, limitAndCounter[0] , shift.getMinutes());
                         if (!isValid) {
                             if (limitAndCounter[1] != null) {
                                 int counterValue = limitAndCounter[1] - 1;
