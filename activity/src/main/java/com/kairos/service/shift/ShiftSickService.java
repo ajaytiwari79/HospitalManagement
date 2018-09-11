@@ -71,11 +71,11 @@ public class ShiftSickService extends MongoBaseService {
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
             exceptionService.actionNotPermittedException("message.periodsetting.notFound");
         }
-
+        logger.info("The current planning period is {}", planningPeriod.getName());
         List<Shift> staffOriginalShiftsOfDates = shiftMongoRepository.findAllShiftsByStaffIds(Collections.singletonList(staffId), DateUtils.getDateFromLocalDate(null), DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activity.getRulesActivityTab().getRecurrenceDays() - 1));
         //This method is used to fetch the shift of the days specified and marked them as disabled as the user is sick.
         createSicknessShiftsOfStaff(staffId, unitId, activity, staffUnitPositionDetails.getId(), staffOriginalShiftsOfDates);
-        SickSettings sickSettings = new SickSettings(staffId, unitId, UserContext.getUserDetails().getId(), activityId, DateUtils.getCurrentLocalDate());
+        SickSettings sickSettings = new SickSettings(staffId, unitId, UserContext.getUserDetails().getId(), activityId, DateUtils.getCurrentLocalDate(), staffUnitPositionDetails.getId());
         save(sickSettings);
         Map<String, Long> response = new HashMap<>();
         response.put("unitId", unitId);

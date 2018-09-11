@@ -20,7 +20,7 @@ public class AppConstants {
     public final static String SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC = "SchedulerToActivityQueue";
 
     public  static  final String JOB_TO_CHECK_SICK_USER="JOB_TO_CHECK_SICK_USER";
-    public final static Set<JobSubType> userSubTypes = Stream.of(INTEGRATION,EMPLOYMENT_END,QUESTIONAIRE_NIGHTWORKER,SENIORITY_LEVEL).collect(Collectors.toSet());
+    public final static Set<JobSubType> userSubTypes = Stream.of(INTEGRATION,EMPLOYMENT_END,QUESTIONAIRE_NIGHTWORKER,SENIORITY_LEVEL,USER_SICK).collect(Collectors.toSet());
     public final static Set<JobSubType> activitySubTypes = Stream.of(PRIORITYGROUP_FILTER).collect(Collectors.toSet());
 
 

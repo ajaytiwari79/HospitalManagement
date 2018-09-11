@@ -121,10 +121,6 @@ public class SickService {
         sickSettings.forEach(currentSickSettings -> {
             Activity activity = activityMap.get(currentSickSettings.getActivityId());
             int datesDifference = DateUtils.getDifferenceBetweenDatesInDays(currentSickSettings.getStartDate(), currentLocalDate);
-
-            String currentQuery = "{staffId:" + currentSickSettings.getStaffId() + ", 'disabled':false, startDate:{$gte:" + currentLocalDate + ",$lte:" + DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activity.getRulesActivityTab().getRecurrenceDays() - 1) + "}}";
-            //  dynamicQuery.add(currentQuery);
-
             List<Integer> validaCombinationDays = new ArrayList<>();
             if (!activity.getRulesActivityTab().isAllowedAutoAbsence() || datesDifference <= 0) {
                 logger.info("either activity is not allowed for break  {} or days is in -ve {}", activity.getRulesActivityTab().isAllowedAutoAbsence(), datesDifference);
@@ -136,8 +132,9 @@ public class SickService {
             }
             if (validaCombinationDays.contains(datesDifference)) {
                 logger.info("The current user is still sick so we need to add more shifts {}", datesDifference);
+                List<Shift> currentStaffShifts = staffWiseShiftMap.get(currentSickSettings.getStaffId()) != null ? staffWiseShiftMap.get(currentSickSettings.getStaffId()) : new ArrayList<>();
+                shiftSickService.createSicknessShiftsOfStaff(currentSickSettings.getStaffId(), unitId, activity, currentSickSettings.getUnitPositionId(), currentStaffShifts);
             }
-
         });
         return true;
     }
