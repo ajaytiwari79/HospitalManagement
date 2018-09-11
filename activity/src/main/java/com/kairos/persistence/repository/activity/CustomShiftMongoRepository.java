@@ -1,8 +1,10 @@
 package com.kairos.persistence.repository.activity;
 
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
@@ -35,5 +37,7 @@ public interface CustomShiftMongoRepository {
     List<DateWiseShiftResponse> findAllByIdGroupByDate(List<BigInteger> shiftIds);
 
     void deleteShiftsAfterDate(Long staffId, LocalDateTime employmentEndDate);
+
+    Shift findShiftToBeDone(List<Long> staffIds, Date startDateMillis,Date endDateMillis);
 
 }

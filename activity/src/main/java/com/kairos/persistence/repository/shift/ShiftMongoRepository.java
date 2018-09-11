@@ -61,4 +61,6 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     ShiftQueryResult findByStaffIdAndUnitIdAndDeletedFalseAndGreaterThanStartDate(Long staffId,Long unitId,Date date);
 
 
+
+
 }

@@ -628,7 +628,8 @@ public class DateUtils {
         return Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
     public static Long getMillisFromLocalDateTime(LocalDateTime date) {
-        return  date==null?null:date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() ;  }
+        return  date==null?null:date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() ;
+    }
 
     public static Long getOneDayBeforeMillis() {
         return  LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
@@ -671,6 +672,12 @@ public class DateUtils {
             e.printStackTrace();
         }
         return localDate;
+
+    }
+
+    public static Long getCurrentDayMidNightMillis() {
+        return ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).minusSeconds(1).toInstant().toEpochMilli();
+
 
     }
 }
