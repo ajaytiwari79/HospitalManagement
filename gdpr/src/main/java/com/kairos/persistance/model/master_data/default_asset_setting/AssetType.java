@@ -27,6 +27,8 @@ public class AssetType extends MongoBaseEntity {
 
     private List<BigInteger> risks;
 
+    private List<BigInteger> subAssetTypes;
+
     public String getSuggestedDataStatus() { return suggestedDataStatus; }
 
     public void setSuggestedDataStatus(String suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
@@ -34,8 +36,6 @@ public class AssetType extends MongoBaseEntity {
     public boolean isHasSubAsset() { return hasSubAsset; }
 
     public void setHasSubAsset(boolean hasSubAsset) { this.hasSubAsset = hasSubAsset; }
-
-    private List<BigInteger> subAssetTypes;
 
     public List<BigInteger> getSubAssetTypes() { return subAssetTypes; }
 

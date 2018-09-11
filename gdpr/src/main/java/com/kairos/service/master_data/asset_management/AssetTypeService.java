@@ -10,6 +10,7 @@ import com.kairos.persistance.repository.master_data.asset_management.AssetTypeM
 import com.kairos.persistance.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.persistance.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
+import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.risk_management.RiskService;
@@ -140,10 +141,20 @@ public class AssetTypeService extends MongoBaseService {
      * @param
      * @return return list of Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
-    public List<AssetTypeResponseDTO> getAllAssetType(Long countryId) {
-        return assetTypeMongoRepository.getAllCountryAssetTypesWithSubAssetTypes(countryId);
+    public List<AssetTypeRiskResponseDTO> getAllAssetTypeWithRisks(Long countryId) {
+        return assetTypeMongoRepository.getAllAssetTypesByCountryId(countryId);
     }
 
+
+    /**
+     * @description
+     * @param countryId
+     * @param assetTypeId
+     * @return method return Sub Asset types of Asset type with risks
+     */
+    public List<AssetTypeRiskResponseDTO> getSubAssetTypesOfAssetTypeWithRisksByAssetTypeId(Long countryId, BigInteger assetTypeId) {
+        return assetTypeMongoRepository.getSubAssetTypesByAssetTypeIdAndCountryId(countryId, assetTypeId);
+    }
 
     /**
      * @param countryId
