@@ -22,15 +22,15 @@ import java.util.Set;
 public class ClauseDTO {
 
 
-    @NotBlank(message = "Title cannot be empty ")
-    @Pattern(message = "Numbers and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
     @Valid
     @NotEmpty(message = "Tags  can't be empty")
     private List<ClauseTagDTO> tags = new ArrayList<>();
 
-    @NotBlank(message = "description  can't be  Empty ")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     @Valid

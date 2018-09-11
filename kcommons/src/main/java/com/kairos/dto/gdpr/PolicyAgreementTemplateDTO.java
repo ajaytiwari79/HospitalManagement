@@ -20,11 +20,11 @@ public class PolicyAgreementTemplateDTO {
 
     private BigInteger id;
 
-    @NotBlank(message = "error.agreement.name.cannot.be.empty.or.null")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotBlank(message = "error.agreement.name.cannot.be.empty.or.null")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     @NotNull(message = "ManagingOrganization Type cannot be null")

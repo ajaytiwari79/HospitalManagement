@@ -13,10 +13,9 @@ public class DataElementDTO {
 
     private BigInteger id;
 
-    @NotBlank(message = "Name can't be empty")
-    @Pattern(message = "Numbers and Special characters are not allowed in Name", regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
-
 
     public BigInteger getId() {
         return id;
