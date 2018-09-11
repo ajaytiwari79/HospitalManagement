@@ -290,4 +290,12 @@ public class ActivityTabsWrapper {
     public void setEmploymentTypes(List<EmploymentTypeDTO> employmentTypes) {
         this.employmentTypes = employmentTypes;
     }
+
+    public List<Long> getRulesTabDayTypes() {
+        return rulesTabDayTypes;
+    }
+
+    public void setRulesTabDayTypes(List<Long> rulesTabDayTypes) {
+        this.rulesTabDayTypes = rulesTabDayTypes;
+    }
 }
