@@ -1,6 +1,5 @@
 package com.kairos.persistance.model.master_data.default_asset_setting;
 
-import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 

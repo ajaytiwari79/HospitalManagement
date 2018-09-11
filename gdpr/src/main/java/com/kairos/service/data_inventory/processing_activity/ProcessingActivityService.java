@@ -440,16 +440,16 @@ public class ProcessingActivityService extends MongoBaseService {
         for (DataSubjectMappingResponseDTO dataSubjectMappingResponseDTO : dataSubjectList) {
 
             List<ProcessingActivityRelatedDataCategory> relatedDataCategoriesToDataSubject = relatedDataCategoryMap.get(dataSubjectMappingResponseDTO.getId());
-            Map<BigInteger, Set<BigInteger>> dataElementsCoresspondingToDataCategory = new HashMap<>();
-            relatedDataCategoriesToDataSubject.forEach(dataCategory -> dataElementsCoresspondingToDataCategory.put(dataCategory.getId(), dataCategory.getDataElements()));
+            Map<BigInteger, Set<BigInteger>> dataElementsCorrespondingToDataCategory = new HashMap<>();
+            relatedDataCategoriesToDataSubject.forEach(dataCategory -> dataElementsCorrespondingToDataCategory.put(dataCategory.getId(), dataCategory.getDataElements()));
             List<DataCategoryResponseDTO> dataCategoryResponseDTOS = new ArrayList<>();
             dataSubjectMappingResponseDTO.getDataCategories().forEach(dataCategoryResponseDTO -> {
 
-                if (dataElementsCoresspondingToDataCategory.containsKey(dataCategoryResponseDTO.getId())) {
+                if (dataElementsCorrespondingToDataCategory.containsKey(dataCategoryResponseDTO.getId())) {
                     List<DataElementBasicResponseDTO> dataElementBasicResponseDTOS = new ArrayList<>();
-                    Set<BigInteger> dataELementIdList = dataElementsCoresspondingToDataCategory.get(dataCategoryResponseDTO.getId());
+                    Set<BigInteger> dataElementIdList = dataElementsCorrespondingToDataCategory.get(dataCategoryResponseDTO.getId());
                     dataCategoryResponseDTO.getDataElements().forEach(dataElementBasicResponseDTO -> {
-                        if (dataELementIdList.contains(dataElementBasicResponseDTO.getId())) {
+                        if (dataElementIdList.contains(dataElementBasicResponseDTO.getId())) {
                             dataElementBasicResponseDTOS.add(dataElementBasicResponseDTO);
                         }
                     });

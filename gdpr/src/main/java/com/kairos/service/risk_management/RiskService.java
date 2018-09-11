@@ -30,7 +30,7 @@ public class RiskService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param risksRelatedToObject Map contain  Object of { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and Risk Coressponding Risk dto list to them
+     * @param risksRelatedToObject Map contain  Object of { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and Risk Corresponding Risk dto list to them
      * @param <T>                  T { Asset type,Asset Sub type, Processing Activity and Asset Object}
      * @return method return  T { Asset type,Asset Sub type, Processing Activity and Asset Object} as key and List of Risk Ids generated after save operation
      */
@@ -61,7 +61,7 @@ public class RiskService extends MongoBaseService {
             riskListRelatedToObjectMap.put(objectToWhichRiskRelated, riskRelatedTOObject);
         });
         if (!existingRisksRelatedToObject.isEmpty()) {
-            risks.addAll(updateExisitingRisk(countryId, existingRiskIds, existingRisksRelatedToObject, riskListRelatedToObjectMap));
+            risks.addAll(updateExistingRisk(countryId, existingRiskIds, existingRisksRelatedToObject, riskListRelatedToObjectMap));
         }
         riskMongoRepository.saveAll(getNextSequence(risks));
         Map<T, List<BigInteger>> objectAndRiskIdsMap = new HashMap<>();
@@ -76,7 +76,7 @@ public class RiskService extends MongoBaseService {
     }
 
 
-    private <T extends MongoBaseEntity> List<Risk> updateExisitingRisk(Long countryId, List<BigInteger> riskIds, Map<T, List<RiskDTO>> existingRisksRelatedToObject, Map<T, List<Risk>> riskListRelatedToObjectMap) {
+    private <T extends MongoBaseEntity> List<Risk> updateExistingRisk(Long countryId, List<BigInteger> riskIds, Map<T, List<RiskDTO>> existingRisksRelatedToObject, Map<T, List<Risk>> riskListRelatedToObjectMap) {
         Assert.notEmpty(riskIds, "List can't be empty");
         List<Risk> riskList = riskMongoRepository.findRiskByCountryIdAndIds(countryId, riskIds);
         Map<BigInteger, Risk> riskMap = riskList.stream().collect(Collectors.toMap(Risk::getId, risk -> risk));

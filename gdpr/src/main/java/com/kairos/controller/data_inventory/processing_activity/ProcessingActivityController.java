@@ -155,7 +155,7 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.mapAssetWithProcessingActivity(unitId, processingActivityId, assetId));
     }
 
-    @ApiOperation(value = "get all Asset linked with Perocessing Activity")
+    @ApiOperation(value = "get all Asset linked with Processing Activity")
     @GetMapping("/processing_activity/{processingActivityId}/asset")
     public ResponseEntity<Object> getAllMappedAssetWithProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
         if (unitId == null) {
