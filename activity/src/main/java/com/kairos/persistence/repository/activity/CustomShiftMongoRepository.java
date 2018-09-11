@@ -20,7 +20,6 @@ import java.util.Map;
  */
 public interface CustomShiftMongoRepository {
 
-    void updatePhasesOfActivities(Long orgId, Date startDateInISO, Date endDateInISO, String phaseName, String PhaseDescription);
 
     List<ShiftQueryResult> findAllShiftsBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId);
 

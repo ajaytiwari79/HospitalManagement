@@ -109,35 +109,35 @@ public class SickService {
     public void checkStatusOfUserAndUpdateStatus(Long unitId) {
 
         List<SickSettings> sickSettings = sickSettingsRepository.findAllSickUsersOfUnit(unitId);
-        Set<BigInteger> activityIds = sickSettings.stream().map(sickSetting -> sickSetting.getActivityId()).collect(Collectors.toSet());
-        List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
-        Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(activity -> activity.getId(), Function.identity()));
-        LocalDate currentLocalDate = DateUtils.getCurrentLocalDate();
-        List<Shift> shifts = new ArrayList<>();
         if (!sickSettings.isEmpty()) {
-            shifts = shiftMongoRepository.findAllShiftByDynamicQuery(sickSettings, activityMap);
+            Set<BigInteger> activityIds = sickSettings.stream().map(sickSetting -> sickSetting.getActivityId()).collect(Collectors.toSet());
+            List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
+            Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(activity -> activity.getId(), Function.identity()));
+            LocalDate currentLocalDate = DateUtils.getCurrentLocalDate();
+            List<Shift> shifts = shiftMongoRepository.findAllShiftByDynamicQuery(sickSettings, activityMap);
+
+            Map<Long, List<Shift>> staffWiseShiftMap = shifts.stream().collect(Collectors.groupingBy(s -> s.getStaffId(), Collectors.toList()));
+            logger.info("Total number of shifts found {} and map is {}", shifts.size(), staffWiseShiftMap);
+
+            sickSettings.forEach(currentSickSettings -> {
+                Activity activity = activityMap.get(currentSickSettings.getActivityId());
+                int differenceOfDaysFromCurrentDateToLastSickDate = DateUtils.getDifferenceBetweenDatesInDays(currentSickSettings.getStartDate(), currentLocalDate);
+                List<Integer> validRepetitionDays = new ArrayList<>();
+                if (!activity.getRulesActivityTab().isAllowedAutoAbsence() || differenceOfDaysFromCurrentDateToLastSickDate <= 0) {
+                    logger.info("either activity is not allowed for break  {} or days is in -ve {}", activity.getRulesActivityTab().isAllowedAutoAbsence(), differenceOfDaysFromCurrentDateToLastSickDate);
+                    return;
+                }
+
+                for (byte recurrenceTimes = activity.getRulesActivityTab().getRecurrenceTimes(); recurrenceTimes > 0; recurrenceTimes--) {
+                    validRepetitionDays.add((recurrenceTimes * activity.getRulesActivityTab().getRecurrenceDays()) - 1);
+                }
+                if (validRepetitionDays.contains(differenceOfDaysFromCurrentDateToLastSickDate)) {
+                    logger.info("The current user is still sick so we need to add more shifts {}", differenceOfDaysFromCurrentDateToLastSickDate);
+                    List<Shift> currentStaffShifts = staffWiseShiftMap.get(currentSickSettings.getStaffId()) != null ? staffWiseShiftMap.get(currentSickSettings.getStaffId()) : new ArrayList<>();
+                    shiftSickService.createSicknessShiftsOfStaff(currentSickSettings.getStaffId(), unitId, activity, currentSickSettings.getUnitPositionId(), currentStaffShifts);
+                }
+            });
+
         }
-        Map<Long, List<Shift>> staffWiseShiftMap = shifts.stream().collect(Collectors.groupingBy(s -> s.getStaffId(), Collectors.toList()));
-        logger.info("Total number of shifts found {} and map is {}", shifts.size(), staffWiseShiftMap);
-
-        sickSettings.forEach(currentSickSettings -> {
-            Activity activity = activityMap.get(currentSickSettings.getActivityId());
-            int datesDifference = DateUtils.getDifferenceBetweenDatesInDays(currentSickSettings.getStartDate(), currentLocalDate);
-            List<Integer> validaCombinationDays = new ArrayList<>();
-            if (!activity.getRulesActivityTab().isAllowedAutoAbsence() || datesDifference <= 0) {
-                logger.info("either activity is not allowed for break  {} or days is in -ve {}", activity.getRulesActivityTab().isAllowedAutoAbsence(), datesDifference);
-                return;
-            }
-
-            for (byte recurrenceTimes = activity.getRulesActivityTab().getRecurrenceTimes(); recurrenceTimes > 0; recurrenceTimes--) {
-                validaCombinationDays.add((recurrenceTimes * activity.getRulesActivityTab().getRecurrenceDays()) - 1);
-            }
-            if (validaCombinationDays.contains(datesDifference)) {
-                logger.info("The current user is still sick so we need to add more shifts {}", datesDifference);
-                List<Shift> currentStaffShifts = staffWiseShiftMap.get(currentSickSettings.getStaffId()) != null ? staffWiseShiftMap.get(currentSickSettings.getStaffId()) : new ArrayList<>();
-                shiftSickService.createSicknessShiftsOfStaff(currentSickSettings.getStaffId(), unitId, activity, currentSickSettings.getUnitPositionId(), currentStaffShifts);
-            }
-        });
-
     }
 }

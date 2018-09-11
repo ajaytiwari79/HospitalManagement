@@ -21,7 +21,7 @@ public class AppConstants {
 
     public static final String JOB_TO_CHECK_SICK_USER = "JOB_TO_CHECK_SICK_USER";
     public final static Set<JobSubType> userSubTypes = Stream.of(INTEGRATION, EMPLOYMENT_END, QUESTIONAIRE_NIGHTWORKER, SENIORITY_LEVEL).collect(Collectors.toSet());
-    public final static Set<JobSubType> activitySubTypes = Stream.of(PRIORITYGROUP_FILTER, FLIP_PHASE, USER_SICKNESS_CHECK).collect(Collectors.toSet());
+    public final static Set<JobSubType> activitySubTypes = Stream.of(PRIORITYGROUP_FILTER, FLIP_PHASE, UPDATE_USER_ABSENCE).collect(Collectors.toSet());
 
 
 }

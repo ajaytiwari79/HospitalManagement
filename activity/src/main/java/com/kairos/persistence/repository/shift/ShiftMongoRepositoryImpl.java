@@ -43,30 +43,14 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    @Override
-    public void updatePhasesOfActivities(Long orgId, Date startDateInISO, Date endDateInISO, String phaseName, String PhaseDescription) {
-
-        Query query = new Query();
-        query.addCriteria(Criteria.where("disabled").is(false).and("unitId").is(orgId).and("startDate").gte(startDateInISO).and("endDate").lte(endDateInISO));
-        Update update = new Update();
-        update.set("phase.name", phaseName);
-        update.set("phase.description", PhaseDescription);
-
-
-        UpdateResult updateResult = mongoTemplate.updateMulti(query, update, Shift.class);
-
-        logger.info(query.toString() + " " + updateResult.toString());
-
-    }
-
     public List<Shift> findAllShiftByDynamicQuery(List<SickSettings> sickSettings, Map<BigInteger, Activity> activityMap) {
         LocalDate currentLocalDate = DateUtils.getCurrentLocalDate();
         Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false);
         List<Criteria> dynamicCriteria = new ArrayList<Criteria>();
-        sickSettings.forEach(sickSettings1 -> {
-            dynamicCriteria.add(new Criteria().and("staffId").is(sickSettings1.getStaffId())
+        sickSettings.forEach(currentSickSettings -> {
+            dynamicCriteria.add(new Criteria().and("staffId").is(currentSickSettings.getStaffId())
                     .and("startDate").gte(currentLocalDate)
-                    .lte(DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activityMap.get(sickSettings1.getActivityId()).getRulesActivityTab().getRecurrenceDays() - 1)));
+                    .lte(DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activityMap.get(currentSickSettings.getActivityId()).getRulesActivityTab().getRecurrenceDays() - 1)));
         });
 
         criteria.orOperator(dynamicCriteria.toArray(new Criteria[dynamicCriteria.size()]));

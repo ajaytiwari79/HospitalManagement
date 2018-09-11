@@ -22,8 +22,8 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
             case FLIP_PHASE:
                 logger.info("JOB for flipping phase");
                 break;
-            case USER_SICKNESS_CHECK:
-                logger.info("JOB for update health of sick user");
+            case UPDATE_USER_ABSENCE:
+                logger.info("Job to update sick absence user and if user is not sick then add more sick shifts");
                 sickService.checkStatusOfUserAndUpdateStatus(job.getUnitId());
                 break;
             default:
