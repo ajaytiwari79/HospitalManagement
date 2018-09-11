@@ -338,31 +338,24 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         createPlanningPeriod(unitId, planningPeriodDTO.getStartDate(), planningPeriods, phases, planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
         save(planningPeriods);
-       // Map<BigInteger,PlanningPeriod>  planningPeriodMap=new HashMap<>();
         List<SchedulerPanelDTO> schedulerPanelDTOS=new ArrayList<>();
         planningPeriods.parallelStream().forEach(planningPeriod -> {
-         //   planningPeriodMap.put(planningPeriod.getId(),planningPeriod);
             planningPeriod.getPhaseFlippingDate().parallelStream().forEach(periodPhaseFlippingDate -> {
                     if(periodPhaseFlippingDate.getFlippingTime()!=null&&periodPhaseFlippingDate.getFlippingTime()!=null)
                     schedulerPanelDTOS.add(new SchedulerPanelDTO(JobType.FUNCTIONAL,JobSubType.FLIP_PHASE,true,LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(),periodPhaseFlippingDate.getFlippingTime()),planningPeriod.getId()));
             });
         });
         if(!schedulerPanelDTOS.isEmpty()) {
-            Map<LocalDateTime, SchedulerPanelDTO> localDateTimeSchedulerPanelDTO = new HashMap<>();
             List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, unitId, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
             }, null, null);
-            Map<BigInteger, List<SchedulerPanelDTO>> schedulerPanelDTOMap = schedulerPanelRestDTOS.parallelStream().collect(Collectors.groupingBy(o -> o.getEntityId(), Collectors.toList()));
-            planningPeriods.parallelStream().forEach(planningPeriod -> {
-                List<SchedulerPanelDTO> schedulerPanelDTO = schedulerPanelDTOMap.get(planningPeriod.getId());
-                schedulerPanelDTO.parallelStream().forEach(schedulerPanelDTO1 -> {
-                    localDateTimeSchedulerPanelDTO.put(schedulerPanelDTO1.getOneTimeTriggerDate(), schedulerPanelDTO1);
-                });
-            });
-            planningPeriods.parallelStream().flatMap(planningPeriod -> planningPeriod.getPhaseFlippingDate().stream()).forEach(periodPhaseFlippingDate -> {
-                if (periodPhaseFlippingDate.getFlippingTime() != null && periodPhaseFlippingDate.getFlippingTime() != null) {
-                    SchedulerPanelDTO schedulerPanelDTO = localDateTimeSchedulerPanelDTO.get(LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(), periodPhaseFlippingDate.getFlippingTime()));
+            Map<String, SchedulerPanelDTO> schedulerPanelDTOMap = schedulerPanelRestDTOS.stream().collect(Collectors.toMap(o -> o.getEntityId()+"-"+o.getOneTimeTriggerDate(),o -> o));
+            planningPeriods.stream().forEach(planningPeriod -> {
+                planningPeriod.getPhaseFlippingDate().stream().forEach(periodPhaseFlippingDate -> {
+                    if (periodPhaseFlippingDate.getFlippingTime() != null && periodPhaseFlippingDate.getFlippingTime() != null) {
+                  SchedulerPanelDTO schedulerPanelDTO=schedulerPanelDTOMap.get(planningPeriod.getId()+"-"+LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(),periodPhaseFlippingDate.getFlippingTime()));
                     periodPhaseFlippingDate.setSchedulerPanelId(schedulerPanelDTO.getId());
                 }
+                });
             });
             save(planningPeriods);
         }
@@ -463,7 +456,8 @@ public class PlanningPeriodService extends MongoBaseService {
         if (!phaseMongoRepository.checkPhaseByName(planningPeriod.getCurrentPhaseId(), "REQUEST")) {
             exceptionService.actionNotPermittedException("message.period.phase.request.name", planningPeriod.getName());
         }
-
+        List<BigInteger> schedulerPanelIds=planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId()!=null).map(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId()).collect(Collectors.toList());
+        Boolean deleteSchedulerJob=schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE,  "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},null,null);
         planningPeriod.setDeleted(true);
         save(planningPeriod);
         return true;
@@ -486,6 +480,8 @@ public class PlanningPeriodService extends MongoBaseService {
         planningPeriod.setNextPhaseId(Optional.ofNullable(toBeNextPhase).isPresent() && toBeNextPhase.size() > 0 ? toBeNextPhase.get(0).getId() : null);
         flipShiftAndCreateShiftState(shifts, planningPeriod.getCurrentPhaseId());
         save(planningPeriod);
+        List<BigInteger> schedulerPanelIds=planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDate -> periodPhaseFlippingDate.getPhaseId().equals(initialNextPhase.getId())).map(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId()).collect(Collectors.toList());
+        Boolean deleteSchedulerJob=schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE,  "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},null,null);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
@@ -583,3 +579,20 @@ public class PlanningPeriodService extends MongoBaseService {
 
 
 }
+
+/*
+  Map<BigInteger, List<SchedulerPanelDTO>> schedulerPanelDTOMap = schedulerPanelRestDTOS.parallelStream().collect(Collectors.groupingBy(o -> o.getEntityId(), Collectors.toList()));
+            Map<LocalDateTime,List<SchedulerPanelDTO>> dateTimeDTOMap=schedulerPanelRestDTOS.parallelStream().collect(Collectors.groupingBy(o -> o.getOneTimeTriggerDate(),Collectors.toList()));
+            planningPeriods.parallelStream().forEach(planningPeriod -> {
+                List<SchedulerPanelDTO> schedulerPanelDTO = schedulerPanelDTOMap.get(planningPeriod.getId());
+                schedulerPanelDTO.parallelStream().forEach(schedulerPanelDTO1 -> {
+                    localDateTimeSchedulerPanelDTO.put(schedulerPanelDTO1.getOneTimeTriggerDate(), schedulerPanelDTO1);
+                });
+            });
+            planningPeriods.parallelStream().flatMap(planningPeriod -> planningPeriod.getPhaseFlippingDate().stream()).forEach(periodPhaseFlippingDate -> {
+                if (periodPhaseFlippingDate.getFlippingTime() != null && periodPhaseFlippingDate.getFlippingTime() != null) {
+                    SchedulerPanelDTO schedulerPanelDTO = localDateTimeSchedulerPanelDTO.get(LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(), periodPhaseFlippingDate.getFlippingTime()));
+                    periodPhaseFlippingDate.setSchedulerPanelId(schedulerPanelDTO.getId());
+                }
+            });
+ */

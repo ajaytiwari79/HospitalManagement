@@ -26,7 +26,7 @@ public class KafkaProducer {
     }
 
     public void pushToActivityQueue(KairosSchedulerExecutorDTO job) {
-        logger.info("Pushing to ScheduleTOUserQueue----------->"+job.getId());
+        logger.info("Pushing to ScheduleTOActivityQueue----------->"+job.getId());
         kafkaTemplate.send(SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC,job);
     }
    /* public KafkaMessageListenerContainer<Integer, QueueDTO> kafkaContainer() {
