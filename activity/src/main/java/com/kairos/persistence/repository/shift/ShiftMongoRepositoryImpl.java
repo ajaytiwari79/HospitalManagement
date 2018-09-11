@@ -2,24 +2,25 @@ package com.kairos.persistence.repository.shift;
 
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
+import com.kairos.dto.activity.shift.ShiftTimeDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
+import com.kairos.service.counter.ShiftFilterCriteria;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
-import com.mongodb.DBObject;
 import com.mongodb.client.result.UpdateResult;
-import org.mortbay.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -187,4 +188,19 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     }
 
+    public List<ShiftTimeDTO> getShiftTimeDTO(List<FilterCriteria> filters){
+        ShiftFilterCriteria shiftFilterCriteria = ShiftFilterCriteria.getInstance();
+        for(FilterCriteria filter: filters){
+            switch (filter.getType()){
+                case STAFF_IDS: shiftFilterCriteria.setStaffIds(filter.getValues()); break;
+                case ACTIVITY_IDS: shiftFilterCriteria.setActivityIds(filter.getValues()); break;
+                case UNIT_IDS: shiftFilterCriteria.setUnitId(filter.getValues()); break;
+                case TIME_INTERVAL: shiftFilterCriteria.setTimeInterval(filter.getValues()); break;
+                default: break;
+            }
+        }
+        List<AggregationOperation> aggregationOperations = shiftFilterCriteria.getMatchOperations();
+        //aggregationOperations.add(Aggregation.group(""))
+        return new ArrayList<>();
+    }
 }

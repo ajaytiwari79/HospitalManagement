@@ -1,11 +1,13 @@
-package com.kairos.service.kafka;
+package com.kairos.service.scheduler;
 
+
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.scheduler.KairosSchedulerExecutorDTO;
+import com.kairos.dto.scheduler.kafka.JobQueueExecutor;
 import com.kairos.service.scheduler.IntegrationJobsExecutorService;
 import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.UserSickService;
 import com.kairos.service.unit_position.UnitPositionService;
-import com.kairos.commons.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,7 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
     private UnitPositionService unitPositionService;
 
     private static Logger logger = LoggerFactory.getLogger(SchedulerToUserQueueService.class);
-    
+
     public void execute(KairosSchedulerExecutorDTO job) {
 
         switch(job.getJobSubType()) {

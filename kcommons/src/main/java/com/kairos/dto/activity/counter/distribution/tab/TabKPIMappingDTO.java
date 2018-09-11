@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.counter.distribution.tab;
 
-import com.kairos.dto.activity.counter.CounterSize;
+import com.kairos.dto.activity.counter.enums.CounterSize;
 
 import java.math.BigInteger;
 

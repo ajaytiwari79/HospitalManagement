@@ -67,9 +67,22 @@ public class AssetTypeController {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAllAssetType(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAllAssetTypeWithRisks(countryId));
 
     }
+
+
+    @ApiOperation("get all Sub Asset Type ")
+    @GetMapping("/asset_type/{assetTypeId}/sub_asset_type")
+    public ResponseEntity<Object> getAllSubAssetTypeOfAssetType(@PathVariable Long countryId,@PathVariable BigInteger assetTypeId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getSubAssetTypesOfAssetTypeWithRisksByAssetTypeId(countryId,assetTypeId));
+
+    }
+
+
 
 
     @ApiOperation("delete AssetType  by id")
