@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 
+import java.util.List;
+
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 
 @Repository
@@ -32,5 +34,11 @@ public class SickSettingsRepository {
         );
         AggregationResults<SickSettingsDTO> results = mongoTemplate.aggregate(aggregation, SickSettings.class, SickSettingsDTO.class);
         return results.getMappedResults().size() > 0 ? results.getMappedResults().get(0) : null;
+    }
+
+    public List<SickSettings> findAllSickUsersOfUnit(Long unitId) {
+        Query query = new Query(Criteria.where("unitId").is(unitId).and("endDate").is(null));
+        List<SickSettings> results = mongoTemplate.find(query, SickSettings.class);
+        return results;
     }
 }
