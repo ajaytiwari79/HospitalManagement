@@ -1,6 +1,5 @@
 package com.kairos.service.scheduler_service;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.scheduler.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.kafka.JobQueueExecutor;
 import com.kairos.service.dashboard.SickService;
@@ -23,7 +22,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
             case FLIP_PHASE:
                 logger.info("JOB for flipping phase");
                 break;
-            case USER_SICK:
+            case USER_SICKNESS_CHECK:
                 logger.info("JOB for update health of sick user");
                 sickService.checkStatusOfUserAndUpdateStatus(job.getUnitId());
                 break;

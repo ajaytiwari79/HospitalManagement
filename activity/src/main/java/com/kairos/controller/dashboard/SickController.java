@@ -38,9 +38,10 @@ public class SickController {
     }
 
     @ApiOperation("API is used to check sick users ")
-    @PutMapping(UNIT_URL+"/check_user_health")
+    @PutMapping(UNIT_URL + "/check_user_health")
     public ResponseEntity<Map<String, Object>> checkStatusOfUserAndUpdateStatus(@RequestParam Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, sickService.checkStatusOfUserAndUpdateStatus(unitId));
+        sickService.checkStatusOfUserAndUpdateStatus(unitId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
 

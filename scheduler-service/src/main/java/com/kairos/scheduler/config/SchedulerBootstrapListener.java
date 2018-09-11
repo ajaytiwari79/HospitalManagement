@@ -34,8 +34,8 @@ public class SchedulerBootstrapListener implements ApplicationListener<Applicati
         List<String> selectedHours = Stream.of("23:00-23:59").collect(Collectors.toList());
 
         SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(JOB_TO_CHECK_SICK_USER,true,0,8,days,null,
-                selectedHours,null,null,JobType.FUNCTIONAL,JobSubType.USER_SICK,false,null,null);
-        schedulerPanelService.createSchedulerPanel(null,schedulerPanelDTO,null);
+                selectedHours,null,null,JobType.FUNCTIONAL,JobSubType.USER_SICKNESS_CHECK,false,null,null);
+        //schedulerPanelService.createSchedulerPanel(null,schedulerPanelDTO,null);
 
     }
 }

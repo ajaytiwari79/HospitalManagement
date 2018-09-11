@@ -106,15 +106,17 @@ public class SickService {
         return response;
     }
 
-    public boolean checkStatusOfUserAndUpdateStatus(Long unitId) {
+    public void checkStatusOfUserAndUpdateStatus(Long unitId) {
 
         List<SickSettings> sickSettings = sickSettingsRepository.findAllSickUsersOfUnit(unitId);
         Set<BigInteger> activityIds = sickSettings.stream().map(sickSetting -> sickSetting.getActivityId()).collect(Collectors.toSet());
         List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(activity -> activity.getId(), Function.identity()));
         LocalDate currentLocalDate = DateUtils.getCurrentLocalDate();
-
-        List<Shift> shifts = shiftMongoRepository.findAllShiftByDynamicQuery(sickSettings, activityMap);
+        List<Shift> shifts = new ArrayList<>();
+        if (!sickSettings.isEmpty()) {
+            shifts = shiftMongoRepository.findAllShiftByDynamicQuery(sickSettings, activityMap);
+        }
         Map<Long, List<Shift>> staffWiseShiftMap = shifts.stream().collect(Collectors.groupingBy(s -> s.getStaffId(), Collectors.toList()));
         logger.info("Total number of shifts found {} and map is {}", shifts.size(), staffWiseShiftMap);
 
@@ -136,6 +138,6 @@ public class SickService {
                 shiftSickService.createSicknessShiftsOfStaff(currentSickSettings.getStaffId(), unitId, activity, currentSickSettings.getUnitPositionId(), currentStaffShifts);
             }
         });
-        return true;
+
     }
 }
