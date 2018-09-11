@@ -24,6 +24,19 @@ public class CTAService {
     /**************************************Logic to fetch CTA******Start****************************************/
 /*****************************************************************************************************/
     /**
+     *
+     * @param longCTAResponseDTOMap
+     * @param unitPositionId
+     * @return
+     */
+//TODO might be in ShiftPlanningInitializationService
+public Map<LocalDate, CTAResponseDTO> getLocalDateCTAMapByunitPositionId( Map<Long, Map<LocalDate, CTAResponseDTO>> longCTAResponseDTOMap, Long unitPositionId)
+{
+    if(longCTAResponseDTOMap.containsKey(unitPositionId))
+    return longCTAResponseDTOMap.get(unitPositionId);
+return null;
+}
+    /**
      * This method will bind each unitPositionId
      * with its Map containing all related CTA
      *

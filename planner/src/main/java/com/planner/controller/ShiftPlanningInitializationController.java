@@ -43,13 +43,15 @@ private CTAService ctaService;
      * @return
      */
 
-    @RequestMapping("/getCTA")
-    ResponseEntity<Map<String, Object>> getCTA() {
-        Long[] unitPositionIds = {35682L,35681L};
-        return ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, ctaService.getunitPositionIdWithLocalDateCTAMap(Arrays.asList(unitPositionIds),new Date(1530383400000l), new Date(1532975400000l)));
+    @RequestMapping("/ShiftPlanning")
+    ResponseEntity<Map<String, Object>> initializeShiftPlanning() {
+        Long[] staffIds = {};
+        shiftPlanningInitializationService.initializeShiftPlanning(25120L, new Date(1530383400000l), new Date(1532975400000l), staffIds);
+
+        return ResponseHandler.generateResponse(" Data fetched sucessFully", HttpStatus.FOUND);
     }
 
-    @RequestMapping("/getWTA")
+    /*@RequestMapping("/getWTA")
     ResponseEntity<Map<String, Object>> getWTA() {
         Long[] unitPositionIds = {35682L,35681L};
         return ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, activityMongoRepository.getWTARuleTemplateByUnitPositionIds(unitPositionIds));
@@ -59,5 +61,5 @@ private CTAService ctaService;
     ResponseEntity<Map<String, Object>> getShifts() {
         Long[] unitPositionIds = {35682L,35681L};
         return ResponseHandler.generateResponseWithData(" Data fetched sucessFully", HttpStatus.FOUND, activityMongoRepository.getAllShiftsByUnitPositionIds(unitPositionIds, new Date(1530383400000l), new Date(1532975400000l)));
-    }
+    }*/
 }

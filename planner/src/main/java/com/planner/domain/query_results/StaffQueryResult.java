@@ -30,11 +30,11 @@ public class StaffQueryResult {
         this.staffName = staffName;
     }
 
-    public Long getStaffUnitPositions() {
+    public Long getStaffUnitPosition() {
         return unitPositionsId;
     }
 
-    public void setStaffUnitPositions(Long staffUnitPositions) {
+    public void setStaffUnitPosition(Long staffUnitPositions) {
         this.unitPositionsId = staffUnitPositions;
     }
 
