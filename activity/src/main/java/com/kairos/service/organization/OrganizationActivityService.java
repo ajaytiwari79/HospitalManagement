@@ -273,7 +273,8 @@ public class OrganizationActivityService extends MongoBaseService {
         List<DayType> dayTypes = organizationRestClient.getDayTypes(unitId);
         Activity activity = activityMongoRepository.findOne(activityId);
         TimeCalculationActivityTab timeCalculationActivityTab = activity.getTimeCalculationActivityTab();
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes);
+        List<Long> rulesTabDayTypes= activity.getRulesActivityTab().getDayTypes();
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes,rulesTabDayTypes);
         return activityTabsWrapper;
     }
 
