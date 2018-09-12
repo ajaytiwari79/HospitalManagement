@@ -4,23 +4,23 @@ import java.math.BigInteger;
 import java.util.List;
 
 public class DashboardKPIsDTO {
-    private BigInteger dashboartId;
+    private BigInteger dashboardId;
     private List<BigInteger> kpiIds;
 
     public DashboardKPIsDTO() {
     }
 
-    public DashboardKPIsDTO(BigInteger dashboartId, List<BigInteger> kpiIds) {
-        this.dashboartId = dashboartId;
+    public DashboardKPIsDTO(BigInteger dashboardId, List<BigInteger> kpiIds) {
+        this.dashboardId = dashboardId;
         this.kpiIds = kpiIds;
     }
 
-    public BigInteger getDashboartId() {
-        return dashboartId;
+    public BigInteger getDashboardId() {
+        return dashboardId;
     }
 
-    public void setDashboartId(BigInteger dashboartId) {
-        this.dashboartId = dashboartId;
+    public void setDashboardId(BigInteger dashboardId) {
+        this.dashboardId = dashboardId;
     }
 
     public List<BigInteger> getKpiIds() {

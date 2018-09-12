@@ -410,16 +410,16 @@ public class CounterDistService extends MongoBaseService {
       }
       List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
       List<BigInteger> dashboardIds = kpiDashboardDTOS.stream().map(kpiDashboardDTO -> kpiDashboardDTO.getId()).collect(Collectors.toList());
-      if (!dashboardIds.contains(dashboardKPIsDTO.getDashboartId())) {
+      if (!dashboardIds.contains(dashboardKPIsDTO.getDashboardId())) {
           exceptionService.dataNotFoundByIdException("error.kpi_category.availability");
       }
       List<DashboardKPIConf> dashboardKPIConfs = counterRepository.getDashboardKPIConfs(dashboardKPIsDTO.getKpiIds(), dashboardIds);
       List<BigInteger> availableDashboardIds = dashboardKPIConfs.stream().map(dashboardKPIConf -> dashboardKPIConf.getDashboardId()).collect(toList());
-      if (availableDashboardIds.contains(dashboardKPIsDTO.getDashboartId())) {
+      if (availableDashboardIds.contains(dashboardKPIsDTO.getDashboardId())) {
           exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
       }
       List<DashboardKPIConf> newDashboardKPIConf = new ArrayList<>();
-      applicableKPIS.parallelStream().forEach(applicableKPI -> newDashboardKPIConf.add(new DashboardKPIConf(applicableKPI.getActiveKpiId(), dashboardKPIsDTO.getDashboartId(), countryId, unitId, null, level)));
+      applicableKPIS.parallelStream().forEach(applicableKPI -> newDashboardKPIConf.add(new DashboardKPIConf(applicableKPI.getActiveKpiId(), dashboardKPIsDTO.getDashboardId(), countryId, unitId, null, level)));
       if (!newDashboardKPIConf.isEmpty()) {
           save(newDashboardKPIConf);
           counterRepository.removeDashboardKPIEntries(availableDashboardIds, dashboardKPIsDTO.getKpiIds());

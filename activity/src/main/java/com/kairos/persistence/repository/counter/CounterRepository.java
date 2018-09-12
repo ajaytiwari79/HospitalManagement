@@ -397,7 +397,7 @@ public class CounterRepository {
         Aggregation ag = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("dashboardId").in(dashboardIds))
                 , Aggregation.group("dashboardId").push("kpiId").as("kpiIds")
-                , Aggregation.project().and("_id").as("categoryId").and("kpiIds").as("kpiId")
+                , Aggregation.project().and("_id").as("dashboardId").and("kpiIds").as("kpiId")
         );
         AggregationResults<DashboardKPIMappingDTO> results = mongoTemplate.aggregate(ag, DashboardKPIConf.class, DashboardKPIMappingDTO.class);
         return results.getMappedResults();

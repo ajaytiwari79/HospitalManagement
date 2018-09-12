@@ -4,6 +4,8 @@ import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIsDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIMappingDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
@@ -204,6 +206,60 @@ public class CounterDistController {
         counterManagementService.removeOrgTypeKPIEntries(orgTypeMappingDTO,countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
+
+    //dashboard setting kpi conf
+
+
+    @GetMapping(COUNTRY_URL+COUNTER_DIST_URL+"/dashboard")
+    public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistributionDataForCountry(@PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDistData(countryId, ConfLevel.COUNTRY));
+    }
+
+    @PostMapping(COUNTRY_URL+COUNTER_DIST_URL+"/dashboard")
+    public ResponseEntity<Map<String, Object>> saveDashboardKPIDistributionForCountry(@RequestBody DashboardKPIsDTO dashboardKPIsDTO, @PathVariable Long countryId){
+        counterManagementService.addDashboradKPIsDistribution(dashboardKPIsDTO, ConfLevel.COUNTRY, countryId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @GetMapping(UNIT_URL+COUNTER_DIST_URL+"/dashboard")
+    public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistributionDataForUnit(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDistData(unitId, ConfLevel.UNIT));
+    }
+
+    @PostMapping(UNIT_URL+COUNTER_DIST_URL+"/dashboard")
+    public ResponseEntity<Map<String, Object>> saveDashboardKPIDistributionUnit(@RequestBody DashboardKPIsDTO dashboardKPIsDTO, @PathVariable Long unitId){
+        counterManagementService.addDashboradKPIsDistribution(dashboardKPIsDTO, ConfLevel.UNIT, unitId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+
+    @PutMapping(COUNTRY_URL+COUNTER_DIST_URL+"/dashboard/remove_dist_entry")
+    public ResponseEntity<Map<String, Object>> removeDashboardKPIEntryForCountry(@PathVariable Long countryId, @RequestBody DashboardKPIMappingDTO dashboardKPIMappingDTO){
+        counterManagementService.removeDashboradKPIEntries(dashboardKPIMappingDTO,countryId,ConfLevel.COUNTRY);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @PutMapping(UNIT_URL+COUNTER_DIST_URL+"/dashboard/remove_dist_entry")
+    public ResponseEntity<Map<String, Object>> removeDashboardKPIEntryForUnit(@PathVariable Long unitId, @RequestBody DashboardKPIMappingDTO dashboardKPIMappingDTO){
+        counterManagementService.removeDashboradKPIEntries(dashboardKPIMappingDTO,unitId,ConfLevel.UNIT);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    //
+//    @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/{tabId}/update_dist_entry")
+//    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForStaff(@PathVariable String tabId,@PathVariable Long unitId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
+//        counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,tabId,unitId,ConfLevel.STAFF);
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+//    }
+
+
+//    @GetMapping(UNIT_URL+COUNTER_DIST_URL+"/staff/dashboard")
+//    public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistributionDataForStaff(@PathVariable Long unitId){
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDataConfForStaff(unitId));
+//    }
+
+
+
 
     //defalut setting for unit and staff
 

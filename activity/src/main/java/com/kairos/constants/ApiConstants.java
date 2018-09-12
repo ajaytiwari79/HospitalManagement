@@ -32,7 +32,7 @@ public final class ApiConstants {
     public static final String COUNTRY_ACTIVITY_CONFIGURATION=COUNTRY_URL+"/activity_configuration";
     public static final String UNIT_ACTIVITY_CONFIGURATION=UNIT_URL+"/activity_configuration";
     public static final String ACTIVITY_SHIFT_STATUS_SETTINGS_URL =UNIT_URL+"/activity_shift_status_settings";
-    public static final String DASHBOARD_URL="dashboard_tab";
+    public static final String DASHBOARD_URL="/dashboard_tab";
 
     //RestClientURL
     public static final String CTA_BASIC_INFO = COUNTRY_URL+"/cta_basic_info";
