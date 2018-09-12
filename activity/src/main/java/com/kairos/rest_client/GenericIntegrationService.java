@@ -5,6 +5,8 @@ import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
+import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
@@ -111,6 +113,7 @@ public class GenericIntegrationService {
         }
         return value.longValue();
     }
+
 
     public AccessGroupPermissionCounterDTO getAccessGroupIdsAndCountryAdmin(Long unitId){
             return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/staff/user/accessgroup",null),AccessGroupPermissionCounterDTO.class);

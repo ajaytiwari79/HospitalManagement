@@ -2,6 +2,8 @@ package com.kairos.persistence.repository.cta;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
+import com.kairos.persistence.model.wta.WTAQueryResultDTO;
+import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import org.bson.Document;
@@ -133,5 +135,19 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation,CostTimeAgreement.class,CTAResponseDTO.class);
         return result.getMappedResults();
     }
+
+
+    @Override
+    public List<CTAResponseDTO> getCTAByUnitPositionIds(List<Long> unitPositionIds, Date date) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
+                project("name", "description", "disabled", "expertise", "organizationType", "organizationSubType", "countryId", "organization", "parentId", "parentCountryCTAId", "startDate", "endDate", "ruleTemplates","unitPositionId")
+        );
+        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
+        return result.getMappedResults().size() > 0 ? result.getMappedResults() : null;
+    }
+
 
 }
