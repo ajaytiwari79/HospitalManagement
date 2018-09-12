@@ -3,6 +3,7 @@ package com.kairos.service.dashboard;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
+import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.activity.Activity;
@@ -134,7 +135,8 @@ public class SickService {
                 if (validRepetitionDays.contains(differenceOfDaysFromCurrentDateToLastSickDate)) {
                     logger.info("The current user is still sick so we need to add more shifts {}", differenceOfDaysFromCurrentDateToLastSickDate);
                     List<Shift> currentStaffShifts = staffWiseShiftMap.get(currentSickSettings.getStaffId()) != null ? staffWiseShiftMap.get(currentSickSettings.getStaffId()) : new ArrayList<>();
-                    shiftSickService.createSicknessShiftsOfStaff(currentSickSettings.getStaffId(), unitId, activity, currentSickSettings.getUnitPositionId(), currentStaffShifts);
+                    Duration duration= new Duration();
+                    //shiftSickService.createSicknessShiftsOfStaff(currentSickSettings.getStaffId(), unitId, activity, currentSickSettings.getUnitPositionId(), currentStaffShifts,duration);
                 }
             });
 

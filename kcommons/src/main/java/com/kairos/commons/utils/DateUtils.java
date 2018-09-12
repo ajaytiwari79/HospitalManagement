@@ -672,8 +672,8 @@ public class DateUtils {
         return localDate.get(woy);
     }
 
-    public static Date getDateAfterDaysWithTime(short daysAfter, int startHour) {
-        return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atStartOfDay().with(LocalTime.of(startHour, 00)).toInstant(ZoneOffset.UTC));
+    public static Date getDateAfterDaysWithTime(short daysAfter, LocalTime duration) {
+        return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atStartOfDay().with(duration).toInstant(ZoneOffset.UTC));
     }
 
     public static LocalDate getLocalDateFromString(String receivedDate) {
