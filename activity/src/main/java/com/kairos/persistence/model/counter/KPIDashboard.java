@@ -12,8 +12,9 @@ public class KPIDashboard extends MongoBaseEntity{
     private Long staffId;
     private ConfLevel level;
 
-    public KPIDashboard(String parentModuleId, String name, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+    public KPIDashboard(String parentModuleId,String moduleId, String name, Long countryId, Long unitId, Long staffId, ConfLevel level) {
         this.parentModuleId = parentModuleId;
+        this.moduleId=moduleId;
         this.name = name;
         this.countryId = countryId;
         this.unitId = unitId;

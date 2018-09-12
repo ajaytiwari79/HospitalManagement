@@ -48,7 +48,7 @@ public class DynamicTabService extends MongoBaseService {
         verifyForDashboardTabAvailability(names, unitId,staffId, countryId, level);
         List<KPIDashboard> kpiDashboards = new ArrayList<>();
         kpiDashboardDTOS.stream().forEach(kpiDashboardDTO -> {
-            kpiDashboards.add(new KPIDashboard(kpiDashboardDTO.getParentModuleId(), kpiDashboardDTO.getName(), countryId, unitId,staffId, level));
+            kpiDashboards.add(new KPIDashboard(kpiDashboardDTO.getParentModuleId(),kpiDashboardDTO.getModuleId(), kpiDashboardDTO.getName(), countryId, unitId,staffId, level));
         });
         save(kpiDashboards);
         kpiDashboards.stream().forEach(kpiDashboard -> {

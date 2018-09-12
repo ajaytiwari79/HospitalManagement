@@ -348,8 +348,9 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPIDashboard.class),KPIDashboardDTO.class);
     }
 
-    public List<DashboardKPIConf> getDashboardKPIConfs(List<BigInteger> kpiIds,List<BigInteger> dashboardIds){
-        Query query = new Query(Criteria.where("kpiId").in(kpiIds).and("dashboardId").in(dashboardIds));
+    public List<DashboardKPIConf> getDashboardKPIConfs(List<BigInteger> kpiIds,List<BigInteger> dashboardIds,Long refId,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("kpiId").in(kpiIds).and("dashboardId").in(dashboardIds).and(refQueryField).is(refId).and("level").is(level));
         return mongoTemplate.find(query, DashboardKPIConf.class);
     }
 
