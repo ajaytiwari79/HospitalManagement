@@ -284,7 +284,7 @@ public class PhaseService extends MongoBaseService {
      * @param date
      * @return phase
      */
-    public Phase getCurrentPhaseByDate(Long unitId,Date date){
+    public Phase getCurrentPhaseByUnitIdAndDate(Long unitId, Date date){
         LocalDate upcomingMondayDate = DateUtils.getDateForUpcomingDay(LocalDate.now(), DayOfWeek.MONDAY);
         LocalDate requestedDate=DateUtils.asLocalDate(date);
         Phase phase;

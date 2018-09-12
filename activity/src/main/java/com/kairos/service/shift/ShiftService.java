@@ -233,7 +233,7 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
         ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO, activity);
 
-        Phase phase = phaseService.getCurrentPhaseByDate(shiftDTO.getUnitId(), shiftDTO.getStartDate());
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getStartDate());
         shiftWithActivityDTO.setPlannedTypeId(addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activity, staffAdditionalInfoDTO));
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftStartDate);
         ViolatedRulesDTO violatedRulesDTO = validateShiftWithActivity(phase,wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
@@ -505,7 +505,7 @@ public class ShiftService extends MongoBaseService {
         List<Shift> shifts = new ArrayList<>(shiftDTOS.size());
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>(shiftDTOS.size());
         Set<DayOfWeek> activityDayTypes = new HashSet<>();
-        Phase phase = phaseService.getCurrentPhaseByDate(shifts.get(0).getUnitId(), shifts.get(0).getStartDate());
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shifts.get(0).getUnitId(), shifts.get(0).getStartDate());
         if (staffAdditionalInfoDTO.getDayTypes() != null && !staffAdditionalInfoDTO.getDayTypes().isEmpty()) {
             activityDayTypes = getValidDays(staffAdditionalInfoDTO.getDayTypes(), activity.getTimeCalculationActivityTab().getDayTypes());
         }
@@ -569,7 +569,7 @@ public class ShiftService extends MongoBaseService {
         BeanUtils.copyProperties(shift, oldStateOfShift);
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
         ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO, activity);
-        Phase phase = phaseService.getCurrentPhaseByDate(shiftDTO.getUnitId(), shiftDTO.getStartDate());
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getStartDate());
         shiftWithActivityDTO.setPlannedTypeId(addPlannedTimeInShift(organizationId, phase.getId(), activity, staffAdditionalInfoDTO));
         ViolatedRulesDTO violatedRulesDTO = validateShiftWithActivity(phase,wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         shift = buildShift(shiftWithActivityDTO);
@@ -655,7 +655,7 @@ public class ShiftService extends MongoBaseService {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId());
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(),shift.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
-        Phase phase = phaseService.getCurrentPhaseByDate(shift.getUnitId(), shift.getStartDate());
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate());
         validateStaffingLevel(phase,shift, activity, false, staffAdditionalInfoDTO);
         Specification<BigInteger> shiftAllowedToDelete = new ShiftAllowedToDelete(activity.getRulesActivityTab().getEligibleForSchedules(), staffAdditionalInfoDTO.getUserAccessRoleDTO());
         Specification<BigInteger> activitySpecification = shiftAllowedToDelete;
@@ -840,7 +840,7 @@ public class ShiftService extends MongoBaseService {
         shiftWithActivityDTO.setActivity(activity);
         shiftWithActivityDTO.setUnitId(unitId);
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftDTO.getStartDate());
-        Phase phase = phaseService.getCurrentPhaseByDate(shift.getUnitId(), shift.getStartDate());
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate());
         ViolatedRulesDTO violatedRulesDTO = validateShiftWithActivity(phase,wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
         ShiftQueryResult shiftQueryResult;
         List<Shift> shifts = null;
