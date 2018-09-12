@@ -35,13 +35,15 @@ public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGrou
             "id(level) as levelId,id(rel) as id,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis")
     List<PayGroupAreaQueryResult> findPayGroupAreaByLevelAndMunicipality(Long levelId, Long municipalityId, Long currentRelationId);
 
-    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(rel)={0} AND id(payGroupArea)={1} AND id(municipality)={2} \n" +
+    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]->(municipality:Municipality) where id(rel)={0} AND id(payGroupArea)={1} AND id(municipality)={2} \n" +
             "SET rel.endDateMillis ={3}")
     void updateEndDateOfPayGroupArea(Long id, Long payGroupAreaId, Long municipalityId, Long dateOneDayLessStartDate);
 
-    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(payGroupArea)={0} AND id(municipality)={1} AND id(rel)={2}\n" +
-            "DETACH DELETE rel")
-    void removePayGroupAreaFromMunicipality(Long payGroupAreaId, Long municipalityId, Long relationshipId);
+    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]->(municipality:Municipality) where id(payGroupArea)={0} AND id(municipality)={1} AND id(rel)={2}\n" +
+            "DETACH DELETE rel with payGroupArea " +
+            "MATCH (payGroupArea)-[linkedMunicipacity:" + HAS_MUNICIPALITY + "]->(municipality:Municipality) " +
+            "return count(linkedMunicipacity)")
+    int removePayGroupAreaFromMunicipality(Long payGroupAreaId, Long municipalityId, Long relationshipId);
 
     @Query("MATCH (level:Level)<-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false}) where id(level)={0} and lower(payGroupArea.name)=lower({1}) " +
             " with count(payGroupArea) as payGroupAreaCount " +
