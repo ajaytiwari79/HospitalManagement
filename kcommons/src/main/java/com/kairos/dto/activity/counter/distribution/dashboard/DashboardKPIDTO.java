@@ -7,7 +7,7 @@ import java.math.BigInteger;
 
 public class DashboardKPIDTO {
     private BigInteger id;
-    private String tabId;
+    private String dashboardId;
     private KPIDTO kpi;
     private String data;
     private KPIPosition position;
@@ -20,12 +20,12 @@ public class DashboardKPIDTO {
         this.id = id;
     }
 
-    public String getTabId() {
-        return tabId;
+    public String getDashboardId() {
+        return dashboardId;
     }
 
-    public void setTabId(String tabId) {
-        this.tabId = tabId;
+    public void setDashboardId(String dashboardId) {
+        this.dashboardId = dashboardId;
     }
 
     public KPIDTO getKpi() {
