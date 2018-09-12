@@ -419,7 +419,7 @@ public class CounterDistService extends MongoBaseService {
           exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
       }
       List<DashboardKPIConf> newDashboardKPIConf = new ArrayList<>();
-      applicableKPIS.parallelStream().forEach(applicableKPI -> newDashboardKPIConf.add(new DashboardKPIConf(applicableKPI.getActiveKpiId(), dashboardKPIsDTO.getDashboardId(), countryId, unitId, null, level)));
+      applicableKPIS.parallelStream().forEach(applicableKPI -> newDashboardKPIConf.add(new DashboardKPIConf(applicableKPI.getActiveKpiId(), dashboardKPIsDTO.getDashboardId(), countryId, unitId, null, level,null)));
       if (!newDashboardKPIConf.isEmpty()) {
           save(newDashboardKPIConf);
           //counterRepository.removeDashboardKPIEntries(availableDashboardIds, dashboardKPIsDTO.getKpiIds());
@@ -432,6 +432,47 @@ public class CounterDistService extends MongoBaseService {
           }
           counterRepository.removeDashboardKPIConfiguration(dashboardKPIMappingDTO,refId,level);
       }
+
+    public List<DashboardKPIDTO> addDashboardKPIEntriesOfStaff(List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS,Long unitId,ConfLevel level){
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+        //  Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
+        List<DashboardKPIConf> entriesToSave = new ArrayList<>();
+        List<String> dashboardIds=dashboardKPIMappingDTOS.stream().map(dashboardKPIMappingDTO -> dashboardKPIMappingDTO.getDashboardId()).collect(toList());
+        List<BigInteger> kpiIds=dashboardKPIMappingDTOS.stream().map(dashboardKPIMappingDTO  -> dashboardKPIMappingDTO.getKpiId()).collect(toList());
+        Map<String, Map<BigInteger, BigInteger>> tabKpiMap=setDashboardKPIEntries(dashboardIds,kpiIds,entriesToSave,null,null,accessGroupPermissionCounterDTO.getStaffId(),level,accessGroupPermissionCounterDTO.getCountryAdmin());
+        dashboardKPIMappingDTOS.stream().forEach(dashboardKPIMappingDTO  -> {
+            if(tabKpiMap.get(dashboardKPIMappingDTO.getDashboardId()).get(dashboardKPIMappingDTO.getKpiId())==null){
+                entriesToSave.add(new DashboardKPIConf(dashboardKPIMappingDTO.getKpiId(),dashboardKPIMappingDTO.getId(),null,unitId,accessGroupPermissionCounterDTO.getStaffId(),level,dashboardKPIMappingDTO.getPosition()));
+            }
+        });
+        if (entriesToSave.isEmpty()) {
+            exceptionService.invalidRequestException("error.kpi.invalidData");
+        }
+        save(entriesToSave);
+        return null;// counterRepository.getTabKPIForStaffByTabAndStaffId(dashboardIds,kpiIds,accessGroupPermissionCounterDTO.getStaffId(),unitId,level);
+    }
+
+    public Map<String, Map<BigInteger, BigInteger>> setDashboardKPIEntries(List<String> dashboardsIds,List<BigInteger> kpiIds,List<DashboardKPIConf> entriesToSave,Long countryId,Long unitId,Long staffId, ConfLevel level,boolean isCountryAdmin){
+        Long refId = ConfLevel.COUNTRY.equals(level) ? countryId : unitId;
+        if(ConfLevel.STAFF.equals(level)){
+            refId=staffId;
+        }
+        List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS = counterRepository.getDashboardKPIConfigurationByTabIds(dashboardsIds,kpiIds,refId,level);
+        if(!isCountryAdmin) {
+            List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(kpiIds, refId, level);
+            if (kpiIds.size() != applicableKPIS.size()) {
+                exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
+            }
+        }
+        Map<String, Map<BigInteger, BigInteger>> dashboardKpiMap = new HashMap<>();
+        dashboardsIds.forEach(tabKpiId -> {
+            dashboardKpiMap.put(tabKpiId, new HashMap<BigInteger, BigInteger>());
+        });
+        dashboardKPIMappingDTOS.forEach(dashboardKPIMappingDTO  -> {
+            dashboardKpiMap.get(dashboardKPIMappingDTO.getDashboardId()).put(dashboardKPIMappingDTO.getKpiId(), dashboardKPIMappingDTO.getKpiId());
+        });
+        return  dashboardKpiMap;
+    }
 
     public void updateDashboardKPIEntries(List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS,String tabId,Long unitId, ConfLevel level) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
@@ -490,7 +531,7 @@ public class CounterDistService extends MongoBaseService {
                     tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, null, staffId, ConfLevel.STAFF,tabKPIConfKPI.getPosition()));
                 });
                 dashboardKPIConfList.stream().forEach(dashboardKPIConf  -> {
-                    dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(),dashboardsOldAndNewIds.get(dashboardKPIConf.getDashboardId()),null,unitId,staffId,ConfLevel.STAFF));
+                    dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(),dashboardsOldAndNewIds.get(dashboardKPIConf.getDashboardId()),null,unitId,staffId,ConfLevel.STAFF,dashboardKPIConf.getPosition()));
                 });
             });
         }
@@ -563,7 +604,7 @@ public class CounterDistService extends MongoBaseService {
         List<BigInteger> oldDashboardsIds=kpiDashboardDTOS.stream().map(kpiDashboardDTO  -> kpiDashboardDTO.getId()).collect(Collectors.toList());
         List<DashboardKPIConf> dashboardKPIConfList = counterRepository.getDashboardKPIConfs(applicableKpiIds,oldDashboardsIds,refId,level);
         dashboardKPIConfList.stream().forEach(dashboardKPIConf  -> {
-            dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(),dashboardsOldAndNewIds.get(dashboardKPIConf.getDashboardId()),null,unitId,null,ConfLevel.UNIT));
+            dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(),dashboardsOldAndNewIds.get(dashboardKPIConf.getDashboardId()),null,unitId,null,ConfLevel.UNIT,dashboardKPIConf.getPosition()));
         });
         List<ApplicableKPI> applicableKPISToSave = new ArrayList<>();
         applicableKpiIds.forEach(kpiId -> {

@@ -18,14 +18,16 @@ public class DashboardKPIConf extends MongoBaseEntity {
     private KPIPosition position;
 
 
-    public DashboardKPIConf(BigInteger kpiId, BigInteger dashboardId, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+    public DashboardKPIConf(BigInteger kpiId, BigInteger dashboardId, Long countryId, Long unitId, Long staffId, ConfLevel level,KPIPosition position) {
         this.kpiId = kpiId;
         this.dashboardId = dashboardId;
         this.countryId = countryId;
         this.unitId = unitId;
         this.staffId = staffId;
         this.level = level;
+        this.position=position;
     }
+
 
     public CounterSize getSize() {
         return size;

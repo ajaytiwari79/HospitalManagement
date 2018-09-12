@@ -409,6 +409,17 @@ public class CounterRepository {
         return mongoTemplate.find(query,DashboardKPIConf.class);
     }
 
+    public List<DashboardKPIMappingDTO> getDashboardKPIConfigurationByTabIds(List<String> dashboardIds,List<BigInteger> kpiIds, Long refId, ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query=null;
+        if(kpiIds.isEmpty()) {
+            query=new Query(Criteria.where("dashboardId").in(dashboardIds).and(refQueryField).is(refId).and("level").is(level));
+        }else{
+            query=new Query(Criteria.where("dashboardId").in(dashboardIds).and("kpiId").in(kpiIds).and(refQueryField).is(refId).and("level").is(level));
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,DashboardKPIConf.class),DashboardKPIMappingDTO.class);
+    }
+
 //    public List<KPIAccessPageDTO> getKPIAcceccPageForCountry(Long countryId,ConfLevel level){
 //        String refQueryField = getRefQueryField(level);
 //    }

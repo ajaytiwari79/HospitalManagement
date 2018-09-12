@@ -246,24 +246,21 @@ public class CounterDistController {
     }
 
     @GetMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/{dashboardId}")
-    public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String tabId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDataConfForStaff(tabId,unitId, ConfLevel.STAFF));
+    public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String dashboardId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDataConfForStaff(dashboardId,unitId, ConfLevel.STAFF));
     }
 
 
     @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/{dashboardId}/update_dist_entry")
-    public ResponseEntity<Map<String, Object>> updateDashboardKPIsEntryForStaff(@PathVariable String tabId,@PathVariable Long unitId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
-        counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,tabId,unitId,ConfLevel.STAFF);
+    public ResponseEntity<Map<String, Object>> updateDashboardKPIsEntryForStaff(@PathVariable String dashboardId,@PathVariable Long unitId,@RequestBody List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS){
+        counterManagementService.updateDashboardKPIEntries(dashboardKPIMappingDTOS,dashboardId,unitId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
-
-//    @GetMapping(UNIT_URL+COUNTER_DIST_URL+"/staff/dashboard")
-//    public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistributionDataForStaff(@PathVariable Long unitId){
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDataConfForStaff(unitId));
-//    }
-
-
+    @PostMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/create_dist_entry")
+    public ResponseEntity<Map<String, Object>> addDashboardKPIsEntryForStaff(@PathVariable Long unitId,@RequestBody List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,counterManagementService.addDashboardKPIEntriesOfStaff(dashboardKPIMappingDTOS,unitId,ConfLevel.STAFF));
+    }
 
 
     //defalut setting for unit and staff
