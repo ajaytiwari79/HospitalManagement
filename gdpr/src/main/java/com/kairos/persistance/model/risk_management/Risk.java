@@ -1,5 +1,6 @@
 package com.kairos.persistance.model.risk_management;
 
+import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,23 +14,21 @@ public class Risk extends MongoBaseEntity {
 
     @NotBlank(message = "Name can't be Empty")
     private String name;
-
     @NotBlank(message = "Description can't be Empty")
     private String description;
-
     private Long countryId;
-
     @NotBlank(message = "Mention Recommendation")
     private String riskRecommendation;
-
     private LocalDate dueDate;
-
     private boolean isReminderActive;
-
     private int daysToReminderBefore;
-
+    private Staff riskOwner;
     @NotNull(message = "Risk Level can't be null")
     private RiskSeverity riskLevel;
+
+    public Staff getRiskOwner() { return riskOwner; }
+
+    public void setRiskOwner(Staff riskOwner) { this.riskOwner = riskOwner; }
 
     public String getName() {
         return name;
