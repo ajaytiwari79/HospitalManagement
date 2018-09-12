@@ -478,10 +478,7 @@ public class ProcessingActivityService extends MongoBaseService {
      * @param processingActivityRiskDTOS
      */
     public List<ProcessingActivityRiskDTO> createRiskAndLinkWithProcessingActivities(Long unitId, BigInteger processingActivityId, List<ProcessingActivityRiskDTO> processingActivityRiskDTOS) {
-        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
-        if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
-        }
+
         Set<BigInteger> processingAndSubProcessingActivityIdList = new HashSet<>();
         Map<BigInteger, List<OrganizationLevelRiskDTO>> riskListCorrespondingToProcessingActivityId = new HashMap<>();
         processingActivityRiskDTOS.forEach(processingActivityRiskDTO -> {
