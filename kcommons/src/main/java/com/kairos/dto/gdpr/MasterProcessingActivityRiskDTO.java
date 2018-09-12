@@ -1,7 +1,7 @@
 package com.kairos.dto.gdpr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.gdpr.data_inventory.RiskDTO;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -15,7 +15,7 @@ public class MasterProcessingActivityRiskDTO {
     private BigInteger id;
 
     @Valid
-    private List<RiskDTO> risks=new ArrayList<>();
+    private List<BasicRiskDTO> risks=new ArrayList<>();
 
     @Valid
     private List<MasterProcessingActivityRiskDTO> subProcessingActivities=new ArrayList<>();
@@ -24,9 +24,9 @@ public class MasterProcessingActivityRiskDTO {
 
     public void setId(BigInteger id) { this.id = id; }
 
-    public List<RiskDTO> getRisks() { return risks; }
+    public List<BasicRiskDTO> getRisks() { return risks; }
 
-    public void setRisks(List<RiskDTO> risks) { this.risks = risks; }
+    public void setRisks(List<BasicRiskDTO> risks) { this.risks = risks; }
 
     public List<MasterProcessingActivityRiskDTO> getSubProcessingActivities() { return subProcessingActivities; }
 

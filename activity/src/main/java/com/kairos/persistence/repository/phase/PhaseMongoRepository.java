@@ -26,7 +26,7 @@ public interface PhaseMongoRepository extends MongoBaseRepository<Phase, BigInte
 
     List<PhaseDTO> findByCountryIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(Long countryId);
 
-    List<Phase> findByOrganizationIdAndPhaseTypeAndDeletedFalseAndDurationGreaterThan(Long unitId, String PhaseType, Long duration);
+    List<Phase> findByOrganizationIdAndPhaseTypeAndDeletedFalse(Long unitId, String PhaseType);
 
     List<Phase> findByOrganizationIdAndDeletedFalse(Long unitId);
 

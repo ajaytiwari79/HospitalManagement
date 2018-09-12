@@ -63,6 +63,12 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private List<BigInteger> assessments=new ArrayList<>();
 
+    private List<BigInteger> risks=new ArrayList<>();
+
+    public List<BigInteger> getRisks() { return risks; }
+
+    public void setRisks(List<BigInteger> risks) { this.risks = risks; }
+
     public List<ProcessingActivityRelatedDataSubject> getDataSubjects() { return dataSubjects; }
 
     public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) { this.dataSubjects = dataSubjects; }
