@@ -354,12 +354,12 @@ public class CounterRepository {
         return mongoTemplate.find(query, DashboardKPIConf.class);
     }
 
-    public List<DashboardKPIDTO> getDashboardKPIForStaffByTabAndStaffId(List<String> tabIds, List<BigInteger> kpiIds, Long staffId, Long unitId, ConfLevel level){
+    public List<DashboardKPIDTO> getDashboardKPIForStaffByTabAndStaffId(List<String> dashboardIds, List<BigInteger> kpiIds, Long staffId, Long unitId, ConfLevel level){
         Criteria criteria;
         if(kpiIds.isEmpty()) {
-            criteria=Criteria.where("dashboardId").in(tabIds).and("staffId").is(staffId).and("unitId").is(unitId).and("level").is(level);
+            criteria=Criteria.where("dashboardId").in(dashboardIds).and("staffId").is(staffId).and("unitId").is(unitId).and("level").is(level);
         }else{
-            criteria=Criteria.where("dashboardId").in(tabIds).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level);
+            criteria=Criteria.where("dashboardId").in(dashboardIds).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level);
         }
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(criteria),
