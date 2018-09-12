@@ -10,8 +10,8 @@ import java.util.Set;
  * Created by vipul on 9/5/18.
  */
 public class ShiftPublishDTO {
-    List<BigInteger> shiftIds;
-    List<ShiftStatus> status;
+    private List<BigInteger> shiftIds;
+    private List<ShiftStatus> status;
 
 
     public ShiftPublishDTO() {
