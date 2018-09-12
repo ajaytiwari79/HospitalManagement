@@ -21,6 +21,7 @@ public class DashboardKPIDTO {
         this.id = id;
     }
 
+
     public BigInteger getDashboardId() {
         return dashboardId;
     }
