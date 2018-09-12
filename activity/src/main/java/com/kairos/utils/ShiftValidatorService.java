@@ -157,16 +157,16 @@ public class ShiftValidatorService {
         }
         switch (intervalUnit) {
             case DAYS:
-                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getEndDate()).plusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getActivities().get(0).getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getActivities().get(0).getEndDate()).plusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
             case WEEKS:
-                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getEndDate()).plusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getActivities().get(0).getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getActivities().get(0).getEndDate()).plusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
             case MONTHS:
-                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getEndDate()).plusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getActivities().get(0).getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getActivities().get(0).getEndDate()).plusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
             case YEARS:
-                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getActivities().get(0).getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getActivities().get(0).getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
         }
         return interval;
@@ -248,7 +248,7 @@ public class ShiftValidatorService {
 
 
     public static DateTimeInterval getIntervalByRuleTemplates(ShiftWithActivityDTO shift, List<WTABaseRuleTemplate> wtaBaseRuleTemplates) {
-        DateTimeInterval interval = new DateTimeInterval(shift.getStartDate().getTime(), shift.getEndDate().getTime());
+        DateTimeInterval interval = new DateTimeInterval(shift.getActivities().get(0).getStartDate().getTime(), shift.getActivities().get(0).getEndDate().getTime());
         for (WTABaseRuleTemplate ruleTemplate : wtaBaseRuleTemplates) {
             switch (ruleTemplate.getWtaTemplateType()) {
                 case NUMBER_OF_PARTOFDAY:

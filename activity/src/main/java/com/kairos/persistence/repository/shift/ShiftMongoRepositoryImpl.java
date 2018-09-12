@@ -61,7 +61,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     public List<ShiftDTO> findAllShiftsBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("unitPositionId").is(unitPositionId).and("deleted").is(false).and("disabled").is(false).and("staffId").is(staffId).and("isMainShift").is(true)
+                match(Criteria.where("unitId").is(unitId).and("unitPositionId").is(unitPositionId).and("deleted").is(false).and("disabled").is(false).and("staffId").is(staffId)
                         .and("startDate").gte(startDate).and("endDate").lte(endDate))
                 //graphLookup("shifts").startWith("$subShifts").connectFrom("subShifts").connectTo("_id").as("subShifts")
                 );
@@ -71,7 +71,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId, Date startDate, Date endDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("isMainShift").is(true).and("unitPositionId").is(unitEmploymentPositionId).and("disabled").is(false)
+                match(Criteria.where("deleted").is(false).and("unitPositionId").is(unitEmploymentPositionId).and("disabled").is(false)
                         .and("startDate").lte(endDate).and("endDate").gte(startDate)),
                 //graphLookup("shifts").startWith("$subShifts").connectFrom("subShifts").connectTo("_id").as("subShift"),
                 unwind("subShifts", true),
@@ -81,7 +81,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                         .andInclude("deleted")
                         .andInclude("startDate")
                         .andInclude("endDate").andInclude("scheduledMinutes").andInclude("durationMinutes")
-                        .andInclude("isMainShift").andInclude("subShift")
+                        .andInclude("subShift")
                         //.andInclude("subShift.startDate").andInclude("subShift.endDate")
                         .andInclude("subShift.activity")
                         .and("activity").arrayElementAt(0).as("activity")
@@ -137,7 +137,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     public List<ShiftDTO> findAllShiftsBetweenDurationOfUnitAndStaffId(Long staffId, Date startDate, Date endDate, Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("disabled").is(false).and("staffId").is(staffId).and("isMainShift").is(true)
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("disabled").is(false).and("staffId").is(staffId)
                         .and("startDate").gte(startDate).and("endDate").lte(endDate)),
                 //graphLookup("shifts").startWith("$subShifts").connectFrom("subShifts").connectTo("_id").as("subShifts"),
                 sort(Sort.Direction.ASC, "startDate"));

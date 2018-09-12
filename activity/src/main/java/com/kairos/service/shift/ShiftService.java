@@ -614,25 +614,19 @@ public class ShiftService extends MongoBaseService {
         return new ShiftWithViolatedInfoDTO(Arrays.asList(shiftDTO), violatedRulesDTO);
     }
 
-    public ShiftFunctionWrapper getShiftByStaffId(Long id, Long staffId, String startDateAsString, String endDateAsString, Long week, Long unitPositionId, String type) throws ParseException {
+    public ShiftFunctionWrapper getShiftByStaffId(Long id, Long staffId, Date startDate, Date endDate, Long week, Long unitPositionId, String type) throws ParseException {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, type, unitPositionId);
         if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent() || staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.dataNotFoundByIdException("message.staff.belongs", staffId, type);
         }
-        Date startDateInISO = DateUtils.getDate();
-        Date endDateInISO = DateUtils.getDate();
-        if (startDateAsString != null) {
-            DateFormat dateISOFormat = new SimpleDateFormat(MONGODB_QUERY_DATE_FORMAT);
-            Date startDate = dateISOFormat.parse(startDateAsString);
-            startDateInISO = new DateTime(startDate).toDate();
-            if (endDateAsString != null) {
-                Date endDate = dateISOFormat.parse(endDateAsString);
-                endDateInISO = new DateTime(endDate).toDate();
+        if (startDate == null) {
+            startDate = DateUtils.getDate();
+            if (endDate == null) {
+                endDate = DateUtils.getDate();
             }
-
         }
-        List<ShiftDTO> shifts = (Optional.ofNullable(unitPositionId).isPresent()) ? shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId()) :
-                shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
+        List<ShiftDTO> shifts = (Optional.ofNullable(unitPositionId).isPresent()) ? shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDate, endDate, staffAdditionalInfoDTO.getUnitId()) :
+                shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, startDate, endDate, staffAdditionalInfoDTO.getUnitId());
         shifts.stream().map(ShiftDTO::sortShifts).collect(Collectors.toList());
         //setShiftTimeType(shifts);
         List<AppliedFunctionDTO> appliedFunctionDTOs = null;
@@ -723,10 +717,10 @@ public class ShiftService extends MongoBaseService {
     }
 
     private RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(Phase phase, ShiftWithActivityDTO shift, WTAQueryResultDTO wtaQueryResultDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        logger.info("Current phase is " + phase.getName() + " for date " + new DateTime(shift.getStartDate()));
-        PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), DateUtils.asLocalDate(shift.getStartDate()));
+        logger.info("Current phase is " + phase.getName() + " for date " + new DateTime(shift.getActivities().get(0).getStartDate()));
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()));
         if (planningPeriod == null) {
-            exceptionService.actionNotPermittedException("message.shift.planning.period.exit", shift.getStartDate());
+            exceptionService.actionNotPermittedException("message.shift.planning.period.exit", shift.getActivities().get(0).getStartDate());
         }
         List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()));
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates());

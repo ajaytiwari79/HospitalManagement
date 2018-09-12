@@ -228,7 +228,7 @@ public class ShiftDTO {
         this.endDate = endDate;
     }
 
-    public ShiftQueryResult getQueryResults(){
+    /*public ShiftQueryResult getQueryResults(){
         ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id,
                 this.startDate,
                 this.endDate,
@@ -244,7 +244,7 @@ public class ShiftDTO {
         shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
         shiftQueryResult.setPlannedTimeId(this.plannedTimeId);
         return shiftQueryResult;
-    }
+    }*/
 
     @Override
     public String toString() {

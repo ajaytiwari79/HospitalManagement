@@ -60,8 +60,10 @@ public class ShiftController {
                                                                  @RequestParam(value = "unitPositionId", required = false) Long unitPositionId,
                                                                  @RequestParam("type") String type,
                                                                  @RequestParam(value = "week", required = false) Long week,
-                                                                 @RequestParam(value = "startDate", required = false) String startDate,
-                                                                 @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
+                                                                 @RequestParam(value = "startDate", required = false)
+                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate,
+                                                                 @RequestParam(value = "endDate", required = false)
+                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) throws ParseException {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, week, unitPositionId, type));
     }
