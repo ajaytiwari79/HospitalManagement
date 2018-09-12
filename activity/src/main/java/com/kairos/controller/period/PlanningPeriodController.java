@@ -85,10 +85,10 @@ public class PlanningPeriodController {
 
     }
     @ApiOperation(value = "restore shift base planning period and phase id")
-    @PutMapping(value = "/period/{periodId}/phase/{phaseId}/reset_phase")
+    @PutMapping(value = "/period/{periodId}/reset_phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> resetPhaseData(@PathVariable BigInteger periodId, @PathVariable Long unitId,@PathVariable BigInteger phaseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialData(periodId,phaseId,unitId));
+    public ResponseEntity<Map<String, Object>> resetPhaseData(@PathVariable BigInteger periodId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialData(periodId,unitId));
     }
 
     @ApiOperation(value = "restore shift data based on shiftIds and phase")

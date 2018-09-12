@@ -532,8 +532,12 @@ public class PlanningPeriodService extends MongoBaseService {
     /**
      * for restore shift initial data
      */
-    public boolean setShiftsDataToInitialData(BigInteger planningPeriodId, BigInteger phaseId, Long unitId){
-        List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(planningPeriodId,phaseId,unitId);
+    public boolean setShiftsDataToInitialData(BigInteger planningPeriodId, Long unitId){
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(planningPeriodId, unitId);
+        if(Optional.ofNullable(planningPeriod).isPresent()){
+            exceptionService.dataNotFoundException("message.periodsetting.notFound");
+        }
+        List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
             restoreShifts(shiftStates);
         return true;
     }
