@@ -29,6 +29,8 @@ public interface RiskMongoRepository extends MongoBaseRepository<Risk,BigInteger
     List<Risk> findRiskByUnitIdAndIds(Long unitId, List<BigInteger> riskIds);
 
 
+    @Query("{deleted:false,organizationId:?0,_id:?1}")
+    Risk findUnitIdAndId(Long unitId,BigInteger riskId);
 
 
 }

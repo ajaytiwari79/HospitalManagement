@@ -69,6 +69,10 @@ public class AssetType extends MongoBaseEntity {
         this.countryId = countryId;
     }
 
+    public AssetType(@NotBlank(message = "Name can't be empty or null") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name) {
+        this.name = name;
+    }
+
     public AssetType() {
     }
 }
