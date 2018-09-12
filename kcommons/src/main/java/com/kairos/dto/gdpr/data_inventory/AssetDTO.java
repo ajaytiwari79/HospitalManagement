@@ -32,11 +32,9 @@ public class AssetDTO {
     private String hostingLocation;
 
     @NotNull(message = "Managing department can't be empty")
-    @Valid
     private ManagingOrganization managingDepartment;
 
-    // @NotNull(message = "Asset Owner can't be Empty")
-    //@Valid
+    @NotNull(message = "Asset Owner can't be Empty")
     private Staff assetOwner;
 
     private List<BigInteger> storageFormats;

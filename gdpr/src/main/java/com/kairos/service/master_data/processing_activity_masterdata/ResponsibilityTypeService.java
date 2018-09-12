@@ -177,15 +177,15 @@ public class ResponsibilityTypeService extends MongoBaseService {
      */
     public List<ResponsibilityType> saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
-        Set<String> responsibilitytTypeNameList = new HashSet<>();
+        Set<String> responsibilityTypeNameList = new HashSet<>();
         for (ResponsibilityTypeDTO ResponsibilityType : responsibilityTypeDTOS) {
-            responsibilitytTypeNameList.add(ResponsibilityType.getName());
+            responsibilityTypeNameList.add(ResponsibilityType.getName());
         }
-        List<ResponsibilityType> existingResponsibilityTypes = findMetaDataByNamesAndCountryId(countryId, responsibilitytTypeNameList, ResponsibilityType.class);
-        responsibilitytTypeNameList = ComparisonUtils.getNameListForMetadata(existingResponsibilityTypes, responsibilitytTypeNameList);
+        List<ResponsibilityType> existingResponsibilityTypes = findMetaDataByNamesAndCountryId(countryId, responsibilityTypeNameList, ResponsibilityType.class);
+        responsibilityTypeNameList = ComparisonUtils.getNameListForMetadata(existingResponsibilityTypes, responsibilityTypeNameList);
         List<ResponsibilityType> responsibilityTypeList = new ArrayList<>();
-        if (!responsibilitytTypeNameList.isEmpty()) {
-            for (String name : responsibilitytTypeNameList) {
+        if (!responsibilityTypeNameList.isEmpty()) {
+            for (String name : responsibilityTypeNameList) {
 
                 ResponsibilityType responsibilityType = new ResponsibilityType(name);
                 responsibilityType.setCountryId(countryId);

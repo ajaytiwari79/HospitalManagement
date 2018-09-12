@@ -108,7 +108,7 @@ public class OrganizationDataCategoryService extends MongoBaseService {
 
             }
         }
-        dataElementList = dataElementService.saveDataElementsAndCheckDuplicateyEntry(unitId, dataElementList);
+        dataElementList = dataElementService.saveDataElementsAndCheckDuplicateEntry(unitId, dataElementList);
         Map<String, Object> result = new HashMap<>();
         List<DataCategory> dataCategoryList = new ArrayList<>();
         for (Map.Entry<DataCategory, List<DataElement>> entrySet : dataCategorySetMapCorrespondingDataElementList.entrySet()) {

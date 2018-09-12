@@ -101,7 +101,7 @@ public class DataCategoryService extends MongoBaseService {
      * @param dataCategoryId             data category id
      * @return return data category with its data elements
      */
-    public DataCategoryResponseDTO getDataCategoryWithDataElementOnLeftHierarchySelctionById(Long countryId, BigInteger dataCategoryId) {
+    public DataCategoryResponseDTO getDataCategoryWithDataElementOnLeftHierarchySelectionById(Long countryId, BigInteger dataCategoryId) {
         DataCategoryResponseDTO dataCategory = dataCategoryMongoRepository.getDataCategoryWithDataElementById(countryId, dataCategoryId);
         if (!Optional.ofNullable(dataCategory).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "data category", dataCategoryId);
