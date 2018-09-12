@@ -25,6 +25,7 @@ public class ActivityDTO {
     private BigInteger categoryId;
     private String categoryName;
     private Long unitId = -1L;
+    private List<Long> employmentTypes;
     private boolean isParentActivity = true;
     private GeneralActivityTabDTO generalActivityTab;
     private TimeCalculationActivityDTO timeCalculationActivityTab;
@@ -47,6 +48,14 @@ public class ActivityDTO {
         //default constructor
     }
 
+
+    public List<Long> getEmploymentTypes() {
+        return employmentTypes;
+    }
+
+    public void setEmploymentTypes(List<Long> employmentTypes) {
+        this.employmentTypes = employmentTypes;
+    }
 
     public RulesActivityTabDTO getRulesActivityTab() {
         return rulesActivityTab;

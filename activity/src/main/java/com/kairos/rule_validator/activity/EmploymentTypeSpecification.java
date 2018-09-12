@@ -6,6 +6,7 @@ import com.kairos.utils.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -22,14 +23,11 @@ public class EmploymentTypeSpecification extends AbstractSpecification<ShiftWith
 
     @Override
     public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
-        if (Optional.ofNullable(shift.getActivity().getEmploymentTypes()).isPresent() && !shift.getActivity().getEmploymentTypes().isEmpty()) {
-            employmentTypeIds.addAll(shift.getActivity().getEmploymentTypes());
-            if (employmentTypeIds.contains(employmentType.getId())) {
-                return Collections.EMPTY_LIST;
-            }
+        employmentTypeIds.addAll(shift.getActivities().stream().flatMap(a -> a.getActivity().getEmploymentTypes().stream()).collect(Collectors.toList()));
+        if (!employmentTypeIds.contains(employmentType.getId())) {
             return Arrays.asList("message.activity.employement-type-match");
         }
-        return Collections.emptyList();
+        return new ArrayList<>();
 
     }
 
@@ -40,11 +38,9 @@ public class EmploymentTypeSpecification extends AbstractSpecification<ShiftWith
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
-        if (Optional.ofNullable(shift.getActivity().getEmploymentTypes()).isPresent() && !shift.getActivity().getEmploymentTypes().isEmpty()) {
-            employmentTypeIds.addAll(shift.getActivity().getEmploymentTypes());
-            if (!employmentTypeIds.contains(employmentType.getId())) {
-                ShiftValidatorService.throwException("message.activity.employement-type-match");
-            }
+        employmentTypeIds.addAll(shift.getActivities().stream().flatMap(a -> a.getActivity().getEmploymentTypes().stream()).collect(Collectors.toList()));
+        if (!employmentTypeIds.contains(employmentType.getId())) {
+            ShiftValidatorService.throwException("message.activity.employement-type-match");
         }
     }
 }

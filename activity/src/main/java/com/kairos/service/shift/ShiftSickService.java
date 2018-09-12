@@ -1,6 +1,7 @@
 package com.kairos.service.shift;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -94,7 +95,8 @@ public class ShiftSickService extends MongoBaseService {
             shiftNeedsToAddForDays--;
             Date startDate = DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, 9);
             Date endDate = DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, 18);
-            shifts.add(new Shift(startDate, endDate, staffId, activity.getId(), activity.getName(), unitPositionId, unitId));
+            ShiftActivity shiftActivity = new ShiftActivity(activity.getName(),startDate,endDate,activity.getId());
+            shifts.add(new Shift(startDate, endDate, staffId, Arrays.asList(shiftActivity), unitPositionId, unitId));
         }
         // Adding all shifts to the same.
         shifts.addAll(staffOriginalShiftsOfDates);

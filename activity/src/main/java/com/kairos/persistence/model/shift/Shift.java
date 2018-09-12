@@ -23,7 +23,6 @@ import java.util.*;
 @Document(collection = "shifts")
 public class Shift extends MongoBaseEntity {
 
-    private String name;
     private Date startDate;
     private Date endDate;
     private boolean disabled = false;
@@ -87,12 +86,11 @@ public class Shift extends MongoBaseEntity {
         this.scheduledMinutes = scheduledMinutes;
     }
 
-    public Shift(Date startDate, Date endDate, Long staffId, List<ShiftActivity> activities, String name, Long unitPositionId, Long unitId) {
+    public Shift(Date startDate, Date endDate, Long staffId, List<ShiftActivity> activities, Long unitPositionId, Long unitId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.staffId = staffId;
         this.activities = activities;
-        this.name=name;
         this.unitPositionId=unitPositionId;
         this.unitId=unitId;
         this.sickShift=true;
@@ -113,9 +111,8 @@ public class Shift extends MongoBaseEntity {
         this.activities = activities;
     }
 
-    public Shift(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
+    public Shift(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
                  long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
-        this.name = name;
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -133,13 +130,6 @@ public class Shift extends MongoBaseEntity {
 
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public Date getStartDate() {
         return startDate;
@@ -239,7 +229,6 @@ public class Shift extends MongoBaseEntity {
     @Override
     public String toString() {
         return "Shift{" +
-                "name='" + name + '\'' +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", disabled=" + disabled +
@@ -289,7 +278,7 @@ public class Shift extends MongoBaseEntity {
 
 
     public ShiftQueryResult getShiftQueryResult() {
-        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id, this.name,
+        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id,
                 this.startDate,
                 this.endDate,
                 this.bid,
@@ -307,7 +296,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public ShiftDTO getShiftDTO() {
-        ShiftDTO shiftDTO = new ShiftDTO(this.id, this.name,
+        ShiftDTO shiftDTO = new ShiftDTO(this.id,
                 this.startDate,
                 this.endDate,
                 this.bid,
@@ -408,8 +397,7 @@ public class Shift extends MongoBaseEntity {
         this.planningPeriodId = planningPeriodId;
     }
 
-    public Shift(String name, Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId, Set<ShiftStatus> status, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
-        this.name = name;
+    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId, Set<ShiftStatus> status, BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.remarks = remarks;

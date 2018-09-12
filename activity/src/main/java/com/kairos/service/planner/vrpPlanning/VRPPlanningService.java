@@ -250,7 +250,7 @@ public class VRPPlanningService extends MongoBaseService{
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIds(staffIds,startDate,endDate);
         List<ShiftDTO> shiftDTOS = new ArrayList<>(shifts.size());
         shifts.forEach(s->{
-            shiftDTOS.add(new ShiftDTO(s.getId().toString(),s.getName(),employeeDTOMap.get(s.getStaffId()),DateUtils.asLocalDate(s.getStartDate()),s.getStartDate(),s.getEndDate()));
+            shiftDTOS.add(new ShiftDTO(s.getId().toString(),s.getActivities().get(0).getActivityName(),employeeDTOMap.get(s.getStaffId()),DateUtils.asLocalDate(s.getStartDate()),s.getStartDate(),s.getEndDate()));
         });
         return shiftDTOS;
     }

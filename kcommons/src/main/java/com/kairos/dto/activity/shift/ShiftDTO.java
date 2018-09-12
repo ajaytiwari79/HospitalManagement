@@ -23,7 +23,6 @@ import java.util.*;
 public class ShiftDTO {
 
     private BigInteger id;
-    private String name;
     private Date startDate;
     private Date endDate;
     private long bid;
@@ -43,20 +42,13 @@ public class ShiftDTO {
     private Long unitPositionId;
     @JsonFormat(pattern = "YYYY-MM-DD")
     private LocalDate shiftDate;
-    @JsonFormat(pattern = "YYYY-MM-DD")
-    private LocalDate startLocalDate;
-    @JsonFormat(pattern = "YYYY-MM-DD")
-    private LocalDate endLocalDate;
-    @JsonFormat(pattern = "HH:mm")
-    private LocalTime startTime;
-    @JsonFormat(pattern = "HH:mm")
-    private LocalTime endTime;
     private Long allowedBreakDurationInMinute;
     private BigInteger templateId;
     private String timeType;
     private Set<ShiftStatus> status = new HashSet<>();
     private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger plannedTimeId;
+    private Long expertiseId;
 
     public ShiftDTO(List<ShiftActivity> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
         this.activities = activities;
@@ -65,21 +57,10 @@ public class ShiftDTO {
         this.unitPositionId = unitPositionId;
     }
 
-    public ShiftDTO(List<ShiftActivity> activities, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId,LocalDate startLocalDate,LocalDate endLocalDate,LocalTime startTime,LocalTime endTime) {
-        this.activities = activities;
-        this.unitId = unitId;
-        this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
-        this.startLocalDate=startLocalDate;
-        this.endLocalDate=endLocalDate;
-        this.startTime=startTime;
-        this.endTime=endTime;
-    }
 
 
-    public ShiftDTO(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
+    public ShiftDTO(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
         this.id = id;
-        this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.bid = bid;
@@ -93,6 +74,15 @@ public class ShiftDTO {
         this.staffId = staffId;
         this.unitId = unitId;
         this.unitPositionId = unitPositionId;
+    }
+
+
+    public Long getExpertiseId() {
+        return expertiseId;
+    }
+
+    public void setExpertiseId(Long expertiseId) {
+        this.expertiseId = expertiseId;
     }
 
     public Set<ShiftStatus> getStatus() {
@@ -119,38 +109,6 @@ public class ShiftDTO {
         this.plannedTimeId = plannedTimeId;
     }
 
-    public LocalDate getStartLocalDate() {
-        return startLocalDate;
-    }
-
-    public void setStartLocalDate(LocalDate startLocalDate) {
-        this.startLocalDate = startLocalDate;
-    }
-
-    public LocalDate getEndLocalDate() {
-        return endLocalDate;
-    }
-
-    public void setEndLocalDate(LocalDate endLocalDate) {
-        this.endLocalDate = endLocalDate;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
-
     public LocalDate getShiftDate() {
         return shiftDate;
     }
@@ -161,7 +119,12 @@ public class ShiftDTO {
 
 
 
-
+    public List<ShiftActivity> sortShifts() {
+        if (Optional.ofNullable(activities).isPresent()) {
+            activities.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
+        }
+        return activities;
+    }
 
     public BigInteger getId() {
         return id;
@@ -169,14 +132,6 @@ public class ShiftDTO {
 
     public void setId(BigInteger id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
 
@@ -229,7 +184,7 @@ public class ShiftDTO {
     }
 
     public Duration getDuration() {
-        return new Interval(this.getMergedStartDate().getTime(), this.getMergedEndDate().getTime()).toDuration();
+        return new Interval(this.activities.get(0).getStartDate().getTime(), this.activities.get(activities.size()-1).getEndDate().getTime()).toDuration();
     }
 
     public String getRemarks() {
@@ -257,9 +212,7 @@ public class ShiftDTO {
         return startDate;
     }
 
-    public Date getMergedStartDate(){
-        return startLocalDate != null && startTime != null ? DateUtils.getDateByLocalDateAndLocalTime(startLocalDate, startTime) : null;
-    }
+
 
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
@@ -269,16 +222,14 @@ public class ShiftDTO {
         return endDate;
     }
 
-    public Date getMergedEndDate(){
-        return startLocalDate != null && startTime != null ? DateUtils.getDateByLocalDateAndLocalTime(endLocalDate, endTime) : null;
-    }
+
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
     public ShiftQueryResult getQueryResults(){
-        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id, this.name,
+        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id,
                 this.startDate,
                 this.endDate,
                 this.bid,
@@ -299,7 +250,6 @@ public class ShiftDTO {
     public String toString() {
         return "ShiftDTO{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", bid=" + bid +

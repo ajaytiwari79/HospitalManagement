@@ -8,6 +8,7 @@ package com.kairos.utils;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
+import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.enums.Day;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.wta.MinMaxSetting;
@@ -235,13 +236,16 @@ public class ShiftValidatorService {
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
         if (timeTypeIds != null && !timeTypeIds.isEmpty()) {
             shifts.forEach(s -> {
-                if ((timeTypeIds == null || timeTypeIds.contains(s.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && (plannedTimeIds == null || plannedTimeIds.contains(s.getPlannedTypeId())) && (activitieIds == null || activitieIds.contains(s.getActivity().getId())))) {
-                    shiftQueryResultWithActivities.add(s);
+                for (ShiftActivity shiftActivity : s.getActivities()) {
+                    if ((timeTypeIds == null || timeTypeIds.contains(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && (plannedTimeIds == null || plannedTimeIds.contains(s.getPlannedTypeId())) && (activitieIds == null || activitieIds.contains(shiftActivity.getActivity().getId())))) {
+                        shiftQueryResultWithActivities.add(s);
+                    }
                 }
             });
         }
         return shiftQueryResultWithActivities;
     }
+
 
     public static DateTimeInterval getIntervalByRuleTemplates(ShiftWithActivityDTO shift, List<WTABaseRuleTemplate> wtaBaseRuleTemplates) {
         DateTimeInterval interval = new DateTimeInterval(shift.getStartDate().getTime(), shift.getEndDate().getTime());

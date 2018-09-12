@@ -16,8 +16,6 @@ import java.util.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftQueryResult {
     private BigInteger id;
-    private String name;
-
     private Date startDate;
 
     private Date endDate;
@@ -53,14 +51,6 @@ public class ShiftQueryResult {
 
     public void setId(BigInteger id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public long getBid() {
@@ -166,7 +156,7 @@ public class ShiftQueryResult {
 
 
     public Long getStartDate() {
-        return startDate.getTime();
+        return this.activities.get(0).getStartDate().getTime();
     }
 
     public void setStartDate(Date startDate) {
@@ -174,7 +164,7 @@ public class ShiftQueryResult {
     }
 
     public Long getEndDate() {
-        return endDate.getTime();
+        return this.activities.get(0).getEndDate().getTime();
     }
 
     public void setEndDate(Date endDate) {
@@ -215,9 +205,8 @@ public class ShiftQueryResult {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
     }
 
-    public ShiftQueryResult(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
+    public ShiftQueryResult(BigInteger id,  Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
         this.id = id;
-        this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.bid = bid;
