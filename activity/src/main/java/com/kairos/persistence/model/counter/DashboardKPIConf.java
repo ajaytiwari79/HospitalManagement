@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.counter;
 
+import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -12,6 +14,9 @@ public class DashboardKPIConf extends MongoBaseEntity {
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
+    private CounterSize size;
+    private KPIPosition position;
+
 
     public DashboardKPIConf(BigInteger kpiId, BigInteger dashboardId, Long countryId, Long unitId, Long staffId, ConfLevel level) {
         this.kpiId = kpiId;
@@ -20,6 +25,22 @@ public class DashboardKPIConf extends MongoBaseEntity {
         this.unitId = unitId;
         this.staffId = staffId;
         this.level = level;
+    }
+
+    public CounterSize getSize() {
+        return size;
+    }
+
+    public void setSize(CounterSize size) {
+        this.size = size;
+    }
+
+    public KPIPosition getPosition() {
+        return position;
+    }
+
+    public void setPosition(KPIPosition position) {
+        this.position = position;
     }
 
     public BigInteger getKpiId() {

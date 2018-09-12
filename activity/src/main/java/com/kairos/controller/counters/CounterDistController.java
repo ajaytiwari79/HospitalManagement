@@ -245,12 +245,17 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    //
-//    @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/{tabId}/update_dist_entry")
-//    public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForStaff(@PathVariable String tabId,@PathVariable Long unitId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
-//        counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,tabId,unitId,ConfLevel.STAFF);
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
-//    }
+    @GetMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/{dashboardId}")
+    public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String tabId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDataConfForStaff(tabId,unitId, ConfLevel.STAFF));
+    }
+
+
+    @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/{dashboardId}/update_dist_entry")
+    public ResponseEntity<Map<String, Object>> updateDashboardKPIsEntryForStaff(@PathVariable String tabId,@PathVariable Long unitId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
+        counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,tabId,unitId,ConfLevel.STAFF);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    }
 
 
 //    @GetMapping(UNIT_URL+COUNTER_DIST_URL+"/staff/dashboard")

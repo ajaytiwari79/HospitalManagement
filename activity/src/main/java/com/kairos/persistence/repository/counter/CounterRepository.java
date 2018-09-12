@@ -402,6 +402,12 @@ public class CounterRepository {
         AggregationResults<DashboardKPIMappingDTO> results = mongoTemplate.aggregate(ag, DashboardKPIConf.class, DashboardKPIMappingDTO.class);
         return results.getMappedResults();
     }
+
+    public List<DashboardKPIConf> findDashboardKPIConfigurationByTabIds( String dashboardId,List<BigInteger> kpiIds,Long staffId,ConfLevel level){
+        Query query=new Query(Criteria.where("dashboardId").is(dashboardId).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level));
+        return mongoTemplate.find(query,DashboardKPIConf.class);
+    }
+
 //    public List<KPIAccessPageDTO> getKPIAcceccPageForCountry(Long countryId,ConfLevel level){
 //        String refQueryField = getRefQueryField(level);
 //    }
