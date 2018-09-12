@@ -14,8 +14,8 @@ public class AssessmentDTO {
 
     private BigInteger id;
 
-    @NotBlank(message = "Assessment name cant't be empty")
-    @Pattern(message = "Number and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     @NotNull(message = "Mention end Date of Assessment")

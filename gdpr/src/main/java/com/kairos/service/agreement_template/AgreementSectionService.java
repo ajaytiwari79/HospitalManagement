@@ -47,7 +47,7 @@ public class AgreementSectionService extends MongoBaseService {
     private ClauseService clauseService;
 
 
-    public PolicyAgreementTemplate createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, BigInteger templateId, List<AgreementSectionDTO> agreementSectionDTOs) {
+    public List<AgreementSectionResponseDTO> createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, BigInteger templateId, List<AgreementSectionDTO> agreementSectionDTOs) {
 
         PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, organizationId, templateId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
@@ -69,8 +69,8 @@ public class AgreementSectionService extends MongoBaseService {
             agreementSectionIdList = createAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, organizationId, agreementSectionDTOs, policyAgreementTemplate);
             policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         }
-        policyAgreementTemplate = policyAgreementTemplateRepository.save(policyAgreementTemplate);
-        return policyAgreementTemplate;
+        policyAgreementTemplateRepository.save(policyAgreementTemplate);
+        return policyAgreementTemplateRepository.getAgreementTemplateAllSectionAndSubSections(countryId,organizationId,templateId);
     }
 
 

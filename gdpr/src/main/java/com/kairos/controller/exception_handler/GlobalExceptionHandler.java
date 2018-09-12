@@ -2,6 +2,7 @@ package com.kairos.controller.exception_handler;
 
 
 import com.kairos.custom_exception.*;
+import com.kairos.service.locale.LocaleService;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +33,22 @@ import java.util.Map;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
+
+    @Inject
+    private LocaleService localeService;
+
+    private String convertMessage(String message, Object... params) {
+        for (int i = 0; i < params.length; i++) {
+            try {
+                params[i] = localeService.getMessage(params[i].toString());
+            } catch (Exception e) {
+                // intentionally left empty
+            }
+        }
+        return localeService.getMessage(message, params);
+    }
+
+
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
@@ -39,11 +57,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
         List<FieldErrorDTO> errors = new ArrayList<>(fieldErrors.size() + globalErrors.size());
         for (FieldError fieldError : fieldErrors) {
-            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(), fieldError.getDefaultMessage());
+            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(),convertMessage( fieldError.getDefaultMessage()));
             errors.add(error);
         }
         for (ObjectError objectError : globalErrors) {
-            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), objectError.getDefaultMessage());
+            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), convertMessage(objectError.getDefaultMessage()));
             errors.add(error);
         }
         ResponseEnvelope errorMessage = new ResponseEnvelope();

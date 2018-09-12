@@ -34,7 +34,7 @@ public class OrganizationDataElementService extends MongoBaseService {
      * @param dataElementList  List of Data Elements
      * @return method return  list of  data Element and check of duplicate name in data Elements
      */
-    public List<DataElement> saveDataElementsAndCheckDuplicateyEntry(Long unitId, List<DataElement> dataElementList) {
+    public List<DataElement> saveDataElementsAndCheckDuplicateEntry(Long unitId, List<DataElement> dataElementList) {
 
         Set<String> dataElementNameList = new HashSet<>();
         for (DataElement dataElement : dataElementList) {

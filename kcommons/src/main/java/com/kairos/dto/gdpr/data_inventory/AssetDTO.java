@@ -21,22 +21,20 @@ public class AssetDTO {
 
     private BigInteger id;
 
-    @NotBlank(message = "name can't be empty ")
-    @Pattern(message = "Number and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotBlank(message = "description  can't be  Empty ")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     @NotBlank(message = "Hosting Location can't be Empty")
     private String hostingLocation;
 
     @NotNull(message = "Managing department can't be empty")
-    @Valid
     private ManagingOrganization managingDepartment;
 
-    // @NotNull(message = "Asset Owner can't be Empty")
-    //@Valid
+    @NotNull(message = "Asset Owner can't be Empty")
     private Staff assetOwner;
 
     private List<BigInteger> storageFormats;

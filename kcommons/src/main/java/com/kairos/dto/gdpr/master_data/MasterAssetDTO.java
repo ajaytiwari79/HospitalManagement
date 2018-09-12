@@ -22,11 +22,11 @@ public class MasterAssetDTO {
 
     private BigInteger id;
 
-    @NotBlank(message = "Name  can't be Empty")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "title can not contain number or special character")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotBlank(message = "Description can't be Empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     @Valid

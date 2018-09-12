@@ -64,7 +64,7 @@ public class AssetService extends MongoBaseService {
         if (Optional.ofNullable(previousAsset).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
         }
-        AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
+        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset  type", assetDTO.getAssetType());
         } else {
@@ -194,7 +194,7 @@ public class AssetService extends MongoBaseService {
         } else if (!asset.isActive()) {
             exceptionService.invalidRequestException("message.asset.inactive");
         }
-        AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
+        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetDTO.getAssetType());
 
@@ -228,6 +228,47 @@ public class AssetService extends MongoBaseService {
         assetMongoRepository.save(asset);
         return asset;
     }
+
+
+    /**
+     *
+     * @param unitId
+     * @param assetId - asset Id
+     * @param processingActivityId Processing Activity id link with Asset
+     * @return
+     */
+    public boolean unLinkProcessingActivityFromAsset(Long unitId, BigInteger assetId, BigInteger processingActivityId) {
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+        }
+        asset.getProcessingActivities().remove(processingActivityId);
+        assetMongoRepository.save(asset);
+        return true;
+
+    }
+
+
+    /**
+     *
+     * @param unitId
+     * @param assetId -Asset Id
+     * @param subProcessingActivityId - Sub Processing Activity Id Link with Asset
+     * @return
+     */
+    public boolean unLinkSubProcessingActivityFromAsset(Long unitId, BigInteger assetId, BigInteger subProcessingActivityId) {
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+        }
+        asset.getSubProcessingActivities().remove(subProcessingActivityId);
+        assetMongoRepository.save(asset);
+        return true;
+
+    }
+
+
+
 
 
     public List<ProcessingActivityBasicResponseDTO> getAllRelatedProcessingActivityAndSubProcessingActivities(Long unitId, BigInteger assetId) {
@@ -266,7 +307,6 @@ public class AssetService extends MongoBaseService {
         }
         return processingActivityResponseDTOList;
     }
-
 
 
 }

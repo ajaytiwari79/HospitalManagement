@@ -296,17 +296,18 @@ public class DateUtils {
 
 
     public static Date getDateFromLocalDate(LocalDate localDate) {
-        Date date ;
+        Date date;
         date = localDate != null
-                                ? Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
-                                : Date.from(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC));
+                ? Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                : Date.from(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC));
         return date;
     }
 
     public static Date asDate(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
-    public static Date asDate(@NotNull(message = "date can not be null")LocalDate localDate) {
+
+    public static Date asDate(@NotNull(message = "date can not be null") LocalDate localDate) {
         return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
@@ -342,8 +343,8 @@ public class DateUtils {
         return add(date, Calendar.MINUTE, amount);
     }
 
-    public static Date addDays(final Date date, final int amount) {
-        return add(date, Calendar.DAY_OF_MONTH, amount);
+    public static Date addDays(final Date date, final int days) {
+        return add(date, Calendar.DAY_OF_MONTH, days);
     }
 
     public static Date addMonths(final Date date, final int amount) {
@@ -405,6 +406,11 @@ public class DateUtils {
         return ((endDate.getTime() - startDate.getTime()) / (1000 * 60));
     }
 
+    public static int getDifferenceBetweenDatesInDays(LocalDate startDate, LocalDate endDate) {
+        return Period.between(startDate,endDate).getDays();
+
+    }
+
     public static DateTime toJodaDateTime(LocalDate localDate) {
         return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), 0, 0);
     }
@@ -461,7 +467,7 @@ public class DateUtils {
                 ZoneId.systemDefault());
     }
 
-    public static Date getDateByZonedDateTime(ZonedDateTime dateTime){
+    public static Date getDateByZonedDateTime(ZonedDateTime dateTime) {
         return Date.from(dateTime.toInstant());
     }
 
@@ -506,7 +512,7 @@ public class DateUtils {
         switch (durationType) {
             // Add case for Month, Year etc
             case DAYS: {
-                return ChronoUnit.DAYS.between(startDate,endDate);
+                return ChronoUnit.DAYS.between(startDate, endDate);
             }
             default:
                 return null;
@@ -608,57 +614,65 @@ public class DateUtils {
     public static LocalTime getLocalTimeFromLocalDateTime(LocalDateTime localDateTime) {
         return localDateTime.toLocalTime();
     }
+
     public static LocalDateTime getTimezonedCurrentDateTime(String timezone) {
         return Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of(timezone)).toLocalDateTime();
     }
+
     public static LocalDateTime getTimezonedCurrentDate(LocalDateTime dateTime) {
-        return  LocalDateTime.of(dateTime.getYear(),dateTime.getMonth(),dateTime.getDayOfMonth(),dateTime.getHour(),dateTime.getMinute());
+        return LocalDateTime.of(dateTime.getYear(), dateTime.getMonth(), dateTime.getDayOfMonth(), dateTime.getHour(), dateTime.getMinute());
     }
 
     public static LocalDateTime getLocalDateTimeFromZoneId(ZoneId unitTimeZone) {
         return LocalDateTime.now(unitTimeZone);
     }
 
-    public static Long getEndOfDayMillisforUnitFromEpoch(ZoneId zone,Long dateMillis) {
+    public static Long getEndOfDayMillisforUnitFromEpoch(ZoneId zone, Long dateMillis) {
         LocalDate date = Instant.ofEpochMilli(dateMillis).atZone(ZoneId.systemDefault()).toLocalDate();
-        ZonedDateTime zdt = ZonedDateTime.of(date,LocalTime.MAX,zone);
+        ZonedDateTime zdt = ZonedDateTime.of(date, LocalTime.MAX, zone);
         return zdt.toInstant().toEpochMilli();
     }
+
     public static LocalDateTime getLocalDatetimeFromLong(Long millis) {
         return Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
+
     public static Long getMillisFromLocalDateTime(LocalDateTime date) {
         return  date==null?null:date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() ;
     }
 
     public static Long getOneDayBeforeMillis() {
-        return  LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public static Long getCurrentDayStartMillis() {
         return LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
+
     public static Long getCurrentMillis() {
         return System.currentTimeMillis();
     }
+
     public static LocalDateTime getStartOfDayFromLocalDate(LocalDate localDate) {
 
         return localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
+
     public static LocalDateTime getEndOfDayFromLocalDate(LocalDate localDate) {
 
         return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
-    public static LocalDateTime getLocalDateTime(LocalDate localDate,int hours,int minutes){
-        return LocalDateTime.of(localDate,LocalTime.of(hours,minutes));
+    public static LocalDateTime getLocalDateTime(LocalDate localDate, int hours, int minutes) {
+        return LocalDateTime.of(localDate, LocalTime.of(hours, minutes));
     }
 
-    public static int getWeekNumberByLocalDate(LocalDate localDate){
+    public static int getWeekNumberByLocalDate(LocalDate localDate) {
         TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         return localDate.get(woy);
     }
-    public static Date getDateAfterDaysWithTime(short daysAfter,int startHour){
+
+    public static Date getDateAfterDaysWithTime(short daysAfter, int startHour) {
         return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atStartOfDay().with(LocalTime.of(startHour, 00)).toInstant(ZoneOffset.UTC));
     }
 

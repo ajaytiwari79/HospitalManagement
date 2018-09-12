@@ -12,11 +12,11 @@ public class MasterQuestionnaireTemplateDTO {
 
     private BigInteger id;
 
-    @NotBlank(message = "name.cannot.be.empty.or.null")
-    @Pattern(message = "Number and Special character are not allowed for Title",regexp ="^[a-zA-Z\\s]+$" )
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotBlank(message = "Description cannot be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     @NotBlank(message = "Template type cannot be empty ")
