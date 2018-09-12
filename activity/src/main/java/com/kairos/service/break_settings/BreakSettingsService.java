@@ -1,11 +1,15 @@
 package com.kairos.service.break_settings;
 
+
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.break_settings.BreakSettingAndActivitiesWrapper;
 import com.kairos.dto.activity.break_settings.BreakActivitiesDTO;
+import com.kairos.dto.activity.unit_settings.FlexibleTimeSettingDTO;
+import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
+import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
@@ -30,6 +34,7 @@ public class BreakSettingsService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
     @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject private UnitSettingRepository unitSettingRepository;
 
     public BreakSettingsDTO createBreakSettings(Long unitId, BreakSettingsDTO breakSettingsDTO) {
         BreakSettings breakSettings = breakSettingMongoRepository.findByDeletedFalseAndUnitIdAndShiftDurationInMinuteEquals(unitId, breakSettingsDTO.getShiftDurationInMinute());
@@ -47,7 +52,12 @@ public class BreakSettingsService extends MongoBaseService {
         List<BreakActivitiesDTO> breakActivityDTOS =activityMongoRepository.getAllActivitiesGroupedByTimeType(unitId);
         Map<String,List<ActivityDTO>> timeTypeActivityMap= breakActivityDTOS.stream().collect(Collectors.toMap(k->k.getTimeType(), v->v.getActivities()));
         List<BreakSettingsDTO> breakSettings= breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdOrderByCreatedAtAsc(unitId);
-        return new BreakSettingAndActivitiesWrapper(breakSettings,timeTypeActivityMap.get(WORKING_TYPE.name()),timeTypeActivityMap.get(NON_WORKING_TYPE.name()));
+        UnitSettingDTO unitSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(unitId);
+        FlexibleTimeSettingDTO flexibleTimeSettingDTO = new FlexibleTimeSettingDTO();
+        if (unitSettingDTO != null) {
+            flexibleTimeSettingDTO = unitSettingDTO.getFlexibleTimeSettings();
+        }
+        return new BreakSettingAndActivitiesWrapper(breakSettings,timeTypeActivityMap.get(WORKING_TYPE.name()),timeTypeActivityMap.get(NON_WORKING_TYPE.name()),flexibleTimeSettingDTO);
     }
 
     public Boolean removeBreakSettings(Long unitId, BigInteger breakSettingsId) {
