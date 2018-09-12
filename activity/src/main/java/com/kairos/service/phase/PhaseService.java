@@ -26,6 +26,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -293,10 +294,10 @@ public class PhaseService extends MongoBaseService {
         }
         else {
             List<Phase> actualPhases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalse(unitId, ACTUAL.toString());
-            LocalDate previousMonday=DateUtils.getDateForPreviousDay(LocalDate.now(),DayOfWeek.MONDAY);
             LocalDate currentDate=LocalDate.now();
-            Map<String, Phase> phaseMap = actualPhases.stream().collect(Collectors.toMap(Phase::getName, v -> v));
-            phase=getActualPhase(requestedDate,previousMonday,phaseMap,currentDate,upcomingMondayDate);
+            LocalDate previousMonday=DateUtils.getDateForPreviousDay(currentDate,DayOfWeek.MONDAY);
+            Map<String, Phase> phaseMap = actualPhases.stream().collect(Collectors.toMap(Phase::getName, Function.identity()));
+            phase= getActualPhaseApplicableForDate(requestedDate,previousMonday,phaseMap,currentDate,upcomingMondayDate);
         }
         return phase;
     }
@@ -325,7 +326,7 @@ public class PhaseService extends MongoBaseService {
                phase=phaseAndIdMap.get(planningPeriod.getCurrentPhaseId());
             }
             else {
-               phase=getActualPhase(requestedDate,previousMonday,phaseMap,currentDate,upcomingMondayDate);
+               phase= getActualPhaseApplicableForDate(requestedDate,previousMonday,phaseMap,currentDate,upcomingMondayDate);
             }
             localDatePhaseStatusMap.put(requestedDate,phase);
         }
@@ -341,7 +342,7 @@ public class PhaseService extends MongoBaseService {
      * @param upcomingMondayDate
      * @return
      */
-    private Phase getActualPhase(LocalDate requestedDate,LocalDate previousMonday,Map<String,Phase> phaseMap,LocalDate currentDate,LocalDate upcomingMondayDate){
+    private Phase getActualPhaseApplicableForDate(LocalDate requestedDate, LocalDate previousMonday, Map<String,Phase> phaseMap, LocalDate currentDate, LocalDate upcomingMondayDate){
         Phase phase=null;
         if (requestedDate.isBefore(previousMonday)) {
             phase= phaseMap.get(PAYROLL);
