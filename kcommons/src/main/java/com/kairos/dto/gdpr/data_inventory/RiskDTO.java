@@ -5,6 +5,7 @@ import com.kairos.enums.RiskSeverity;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.time.LocalDate;
 
@@ -13,10 +14,11 @@ public class RiskDTO {
 
     private BigInteger id;
 
-    @NotBlank(message = "Name can't be Empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed",regexp ="^[a-zA-Z\\s]+$" )
     private String name;
 
-    @NotBlank(message = "Description can't be Empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     @NotBlank(message = "Mention Risk Recommendation")

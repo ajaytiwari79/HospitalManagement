@@ -2,7 +2,6 @@ package com.kairos.scheduler.constants;
 
 import com.kairos.enums.scheduler.JobSubType;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,8 +19,9 @@ public class AppConstants {
     public final static String SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC = "SchedulerToActivityQueue";
 
 
-    public final static Set<JobSubType> userSubTypes = Stream.of(INTEGRATION,EMPLOYMENT_END,QUESTIONAIRE_NIGHTWORKER,SENIORITY_LEVEL).collect(Collectors.toSet());
-    public final static Set<JobSubType> activitySubTypes = Stream.of(PRIORITYGROUP_FILTER,FLIP_PHASE).collect(Collectors.toSet());
+    public static final String JOB_TO_CHECK_SICK_USER = "JOB_TO_CHECK_SICK_USER";
+    public final static Set<JobSubType> userSubTypes = Stream.of(INTEGRATION, EMPLOYMENT_END, QUESTIONAIRE_NIGHTWORKER, SENIORITY_LEVEL).collect(Collectors.toSet());
+    public final static Set<JobSubType> activitySubTypes = Stream.of(PRIORITYGROUP_FILTER, FLIP_PHASE, UPDATE_USER_ABSENCE).collect(Collectors.toSet());
 
 
 }

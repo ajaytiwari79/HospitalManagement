@@ -44,8 +44,8 @@ public class RulesActivityTab implements Serializable{
     private DurationField plannedTimeInAdvance;
     private LocalTime maximumEndTime;// shift can't be extend this time
     private boolean allowedAutoAbsence;
-    private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --
-    private byte recurrenceTimes;// -- the  shift of that staff will be entered.
+    private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --   -128 to 127
+    private byte recurrenceTimes;// -- the  shift of that staff will be entered.     -128 to 127
     private PQLSettings pqlSettings;
 
     public RulesActivityTab() {
