@@ -6,6 +6,7 @@ import com.kairos.dto.scheduler.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.kafka.JobQueueExecutor;
 import com.kairos.service.scheduler.IntegrationJobsExecutorService;
 import com.kairos.service.staff.EmploymentService;
+import com.kairos.service.staff.UserSickService;
 import com.kairos.service.unit_position.UnitPositionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
