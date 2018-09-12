@@ -132,7 +132,7 @@ public class ClauseService extends MongoBaseService {
 
 
     public List<Clause> getClauseList(Long countryId, Long organizationId, List<BigInteger> clausesId) {
-        return clauseMongoRepository.getClauseListByIds(countryId, organizationId, clausesId);
+        return clauseMongoRepository.findClauseByCountryIdAndIdList(countryId, organizationId, clausesId);
     }
 
 
