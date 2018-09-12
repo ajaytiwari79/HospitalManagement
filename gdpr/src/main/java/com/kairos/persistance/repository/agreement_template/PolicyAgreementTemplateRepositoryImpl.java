@@ -36,18 +36,13 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
     public List<AgreementSectionResponseDTO> getAgreementTemplateAllSectionAndSubSections(Long countryId, Long unitId, BigInteger agreementTemplateId) {
 
         String replaceRoot = "{ '$replaceRoot': { 'newRoot': '$agreementSections' } }";
-        String sortAgreementSectionClauses = "{$sort:{'clauses.orderedIndex':-1}}";
-        String sortSubSections = " {$sort:{'subSections.orderedIndex':-1}}";
-        String sortAgreementSection = "{$sort:{'orderedIndex':-1}}";
-
+        String sortSubSections = " {$sort:{'subSections.orderedIndex':1}}";
+        String sortAgreementSection = "{$sort:{'orderedIndex':1}}";
         String groupSubSections = "{$group:{_id: '$_id', subSections:{'$addToSet':'$subSections'},clauses:{$first:'$clauses'},orderedIndex:{$first:'$orderedIndex'},title:{$first:'$title' }}}";
-        String clauseGroupAggregation = "{$group:{_id: '$_id', clauses:{'$addToSet': '$clauses'},subSections:{$first:'$subSections'},orderedIndex:{$first:'$orderedIndex'},title:{$first:'$title' }}}";
 
         Document replaceRootOperation = Document.parse(replaceRoot);
         Document groupOperation = Document.parse(groupSubSections);
-        Document sortAgreementSectionClausesOperation = Document.parse(sortAgreementSectionClauses);
         Document sortSubSectionsOperation = Document.parse(sortSubSections);
-        Document clauseGroupOperation = Document.parse(clauseGroupAggregation);
 
 
         Aggregation aggregation = Aggregation.newAggregation(
@@ -56,9 +51,6 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
                 unwind("agreementSections"),
                 new CustomAggregationOperation(replaceRootOperation),
                 lookup("clause", "clauses", "_id", "clauses"),
-                unwind("clauses", true),
-                new CustomAggregationOperation(sortAgreementSectionClausesOperation),
-                new CustomAggregationOperation(clauseGroupOperation),
                 lookup("agreement_section", "subSections", "_id", "subSections"),
                 unwind("subSections", true),
                 lookup("clause", "subSections.clauses", "_id", "subSections.clauses"),

@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "agreement_section")
@@ -16,9 +17,9 @@ public class AgreementSection extends MongoBaseEntity {
     @NotBlank(message = "Section Title cannot be empty")
     private String title;
 
-    private List<BigInteger> clauses;
+    private List<BigInteger> clauses=new ArrayList<>();
 
-    private List<BigInteger> subSections;
+    private List<BigInteger> subSections=new ArrayList<>();
 
     @NotNull(message = "Clause order is Not defined")
     private Integer orderedIndex;
