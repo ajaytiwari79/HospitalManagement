@@ -10,6 +10,9 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,9 +30,10 @@ public class CTAService {
      */
 //TODO might be in ShiftPlanningInitializationService
     public Map<LocalDate, CTAResponseDTO> getLocalDateCTAMapByunitPositionId(Map<Long, Map<LocalDate, CTAResponseDTO>> longCTAResponseDTOMap, Long unitPositionId) {
-        if (longCTAResponseDTOMap.containsKey(unitPositionId))
+        Map<LocalDate, CTAResponseDTO> applicableLocalDateCTAPerStaff=new HashMap<>();
+        if (!longCTAResponseDTOMap.containsKey(unitPositionId)){}
             return longCTAResponseDTOMap.get(unitPositionId);
-        return null;
+
     }
 
     /**
@@ -59,9 +63,11 @@ public class CTAService {
     }
 /*************************************************************************************************/
     /**
+     * <ul><li>
      * This method will bind each CTA
-     * with applicable LocalDate one-to-one
-     *
+     * with applicable LocalDate one-to-one<li/>
+     * <li>Note:- It is assumed that no any 2 CTA Date will contradict each other
+     * </li></ul>
      * @param ctaResponseDTOS
      * @param localDateApplicableIntervals
      * @param toPlanningDate
@@ -69,12 +75,15 @@ public class CTAService {
      */
     public Map<LocalDate, CTAResponseDTO> filterOverlapedCTA(List<CTAResponseDTO> ctaResponseDTOS, Set<LocalDate> localDateApplicableIntervals, Date toPlanningDate) {
         Map<LocalDate, CTAResponseDTO> localDateCTAMap=new HashMap<>();
-        for (LocalDate applicableLocalDate : localDateApplicableIntervals) {
-            for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
-                DateTimeInterval dateTimeIntervalPerCTA = createCTADateTimeInterval(ctaResponseDTO, toPlanningDate);
-                if (dateTimeIntervalPerCTA.contains(DateUtils.asDate(applicableLocalDate))) {
-                    localDateCTAMap.put(applicableLocalDate, ctaResponseDTO);
-                }
+
+        for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
+            DateTimeInterval dateTimeIntervalPerCTA = createCTADateTimeInterval(ctaResponseDTO, toPlanningDate);
+           LocalDate startLocalDate=ctaResponseDTO.getStartDate();
+            LocalDate endLocalDate=dateTimeIntervalPerCTA.getEndLocalDate();
+            while(!startLocalDate.equals(endLocalDate) && localDateApplicableIntervals.contains(startLocalDate))
+            {
+                localDateCTAMap.put(startLocalDate,ctaResponseDTO);
+                startLocalDate=startLocalDate.plusDays(1l);//TODO optimization reuse {localDateApplicableIntervals}
             }
         }
         return localDateCTAMap;
@@ -103,7 +112,7 @@ public class CTAService {
     public Set<LocalDate> getApplicableIntervals(Date fromPlanningDate, Date toPlanningDate) {
         LocalDate fromPlanningLocalDate = ZonedDateTime.ofInstant(fromPlanningDate.toInstant(), ZoneId.systemDefault()).toLocalDate();
         LocalDate toPlanningLocalDate = ZonedDateTime.ofInstant(toPlanningDate.toInstant(), ZoneId.systemDefault()).toLocalDate();
-        Set<LocalDate> localDateSet= new HashSet<>();
+        Set<LocalDate> localDateSet= new TreeSet<>();
         while (!fromPlanningLocalDate.equals(toPlanningLocalDate)) {
             localDateSet.add(fromPlanningLocalDate);
             fromPlanningLocalDate = fromPlanningLocalDate.plusDays(1l);

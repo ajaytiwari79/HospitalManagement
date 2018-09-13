@@ -10,17 +10,17 @@ import java.util.Objects;
 @QueryResult
 public class SkillQueryResult {
 
-    private String id;
+    private String skillId;
     private String name;
     private SkillType skillType;
     private int weight;
 
-    public String getId() {
-        return id;
+    public String getSkillId() {
+        return skillId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setSkillId(String skillId) {
+        this.skillId = skillId;
     }
 
     public String getName() {
@@ -57,7 +57,7 @@ public class SkillQueryResult {
 
         return new EqualsBuilder()
                 .append(weight, that.weight)
-                .append(id, that.id)
+                .append(skillId, that.skillId)
                 .append(name, that.name)
                 .append(skillType, that.skillType)
                 .isEquals();
@@ -66,7 +66,7 @@ public class SkillQueryResult {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(id)
+                .append(skillId)
                 .append(name)
                 .append(skillType)
                 .append(weight)

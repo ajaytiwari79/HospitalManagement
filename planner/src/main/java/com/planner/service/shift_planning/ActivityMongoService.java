@@ -4,6 +4,7 @@ import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
 import com.kairos.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.shiftplanning.domain.Activity;
 import com.planner.domain.shift_planning.Shift;
 import com.planner.domain.wta.templates.WorkingTimeAgreement;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
@@ -114,5 +115,20 @@ public class ActivityMongoService {
      */
     public List<WorkingTimeAgreement> getWTARuleTemplateByUnitPositionIds(List<Long> unitPositionIds,Date fromPlanningDate,Date toPlanningDate) {
         return activityMongoRepository.getWTARuleTemplateByUnitPositionIds(unitPositionIds,fromPlanningDate,toPlanningDate);
+    }
+
+    //TODO temporary use ObjectMapperUtils(currently not working)
+    public List<Activity> getConvertedActivityList(List<ActivityDTO> activities){
+        List<Activity> activityList=new ArrayList<>();
+        for(ActivityDTO activityDTO:activities)
+        {
+            Activity activity=new Activity();
+            activity.setId(activityDTO.getId().toString());
+            activity.setName(activityDTO.getName());
+            //activity.setActivityConstraints(activityDTO.);
+            //activity.setSkills(activityDTO.get);
+            activityList.add(activity);
+        }
+        return activityList;
     }
 }

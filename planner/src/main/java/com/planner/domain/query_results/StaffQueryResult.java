@@ -2,7 +2,9 @@ package com.planner.domain.query_results;
 
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @QueryResult
@@ -11,7 +13,7 @@ public class StaffQueryResult {
     private Long staffId ;
      private String staffName;
      private Long unitPositionsId;
-     private Set<SkillQueryResult> staffSkills;
+     private HashSet<Map> staffSkills;
      private List<ExpertiseQueryResult> unitPositionExpertise;
 
     public Long getStaffId() {
@@ -38,11 +40,11 @@ public class StaffQueryResult {
         this.unitPositionsId = staffUnitPositions;
     }
 
-    public Set<SkillQueryResult> getStaffSkills() {
+    public HashSet<Map> getStaffSkills() {
         return staffSkills;
     }
 
-    public void setStaffSkills(Set<SkillQueryResult> staffSkills) {
+    public void setStaffSkills(HashSet<Map> staffSkills) {
         this.staffSkills = staffSkills;
     }
 

@@ -48,6 +48,7 @@ public class StaffingLevelService {
         for(LocalDate localDate:map.keySet()){
             for(StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO:map.get(localDate))
             {
+                if(staffingLevelTimeSlotDTO.getStaffingLevelActivities().size()>0)
                 map1.put(localDate,staffingLevelTimeSlotDTO.getStaffingLevelActivities());
             }
 

@@ -85,27 +85,28 @@ public class ShiftPlanningInitializationService {
     /**
      * This method is used to get
      * All Staff/Employee with in {@param unitId}
-     * TODO(This is the only applicable staff{@param staffWithSkillsAndUnitPostionIds must have unitPositionIds else filter in this function itself})
+     * TODO Testing(This is the only applicable staff{@param staffWithSkillsAndUnitPostionIds must have unitPositionIds else filter in this function itself})
      * between
+     *
      * @param fromPlanningDate
-     * @param toPlanningDate
-     * Must have CTA associated with unitPositionId within planning range else Staff will be skipped in planning
-     * Must have WTA associated with unitPositionId within planning range else Staff will be skipped in planning //TODO attach logic
+     * @param toPlanningDate   Must have CTA associated with unitPositionId within planning range else Staff will be skipped in planning
+     *                         Must have WTA associated with unitPositionId within planning range else Staff will be skipped in planning //TODO attach logic
      * @return
      */
     public List<Employee> getAllEmployee(Date fromPlanningDate, Date toPlanningDate, List<StaffQueryResult> staffWithSkillsAndUnitPostionIds, List<Long> unitPositionIds) {
         List<Employee> employeeList = new ArrayList<>();
         //Prepare CTA data
         Map<Long, Map<java.time.LocalDate, CTAResponseDTO>> unitPositionIdWithLocalDateCTAMap = ctaService.getunitPositionIdWithLocalDateCTAMap(unitPositionIds, fromPlanningDate, toPlanningDate);
-        if(unitPositionIdWithLocalDateCTAMap.size()>0) {
-        //Initialize Employee
+        if (unitPositionIdWithLocalDateCTAMap.size() > 0) {
+            //Initialize Employee
             for (StaffQueryResult staffQueryResult : staffWithSkillsAndUnitPostionIds) {
-                if (unitPositionIdWithLocalDateCTAMap.containsKey(staffQueryResult.getStaffUnitPosition())) {
+                if (staffQueryResult.getStaffUnitPosition() != null && unitPositionIdWithLocalDateCTAMap.containsKey(staffQueryResult.getStaffUnitPosition())) {
                     Employee employee = new Employee();
                     employee.setId(staffQueryResult.getStaffId().toString());
                     employee.setName(staffQueryResult.getStaffName());
                     employee.setUnitPositionId(staffQueryResult.getStaffUnitPosition());
                     employee.setLocalDateCTAResponseDTOMap(ctaService.getLocalDateCTAMapByunitPositionId(unitPositionIdWithLocalDateCTAMap, staffQueryResult.getStaffUnitPosition()));
+
                     employee.setSkillSet(skillService.setSkillsOfEmployee(staffQueryResult.getStaffSkills()));
                     //employee.setLocalDateWTAMap();
                     employeeList.add(employee);
@@ -125,17 +126,19 @@ public class ShiftPlanningInitializationService {
      * @return
      */
     public List<ShiftRequestPhase> getShiftRequestPhase(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate, List<Employee> employeeList) {
-        Map<Long, Employee> unitPositionEmployeeMap = employeeList.stream().collect(Collectors.toMap(unitPositionId -> unitPositionId.getUnitPositionId(), emp -> emp));
         List<Shift> shifts = activityMongoService.getAllShiftsByUnitPositionIds(unitPositionIds, fromPlanningDate, toPlanningDate);
         List<ShiftRequestPhase> shiftRequestPhaseList = new ArrayList<>();
-        //Initiaize Shifts
-        for (Shift shift : shifts) {
-            if (unitPositionEmployeeMap.containsKey(shift.getUnitPositionId())) {
-                ShiftRequestPhase shiftRequestPhase = new ShiftRequestPhase();
-                shiftRequestPhase.setStartDate(shift.getStartLocalDate());
-                shiftRequestPhase.setEndDate(shift.getEndLocalDate());
-                shiftRequestPhase.setEmployee(unitPositionEmployeeMap.get(shift.getUnitPositionId()));
-                shiftRequestPhaseList.add(shiftRequestPhase);
+        if (shifts.size() > 0) {
+            Map<Long, Employee> unitPositionEmployeeMap = employeeList.stream().collect(Collectors.toMap(unitPositionId -> unitPositionId.getUnitPositionId(), emp -> emp));
+            //Initiaize Shifts
+            for (Shift shift : shifts) {
+                if (unitPositionEmployeeMap.containsKey(shift.getUnitPositionId())) {
+                    ShiftRequestPhase shiftRequestPhase = new ShiftRequestPhase();
+                    shiftRequestPhase.setStartDate(shift.getStartLocalDate());
+                    shiftRequestPhase.setEndDate(shift.getEndLocalDate());
+                    shiftRequestPhase.setEmployee(unitPositionEmployeeMap.get(shift.getUnitPositionId()));
+                    shiftRequestPhaseList.add(shiftRequestPhase);
+                }
             }
         }
         return shiftRequestPhaseList;
@@ -153,8 +156,9 @@ public class ShiftPlanningInitializationService {
             }
 
         }
-
-        return ObjectMapperUtils.copyProperties(activityMongoService.getActivities(activityIds), Activity.class);
+        return activityMongoService.getConvertedActivityList(activityMongoService.getActivities(activityIds));
+//TODO checking
+        //return ObjectMapperUtils.copyProperties(activityMongoService.getActivities(activityIds), Activity.class);
     }
 /****************************************************************************/
     /**
@@ -169,7 +173,7 @@ public class ShiftPlanningInitializationService {
         List<ActivityLineInterval> activityLineIntervalList = new ArrayList<>();
         Map<LocalDate, List<Activity>> activitiesPerDay = new HashMap<>();
         Map<String, Activity> activityIdActivityMap = activityList.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-
+//Todo need loop over localDateStaffingLevelAcitivity else null pointer
         for (Map.Entry<java.time.LocalDate, List<StaffingLevelTimeSlotDTO>> localDateListEntry : localDateStaffingLevelTimeSlotMap.entrySet()) {
             LocalDate jodaLocalDate = DateUtils.asJodaLocalDate(DateUtils.asDate(localDateListEntry.getKey()));
             List<Activity> activityListPerDay = new ArrayList<>();

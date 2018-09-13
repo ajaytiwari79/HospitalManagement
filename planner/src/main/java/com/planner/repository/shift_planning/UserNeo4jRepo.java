@@ -20,7 +20,7 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
             "return " +
             "id(staff) as staffId," +
             "staff.firstName+staff.lastName as staffName," +
-            "collect({skillid:id(skill),name:skill.name,weight:skill.weight}) as staffSkills,"+
+            "collect({skillId:id(skill),name:skill.name,weight:skill.weight}) as staffSkills,"+
             "id(unitPosition) as unitPositionsId "
             // "unitPositionExpertise:expertise"
     )
