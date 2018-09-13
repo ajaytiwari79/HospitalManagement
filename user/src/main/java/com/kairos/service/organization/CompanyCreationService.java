@@ -366,7 +366,10 @@ public class CompanyCreationService {
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
-        if (organizationBasicDTO.getUnitManager() != null) {
+        if (organizationBasicDTO.getUnitManager() != null
+                && (organizationBasicDTO.getUnitManager().getEmail()!=null||organizationBasicDTO.getUnitManager().getLastName()!=null||
+                organizationBasicDTO.getUnitManager().getFirstName()!=null|| organizationBasicDTO.getUnitManager().getCprNumber()!=null||
+                organizationBasicDTO.getUnitManager().getAccessGroupId()!=null)) {
             setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
         }
         //Assign Parent Organization's level to unit
