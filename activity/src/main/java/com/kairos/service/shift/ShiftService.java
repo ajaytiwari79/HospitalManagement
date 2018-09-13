@@ -235,7 +235,9 @@ public class ShiftService extends MongoBaseService {
 
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getStartDate());
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findCurrentDatePlanningPeriod(shiftDTO.getUnitId(),shiftDTO.getStartLocalDate(),shiftDTO.getEndLocalDate());
-
+        if (!Optional.ofNullable(planningPeriod).isPresent()){
+            exceptionService.actionNotPermittedException("message.periodsetting.notFound");
+        }
         shiftWithActivityDTO.setPlannedTypeId(addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activity, staffAdditionalInfoDTO));
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(),shiftStartDate);
         ViolatedRulesDTO violatedRulesDTO = validateShiftWithActivity(phase,wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
