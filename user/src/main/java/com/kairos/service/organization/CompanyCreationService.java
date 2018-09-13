@@ -267,7 +267,7 @@ public class CompanyCreationService {
                 user.setLastName(unitManagerDTO.getLastName());
                 userGraphRepository.save(user);
             } else {
-                if (unitManagerDTO != null && unitManagerDTO.getCprNumber() != null) {
+                if (unitManagerDTO.getCprNumber() != null) {
                     StaffCreationDTO unitManagerData = new StaffCreationDTO(unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(),
                             unitManagerDTO.getCprNumber(),
                             null, unitManagerDTO.getEmail(), null, unitManagerDTO.getEmail(), null, unitManagerDTO.getAccessGroupId());
