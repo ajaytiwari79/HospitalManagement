@@ -227,7 +227,7 @@ public class EmploymentService {
 
         } else {
             // need to remove unit permission
-            if(unitPermissionGraphRepository.getCountOfUnitPermissionsOfStaff(staffId)<=1){
+            if(unitPermissionGraphRepository.getAccessGroupRelationShipCountOfStaff(staffId)<=1){
                 exceptionService.actionNotPermittedException("error.permission.remove");
             }
             unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);

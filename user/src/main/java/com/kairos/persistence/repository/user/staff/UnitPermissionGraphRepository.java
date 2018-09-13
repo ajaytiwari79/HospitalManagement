@@ -82,7 +82,7 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
             "Match (employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission) " +
             "Match (unitPermission)-[r:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) " +
             "return count(r)")
-    int getCountOfUnitPermissionsOfStaff(Long staffId);
+    int getAccessGroupRelationShipCountOfStaff(Long staffId);
 
 
 
