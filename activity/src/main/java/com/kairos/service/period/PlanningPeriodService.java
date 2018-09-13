@@ -243,15 +243,15 @@ public class PlanningPeriodService extends MongoBaseService {
         // Add planning period object in list
         planningPeriods.add(planningPeriod);
         if (recurringNumber > 1) {
-//            if (planningPeriodDTO.getDurationType().equals(DurationType.MONTHS)) {
-//                startDate = startDate.withDayOfMonth(1);
-//            }else{
-//                startDate = startDate.minusDays(startDate.getDayOfWeek().getValue() - 1);
-//            }
-            createPlanningPeriod(unitId,endDate.plusDays(1),
+            if (planningPeriodDTO.getDurationType().equals(DurationType.MONTHS)) {
+                startDate = startDate.withDayOfMonth(1);
+            }else{
+                startDate = startDate.minusDays(startDate.getDayOfWeek().getValue() - 1);
+            }
+            createPlanningPeriod(unitId,
+                    DateUtils.addDurationInLocalDate(startDate, planningPeriodDTO.getDuration(), planningPeriodDTO.getDurationType(), 1),
                     planningPeriods, applicablePhases, planningPeriodDTO, --recurringNumber);
         }
-        //DateUtils.addDurationInLocalDate(startDate, planningPeriodDTO.getDuration(), planningPeriodDTO.getDurationType(), 1)
     }
 
     public List<LocalDate> getListOfStartDateInWeekOrMonths(LocalDate startDate, LocalDate endDate, PlanningPeriodDTO planningPeriodDTO) {
