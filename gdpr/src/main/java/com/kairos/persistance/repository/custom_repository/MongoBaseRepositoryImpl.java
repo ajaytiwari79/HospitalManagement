@@ -62,7 +62,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 
 
     @Override
-    public boolean findByIdAndSaveDelete(ID id) {
+    public boolean findByIdAndSafeDelete(ID id) {
         Assert.notNull(id, "The given id must not be null!");
         Query query = new Query(Criteria.where("_id").is(id).and("deleted").is(false));
         Update update = new Update().set("deleted", true);

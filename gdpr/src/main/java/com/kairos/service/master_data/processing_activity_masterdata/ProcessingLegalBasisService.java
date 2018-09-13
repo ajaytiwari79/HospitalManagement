@@ -174,7 +174,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
      * @param processingLegalBasisDTOS - processing legal basis suggested by Unit
      * @return
      */
-    public List<ProcessingLegalBasis> saveSuggestedProcessingLegalBasissFromUnit(Long countryId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
+    public List<ProcessingLegalBasis> saveSuggestedProcessingLegalBasisFromUnit(Long countryId, List<ProcessingLegalBasisDTO> processingLegalBasisDTOS) {
 
         Set<String> processingLegalBasisNameList = new HashSet<>();
         for (ProcessingLegalBasisDTO ProcessingLegalBasis : processingLegalBasisDTOS) {

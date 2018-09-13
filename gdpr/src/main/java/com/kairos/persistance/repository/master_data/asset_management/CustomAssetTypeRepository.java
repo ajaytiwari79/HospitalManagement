@@ -19,9 +19,13 @@ public interface CustomAssetTypeRepository {
 
     AssetType findByNameAndOrganizationId(Long organizationId,String name);
 
-    List<AssetTypeResponseDTO> getAllOrganizationAssetTypesWithSubAssetTypes(Long organizationId);
+    AssetTypeResponseDTO getOrganizationAssetTypesWithSubAssetTypes( Long unitId, BigInteger id);
 
-    AssetTypeResponseDTO getOrganizationAssetTypesWithSubAssetTypes( Long organizationId, BigInteger id);
+    List<AssetTypeRiskResponseDTO> getAllAssetTypesByUnitId(Long unitId);
+
+    List<AssetTypeRiskResponseDTO> getSubAssetTypesByAssetTypeIdAndUnitId(Long unitId,BigInteger assetTypeId);
+
+
 
 
 

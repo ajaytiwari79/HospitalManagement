@@ -7,6 +7,7 @@ import com.kairos.persistance.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityRiskResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -172,6 +173,25 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
         );
         AggregationResults<AssetBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, AssetBasicResponseDTO.class);
         return result.getMappedResults();
+
+    }
+
+    @Override
+    public ProcessingActivityRiskResponseDTO getProcessingActivityWithRisksAndSubProcessingActivities(Long unitId, BigInteger processingActivityId) {
+
+        String groupSubProcessingActivity="{'$group':{_id:'$_id','subProcessingActivities':{'$addToSet':'$subProcessingActivities'},'risks':{'$first':'$risks'},'name':{'$first':'$name'}}}";
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false).and("_id").is(processingActivityId)),
+                lookup("risk","risks","_id","risks"),
+                lookup("processing_activity","subProcessingActivities","_id","subProcessingActivities"),
+                unwind("subProcessingActivities",true),
+                lookup("risk","subProcessingActivities.risks","_id","subProcessingActivities.risks"),
+                new CustomAggregationOperation(Document.parse(groupSubProcessingActivity))
+
+        );
+        AggregationResults<ProcessingActivityRiskResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityRiskResponseDTO.class);
+        return result.getUniqueMappedResult();
 
     }
 }

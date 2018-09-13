@@ -501,7 +501,7 @@ public class AccessGroupService {
 
     /***** Access group - COUNTRY LEVEL - STARTS HERE ******************/
 
-    public void setAccessPageRelationshipWithAccessGroupByOrgCategory(Long countryId, Long accessGroupId, OrganizationCategory organizationCategory) {
+    private void setAccessPageRelationshipWithAccessGroupByOrgCategory(Long countryId, Long accessGroupId, OrganizationCategory organizationCategory) {
         switch (organizationCategory) {
             case HUB: {
                 accessGroupRepository.setAccessPageForHubAccessGroup(countryId, accessGroupId);

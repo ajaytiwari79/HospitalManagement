@@ -1,6 +1,5 @@
 package com.kairos.persistance.model.master_data.default_asset_setting;
 
-import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.persistance.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -68,6 +67,10 @@ public class AssetType extends MongoBaseEntity {
     public AssetType(@NotBlank(message = "Name can't be empty or null") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
         this.name = name;
         this.countryId = countryId;
+    }
+
+    public AssetType(@NotBlank(message = "Name can't be empty or null") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name) {
+        this.name = name;
     }
 
     public AssetType() {

@@ -77,7 +77,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @return
      */
     public List<PolicyAgreementTemplateResponseDTO> getAllPolicyAgreementTemplateWithAgreementSectionAndClauses(Long countryId, Long organizationId) {
-        return policyAgreementTemplateRepository.getAllPolicyAgreementTemplateByCountryId(countryId, organizationId);
+       List<PolicyAgreementTemplateResponseDTO>  policyAgreementTemplateResponseDTOS= policyAgreementTemplateRepository.getAllPolicyAgreementTemplateByCountryId(countryId, organizationId);
+        policyAgreementTemplateResponseDTOS.forEach(policyAgreementTemplateResponseDTO -> policyAgreementTemplateResponseDTO.setSections(new ArrayList<>()));
+        return policyAgreementTemplateResponseDTOS;
     }
 
 
