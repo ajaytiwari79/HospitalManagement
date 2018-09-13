@@ -19,6 +19,7 @@ public class SickSettings extends MongoBaseEntity {
     private LocalDate endDate;
     private Long unitPositionId;   // This is required to find user shifts based on unitPosition Id
 
+
     public SickSettings() {
         //
     }

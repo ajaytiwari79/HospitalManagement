@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -116,7 +117,10 @@ public class SickService {
             Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(activity -> activity.getId(), Function.identity()));
             LocalDate currentLocalDate = DateUtils.getCurrentLocalDate();
             List<Shift> shifts = shiftMongoRepository.findAllShiftByDynamicQuery(sickSettings, activityMap);
-
+            Set<Long> staffIds = sickSettings.stream().map(sickSetting -> sickSetting.getStaffId()).collect(Collectors.toSet());
+            logger.info("last date iso string {} , {}", DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MIN), DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MAX));
+            List<Shift> previousDaySickShifts = shiftMongoRepository.findAllByStaffIdInAndSickShiftTrueAndStartDateGreaterThanEqualAndEndDateLessThanEqual(staffIds, DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MIN), DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MAX));
+            logger.info("" + previousDaySickShifts);
             Map<Long, List<Shift>> staffWiseShiftMap = shifts.stream().collect(Collectors.groupingBy(s -> s.getStaffId(), Collectors.toList()));
             logger.info("Total number of shifts found {} and map is {}", shifts.size(), staffWiseShiftMap);
 
@@ -135,7 +139,7 @@ public class SickService {
                 if (validRepetitionDays.contains(differenceOfDaysFromCurrentDateToLastSickDate)) {
                     logger.info("The current user is still sick so we need to add more shifts {}", differenceOfDaysFromCurrentDateToLastSickDate);
                     List<Shift> currentStaffShifts = staffWiseShiftMap.get(currentSickSettings.getStaffId()) != null ? staffWiseShiftMap.get(currentSickSettings.getStaffId()) : new ArrayList<>();
-                    Duration duration= new Duration();
+                    Duration duration = new Duration();
                     //shiftSickService.createSicknessShiftsOfStaff(currentSickSettings.getStaffId(), unitId, activity, currentSickSettings.getUnitPositionId(), currentStaffShifts,duration);
                 }
             });

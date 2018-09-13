@@ -33,7 +33,12 @@ public class Duration {
         else
             return 0;
     }
-
+    public static Duration getDefaultMinDuration() {
+       return new Duration(LocalTime.MIN,LocalTime.MIN);
+    }
+    public static Duration getMaxDuration() {
+        return new Duration(LocalTime.MAX,LocalTime.MAX);
+    }
     public LocalTime getFrom() {
         return from;
     }

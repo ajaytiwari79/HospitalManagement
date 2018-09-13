@@ -673,9 +673,15 @@ public class DateUtils {
     }
 
     public static Date getDateAfterDaysWithTime(short daysAfter, LocalTime duration) {
-        return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atStartOfDay().with(duration).toInstant(ZoneOffset.UTC));
+        return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atTime(duration).toInstant(ZoneOffset.UTC));
     }
+    public static String getDateBeforeDaysWithTimeInISO(short daysAfter,LocalTime localTime){
 
+        SimpleDateFormat isoFormat = new SimpleDateFormat(MONGODB_QUERY_DATE_FORMAT);
+        return isoFormat.format(getDateAfterDaysWithTime(daysAfter,localTime));
+
+
+    }
     public static LocalDate getLocalDateFromString(String receivedDate) {
         SimpleDateFormat format = new SimpleDateFormat(ISO_FORMAT, Locale.US);
         format.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
