@@ -33,12 +33,12 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
 
 
     @Override
-    public List<AgreementSectionResponseDTO> getAgreementTemplateAllSectionAndSubSections(Long countryId, Long unitId, BigInteger agreementTemplateId) {
+    public List<AgreementSectionResponseDTO> getAgreementTemplateWithSectionsAndSubSections(Long countryId, Long unitId, BigInteger agreementTemplateId) {
 
         String replaceRoot = "{ '$replaceRoot': { 'newRoot': '$agreementSections' } }";
-        String sortSubSections = " {$sort:{'subSections.orderedIndex':1}}";
+        String sortSubSections = " {$sort:{'subSections.orderedIndex':-1}}";
         String sortAgreementSection = "{$sort:{'orderedIndex':1}}";
-        String groupSubSections = "{$group:{_id: '$_id', subSections:{'$addToSet':'$subSections'},clauses:{$first:'$clauses'},orderedIndex:{$first:'$orderedIndex'},title:{$first:'$title' }}}";
+        String groupSubSections = "{$group:{_id: '$_id', subSections:{'$addToSet':'$subSections'},clauses:{$first:'$clauses'},orderedIndex:{$first:'$orderedIndex'},title:{$first:'$title' },'clauseOrder':{'$first':'$clauseOrder'}}}";
 
         Document replaceRootOperation = Document.parse(replaceRoot);
         Document groupOperation = Document.parse(groupSubSections);

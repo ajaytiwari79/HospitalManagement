@@ -82,7 +82,7 @@ public class PolicyAgreementTemplateController {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id cannot be null ");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllPolicyAgreementTemplateWithAgreementSectionAndClauses(countryId, organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllPolicyAgreementTemplate(countryId, organizationId));
 
     }
 

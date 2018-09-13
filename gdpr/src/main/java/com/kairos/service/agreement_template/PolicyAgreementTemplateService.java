@@ -71,13 +71,13 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
     /**
-     * @description method return policy agreement template with basic details
      * @param countryId
      * @param organizationId
      * @return
+     * @description method return policy agreement template with basic details
      */
-    public List<PolicyAgreementTemplateResponseDTO> getAllPolicyAgreementTemplateWithAgreementSectionAndClauses(Long countryId, Long organizationId) {
-       List<PolicyAgreementTemplateResponseDTO>  policyAgreementTemplateResponseDTOS= policyAgreementTemplateRepository.getAllPolicyAgreementTemplateByCountryId(countryId, organizationId);
+    public List<PolicyAgreementTemplateResponseDTO> getAllPolicyAgreementTemplate(Long countryId, Long organizationId) {
+        List<PolicyAgreementTemplateResponseDTO> policyAgreementTemplateResponseDTOS = policyAgreementTemplateRepository.getAllPolicyAgreementTemplateByCountryId(countryId, organizationId);
         policyAgreementTemplateResponseDTOS.forEach(policyAgreementTemplateResponseDTO -> policyAgreementTemplateResponseDTO.setSections(new ArrayList<>()));
         return policyAgreementTemplateResponseDTOS;
     }
@@ -91,7 +91,17 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @description method return list of Agreement sections with sub sections of policy agreement template
      */
     public List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(Long countryId, Long unitId, BigInteger agreementTemplateId) {
-        return policyAgreementTemplateRepository.getAgreementTemplateAllSectionAndSubSections(countryId, unitId, agreementTemplateId);
+
+
+        List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAgreementTemplateWithSectionsAndSubSections(countryId, unitId, agreementTemplateId);
+        agreementSectionResponseDTOS.forEach(agreementSectionResponseDTO ->
+                {
+                    if (!Optional.ofNullable(agreementSectionResponseDTO.getSubSections().get(0).getId()).isPresent()) {
+                        agreementSectionResponseDTO.setSubSections(new ArrayList<>());
+                    }
+                }
+        );
+        return agreementSectionResponseDTOS;
     }
 
 
