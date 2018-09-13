@@ -7,7 +7,7 @@ import java.math.BigInteger;
 
 public class DashboardKPIMappingDTO {
     private BigInteger id;
-    private String dashboardId;
+    private String moduleId;
     private BigInteger kpiId;
     private CounterSize size;
     private KPIPosition position;
@@ -20,12 +20,12 @@ public class DashboardKPIMappingDTO {
         this.id = id;
     }
 
-    public String getDashboardId() {
-        return dashboardId;
+    public String getModuleId() {
+        return moduleId;
     }
 
-    public void setDashboardId(String dashboardId) {
-        this.dashboardId = dashboardId;
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
     }
 
     public BigInteger getKpiId() {

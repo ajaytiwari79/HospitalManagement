@@ -5,14 +5,24 @@ import java.util.List;
 
 public class DashboardKPIsDTO {
     private BigInteger dashboardId;
+    private String moduleId;
     private List<BigInteger> kpiIds;
 
     public DashboardKPIsDTO() {
     }
 
-    public DashboardKPIsDTO(BigInteger dashboardId, List<BigInteger> kpiIds) {
+    public DashboardKPIsDTO(BigInteger dashboardId,String moduleId, List<BigInteger> kpiIds) {
         this.dashboardId = dashboardId;
+        this.moduleId=moduleId;
         this.kpiIds = kpiIds;
+    }
+
+    public String getModuleId() {
+        return moduleId;
+    }
+
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
     }
 
     public BigInteger getDashboardId() {

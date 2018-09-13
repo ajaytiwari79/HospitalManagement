@@ -10,6 +10,7 @@ import java.math.BigInteger;
 public class DashboardKPIConf extends MongoBaseEntity {
     private BigInteger kpiId;
     private BigInteger dashboardId;
+    private String moduleId;
     private Long countryId;
     private Long unitId;
     private Long staffId;
@@ -18,9 +19,13 @@ public class DashboardKPIConf extends MongoBaseEntity {
     private KPIPosition position;
 
 
-    public DashboardKPIConf(BigInteger kpiId, BigInteger dashboardId, Long countryId, Long unitId, Long staffId, ConfLevel level,KPIPosition position) {
+    public DashboardKPIConf() {
+    }
+
+    public DashboardKPIConf(BigInteger kpiId, BigInteger dashboardId, String moduleId, Long countryId, Long unitId, Long staffId, ConfLevel level, KPIPosition position) {
         this.kpiId = kpiId;
         this.dashboardId = dashboardId;
+        this.moduleId=moduleId;
         this.countryId = countryId;
         this.unitId = unitId;
         this.staffId = staffId;
@@ -28,6 +33,15 @@ public class DashboardKPIConf extends MongoBaseEntity {
         this.position=position;
     }
 
+    public DashboardKPIConf(BigInteger kpiId, String moduleId, Long countryId, Long unitId, Long staffId, ConfLevel level, KPIPosition position) {
+        this.kpiId = kpiId;
+        this.moduleId = moduleId;
+        this.countryId = countryId;
+        this.unitId = unitId;
+        this.staffId = staffId;
+        this.level = level;
+        this.position = position;
+    }
 
     public CounterSize getSize() {
         return size;
@@ -91,5 +105,13 @@ public class DashboardKPIConf extends MongoBaseEntity {
 
     public void setLevel(ConfLevel level) {
         this.level = level;
+    }
+
+    public String getModuleId() {
+        return moduleId;
+    }
+
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
     }
 }

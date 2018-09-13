@@ -12,6 +12,7 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.service.counter.CounterDistService;
+import com.kairos.service.counter.DynamicTabService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
@@ -39,6 +40,9 @@ public class CounterDistController {
 
     @Inject
     private CounterDistService counterManagementService;
+
+    @Inject
+    private DynamicTabService dynamicTabService;
 
     private final static Logger logger = LoggerFactory.getLogger(CounterDistController.class);
 
@@ -209,6 +213,10 @@ public class CounterDistController {
 
     //dashboard setting kpi conf
 
+    @GetMapping(STAFF_URL+COUNTER_DIST_URL+"/dashboard_tab")
+    public ResponseEntity<Map<String, Object>> getDashboardTabForStaff(@PathVariable Long organizationId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dynamicTabService.getDashboardTabOfRef(organizationId,ConfLevel.STAFF));
+    }
 
     @GetMapping(COUNTRY_URL+COUNTER_DIST_URL+"/dashboard")
     public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistributionDataForCountry(@PathVariable Long countryId){
@@ -245,15 +253,15 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @GetMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/{dashboardId}")
-    public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String dashboardId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDataConfForStaff(dashboardId,unitId, ConfLevel.STAFF));
+    @GetMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/{moduleId}")
+    public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String moduleId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDataConfForStaff(moduleId,unitId, ConfLevel.STAFF));
     }
 
 
-    @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/{dashboardId}/update_dist_entry")
-    public ResponseEntity<Map<String, Object>> updateDashboardKPIsEntryForStaff(@PathVariable String dashboardId,@PathVariable Long unitId,@RequestBody List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS){
-        counterManagementService.updateDashboardKPIEntries(dashboardKPIMappingDTOS,dashboardId,unitId,ConfLevel.STAFF);
+    @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/{moduleId}/update_dist_entry")
+    public ResponseEntity<Map<String, Object>> updateDashboardKPIsEntryForStaff(@PathVariable String moduleId,@PathVariable Long unitId,@RequestBody List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS){
+        counterManagementService.updateDashboardKPIEntries(dashboardKPIMappingDTOS,moduleId,unitId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
