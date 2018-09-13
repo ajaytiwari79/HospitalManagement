@@ -87,6 +87,22 @@ public class WeeklyRestPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.continuousWeekRest = continuousWeekRest;
     }
 
+    public List<BigInteger> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
     public WeeklyRestPeriodWTATemplateDTO(String name, boolean disabled,
                                           String description, long continuousWeekRest) {
         this.name = name;

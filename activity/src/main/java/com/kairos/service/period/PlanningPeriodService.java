@@ -23,10 +23,7 @@ import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
-import com.kairos.rest_client.GenericRestClient;
-import com.kairos.rest_client.OrganizationRestClient;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.rest_client.SchedulerRestClient;
+import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
@@ -77,7 +74,7 @@ public class PlanningPeriodService extends MongoBaseService {
     @Inject
     private GenericRestClient genericRestClient;
     @Inject
-    private SchedulerRestClient schedulerRestClient;
+    private SchedulerServiceRestClient schedulerRestClient;
     // To get list of phases with duration in days
     public List<PhaseDTO> getPhasesWithDurationInDays(Long unitId) {
         List<PhaseDTO> phases = phaseService.getApplicablePlanningPhasesByOrganizationId(unitId, Sort.Direction.DESC);

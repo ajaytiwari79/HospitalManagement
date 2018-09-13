@@ -10,6 +10,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +41,7 @@ public class ActivityTabsWrapper {
     private LocationActivityTab locationActivityTab;
     private PermissionsActivityTab permissionsActivityTab;
     private List<EmploymentTypeDTO> employmentTypes;
+    private List<Long> rulesTabDayTypes= new ArrayList<>();
 
     public List<TimeTypeDTO> getTimeTypes() {
         return timeTypes;
@@ -130,9 +132,10 @@ public class ActivityTabsWrapper {
 
     }
 
-    public ActivityTabsWrapper(TimeCalculationActivityTab timeCalculationActivityTab, List<DayType> dayTypes) {
+    public ActivityTabsWrapper(TimeCalculationActivityTab timeCalculationActivityTab, List<DayType> dayTypes,List<Long> rulesTabDayTypes) {
         this.timeCalculationActivityTab = timeCalculationActivityTab;
         this.dayTypes = dayTypes;
+        this.rulesTabDayTypes=rulesTabDayTypes;
 
     }
 
@@ -286,5 +289,13 @@ public class ActivityTabsWrapper {
 
     public void setEmploymentTypes(List<EmploymentTypeDTO> employmentTypes) {
         this.employmentTypes = employmentTypes;
+    }
+
+    public List<Long> getRulesTabDayTypes() {
+        return rulesTabDayTypes;
+    }
+
+    public void setRulesTabDayTypes(List<Long> rulesTabDayTypes) {
+        this.rulesTabDayTypes = rulesTabDayTypes;
     }
 }

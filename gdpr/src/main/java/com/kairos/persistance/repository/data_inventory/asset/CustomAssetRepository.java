@@ -5,7 +5,6 @@ import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 public interface CustomAssetRepository {
 

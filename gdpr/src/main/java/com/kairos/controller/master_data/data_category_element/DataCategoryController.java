@@ -94,7 +94,7 @@ public class DataCategoryController {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.getDataCategoryWithDataElementOnLeftHierarchySelctionById(unitId, dataCategoryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.getDataCategoryWithDataElementOnLeftHierarchySelectionById(unitId, dataCategoryId));
 
     }
 
