@@ -3,11 +3,11 @@ package com.kairos.service.dashboard;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
-import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
@@ -96,16 +95,16 @@ public class SickService {
 
         List<SickSettings> sickSettings = sickSettingsRepository.findAllSickUsersOfUnit(unitId);
         if (!sickSettings.isEmpty()) {
-            Set<BigInteger> activityIds = sickSettings.stream().map(sickSetting -> sickSetting.getActivityId()).collect(Collectors.toSet());
+            Set<BigInteger> activityIds = sickSettings.stream().map(SickSettings::getActivityId).collect(Collectors.toSet());
             List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
-            Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(activity -> activity.getId(), Function.identity()));
+            Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(MongoBaseEntity::getId, Function.identity()));
 
             List<Shift> shifts = shiftMongoRepository.findAllShiftByDynamicQuery(sickSettings, activityMap);
-            Set<Long> staffIds = sickSettings.stream().map(sickSetting -> sickSetting.getStaffId()).collect(Collectors.toSet());
+            Set<Long> staffIds = sickSettings.stream().map(SickSettings::getStaffId).collect(Collectors.toSet());
             logger.info("last date iso string {} , {}", DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MIN), DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MAX));
             List<Shift> previousDaySickShifts = shiftMongoRepository.findAllByStaffIdInAndSickShiftTrueAndStartDateGreaterThanEqualAndEndDateLessThanEqual(staffIds, DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MIN), DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MAX));
-            Map<Long, Shift> staffWisePreviousDayShiftMap = previousDaySickShifts.stream().collect(Collectors.toMap(s -> s.getStaffId(), Function.identity()));
-            Map<Long, List<Shift>> staffWiseShiftMap = shifts.stream().collect(Collectors.groupingBy(s -> s.getStaffId(), Collectors.toList()));
+            Map<Long, Shift> staffWisePreviousDayShiftMap = previousDaySickShifts.stream().collect(Collectors.toMap(Shift::getStaffId, Function.identity()));
+            Map<Long, List<Shift>> staffWiseShiftMap = shifts.stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
             logger.info("Total number of shifts found {} ", shifts.size());
 
             sickSettings.forEach(currentSickSettings -> {
