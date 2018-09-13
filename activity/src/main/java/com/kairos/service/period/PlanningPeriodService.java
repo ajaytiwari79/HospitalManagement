@@ -43,6 +43,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -255,16 +256,16 @@ public class PlanningPeriodService extends MongoBaseService {
         // Add planning period object in list
         planningPeriods.add(planningPeriod);
         if (recurringNumber > 1) {
-            if (planningPeriodDTO.getDurationType().equals(DurationType.MONTHS)) {
-                startDate = startDate.withDayOfMonth(1);
-            }else{
-                startDate = startDate.minusDays(startDate.getDayOfWeek().getValue() - 1);
-            }
-            createPlanningPeriod(unitId,
-                    DateUtils.addDurationInLocalDate(startDate, planningPeriodDTO.getDuration(), planningPeriodDTO.getDurationType(), 1),
+            createPlanningPeriod(unitId,endDate.plusDays(1),
                     planningPeriods, applicablePhases, planningPeriodDTO, --recurringNumber);
         }
     }
+//  if (planningPeriodDTO.getDurationType().equals(DurationType.MONTHS)) {
+//        startDate = startDate.withDayOfMonth(1);
+//    }else{
+//        startDate = startDate.minusDays(startDate.getDayOfWeek().getValue() - 1);
+//    }
+    //DateUtils.addDurationInLocalDate(startDate, planningPeriodDTO.getDuration(), planningPeriodDTO.getDurationType(), 1),
 
     public List<LocalDate> getListOfStartDateInWeekOrMonths(LocalDate startDate, LocalDate endDate, PlanningPeriodDTO planningPeriodDTO) {
         List<LocalDate> startDateList = new ArrayList<>();
@@ -294,9 +295,9 @@ public class PlanningPeriodService extends MongoBaseService {
                     planningPeriodDTO.getDurationType(), 1);
         } else {
             if (planningPeriodDTO.getDurationType().equals(DurationType.MONTHS)) {
-                endDate = startDate.withDayOfMonth(1).plusMonths(1).minusDays(1);
+                endDate = startDate.with(TemporalAdjusters.firstDayOfNextMonth()).minusDays(1);
             } else{
-                endDate = startDate.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).minusDays(1);
+                endDate = startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
             }
         }
         return endDate;
