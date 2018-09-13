@@ -36,13 +36,5 @@ public class SickController {
     public ResponseEntity<Map<String, Object>> markUserAsFine(@RequestParam(value = "unitId", required = false) Long unitId, @RequestParam(value = "staffId") Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, sickService.markUserAsFine(staffId, unitId));
     }
-    @ApiOperation("API is used to call the user as fine")
-    @PutMapping(UNIT_URL+"/check_user_health")
-    public ResponseEntity<Map<String, Object>> checkStatusOfUserAndUpdateStatus(@RequestParam(value = "unitId", required = false) Long unitId) {
-        sickService.checkStatusOfUserAndUpdateStatus(unitId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
-    }
-
-
 
 }
