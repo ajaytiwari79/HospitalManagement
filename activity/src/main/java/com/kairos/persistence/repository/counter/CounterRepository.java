@@ -179,7 +179,7 @@ public class CounterRepository {
     public List<TabKPIDTO> getTabKPIForStaffByTabAndStaffId(List<String> tabIds,List<BigInteger> kpiIds,Long staffId,Long unitId,ConfLevel level){
         Criteria criteria;
         if(kpiIds.isEmpty()) {
-            criteria=Criteria.where("tabId").in(tabIds).and("staffId").is(staffId).and("level").is(level);
+            criteria=Criteria.where("tabId").in(tabIds).and("staffId").is(staffId).and("unitId").is(unitId).and("level").is(level);
         }else{
             criteria=Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level);
         }
@@ -324,7 +324,7 @@ public class CounterRepository {
 
     public List<TabKPIConf> findTabKPIIdsByKpiIdAndUnitOrCountry(List<BigInteger> kpiIds,Long refid,ConfLevel level){
         String refQueryField = getRefQueryField(level);
-        Query query=new Query(Criteria.where(refQueryField).is(refid).and("KpiId").in(kpiIds));
+        Query query=new Query(Criteria.where(refQueryField).is(refid).and("KpiId").in(kpiIds).and("level").is(level));
         return mongoTemplate.find(query,TabKPIConf.class);
     }
 
