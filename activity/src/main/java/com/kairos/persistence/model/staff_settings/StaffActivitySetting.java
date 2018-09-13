@@ -5,6 +5,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 public class StaffActivitySetting extends MongoBaseEntity {
     private Long staffId;
@@ -145,5 +146,20 @@ public class StaffActivitySetting extends MongoBaseEntity {
 
     public void setDayTypeIds(List<Long> dayTypeIds) {
         this.dayTypeIds = dayTypeIds;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StaffActivitySetting that = (StaffActivitySetting) o;
+        return Objects.equals(staffId, that.staffId) &&
+                Objects.equals(activityId, that.activityId);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(staffId, activityId);
     }
 }

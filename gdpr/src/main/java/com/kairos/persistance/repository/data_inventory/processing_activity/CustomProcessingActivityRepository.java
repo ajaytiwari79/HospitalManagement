@@ -4,6 +4,7 @@ import com.kairos.persistance.model.data_inventory.processing_activity.Processin
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityRiskResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 
 import java.math.BigInteger;
@@ -27,5 +28,7 @@ public interface CustomProcessingActivityRepository {
     List<DataSubjectMappingResponseDTO> getAllMappedDataSubjectWithDataCategoryAndDataElement(Long unitId,List<BigInteger> dataSubjectIds);
 
     List<AssetBasicResponseDTO> getAllAssetLinkedWithProcessingActivityById(Long unitId,BigInteger processingActivityId);
+
+    ProcessingActivityRiskResponseDTO getProcessingActivityWithRisksAndSubProcessingActivities(Long unitId,BigInteger processingActivityId);
 
 }

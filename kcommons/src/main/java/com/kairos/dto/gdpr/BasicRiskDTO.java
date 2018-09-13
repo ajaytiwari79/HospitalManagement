@@ -1,35 +1,31 @@
-package com.kairos.dto.gdpr.data_inventory;
+package com.kairos.dto.gdpr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.RiskSeverity;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RiskDTO {
+public class BasicRiskDTO {
 
-    private BigInteger id;
+    protected BigInteger id;
 
-    @NotBlank(message = "Name can't be Empty")
-    private String name;
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed",regexp ="^[a-zA-Z\\s]+$" )
+    protected String name;
 
-    @NotBlank(message = "Description can't be Empty")
-    private String description;
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
+    protected String description;
 
     @NotBlank(message = "Mention Risk Recommendation")
-    private String riskRecommendation;
-
-    private LocalDate dueDate;
-
-    private boolean isReminderActive;
-
-    private int daysToReminderBefore;
+    protected String riskRecommendation;
 
     @NotNull(message = "Risk Level can't be empty")
-    private RiskSeverity riskLevel;
+    protected RiskSeverity riskLevel;
 
     public String getName() { return name.trim(); }
 
@@ -42,18 +38,6 @@ public class RiskDTO {
     public String getRiskRecommendation() { return riskRecommendation.trim(); }
 
     public void setRiskRecommendation(String riskRecommendation) { this.riskRecommendation = riskRecommendation; }
-
-    public LocalDate getDueDate() { return dueDate; }
-
-    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
-
-    public boolean isReminderActive() { return isReminderActive; }
-
-    public void setReminderActive(boolean reminderActive) { isReminderActive = reminderActive; }
-
-    public int getDaysToReminderBefore() { return daysToReminderBefore; }
-
-    public void setDaysToReminderBefore(int daysToReminderBefore) { this.daysToReminderBefore = daysToReminderBefore; }
 
     public RiskSeverity getRiskLevel() { return riskLevel; }
 

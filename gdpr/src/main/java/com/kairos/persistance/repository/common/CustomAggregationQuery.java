@@ -116,7 +116,7 @@ public class CustomAggregationQuery {
         return "{'$project':{" +
                 "      'templateType':{'$arrayElemAt':['$templateType',0]}," +
                 "      'name':1," +
-                "      'agreementSections':1," +
+                "      'sections':1," +
                 "      'description':1," +
                 "       'accountTypes':1," +
                 "             'organizationTypes':1," +

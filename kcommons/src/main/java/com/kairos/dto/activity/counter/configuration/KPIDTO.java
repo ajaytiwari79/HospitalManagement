@@ -1,4 +1,7 @@
-package com.kairos.dto.activity.counter;
+package com.kairos.dto.activity.counter.configuration;
+
+import com.kairos.dto.activity.counter.enums.ChartType;
+import com.kairos.dto.activity.counter.enums.CounterSize;
 
 import java.math.BigInteger;
 

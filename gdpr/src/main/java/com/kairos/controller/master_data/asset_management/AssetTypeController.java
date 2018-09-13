@@ -67,9 +67,22 @@ public class AssetTypeController {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAllAssetType(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAllAssetTypeWithRisks(countryId));
 
     }
+
+
+    @ApiOperation("get all Sub Asset Type ")
+    @GetMapping("/asset_type/{assetTypeId}/sub_asset_type")
+    public ResponseEntity<Object> getAllSubAssetTypeOfAssetType(@PathVariable Long countryId,@PathVariable BigInteger assetTypeId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getSubAssetTypesOfAssetTypeWithRisksByAssetTypeId(countryId,assetTypeId));
+
+    }
+
+
 
 
     @ApiOperation("delete AssetType  by id")
@@ -81,15 +94,12 @@ public class AssetTypeController {
     }
 
     @ApiOperation("update subAsset by id")
-    @PutMapping("/asset_type/update/{id}")
-    public ResponseEntity<Object> updateAssetType(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody AssetTypeDTO assetType) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
+    @PutMapping("/asset_type/update/{assetTypeId}")
+    public ResponseEntity<Object> updateAssetType(@PathVariable Long countryId, @PathVariable BigInteger assetTypeId, @Valid @RequestBody AssetTypeDTO assetType) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(countryId, id, assetType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(countryId, assetTypeId, assetType));
 
     }
 

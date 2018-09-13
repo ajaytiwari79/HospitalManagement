@@ -2,7 +2,7 @@ package com.kairos.controller.wta;
 
 
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
-import com.kairos.dto.user.employment.UnitPositionIdDTO;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.wta.WTAOrganizationService;
 import com.kairos.service.wta.WTAService;
 import com.kairos.utils.response.ResponseHandler;
@@ -235,4 +235,10 @@ public class WTAController {
 
 
 
+   /* @ApiOperation(value = "check scheduler load balncing")
+    @GetMapping(value = UNIT_URL + "/check_load_balancing_scheduler")
+    public ResponseEntity<Map<String, Object>> checkSchedulerLoadBalancing(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, genericIntegrationService.checkSchedulerLoadBalanceWorking());
+    }
+*/
 }

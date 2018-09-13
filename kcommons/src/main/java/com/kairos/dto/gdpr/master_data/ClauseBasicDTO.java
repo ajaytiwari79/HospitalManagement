@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -13,10 +14,11 @@ public class ClauseBasicDTO {
 
     private BigInteger id;
 
-    @NotBlank(message = "Clause Title can't  be empty")
+    @NotBlank(message = "error.message.title.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
-    @NotBlank(message = "Clause description can't  be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     private Boolean requireUpdate=false;

@@ -978,7 +978,7 @@ public class StaffingLevelService extends MongoBaseService {
             staffingLevel.setId(null);
             staffingLevel.setPresenceStaffingLevelInterval(staffingLevelIntervals);
             staffingLevel.setWeekCount(getWeekNumberByLocalDate(currentDate.getLocalDate()));
-            Phase phase = phaseService.getPhaseCurrentByUnit(unitId, DateUtils.asDate(currentDate.getLocalDate()));
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, DateUtils.asDate(currentDate.getLocalDate()));
             staffingLevel.setPhaseId(phase.getId());
             staffingLevel.setUnitId(unitId);
             staffingLevel.setCurrentDate(DateUtils.asDate(currentDate.getLocalDate()));

@@ -1,7 +1,5 @@
 package com.kairos.dto.activity.counter.distribution.category;
 
-import com.kairos.dto.activity.counter.KPICategoryDTO;
-
 import javax.validation.Valid;
 import java.util.List;
 

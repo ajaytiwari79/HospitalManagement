@@ -15,8 +15,8 @@ import java.util.List;
 public class DataCategoryDTO {
 
     private BigInteger id;
-    @NotBlank(message = "Name  can't be  Empty")
-    @Pattern(message = "Number and Special characters are not allowed", regexp = "^[a-zA-Z\\s]+$")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
     @NotNull(message = "Data Element can't be  Empty")

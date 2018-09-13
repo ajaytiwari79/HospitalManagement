@@ -1,7 +1,7 @@
 package com.kairos.service.counter;
 
-import com.kairos.dto.activity.counter.KPICategoryDTO;
-import com.kairos.dto.activity.counter.KPIDashboardDTO;
+import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.counter.chart.KPIDashboard;
