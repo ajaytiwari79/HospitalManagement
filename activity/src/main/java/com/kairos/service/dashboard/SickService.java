@@ -122,8 +122,8 @@ public class SickService {
                 }
                 if (validRepetitionDays.contains(differenceOfDaysFromCurrentDateToLastSickDate)) {
                     logger.info("The current user is still sick so we need to add more shifts {}", differenceOfDaysFromCurrentDateToLastSickDate);
-                    List<Shift> currentStaffShifts = staffWiseShiftMap.get(currentSickSettings.getStaffId()) != null ? staffWiseShiftMap.get(currentSickSettings.getStaffId()) : new ArrayList<>();
                     if (staffWisePreviousDayShiftMap.get(currentSickSettings.getStaffId()) != null) {
+                        List<Shift> currentStaffShifts = staffWiseShiftMap.get(currentSickSettings.getStaffId()) != null ? staffWiseShiftMap.get(currentSickSettings.getStaffId()) : new ArrayList<>();
                         shiftSickService.createSicknessShiftsOfStaff(activity, currentStaffShifts, staffWisePreviousDayShiftMap.get(currentSickSettings.getStaffId()));
                     }
                 }
