@@ -5,6 +5,7 @@ import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
 import com.kairos.dto.activity.pay_out.PayOutDTO;
 import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 
 import com.kairos.dto.activity.time_bank.*;
@@ -196,7 +197,7 @@ public class TimeBankCalculationService {
         int contractualMin = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysInWeek() ? ctaDto.getTotalWeeklyMinutes() / ctaDto.getWorkingDaysInWeek() : 0;
         Map<BigInteger, Integer> ctaTimeBankMinMap = new HashMap<>();
         for (ShiftWithActivityDTO shift : shifts) {
-            for (ShiftActivity shiftActivity : shift.getActivities()) {
+            for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
                 Interval shiftInterval = new Interval(new DateTime(shiftActivity.getStartDate().getTime()), new DateTime(shiftActivity.getEndDate().getTime()));
                 if (interval.overlaps(shiftInterval)) {
                     shiftInterval = interval.overlap(shiftInterval);
@@ -895,7 +896,7 @@ public class TimeBankCalculationService {
                 }
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftWithActivityDTO shift : shifts) {
-                        for (ShiftActivity shiftActivity : shift.getActivities()) {
+                        for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
                             if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getActivitiesStartDate().getTime())) {
                                 totalScheduledMin += shift.getScheduledMinutes();
                             }
@@ -974,7 +975,7 @@ public class TimeBankCalculationService {
 
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftWithActivityDTO shift : shifts) {
-                        for (ShiftActivity shiftActivity : shift.getActivities()) {
+                        for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
                             if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getActivitiesStartDate().getTime())) {
                                 totalScheduledMin += shift.getScheduledMinutes();
                             }

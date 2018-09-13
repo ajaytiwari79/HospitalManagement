@@ -44,7 +44,6 @@ public class ShiftDTO {
     private LocalDate shiftDate;
     private Long allowedBreakDurationInMinute;
     private BigInteger templateId;
-    private String timeType;
     private Set<ShiftStatus> status = new HashSet<>();
     private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger plannedTimeId;
@@ -316,11 +315,4 @@ public class ShiftDTO {
         this.templateId = templateId;
     }
 
-    public String getTimeType() {
-        return timeType;
-    }
-
-    public void setTimeType(String timeType) {
-        this.timeType = timeType;
-    }
 }

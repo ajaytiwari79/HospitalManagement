@@ -1,18 +1,16 @@
 package com.kairos.dto.activity.shift;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.activity.activity.ActivityDTO;
 
-import java.beans.Transient;
 import java.math.BigInteger;
 import java.util.Date;
 
 /**
  * @author pradeep
- * @date - 10/9/18
+ * @date - 13/9/18
  */
-public class ShiftActivity {
 
+public class ShiftActivityDTO {
 
     private BigInteger activityId;
     private Date startDate;
@@ -26,9 +24,11 @@ public class ShiftActivity {
     private BigInteger id;
     private String timeType;
 
+    //This field is only for validation
+    //@JsonIgnore
+    private ActivityDTO activity;
 
-
-    public ShiftActivity( String activityname,Date startDate, Date endDate,BigInteger activityId) {
+    public ShiftActivityDTO( String activityname,Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -36,12 +36,12 @@ public class ShiftActivity {
     }
 
 
-    public ShiftActivity(BigInteger activityId, String activityName) {
+    public ShiftActivityDTO(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
     }
 
-    public ShiftActivity() {
+    public ShiftActivityDTO() {
     }
 
 
@@ -53,6 +53,13 @@ public class ShiftActivity {
         this.timeType = timeType;
     }
 
+    public ActivityDTO getActivity() {
+        return activity;
+    }
+
+    public void setActivity(ActivityDTO activity) {
+        this.activity = activity;
+    }
 
     public long getBid() {
         return bid;

@@ -3,6 +3,7 @@ package com.kairos.wrapper.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.phase.Phase;
@@ -43,7 +44,7 @@ public class ShiftWithActivityDTO {
     private Long unitId;
     private int scheduledMinutes;
     private int durationMinutes;
-    private List<ShiftActivity> activities = new ArrayList<>();
+    private List<ShiftActivityDTO> activities = new ArrayList<>();
     private List<ShiftStatus> status;
     private BigInteger plannedTypeId ;
     private String timeType;
@@ -66,7 +67,7 @@ public class ShiftWithActivityDTO {
 
 
 
-    public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,List<ShiftActivity> activities, Long staffId, Long unitPositionId, Long unitId) {
+    public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,List<ShiftActivityDTO> activities, Long staffId, Long unitPositionId, Long unitId) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
@@ -88,11 +89,11 @@ public class ShiftWithActivityDTO {
         this.activities = activities;
     }
 
-    public List<ShiftActivity> getActivities() {
+    public List<ShiftActivityDTO> getActivities() {
         return activities;
     }
 
-    public void setActivities(List<ShiftActivity> activities) {
+    public void setActivities(List<ShiftActivityDTO> activities) {
         this.activities = activities;
     }
 

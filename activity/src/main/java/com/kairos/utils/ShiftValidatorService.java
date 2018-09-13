@@ -9,6 +9,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.enums.Day;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.wta.MinMaxSetting;
@@ -236,7 +237,7 @@ public class ShiftValidatorService {
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities = new ArrayList<>();
         if (timeTypeIds != null && !timeTypeIds.isEmpty()) {
             shifts.forEach(s -> {
-                for (ShiftActivity shiftActivity : s.getActivities()) {
+                for (ShiftActivityDTO shiftActivity : s.getActivities()) {
                     if ((timeTypeIds == null || timeTypeIds.contains(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && (plannedTimeIds == null || plannedTimeIds.contains(s.getPlannedTypeId())) && (activitieIds == null || activitieIds.contains(shiftActivity.getActivity().getId())))) {
                         shiftQueryResultWithActivities.add(s);
                     }
