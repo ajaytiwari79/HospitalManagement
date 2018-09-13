@@ -179,7 +179,7 @@ public class CounterRepository {
     public List<TabKPIDTO> getTabKPIForStaffByTabAndStaffId(List<String> tabIds,List<BigInteger> kpiIds,Long staffId,Long unitId,ConfLevel level){
         Criteria criteria;
         if(kpiIds.isEmpty()) {
-            criteria=Criteria.where("tabId").in(tabIds).and("staffId").is(staffId).and("unitId").is(unitId).and("level").is(level);
+            criteria=Criteria.where("tabId").in(tabIds).and("staffId").is(staffId).and("level").is(level);
         }else{
             criteria=Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level);
         }
@@ -379,10 +379,10 @@ public class CounterRepository {
     }
 
 
-    public void removeDashboardKPIEntries(List<BigInteger> dashboardIds,List<BigInteger> kpiIds){
-        Query query=new Query(Criteria.where("dashboardId").in(dashboardIds).and("kpiId").in(kpiIds));
-        mongoTemplate.remove(query, DashboardKPIConf.class);
-    }
+//    public void removeDashboardKPIEntries(List<BigInteger> dashboardIds,List<BigInteger> kpiIds){
+//        Query query=new Query(Criteria.where("dashboardId").in(dashboardIds).and("kpiId").in(kpiIds));
+//        mongoTemplate.remove(query, DashboardKPIConf.class);
+//    }
 
     public void removeDashboardKPIConfiguration(DashboardKPIMappingDTO entry, Long refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);

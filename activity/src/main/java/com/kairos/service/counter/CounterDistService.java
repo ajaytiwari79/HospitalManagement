@@ -157,8 +157,9 @@ public class CounterDistService extends MongoBaseService {
 
     public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId,Long unitId, ConfLevel level){
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
-       // Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
-        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(Arrays.asList(moduleId),new ArrayList<>(),accessGroupPermissionCounterDTO.getStaffId(),unitId,level);
+        List<KPIDTO> kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,unitId,accessGroupPermissionCounterDTO.getStaffId());
+        List<BigInteger >kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
+        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(Arrays.asList(moduleId),kpiIds,accessGroupPermissionCounterDTO.getStaffId(),unitId,level);
         return tabKPIDTOS;
     }
 
@@ -416,13 +417,13 @@ public class CounterDistService extends MongoBaseService {
       List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
       List<BigInteger> dashboardIds = kpiDashboardDTOS.stream().map(kpiDashboardDTO -> kpiDashboardDTO.getId()).collect(Collectors.toList());
       if (!dashboardIds.contains(dashboardKPIsDTO.getDashboardId())) {
-          exceptionService.dataNotFoundByIdException("error.kpi_category.availability");
+          exceptionService.dataNotFoundByIdException("error.kpi_dashboard.availability");
       }
       List<DashboardKPIConf> dashboardKPIConfs = counterRepository.getDashboardKPIConfs(dashboardKPIsDTO.getKpiIds(), dashboardIds,refId,level);
-      List<BigInteger> availableDashboardIds = dashboardKPIConfs.stream().map(dashboardKPIConf -> dashboardKPIConf.getDashboardId()).collect(toList());
-      if (availableDashboardIds.contains(dashboardKPIsDTO.getDashboardId())) {
-          exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
-      }
+//      List<BigInteger> availableDashboardIds = dashboardKPIConfs.stream().map(dashboardKPIConf -> dashboardKPIConf.getDashboardId()).collect(toList());
+//      if (availableDashboardIds.contains(dashboardKPIsDTO.getDashboardId())) {
+//          exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
+//      }
       List<DashboardKPIConf> newDashboardKPIConf = new ArrayList<>();
       applicableKPIS.parallelStream().forEach(applicableKPI -> newDashboardKPIConf.add(new DashboardKPIConf(applicableKPI.getActiveKpiId(),dashboardKPIsDTO.getDashboardId(), dashboardKPIsDTO.getModuleId(), countryId, unitId, null, level,null)));
       if (!newDashboardKPIConf.isEmpty()) {
@@ -519,7 +520,6 @@ public class CounterDistService extends MongoBaseService {
             List<KPIDashboard>  kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,staffId,ConfLevel.STAFF)).collect(Collectors.toList());
             kpiDashboardsTosave.addAll(kpiDashboards);
         });
-//        kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getName(),null,unitId,null,ConfLevel.STAFF)).collect(Collectors.toList());
         if(!kpiDashboardsTosave.isEmpty()){
             save(kpiDashboardsTosave);
         }
@@ -606,7 +606,7 @@ public class CounterDistService extends MongoBaseService {
         kpiDashboards.stream().forEach(kpiDashboard -> {
             kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(),kpiDashboard.getParentModuleId()));
         });
-        save(kpiDashboards);
+        if(!kpiCategories.isEmpty()) save(kpiDashboards);
         kpiDashboards.stream().forEach(kpiDashboard  -> {
             dashboardsOldAndNewIds.put(dashboardsNameMap.get(kpiDashboard.getName()),kpiDashboard.getId());
         });
