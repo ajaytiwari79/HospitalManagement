@@ -45,7 +45,7 @@ private CTAService ctaService;
 
     @RequestMapping("/ShiftPlanning")
     ResponseEntity<Map<String, Object>> initializeShiftPlanning() {
-        Long[] staffIds = {};
+        Long[] staffIds = {34246L,27075L,27079L,34251L,34246L,34272L};
         shiftPlanningInitializationService.initializeShiftPlanning(25120L, new Date(1530383400000l), new Date(1532975400000l), staffIds);
 
         return ResponseHandler.generateResponse(" Data fetched sucessFully", HttpStatus.FOUND);

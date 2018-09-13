@@ -10,10 +10,7 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,22 +21,24 @@ public class CTAService {
     /**************************************Logic to fetch CTA******Start****************************************/
 /*****************************************************************************************************/
     /**
-     *
      * @param longCTAResponseDTOMap
      * @param unitPositionId
      * @return
      */
 //TODO might be in ShiftPlanningInitializationService
-public Map<LocalDate, CTAResponseDTO> getLocalDateCTAMapByunitPositionId( Map<Long, Map<LocalDate, CTAResponseDTO>> longCTAResponseDTOMap, Long unitPositionId)
-{
-    if(longCTAResponseDTOMap.containsKey(unitPositionId))
-    return longCTAResponseDTOMap.get(unitPositionId);
-return null;
-}
+    public Map<LocalDate, CTAResponseDTO> getLocalDateCTAMapByunitPositionId(Map<Long, Map<LocalDate, CTAResponseDTO>> longCTAResponseDTOMap, Long unitPositionId) {
+        if (longCTAResponseDTOMap.containsKey(unitPositionId))
+            return longCTAResponseDTOMap.get(unitPositionId);
+        return null;
+    }
+
     /**
-     * This method will bind each unitPositionId
-     * with its Map containing all related CTA
-     *
+     * <ul>
+     * <li>This method will bind each unitPositionId with its Map containing all related [CTA/s datewise].</li>
+     * <li>This may happen that there always exist some CTA(either List or single) for particular unitPositionId but not applicable
+     * in this{@param fromPlanningDate},{@param toPlanningDate} range(All CTA's) hence might be empty
+     * so we need to skip this staff for further planning</li>
+     * </ul>
      * @param unitPositionIds
      * @param fromPlanningDate
      * @param toPlanningDate
@@ -49,11 +48,13 @@ return null;
         Map<Long, Map<LocalDate, CTAResponseDTO>> unitPositionIdWithLocalDateCTAMap = new HashMap<>();
         List<CTAResponseDTO> ctaResponseDTOS = activityMongoService.getCTARuleTemplateByUnitPositionIds(unitPositionIds, fromPlanningDate, toPlanningDate);
         //Group CTA with unitPosition
-        Map<Long, List<CTAResponseDTO>> unitPositionIdCTAMap = ctaResponseDTOS.stream().collect(Collectors.groupingBy(cta -> cta.getUnitPositionId(), Collectors.toList()));
-        unitPositionIdCTAMap.forEach((unitPositionId, groupedCTAList) -> {
-            Map<LocalDate, CTAResponseDTO> localDateCTAMap = filterOverlapedCTA(groupedCTAList, getInitialMapWithAllIntervals(fromPlanningDate, toPlanningDate), toPlanningDate);
-            unitPositionIdWithLocalDateCTAMap.put(unitPositionId, localDateCTAMap);
-        });
+        if (ctaResponseDTOS.size() > 0) {
+            Map<Long, List<CTAResponseDTO>> unitPositionIdCTAMap = ctaResponseDTOS.stream().collect(Collectors.groupingBy(cta -> cta.getUnitPositionId(), Collectors.toList()));
+            unitPositionIdCTAMap.forEach((unitPositionId, groupedCTAList) -> {
+                Map<LocalDate, CTAResponseDTO> localDateCTAMap = filterOverlapedCTA(groupedCTAList, getApplicableIntervals(fromPlanningDate, toPlanningDate), toPlanningDate);
+                unitPositionIdWithLocalDateCTAMap.put(unitPositionId, localDateCTAMap);
+            });
+        }
         return unitPositionIdWithLocalDateCTAMap;
     }
 /*************************************************************************************************/
@@ -62,12 +63,13 @@ return null;
      * with applicable LocalDate one-to-one
      *
      * @param ctaResponseDTOS
-     * @param localDateCTAMap
+     * @param localDateApplicableIntervals
      * @param toPlanningDate
      * @return
      */
-    public Map<LocalDate, CTAResponseDTO> filterOverlapedCTA(List<CTAResponseDTO> ctaResponseDTOS, Map<LocalDate, CTAResponseDTO> localDateCTAMap, Date toPlanningDate) {
-        for (LocalDate applicableLocalDate : localDateCTAMap.keySet()) {
+    public Map<LocalDate, CTAResponseDTO> filterOverlapedCTA(List<CTAResponseDTO> ctaResponseDTOS, Set<LocalDate> localDateApplicableIntervals, Date toPlanningDate) {
+        Map<LocalDate, CTAResponseDTO> localDateCTAMap=new HashMap<>();
+        for (LocalDate applicableLocalDate : localDateApplicableIntervals) {
             for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOS) {
                 DateTimeInterval dateTimeIntervalPerCTA = createCTADateTimeInterval(ctaResponseDTO, toPlanningDate);
                 if (dateTimeIntervalPerCTA.contains(DateUtils.asDate(applicableLocalDate))) {
@@ -98,16 +100,15 @@ return null;
      * @param toPlanningDate
      * @return
      */
-    public Map<LocalDate, CTAResponseDTO> getInitialMapWithAllIntervals(Date fromPlanningDate, Date toPlanningDate) {
+    public Set<LocalDate> getApplicableIntervals(Date fromPlanningDate, Date toPlanningDate) {
         LocalDate fromPlanningLocalDate = ZonedDateTime.ofInstant(fromPlanningDate.toInstant(), ZoneId.systemDefault()).toLocalDate();
         LocalDate toPlanningLocalDate = ZonedDateTime.ofInstant(toPlanningDate.toInstant(), ZoneId.systemDefault()).toLocalDate();
-        ;
-        Map<LocalDate, CTAResponseDTO> localDateCTAResponseDTOMap = new HashMap<>();
+        Set<LocalDate> localDateSet= new HashSet<>();
         while (!fromPlanningLocalDate.equals(toPlanningLocalDate)) {
-            localDateCTAResponseDTOMap.put(fromPlanningLocalDate, null);
+            localDateSet.add(fromPlanningLocalDate);
             fromPlanningLocalDate = fromPlanningLocalDate.plusDays(1l);
         }
-        return localDateCTAResponseDTOMap;
+        return localDateSet;
     }
 
 /*********************************fetch CTA logic *****End***********************************************************/

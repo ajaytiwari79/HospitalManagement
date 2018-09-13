@@ -61,7 +61,7 @@ public class ShiftPlanningInitializationService {
         List<Long> unitPositionIds = staffWithSkillsAndUnitPostionIds.stream().map(s -> s.getStaffUnitPosition()).collect(Collectors.toList());
 
         //1.) Initialize Employees
-        List<Employee> employeeList = getAllEmployee(staffIds, fromPlanningDate, toPlanningDate, staffWithSkillsAndUnitPostionIds, unitPositionIds);
+        List<Employee> employeeList = getAllEmployee(fromPlanningDate, toPlanningDate, staffWithSkillsAndUnitPostionIds, unitPositionIds);
 
         //2.)Initialize shifts
         List<ShiftRequestPhase> shiftRequestPhase = getShiftRequestPhase(unitPositionIds, fromPlanningDate, toPlanningDate, employeeList);
@@ -85,27 +85,32 @@ public class ShiftPlanningInitializationService {
     /**
      * This method is used to get
      * All Staff/Employee with in {@param unitId}
-     *
-     * @param staffIds
+     * TODO(This is the only applicable staff{@param staffWithSkillsAndUnitPostionIds must have unitPositionIds else filter in this function itself})
+     * between
      * @param fromPlanningDate
      * @param toPlanningDate
+     * Must have CTA associated with unitPositionId within planning range else Staff will be skipped in planning
+     * Must have WTA associated with unitPositionId within planning range else Staff will be skipped in planning //TODO attach logic
      * @return
      */
-    public List<Employee> getAllEmployee(Long[] staffIds, Date fromPlanningDate, Date toPlanningDate, List<StaffQueryResult> staffWithSkillsAndUnitPostionIds, List<Long> unitPositionIds) {
+    public List<Employee> getAllEmployee(Date fromPlanningDate, Date toPlanningDate, List<StaffQueryResult> staffWithSkillsAndUnitPostionIds, List<Long> unitPositionIds) {
         List<Employee> employeeList = new ArrayList<>();
         //Prepare CTA data
         Map<Long, Map<java.time.LocalDate, CTAResponseDTO>> unitPositionIdWithLocalDateCTAMap = ctaService.getunitPositionIdWithLocalDateCTAMap(unitPositionIds, fromPlanningDate, toPlanningDate);
-
+        if(unitPositionIdWithLocalDateCTAMap.size()>0) {
         //Initialize Employee
-        for (StaffQueryResult staffQueryResult : staffWithSkillsAndUnitPostionIds) {
-            Employee employee = new Employee();
-            employee.setId(staffQueryResult.getStaffId().toString());
-            employee.setName(staffQueryResult.getStaffName());
-            employee.setUnitPositionId(staffQueryResult.getStaffUnitPosition());
-            employee.setLocalDateCTAResponseDTOMap(ctaService.getLocalDateCTAMapByunitPositionId(unitPositionIdWithLocalDateCTAMap, staffQueryResult.getStaffUnitPosition()));
-            employee.setSkillSet(skillService.setSkillsOfEmployee(staffQueryResult.getStaffSkills()));
-            //employee.setLocalDateWTAMap();
-            employeeList.add(employee);
+            for (StaffQueryResult staffQueryResult : staffWithSkillsAndUnitPostionIds) {
+                if (unitPositionIdWithLocalDateCTAMap.containsKey(staffQueryResult.getStaffUnitPosition())) {
+                    Employee employee = new Employee();
+                    employee.setId(staffQueryResult.getStaffId().toString());
+                    employee.setName(staffQueryResult.getStaffName());
+                    employee.setUnitPositionId(staffQueryResult.getStaffUnitPosition());
+                    employee.setLocalDateCTAResponseDTOMap(ctaService.getLocalDateCTAMapByunitPositionId(unitPositionIdWithLocalDateCTAMap, staffQueryResult.getStaffUnitPosition()));
+                    employee.setSkillSet(skillService.setSkillsOfEmployee(staffQueryResult.getStaffSkills()));
+                    //employee.setLocalDateWTAMap();
+                    employeeList.add(employee);
+                }
+            }
         }
         return employeeList;
     }
