@@ -120,9 +120,9 @@ public class SickService {
             Set<Long> staffIds = sickSettings.stream().map(sickSetting -> sickSetting.getStaffId()).collect(Collectors.toSet());
             logger.info("last date iso string {} , {}", DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MIN), DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MAX));
             List<Shift> previousDaySickShifts = shiftMongoRepository.findAllByStaffIdInAndSickShiftTrueAndStartDateGreaterThanEqualAndEndDateLessThanEqual(staffIds, DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MIN), DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MAX));
-            logger.info("" + previousDaySickShifts);
+            Map<Long, Shift> staffWisePreviousDayShiftMap = previousDaySickShifts.stream().collect(Collectors.toMap(s -> s.getStaffId(), Function.identity()));
             Map<Long, List<Shift>> staffWiseShiftMap = shifts.stream().collect(Collectors.groupingBy(s -> s.getStaffId(), Collectors.toList()));
-            logger.info("Total number of shifts found {} and map is {}", shifts.size(), staffWiseShiftMap);
+            logger.info("Total number of shifts found {} ", shifts.size());
 
             sickSettings.forEach(currentSickSettings -> {
                 Activity activity = activityMap.get(currentSickSettings.getActivityId());
@@ -139,8 +139,9 @@ public class SickService {
                 if (validRepetitionDays.contains(differenceOfDaysFromCurrentDateToLastSickDate)) {
                     logger.info("The current user is still sick so we need to add more shifts {}", differenceOfDaysFromCurrentDateToLastSickDate);
                     List<Shift> currentStaffShifts = staffWiseShiftMap.get(currentSickSettings.getStaffId()) != null ? staffWiseShiftMap.get(currentSickSettings.getStaffId()) : new ArrayList<>();
-                    Duration duration = new Duration();
-                    //shiftSickService.createSicknessShiftsOfStaff(currentSickSettings.getStaffId(), unitId, activity, currentSickSettings.getUnitPositionId(), currentStaffShifts,duration);
+                    if (staffWisePreviousDayShiftMap.get(currentSickSettings.getStaffId()) != null) {
+                        shiftSickService.createSicknessShiftsOfStaff(activity, currentStaffShifts, staffWisePreviousDayShiftMap.get(currentSickSettings.getStaffId()));
+                    }
                 }
             });
 

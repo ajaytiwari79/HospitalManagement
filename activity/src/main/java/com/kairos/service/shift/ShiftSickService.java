@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalTime;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
@@ -94,6 +95,36 @@ public class ShiftSickService extends MongoBaseService {
         response.put("unitId", unitId);
         response.put("staffId", staffId);
         return response;
+
+    }
+
+    public void createSicknessShiftsOfStaff(Activity activity, List<Shift> staffOriginalShiftsOfDates, Shift previousDaySickShift) {
+        short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
+        logger.info(staffOriginalShiftsOfDates.size() + "", " shifts found for days");
+        staffOriginalShiftsOfDates.forEach(s -> s.setDisabled(true));
+        List<Shift> shifts = new ArrayList<>();
+        while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 0) {
+            shiftNeedsToAddForDays--;
+            Shift currentShift = new Shift(null, null, previousDaySickShift.getStaffId(), activity.getId(), activity.getName(), previousDaySickShift.getUnitPositionId(), previousDaySickShift.getUnitId());
+            calculateShiftStartAndEndTime(currentShift, previousDaySickShift, shiftNeedsToAddForDays);
+            shifts.add(currentShift);
+
+        }
+        // Adding all shifts to the same.
+        shifts.addAll(staffOriginalShiftsOfDates);
+        if (!shifts.isEmpty())
+            save(shifts);
+
+    }
+
+    private void calculateShiftStartAndEndTime(Shift currentShift, Shift previousDayShift, short shiftNeedsToAddForDays) {
+        LocalTime shiftStartTime = DateUtils.asLocalTime(previousDayShift.getStartDate());
+        LocalTime shiftEndTime = DateUtils.asLocalTime(previousDayShift.getEndDate());
+        Duration duration = new Duration(shiftStartTime, shiftEndTime);
+        currentShift.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, duration.getFrom()));
+        currentShift.setEndDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, duration.getTo()));
+        currentShift.setScheduledMinutes(previousDayShift.getScheduledMinutes());
+        currentShift.setDurationMinutes(previousDayShift.getDurationMinutes());
 
     }
 
