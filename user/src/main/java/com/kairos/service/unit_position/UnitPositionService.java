@@ -1145,12 +1145,14 @@ public class UnitPositionService {
         List<NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("upIds", upIds.toString().replace("[", "").replace("]", "")));
         CTATableSettingWrapper ctaTableSettingWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_CTA, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTATableSettingWrapper>>() {
         });
+        Map<Long,UnitPositionQueryResult> unitPositionQueryResultMap = unitPositionQueryResults.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         ctaTableSettingWrapper.getAgreements().forEach(currentCTA -> {
-            UnitPositionQueryResult currentActiveUnitPosition = unitPositionQueryResults.stream().filter(currentUnitPosition -> currentUnitPosition.getId().equals(currentCTA.getUnitPositionId())
-                    && currentUnitPosition.getHistory().equals(false)).findFirst().get();
-            currentCTA.setUnitInfo(currentActiveUnitPosition.getUnitInfo());
-            currentCTA.setUnitPositionId(currentActiveUnitPosition.getId());
-            currentCTA.setPositionCode(ObjectMapperUtils.copyPropertiesByMapper(currentActiveUnitPosition.getPositionCode(), PositionCodeDTO.class));
+            if(unitPositionQueryResultMap.containsKey(currentCTA.getUnitPositionId())) {
+                UnitPositionQueryResult currentActiveUnitPosition = unitPositionQueryResultMap.get(currentCTA.getUnitPositionId());
+                currentCTA.setUnitInfo(currentActiveUnitPosition.getUnitInfo());
+                currentCTA.setUnitPositionId(currentActiveUnitPosition.getId());
+                currentCTA.setPositionCode(ObjectMapperUtils.copyPropertiesByMapper(currentActiveUnitPosition.getPositionCode(), PositionCodeDTO.class));
+            }
         });
         return ctaTableSettingWrapper;
     }
