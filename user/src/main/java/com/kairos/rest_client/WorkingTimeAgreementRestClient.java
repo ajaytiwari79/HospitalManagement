@@ -36,18 +36,18 @@ public class WorkingTimeAgreementRestClient {
     @Inject
     private RestTemplate restTemplate;
 
-    public List<WTAResponseDTO> getWTAByExpertise(Long expertiseId) {
+    public CTAWTAWrapper getWTAByExpertise(Long expertiseId) {
         String baseUrl = getBaseUrl(true);
         try {
             //HttpEntity<Long> request = new HttpEntity<>(expertiseId);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>>() {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {
             };
-            ResponseEntity<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> restExchange =
+            ResponseEntity<RestTemplateResponseEnvelope<CTAWTAWrapper>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/expertise/{expertiseId}/cta_wta",
                             HttpMethod.GET, null, typeReference, expertiseId);
 
-            RestTemplateResponseEnvelope<List<WTAResponseDTO>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<CTAWTAWrapper> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {

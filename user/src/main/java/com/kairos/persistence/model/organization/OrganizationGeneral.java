@@ -22,7 +22,7 @@ public class OrganizationGeneral {
     //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
     private String description;
     @NotNull(message = "error.OrganizationType.name.notEmpty")
-    private List<Long> organizationTypeId;
+    private Long organizationTypeId;
     @NotNull(message = "error.OrganizationType.name.notEmpty")
     private List<Long> organizationSubTypeId;
   //  @NotNull(message = "error.Organization.businesstype.notnull")
@@ -248,7 +248,7 @@ public class OrganizationGeneral {
         this.externalId = externalId;
     }
 
-    public List<Long> getOrganizationTypeId() {
+    public Long getOrganizationTypeId() {
         return organizationTypeId;
     }
 
@@ -260,7 +260,7 @@ public class OrganizationGeneral {
         return businessTypeId;
     }
 
-    public void setOrganizationTypeId(List<Long> organizationTypeId) {
+    public void setOrganizationTypeId(Long organizationTypeId) {
         this.organizationTypeId = organizationTypeId;
     }
 

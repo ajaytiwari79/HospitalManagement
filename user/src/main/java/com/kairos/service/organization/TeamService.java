@@ -157,7 +157,7 @@ public class TeamService {
                 contactAddress.setVerifiedByVisitour(false);
 
                 // Native Details
-                contactAddress.setStreet1(addressDTO.getStreet1());
+                contactAddress.setStreet(addressDTO.getStreet());
                 contactAddress.setHouseNumber(addressDTO.getHouseNumber());
                 contactAddress.setFloorNumber(addressDTO.getFloorNumber());
                 contactAddress.setCity(zipCode.getName());
@@ -204,7 +204,7 @@ public class TeamService {
                     contactAddress.setCity(zipCode.getName());
 
                     // Native Details
-                    contactAddress.setStreet1(addressDTO.getStreet1());
+                    contactAddress.setStreet(addressDTO.getStreet());
                     contactAddress.setHouseNumber(addressDTO.getHouseNumber());
                     contactAddress.setFloorNumber(addressDTO.getFloorNumber());
                     contactAddress.setCity(zipCode.getName());
@@ -253,7 +253,7 @@ public class TeamService {
                 contactAddress.setLatitude(organizationContactAddress.getContactAddress().getLatitude());
                 contactAddress.setHouseNumber(organizationContactAddress.getContactAddress().getHouseNumber());
                 contactAddress.setStreetUrl(organizationContactAddress.getContactAddress().getStreetUrl());
-                contactAddress.setStreet1(organizationContactAddress.getContactAddress().getStreet1());
+                contactAddress.setStreet(organizationContactAddress.getContactAddress().getStreet());
                 contactAddress.setFloorNumber(organizationContactAddress.getContactAddress().getFloorNumber());
                 team.setContactAddress(contactAddress);
                 teamGraphRepository.save(team);

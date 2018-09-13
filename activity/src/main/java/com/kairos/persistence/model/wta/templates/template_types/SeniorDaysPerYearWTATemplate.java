@@ -52,8 +52,8 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        return "";
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
+
     }
 
     public SeniorDaysPerYearWTATemplate(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activityIds,

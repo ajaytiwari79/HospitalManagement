@@ -1,6 +1,6 @@
 package com.kairos.wrapper.priority_group;
 
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;

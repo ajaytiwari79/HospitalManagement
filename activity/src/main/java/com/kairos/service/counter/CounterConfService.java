@@ -18,6 +18,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 /*
  * @author: mohit.shakya@oodlestechnologies.com
  * @dated: Jun/26/2018
@@ -70,6 +72,9 @@ public class CounterConfService extends MongoBaseService {
     private List<String> getTrimmedNames(List<KPICategoryDTO> categories){
         List<String> categoriesNames = new ArrayList<>();
         categories.forEach(category -> {
+            if(isBlank(category.getName())){
+                exceptionService.dataNotFoundException("error.name.notnull");
+            }
             category.setName(category.getName().trim());
             categoriesNames.add(category.getName());
         });

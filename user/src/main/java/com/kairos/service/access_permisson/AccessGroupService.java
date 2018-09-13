@@ -20,6 +20,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.staff.StaffService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.user.access_group.CountryAccessGroupDTO;
 import com.kairos.user.access_group.UserAccessRoleDTO;
@@ -64,6 +65,7 @@ public class AccessGroupService {
     private ExceptionService exceptionService;
     @Inject
     private AccountTypeGraphRepository accountTypeGraphRepository;
+    @Inject private StaffService staffService;
 
     public AccessGroup createAccessGroup(long organizationId, AccessGroup accessGroup) {
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroup.getName().trim());
@@ -557,17 +559,6 @@ public class AccessGroupService {
             exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
 
         }
-        if (OrganizationCategory.ORGANIZATION.equals(accessGroupDTO.getOrganizationCategory())) {
-            if (accessGroupDTO.getAccountTypeIds().isEmpty()) {
-                exceptionService.dataNotMatchedException("message.accountType.select");
-            } else {
-                List<AccountType> accountTypes = accountTypeGraphRepository.getAllAccountTypeByIds(accessGroupDTO.getAccountTypeIds());
-                if (accountTypes.size() != accessGroupDTO.getAccountTypeIds().size()) {
-                    exceptionService.actionNotPermittedException("message.accountType.notFound");
-                }
-                accessGrpToUpdate.get().setAccountType(accountTypes);
-            }
-        }
         accessGrpToUpdate.get().setName(accessGroupDTO.getName());
         accessGrpToUpdate.get().setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.get().setLastModificationDate(DateUtil.getCurrentDate().getTime());
@@ -689,7 +680,6 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupDTO.getId());
 
         }
-
         AccessGroup accessGroup=new AccessGroup(accessGroupDTO.getName().trim(),accessGroupDTO.getDescription(),accessGroupDTO.getRole());
         accessGroupRepository.save(accessGroup);
         organization.get().getAccessGroups().add(accessGroup);
@@ -715,7 +705,7 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", countryAccessGroupDTO.getId());
 
         }
-        AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole());
+        AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole(),currentAccessGroup.get().getAccountType());
         accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
@@ -766,5 +756,10 @@ public class AccessGroupService {
     }
     public List<StaffIdsQueryResult> getStaffIdsByUnitIdAndAccessGroupId(Long unitId, List<Long> accessGroupId){
         return accessGroupRepository.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId);
+    }
+
+    public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId){
+        Long staffId=staffService.getStaffIdOfLoggedInUser(unitId);
+        return accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
     }
 }

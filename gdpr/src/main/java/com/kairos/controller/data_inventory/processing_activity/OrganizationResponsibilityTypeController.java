@@ -103,7 +103,7 @@ public class OrganizationResponsibilityTypeController {
 
 
     @ApiOperation("save responsibility Type And Suggest To Country admin")
-    @PostMapping(COUNTRY_URL + "/responsibility_type")
+    @PostMapping(COUNTRY_URL + "/responsibility_type/suggest")
     public ResponseEntity<Object> saveResponsibilityTypeAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ResponsibilityTypeDTO> responsibilityTypeDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");

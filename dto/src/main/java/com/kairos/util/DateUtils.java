@@ -296,9 +296,10 @@ public class DateUtils {
 
 
     public static Date getDateFromLocalDate(LocalDate localDate) {
-        Date date = null;
-        if (localDate != null)
-            date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date date ;
+        date = localDate != null
+                                ? Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                                : Date.from(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC));
         return date;
     }
 
@@ -314,8 +315,7 @@ public class DateUtils {
     }
 
     public static LocalDate asLocalDate(String receivedDate) {
-        LocalDate date = LocalDate.parse(receivedDate, DateTimeFormatter.ISO_LOCAL_DATE);
-        return date;
+        return LocalDate.parse(receivedDate, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
 
@@ -335,13 +335,7 @@ public class DateUtils {
     }
 
     public static Date onlyDate(Date date) {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.setTime(date);
-        calendar.set(Calendar.MILLISECOND, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        return calendar.getTime();
+        return getDateByZoneDateTime(getZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
     }
 
     public static Date addMinutes(final Date date, final int amount) {
@@ -662,5 +656,21 @@ public class DateUtils {
     public static int getWeekNumberByLocalDate(LocalDate localDate){
         TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         return localDate.get(woy);
+    }
+    public static Date getDateAfterDaysWithTime(short daysAfter,int startHour){
+        return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atStartOfDay().with(LocalTime.of(startHour, 00)).toInstant(ZoneOffset.UTC));
+    }
+
+    public static LocalDate getLocalDateFromString(String receivedDate) {
+        SimpleDateFormat format = new SimpleDateFormat(ISO_FORMAT, Locale.US);
+        format.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
+        LocalDate localDate = null;
+        try {
+            localDate = DateUtils.asLocalDate(format.parse(receivedDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return localDate;
+
     }
 }

@@ -9,8 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Document(collection = "processing_activity")
 public class ProcessingActivity extends MongoBaseEntity {
@@ -27,9 +27,9 @@ public class ProcessingActivity extends MongoBaseEntity {
     @NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
 
-    private List<ProcessingActivityRelatedDataSubject> dataSubjects;
+    private List<ProcessingActivityRelatedDataSubject> dataSubjects =new ArrayList<>();
 
-    private BigInteger assetId;
+    private List<BigInteger> linkedAssets=new ArrayList<>();
 
     private List<BigInteger> processingPurposes;
 
@@ -61,6 +61,8 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     private boolean subProcess=false;
 
+    private List<BigInteger> assessments=new ArrayList<>();
+
     public List<ProcessingActivityRelatedDataSubject> getDataSubjects() { return dataSubjects; }
 
     public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) { this.dataSubjects = dataSubjects; }
@@ -72,6 +74,10 @@ public class ProcessingActivity extends MongoBaseEntity {
     public boolean isActive() { return active; }
 
     public void setActive(boolean active) { this.active = active; }
+
+    public List<BigInteger> getAssessments() { return assessments; }
+
+    public void setAssessments(List<BigInteger> assessments) { this.assessments = assessments; }
 
     public boolean isSubProcess() {
         return subProcess;
@@ -145,9 +151,9 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
 
-    public BigInteger getAssetId() { return assetId; }
+    public List<BigInteger> getLinkedAssets() { return linkedAssets; }
 
-    public void setAssetId(BigInteger assetId) { this.assetId = assetId; }
+    public void setLinkedAssets(List<BigInteger> linkedAssets) { this.linkedAssets = linkedAssets; }
 
     public ProcessingActivity() { }
 

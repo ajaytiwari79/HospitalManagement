@@ -4,11 +4,11 @@ import com.kairos.persistance.model.data_inventory.processing_activity.Processin
 import com.kairos.persistance.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistance.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistance.repository.common.CustomAggregationQuery;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import org.bson.Document;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -20,7 +20,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
-import javax.print.Doc;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -83,7 +82,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                         .addToSet("subProcessingActivities").as("subProcessingActivities"),
                 unwind("subProcessingActivities"),
                 new CustomAggregationOperation(replaceRootOperation)
-               // sort(Sort.Direction.ASC, "name")
+                // sort(Sort.Direction.ASC, "name")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
@@ -106,7 +105,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
 
 
     @Override
-    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubprocessingActivities(Long unitId) {
+    public List<ProcessingActivityBasicResponseDTO> getAllProcessingActivityBasicDetailWithSubProcessingActivities(Long unitId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
 
@@ -140,6 +139,39 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
         AggregationResults<DataSubjectMappingResponseDTO> result = mongoTemplate.aggregate(aggregation, DataSubjectMapping.class, DataSubjectMappingResponseDTO.class);
         return result.getMappedResults();
 
+
+    }
+
+    @Override
+    public ProcessingActivityResponseDTO getProcessingActivityAndMetaDataById(Long unitId, BigInteger processingActivityId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false)),
+                lookup("processing_purpose", "processingPurposes", "_id", "processingPurposes"),
+                lookup("transfer_method", "transferMethods", "_id", "transferMethods"),
+                lookup("accessor_party", "accessorParties", "_id", "accessorParties"),
+                lookup("dataSource", "dataSources", "_id", "dataSources"),
+                lookup("responsibility_type", "responsibilityType", "_id", "responsibilityType"),
+                lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis"),
+                lookup("asset", "assetId", "_id", "asset")
+        );
+
+        AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
+        return result.getUniqueMappedResult();
+    }
+
+    @Override
+    public List<AssetBasicResponseDTO> getAllAssetLinkedWithProcessingActivityById(Long unitId, BigInteger processingActivityId) {
+
+        String replaceRoot = "{ '$replaceRoot': { 'newRoot': '$linkedAssets' } }";
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false).and("_id").is(processingActivityId)),
+                lookup("asset", "linkedAssets", "_id", "linkedAssets"),
+                unwind("linkedAssets"),
+                new CustomAggregationOperation(Document.parse(replaceRoot)),
+                match(Criteria.where(DELETED).is(false))
+        );
+        AggregationResults<AssetBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, AssetBasicResponseDTO.class);
+        return result.getMappedResults();
 
     }
 }

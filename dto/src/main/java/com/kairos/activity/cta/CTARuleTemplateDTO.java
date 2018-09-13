@@ -60,11 +60,19 @@ public class CTARuleTemplateDTO {
     private List<DayOfWeek> days;
     private List<LocalDate> publicHolidays;
     private BigInteger ruleTemplateCategoryId;
+    private String ruleTemplateCategoryName;
 
     public CTARuleTemplateDTO() {
     }
 
 
+    public String getRuleTemplateCategoryName() {
+        return ruleTemplateCategoryName;
+    }
+
+    public void setRuleTemplateCategoryName(String ruleTemplateCategoryName) {
+        this.ruleTemplateCategoryName = ruleTemplateCategoryName;
+    }
 
     public List<LocalDate> getPublicHolidays() {
         return publicHolidays;

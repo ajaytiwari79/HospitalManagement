@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.period;
 
+import com.kairos.activity.period.PeriodDTO;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.util.DateUtils;
 import com.kairos.activity.period.PlanningPeriodDTO;
@@ -87,6 +88,34 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return result.getMappedResults();
     }
 
+    public List<PeriodDTO> findAllPeriodsByStartDateAndLastDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
+        Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
+        Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
+        ProjectionOperation projectionOperation = Aggregation.project().
+                and("id").as("id").
+                andInclude("name").
+                andInclude("startDate").
+                andInclude("endDate").
+                and("current_phase_data._id").as("phaseId").
+                and("current_phase_data.name").as("currentPhaseName").
+                and("current_phase_data.color").as("phaseColor").
+                and("current_phase_data.phaseEnum").as("phaseEnum").
+                and("next_phase_data.name").as("nextPhaseName");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).
+                        and("startDate").lte(endDate).and("endDate").gte(startDate)),
+                lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
+                lookup("phases", "nextPhaseId", "_id", "next_phase_data"),
+                sort(Sort.Direction.ASC, "startDate"),
+                projectionOperation
+
+        );
+
+        AggregationResults<PeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PeriodDTO.class);
+        return result.getMappedResults();
+    }
+
 
     /*public  List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, Date startDate, Date endDate) {
 
@@ -138,6 +167,17 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return result.getMappedResults();
     }
 
+    public PlanningPeriod findCurrentDatePlanningPeriod(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
+        Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
+        Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
+        Query query = Query.query(
+                Criteria.where("deleted").is(false).and("active").is(true).and("unitId").is(unitId)
+                        .orOperator(
+                                Criteria.where("startDate").gte(startDate).lte(endDate),
+                                Criteria.where("endDate").gte(startDate).gte(endDate)
+                        ));
+        return mongoTemplate.findOne(query, PlanningPeriod.class);
+    }
 
     public boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate, int sequence) {
 
@@ -206,7 +246,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 match(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("active").is(true)),
                 lookup("phases", "currentPhaseId", "_id", "phase_name"),
                 match(Criteria.where("phase_name.name").is(requestPhaseName)),
-               sort(Sort.Direction.ASC,"startDate")
+                sort(Sort.Direction.ASC, "startDate")
         );
         AggregationResults<PlanningPeriod> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriod.class);
         return results.getMappedResults();

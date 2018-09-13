@@ -13,6 +13,7 @@ import java.util.List;
  * Created by pavan on 24/4/18.
  */
 public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
+
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
@@ -31,6 +32,7 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
     protected float recommendedValue;
+
     public List<BigInteger> getActivityIds() {
         return activityIds;
     }
@@ -75,7 +77,6 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.plannedTimeIds = plannedTimeIds;
     }
 
-    
 
     public List<AgeRange> getAgeRange() {
         return ageRange;
@@ -84,7 +85,6 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
     public void setAgeRange(List<AgeRange> ageRange) {
         this.ageRange = ageRange;
     }
-
 
 
     public LocalDate getValidationStartDate() {
@@ -110,4 +110,7 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
+
+
+
 }

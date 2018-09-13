@@ -34,7 +34,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         String orgIdStirng=pathVariables.get("organizationId");
         String unitIdString=pathVariables.get("unitId");
         log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
-                + "]" + request.getRequestURI()+"[ orgainzationID ,Unit Id " +orgIdStirng+" ,"+unitIdString+" ]");
+                + "]" + request.getRequestURI()+"[ organizationId ,Unit Id " +orgIdStirng+" ,"+unitIdString+" ]");
 
         if(orgIdStirng!=null){
               final Long orgId = Long.valueOf(orgIdStirng);

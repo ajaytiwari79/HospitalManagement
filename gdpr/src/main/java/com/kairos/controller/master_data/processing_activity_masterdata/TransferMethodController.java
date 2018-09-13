@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.TransferMethodDTO;
 import com.kairos.service.master_data.processing_activity_masterdata.TransferMethodService;
 import com.kairos.utils.ResponseHandler;
@@ -17,6 +18,8 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 
 import java.math.BigInteger;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
@@ -107,6 +110,21 @@ public class TransferMethodController {
         }
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.updateTransferMethod(countryId, id, transferMethod));
-
     }
+
+
+
+    @ApiOperation("update Suggested status of Transfer methods")
+    @PutMapping("/transfer_method")
+    public ResponseEntity<Object> updateSuggestedStatusOfTransferMethods(@PathVariable Long countryId, @RequestBody Set<BigInteger> transferMethodIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,transferMethodDestinationService.updateSuggestedStatusOfTransferMethodList(countryId, transferMethodIds, suggestedDataStatus));
+    }
+
+
 }

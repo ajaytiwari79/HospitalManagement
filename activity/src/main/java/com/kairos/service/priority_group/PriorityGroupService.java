@@ -2,10 +2,14 @@ package com.kairos.service.priority_group;
 
 import com.kairos.activity.enums.counter.ModuleType;
 import com.kairos.activity.counter.CounterDTO;
+import com.kairos.constants.AppConstants;
+import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.persistence.repository.counter.CounterRepository;
+import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.persistence.model.priority_group.*;
 import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
+import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
 import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -23,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -42,6 +48,8 @@ public class PriorityGroupService extends MongoBaseService {
 
     @Inject private GenericIntegrationService genericIntegrationService;
     @Inject private CounterRepository counterRepository;
+    @Inject
+    private OpenShiftNotificationMongoRepository openShiftNotificationRepository;
 
 
     public boolean createPriorityGroupForCountry(long countryId,List<PriorityGroupDTO> priorityGroupDTO) {
@@ -49,7 +57,7 @@ public class PriorityGroupService extends MongoBaseService {
         if(isPriorityGroupsAlreadyExists){
             exceptionService.actionNotPermittedException("priorityGroup.already.exists",countryId);
         }
-        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTO, PriorityGroup.class);
+        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroupDTO, PriorityGroup.class);
         save(priorityGroups);
         return true;
     }
@@ -171,14 +179,14 @@ public class PriorityGroupService extends MongoBaseService {
             priorityGroupDTO.setId(null);
 
         });
-        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyProperties(priorityGroupDTOs, PriorityGroup.class);
+        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroupDTOs, PriorityGroup.class);
         save(priorityGroups);
 
         return ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroups,PriorityGroupDTO.class);
         //return  priorityGroupDTOs;
     }
     public List<PriorityGroupDTO> updatePriorityGroupsForOrder(List<PriorityGroupDTO> priorityGroupDTOs) {
-        List<PriorityGroup> priorityGroups= ObjectMapperUtils.copyProperties(priorityGroupDTOs,PriorityGroup.class);
+        List<PriorityGroup> priorityGroups= ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroupDTOs,PriorityGroup.class);
         save(priorityGroups);
         return priorityGroupDTOs;
     }
@@ -196,7 +204,7 @@ public class PriorityGroupService extends MongoBaseService {
 
     public void notifyStaffByPriorityGroup(BigInteger priorityGroupId){
         if(Optional.ofNullable(priorityGroupId).isPresent()) {
-            logger.info("Excuting priority group----------->"+priorityGroupId);
+            logger.info("Executing priority group----------->"+priorityGroupId);
             PriorityGroupDTO priorityGroup = priorityGroupRepository.findByIdAndDeletedFalse(priorityGroupId);
             PriorityGroupRuleDataDTO priorityGroupRuleDataDTO = priorityGroupRulesDataGetterService.getData(priorityGroup);
             logger.info("Priority group data---------->filtering staffs from---------->"+priorityGroupRuleDataDTO.getOpenShiftStaffMap().toString());
@@ -205,9 +213,27 @@ public class PriorityGroupService extends MongoBaseService {
             priorityGroupRulesExecutorService.executeRules(priorityGroup,priorityGroupRuleDataDTO,impactWeight);
             logger.info("Priority group data---------->filtering staffs from---------->"+priorityGroupRuleDataDTO.getOpenShiftStaffMap().toString());
 
+
             applicationContext.publishEvent(priorityGroupRuleDataDTO);
         }
 
+    }
+
+    public void sendNotificationsToStaff(Map<BigInteger,List<StaffUnitPositionQueryResult>> openShiftStaffMap) {
+        OpenShiftNotification openShiftNotification;
+        List<OpenShiftNotification> openShiftNotifications = new ArrayList<>();
+
+        for(Map.Entry<BigInteger,List<StaffUnitPositionQueryResult>> entry:openShiftStaffMap.entrySet()) {
+
+            int fibonacciCounter = 0;//Using it to put fibonacci order in email for testing.
+            for(StaffUnitPositionQueryResult staffUnitPositionQueryResult:entry.getValue()) {
+
+                mailService.sendPlainMail(staffUnitPositionQueryResult.getStaffEmail(), String.format(AppConstants.OPENSHIFT_EMAIL_BODY,fibonacciCounter++),AppConstants.OPENSHIFT_SUBJECT);
+                openShiftNotification = new OpenShiftNotification(entry.getKey(),staffUnitPositionQueryResult.getStaffId());
+                openShiftNotifications.add(openShiftNotification);
+            }
+        }
+        save(openShiftNotifications);
     }
 
     public PriorityGroupWrapper getPriorityGroupsByOrderIdForUnit(Long unitId,BigInteger orderId){

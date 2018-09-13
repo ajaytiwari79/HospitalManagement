@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
@@ -59,8 +60,7 @@ public class AccessorPartyService extends MongoBaseService {
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();
             if (!accessorPartyNames.isEmpty()) {
                 for (String name : accessorPartyNames) {
-                    AccessorParty newAccessorParty = new AccessorParty(name);
-                    newAccessorParty.setCountryId(countryId);
+                    AccessorParty newAccessorParty = new AccessorParty(name,countryId,SuggestedDataStatus.APPROVED);
                     newAccessorPartyList.add(newAccessorParty);
                 }
                 newAccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(newAccessorPartyList));
@@ -76,7 +76,7 @@ public class AccessorPartyService extends MongoBaseService {
 
 
     public List<AccessorPartyResponseDTO> getAllAccessorParty(Long countryId) {
-        return accessorPartyMongoRepository.findAllAccessorParty(countryId,SuggestedDataStatus.ACCEPTED.value);
+        return accessorPartyMongoRepository.findAllAccessorParty(countryId);
     }
 
     /**
@@ -157,34 +157,50 @@ public class AccessorPartyService extends MongoBaseService {
 
 
     /**
-     * @description method save Accesor Party suggested by unit
+     * @description method save Accessor Party suggested by unit
      * @param countryId
-     * @param AccessorPartyDTOS
+     * @param accessorPartyDTOS
      * @return
      */
-    public List<AccessorParty> saveSuggestedAccessorPartysFromUnit(Long countryId, List<AccessorPartyDTO> AccessorPartyDTOS) {
+    public List<AccessorParty> saveSuggestedAccessorPartiesFromUnit(Long countryId, List<AccessorPartyDTO> accessorPartyDTOS) {
 
-        Set<String> hostingProvoiderNames = new HashSet<>();
-        for (AccessorPartyDTO AccessorParty : AccessorPartyDTOS) {
-            hostingProvoiderNames.add(AccessorParty.getName());
+        Set<String> accessorPartyNameList = new HashSet<>();
+        for (AccessorPartyDTO AccessorParty : accessorPartyDTOS) {
+            accessorPartyNameList.add(AccessorParty.getName());
         }
-        List<AccessorParty> existingAccessorPartys = findMetaDataByNamesAndCountryId(countryId, hostingProvoiderNames, AccessorParty.class);
-        hostingProvoiderNames = ComparisonUtils.getNameListForMetadata(existingAccessorPartys, hostingProvoiderNames);
-        List<AccessorParty> AccessorPartyList = new ArrayList<>();
-        if (hostingProvoiderNames.size() != 0) {
-            for (String name : hostingProvoiderNames) {
+        List<AccessorParty> existingAccessorParties = findMetaDataByNamesAndCountryId(countryId, accessorPartyNameList, AccessorParty.class);
+        accessorPartyNameList = ComparisonUtils.getNameListForMetadata(existingAccessorParties, accessorPartyNameList);
+        List<AccessorParty> accessorPartyList = new ArrayList<>();
+        if (!accessorPartyNameList.isEmpty()) {
+            for (String name : accessorPartyNameList) {
 
-                AccessorParty AccessorParty = new AccessorParty(name);
-                AccessorParty.setCountryId(countryId);
-                AccessorParty.setSuggestedDataStatus(SuggestedDataStatus.NEW.value);
-                AccessorPartyList.add(AccessorParty);
+                AccessorParty accessorParty = new AccessorParty(name);
+                accessorParty.setCountryId(countryId);
+                accessorParty.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
+                accessorParty.setSuggestedDate(LocalDate.now());
+                accessorPartyList.add(accessorParty);
             }
 
-            AccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(AccessorPartyList));
+           accessorPartyMongoRepository.saveAll(getNextSequence(accessorPartyList));
         }
-        return AccessorPartyList;
+        return accessorPartyList;
     }
 
+
+    /**
+     *
+     * @param countryId
+     * @param accessorPartyIds
+     * @param suggestedDataStatus
+     * @return
+     */
+    public List<AccessorParty> updateSuggestedStatusOfAccessorPartyList(Long countryId, Set<BigInteger> accessorPartyIds, SuggestedDataStatus suggestedDataStatus) {
+
+        List<AccessorParty> accessorPartyList = accessorPartyMongoRepository.getAccessorPartyListByIds(countryId, accessorPartyIds);
+        accessorPartyList.forEach(accessorParty-> accessorParty.setSuggestedDataStatus(suggestedDataStatus));
+        accessorPartyMongoRepository.saveAll(getNextSequence(accessorPartyList));
+        return accessorPartyList;
+    }
 
 }
 

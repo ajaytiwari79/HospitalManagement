@@ -6,7 +6,7 @@ package com.kairos.service.staffing_level;
 
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.staffing_level.Duration;
 import com.kairos.activity.staffing_level.StaffingLevelInterval;

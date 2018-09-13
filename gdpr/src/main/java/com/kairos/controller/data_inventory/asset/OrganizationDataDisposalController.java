@@ -66,17 +66,6 @@ public class OrganizationDataDisposalController {
 
     }
 
-    @ApiOperation("get DataDisposal by name")
-    @GetMapping("/data_disposal/name")
-    public ResponseEntity<Object> getDataDisposalByName(@PathVariable Long unitId, @RequestParam String name) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalByName(unitId, name));
-
-    }
-
-
     @ApiOperation("delete data disposal by id")
     @DeleteMapping("/data_disposal/delete/{id}")
     public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long unitId, @PathVariable BigInteger id) {
@@ -104,7 +93,7 @@ public class OrganizationDataDisposalController {
 
 
     @ApiOperation("save Data Disposal And Suggest To Country admin")
-    @PostMapping(COUNTRY_URL + "/data_disposal")
+    @PostMapping(COUNTRY_URL + "/data_disposal/suggest")
     public ResponseEntity<Object> saveDataDisposalAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");

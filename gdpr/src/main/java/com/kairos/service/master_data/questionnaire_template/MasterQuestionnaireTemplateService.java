@@ -106,7 +106,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
             case ASSET_TYPE:
                 if (assetTypeId == null) {
                     exceptionService.invalidRequestException("message.invalid.request", "asset type is null");
-                } else if (assetTypeMongoRepository.findByIdAndNonDeleted(UserContext.getCountryId(), assetTypeId) != null) {
+                } else if (assetTypeMongoRepository.findByIdAndCountryId(UserContext.getCountryId(), assetTypeId) != null) {
                     questionnaireTemplate.setTemplateType(templateType);
                     questionnaireTemplate.setAssetType(assetTypeId);
                 } else {
@@ -207,21 +207,17 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
 
     public Object[] getQuestionnaireTemplateAttributeNames(String templateType) {
 
-
         if (QuestionnaireTemplateType.valueOf(templateType) == null) {
             throw new InvalidRequestException("template type not found for" + templateType);
         }
         QuestionnaireTemplateType questionnaireTemplateType = QuestionnaireTemplateType.valueOf(templateType);
-        Object[] attributeNames = new Object[]{};
         switch (questionnaireTemplateType) {
             case ASSET_TYPE:
-                attributeNames = AssetAttributeName.values();
-                break;
+                return AssetAttributeName.values();
             case PROCESSING_ACTIVITY:
-                attributeNames = ProcessingActivityAttributeName.values();
-                break;
+                return ProcessingActivityAttributeName.values();
+            default: return null;
         }
-        return attributeNames;
     }
 
 

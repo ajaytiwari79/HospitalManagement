@@ -1,6 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
+import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.gdpr.metadata.HostingTypeDTO;
 import com.kairos.service.master_data.asset_management.HostingTypeService;
 import com.kairos.utils.ResponseHandler;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
@@ -99,14 +102,26 @@ public class HostingTypeController {
 
     @ApiOperation("update HostingType by id")
     @PutMapping("/hosting_type/update/{id}")
-    public ResponseEntity<Object> updateHostingType(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody HostingTypeDTO hostingtype) {
+    public ResponseEntity<Object> updateHostingType(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody HostingTypeDTO hostingType) {
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
         } else if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(countryId, id, hostingtype));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(countryId, id, hostingType));
 
+    }
+
+    @ApiOperation("update Suggested status of Hosting types")
+    @PutMapping("/hosting_type")
+    public ResponseEntity<Object> updateSuggestedStatusOfHostingTypes(@PathVariable Long countryId, @RequestBody Set<BigInteger> hostingTypeIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }
+        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateSuggestedStatusOfHostingTypes(countryId, hostingTypeIds, suggestedDataStatus));
     }
 
 

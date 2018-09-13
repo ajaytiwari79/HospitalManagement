@@ -1,6 +1,7 @@
 package com.kairos.controller.wta;
 
 import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryRequestDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.service.wta.RuleTemplateCategoryService;
 import com.kairos.util.response.ResponseHandler;
@@ -31,7 +32,7 @@ public class RuleTemplateCategoryController {
 
 
     @RequestMapping(value = COUNTRY_URL+"/template_category", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> createRuleTemplate(@PathVariable long countryId, @RequestBody @Valid RuleTemplateCategoryDTO ruleTemplateCategory) {
+    ResponseEntity<Map<String, Object>> createRuleTemplate(@PathVariable long countryId, @RequestBody @Valid RuleTemplateCategoryRequestDTO ruleTemplateCategory) {
 
         if (ruleTemplateCategory != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.createRuleTemplateCategory(countryId, ruleTemplateCategory));
@@ -50,7 +51,7 @@ public class RuleTemplateCategoryController {
     }
 
     @RequestMapping(value = COUNTRY_URL+"/template_category/{templateCategoryId}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> updateRuleTemplateCategory(@PathVariable long countryId, @PathVariable BigInteger templateCategoryId, @RequestBody RuleTemplateCategoryDTO ruleTemplateCategory) {
+    ResponseEntity<Map<String, Object>> updateRuleTemplateCategory(@PathVariable long countryId, @PathVariable BigInteger templateCategoryId, @RequestBody RuleTemplateCategoryRequestDTO ruleTemplateCategory) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.updateRuleTemplateCategory(countryId, templateCategoryId, ruleTemplateCategory));
     }
 

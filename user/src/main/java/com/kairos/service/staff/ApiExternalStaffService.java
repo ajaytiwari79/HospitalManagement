@@ -91,7 +91,7 @@ public class ApiExternalStaffService {
             AddressDTO address = new AddressDTO();
             address.setCity("Odense");
             address.setCountry("Denmark");
-            address.setStreet1("Thorsgade");
+            address.setStreet("Thorsgade");
             address.setLatitude(Float.valueOf("10.376834"));
             address.setLongitude(Float.valueOf("55.3958"));
             address.setHouseNumber("8");

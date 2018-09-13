@@ -28,7 +28,6 @@ public class AssetDTO {
     @NotBlank(message = "description  can't be  Empty ")
     private String description;
 
-
     @NotBlank(message = "Hosting Location can't be Empty")
     private String hostingLocation;
 
@@ -68,9 +67,7 @@ public class AssetDTO {
 
     private Long maxDataSubjectVolume;
 
-    private RiskSeverity risk;
-
-    private Boolean active;
+    private RiskSeverity riskLevel;
 
     public BigInteger getId() { return id; }
 
@@ -107,9 +104,9 @@ public class AssetDTO {
 
     public Long getMaxDataSubjectVolume() { return maxDataSubjectVolume; }
 
-    public RiskSeverity getRisk() { return risk; }
+    public RiskSeverity getRiskLevel() { return riskLevel; }
 
-    public Boolean getActive() { return active; }
+    public void setRiskLevel(RiskSeverity riskLevel) { this.riskLevel = riskLevel; }
 
     public AssetDTO() {
     }

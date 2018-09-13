@@ -2,6 +2,8 @@ package com.kairos.user.staff.staff_settings;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class StaffActivitySettingDTO {
@@ -10,22 +12,23 @@ public class StaffActivitySettingDTO {
     private BigInteger activityId;
     private Long unitPositionId;
     private Long unitId;
-    private int shortestTime;
-    private int longestTime;
+    private Short shortestTime;
+    private Short longestTime;
     private Integer minLength;
     private Integer maxThisActivityPerShift;
     private boolean eligibleForMove;
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
     private LocalTime maximumEndTime;
+    private List<Long> dayTypeIds= new ArrayList<>();
 
 
     public StaffActivitySettingDTO() {
         //Default Constructor
     }
 
-    public StaffActivitySettingDTO(BigInteger activityId, Long unitPositionId, int shortestTime,
-                                   int longestTime, Integer minLength, Integer maxThisActivityPerShift, boolean eligibleForMove) {
+    public StaffActivitySettingDTO(BigInteger activityId, Long unitPositionId, Short shortestTime,
+                                   Short longestTime, Integer minLength, Integer maxThisActivityPerShift, boolean eligibleForMove) {
         this.activityId = activityId;
         this.unitPositionId = unitPositionId;
         this.shortestTime = shortestTime;
@@ -75,19 +78,19 @@ public class StaffActivitySettingDTO {
         this.unitId = unitId;
     }
 
-    public int getShortestTime() {
+    public Short getShortestTime() {
         return shortestTime;
     }
 
-    public void setShortestTime(int shortestTime) {
+    public void setShortestTime(Short shortestTime) {
         this.shortestTime = shortestTime;
     }
 
-    public int getLongestTime() {
+    public Short getLongestTime() {
         return longestTime;
     }
 
-    public void setLongestTime(int longestTime) {
+    public void setLongestTime(Short longestTime) {
         this.longestTime = longestTime;
     }
 
@@ -137,5 +140,13 @@ public class StaffActivitySettingDTO {
 
     public void setMaximumEndTime(LocalTime maximumEndTime) {
         this.maximumEndTime = maximumEndTime;
+    }
+
+    public List<Long> getDayTypeIds() {
+        return dayTypeIds;
+    }
+
+    public void setDayTypeIds(List<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
     }
 }

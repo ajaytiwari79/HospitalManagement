@@ -48,7 +48,7 @@ public class PhaseService extends MongoBaseService {
     private ExceptionService exceptionService;
 
     public List<Phase> createDefaultPhase(Long unitId, Long countryId) {
-        List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
+        List<PhaseDTO> countryPhases = phaseMongoRepository.findByCountryIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(countryId);
         List<Phase> phases = new ArrayList<>();
         for (PhaseDTO phaseDTO : countryPhases) {
             Phase phase = new Phase(phaseDTO.getName(), phaseDTO.getDescription(),phaseDTO.getPhaseEnum(), phaseDTO.getDuration(), phaseDTO.getDurationType(), phaseDTO.getSequence(), null,
@@ -155,7 +155,7 @@ public class PhaseService extends MongoBaseService {
     }
 
     public List<PhaseDTO> getPhasesByCountryId(Long countryId) {
-        return phaseMongoRepository.findByCountryIdAndDeletedFalse(countryId);
+        return phaseMongoRepository.findByCountryIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(countryId);
     }
 
     public Map<String, List<PhaseDTO>> getPhasesWithCategoryByCountryId(Long countryId) {
@@ -335,10 +335,10 @@ public class PhaseService extends MongoBaseService {
         }
 
 
-    public Map<LocalDate,List<ShiftStatus>> getStatusByDates(Long unitId, Set<LocalDate> dates) {
-        Map<LocalDate,List<ShiftStatus>> localDatePhaseStatusMap=new HashMap<>();
+    public Map<LocalDate,Phase> getStatusByDates(Long unitId, Set<LocalDate> dates) {
+        Map<LocalDate,Phase> localDatePhaseStatusMap=new HashMap<>();
         List<Phase> phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
-        Map<String,List<ShiftStatus>> phaseMap=phases.stream().collect(Collectors.toMap(Phase::getName, Phase::getStatus));
+        Map<String,Phase> phaseMap=phases.stream().collect(Collectors.toMap(Phase::getName, v->v));
         LocalDate currentDate=LocalDate.now();
         List<Phase> planningPhases=phases.stream().filter(phase -> phase.getPhaseType().equals(PhaseType.PLANNING) && phase.getDuration()>0).collect(Collectors.toList());
         Collections.sort(planningPhases, (Phase p1, Phase p2) -> {
@@ -373,7 +373,7 @@ public class PhaseService extends MongoBaseService {
      * @param localDatePhaseStatusMap
      * @param upcomingMondayDate
      */
-    private void addPlanningPhase(List<Phase> phases, LocalDate proposedDate, Map<LocalDate,List<ShiftStatus>> localDatePhaseStatusMap, LocalDate upcomingMondayDate) {
+    private void addPlanningPhase(List<Phase> phases, LocalDate proposedDate, Map<LocalDate,Phase> localDatePhaseStatusMap, LocalDate upcomingMondayDate) {
         if(!Optional.ofNullable(phases).isPresent() || phases.isEmpty()){
             exceptionService.actionNotPermittedException("phases.absent");
         }
@@ -410,7 +410,7 @@ public class PhaseService extends MongoBaseService {
         if (!Optional.ofNullable(phase).isPresent()) {
             phase = phases.get(phases.size() - 1);
             }
-        localDatePhaseStatusMap.put(proposedDate,phase.getStatus());
+        localDatePhaseStatusMap.put(proposedDate,phase);
     }
 
 }

@@ -39,7 +39,7 @@ public class MongoAddFilterGroupData extends MongoBaseService implements Command
     private FilterMongoRepository filterMongoRepository;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
         LOGGER.info("creating filter group data");
 

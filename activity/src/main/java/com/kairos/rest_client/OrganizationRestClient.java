@@ -497,55 +497,6 @@ public class OrganizationRestClient {
         }
     }
 
-
-    public List<Long> getAllOrganizationIds() {
-        final String baseUrl = RestClientUrlUtil.getBaseUrl();
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<List<Long>>> restExchange =
-                    restTemplateWithAuth.exchange(
-                            baseUrl + "organizationwithoutphases",
-                            HttpMethod.GET,
-                            null, typeReference);
-            RestTemplateResponseEnvelope<List<Long>> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
-        }
-    }
-
-    public void updateOrganizationWithoutPhases(List<Long> organizationIds) {
-        final String baseUrl = RestClientUrlUtil.getBaseUrl();
-        try {
-            HttpEntity<List<Long>> request = new HttpEntity<>(organizationIds);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope> restExchange =
-                    restTemplateWithAuth.exchange(
-                            baseUrl + "organizationwithoutphases",
-                            HttpMethod.PUT,
-                            request, typeReference, organizationIds);
-            RestTemplateResponseEnvelope<List<Long>> response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
-                logger.info("updated Successfully");
-            } else {
-                throw new RuntimeException(response.getMessage());
-            }
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
-        }
-    }
-
-
     //TODO  Add custom Auth to fix this
     public OrganizationDTO getOrganizationWithoutAuth(long unitId) {
 

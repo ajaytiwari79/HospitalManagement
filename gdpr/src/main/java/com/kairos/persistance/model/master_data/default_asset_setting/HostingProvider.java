@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 
 
 @Document(collection = "hosting_provider")
@@ -16,33 +17,33 @@ public class HostingProvider extends MongoBaseEntity {
     private String name;
 
     private Long countryId;
+    private SuggestedDataStatus suggestedDataStatus;
 
-    private String suggestedDataStatus=SuggestedDataStatus.ACCEPTED.value;
+    private LocalDate suggestedDate;
 
-    public String getSuggestedDataStatus() { return suggestedDataStatus; }
+    public LocalDate getSuggestedDate() { return suggestedDate; }
 
-    public void setSuggestedDataStatus(String suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
+    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
 
-    public Long getCountryId() {
-        return countryId;
-    }
+    public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
 
-    public void setCountryId(Long countryId) {
+    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
+
+    public Long getCountryId() { return countryId; }
+
+    public void setCountryId(Long countryId) { this.countryId = countryId; }
+
+    public String getName() { return name.trim(); }
+
+    public void setName(String name) { this.name = name; }
+
+    public HostingProvider(String name) { this.name = name; }
+
+    public HostingProvider(@NotBlank(message = "Name can't be empty ") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
         this.countryId = countryId;
+        this.suggestedDataStatus = suggestedDataStatus;
     }
 
-    public String getName() {
-        return name.trim();
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public HostingProvider(String name) {
-        this.name = name;
-    }
-
-    public HostingProvider() {
-    }
+    public HostingProvider() { }
 }

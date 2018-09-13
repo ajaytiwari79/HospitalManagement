@@ -1,7 +1,7 @@
 package com.kairos.wrapper;
 
 
-import com.kairos.persistence.model.activity.Shift;
+import com.kairos.persistence.model.shift.Shift;
 
 import java.time.LocalDate;
 import java.util.List;

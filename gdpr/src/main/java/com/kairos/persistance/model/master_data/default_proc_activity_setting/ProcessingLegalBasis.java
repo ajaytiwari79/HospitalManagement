@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 
 @Document
 public class ProcessingLegalBasis extends MongoBaseEntity {
@@ -18,11 +19,17 @@ public class ProcessingLegalBasis extends MongoBaseEntity {
 
     private Long countryId;
 
-    private String suggestedDataStatus=SuggestedDataStatus.ACCEPTED.value;
+    private SuggestedDataStatus suggestedDataStatus;
 
-    public String getSuggestedDataStatus() { return suggestedDataStatus; }
+    private LocalDate suggestedDate;
 
-    public void setSuggestedDataStatus(String suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
+    public LocalDate getSuggestedDate() { return suggestedDate; }
+
+    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
+
+    public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
+
+    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
     public Long getCountryId() {
         return countryId;
@@ -40,7 +47,11 @@ public class ProcessingLegalBasis extends MongoBaseEntity {
         this.name = name;
     }
 
-
+    public ProcessingLegalBasis(@NotBlank(message = "error.message.name.cannot.be.null.or.empty")String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
+        this.countryId = countryId;
+        this.suggestedDataStatus = suggestedDataStatus;
+    }
 
     public ProcessingLegalBasis(String name) {
         this.name = name;
