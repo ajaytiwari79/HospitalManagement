@@ -307,7 +307,7 @@ public class TimeBankCalculationService {
     private List<ShiftWithActivityDTO> getShiftsByDate(Interval interval, List<ShiftWithActivityDTO> shifts) {
         List<ShiftWithActivityDTO> shifts1 = new ArrayList<>();
         shifts.forEach(s -> {
-            if (interval.contains(s.getStartDate().getTime()) || interval.contains(s.getEndDate().getTime())) {
+            if (interval.contains(s.getActivitiesStartDate().getTime()) || interval.contains(s.getActivitiesEndDate().getTime())) {
                 shifts1.add(s);
             }
         });
@@ -896,7 +896,7 @@ public class TimeBankCalculationService {
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftWithActivityDTO shift : shifts) {
                         for (ShiftActivity shiftActivity : shift.getActivities()) {
-                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
+                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getActivitiesStartDate().getTime())) {
                                 totalScheduledMin += shift.getScheduledMinutes();
                             }
                         }
@@ -975,7 +975,7 @@ public class TimeBankCalculationService {
                 if (shifts != null && !shifts.isEmpty()) {
                     for (ShiftWithActivityDTO shift : shifts) {
                         for (ShiftActivity shiftActivity : shift.getActivities()) {
-                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getStartDate().getTime())) {
+                            if (timeType.getId().equals(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && interval.contains(shift.getActivitiesStartDate().getTime())) {
                                 totalScheduledMin += shift.getScheduledMinutes();
                             }
                         }

@@ -149,6 +149,16 @@ public class ShiftWithActivityDTO {
         return endDate;
     }
 
+    public Date getActivitiesEndDate(){
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+        return activities.get(activities.size()-1).getEndDate();
+    }
+
+    public Date getActivitiesStartDate(){
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+        return activities.get(activities.size()-1).getEndDate();
+    }
+
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }

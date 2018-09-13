@@ -89,7 +89,7 @@ public class ShiftValidatorService {
     }
 
     public static Comparator getShiftStartTimeComparator() {
-        return (Comparator<ShiftWithActivityDTO>) (ShiftWithActivityDTO s1, ShiftWithActivityDTO s2) -> s1.getStartDate().compareTo(s2.getStartDate());
+        return (Comparator<ShiftWithActivityDTO>) (ShiftWithActivityDTO s1, ShiftWithActivityDTO s2) -> s1.getActivitiesStartDate().compareTo(s2.getActivitiesStartDate());
     }
 
     public static boolean isValid(MinMaxSetting minMaxSetting, int limitValue, int calculatedValue) {
@@ -97,7 +97,7 @@ public class ShiftValidatorService {
     }
 
     public static List<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift) {
-        List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).sorted().collect(Collectors.toSet()));
+        List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> DateUtils.asLocalDate(s.getActivitiesStartDate())).sorted().collect(Collectors.toSet()));
         return dates;
     }
 
@@ -124,7 +124,7 @@ public class ShiftValidatorService {
             for (TimeSlotWrapper timeSlotWrapper : timeSlotWrappers) {
                 if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
                     TimeInterval interval = new TimeInterval(((timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute()), ((timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute()));
-                    if (interval.contains(DateUtils.getZoneDateTime(shift.getStartDate()).get(ChronoField.MINUTE_OF_DAY))) {
+                    if (interval.contains(DateUtils.getZoneDateTime(shift.getActivities().get(0).getStartDate()).get(ChronoField.MINUTE_OF_DAY))) {
                         timeInterval = interval;
                         break;
                     }
@@ -175,7 +175,7 @@ public class ShiftValidatorService {
     public static List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, TimeInterval timeInterval) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         shifts.forEach(s -> {
-            if ((dateTimeInterval.contains(s.getStartDate()) || dateTimeInterval.contains(s.getEndDate())) && (timeInterval == null || timeInterval.contains(DateUtils.getZoneDateTime(s.getStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
+            if ((dateTimeInterval.contains(s.getActivitiesStartDate()) || dateTimeInterval.contains(s.getActivitiesEndDate())) && (timeInterval == null || timeInterval.contains(DateUtils.getZoneDateTime(s.getActivitiesStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
                 updatedShifts.add(s);
             }
         });
@@ -191,7 +191,7 @@ public class ShiftValidatorService {
         while (true) {
             dateTimeInterval = new DateTimeInterval(validationStartDate.atStartOfDay(ZoneId.systemDefault()), endDate.atStartOfDay(ZoneId.systemDefault()));
             endDate = validationStartDate.plusWeeks(numberOfWeeks);
-            if (dateTimeInterval.contains(shift.getStartDate())) {
+            if (dateTimeInterval.contains(shift.getActivitiesStartDate())) {
                 break;
             }
             validationStartDate = endDate;
@@ -308,7 +308,7 @@ public class ShiftValidatorService {
 
 
     public static boolean isValidForDay(List<Long> dayTypeIds, RuleTemplateSpecificInfo infoWrapper) {
-        DayOfWeek shiftDay = DateUtils.asLocalDate(infoWrapper.getShift().getStartDate()).getDayOfWeek();
+        DayOfWeek shiftDay = DateUtils.asLocalDate(infoWrapper.getShift().getActivitiesStartDate()).getDayOfWeek();
         return getValidDays(infoWrapper.getDayTypes(), dayTypeIds).stream().filter(day -> day.equals(shiftDay)).findAny().isPresent();
     }
 

@@ -96,10 +96,10 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && (plannedTimeIds.contains(infoWrapper.getShift().getPlannedTypeId()) && timeTypeIds.contains(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))) {
             int timefromPrevShift = 0;
             List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds, null);
-            shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.getZoneDateTime(shift1.getEndDate()).isBefore(DateUtils.getZoneDateTime(infoWrapper.getShift().getStartDate()))).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
+            shifts = (List<ShiftWithActivityDTO>) shifts.stream().filter(shift1 -> DateUtils.getZoneDateTime(shift1.getActivitiesEndDate()).isBefore(DateUtils.getZoneDateTime(infoWrapper.getShift().getActivitiesStartDate()))).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
             if (shifts.size() > 0) {
-                ZonedDateTime prevShiftEnd = DateUtils.getZoneDateTime(shifts.size() > 1 ? shifts.get(shifts.size() - 1).getEndDate() : shifts.get(0).getEndDate());
-                timefromPrevShift = (int)new DateTimeInterval(prevShiftEnd, DateUtils.getZoneDateTime(infoWrapper.getShift().getStartDate())).getMinutes();
+                ZonedDateTime prevShiftEnd = DateUtils.getZoneDateTime(shifts.size() > 1 ? shifts.get(shifts.size() - 1).getActivitiesEndDate() : shifts.get(0).getActivitiesEndDate());
+                timefromPrevShift = (int)new DateTimeInterval(prevShiftEnd, DateUtils.getZoneDateTime(infoWrapper.getShift().getActivitiesStartDate())).getMinutes();
                 Integer[] limitAndCounter = getValueByPhase(infoWrapper, getPhaseTemplateValues(), this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], timefromPrevShift/60);
                 if (!isValid) {

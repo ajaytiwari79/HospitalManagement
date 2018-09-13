@@ -118,7 +118,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     public int getMaxRestingTime(List<ShiftWithActivityDTO> shifts) {
         int maxRestTime = 0;
         for (int i=1;i<shifts.size();i++) {
-            int restTime = (int)new DateTimeInterval(shifts.get(i-1).getEndDate().getTime(),shifts.get(i).getStartDate().getTime()).getMinutes();
+            int restTime = (int)new DateTimeInterval(shifts.get(i-1).getActivitiesEndDate().getTime(),shifts.get(i).getActivitiesStartDate().getTime()).getMinutes();
             if(restTime>maxRestTime){
                 maxRestTime = restTime;
             }

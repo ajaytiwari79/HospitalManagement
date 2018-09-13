@@ -1,7 +1,9 @@
 package com.kairos.dto.activity.shift;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.activity.activity.ActivityDTO;
 
+import java.beans.Transient;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -9,7 +11,6 @@ import java.util.Date;
  * @author pradeep
  * @date - 10/9/18
  */
-
 public class ShiftActivity {
 
 
@@ -26,7 +27,8 @@ public class ShiftActivity {
     private String timeType;
 
     //This field is only for validation
-    private transient ActivityDTO activity;
+    //@JsonIgnore
+    private ActivityDTO activity;
 
 
     public ShiftActivity( String activityname,Date startDate, Date endDate,BigInteger activityId) {
