@@ -1172,7 +1172,7 @@ public class ShiftService extends MongoBaseService {
 
             StaffUnitPositionDetails staffUnitPosition = staffDataList.parallelStream().filter(unitPosition -> unitPosition.getStaff().getId().equals(currentStaffId)).findFirst().get();
             boolean paid = staffUnitPosition.getExpertise().getBreakPaymentSetting().equals(BreakPaymentSetting.PAID);
-            // TODO PAVAN handle error
+
             WorkingTimeAgreement workingTimeAgreement = workingTimeAgreements.stream().filter(wta -> wta.getUnitPositionId().equals(staffUnitPosition.getId())).findAny().get();
 
             Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffUnitPosition, activities, copyShiftDTO, breakSettings, breakActivitiesMap, paid);
