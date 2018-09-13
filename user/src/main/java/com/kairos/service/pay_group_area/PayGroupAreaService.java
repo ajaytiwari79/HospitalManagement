@@ -217,13 +217,17 @@ public class PayGroupAreaService {
 
     public boolean deletePayGroupFromMunicipality(Long payGroupAreaId, Long municipalityId, Long relationshipId) {
         PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
-        if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
+        if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted()) {
             logger.info("pay group area not found for deletion  ");
             exceptionService.dataNotFoundByIdException("message.paygroup.id.notfound", payGroupAreaId);
 
         }
 
-        payGroupAreaGraphRepository.removePayGroupAreaFromMunicipality(payGroupAreaId, municipalityId, relationshipId);
+      int linkedMunicipalityCount=  payGroupAreaGraphRepository.removePayGroupAreaFromMunicipality(payGroupAreaId, municipalityId, relationshipId);
+        if (linkedMunicipalityCount==0){
+            payGroupArea.setDeleted(true);
+            payGroupAreaGraphRepository.save(payGroupArea);
+        }
         return true;
     }
 
