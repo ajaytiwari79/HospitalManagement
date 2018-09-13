@@ -224,10 +224,10 @@ public class ShiftValidatorService {
         if (infoWrapper.getUser().getStaff() && phaseTemplateValue.isStaffCanIgnore()) {
             counterValue = ruleTemplate.getStaffCanIgnoreCounter();
         }
-        if (infoWrapper.getUser().getManagement() && phaseTemplateValue.isManagementCanIgnore()) {
+        else if (infoWrapper.getUser().getManagement() && phaseTemplateValue.isManagementCanIgnore()) {
             counterValue = ruleTemplate.getManagementCanIgnoreCounter();
         }
-        return counterValue != null ? counterValue - infoWrapper.getCounterMap().getOrDefault(ruleTemplate.getId(), 0) : null;
+        return counterValue != null ? infoWrapper.getCounterMap().getOrDefault(ruleTemplate.getId(), counterValue) : null;
 
     }
 
