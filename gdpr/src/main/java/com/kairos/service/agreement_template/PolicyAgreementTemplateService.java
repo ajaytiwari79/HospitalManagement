@@ -4,6 +4,7 @@ package com.kairos.service.agreement_template;
 import com.kairos.dto.gdpr.PolicyAgreementTemplateDTO;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
+import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -96,12 +98,27 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAgreementTemplateWithSectionsAndSubSections(countryId, unitId, agreementTemplateId);
         agreementSectionResponseDTOS.forEach(agreementSectionResponseDTO ->
                 {
+                    Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS = agreementSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));
+                    sortClauseOfAgreementSectionAndSubSectionInResponseDTO(clauseBasicResponseDTOS, agreementSectionResponseDTO);
                     if (!Optional.ofNullable(agreementSectionResponseDTO.getSubSections().get(0).getId()).isPresent()) {
                         agreementSectionResponseDTO.setSubSections(new ArrayList<>());
+                    } else {
+                        agreementSectionResponseDTO.getSubSections().forEach(agreementSubSectionResponseDTO -> {
+                            Map<BigInteger, ClauseBasicResponseDTO> subSectionClauseBasicResponseDTOS = agreementSubSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));
+                            sortClauseOfAgreementSectionAndSubSectionInResponseDTO(subSectionClauseBasicResponseDTOS, agreementSubSectionResponseDTO);
+                        });
                     }
                 }
         );
         return agreementSectionResponseDTOS;
+    }
+
+    private void sortClauseOfAgreementSectionAndSubSectionInResponseDTO(Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS, AgreementSectionResponseDTO agreementSectionResponseDTO) {
+        List<BigInteger> clauseIdOrderedIndexs = agreementSectionResponseDTO.getClauseIdOrderedIndex();
+        agreementSectionResponseDTO.getClauses().clear();
+        List<ClauseBasicResponseDTO> clauses = new ArrayList<>();
+        clauseIdOrderedIndexs.stream().forEach(clauseIdOrderedIndex -> clauses.add(clauseBasicResponseDTOS.get(clauseIdOrderedIndex)));
+        agreementSectionResponseDTO.setClauses(clauses);
     }
 
 

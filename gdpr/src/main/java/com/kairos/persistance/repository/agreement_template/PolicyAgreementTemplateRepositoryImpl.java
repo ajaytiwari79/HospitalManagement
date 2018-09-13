@@ -38,7 +38,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         String replaceRoot = "{ '$replaceRoot': { 'newRoot': '$agreementSections' } }";
         String sortSubSections = " {$sort:{'subSections.orderedIndex':-1}}";
         String sortAgreementSection = "{$sort:{'orderedIndex':1}}";
-        String groupSubSections = "{$group:{_id: '$_id', subSections:{'$addToSet':'$subSections'},clauses:{$first:'$clauses'},orderedIndex:{$first:'$orderedIndex'},title:{$first:'$title' },'clauseOrder':{'$first':'$clauseOrder'}}}";
+        String groupSubSections = "{$group:{_id: '$_id', subSections:{'$addToSet':'$subSections'},'clauseIdOrderedIndex':{'$first':'$clauseIdOrderedIndex'},clauses:{$first:'$clauses'},orderedIndex:{$first:'$orderedIndex'},title:{$first:'$title' }}}";
 
         Document replaceRootOperation = Document.parse(replaceRoot);
         Document groupOperation = Document.parse(groupSubSections);
@@ -50,10 +50,10 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
                 lookup("agreement_section", "agreementSections", "_id", "agreementSections"),
                 unwind("agreementSections"),
                 new CustomAggregationOperation(replaceRootOperation),
-                lookup("clause", "clauses", "_id", "clauses"),
+                lookup("clause", "clauseIdOrderedIndex", "_id", "clauses"),
                 lookup("agreement_section", "subSections", "_id", "subSections"),
                 unwind("subSections", true),
-                lookup("clause", "subSections.clauses", "_id", "subSections.clauses"),
+                lookup("clause", "subSections.clauseIdOrderedIndex", "_id", "subSections.clauses"),
                 new CustomAggregationOperation(sortSubSectionsOperation),
                 new CustomAggregationOperation(groupOperation),
                 new CustomAggregationOperation(Document.parse(sortAgreementSection))

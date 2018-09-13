@@ -17,9 +17,8 @@ public class AgreementSection extends MongoBaseEntity {
     @NotBlank(message = "Section Title cannot be empty")
     private String title;
 
-    private ClauseIdOrderIndex clauseOrder;
-
-    private List<BigInteger> clauses=new ArrayList<>();
+    // clause id are saved in sorted order index
+    private List<BigInteger> clauseIdOrderedIndex=new ArrayList<>();
 
     private List<BigInteger> subSections=new ArrayList<>();
 
@@ -28,37 +27,21 @@ public class AgreementSection extends MongoBaseEntity {
 
     private Long countryId;
 
-    public Long getCountryId() {
-        return countryId;
-    }
+    public Long getCountryId() { return countryId; }
 
-    public String getTitle() {
-        return title;
-    }
+    public String getTitle() { return title; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public void setTitle(String title) { this.title = title; }
 
-    public List<BigInteger> getSubSections() {
-        return subSections;
-    }
+    public List<BigInteger> getSubSections() { return subSections; }
 
-    public void setSubSections(List<BigInteger> subSections) {
-        this.subSections = subSections;
-    }
+    public void setSubSections(List<BigInteger> subSections) { this.subSections = subSections; }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
+    public void setCountryId(Long countryId) { this.countryId = countryId; }
 
-    public List<BigInteger> getClauses() {
-        return clauses;
-    }
+    public List<BigInteger> getClauseIdOrderedIndex() { return clauseIdOrderedIndex; }
 
-    public void setClauses(List<BigInteger> clauses) {
-        this.clauses = clauses;
-    }
+    public void setClauseIdOrderedIndex(List<BigInteger> clauseIdOrderedIndex) { this.clauseIdOrderedIndex = clauseIdOrderedIndex; }
 
     public Integer getOrderedIndex() { return orderedIndex; }
 
@@ -66,13 +49,6 @@ public class AgreementSection extends MongoBaseEntity {
 
     public AgreementSection(){ }
 
-    public ClauseIdOrderIndex getClauseOrder() {
-        return clauseOrder;
-    }
-
-    public void setClauseOrder(ClauseIdOrderIndex clauseOrder) {
-        this.clauseOrder = clauseOrder;
-    }
 
     public AgreementSection(Long countryId , @NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex)
     {
