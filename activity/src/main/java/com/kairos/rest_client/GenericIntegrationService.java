@@ -5,6 +5,8 @@ import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.scheduler.SchedulerPanelDTO;
+import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
@@ -15,9 +17,11 @@ import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +34,7 @@ public class GenericIntegrationService {
     GenericRestClient genericRestClient;
     @Autowired
     ExceptionService exceptionService;
+
 
     public Long getUnitPositionId(Long unitId, Long staffId, Long expertiseId, Long dateInMillis) {
         Map<String, Object> queryParam = new HashMap<>();
@@ -115,4 +120,9 @@ public class GenericIntegrationService {
     public AccessGroupPermissionCounterDTO getAccessGroupIdsAndCountryAdmin(Long unitId){
             return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/staff/user/accessgroup",null),AccessGroupPermissionCounterDTO.class);
     }
-}
+
+  /*  public SchedulerPanelDTO checkSchedulerLoadBalanceWorking() {
+
+        return schedulerServiceRestClient.publishRequest(null,2567L,true,IntegrationOperation.GET,"/scheduler_panel/12",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<SchedulerPanelDTO>>() {});
+    }*/
+ }
