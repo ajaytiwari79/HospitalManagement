@@ -1,7 +1,5 @@
 package com.kairos.service.shift;
 
-import com.kairos.constants.AppConstants;
-import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.staffing_level.Duration;
@@ -22,14 +20,12 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.utils.user_context.UserContext;
-import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalTime;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
@@ -52,6 +48,7 @@ public class ShiftSickService extends MongoBaseService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
+    private
     PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
     private SickSettingsRepository sickSettingsRepository;
@@ -62,7 +59,7 @@ public class ShiftSickService extends MongoBaseService {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(activityId);
         Activity activity = activityWrapper.getActivity();
         if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.activity.id", activity);
+            exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
         if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(ENTERED_MANUALLY)) {
             if (duration == null || duration.getFrom() == null || duration.getTo() == null) {
@@ -110,25 +107,25 @@ public class ShiftSickService extends MongoBaseService {
             shifts.add(currentShift);
 
         }
-        // Adding all shifts to the same.
-        shifts.addAll(staffOriginalShiftsOfDates);
-        if (!shifts.isEmpty())
-            save(shifts);
+        addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts);
 
+    }
+
+    private void addPreviousShiftAndSaveShift(List<Shift> staffOriginalShiftsOfDates, List<Shift> shifts) {
+        shifts.addAll(staffOriginalShiftsOfDates);
+        if (!shifts.isEmpty()) {
+            save(shifts);
+        }
     }
 
     private void calculateShiftStartAndEndTime(Shift currentShift, Shift previousDayShift, short shiftNeedsToAddForDays) {
-        LocalTime shiftStartTime = DateUtils.asLocalTime(previousDayShift.getStartDate());
-        LocalTime shiftEndTime = DateUtils.asLocalTime(previousDayShift.getEndDate());
-        Duration duration = new Duration(shiftStartTime, shiftEndTime);
-        currentShift.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, duration.getFrom()));
-        currentShift.setEndDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, duration.getTo()));
+        currentShift.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, DateUtils.asLocalTime(previousDayShift.getStartDate())));
+        currentShift.setEndDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, DateUtils.asLocalTime(previousDayShift.getEndDate())));
         currentShift.setScheduledMinutes(previousDayShift.getScheduledMinutes());
         currentShift.setDurationMinutes(previousDayShift.getDurationMinutes());
-
     }
 
-    public void createSicknessShiftsOfStaff(Long staffId, Long unitId, Activity activity, StaffUnitPositionDetails staffUnitPositionDetails, List<Shift> staffOriginalShiftsOfDates, Duration duration) {
+    private void createSicknessShiftsOfStaff(Long staffId, Long unitId, Activity activity, StaffUnitPositionDetails staffUnitPositionDetails, List<Shift> staffOriginalShiftsOfDates, Duration duration) {
         short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
         logger.info(staffOriginalShiftsOfDates.size() + "", " shifts found for days");
         staffOriginalShiftsOfDates.forEach(s -> s.setDisabled(true));
@@ -138,20 +135,14 @@ public class ShiftSickService extends MongoBaseService {
             shiftNeedsToAddForDays--;
             Shift currentShift = new Shift(null, null, staffId, activity.getId(), activity.getName(), staffUnitPositionDetails.getId(), unitId);
             Duration calculatedDuration = calculateShiftStartAndEndTime(currentShift, activity.getTimeCalculationActivityTab(), staffUnitPositionDetails, duration);
-            Date startDate = DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, calculatedDuration.getFrom());
-            Date endDate = DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, calculatedDuration.getTo());
-            currentShift.setStartDate(startDate);
-            currentShift.setEndDate(endDate);
+            currentShift.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, calculatedDuration.getFrom()));
+            currentShift.setEndDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, calculatedDuration.getTo()));
             shifts.add(currentShift);
         }
-        // Adding all shifts to the same.
-        shifts.addAll(staffOriginalShiftsOfDates);
-        if (!shifts.isEmpty())
-            save(shifts);
-
+        addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts);
     }
 
-    public Duration calculateShiftStartAndEndTime(Shift shift, TimeCalculationActivityTab timeCalculationActivityTab, StaffUnitPositionDetails unitPosition, Duration duration) {
+    private Duration calculateShiftStartAndEndTime(Shift shift, TimeCalculationActivityTab timeCalculationActivityTab, StaffUnitPositionDetails unitPosition, Duration duration) {
         int scheduledMinutes = 0;
         int weeklyMinutes;
         int shiftDurationInMinute = 0;
