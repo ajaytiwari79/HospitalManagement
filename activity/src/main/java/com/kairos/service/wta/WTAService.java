@@ -607,7 +607,9 @@ public class WTAService extends MongoBaseService {
             for(WTABaseRuleTemplate wtaBaseRuleTemplate:ruleTemplates) {
                 wtaBaseRuleTemplate.setId(null);
             }
-            save(ruleTemplates);
+            if(!ruleTemplates.isEmpty()) {
+                save(ruleTemplates);
+            }
 
             List<BigInteger> ruleTemplateIds = ruleTemplates.stream().map(ruleTemplate->ruleTemplate.getId()).collect(Collectors.toList());
 
@@ -624,25 +626,27 @@ public class WTAService extends MongoBaseService {
         List<CTAResponseDTO> ctaResponseDTOs = costTimeAgreementRepository.getCTAByUnitPositionIds(oldUnitPositionIds,DateUtils.getCurrentDate());
 
 
-       List<CostTimeAgreement> ctaDBs = new ArrayList<>();
+       List<CostTimeAgreement> newCTAs = new ArrayList<>();
         for(CTAResponseDTO cta:ctaResponseDTOs) {
            CostTimeAgreement ctaDB = ObjectMapperUtils.copyPropertiesByMapper(cta,CostTimeAgreement.class);
            List<CTARuleTemplate> ctaRuleTemplates =  ObjectMapperUtils.copyPropertiesOfListByMapper(cta.getRuleTemplates(),CTARuleTemplate.class);
            for(CTARuleTemplate ctaRuleTemplate:ctaRuleTemplates) {
                ctaRuleTemplate.setId(null);
            }
-           save(ctaRuleTemplates);
+           if(!ctaRuleTemplates.isEmpty()) {
+               save(ctaRuleTemplates);
+           }
 
            List<BigInteger> ctaRuleTemplateIds = ctaRuleTemplates.stream().map(ctaRuleTemplate -> ctaRuleTemplate.getId()).collect(Collectors.toList());
            ctaDB.setRuleTemplateIds(ctaRuleTemplateIds);
            ctaDB.setUnitPositionId(newOldunitPositionIdMap.get(cta.getUnitPositionId()));
            ctaDB.setId(null);
-           ctaDBs.add(ctaDB);
+           newCTAs.add(ctaDB);
        }
-       if(!ctaDBs.isEmpty()) {
-           save(ctaDBs);
+       if(!newCTAs.isEmpty()) {
+           save(newCTAs);
        }
-        Map<Long,CostTimeAgreement> ctaMap =  ctaDBs.stream().collect(Collectors.toMap(k->k.getUnitPositionId(),v->v));
+        Map<Long,CostTimeAgreement> ctaMap =  newCTAs.stream().collect(Collectors.toMap(k->k.getUnitPositionId(),v->v));
         List<CTAWTAResponseDTO> ctaWtas = new ArrayList<>();
         for(WorkingTimeAgreement wta:newWtas) {
 
