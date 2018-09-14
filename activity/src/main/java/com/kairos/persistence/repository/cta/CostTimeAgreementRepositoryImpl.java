@@ -146,7 +146,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
                 project("name", "description", "disabled", "expertise", "organizationType", "organizationSubType", "countryId", "organization", "parentId", "parentCountryCTAId", "startDate", "endDate", "ruleTemplates","unitPositionId")
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
-        return result.getMappedResults().size() > 0 ? result.getMappedResults() : null;
+        return result.getMappedResults();
     }
 
 

@@ -596,12 +596,12 @@ public class WTAService extends MongoBaseService {
         logger.info("Inside wtaservice");
         List<Long> oldUnitPositionIds = unitPositionIDs.stream().map(unitPositionIdDTO -> unitPositionIdDTO.getOldUnitPositionID()).collect(Collectors.toList());
         Map<Long,Long> newOldunitPositionIdMap = unitPositionIDs.stream().collect(Collectors.toMap(k->k.getOldUnitPositionID(),v->v.getNewUnitPositionID()));
-        List<WTAQueryResultDTO> wtas = wtaRepository.getWTAByUnitPositionIds(oldUnitPositionIds,DateUtils.getCurrentDate());
+        List<WTAQueryResultDTO> oldWtas = wtaRepository.getWTAByUnitPositionIds(oldUnitPositionIds,DateUtils.getCurrentDate());
 
-        List<WorkingTimeAgreement> wtaDBs = new ArrayList<>();
+        List<WorkingTimeAgreement> newWtas = new ArrayList<>();
 
         // cta = ctawtaWrapper.getCta();
-        for(WTAQueryResultDTO wta:wtas) {
+        for(WTAQueryResultDTO wta:oldWtas) {
             List<WTABaseRuleTemplate> ruleTemplates = wta.getRuleTemplates();
 
             for(WTABaseRuleTemplate wtaBaseRuleTemplate:ruleTemplates) {
@@ -615,21 +615,15 @@ public class WTAService extends MongoBaseService {
             wtaDB.setUnitPositionId(newOldunitPositionIdMap.get(wta.getUnitPositionId()));
             wtaDB.setRuleTemplateIds(ruleTemplateIds);
             wtaDB.setId(null);
-            wtaDBs.add(wtaDB);
+            newWtas.add(wtaDB);
         }
 
-        save(wtaDBs);
+        if(!newWtas.isEmpty()) {
+            save(newWtas);
+        }
         List<CTAResponseDTO> ctaResponseDTOs = costTimeAgreementRepository.getCTAByUnitPositionIds(oldUnitPositionIds,DateUtils.getCurrentDate());
 
 
-        /*List<BigInteger> ruleTemplateIds = ruleTemplates.stream().map(ruleTemplate->ruleTemplate.getId()).collect(Collectors.toList());
-        WorkingTimeAgreement wtaDB = ObjectMapperUtils.copyPropertiesByMapper(wta,WorkingTimeAgreement.class);
-
-        wtaDB.setUnitPositionId(newUnitpositionId);
-        wtaDB.setRuleTemplateIds(ruleTemplateIds);
-        save(wtaDB);
-*/
-        //CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(oldUnitPositionId,DateUtils.getCurrentDate());
        List<CostTimeAgreement> ctaDBs = new ArrayList<>();
         for(CTAResponseDTO cta:ctaResponseDTOs) {
            CostTimeAgreement ctaDB = ObjectMapperUtils.copyPropertiesByMapper(cta,CostTimeAgreement.class);
@@ -645,29 +639,18 @@ public class WTAService extends MongoBaseService {
            ctaDB.setId(null);
            ctaDBs.add(ctaDB);
        }
-       save(ctaDBs);
+       if(!ctaDBs.isEmpty()) {
+           save(ctaDBs);
+       }
         Map<Long,CostTimeAgreement> ctaMap =  ctaDBs.stream().collect(Collectors.toMap(k->k.getUnitPositionId(),v->v));
         List<CTAWTAResponseDTO> ctaWtas = new ArrayList<>();
-        for(WorkingTimeAgreement wta:wtaDBs) {
+        for(WorkingTimeAgreement wta:newWtas) {
 
             CTAWTAResponseDTO ctaWTAResponseDTO = new CTAWTAResponseDTO(wta.getId(),wta.getName(),wta.getUnitPositionId(),ctaMap.get(wta.getUnitPositionId()).getId(),
                     ctaMap.get(wta.getUnitPositionId()).getName());
             ctaWtas.add(ctaWTAResponseDTO);
 
         }
-       /* CostTimeAgreement ctaDB = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO,CostTimeAgreement.class);
-
-        List<CTARuleTemplate> ctaRuleTemplates =  ObjectMapperUtils.copyPropertiesOfListByMapper(ctaResponseDTO.getRuleTemplates(),CTARuleTemplate.class);
-        for(CTARuleTemplate ctaRuleTemplate:ctaRuleTemplates) {
-            ctaRuleTemplate.setId(null);
-        }
-        save(ctaRuleTemplates);
-        List<BigInteger> ctaRuleTemplateIds = ctaRuleTemplates.stream().map(ctaRuleTemplate -> ctaRuleTemplate.getId()).collect(Collectors.toList());
-        ctaDB.setRuleTemplateIds(ctaRuleTemplateIds);
-        ctaDB.setUnitPositionId(newUnitpositionId);
-        ctaDB.setId(null);*/
-
-       // CTAWTAResponseDTO ctaWTAResponseDTO = new CTAWTAResponseDTO(ctaDB.getId(),ctaDB.getName(),wtaDB.getId(),wtaDB.getName());
 
         return ctaWtas;
     }
