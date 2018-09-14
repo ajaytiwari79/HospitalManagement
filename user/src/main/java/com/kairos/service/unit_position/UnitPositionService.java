@@ -3,10 +3,12 @@ package com.kairos.service.unit_position;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTAWTAWrapper;
+import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
 
@@ -66,6 +68,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.wrapper.PositionWrapper;
 import com.kairos.dto.activity.cta.CTATableSettingWrapper;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -1141,12 +1144,14 @@ public class UnitPositionService {
         List<NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("upIds", upIds.toString().replace("[", "").replace("]", "")));
         CTATableSettingWrapper ctaTableSettingWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_CTA, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTATableSettingWrapper>>() {
         });
+        Map<Long,UnitPositionQueryResult> unitPositionQueryResultMap = unitPositionQueryResults.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         ctaTableSettingWrapper.getAgreements().forEach(currentCTA -> {
-            UnitPositionQueryResult currentActiveUnitPosition = unitPositionQueryResults.stream().filter(currentUnitPosition -> currentUnitPosition.getId().equals(currentCTA.getUnitPositionId())
-                    && currentUnitPosition.getHistory().equals(false)).findFirst().get();
-            currentCTA.setUnitInfo(currentActiveUnitPosition.getUnitInfo());
-            currentCTA.setUnitPositionId(currentActiveUnitPosition.getId());
-            currentCTA.setPositionCode(ObjectMapperUtils.copyPropertiesByMapper(currentActiveUnitPosition.getPositionCode(), PositionCodeDTO.class));
+            if(unitPositionQueryResultMap.containsKey(currentCTA.getUnitPositionId())) {
+                UnitPositionQueryResult currentActiveUnitPosition = unitPositionQueryResultMap.get(currentCTA.getUnitPositionId());
+                currentCTA.setUnitInfo(currentActiveUnitPosition.getUnitInfo());
+                currentCTA.setUnitPositionId(currentActiveUnitPosition.getId());
+                currentCTA.setPositionCode(ObjectMapperUtils.copyPropertiesByMapper(currentActiveUnitPosition.getPositionCode(), PositionCodeDTO.class));
+            }
         });
         return ctaTableSettingWrapper;
     }
@@ -1191,7 +1196,16 @@ public class UnitPositionService {
             unitPosition.setId(null);
             unitPositions.add(unitPosition);
         }
+        List<UnitPositionIdDTO> unitPositionNewOldIds = new ArrayList<>();
         unitPositionGraphRepository.saveAll(unitPositions);
+        int i = 0;
+        for(UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult:unitPositionSeniorityLevelQueryResults) {
+            unitPositionNewOldIds.add(new UnitPositionIdDTO(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId(),unitPositions.get(i++).getId()));
+        }
         unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(unitPositionEmploymentTypeRelationShips);
+        activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
+
+      // List<CTAWTAResponseDTO> ctaWTAs =  activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
+
     }
 }
