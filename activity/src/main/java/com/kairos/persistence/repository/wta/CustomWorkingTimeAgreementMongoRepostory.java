@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.wta;
 
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
+import com.kairos.wrapper.wta.CTAWTADTO;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -44,5 +45,8 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
     List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> upIds);
 
     WTAQueryResultDTO getWTAByUnitPosition(Long unitPositionId,Date date);
+
+    public List<WTAQueryResultDTO> getWTAByUnitPositionIds(List<Long> unitPositionIds,Date date);
+
 
 }
