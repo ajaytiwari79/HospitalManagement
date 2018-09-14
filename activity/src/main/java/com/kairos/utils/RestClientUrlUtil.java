@@ -81,6 +81,7 @@ public class RestClientUrlUtil {
 
     public final static String getSchedulerBaseUrl(boolean hasUnitInUrl, Long id) {
         if (hasUnitInUrl) {
+
             String baseUrl = new StringBuilder(schedulerServiceUrl).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
             return baseUrl;
         } else {
@@ -88,5 +89,6 @@ public class RestClientUrlUtil {
             return baseUrl;
         }
     }
+
 
 }
