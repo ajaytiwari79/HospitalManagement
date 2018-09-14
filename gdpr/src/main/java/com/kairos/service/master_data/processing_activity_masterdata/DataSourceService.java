@@ -141,25 +141,6 @@ public class DataSourceService extends MongoBaseService {
 
     }
 
-    /**
-     * @param countryId
-     * @param name      name of DataSource
-     * @return DataSource object fetch on basis of  name
-     * @throws DataNotExists throw exception if DataSource not exist for given name
-     */
-    public DataSource getDataSourceByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
 
     /**
      * @description method save Data Source suggested by unit

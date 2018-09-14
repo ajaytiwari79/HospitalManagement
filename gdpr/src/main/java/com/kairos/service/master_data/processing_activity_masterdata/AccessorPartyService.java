@@ -135,26 +135,6 @@ public class AccessorPartyService extends MongoBaseService {
 
     }
 
-    /**
-     * @param countryId
-     * @param name      name of AccessorParty
-     * @return AccessorParty object fetch on basis of  name
-     * @throws DataNotExists throw exception if AccessorParty exist for given name
-     */
-    public AccessorParty getAccessorPartyByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
 
     /**
      * @description method save Accessor Party suggested by unit

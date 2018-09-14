@@ -147,28 +147,7 @@ public class HostingProviderService extends MongoBaseService {
 
 
     /**
-     * @param countryId
-     * @param
-     * @param name      name of hosting provider
-     * @return return object of hosting provider
-     * @throws DataNotExists if hosting provider not exist for given name
-     */
-    public HostingProvider getHostingProviderByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            HostingProvider exist = hostingProviderMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
-
-    /**
+     **
      * @param countryId
      * @param hostingProviderDTOS
      * @return

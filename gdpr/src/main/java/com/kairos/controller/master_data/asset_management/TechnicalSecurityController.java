@@ -7,6 +7,7 @@ import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,7 @@ public class TechnicalSecurityController {
 
 
     @ApiOperation("add TechnicalSecurityMeasure")
-    @PostMapping("/technical_security/add")
+    @PostMapping("/technical_security")
     public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> securityMeasures) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -50,20 +51,18 @@ public class TechnicalSecurityController {
 
 
     @ApiOperation("get TechnicalSecurityMeasure by id")
-    @GetMapping("/technical_security/{id}")
-    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
+    @GetMapping("/technical_security/{techSecurityMeasureId}")
+    public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger techSecurityMeasureId) {
+         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(countryId, techSecurityMeasureId));
     }
 
 
     @ApiOperation("get all TechnicalSecurityMeasure ")
-    @GetMapping("/technical_security/all")
+    @GetMapping("/technical_security")
     public ResponseEntity<Object> getAllTechnicalSecurityMeasure(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -71,50 +70,33 @@ public class TechnicalSecurityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getAllTechnicalSecurityMeasure(countryId));
     }
 
-    @ApiOperation("get TechnicalSecurityMeasure by name")
-    @GetMapping("/technical_security/name")
-    public ResponseEntity<Object> getTechnicalSecurityMeasureByName(@PathVariable Long countryId, @RequestParam String name) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasureByName(countryId, name));
-
-    }
-
-
     @ApiOperation("delete TechnicalSecurityMeasure  by id")
-    @DeleteMapping("/technical_security/delete/{id}")
-    public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
+    @DeleteMapping("/technical_security/{techSecurityMeasureId}")
+    public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger techSecurityMeasureId) {
+       if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.deleteTechnicalSecurityMeasure(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.deleteTechnicalSecurityMeasure(countryId, techSecurityMeasureId));
 
     }
 
 
     @ApiOperation("update Technical security measure by id")
-    @PutMapping("/technical_security/update/{id}")
-    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
+    @PutMapping("/technical_security/{techSecurityMeasureId}")
+    public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger techSecurityMeasureId, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure(countryId, id, securityMeasure));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure(countryId, techSecurityMeasureId, securityMeasure));
 
     }
 
     @ApiOperation("update Suggested status of Technical Security")
     @PutMapping("/technical_security")
     public ResponseEntity<Object> updateSuggestedStatusOfTechnicalSecurityMeasures(@PathVariable Long countryId, @RequestBody Set<BigInteger> techSecurityMeasureIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+        if (CollectionUtils.isEmpty(techSecurityMeasureIds)) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+        }else   if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateSuggestedStatusOfTechnicalSecurityMeasures(countryId, techSecurityMeasureIds, suggestedDataStatus));

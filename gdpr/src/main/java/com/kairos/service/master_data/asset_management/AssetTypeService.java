@@ -5,7 +5,6 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
-import com.kairos.persistance.model.risk_management.Risk;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.persistance.repository.risk_management.RiskMongoRepository;
@@ -141,20 +140,10 @@ public class AssetTypeService extends MongoBaseService {
      * @param
      * @return return list of Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
-    public List<AssetTypeRiskResponseDTO> getAllAssetTypeWithRisks(Long countryId) {
-        return assetTypeMongoRepository.getAllAssetTypesByCountryId(countryId);
+    public List<AssetTypeRiskResponseDTO> getAllAssetTypeWithSubAssetTypeAndRisk(Long countryId) {
+        return assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
     }
 
-
-    /**
-     * @description
-     * @param countryId
-     * @param assetTypeId
-     * @return method return Sub Asset types of Asset type with risks
-     */
-    public List<AssetTypeRiskResponseDTO> getSubAssetTypesOfAssetTypeWithRisksByAssetTypeId(Long countryId, BigInteger assetTypeId) {
-        return assetTypeMongoRepository.getSubAssetTypesByAssetTypeIdAndCountryId(countryId, assetTypeId);
-    }
 
     /**
      * @param countryId
@@ -162,7 +151,7 @@ public class AssetTypeService extends MongoBaseService {
      * @return return Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
     public AssetTypeResponseDTO getAssetTypeById(Long countryId, BigInteger id) {
-        AssetTypeResponseDTO assetType = assetTypeMongoRepository.getCountryAssetTypesWithSubAssetTypes(countryId, id);
+        AssetTypeResponseDTO assetType = assetTypeMongoRepository.getAssetTypesWithSubAssetTypesByIdAndCountryId(countryId, id);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", id);
         }
