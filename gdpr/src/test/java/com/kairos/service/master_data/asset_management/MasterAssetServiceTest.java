@@ -1,12 +1,12 @@
 package com.kairos.service.master_data.asset_management;
 
 import com.kairos.KairosGdprApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.gdpr.OrganizationSubType;
-import com.kairos.gdpr.OrganizationType;
-import com.kairos.gdpr.ServiceCategory;
-import com.kairos.gdpr.SubServiceCategory;
-import com.kairos.gdpr.master_data.MasterAssetDTO;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.gdpr.OrganizationSubType;
+import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.ServiceCategory;
+import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.master_data.MasterAssetDTO;
 import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import org.junit.Assert;

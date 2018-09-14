@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.DataSourceDTO;
+import com.kairos.dto.gdpr.metadata.DataSourceDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
@@ -62,8 +62,7 @@ public class DataSourceService extends MongoBaseService {
             if (!dataSourceNames.isEmpty()) {
                 for (String name : dataSourceNames) {
 
-                    DataSource newDataSource = new DataSource(name);
-                    newDataSource.setCountryId(countryId);
+                    DataSource newDataSource = new DataSource(name,countryId,SuggestedDataStatus.APPROVED);
                     newDataSources.add(newDataSource);
 
                 }
@@ -182,7 +181,7 @@ public class DataSourceService extends MongoBaseService {
 
                 DataSource dataSource = new DataSource(name);
                 dataSource.setCountryId(countryId);
-                dataSource.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                dataSource.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 dataSource.setSuggestedDate(LocalDate.now());
                 dataSourceList.add(dataSource);
             }

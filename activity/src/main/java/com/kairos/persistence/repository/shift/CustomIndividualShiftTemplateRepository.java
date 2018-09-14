@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.shift;
 
-import com.kairos.response.dto.web.shift.IndividualShiftTemplateDTO;
+import com.kairos.dto.activity.shift.IndividualShiftTemplateDTO;
 
 import java.math.BigInteger;
 import java.util.List;

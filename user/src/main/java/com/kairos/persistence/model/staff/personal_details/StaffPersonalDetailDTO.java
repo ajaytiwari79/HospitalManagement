@@ -3,7 +3,7 @@ package com.kairos.persistence.model.staff.personal_details;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.Gender;
-import com.kairos.util.CPRUtil;
+import com.kairos.utils.CPRUtil;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;

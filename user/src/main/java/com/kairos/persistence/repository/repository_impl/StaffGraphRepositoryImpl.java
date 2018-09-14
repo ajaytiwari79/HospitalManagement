@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.repository_impl;
 
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.staff.StaffUnitPositionQueryResult;
 import com.kairos.persistence.repository.user.staff.CustomStaffGraphRepository;
-import com.kairos.activity.open_shift.priority_group.StaffIncludeFilterDTO;
+import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.tag;
 
-import com.kairos.user.country.tag.TagDTO;
+import com.kairos.dto.user.country.tag.TagDTO;
 
 import java.math.BigInteger;
 import java.util.List;

@@ -2,7 +2,7 @@ package com.planner.domain.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.WTATemplateType;
 
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

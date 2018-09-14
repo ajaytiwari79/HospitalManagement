@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 
-import com.kairos.activity.open_shift.DurationField;
-import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.PQLSettings;
-import com.kairos.wrapper.activity.CutOffInterval;
-import com.kairos.wrapper.activity.CutOffIntervalUnit;
+import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
+import com.kairos.dto.activity.open_shift.DurationField;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -39,14 +39,14 @@ public class RulesActivityTab implements Serializable{
     // in Minutes
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
-    private int shortestTime;
-    private int longestTime;
+    private Short shortestTime;
+    private Short longestTime;
     private boolean eligibleForCopy;
     private DurationField plannedTimeInAdvance;
     private LocalTime maximumEndTime;// shift can't be extend this time
     private boolean allowedAutoAbsence;
-    private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --
-    private byte recurrenceTimes;// -- the  shift of that staff will be entered.
+    private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --   -128 to 127
+    private byte recurrenceTimes;// -- the  shift of that staff will be entered.     -128 to 127
     private PQLSettings pqlSettings;
 
     public RulesActivityTab() {
@@ -74,7 +74,7 @@ public class RulesActivityTab implements Serializable{
 
     public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleAgainstTimeRules, boolean lockLengthPresent, boolean eligibleToBeForced,
                             List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules, boolean eligibleForStaffingLevel, boolean eligibleForPresence, boolean eligibleForAbsence, boolean breakAllowed, boolean approvalAllowed
-            , LocalTime earliestStartTime, LocalTime latestStartTime, int shortestTime, int longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,PQLSettings pqlSettings,LocalTime maximumEndTime,Integer cutOffdayValue,CutOffIntervalUnit cutOffIntervalUnit,LocalDate cutOffStartFrom,byte recurrenceDays,byte recurrenceTimes,boolean allowedAutoAbsence) {
+            , LocalTime earliestStartTime, LocalTime latestStartTime, Short shortestTime, Short longestTime, boolean eligibleForCopy,DurationField plannedTimeInAdvance,PQLSettings pqlSettings,LocalTime maximumEndTime,Integer cutOffdayValue,CutOffIntervalUnit cutOffIntervalUnit,LocalDate cutOffStartFrom,byte recurrenceDays,byte recurrenceTimes,boolean allowedAutoAbsence) {
 
         this.eligibleForFinalSchedule = eligibleForFinalSchedule;
         this.eligibleForDraftSchedule = eligibleForDraftSchedule;
@@ -258,19 +258,19 @@ public class RulesActivityTab implements Serializable{
         this.latestStartTime = latestStartTime;
     }
 
-    public int getShortestTime() {
+    public Short getShortestTime() {
         return shortestTime;
     }
 
-    public void setShortestTime(int shortestTime) {
+    public void setShortestTime(Short shortestTime) {
         this.shortestTime = shortestTime;
     }
 
-    public int getLongestTime() {
+    public Short getLongestTime() {
         return longestTime;
     }
 
-    public void setLongestTime(int longestTime) {
+    public void setLongestTime(Short longestTime) {
         this.longestTime = longestTime;
     }
 

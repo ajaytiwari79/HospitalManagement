@@ -6,7 +6,7 @@ import com.kairos.persistence.repository.period.PeriodSettingsMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.activity.period.PeriodSettingsDTO;
+import com.kairos.dto.activity.period.PeriodSettingsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

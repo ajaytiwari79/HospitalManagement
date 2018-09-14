@@ -52,6 +52,12 @@ public class AccessorParty extends MongoBaseEntity {
         this.name = name;
     }
 
+    public AccessorParty(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
+        this.countryId = countryId;
+        this.suggestedDataStatus = suggestedDataStatus;
+    }
+
     public AccessorParty() {
     }
 }

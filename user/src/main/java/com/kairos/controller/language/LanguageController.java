@@ -2,7 +2,7 @@ package com.kairos.controller.language;
 
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.service.language.LanguageService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -2,7 +2,7 @@ package com.kairos.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.persistence.model.auth.UserPrincipal;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;

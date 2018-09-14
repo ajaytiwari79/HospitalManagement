@@ -1,15 +1,15 @@
 package com.kairos.controller.task;
 
-import com.kairos.activity.task_type.TaskTypeCopyDTO;
-import com.kairos.activity.task_type.TaskTypeDTO;
-import com.kairos.activity.task_type.TaskTypeSettingDTO;
-import com.kairos.activity.task_type.TaskTypeSlaConfigDTO;
+import com.kairos.dto.activity.task_type.TaskTypeCopyDTO;
+import com.kairos.dto.activity.task_type.TaskTypeDTO;
+import com.kairos.dto.activity.task_type.TaskTypeSettingDTO;
+import com.kairos.dto.activity.task_type.TaskTypeSlaConfigDTO;
 import com.kairos.persistence.model.task_type.MapPointer;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.model.task_type.TaskTypeDefination;
 import com.kairos.service.MapPointerService;
 import com.kairos.service.task_type.TaskTypeService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.task_type.TaskTypeResourceDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

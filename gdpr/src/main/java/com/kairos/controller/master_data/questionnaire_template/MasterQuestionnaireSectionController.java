@@ -1,6 +1,6 @@
 package com.kairos.controller.master_data.questionnaire_template;
 
-import com.kairos.gdpr.master_data.MasterQuestionnaireSectionDTO;
+import com.kairos.dto.gdpr.master_data.MasterQuestionnaireSectionDTO;
 import com.kairos.service.master_data.questionnaire_template.MasterQuestionnaireSectionService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;

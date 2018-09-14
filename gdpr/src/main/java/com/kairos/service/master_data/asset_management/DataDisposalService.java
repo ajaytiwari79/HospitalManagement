@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.DataDisposalDTO;
+import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
@@ -56,13 +56,10 @@ public class DataDisposalService extends MongoBaseService {
         List<DataDisposal> existing = findMetaDataByNamesAndCountryId(countryId, dataDisposalsNames, DataDisposal.class);
         dataDisposalsNames = ComparisonUtils.getNameListForMetadata(existing, dataDisposalsNames);
         List<DataDisposal> newDataDisposals = new ArrayList<>();
-        if (dataDisposalsNames.size() != 0) {
+        if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
-
-                DataDisposal newDataDisposal = new DataDisposal(name);
-                newDataDisposal.setCountryId(countryId);
+                DataDisposal newDataDisposal = new DataDisposal(name,countryId,SuggestedDataStatus.APPROVED);
                 newDataDisposals.add(newDataDisposal);
-
             }
 
             newDataDisposals = dataDisposalMongoRepository.saveAll(getNextSequence(newDataDisposals));
@@ -183,7 +180,7 @@ public class DataDisposalService extends MongoBaseService {
 
                 DataDisposal dataDisposal = new DataDisposal(name);
                 dataDisposal.setCountryId(countryId);
-                dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                dataDisposal.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 dataDisposal.setSuggestedDate(LocalDate.now());
                 dataDisposalList.add(dataDisposal);
             }

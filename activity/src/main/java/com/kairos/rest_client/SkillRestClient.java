@@ -1,6 +1,6 @@
 package com.kairos.rest_client;
 
-import com.kairos.user.organization.skill.Skill;
+import com.kairos.dto.user.organization.skill.Skill;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.util.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
 public class SkillRestClient {

@@ -1,13 +1,7 @@
 package com.kairos.service.data_inventory.asset;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonObject;
-import com.kairos.enums.AssessmentStatus;
-import com.kairos.enums.AssetAttributeName;
-import com.kairos.enums.QuestionType;
-import com.kairos.gdpr.data_inventory.AssetDTO;
-import com.kairos.gdpr.data_inventory.AssetRelateProcessingActivityDTO;
-import com.kairos.persistance.model.data_inventory.assessment.Assessment;
+import com.kairos.dto.gdpr.data_inventory.AssetDTO;
+import com.kairos.dto.gdpr.data_inventory.AssetRelateProcessingActivityDTO;
 import com.kairos.persistance.model.data_inventory.asset.Asset;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistance.repository.data_inventory.Assessment.AssessmentMongoRepository;
@@ -18,13 +12,10 @@ import com.kairos.persistance.repository.master_data.questionnaire_template.Mast
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionBasicResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireSectionResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
@@ -73,7 +64,7 @@ public class AssetService extends MongoBaseService {
         if (Optional.ofNullable(previousAsset).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
         }
-        AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
+        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset  type", assetDTO.getAssetType());
         } else {
@@ -203,7 +194,7 @@ public class AssetService extends MongoBaseService {
         } else if (!asset.isActive()) {
             exceptionService.invalidRequestException("message.asset.inactive");
         }
-        AssetType assetType = assetTypeMongoRepository.findByOrganizationIdAndId(organizationId, assetDTO.getAssetType());
+        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetDTO.getAssetType());
 
@@ -237,6 +228,47 @@ public class AssetService extends MongoBaseService {
         assetMongoRepository.save(asset);
         return asset;
     }
+
+
+    /**
+     *
+     * @param unitId
+     * @param assetId - asset Id
+     * @param processingActivityId Processing Activity id link with Asset
+     * @return
+     */
+    public boolean unLinkProcessingActivityFromAsset(Long unitId, BigInteger assetId, BigInteger processingActivityId) {
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+        }
+        asset.getProcessingActivities().remove(processingActivityId);
+        assetMongoRepository.save(asset);
+        return true;
+
+    }
+
+
+    /**
+     *
+     * @param unitId
+     * @param assetId -Asset Id
+     * @param subProcessingActivityId - Sub Processing Activity Id Link with Asset
+     * @return
+     */
+    public boolean unLinkSubProcessingActivityFromAsset(Long unitId, BigInteger assetId, BigInteger subProcessingActivityId) {
+        Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assetId);
+        if (!Optional.ofNullable(asset).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
+        }
+        asset.getSubProcessingActivities().remove(subProcessingActivityId);
+        assetMongoRepository.save(asset);
+        return true;
+
+    }
+
+
+
 
 
     public List<ProcessingActivityBasicResponseDTO> getAllRelatedProcessingActivityAndSubProcessingActivities(Long unitId, BigInteger assetId) {
@@ -275,7 +307,6 @@ public class AssetService extends MongoBaseService {
         }
         return processingActivityResponseDTOList;
     }
-
 
 
 }

@@ -1,6 +1,6 @@
 package com.kairos.service.organization;
 
-import com.kairos.activity.counter.DefaultKPISettingDTO;
+import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -8,8 +8,8 @@ import com.kairos.service.AsynchronousService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.service.integration.ActivityIntegrationService;
-import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.util.DateUtils;
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.commons.utils.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 /**
  * CreatedBy vipulpandey on 22/8/18
@@ -42,18 +41,13 @@ public class CompanyDefaultDataService {
 
 
     public CompletableFuture<Boolean> createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots) throws InterruptedException, ExecutionException {
-        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId);
+        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId,parentId);
         units.forEach(unit -> {
-            try {
                 asynchronousService.executeInBackGround(() -> accessGroupService.createDefaultAccessGroups(unit));
                 asynchronousService.executeInBackGround(() -> timeSlotService.createDefaultTimeSlots(unit, timeSlots));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO));
                 asynchronousService.executeInBackGround(() -> vrpClientService.createDefaultPreferredTimeWindow(unit));
                 asynchronousService.executeInBackGround(() -> activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId()));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
         });
         return CompletableFuture.completedFuture(true);
     }

@@ -9,7 +9,7 @@ import com.kairos.config.LocalDateSerializer;
 import com.kairos.interceptor.ExtractOrganizationAndUnitInfoInterceptor;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
 
-import com.kairos.util.user_context.UserContextInterceptor;
+import com.kairos.utils.user_context.UserContextInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

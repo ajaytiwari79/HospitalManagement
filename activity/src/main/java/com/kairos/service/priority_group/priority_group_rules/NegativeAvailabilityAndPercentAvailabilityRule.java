@@ -1,11 +1,11 @@
 package com.kairos.service.priority_group.priority_group_rules;
 
-import com.kairos.activity.open_shift.priority_group.PriorityGroupDTO;
+import com.kairos.dto.activity.open_shift.priority_group.PriorityGroupDTO;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.open_shift.OpenShift;
-import com.kairos.user.staff.unit_position.StaffUnitPositionQueryResult;
-import com.kairos.util.DateTimeInterval;
-import com.kairos.util.DateUtils;
+import com.kairos.dto.user.staff.unit_position.StaffUnitPositionQueryResult;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -43,11 +43,11 @@ public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityG
             Set<Long> unitPositionIds = new HashSet<Long>();
             for (Shift shift : shifts) {
                 if (priorityGroupDTO.getStaffExcludeFilter().isNegativeAvailabilityInCalender() && dateTimeInterval.overlaps(shift.getInterval())
-                        && unavailableActivitySet.contains(shift.getActivityId()) && !unitPositionIds.contains(shift.getUnitPositionId())) {
+                        && unavailableActivitySet.contains(shift.getActivities().get(0).getActivityId()) && !unitPositionIds.contains(shift.getUnitPositionId())) {
                     unitPositionIds.add(shift.getUnitPositionId());
                 }
                 if (Optional.ofNullable(priorityGroupDTO.getStaffIncludeFilter().getStaffAvailability()).isPresent() && dateTimeIntervalPerAvailability.
-                        overlaps(shift.getInterval()) && (((dateTimeIntervalPerAvailability.overlap(shift.getInterval()).getMinutes()) /
+                        overlaps(shift.getInterval()) && ((((int)dateTimeIntervalPerAvailability.overlap(shift.getInterval()).getMinutes()) /
                         (dateTimeIntervalPerAvailability.getMinutes())) * 100) < priorityGroupDTO.getStaffIncludeFilter().getStaffAvailability() &&
                         !unitPositionIds.contains(shift.getUnitPositionId())) {
                     unitPositionIds.add(shift.getUnitPositionId());

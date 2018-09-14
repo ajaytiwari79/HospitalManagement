@@ -1,6 +1,5 @@
 package com.kairos.persistance.repository.master_data.asset_management.hosting_provider;
 
-import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.persistance.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;

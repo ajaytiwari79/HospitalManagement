@@ -25,6 +25,11 @@ public class OrActivitySpecification<T> extends AbstractActivitySpecification<T>
     }
 
     @Override
+    public void validateRules(T t) {
+        boolean valid = specification1.isSatisfied(t) || specification2.isSatisfied(t);
+    }
+
+    @Override
     public List<String> isSatisfiedString(T t) {
         return Collections.emptyList();
     }

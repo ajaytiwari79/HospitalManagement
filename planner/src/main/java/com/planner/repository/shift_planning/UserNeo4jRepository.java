@@ -1,11 +1,6 @@
 package com.planner.repository.shift_planning;
 
-import com.kairos.util.ObjectMapperUtils;
-import org.bouncycastle.util.Arrays;
-import org.neo4j.ogm.model.Property;
-
-import org.neo4j.ogm.model.QueryStatistics;
-import org.neo4j.ogm.model.Result;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 
@@ -14,9 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.planner.constants.AppConstants.BELONGS_TO_STAFF;
-import static com.planner.constants.AppConstants.HAS_EXPERTISE_IN;
-import static com.planner.constants.AppConstants.STAFF_HAS_SKILLS;
+import static com.planner.constants.AppConstants.*;
 
 /**
  * @author mohit

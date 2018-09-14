@@ -19,7 +19,7 @@ public interface AssetTypeMongoRepository extends MongoBaseRepository<AssetType,
 
 
     @Query("{'countryId':?0,_id:?1,deleted:false}")
-    AssetType findByIdAndNonDeleted(Long countryId, BigInteger id);
+    AssetType findByIdAndCountryId(Long countryId, BigInteger id);
 
     @Query("{_id:?0,deleted:false}")
     AssetTypeBasicResponseDTO findAssetTypeById( BigInteger id);
@@ -31,15 +31,14 @@ public interface AssetTypeMongoRepository extends MongoBaseRepository<AssetType,
 
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
-    List<AssetType> findAllAssetTypeByIds(Long countryId,List<BigInteger> ids);
-
+    List<AssetType> findAllAssetTypeByCountryIdAndIds(Long countryId, List<BigInteger> ids);
 
     @Query("{deleted:false,organizationId:?0,_id:{$in:?1}}")
-    List<AssetType> findAllAssetTypeByIdsAndOrganizationId(Long organizationId,List<BigInteger> ids);
+    List<AssetType> findAllAssetTypeByUnitIdAndIds(Long unitId, List<BigInteger> ids);
 
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    AssetType findByOrganizationIdAndId(Long organizationId, BigInteger id);
+    AssetType findByUnitIdAndId(Long organizationId, BigInteger id);
 
 
 }

@@ -2,8 +2,7 @@ package com.planner.domain.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.MinMaxSetting;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.MinMaxSetting;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -55,13 +54,6 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
-
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
 
     public String getIntervalUnit() {
         return intervalUnit;
@@ -88,12 +80,12 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         this.disabled = disabled;
         this.description = description;
         this.intervalUnit = intervalUnit;
-        wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
+
 
     }
 
     public DaysOffInPeriodWTATemplate() {
-        wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
+
     }
 
 

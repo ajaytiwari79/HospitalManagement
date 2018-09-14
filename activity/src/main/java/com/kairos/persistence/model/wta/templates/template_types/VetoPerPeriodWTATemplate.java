@@ -2,12 +2,12 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.enums.MinMaxSetting;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.MinMaxSetting;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
-import com.kairos.util.DateTimeInterval;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
 import java.math.BigInteger;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kairos.util.WTARuleTemplateValidatorUtility.*;
+import static com.kairos.utils.ShiftValidatorService.*;
 
 
 /**
@@ -107,9 +107,9 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         String exception = "";
-        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues) && activityIds.contains(infoWrapper.getShift().getActivity().getId())) {
+        if (!isDisabled() && isValidForPhase(infoWrapper.getPhase(), this.phaseTemplateValues) && activityIds.contains(infoWrapper.getShift().getActivities().get(0).getActivity().getId())) {
             DateTimeInterval interval = getIntervalByNumberOfWeeks(infoWrapper.getShift(), numberOfWeeks, validationStartDate);
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(interval, infoWrapper.getShifts(), null);
             shifts = filterShifts(shifts, null, null, activityIds);
@@ -117,9 +117,10 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
             Integer[] limitAndCounter = getValueByPhase(infoWrapper, phaseTemplateValues, this);
             boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shifts.size());
             if (!isValid) {
-                exception = getName();            }
+                WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(this.id,this.name,0,true,false);
+                infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+            }
         }
-        return exception;
     }
 
 }

@@ -1,12 +1,14 @@
 package com.kairos.service.organization;
 
-import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.activity.activity.OrganizationMappingActivityTypeDTO;
-import com.kairos.activity.cta.CTABasicDetailsDTO;
-import com.kairos.activity.open_shift.PriorityGroupDefaultData;
-import com.kairos.activity.presence_type.PresenceTypeDTO;
-import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
-import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
+import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
+import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
+import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
+import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
@@ -58,8 +60,8 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
-import com.kairos.planner.planninginfo.PlannerSyncResponseDTO;
-import com.kairos.response.dto.web.organization.UnitAndParentOrganizationAndCountryDTO;
+import com.kairos.dto.planner.planninginfo.PlannerSyncResponseDTO;
+import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.rest_client.PeriodRestClient;
 import com.kairos.rest_client.PhaseRestClient;
 import com.kairos.rest_client.PlannedTimeTypeRestClient;
@@ -81,22 +83,21 @@ import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.user.country.basic_details.CountryDTO;
-import com.kairos.user.country.experties.ExpertiseResponseDTO;
-import com.kairos.user.country.time_slot.TimeSlotDTO;
-import com.kairos.user.country.time_slot.TimeSlotsDeductionDTO;
-import com.kairos.user.organization.*;
-import com.kairos.user.organization.UnitManagerDTO;
-import com.kairos.user.staff.client.ContactAddressDTO;
-import com.kairos.util.DateConverter;
-import com.kairos.util.DateUtil;
-import com.kairos.util.FormatUtil;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.external_plateform_shift.GetAllWorkPlacesResponse;
-import com.kairos.util.external_plateform_shift.GetAllWorkPlacesResult;
-import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
+
+import com.kairos.dto.user.staff.client.ContactAddressDTO;
+import com.kairos.utils.DateConverter;
+import com.kairos.utils.DateUtil;
+import com.kairos.utils.FormatUtil;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.external_plateform_shift.GetAllWorkPlacesResponse;
+import com.kairos.utils.external_plateform_shift.GetAllWorkPlacesResult;
+import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
@@ -276,10 +277,10 @@ public class OrganizationService {
         return organizationGraphRepository.findOne(id);
     }
 
-    public com.kairos.user.organization.OrganizationDTO getOrganizationWithCountryId(long id) {
+    public OrganizationDTO getOrganizationWithCountryId(long id) {
         Organization organization = organizationGraphRepository.findOne(id);
         Country country = organization.isParentOrganization() ? organizationGraphRepository.getCountry(organization.getId()) : organizationGraphRepository.getCountryByParentOrganization(organization.getId());
-        com.kairos.user.organization.OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(organization, com.kairos.user.organization.OrganizationDTO.class);
+        OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(organization, OrganizationDTO.class);
         organizationDTO.setCountryId(country.getId());
         return organizationDTO;
     }
@@ -563,12 +564,22 @@ public class OrganizationService {
 
     public boolean deleteOrganization(long organizationId) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
-        if (organization != null) {
+        boolean success = false;
+
+        if (organization != null && organization.isBoardingCompleted()) {
             organization.setEnable(false);
+            organization.setDeleted(true);
             organizationGraphRepository.save(organization);
-            return true;
+            success = true;
+        } else {
+            List<Long> organizationIdsToDelete = new ArrayList<>();
+            organizationIdsToDelete.add(organization.getId());
+            organizationIdsToDelete.addAll(organization.getChildren().stream().map(child -> child.getId()).collect(Collectors.toList()));
+            organizationGraphRepository.removeOrganizationCompletely(organizationIdsToDelete);
+            success = true;
+
         }
-        return false;
+        return success;
     }
 
     public List<Map<String, Object>> getUnits(long organizationId) {
@@ -1119,7 +1130,7 @@ public class OrganizationService {
 
 
     public Long getOrganization(Long id, String type) {
-        Organization organization = getOrganizationDetail( id,type);
+        Organization organization = getOrganizationDetail(id, type);
         return organization.getId();
     }
 
@@ -1350,7 +1361,7 @@ public class OrganizationService {
         List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId, ReasonCodeType.ORDER);
         List<com.kairos.persistence.model.country.DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         return new OrderDefaultDataWrapper(orderAndActivityDTO.getOrders(), orderAndActivityDTO.getActivities(),
-                skills, expertise, staffList, plannedTypes, functions, reasonCodes, dayTypes, orderAndActivityDTO.getMinOpenShiftHours(),orderAndActivityDTO.getCounters());
+                skills, expertise, staffList, plannedTypes, functions, reasonCodes, dayTypes, orderAndActivityDTO.getMinOpenShiftHours(), orderAndActivityDTO.getCounters());
     }
 
     public PlannerSyncResponseDTO initialOptaplannerSync(Long organizationId, Long unitId) {
@@ -1376,7 +1387,7 @@ public class OrganizationService {
         ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = activityIntegrationService.getAllActivitiesAndTimeTypes(countryId);
 
         return new RuleTemplateDefaultData(organizationTypeAndSubTypes, skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(), activityWithTimeTypeDTOS.getIntervals(),
-                priorityGroupDefaultData1.getEmploymentTypes(), priorityGroupDefaultData1.getExpertises(),activityWithTimeTypeDTOS.getCounters());
+                priorityGroupDefaultData1.getEmploymentTypes(), priorityGroupDefaultData1.getExpertises(), activityWithTimeTypeDTOS.getCounters());
     }
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId) {
@@ -1407,7 +1418,7 @@ public class OrganizationService {
         ActivityWithTimeTypeDTO activityWithTimeTypeDTOS = activityIntegrationService.getAllActivitiesAndTimeTypesByUnit(unitId, countryId);
         PriorityGroupDefaultData priorityGroupDefaultData1 = employmentTypeService.getExpertiseAndEmployment(countryId, false);
         RuleTemplateDefaultData ruleTemplateDefaultData = new RuleTemplateDefaultData(skills, activityWithTimeTypeDTOS.getTimeTypeDTOS(), activityWithTimeTypeDTOS.getActivityDTOS(), activityWithTimeTypeDTOS.getIntervals(),
-                priorityGroupDefaultData1.getEmploymentTypes(), priorityGroupDefaultData1.getExpertises(), activityWithTimeTypeDTOS.getMinOpenShiftHours(),activityWithTimeTypeDTOS.getCounters());
+                priorityGroupDefaultData1.getEmploymentTypes(), priorityGroupDefaultData1.getExpertises(), activityWithTimeTypeDTOS.getMinOpenShiftHours(), activityWithTimeTypeDTOS.getCounters());
         return ruleTemplateDefaultData;
     }
 

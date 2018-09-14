@@ -1,9 +1,7 @@
 package com.kairos.persistence.repository.open_shift;
 
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.open_shift.Order;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.activity.open_shift.ShiftAssignmentCriteria;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 

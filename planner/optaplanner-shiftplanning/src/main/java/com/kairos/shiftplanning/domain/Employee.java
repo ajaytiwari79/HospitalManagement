@@ -1,14 +1,13 @@
 package com.kairos.shiftplanning.domain;
 
-import com.kairos.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
-import com.kairos.shiftplanning.domain.wta.*;
+import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.kie.api.runtime.rule.RuleContext;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 import org.slf4j.Logger;

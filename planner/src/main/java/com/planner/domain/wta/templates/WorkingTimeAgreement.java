@@ -1,7 +1,5 @@
 package com.planner.domain.wta.templates;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -18,7 +16,7 @@ import java.util.Optional;
  *
  * @Modified added organization and staff for personal copy
  */
-@Document
+//@Document
 public class WorkingTimeAgreement  {
    private BigInteger id;
     @NotNull(message = "error.WorkingTimeAgreement.name.notnull")

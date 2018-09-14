@@ -2,7 +2,7 @@ package com.kairos.controller.data_inventory.assessment;
 
 
 import com.kairos.enums.AssessmentStatus;
-import com.kairos.gdpr.data_inventory.AssessmentDTO;
+import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
 import com.kairos.persistance.model.data_inventory.assessment.AssessmentAnswerValueObject;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
 import com.kairos.utils.ResponseHandler;

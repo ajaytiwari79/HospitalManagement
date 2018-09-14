@@ -1,16 +1,16 @@
 package com.kairos.service.country.equipment;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.country.equipment.Equipment;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.country.equipment.EquipmentQueryResult;
 import com.kairos.persistence.model.user.resources.Resource;
-import com.kairos.user.equipment.EquipmentCategoryDTO;
-import com.kairos.user.equipment.EquipmentDTO;
-import com.kairos.user.equipment.VehicleEquipmentDTO;
+import com.kairos.dto.user.equipment.EquipmentCategoryDTO;
+import com.kairos.dto.user.equipment.EquipmentDTO;
+import com.kairos.dto.user.equipment.VehicleEquipmentDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.junit.Assert;
 import org.junit.Test;

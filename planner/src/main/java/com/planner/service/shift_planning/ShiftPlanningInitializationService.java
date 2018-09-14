@@ -1,16 +1,16 @@
 package com.planner.service.shift_planning;
+import com.kairos.commons.utils.DateUtils;
 
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.staffing_level.Duration;
-import com.kairos.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
-import com.kairos.activity.staffing_level.StaffingLevelActivity;
-import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.staffing_level.Duration;
+import com.kairos.dto.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
+import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.shiftplanning.domain.Activity;
 import com.kairos.shiftplanning.domain.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.Employee;
 import com.kairos.shiftplanning.domain.ShiftRequestPhase;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
-import com.kairos.util.DateUtils;
 import com.planner.domain.query_results.StaffQueryResult;
 import com.planner.domain.shift_planning.Shift;
 import org.joda.time.DateTime;

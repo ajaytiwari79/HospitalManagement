@@ -1,6 +1,7 @@
 package com.kairos.service.planner.vrpPlanning;
 
-import com.kairos.activity.task_type.TaskTypeSettingDTO;
+import com.kairos.dto.activity.task_type.TaskTypeSettingDTO;
+import com.kairos.dto.planner.vrp.vrpPlanning.*;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.solver_config.PlannerUrl;
 import com.kairos.enums.solver_config.PlanningType;
@@ -12,8 +13,8 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.solver_config.ConstraintRepository;
 import com.kairos.persistence.repository.solver_config.SolverConfigRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
-import com.kairos.planner.solverconfig.ConstraintDTO;
-import com.kairos.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.ConstraintDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.rest_client.planner.PlannerRestClient;
@@ -22,12 +23,11 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.solver_config.SolverConfigService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.task_type.TaskTypeService;
-import com.kairos.user.staff.staff.StaffDTO;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.ObjectUtils;
-import com.kairos.vrp.task.VRPTaskDTO;
-import com.kairos.vrp.vrpPlanning.*;
+import com.kairos.dto.user.staff.staff.StaffDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -105,31 +105,7 @@ public class VRPPlanningService extends MongoBaseService{
     }
 
 
-    public void createShift(){
-        List<Long> staffs = Arrays.asList(5728l, 3361l, 3374l, 3122l, 5217l);
-        List<Shift> shifts = new ArrayList<>();
-        /*staffs.forEach(s->{
-            IntStream.range(0,4).forEachOrdered(i->{
-                Date startDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY)).plusDays(i).with(LocalTime.of(07,00)).toInstant());
-                Date endDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY)).plusDays(i).with(LocalTime.of(16,00)).plusDays(0).toInstant());
-                shifts.add(new Shift(startDate,endDate,s,new BigInteger("145")));
-            });
-            Date startDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.FRIDAY)).with(LocalTime.of(07,00)).toInstant());
-            Date endDate = Date.from(ZonedDateTime.now().with(TemporalAdjusters.next(DayOfWeek.FRIDAY)).with(LocalTime.of(12,30)).plusDays(0).toInstant());
-            shifts.add(new Shift(startDate,endDate,s,new BigInteger("145")));
 
-        });*/
-        LocalDate weekStart= LocalDate.of(2018,Month.JULY,16);
-        staffs.forEach(s->{
-            IntStream.range(0,5).forEachOrdered(i->{
-                Date startDate = Date.from(weekStart.plusDays(i).atStartOfDay().with(LocalTime.of(07,00)).toInstant(ZoneOffset.UTC));
-                Date endDate = Date.from(weekStart.plusDays(i).atStartOfDay().with(i==4?LocalTime.of(12,30):LocalTime.of(16,00)).toInstant(ZoneOffset.UTC));
-                shifts.add(new Shift(startDate,endDate,s,new BigInteger("145")));
-            });
-
-        });
-        save(shifts);
-    }
     public Boolean planningCompleted(Long unitId,BigInteger solverConfigId){
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         solverConfig.setStatus(SolverConfigStatus.COMPLETED);
@@ -192,7 +168,7 @@ public class VRPPlanningService extends MongoBaseService{
 
 
 
-    public VRPIndictmentDTO getIndictmentBySolverConfig(Long unitId,BigInteger solverConfigId){
+    public VRPIndictmentDTO getIndictmentBySolverConfig(Long unitId, BigInteger solverConfigId){
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(solverConfig.getPlannerNumber(),null,unitId, IntegrationOperation.GET,PlannerUrl.GET_INDICTMENT,solverConfigId);
         VRPIndictmentDTO  vrpIndictmentDTO = ObjectMapperUtils.copyPropertiesByMapper(responseEnvelope.getData(),VRPIndictmentDTO.class);
@@ -204,7 +180,7 @@ public class VRPPlanningService extends MongoBaseService{
         if(taskDTOS.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.solution.datanotFound");
         }
-        Map<String,EmployeeDTO> employeeDTOMap = vrpTaskPlanningDTO.getEmployees().stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        Map<String,EmployeeDTO> employeeDTOMap = vrpTaskPlanningDTO.getEmployees().stream().collect(Collectors.toMap(k->k.getId(), v->v));
         Map<Long,TaskDTO> taskMap = taskDTOS.stream().collect(Collectors.toMap(k->k.getInstallationNumber(), v->v));
         Map<Long,List<VRPTaskDTO>> installationNOtasks = taskService.getAllTask(unitId).stream().collect(Collectors.groupingBy(VRPTaskDTO::getInstallationNumber,toList()));
         List<TaskDTO> tasks = new ArrayList<>();
@@ -274,7 +250,7 @@ public class VRPPlanningService extends MongoBaseService{
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIds(staffIds,startDate,endDate);
         List<ShiftDTO> shiftDTOS = new ArrayList<>(shifts.size());
         shifts.forEach(s->{
-            shiftDTOS.add(new ShiftDTO(s.getId().toString(),s.getName(),employeeDTOMap.get(s.getStaffId()),DateUtils.asLocalDate(s.getStartDate()),s.getStartDate(),s.getEndDate()));
+            shiftDTOS.add(new ShiftDTO(s.getId().toString(),s.getActivities().get(0).getActivityName(),employeeDTOMap.get(s.getStaffId()),DateUtils.asLocalDate(s.getStartDate()),s.getStartDate(),s.getEndDate()));
         });
         return shiftDTOS;
     }

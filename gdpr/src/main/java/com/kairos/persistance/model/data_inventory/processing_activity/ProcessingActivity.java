@@ -2,8 +2,8 @@ package com.kairos.persistance.model.data_inventory.processing_activity;
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.gdpr.ManagingOrganization;
-import com.kairos.gdpr.Staff;
+import com.kairos.dto.gdpr.ManagingOrganization;
+import com.kairos.dto.gdpr.Staff;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -62,6 +62,12 @@ public class ProcessingActivity extends MongoBaseEntity {
     private boolean subProcess=false;
 
     private List<BigInteger> assessments=new ArrayList<>();
+
+    private List<BigInteger> risks=new ArrayList<>();
+
+    public List<BigInteger> getRisks() { return risks; }
+
+    public void setRisks(List<BigInteger> risks) { this.risks = risks; }
 
     public List<ProcessingActivityRelatedDataSubject> getDataSubjects() { return dataSubjects; }
 

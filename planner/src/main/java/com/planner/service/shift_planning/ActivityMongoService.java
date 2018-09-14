@@ -1,13 +1,11 @@
 package com.planner.service.shift_planning;
 
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
-import com.kairos.activity.staffing_level.StaffingLevelActivity;
-import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.shiftplanning.domain.Activity;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
 import com.planner.domain.shift_planning.Shift;
-
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.responseDto.PlanningDto.shiftPlanningDto.ActivityDTO;
 import org.springframework.stereotype.Service;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This service is used to interact with or have logic to collect data

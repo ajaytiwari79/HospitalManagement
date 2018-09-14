@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.cta;
 
-import com.kairos.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -19,8 +19,8 @@ public interface CTARuleTemplateRepository extends MongoBaseRepository<CTARuleTe
     @Query(value = "{name:?1,countryId:?0}",exists = true)
     Boolean isCTARuleTemplateExistWithSameName(Long countryId, String name);
 
-    @Query("{countryId:?0}")
-    List<CTARuleTemplateDTO> findByRuleTemplateCategoryIdInAndCountryAndDeletedFalse(Long countryId);
+    @Query("{countryId:?0,deleted:false}")
+    List<CTARuleTemplateDTO> findByCountryIdAndDeletedFalse(Long countryId);
 
 
     @Query("{ruleTemplateCategoryId:?0,deleted:false}")

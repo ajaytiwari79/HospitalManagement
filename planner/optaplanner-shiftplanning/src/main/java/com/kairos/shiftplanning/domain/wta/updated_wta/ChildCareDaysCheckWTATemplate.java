@@ -2,8 +2,8 @@ package com.kairos.shiftplanning.domain.wta.updated_wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.wta.AgeRange;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.dto.activity.wta.AgeRange;
+import com.kairos.enums.wta.WTATemplateType;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

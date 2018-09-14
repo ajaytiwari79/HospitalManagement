@@ -1,5 +1,5 @@
 package com.kairos.persistence.model.client_aggregator;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

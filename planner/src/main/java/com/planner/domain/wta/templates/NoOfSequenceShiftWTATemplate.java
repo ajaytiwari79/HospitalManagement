@@ -2,8 +2,8 @@ package com.planner.domain.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.PartOfDay;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.PartOfDay;
+import com.kairos.enums.wta.WTATemplateType;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
+public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate {
 
     //private int sequence;
     private boolean restingTimeAllowed;

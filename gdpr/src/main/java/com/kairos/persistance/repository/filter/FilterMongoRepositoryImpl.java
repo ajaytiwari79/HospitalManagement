@@ -2,7 +2,7 @@ package com.kairos.persistance.repository.filter;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.gdpr.master_data.ModuleIdDTO;
+import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.enums.FilterType;
 import com.kairos.persistance.model.filter.FilterGroup;
@@ -57,8 +57,8 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     }
 
 
-    /**accountTypes ,organizationServices ,organizationSubServices ,organizationSubTypes ,organizationTypes    are fields in domain (cluse ,asset ,master processing activity)
-     * ACCOUNT_TYPES ,ORGANIZATION_SERVICES,ORGANIZATION_SUB_SERVICES ,ORGANIZATION_TYPES,ORGANIZATION_SUB_TYPESetc represent field name in domains(Clause,MasterAsset and Master Processing activity)
+    /**accountTypes ,organizationServices ,organizationSubServices ,organizationSubTypes ,organizationTypes    are fields in domain (clause ,asset ,master processing activity)
+     * ACCOUNT_TYPES ,ORGANIZATION_SERVICES,ORGANIZATION_SUB_SERVICES ,ORGANIZATION_TYPES,ORGANIZATION_SUB_TYPES etc represent field name in domains(Clause,MasterAsset and Master Processing activity)
      * @param filterType
      * @return
      */

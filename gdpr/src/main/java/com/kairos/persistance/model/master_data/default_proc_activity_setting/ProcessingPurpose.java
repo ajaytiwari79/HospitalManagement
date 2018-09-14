@@ -47,6 +47,11 @@ public class ProcessingPurpose extends MongoBaseEntity {
         this.name = name;
     }
 
+    public ProcessingPurpose(@NotBlank(message = "error.message.name.cannot.be.null.or.empty") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
+        this.countryId = countryId;
+        this.suggestedDataStatus = suggestedDataStatus;
+    }
 
     public ProcessingPurpose(String name) {
         this.name = name;

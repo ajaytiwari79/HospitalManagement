@@ -1,16 +1,16 @@
 package com.kairos.persistence.model.wta.templates.template_types;
 
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
-public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
+public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate {
 
- private int belowAge;
- private int aboveAge;
- private boolean pregnant;
- private boolean restingTimeAllowed;
- private int restingTime;
+    private int belowAge;
+    private int aboveAge;
+    private boolean pregnant;
+    private boolean restingTimeAllowed;
+    private int restingTime;
 
     public int getBelowAge() {
         return belowAge;
@@ -44,6 +44,7 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
     public void setRestingTimeAllowed(boolean restingTimeAllowed) {
         this.restingTimeAllowed = restingTimeAllowed;
     }
+
     public int getRestingTime() {
         return restingTime;
     }
@@ -51,6 +52,7 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
     public void setRestingTime(int restingTime) {
         this.restingTime = restingTime;
     }
+
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
     }
@@ -60,18 +62,18 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
     }
 
     public EmployeesWithIncreasedRiskWTATemplate() {
-        wtaTemplateType=WTATemplateType.EMPLOYEES_WITH_INCREASE_RISK;
+        wtaTemplateType = WTATemplateType.EMPLOYEES_WITH_INCREASE_RISK;
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        return "";
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
+
     }
 
     public EmployeesWithIncreasedRiskWTATemplate(String name, boolean disabled, String description, int belowYear, int aboveYear, boolean pregnant) {
-        this.name=name;
-        this.disabled=disabled;
-        this.description=description;
+        this.name = name;
+        this.disabled = disabled;
+        this.description = description;
         this.belowAge = belowYear;
         this.aboveAge = aboveYear;
         this.pregnant = pregnant;

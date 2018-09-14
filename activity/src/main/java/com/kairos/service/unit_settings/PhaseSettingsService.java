@@ -5,8 +5,8 @@ import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.activity.unit_settings.PhaseSettingsDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.unit_settings.PhaseSettingsDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -26,7 +26,8 @@ public class PhaseSettingsService extends MongoBaseService {
         phaseSettingsDTOS.forEach(phaseSettingsDTO -> {
             phaseSettingsDTO.setUnitId(unitId);
         });
-        save(ObjectMapperUtils.copyProperties(phaseSettingsDTOS,PhaseSettings.class));
+        List<PhaseSettings> phaseSettings = ObjectMapperUtils.copyPropertiesOfListByMapper(phaseSettingsDTOS,PhaseSettings.class);
+        save(phaseSettings);
         return phaseSettingsDTOS;
     }
 
@@ -34,7 +35,7 @@ public class PhaseSettingsService extends MongoBaseService {
 
     public boolean createDefaultPhaseSettings(Long unitId, List<Phase> phases){
         if (!Optional.ofNullable(phases).isPresent()){
-            phases=ObjectMapperUtils.copyProperties(phaseService.getPhasesByUnit(unitId),Phase.class);
+            phases=ObjectMapperUtils.copyPropertiesOfListByMapper(phaseService.getPhasesByUnit(unitId),Phase.class);
         }
         List<PhaseSettings> phaseSettings=new ArrayList<>();
         phases.forEach(phase -> {

@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.ResponsibilityTypeDTO;
+import com.kairos.dto.gdpr.metadata.ResponsibilityTypeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
@@ -64,8 +64,7 @@ public class ResponsibilityTypeService extends MongoBaseService {
             if (!responsibilityTypeNames.isEmpty()) {
                 for (String name : responsibilityTypeNames) {
 
-                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name);
-                    newResponsibilityType.setCountryId(countryId);
+                    ResponsibilityType newResponsibilityType = new ResponsibilityType(name,countryId,SuggestedDataStatus.APPROVED);
                     newResponsibilityTypes.add(newResponsibilityType);
 
                 }
@@ -178,19 +177,19 @@ public class ResponsibilityTypeService extends MongoBaseService {
      */
     public List<ResponsibilityType> saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
-        Set<String> responsibilitytTypeNameList = new HashSet<>();
+        Set<String> responsibilityTypeNameList = new HashSet<>();
         for (ResponsibilityTypeDTO ResponsibilityType : responsibilityTypeDTOS) {
-            responsibilitytTypeNameList.add(ResponsibilityType.getName());
+            responsibilityTypeNameList.add(ResponsibilityType.getName());
         }
-        List<ResponsibilityType> existingResponsibilityTypes = findMetaDataByNamesAndCountryId(countryId, responsibilitytTypeNameList, ResponsibilityType.class);
-        responsibilitytTypeNameList = ComparisonUtils.getNameListForMetadata(existingResponsibilityTypes, responsibilitytTypeNameList);
+        List<ResponsibilityType> existingResponsibilityTypes = findMetaDataByNamesAndCountryId(countryId, responsibilityTypeNameList, ResponsibilityType.class);
+        responsibilityTypeNameList = ComparisonUtils.getNameListForMetadata(existingResponsibilityTypes, responsibilityTypeNameList);
         List<ResponsibilityType> responsibilityTypeList = new ArrayList<>();
-        if (!responsibilitytTypeNameList.isEmpty()) {
-            for (String name : responsibilitytTypeNameList) {
+        if (!responsibilityTypeNameList.isEmpty()) {
+            for (String name : responsibilityTypeNameList) {
 
                 ResponsibilityType responsibilityType = new ResponsibilityType(name);
                 responsibilityType.setCountryId(countryId);
-                responsibilityType.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                responsibilityType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 responsibilityType.setSuggestedDate(LocalDate.now());
                 responsibilityTypeList.add(responsibilityType);
             }

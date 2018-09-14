@@ -1,10 +1,10 @@
 package com.kairos.rest_client;
 
-import com.kairos.client.dto.OrgTaskTypeAggregateResult;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.client.dto.TaskTypeAggregateResult;
-import com.kairos.user.staff.client.ClientExceptionTypesDTO;
-import com.kairos.user.staff.client.ClientFilterDTO;
+import com.kairos.dto.activity.task_type.OrgTaskTypeAggregateResult;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.activity.task_type.TaskTypeAggregateResult;
+import com.kairos.dto.user.staff.client.ClientExceptionTypesDTO;
+import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -4,7 +4,7 @@ package com.kairos.controller.timeBank;
 import com.kairos.constants.ApiConstants;
 import com.kairos.controller.task.TaskController;
 import com.kairos.service.time_bank.TimeBankService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 

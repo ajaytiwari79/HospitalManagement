@@ -1,8 +1,8 @@
 package com.kairos.controller.data_inventory.asset;
 
 
-import com.kairos.gdpr.data_inventory.AssetDTO;
-import com.kairos.gdpr.data_inventory.AssetRelateProcessingActivityDTO;
+import com.kairos.dto.gdpr.data_inventory.AssetDTO;
+import com.kairos.dto.gdpr.data_inventory.AssetRelateProcessingActivityDTO;
 import com.kairos.service.data_inventory.asset.AssetService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -43,8 +43,6 @@ public class AssetController {
     @ApiOperation(value = "delete  asset by Id")
     @DeleteMapping("/asset/{assetId}")
     public ResponseEntity<Object> deleteAssetById(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
-
-
         Map<String, Object> result = assetService.deleteAssetById(unitId, assetId);
         if ((boolean) result.get(IS_SUCCESS)) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, result);
@@ -116,7 +114,6 @@ public class AssetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.addProcessingActivitiesAndSubProcessingActivitiesToAsset(unitId, assetId, relateProcessingActivityDTO));
     }
 
-
     @ApiOperation(value = "get Processing activity and Sub processing Activity  related with asset")
     @GetMapping("/asset/{assetId}/processing_activity")
     public ResponseEntity<Object> getRelatedSubProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
@@ -127,6 +124,20 @@ public class AssetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllRelatedProcessingActivityAndSubProcessingActivities(unitId, assetId));
     }
 
+
+    @ApiOperation(value = "Unlink Processing Activity From asset ")
+    @DeleteMapping("/asset/{assetId}/processing_activity/{processingActivityId}")
+    public ResponseEntity<Object> unLinkProcessingActivityFromAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @PathVariable BigInteger processingActivityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, false, assetService.unLinkProcessingActivityFromAsset(unitId, assetId, processingActivityId));
+    }
+
+
+    @ApiOperation(value = "Unlink Sub Processing Activity From asset ")
+    @DeleteMapping("/asset/{assetId}/processing_activity/sub_processing_activity/{subProcessingActivityId}")
+    public ResponseEntity<Object> unLinkSubProcessingActivityFromAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @PathVariable BigInteger subProcessingActivityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, false, assetService.unLinkSubProcessingActivityFromAsset(unitId, assetId, subProcessingActivityId));
+
+    }
 
     @ApiOperation(value = "get all active asset used in processing activity related tab")
     @GetMapping("/asset/related")

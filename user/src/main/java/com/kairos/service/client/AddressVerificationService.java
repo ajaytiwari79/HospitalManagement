@@ -1,5 +1,5 @@
 package com.kairos.service.client;
-import com.kairos.user.organization.AddressDTO;
+import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ClientTemporaryAddress;
 import com.kairos.persistence.model.client.ContactAddress;

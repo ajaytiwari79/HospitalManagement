@@ -2,11 +2,10 @@ package com.kairos.response.dto.policy_agreement;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.gdpr.OrganizationSubType;
-import com.kairos.gdpr.OrganizationType;
-import com.kairos.gdpr.ServiceCategory;
-import com.kairos.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubType;
+import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.ServiceCategory;
+import com.kairos.dto.gdpr.SubServiceCategory;
 import com.kairos.response.dto.master_data.AccountTypeResponseDTO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
@@ -31,7 +30,7 @@ public class PolicyAgreementTemplateResponseDTO {
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
 
-    private List<BigInteger> agreementSections=new ArrayList<>();
+    private List<BigInteger> sections;
 
     private TemplateTypeResponseDTO templateType;
 
@@ -75,9 +74,9 @@ public class PolicyAgreementTemplateResponseDTO {
         this.accountTypes = accountTypes;
     }
 
-    public List<BigInteger> getAgreementSections() { return agreementSections; }
+    public List<BigInteger> getSections() { return sections; }
 
-    public void setAgreementSections(List<BigInteger> agreementSections) { this.agreementSections = agreementSections; }
+    public void setSections(List<BigInteger> sections) { this.sections = sections; }
 
     public List<OrganizationType> getOrganizationTypes() {
         return organizationTypes;

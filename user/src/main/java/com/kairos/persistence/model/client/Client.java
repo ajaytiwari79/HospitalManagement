@@ -11,8 +11,8 @@ import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
-import com.kairos.util.CPRUtil;
-import com.kairos.util.DateConverter;
+import com.kairos.utils.CPRUtil;
+import com.kairos.utils.DateConverter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 

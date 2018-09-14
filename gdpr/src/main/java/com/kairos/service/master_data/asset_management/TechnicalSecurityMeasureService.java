@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.TechnicalSecurityMeasureDTO;
+import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistance.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
@@ -61,8 +61,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
             List<TechnicalSecurityMeasure> newTechnicalMeasures = new ArrayList<>();
             if (!techSecurityMeasureNames.isEmpty()) {
                 for (String name : techSecurityMeasureNames) {
-                    TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure(name);
-                    newTechnicalSecurityMeasure.setCountryId(countryId);
+                    TechnicalSecurityMeasure newTechnicalSecurityMeasure = new TechnicalSecurityMeasure(name,countryId,SuggestedDataStatus.APPROVED);
                     newTechnicalMeasures.add(newTechnicalSecurityMeasure);
 
                 }
@@ -188,7 +187,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
                 TechnicalSecurityMeasure technicalSecurityMeasure = new TechnicalSecurityMeasure(name);
                 technicalSecurityMeasure.setCountryId(countryId);
-                technicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                technicalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 technicalSecurityMeasure.setSuggestedDate(LocalDate.now());
                 technicalSecurityMeasureList.add(technicalSecurityMeasure);
             }

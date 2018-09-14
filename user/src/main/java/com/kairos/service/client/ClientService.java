@@ -1,11 +1,11 @@
 package com.kairos.service.client;
 
-import com.kairos.activity.task.EscalateTaskWrapper;
-import com.kairos.activity.task.EscalatedTasksWrapper;
-import com.kairos.client.dto.ClientExceptionDTO;
-import com.kairos.client.dto.OrganizationClientWrapper;
-import com.kairos.client.dto.TaskDemandRequestWrapper;
-import com.kairos.client.dto.TaskTypeAggregateResult;
+import com.kairos.dto.activity.task.EscalateTaskWrapper;
+import com.kairos.dto.activity.task.EscalatedTasksWrapper;
+import com.kairos.dto.user.client.ClientExceptionDTO;
+import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
+import com.kairos.dto.activity.task.TaskDemandRequestWrapper;
+import com.kairos.dto.activity.task_type.TaskTypeAggregateResult;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.enums.Gender;
@@ -57,16 +57,16 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.user.staff.ContactPersonDTO;
-import com.kairos.user.staff.client.ClientExceptionTypesDTO;
-import com.kairos.user.staff.client.ClientFilterDTO;
-import com.kairos.user.staff.client.ClientStaffInfoDTO;
-import com.kairos.util.CPRUtil;
-import com.kairos.util.DateUtil;
-import com.kairos.util.FormatUtil;
-import com.kairos.util.user_context.UserContext;
-import com.kairos.vrp.TaskAddress;
+import com.kairos.dto.user.organization.AddressDTO;
+import com.kairos.dto.user.staff.ContactPersonDTO;
+import com.kairos.dto.user.staff.client.ClientExceptionTypesDTO;
+import com.kairos.dto.user.staff.client.ClientFilterDTO;
+import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
+import com.kairos.utils.CPRUtil;
+import com.kairos.utils.DateUtil;
+import com.kairos.utils.FormatUtil;
+import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.planner.vrp.TaskAddress;
 import com.kairos.wrapper.ClientPersonalCalenderPrerequisiteDTO;
 import com.kairos.wrapper.ContactPersonTabDataDTO;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
@@ -92,7 +92,7 @@ import java.util.stream.Collectors;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.enums.CitizenHealthStatus.DECEASED;
 import static com.kairos.enums.CitizenHealthStatus.TERMINATED;
-import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
+import static com.kairos.utils.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
 /**
  * Created by oodles on 28/9/16.

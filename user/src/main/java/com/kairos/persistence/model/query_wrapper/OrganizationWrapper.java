@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.query_wrapper;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.user.organization.group.GroupWrapper;
+import com.kairos.dto.user.organization.group.GroupWrapper;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

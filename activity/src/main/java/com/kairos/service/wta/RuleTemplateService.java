@@ -1,15 +1,15 @@
 package com.kairos.service.wta;
 
 
-import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
-import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
-import com.kairos.activity.wta.rule_template_category.RuleTemplateWrapper;
-import com.kairos.activity.wta.AgeRange;
-import com.kairos.activity.wta.templates.PhaseTemplateValue;
-import com.kairos.enums.PartOfDay;
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateWrapper;
+import com.kairos.dto.activity.wta.AgeRange;
+import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.RuleTemplateCategoryType;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
@@ -21,11 +21,11 @@ import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
-import com.kairos.user.country.basic_details.CountryDTO;
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.user_context.CurrentUserDetails;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.user_context.CurrentUserDetails;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -106,7 +106,7 @@ public class RuleTemplateService extends MongoBaseService {
         shiftLengthWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(shiftLengthWTATemplate);
 
-        ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive days", true, "Maximum number of consecutive days", true, daysCount);
+        ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive days",  "Maximum number of consecutive days");
         consecutiveWorking.setCountryId(countryDTO.getId());
         consecutiveWorking.setIntervalLength(12);
         consecutiveWorking.setIntervalUnit(week);
@@ -114,14 +114,13 @@ public class RuleTemplateService extends MongoBaseService {
         consecutiveWorking.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(consecutiveWorking);
 
-        ConsecutiveRestPartOfDayWTATemplate restInConsecutiveDays = new ConsecutiveRestPartOfDayWTATemplate("Minimum rest after consecutive days worked", false, "Minimum rest after consecutive days worked", timeInMins, daysCount);
+        ConsecutiveRestPartOfDayWTATemplate restInConsecutiveDays = new ConsecutiveRestPartOfDayWTATemplate("Minimum rest after consecutive days worked", false, "Minimum rest after consecutive days worked");
         restInConsecutiveDays.setCountryId(countryDTO.getId());
         restInConsecutiveDays.setPhaseTemplateValues(phaseTemplateValues);
         restInConsecutiveDays.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(restInConsecutiveDays);
 
-        NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = new NumberOfPartOfDayShiftsWTATemplate("Maximum number of shifts per interval", false, "Maximum number of shifts per interval", daysCount);
-        //numberOfPartOfDayShiftsWTATemplate.setValidationStartDate(dateInMillis);
+        NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = new NumberOfPartOfDayShiftsWTATemplate("Maximum number of shifts per interval", false, "Maximum number of shifts per interval");
         numberOfPartOfDayShiftsWTATemplate.setIntervalLength(1);
         numberOfPartOfDayShiftsWTATemplate.setIntervalUnit(week);
         numberOfPartOfDayShiftsWTATemplate.setCountryId(countryDTO.getId());
@@ -328,6 +327,7 @@ public class RuleTemplateService extends MongoBaseService {
 
         }
         WTABaseRuleTemplate wtaBaseRuleTemplate = WTABuilderService.copyRuleTemplate(wtaRuleTemplateDTO, true);
+        wtaBaseRuleTemplate.setCountryId(countryId);
         wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         save(wtaBaseRuleTemplate);
         wtaRuleTemplateDTO.setId(wtaBaseRuleTemplate.getId());

@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data.data_category_element;
 
 
-import com.kairos.gdpr.master_data.DataCategoryDTO;
+import com.kairos.dto.gdpr.master_data.DataCategoryDTO;
 import com.kairos.service.master_data.data_category_element.DataCategoryService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -94,7 +94,7 @@ public class DataCategoryController {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.getDataCategoryWithDataElementOnLeftHierarchySelctionById(unitId, dataCategoryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.getDataCategoryWithDataElementOnLeftHierarchySelectionById(unitId, dataCategoryId));
 
     }
 

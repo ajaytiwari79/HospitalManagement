@@ -2,12 +2,15 @@ package com.kairos.service.task_type;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.shift.StaffUnitPositionDetails;
-import com.kairos.activity.task.AbsencePlanningStatus;
-import com.kairos.activity.task.TaskDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.task.AbsencePlanningStatus;
+import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.staff.*;
 import com.kairos.enums.Day;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.messaging.ReceivedTask;
@@ -42,23 +45,23 @@ import com.kairos.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.planner.TasksMergingService;
+import com.kairos.service.shift.ShiftService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.rule_validator.task.MergeTaskSpecification;
 import com.kairos.rule_validator.task.TaskDaySpecification;
 import com.kairos.rule_validator.TaskSpecification;
 import com.kairos.rule_validator.task.TaskStaffTypeSpecification;
-import com.kairos.user.client.Client;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.user.patient.PatientResourceList;
-import com.kairos.user.staff.*;
-import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.util.*;
-import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResponse;
-import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.util.time_bank.TimeBankCalculationService;
-import com.kairos.util.user_context.UserContext;
-import com.kairos.vrp.task.VRPTaskDTO;
+import com.kairos.dto.user.client.Client;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.patient.PatientResourceList;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.utils.*;
+import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResponse;
+import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.utils.time_bank.TimeBankCalculationService;
+import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.kairos.wrapper.EscalatedTasksWrapper;
 import com.kairos.wrapper.TaskWrapper;
 import com.kairos.wrapper.task.StaffAssignedTasksWrapper;
@@ -177,6 +180,7 @@ public class TaskService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject private ShiftService shiftService;
 
     public List<Long> getClientTaskServices(Long clientId, long orgId) {
         logger.info("Fetching tasks for ClientId: " + clientId);
@@ -717,23 +721,14 @@ public class TaskService extends MongoBaseService {
             if (!Optional.ofNullable(activity).isPresent()) {
                 skippedShiftsWhileSave.add(timeCareShift.getId());
             } else {
-                shift.setName(activity.getName());
-                shift.setActivityId(activity.getId());
                 shift.setStaffId(staffId);
                 shift.setUnitPositionId(unitPositionDTO.getId());
-                List<Integer> activityDayTypes = new ArrayList<>();
-                if (staffAdditionalInfoDTO.getDayTypes() != null && !staffAdditionalInfoDTO.getDayTypes().isEmpty()) {
-                    activityDayTypes = WTARuleTemplateValidatorUtility.getValidDays(staffAdditionalInfoDTO.getDayTypes(), activity.getTimeCalculationActivityTab().getDayTypes());
-                }
-                if (activityDayTypes.contains(new DateTime(shift.getStartDate()).getDayOfWeek())) {
-                    timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
-                }
                 shiftsToCreate.add(shift);
             }
 
         }
         if (!shiftsToCreate.isEmpty()) {
-            save(shiftsToCreate);
+            shiftService.saveShiftsWithActivity(shiftsToCreate,staffAdditionalInfoDTO);
             timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shiftsToCreate);
             payOutService.savePayOuts(staffAdditionalInfoDTO, shiftsToCreate,activities);
         }

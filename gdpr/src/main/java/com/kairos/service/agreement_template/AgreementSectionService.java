@@ -2,8 +2,8 @@ package com.kairos.service.agreement_template;
 
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.gdpr.master_data.AgreementSectionDTO;
-import com.kairos.gdpr.master_data.ClauseBasicDTO;
+import com.kairos.dto.gdpr.master_data.AgreementSectionDTO;
+import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
 import com.kairos.persistance.model.agreement_template.AgreementSectionClauseWrapper;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
@@ -47,7 +47,7 @@ public class AgreementSectionService extends MongoBaseService {
     private ClauseService clauseService;
 
 
-    public PolicyAgreementTemplate createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, BigInteger templateId, List<AgreementSectionDTO> agreementSectionDTOs) {
+    public List<AgreementSectionResponseDTO> createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, BigInteger templateId, List<AgreementSectionDTO> agreementSectionDTOs) {
 
         PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, organizationId, templateId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
@@ -69,8 +69,8 @@ public class AgreementSectionService extends MongoBaseService {
             agreementSectionIdList = createAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, organizationId, agreementSectionDTOs, policyAgreementTemplate);
             policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         }
-        policyAgreementTemplate = policyAgreementTemplateRepository.save(policyAgreementTemplate);
-        return policyAgreementTemplate;
+        policyAgreementTemplateRepository.save(policyAgreementTemplate);
+        return policyAgreementTemplateRepository.getAgreementTemplateAllSectionAndSubSections(countryId,organizationId,templateId);
     }
 
 

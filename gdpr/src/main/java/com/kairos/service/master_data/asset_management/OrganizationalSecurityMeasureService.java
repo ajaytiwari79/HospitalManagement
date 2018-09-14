@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.OrganizationalSecurityMeasureDTO;
+import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
 import com.kairos.persistance.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
@@ -62,8 +62,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
             if (!orgSecurityMeasureNames.isEmpty()) {
                 for (String name : orgSecurityMeasureNames) {
 
-                    OrganizationalSecurityMeasure newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name);
-                    newOrganizationalSecurityMeasure.setCountryId(countryId);
+                    OrganizationalSecurityMeasure newOrganizationalSecurityMeasure = new OrganizationalSecurityMeasure(name,countryId,SuggestedDataStatus.APPROVED);
                     newOrgSecurityMeasures.add(newOrganizationalSecurityMeasure);
 
                 }
@@ -188,7 +187,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
                 OrganizationalSecurityMeasure organizationalSecurityMeasure = new OrganizationalSecurityMeasure(name);
                 organizationalSecurityMeasure.setCountryId(countryId);
-                organizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                organizationalSecurityMeasure.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 organizationalSecurityMeasure.setSuggestedDate(LocalDate.now());
                 organizationalSecurityMeasureList.add(organizationalSecurityMeasure);
             }

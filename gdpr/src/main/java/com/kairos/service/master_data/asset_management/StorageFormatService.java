@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.StorageFormatDTO;
+import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistance.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
@@ -58,11 +58,10 @@ public class StorageFormatService extends MongoBaseService {
             storageFormatNames = ComparisonUtils.getNameListForMetadata(existing, storageFormatNames);
 
             List<StorageFormat> newStorageFormats = new ArrayList<>();
-            if (storageFormatNames.size() != 0) {
+            if (!storageFormatNames.isEmpty()) {
                 for (String name : storageFormatNames) {
 
-                    StorageFormat newStorageFormat = new StorageFormat(name);
-                    newStorageFormat.setCountryId(countryId);
+                    StorageFormat newStorageFormat = new StorageFormat(name,countryId,SuggestedDataStatus.APPROVED);
                     newStorageFormats.add(newStorageFormat);
 
                 }
@@ -190,7 +189,7 @@ public class StorageFormatService extends MongoBaseService {
 
                 StorageFormat storageFormat = new StorageFormat(name);
                 storageFormat.setCountryId(countryId);
-                storageFormat.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                storageFormat.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 storageFormat.setSuggestedDate(LocalDate.now());
                 storageFormatList.add(storageFormat);
             }

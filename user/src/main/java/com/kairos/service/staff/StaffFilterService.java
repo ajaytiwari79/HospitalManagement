@@ -6,7 +6,7 @@ import com.kairos.constants.AppConstants;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
-import com.kairos.user.country.filter.FilterDetailDTO;
+import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
@@ -23,7 +23,7 @@ import com.kairos.persistence.repository.user.user_filter.FilterGroupGraphReposi
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

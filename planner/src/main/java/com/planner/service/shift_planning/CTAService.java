@@ -1,19 +1,14 @@
 package com.planner.service.shift_planning;
 
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.util.DateTimeInterval;
-import com.kairos.util.DateUtils;
-import com.planner.domain.wta.templates.WorkingTimeAgreement;
-import org.joda.time.chrono.ZonedChronology;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 

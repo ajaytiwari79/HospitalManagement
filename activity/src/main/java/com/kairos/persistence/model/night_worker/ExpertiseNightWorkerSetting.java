@@ -3,7 +3,7 @@ package com.kairos.persistence.model.night_worker;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.user.country.time_slot.TimeSlot;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 
 public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
 

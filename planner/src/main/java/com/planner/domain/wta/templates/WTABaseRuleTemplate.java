@@ -1,9 +1,8 @@
 package com.planner.domain.wta.templates;
 
-import com.kairos.activity.wta.templates.PhaseTemplateValue;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.enums.wta.WTATemplateType;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.List;
  * Created by vipul on 26/7/17.
  */
 
-@Document(collection = "wtaBaseRuleTemplate")
+//@Document(collection = "wtaBaseRuleTemplate")
 public class WTABaseRuleTemplate{
 
     protected BigInteger id;

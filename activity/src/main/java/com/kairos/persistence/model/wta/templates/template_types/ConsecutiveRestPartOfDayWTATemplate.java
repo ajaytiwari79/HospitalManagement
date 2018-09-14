@@ -2,9 +2,9 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.MinMaxSetting;
-import com.kairos.enums.PartOfDay;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.MinMaxSetting;
+import com.kairos.enums.wta.PartOfDay;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
@@ -23,8 +23,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
 
-    private long minimumRest;//hh:mm
-    private long daysWorked;
     private Long consecutiveDays;
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
 
@@ -82,22 +80,6 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-    public long getMinimumRest() {
-        return minimumRest;
-    }
-
-
-    public void setMinimumRest(long minimumRest) {
-        this.minimumRest = minimumRest;
-    }
-
-    public long getDaysWorked() {
-        return daysWorked;
-    }
-
-    public void setDaysWorked(long daysWorked) {
-        this.daysWorked = daysWorked;
-    }
 
     public Long getConsecutiveDays() {
         return consecutiveDays;
@@ -107,12 +89,10 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         this.consecutiveDays = consecutiveDays;
     }
 
-    public ConsecutiveRestPartOfDayWTATemplate(String name, boolean disabled, String description, long minimumRest, long daysWorked) {
+    public ConsecutiveRestPartOfDayWTATemplate(String name, boolean disabled, String description) {
         this.name=name;
         this.disabled=disabled;
         this.description=description;
-        this.minimumRest = minimumRest;
-        this.daysWorked = daysWorked;
         wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
 
     }
@@ -121,9 +101,9 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
        /* if(shifts.size()<2) return true;
-        WTARuleTemplateValidatorUtility.sortShifts(shifts);
+        ShiftValidatorService.sortShifts(shifts);
         List<LocalDate> dates=getSortedDates(shifts);
 
         int l=1;
@@ -144,7 +124,6 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
             }
             l++;
         }*/
-        return "";
     }
 
 }

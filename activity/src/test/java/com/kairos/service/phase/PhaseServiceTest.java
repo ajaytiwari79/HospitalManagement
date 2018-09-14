@@ -1,13 +1,14 @@
 package com.kairos.service.phase;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.util.DateUtils;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.commons.utils.DateUtils;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -92,7 +93,7 @@ public class PhaseServiceTest {
 
     @Test
     public void createPhaseInCountry() throws Exception {
-        PhaseDTO testPhase = new PhaseDTO("TEST", "TEST Phase", 1, DurationType.WEEKS, 19, 53L);
+        PhaseDTO testPhase = new PhaseDTO("TEST", "TEST Phase", PhaseDefaultName.REQUEST, 1, DurationType.WEEKS, 19, 53L);
         String baseUrl = getBaseUrl(71L, null,53L);
         HttpEntity<PhaseDTO> entity = new HttpEntity<>(testPhase);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PhaseDTO>> typeReference =
@@ -120,7 +121,7 @@ public class PhaseServiceTest {
     }
     @Test
     public void test3_updatePhaseInCountry() throws Exception {
-        PhaseDTO testPhase = new PhaseDTO("TEST", "TEST Phase", 3, DurationType.WEEKS, 4, 53L);
+        PhaseDTO testPhase = new PhaseDTO("TEST", "TEST Phase", PhaseDefaultName.PUZZLE, 3, DurationType.WEEKS, 4, 53L);
         String baseUrl = getBaseUrl(71L, null,53L);
         HttpEntity<PhaseDTO> entity = new HttpEntity<>(testPhase);
 

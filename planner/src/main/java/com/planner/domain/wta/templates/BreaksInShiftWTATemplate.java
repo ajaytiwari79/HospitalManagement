@@ -2,8 +2,7 @@ package com.planner.domain.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.wta.templates.BreakTemplateValue;
-
+import com.kairos.dto.activity.wta.templates.BreakTemplateValue;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate{
+public class BreaksInShiftWTATemplate extends WTABaseRuleTemplate {
     private List<BreakTemplateValue> breakTemplateValues;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> plannedTimeIds = new ArrayList<>();;

@@ -1,8 +1,8 @@
 package com.planner.domain.wta.templates;
 
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.WTATemplateType;
 
-public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
+public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate {
 
  private int belowAge;
  private int aboveAge;
@@ -58,7 +58,7 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
     }
 
     public EmployeesWithIncreasedRiskWTATemplate() {
-        wtaTemplateType=WTATemplateType.EMPLOYEES_WITH_INCREASE_RISK;
+        wtaTemplateType= WTATemplateType.EMPLOYEES_WITH_INCREASE_RISK;
     }
 
 

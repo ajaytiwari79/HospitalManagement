@@ -5,7 +5,7 @@ import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.gdpr.metadata.ProcessingLegalBasisDTO;
+import com.kairos.dto.gdpr.metadata.ProcessingLegalBasisDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
 import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
@@ -177,7 +177,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
 
         Map<String, List<ProcessingLegalBasis>> result;
         result = createProcessingLegalBasis(organizationId, processingLegalBasisDTOS);
-        List<ProcessingLegalBasis> masterProcessingLegalBasisSuggestedByUnit = processingLegalBasisService.saveSuggestedProcessingLegalBasissFromUnit(countryId, processingLegalBasisDTOS);
+        List<ProcessingLegalBasis> masterProcessingLegalBasisSuggestedByUnit = processingLegalBasisService.saveSuggestedProcessingLegalBasisFromUnit(countryId, processingLegalBasisDTOS);
         if (!masterProcessingLegalBasisSuggestedByUnit.isEmpty()) {
             result.put("SuggestedData", masterProcessingLegalBasisSuggestedByUnit);
         }

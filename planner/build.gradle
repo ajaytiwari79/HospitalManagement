@@ -59,7 +59,7 @@ dependencies {
 	compile project('optaplanner-taskplanning')
 	compile project('optaplanner-vrp-taskplanning')
 	compile project('responseWrapper')
-	compile project (':dto')
+	compile project (':kcommons')
 	compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
 	//compile group: 'org.springframework.data', name: 'spring-data-cassandra', version: '2.0.6.RELEASE'
 	compile group: 'com.google.guava', name: 'guava', version: '19.0'
@@ -94,7 +94,7 @@ subprojects {
 	if (!it.name.startsWith('responseWrapper')) {
 		apply plugin: 'java'
 		dependencies {
-			compile project(':dto')
+			compile project(':kcommons')
 			compile group: 'org.optaplanner', name: 'optaplanner-persistence-xstream', version: versionoptaplannerbom
 			compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 			compile group: 'org.optaplanner', name: 'optaplanner-core', version: versionoptaplannerbom

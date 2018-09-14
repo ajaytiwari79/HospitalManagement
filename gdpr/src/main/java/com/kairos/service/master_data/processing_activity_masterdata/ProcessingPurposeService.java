@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.ProcessingPurposeDTO;
+import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
@@ -62,8 +62,7 @@ public class ProcessingPurposeService extends MongoBaseService {
             if (!processingPurposesNames.isEmpty()) {
                 for (String name : processingPurposesNames) {
 
-                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name);
-                    newProcessingPurpose.setCountryId(countryId);
+                    ProcessingPurpose newProcessingPurpose = new ProcessingPurpose(name,countryId,SuggestedDataStatus.APPROVED);
                     newProcessingPurposes.add(newProcessingPurpose);
 
                 }
@@ -187,7 +186,7 @@ public class ProcessingPurposeService extends MongoBaseService {
 
                 ProcessingPurpose processingPurpose = new ProcessingPurpose(name);
                 processingPurpose.setCountryId(countryId);
-                processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                processingPurpose.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 processingPurpose.setSuggestedDate(LocalDate.now());
                 processingPurposeList.add(processingPurpose);
             }

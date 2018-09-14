@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.HostingTypeDTO;
+import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
 import com.kairos.persistance.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
@@ -60,8 +60,7 @@ public class HostingTypeService extends MongoBaseService {
             List<HostingType> newHostingTypes = new ArrayList<>();
             if (!hostingTypeNames.isEmpty()) {
                 for (String name : hostingTypeNames) {
-                    HostingType newHostingType = new HostingType(name);
-                    newHostingType.setCountryId(countryId);
+                    HostingType newHostingType = new HostingType(name,countryId,SuggestedDataStatus.APPROVED);
                     newHostingTypes.add(newHostingType);
                 }
                 newHostingTypes = hostingTypeMongoRepository.saveAll(getNextSequence(newHostingTypes));
@@ -190,7 +189,7 @@ public class HostingTypeService extends MongoBaseService {
 
                 HostingType hostingType = new HostingType(name);
                 hostingType.setCountryId(countryId);
-                hostingType.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                hostingType.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 hostingType.setSuggestedDate(LocalDate.now());
                 hostingTypeList.add(hostingType);
             }

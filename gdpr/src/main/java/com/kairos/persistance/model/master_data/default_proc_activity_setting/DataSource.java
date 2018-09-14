@@ -45,6 +45,11 @@ public class DataSource extends  MongoBaseEntity {
         this.name = name;
     }
 
+    public DataSource(@NotBlank(message = "Name can't be empty")  String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
+        this.countryId = countryId;
+        this.suggestedDataStatus = suggestedDataStatus;
+    }
 
     public DataSource(String name) {
         this.name = name;

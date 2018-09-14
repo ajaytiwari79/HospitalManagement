@@ -5,7 +5,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.AccessorPartyDTO;
+import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
 import com.kairos.persistance.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
@@ -60,8 +60,7 @@ public class AccessorPartyService extends MongoBaseService {
             List<AccessorParty> newAccessorPartyList = new ArrayList<>();
             if (!accessorPartyNames.isEmpty()) {
                 for (String name : accessorPartyNames) {
-                    AccessorParty newAccessorParty = new AccessorParty(name);
-                    newAccessorParty.setCountryId(countryId);
+                    AccessorParty newAccessorParty = new AccessorParty(name,countryId,SuggestedDataStatus.APPROVED);
                     newAccessorPartyList.add(newAccessorParty);
                 }
                 newAccessorPartyList = accessorPartyMongoRepository.saveAll(getNextSequence(newAccessorPartyList));
@@ -177,7 +176,7 @@ public class AccessorPartyService extends MongoBaseService {
 
                 AccessorParty accessorParty = new AccessorParty(name);
                 accessorParty.setCountryId(countryId);
-                accessorParty.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                accessorParty.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 accessorParty.setSuggestedDate(LocalDate.now());
                 accessorPartyList.add(accessorParty);
             }

@@ -2,6 +2,7 @@ package com.kairos.service.auth;
 
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.access_permission.UnitModuleAccess;
 import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.auth.*;
 import com.kairos.persistence.model.client.ContactDetail;
@@ -9,7 +10,8 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
-import com.kairos.user.staff.staff.UnitWiseStaffPermissionsDTO;
+import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
+import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -19,12 +21,12 @@ import com.kairos.service.SmsService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.user.password.FirstTimePasswordUpdateDTO;
-import com.kairos.util.CPRUtil;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.OtpGenerator;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
+import com.kairos.utils.CPRUtil;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.OtpGenerator;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -74,7 +76,8 @@ public class UserService {
     private AccessPageService accessPageService;
     @Inject
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
-
+    @Inject
+    private UnitTypeGraphRepository unitTypeGraphRepository;
 
     /**
      * Calls UserGraphRepository,
@@ -156,9 +159,10 @@ public class UserService {
         return userGraphRepository.findByUserNameIgnoreCase(name);
     }
 
-    public User findOne(Long  id) {
-        return userGraphRepository.findOne(id,0);
+    public User findOne(Long id) {
+        return userGraphRepository.findOne(id, 0);
     }
+
     /**
      * Calls UserGraphRepository and Check if User with combination of username & password exists.
      *
@@ -191,7 +195,7 @@ public class UserService {
         }
         generateTokenToUser(currentUser);
         return new UserAuthentication(currentUser);
-       /* *//*ContactDetail contactDetail = user.getContactDetail();
+        /* *//*ContactDetail contactDetail = user.getContactDetail();
         if(contactDetail == null && contactDetail.getMobilePhone() != null){
             throw new InternalError("phone number is null");
         }*//*
@@ -270,7 +274,7 @@ public class UserService {
         } else {
             exceptionService.dataNotFoundByIdException("message.user.mobileNumber.notFound");
         }
-        return  false;
+        return false;
     }
 
     public Map<String, Object> verifyOtp(int otp, String email) {
@@ -316,7 +320,7 @@ public class UserService {
             return null;
         }
         currentUser = generateTokenToUser(currentUser);
-        Organization org =  staffGraphRepositoy.getStaffOrganization(currentUser.getId());
+        Organization org = staffGraphRepositoy.getStaffOrganization(currentUser.getId());
         if (org == null) {
             exceptionService.dataNotFoundByIdException("message.organisation.notFound");
 
@@ -371,7 +375,7 @@ public class UserService {
         User user = userGraphRepository.findByEmail(firstTimePasswordUpdateDTO.getEmail());
         if (user == null) {
             logger.error("User not found belongs to this email " + firstTimePasswordUpdateDTO.getEmail());
-           exceptionService.dataNotFoundByIdException("message.user.email.notFound",firstTimePasswordUpdateDTO.getEmail());
+            exceptionService.dataNotFoundByIdException("message.user.email.notFound", firstTimePasswordUpdateDTO.getEmail());
 
         }
         CharSequence password = CharBuffer.wrap(firstTimePasswordUpdateDTO.getRepeatPassword());
@@ -385,32 +389,46 @@ public class UserService {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         Long userLanguageId = Optional.ofNullable(currentUser.getUserLanguage()).isPresent() ? currentUser.getUserLanguage().getId() : null;
         UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(userGraphRepository.getOrganizations(UserContext.getUserDetails().getId()),
-        currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), userLanguageId);
+                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId(), userLanguageId);
         return userOrganizationsDTO;
     }
 
-    public Map<String, AccessPageQueryResult> prepareUnitPermissions(List<AccessPageQueryResult> accessPageQueryResults){
+    public Map<String, AccessPageQueryResult> prepareUnitPermissions(List<AccessPageQueryResult> accessPageQueryResults, List<Long> accessibleModules, boolean parentOrganization) {
         Map<String, AccessPageQueryResult> unitPermissionMap = new HashMap<>();
-        for (AccessPageQueryResult permissionn : accessPageQueryResults) {
-            if(unitPermissionMap.containsKey(permissionn.getModuleId())){
-                AccessPageQueryResult existingPermission = unitPermissionMap.get(permissionn.getModuleId());
-                existingPermission.setRead(existingPermission.isRead() || permissionn.isRead());
-                existingPermission.setWrite(existingPermission.isWrite() || permissionn.isWrite());
+        for (AccessPageQueryResult permission : accessPageQueryResults) {
+            if (unitPermissionMap.containsKey(permission.getModuleId()) && parentOrganization) {
+                AccessPageQueryResult existingPermission = unitPermissionMap.get(permission.getModuleId());
+                existingPermission.setRead(existingPermission.isRead() || permission.isRead());
+                existingPermission.setWrite(existingPermission.isWrite() || permission.isWrite());
                 existingPermission.setActive(existingPermission.isRead() || existingPermission.isWrite());
-                unitPermissionMap.put(permissionn.getModuleId(),existingPermission );
+                unitPermissionMap.put(permission.getModuleId(), existingPermission);
             } else {
-                permissionn.setActive(permissionn.isRead() || permissionn.isWrite());
-                unitPermissionMap.put(permissionn.getModuleId(),permissionn);
+                if (!parentOrganization) {
+
+                    if (accessibleModules.contains(permission.getId()) || !permission.isModule()) {
+                        permission.setActive(permission.isRead() || permission.isWrite());
+                        unitPermissionMap.put(permission.getModuleId(), permission);
+                    } else {
+                        permission.setActive(false);
+                        permission.setRead(false);
+                        permission.setWrite(false);
+                        unitPermissionMap.put(permission.getModuleId(), permission);
+                    }
+                } else {
+                    permission.setActive(permission.isRead() || permission.isWrite());
+                    unitPermissionMap.put(permission.getModuleId(), permission);
+                }
+
             }
         }
         return unitPermissionMap;
     }
 
-    public UnitWiseStaffPermissionsDTO getPermission(Long organizationId){
+    public UnitWiseStaffPermissionsDTO getPermission(Long organizationId) {
         long currentUserId = UserContext.getUserDetails().getId();
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
-        if(permissionData.isHub()){
+        if (permissionData.isHub()) {
             Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
             List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId());
             HashMap<String, Object> unitPermissionMap = new HashMap<>();
@@ -424,10 +442,22 @@ public class UserService {
 
             List<UserPermissionQueryResult> unitWisePermissions = accessPageRepository.fetchStaffPermission(currentUserId);
             HashMap<Long, Object> unitPermission = new HashMap<>();
-            for (UserPermissionQueryResult userPermissionQueryResult: unitWisePermissions){
+
+            List<Long> unitIds = unitWisePermissions.stream()
+                    .filter(userPermissionQueryResult -> !userPermissionQueryResult.isParentOrganization())
+                    .map(u -> u.getUnitId())
+                    .collect(Collectors.toList());
+            List<UnitModuleAccess> unitModuleAccesses = unitTypeGraphRepository.getAccessibleModulesByUnits(unitIds);
+            for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
+                List<Long> accessibleModules = unitModuleAccesses.stream()
+                        .filter(unitModuleAccess -> unitModuleAccess.getUnitId().equals(userPermissionQueryResult.getUnitId()))
+                        .findAny().map(u -> u.getAccessibleModules())
+                        .orElse(new ArrayList<>());
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
-                        prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class)));
+                        prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), accessibleModules, userPermissionQueryResult.isParentOrganization()));
             }
+
+
             permissionData.setOrganizationPermissions(unitPermission);
         }
         return permissionData;
@@ -449,7 +479,7 @@ public class UserService {
         Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
 
-            List<AccessPageQueryResult> mainModulePermissions = (isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
+        List<AccessPageQueryResult> mainModulePermissions = (isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
                 accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
         Set<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
         // USER HAS NO main module permission check his permission in current unit only via parent employment id
@@ -468,7 +498,7 @@ public class UserService {
             if (isCountryAdmin) {
                 accessPageQueryResults = accessPageRepository.getTabsPermissionForHubMember();
             } else {
-                accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId,parentOrganization.getId());
+                accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId, parentOrganization.getId());
             }
             unitPermissionMap = new HashMap<>();
             unitPermissionMap.put("id", unit.getId());
@@ -629,33 +659,33 @@ public class UserService {
         return permissionList;
     }
 
-    public Boolean updateLastSelectedChildAndParentId(OrganizationSelectionDTO organizationSelectionDTO){
+    public Boolean updateLastSelectedChildAndParentId(OrganizationSelectionDTO organizationSelectionDTO) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        if(Optional.ofNullable(organizationSelectionDTO.getLastSelectedParentOrgId()).isPresent()){
+        if (Optional.ofNullable(organizationSelectionDTO.getLastSelectedParentOrgId()).isPresent()) {
             currentUser.setLastSelectedParentOrgId(organizationSelectionDTO.getLastSelectedParentOrgId());
         }
-        if(Optional.ofNullable(organizationSelectionDTO.getLastSelectedChildOrgId()).isPresent()){
+        if (Optional.ofNullable(organizationSelectionDTO.getLastSelectedChildOrgId()).isPresent()) {
             currentUser.setLastSelectedChildOrgId(organizationSelectionDTO.getLastSelectedChildOrgId());
         }
-       userGraphRepository.save(currentUser);
+        userGraphRepository.save(currentUser);
         return true;
     }
 
 
-    public boolean updateDateOfBirthOfUserByCPRNumber(){
+    public boolean updateDateOfBirthOfUserByCPRNumber() {
         List<User> users = userGraphRepository.findAll();
 
         users.stream().forEach(user -> {
             String cprNumber = user.getCprNumber();
             Date dateOfBirth = Optional.ofNullable(user.getCprNumber()).isPresent() ? CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : DateUtils.getCurrentDate();
-            user.setDateOfBirth( Optional.ofNullable(user.getCprNumber()).isPresent() ?
+            user.setDateOfBirth(Optional.ofNullable(user.getCprNumber()).isPresent() ?
                     CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
         });
         userGraphRepository.saveAll(users);
         return true;
     }
 
-    public boolean updateSelectedLanguageOfUser(Long userLanguageId){
+    public boolean updateSelectedLanguageOfUser(Long userLanguageId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(userLanguageId);
         currentUser.setUserLanguage(systemLanguage);
@@ -663,7 +693,7 @@ public class UserService {
         return true;
     }
 
-    public Long getUserSelectedLanguageId(Long userId){
+    public Long getUserSelectedLanguageId(Long userId) {
         return userGraphRepository.getUserSelectedLanguageId(userId);
     }
 }

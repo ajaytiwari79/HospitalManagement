@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.counter;
 
-import com.kairos.activity.counter.distribution.tab.KPIPosition;
-import com.kairos.activity.counter.enums.ConfLevel;
-import com.kairos.activity.enums.counter.CounterSize;
+import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -14,32 +14,23 @@ public class TabKPIConf extends MongoBaseEntity {
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
-    private CounterSize counterSize;
-    private KPIPosition kpiPosition;
+    private CounterSize size;
+    private KPIPosition position;
 
     public TabKPIConf() {
 
     }
 
-    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level) {
+    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level,KPIPosition position) {
         this.tabId = tabId;
         this.kpiId = kpiId;
         this.countryId = countryId;
         this.unitId = unitId;
         this.staffId = staffId;
         this.level = level;
+        this.position = position;
     }
 
-    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, CounterSize counterSize, KPIPosition kpiPosition) {
-        this.tabId = tabId;
-        this.kpiId = kpiId;
-        this.countryId = countryId;
-        this.unitId = unitId;
-        this.staffId = staffId;
-        this.level = level;
-        this.counterSize = counterSize;
-        this.kpiPosition = kpiPosition;
-    }
 
     public String getTabId() {
         return tabId;
@@ -90,19 +81,19 @@ public class TabKPIConf extends MongoBaseEntity {
         this.level = level;
     }
 
-    public CounterSize getCounterSize() {
-        return counterSize;
+    public CounterSize getSize() {
+        return size;
     }
 
-    public void setCounterSize(CounterSize counterSize) {
-        this.counterSize = counterSize;
+    public void setSize(CounterSize size) {
+        this.size = size;
     }
 
-    public KPIPosition getKpiPosition() {
-        return kpiPosition;
+    public KPIPosition getPosition() {
+        return position;
     }
 
-    public void setKpiPosition(KPIPosition kpiPosition) {
-        this.kpiPosition = kpiPosition;
+    public void setPosition(KPIPosition position) {
+        this.position = position;
     }
 }

@@ -2,7 +2,7 @@ package com.kairos.controller.organization_service;
 
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

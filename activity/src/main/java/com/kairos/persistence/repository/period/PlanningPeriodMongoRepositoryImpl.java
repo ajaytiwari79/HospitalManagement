@@ -1,9 +1,10 @@
 package com.kairos.persistence.repository.period;
 
-import com.kairos.activity.period.PeriodDTO;
+import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.persistence.model.period.PlanningPeriod;
-import com.kairos.util.DateUtils;
-import com.kairos.activity.period.PlanningPeriodDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
+import com.kairos.persistence.model.phase.Phase;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,10 +17,7 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -137,7 +135,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
         );
 
-        AggregationResults<com.kairos.activity.period.PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, com.kairos.activity.period.PlanningPeriodDTO.class);
+        AggregationResults<PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
         return result.getMappedResults();
     }*/
 
@@ -163,7 +161,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
         );
 
-        AggregationResults<com.kairos.activity.period.PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, com.kairos.activity.period.PlanningPeriodDTO.class);
+        AggregationResults<PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
         return result.getMappedResults();
     }
 
@@ -250,5 +248,31 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         );
         AggregationResults<PlanningPeriod> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriod.class);
         return results.getMappedResults();
+    }
+
+    @Override
+    public Phase getCurrentPhaseByDate(Long unitId, Date dateLiesInPeriod) {
+        Aggregation aggregation = newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).
+                        and("startDate").lte(dateLiesInPeriod).and("endDate").gte(dateLiesInPeriod)),
+                lookup("phases", "currentPhaseId", "_id", "phase"),
+                project("phase._id","phase.name")
+        );
+        AggregationResults<Phase> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, Phase.class);
+        return results.getMappedResults().get(0);
+    }
+
+
+    @Override
+    public List<PlanningPeriod> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates) {
+        Criteria [] criteriaList=new Criteria[localDates.size()];
+        int i=0;
+        for(LocalDate localDate:localDates){
+            criteriaList[i++]=Criteria.where("startDate").lte(localDate).and("endDate").gte(localDate);
+        }
+        Criteria criteria =Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).orOperator(criteriaList);
+        Query query=new Query(criteria);
+        List<PlanningPeriod> results = mongoTemplate.find(query, PlanningPeriod.class);
+        return results;
     }
 }

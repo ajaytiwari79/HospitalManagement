@@ -1,7 +1,7 @@
 package com.kairos.controller.skill;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.service.skill.SkillService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

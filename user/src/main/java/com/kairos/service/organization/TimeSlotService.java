@@ -12,10 +12,10 @@ import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRep
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotRelationshipGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotSetRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.time_slot.TimeSlotDTO;
-import com.kairos.user.country.time_slot.TimeSlotSetDTO;
-import com.kairos.util.DateUtil;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
+import com.kairos.utils.DateUtil;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -464,7 +464,7 @@ public class TimeSlotService {
     public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(Organization organization) {
         List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(organization.getId(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
-        List<TimeSlotDTO> timeSlotDTOS = ObjectMapperUtils.copyProperties(timeSlotWrappers, TimeSlotDTO.class);
+        List<TimeSlotDTO> timeSlotDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, TimeSlotDTO.class);
         return timeSlotDTOS;
     }
 

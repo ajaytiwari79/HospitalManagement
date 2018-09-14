@@ -1,8 +1,8 @@
 package com.planner.service.shift_planning;
 
-import com.kairos.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
-import com.kairos.activity.staffing_level.StaffingLevelActivity;
-import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.dto.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
+import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -41,7 +41,7 @@ public class StaffingLevelService {
      * @param map
      * @return
      */
-    Map<LocalDate,Set<StaffingLevelActivity>> getStaffingLevelActivityByDay( Map<LocalDate,List<StaffingLevelTimeSlotDTO>> map)
+    Map<LocalDate,Set<StaffingLevelActivity>> getStaffingLevelActivityByDay(Map<LocalDate,List<StaffingLevelTimeSlotDTO>> map)
     {
 
         Map<LocalDate,Set<StaffingLevelActivity>> map1=new HashMap<>();

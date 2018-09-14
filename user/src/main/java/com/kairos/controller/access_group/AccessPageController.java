@@ -5,9 +5,9 @@ import com.kairos.persistence.model.access_permission.Tab;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.persistence.model.access_permission.AccessPageLanguageDTO;
 import com.kairos.service.auth.UserService;
-import com.kairos.user.access_page.OrgCategoryTabAccessDTO;
-import com.kairos.user.access_permission.AccessPageStatusDTO;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
+import com.kairos.dto.user.access_permission.AccessPageStatusDTO;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,9 +18,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 /**
  * Created by prabjot on 3/1/17.
@@ -83,6 +81,16 @@ public class AccessPageController {
     public ResponseEntity<Map<String,Object>> setPermissionsToPage(){
         accessPageService.setPermissionToAccessPage();
         return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
+    }
+
+    @GetMapping(value = COUNTRY_URL+"/kpi_details")
+    public ResponseEntity<Map<String, Object>> getKPITabsDataForModuleForCountry(@PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getKPIAccessPageListForCountry(countryId));
+    }
+
+    @GetMapping(value = UNIT_URL+"/kpi_details")
+    public ResponseEntity<Map<String, Object>> getKPITabsDataForModuleForUnit(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessPageService.getKPIAccessPageListForUnit(unitId));
     }
 
     @GetMapping(value = "/module/{moduleId}/kpi_details")

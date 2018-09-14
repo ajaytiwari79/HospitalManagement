@@ -3,8 +3,8 @@ package com.kairos.response.dto.data_inventory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.gdpr.ManagingOrganization;
-import com.kairos.gdpr.Staff;
+import com.kairos.dto.gdpr.ManagingOrganization;
+import com.kairos.dto.gdpr.Staff;
 import com.kairos.response.dto.common.*;
 
 import java.math.BigInteger;

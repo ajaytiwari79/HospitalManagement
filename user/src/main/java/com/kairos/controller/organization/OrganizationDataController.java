@@ -2,10 +2,10 @@ package com.kairos.controller.organization;
 
 import com.kairos.service.organization.CompanyCreationService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.user.organization.OrganizationBasicDTO;
-import com.kairos.user.organization.UnitManagerDTO;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.dto.user.organization.AddressDTO;
+import com.kairos.dto.user.organization.OrganizationBasicDTO;
+import com.kairos.dto.user.organization.UnitManagerDTO;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,6 @@ import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by vipul on 27/9/17.
@@ -54,7 +53,7 @@ public class OrganizationDataController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> publishOrganization(@PathVariable Long countryId,@PathVariable long organizationId) throws InterruptedException, ExecutionException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                companyCreationService.publishOrganization(countryId,organizationId));
+                companyCreationService.onBoardOrganization(countryId,organizationId));
     }
 
     @ApiOperation(value = "get basic details  of parent organization")
@@ -78,7 +77,7 @@ public class OrganizationDataController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setUserInfoInOrganization(@Validated @RequestBody UnitManagerDTO unitManagerDTO, @PathVariable long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                companyCreationService.setUserInfoInOrganization(organizationId, null, unitManagerDTO,false));
+                companyCreationService.setUserInfoInOrganization(organizationId, null, unitManagerDTO,false,true));
     }
 
     @ApiOperation(value = "get address of parent organization")

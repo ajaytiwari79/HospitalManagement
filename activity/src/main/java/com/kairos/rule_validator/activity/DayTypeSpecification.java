@@ -1,86 +1,48 @@
 package com.kairos.rule_validator.activity;
 
 import com.kairos.enums.Day;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.day_type.DayType;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.ShiftValidatorService;
+import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.DayOfWeek;
 import java.util.*;
-
-import static com.kairos.enums.Day.*;
 
 /**
  * Created by oodles on 30/11/17.
  */
-public class DayTypeSpecification extends AbstractSpecification<Activity> {
+public class DayTypeSpecification extends AbstractSpecification<ShiftWithActivityDTO> {
 
 
-    private List<DayType> dayTypes;
+    private Set<DayOfWeek> validDays;
     private Set<Day> days = new HashSet<>();
     private Date shiftStartDateTime;
     @Autowired
     private ExceptionService exceptionService;
 
-    public DayTypeSpecification(List<DayType> dayTypes, Date shiftStartDateTime) {
-        this.dayTypes = dayTypes;
+    public DayTypeSpecification(Set<DayOfWeek> validDays, Date shiftStartDateTime) {
+        this.validDays = validDays;
         this.shiftStartDateTime = shiftStartDateTime;
     }
 
     @Override
-    public boolean isSatisfied(Activity activity) {
-        for (DayType dayType : dayTypes) {
-            days.addAll(dayType.getValidDays());
-        }
-        if (this.days.contains(EVERYDAY)) {
-            return true;
-        } else if (this.days.contains(getDay(shiftStartDateTime))) {
-            return true;
-        } else {
-            exceptionService.invalidRequestException("message.activity.day.create");
-        }
-        return true;
+    public boolean isSatisfied(ShiftWithActivityDTO shift) {
+        return validDays.contains(DateUtils.asLocalDate(shiftStartDateTime).getDayOfWeek());
     }
 
     @Override
-    public List<String> isSatisfiedString(Activity activity) {
+    public void validateRules(ShiftWithActivityDTO shift) {
+        if(!validDays.contains(DateUtils.asLocalDate(shiftStartDateTime).getDayOfWeek())){
+            ShiftValidatorService.throwException("message.activity.dayType");
+        }
+    }
+
+    @Override
+    public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
         return Collections.emptyList();
     }
 
-    private Day getDay(Date activityDate) {
-
-        Calendar c = Calendar.getInstance();
-        c.setTime(activityDate);
-        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-        Day activityDay = null;
-        switch (dayOfWeek) {
-            case 1:
-                activityDay = SUNDAY;
-                break;
-            case 2:
-                activityDay = MONDAY;
-                break;
-            case 3:
-                activityDay = TUESDAY;
-                break;
-            case 4:
-                activityDay = WEDNESDAY;
-                break;
-            case 5:
-                activityDay = THURSDAY;
-                break;
-            case 6:
-                activityDay = FRIDAY;
-                break;
-            case 7:
-                activityDay = SATURDAY;
-                break;
-            default:
-                exceptionService.internalError("error.day.invalid");
-
-        }
-        return activityDay;
-
-    }
 }

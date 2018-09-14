@@ -1,7 +1,7 @@
 package com.kairos.controller.control_panel;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.service.control_panel.ControlPanelService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

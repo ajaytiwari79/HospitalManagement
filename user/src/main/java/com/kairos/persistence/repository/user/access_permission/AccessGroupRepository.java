@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.access_permission;
 
 import com.kairos.persistence.model.access_permission.*;
+import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
@@ -284,6 +285,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "match (staff)-[:"+BELONGS_TO+"]-(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(org) with up,country  " +
             "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag) RETURN Collect(DISTINCT id(ag)) as accessGroupIds ,id(country) as countryId")
     StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long staffId, Long unitId);
+
 }
 
 

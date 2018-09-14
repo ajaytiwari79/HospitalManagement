@@ -1,6 +1,6 @@
 package com.kairos.service.country;
 
-import com.kairos.activity.shift.FunctionDTO;
+import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;

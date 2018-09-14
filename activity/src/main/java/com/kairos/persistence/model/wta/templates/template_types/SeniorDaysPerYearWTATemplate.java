@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.wta.templates.template_types;
 
-import com.kairos.enums.WTATemplateType;
-import com.kairos.activity.wta.AgeRange;
+import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
@@ -52,8 +52,8 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
     }
 
     @Override
-    public String isSatisfied(RuleTemplateSpecificInfo infoWrapper) {
-        return "";
+    public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
+
     }
 
     public SeniorDaysPerYearWTATemplate(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<BigInteger> activityIds,

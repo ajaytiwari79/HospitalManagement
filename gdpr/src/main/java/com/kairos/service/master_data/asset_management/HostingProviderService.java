@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.HostingProviderDTO;
+import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
 import com.kairos.persistance.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
@@ -60,11 +60,8 @@ public class HostingProviderService extends MongoBaseService {
             if (!hostingProviderNames.isEmpty()) {
                 for (String name : hostingProviderNames) {
 
-                    HostingProvider newHostingProvider = new HostingProvider();
-                    newHostingProvider.setName(name);
-                    newHostingProvider.setCountryId(countryId);
+                    HostingProvider newHostingProvider = new HostingProvider(name, countryId, SuggestedDataStatus.APPROVED);
                     newHostingProviders.add(newHostingProvider);
-
                 }
 
                 newHostingProviders = hostingProviderMongoRepository.saveAll(getNextSequence(newHostingProviders));
@@ -140,7 +137,7 @@ public class HostingProviderService extends MongoBaseService {
         }
         hostingProvider = hostingProviderMongoRepository.findByid(id);
         if (!Optional.ofNullable(hostingProvider).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","Hosting Provider",id);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Provider", id);
         }
         hostingProvider.setName(hostingProviderDTO.getName());
         hostingProviderMongoRepository.save(hostingProvider);
@@ -171,12 +168,11 @@ public class HostingProviderService extends MongoBaseService {
     }
 
 
-
     /**
-     * @description method save Hosting provider suggested by unit
      * @param countryId
      * @param hostingProviderDTOS
      * @return
+     * @description method save Hosting provider suggested by unit
      */
     public List<HostingProvider> saveSuggestedHostingProvidersFromUnit(Long countryId, List<HostingProviderDTO> hostingProviderDTOS) {
 
@@ -192,7 +188,7 @@ public class HostingProviderService extends MongoBaseService {
 
                 HostingProvider hostingProvider = new HostingProvider(name);
                 hostingProvider.setCountryId(countryId);
-                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.APPROVAL_PENDING);
+                hostingProvider.setSuggestedDataStatus(SuggestedDataStatus.PENDING);
                 hostingProvider.setSuggestedDate(LocalDate.now());
                 hostingProviderList.add(hostingProvider);
             }
@@ -205,13 +201,13 @@ public class HostingProviderService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param hostingPrividerIds   - ids of hosting providers
+     * @param hostingProviderIds  - ids of hosting providers
      * @param suggestedDataStatus - status to update
      * @return
      */
-    public List<HostingProvider> updateSuggestedStatusOfHostingProviders(Long countryId, Set<BigInteger> hostingPrividerIds, SuggestedDataStatus suggestedDataStatus) {
+    public List<HostingProvider> updateSuggestedStatusOfHostingProviders(Long countryId, Set<BigInteger> hostingProviderIds, SuggestedDataStatus suggestedDataStatus) {
 
-        List<HostingProvider> hostingProviderList = hostingProviderMongoRepository.getHostingProviderListByIds(countryId, hostingPrividerIds);
+        List<HostingProvider> hostingProviderList = hostingProviderMongoRepository.getHostingProviderListByIds(countryId, hostingProviderIds);
         hostingProviderList.forEach(hostingProvider -> hostingProvider.setSuggestedDataStatus(suggestedDataStatus));
         hostingProviderMongoRepository.saveAll(getNextSequence(hostingProviderList));
         return hostingProviderList;

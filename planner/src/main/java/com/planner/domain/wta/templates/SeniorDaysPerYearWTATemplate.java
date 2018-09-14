@@ -1,7 +1,7 @@
 package com.planner.domain.wta.templates;
 
-import com.kairos.activity.wta.AgeRange;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.dto.activity.wta.AgeRange;
+import com.kairos.enums.wta.WTATemplateType;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by pavan on 24/4/18.
  */
-public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
+public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds;
     private LocalDate validationStartDate;

@@ -1,6 +1,6 @@
 package com.kairos.shiftplanning.domain.wta.updated_wta;
 
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.WTATemplateType;
 
 public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
 
@@ -58,7 +58,7 @@ public class EmployeesWithIncreasedRiskWTATemplate extends WTABaseRuleTemplate{
     }
 
     public EmployeesWithIncreasedRiskWTATemplate() {
-        wtaTemplateType=WTATemplateType.EMPLOYEES_WITH_INCREASE_RISK;
+        wtaTemplateType= WTATemplateType.EMPLOYEES_WITH_INCREASE_RISK;
     }
 
 

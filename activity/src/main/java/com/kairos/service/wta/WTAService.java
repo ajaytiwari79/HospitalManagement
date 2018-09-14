@@ -1,16 +1,15 @@
 package com.kairos.service.wta;
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.cta.CTAWTAWrapper;
-import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
-import com.kairos.activity.wta.basic_details.WTADTO;
-import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.activity.wta.version.WTATableSettingWrapper;
-import com.kairos.activity.wta.version.WTAVersionDTO;
-import com.kairos.client.dto.TableConfiguration;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.cta.CTAWTAWrapper;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
+import com.kairos.dto.activity.wta.basic_details.WTADTO;
+import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
+import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.persistence.model.wta.*;
@@ -31,8 +30,9 @@ import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.solver_config.SolverConfigService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +41,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
-import static javax.management.timer.Timer.ONE_DAY;
 
 
 /**
@@ -111,11 +111,14 @@ public class WTAService extends MongoBaseService {
         wta = new WorkingTimeAgreement();
         // Link tags to WTA
         Date startDate = (wtaDTO.getStartDateMillis() == 0) ? DateUtils.getCurrentDate() : new Date(wtaDTO.getStartDateMillis());
+        startDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(startDate).truncatedTo(ChronoUnit.DAYS));
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {
             if (startDate.getTime() > wtaDTO.getEndDateMillis()) {
                 exceptionService.invalidRequestException("message.wta.start-end-date");
             }
-            wta.setEndDate(new Date(wtaDTO.getEndDateMillis()));
+            Date endDate = new Date(wtaDTO.getEndDateMillis());
+            endDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(endDate).truncatedTo(ChronoUnit.DAYS));
+            wta.setEndDate(endDate);
         }
         WTABasicDetailsDTO wtaBasicDetailsDTO = wtaDetailRestClient.getWtaRelatedInfo(wtaDTO.getExpertiseId(), wtaDTO.getOrganizationSubType(), countryId, 0l, wtaDTO.getOrganizationType());
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getCountryDTO()).isPresent()) {
@@ -450,20 +453,25 @@ public class WTAService extends MongoBaseService {
 
     private WTAResponseDTO assignWTATOUnitPosition(Long unitPositionId,BigInteger wtaId){
         WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wtaId);
-        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
-        if (!Optional.ofNullable(wtaResponseDTO).isPresent()) {
+        if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
             exceptionService.duplicateDataException("message.wta.id", wtaId);
         }
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
         WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-        if (wtaResponseDTO.getRuleTemplates().size() > 0) {
+        if (CollectionUtils.isNotEmpty(wtaResponseDTO.getRuleTemplates())) {
             ruleTemplates = wtaBuilderService.copyRuleTemplates(wtaResponseDTO.getRuleTemplates(), true);
             save(ruleTemplates);
             List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
             workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
         }
         workingTimeAgreement.setUnitPositionId(unitPositionId);
-        workingTimeAgreement.setStartDate(new Date());
+        Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(wtaQueryResultDTO.getStartDate()).truncatedTo(ChronoUnit.DAYS));
+        if(wtaQueryResultDTO.getEndDate()!=null){
+            Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(wtaQueryResultDTO.getEndDate()).truncatedTo(ChronoUnit.DAYS));
+            workingTimeAgreement.setEndDate(endDate);
+        }
+        workingTimeAgreement.setStartDate(startDate);
         workingTimeAgreement.setId(null);
         workingTimeAgreement.setOrganization(null);
         workingTimeAgreement.setOrganizationParentWTA(wtaResponseDTO.getId());

@@ -1,15 +1,15 @@
 package com.kairos.controller.shift;
 
-import com.kairos.activity.shift.CopyShiftDTO;
-import com.kairos.activity.shift.ShiftDTO;
-import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.activity.shift.CopyShiftDTO;
-import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.dto.activity.shift.CopyShiftDTO;
+import com.kairos.dto.activity.shift.ShiftPublishDTO;
 import com.kairos.service.shift.ShiftSickService;
-import com.kairos.util.DateUtils;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.service.shift.ShiftTemplateService;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,8 +21,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +42,7 @@ public class ShiftController {
 
     @Inject
     private ShiftSickService shiftSickService;
+    @Inject private ShiftTemplateService shiftTemplateService;
 
     @Inject
     private ActivityService activityService;
@@ -63,12 +62,21 @@ public class ShiftController {
                                                                  @RequestParam(value = "unitPositionId", required = false) Long unitPositionId,
                                                                  @RequestParam("type") String type,
                                                                  @RequestParam(value = "week", required = false) Long week,
-                                                                 @RequestParam(value = "startDate", required = false) String startDate,
-                                                                 @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
+                                                                 @RequestParam(value = "startDate", required = false)
+                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate,
+                                                                 @RequestParam(value = "endDate", required = false)
+                                                                     @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) throws ParseException {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, week, unitPositionId, type));
     }
 
+
+    @ApiOperation("save Shift after validation")
+    @PostMapping(value = "/shift/validated")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation(@PathVariable Long organizationId, @PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, type));
+    }
 
     @ApiOperation("update a Shift of a staff")
     @PutMapping(value = "/shift")
@@ -132,7 +140,6 @@ public class ShiftController {
 
     @ApiOperation("copy shifts from 1 employee to others")
     @PutMapping(value = "/copy_shifts")
-    //
     public ResponseEntity<Map<String, Object>> copyShifts(@PathVariable long unitId,@RequestBody @Valid CopyShiftDTO copyShiftDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.copyShifts(unitId, copyShiftDTO));
     }
@@ -151,7 +158,7 @@ public class ShiftController {
     @PostMapping(value = "shift/from_shift_template")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createShiftUsingTemplate(@PathVariable Long unitId, @RequestBody ShiftDTO shiftDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShiftUsingTemplate(unitId,shiftDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftTemplateService.createShiftUsingTemplate(unitId,shiftDTO));
     }
     @ApiOperation("delete shifts and update openshifts")
     @PutMapping(value = "/staff/{staffId}/shifts_and_openshifts")

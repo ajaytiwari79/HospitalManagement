@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.common;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 
 import java.util.Date;
 

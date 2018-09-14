@@ -5,7 +5,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.AssetAttributeName;
 import com.kairos.enums.ProcessingActivityAttributeName;
-import com.kairos.gdpr.master_data.MasterQuestionnaireTemplateDTO;
+import com.kairos.dto.gdpr.master_data.MasterQuestionnaireTemplateDTO;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireTemplate;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
@@ -106,7 +106,7 @@ public class MasterQuestionnaireTemplateService extends MongoBaseService {
             case ASSET_TYPE:
                 if (assetTypeId == null) {
                     exceptionService.invalidRequestException("message.invalid.request", "asset type is null");
-                } else if (assetTypeMongoRepository.findByIdAndNonDeleted(UserContext.getCountryId(), assetTypeId) != null) {
+                } else if (assetTypeMongoRepository.findByIdAndCountryId(UserContext.getCountryId(), assetTypeId) != null) {
                     questionnaireTemplate.setTemplateType(templateType);
                     questionnaireTemplate.setAssetType(assetTypeId);
                 } else {

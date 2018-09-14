@@ -2,7 +2,7 @@ package com.kairos.rule_validator.activity;
 
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.user.staff.StaffDTO;
+import com.kairos.dto.user.staff.StaffDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +19,11 @@ public class StaffEmploymentTypeSpecification extends AbstractSpecification<Staf
     @Override
     public boolean isSatisfied(StaffDTO staffDTO) {
         return false;
+    }
+
+    @Override
+    public void validateRules(StaffDTO staffDTO) {
+
     }
 
     @Override

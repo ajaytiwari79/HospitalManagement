@@ -1,7 +1,7 @@
 package com.kairos.service.agreement_template;
 
 
-import com.kairos.gdpr.PolicyAgreementTemplateDTO;
+import com.kairos.dto.gdpr.PolicyAgreementTemplateDTO;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
@@ -77,7 +77,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @return
      */
     public List<PolicyAgreementTemplateResponseDTO> getAllPolicyAgreementTemplateWithAgreementSectionAndClauses(Long countryId, Long organizationId) {
-        return policyAgreementTemplateRepository.getAllPolicyAgreementTemplateByCountryId(countryId, organizationId);
+       List<PolicyAgreementTemplateResponseDTO>  policyAgreementTemplateResponseDTOS= policyAgreementTemplateRepository.getAllPolicyAgreementTemplateByCountryId(countryId, organizationId);
+        policyAgreementTemplateResponseDTOS.forEach(policyAgreementTemplateResponseDTO -> policyAgreementTemplateResponseDTO.setSections(new ArrayList<>()));
+        return policyAgreementTemplateResponseDTOS;
     }
 
 

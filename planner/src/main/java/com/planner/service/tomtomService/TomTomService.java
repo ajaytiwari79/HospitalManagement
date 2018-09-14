@@ -1,15 +1,13 @@
 package com.planner.service.tomtomService;
 
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.ObjectUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.planner.vrp.taskplanning.model.LocationPair;
 import com.kairos.planner.vrp.taskplanning.model.Task;
 import com.kairos.planner.vrp.taskplanning.routes.Route;
 import com.kairos.planner.vrp.taskplanning.routes.RouteInfo;
-import com.kairos.planner.vrp.taskplanning.solver.VrpTaskPlanningSolver;
 import com.planner.domain.location.LocationDistance;
 import com.planner.domain.tomtomResponse.AtoBRoute;
 import com.planner.domain.tomtomResponse.Matrix;
@@ -43,8 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;

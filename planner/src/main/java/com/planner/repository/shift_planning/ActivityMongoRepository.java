@@ -1,12 +1,9 @@
 package com.planner.repository.shift_planning;
 
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
-import com.kairos.shiftplanning.domain.ShiftRequestPhase;
-import com.kairos.shiftplanning.domain.cta.CTARuleTemplate;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
 import com.planner.domain.shift_planning.Shift;
-
 import com.planner.responseDto.PlanningDto.shiftPlanningDto.ActivityDTO;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,7 +13,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +20,6 @@ import java.util.Set;
 import static com.planner.constants.AppConstants.*;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
 /**
  * Here data comes from Activity Micro-service
@@ -69,7 +64,7 @@ public class ActivityMongoRepository {
      * @param unitPositionIds
      * @return
      */
-    public List<CTAResponseDTO> getCTARuleTemplateByUnitPositionIds(List<Long> unitPositionIds,Date fromPlanningDate,Date toPlanningDate) {
+    public List<CTAResponseDTO> getCTARuleTemplateByUnitPositionIds(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate) {
        Criteria endDateCriteria1=Criteria.where("endDate").exists(false);
        Criteria endDateCriteria2=Criteria.where("endDate").gte(fromPlanningDate);
        Aggregation aggregation = Aggregation.newAggregation(

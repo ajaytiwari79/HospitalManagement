@@ -1,19 +1,22 @@
 package com.kairos.service.organization;
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.activity.activity.activity_tabs.GeneralActivityTabDTO;
-import com.kairos.activity.activity.activity_tabs.PermissionsActivityTabDTO;
-import com.kairos.activity.counter.CounterDTO;
-import com.kairos.activity.enums.counter.ModuleType;
-import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
-import com.kairos.activity.phase.PhaseDTO;
-import com.kairos.activity.presence_type.PresenceTypeDTO;
-import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
-import com.kairos.activity.shift.ShiftDTO;
-import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
-import com.kairos.activity.unit_settings.UnitSettingDTO;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
+import com.kairos.dto.activity.activity.activity_tabs.GeneralActivityTabDTO;
+import com.kairos.dto.activity.activity.activity_tabs.PermissionsActivityTabDTO;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
+import com.kairos.dto.activity.counter.enums.ModuleType;
+import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
+import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.Activity;
@@ -21,11 +24,13 @@ import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.open_shift.OrderAndActivityDTO;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
@@ -41,16 +46,15 @@ import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
-import com.kairos.service.staff_settings.StaffActivitySettingService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.service.unit_settings.PhaseSettingsService;
 import com.kairos.service.unit_settings.TimeAttendanceGracePeriodService;
 import com.kairos.service.unit_settings.UnitSettingService;
 import com.kairos.service.user_service_data.UnitDataService;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
-import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithSelectedDTO;
@@ -65,8 +69,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.*;
-
-import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
  * Created by vipul on 5/12/17.
@@ -119,8 +121,11 @@ public class OrganizationActivityService extends MongoBaseService {
     private TimeAttendanceGracePeriodService timeAttendanceGracePeriodService;
     @Inject
     private PriorityGroupService priorityGroupService;
-    @Inject private CounterRepository counterRepository;
-    @Inject private StaffActivitySettingRepository staffActivitySettingRepository;
+    @Inject
+    private CounterRepository counterRepository;
+    @Inject
+    private StaffActivitySettingRepository staffActivitySettingRepository;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -277,7 +282,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper getRulesTabOfActivity(BigInteger activityId, Long unitId) {
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = genericIntegrationService.getDayTypesAndEmploymentTypesAtUnit(unitId);
-        List<DayType> dayTypes = ObjectMapperUtils.copyProperties(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
+        List<DayType> dayTypes = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
         Activity activity = activityMongoRepository.findOne(activityId);
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes, dayTypeEmploymentTypeWrapper.getEmploymentTypes());
@@ -311,7 +316,7 @@ public class OrganizationActivityService extends MongoBaseService {
         save(activityCopied);
 
         // copying activity and shift status settings of this activity
-        activityService.copyActivityAndShiftStatusOfThisActivity(activityId,activityCopied.getId());
+        activityService.copyActivityAndShiftStatusOfThisActivity(activityId, activityCopied.getId());
         activityDTO.setId(activityCopied.getId());
         PermissionsActivityTabDTO permissionsActivityTabDTO = new PermissionsActivityTabDTO();
         BeanUtils.copyProperties(activityCopied.getPermissionsActivityTab(), permissionsActivityTabDTO);
@@ -333,15 +338,15 @@ public class OrganizationActivityService extends MongoBaseService {
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
         UnitSettingDTO minOpenShiftHours = unitSettingRepository.getMinOpenShiftHours(unitId);
-        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
+        List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
 
         ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals,
-                minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours(),counters);
+                minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours(), counters);
         return activityWithTimeTypeDTO;
     }
 
     public boolean createDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
-        logger.info("I am going to create default data or organization "+unitId);
+        logger.info("I am going to create default data or organization " + unitId);
         //unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
         List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
         periodSettingsService.createDefaultPeriodSettings(unitId);
@@ -351,11 +356,16 @@ public class OrganizationActivityService extends MongoBaseService {
         TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
         timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
-        List<Activity>  existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubType(orgTypeAndSubTypeDTO.getOrganizationTypeId(),orgTypeAndSubTypeDTO.getSubTypeId());
-        if(!existingActivities.isEmpty()) {
+        List<Activity> existingActivities;
+        if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
+            existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubType(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
+        } else {
+            existingActivities = activityMongoRepository.findAllByUnitIdAndDeletedFalse(orgTypeAndSubTypeDTO.getParentOrganizationId());
+        }
+        if (!existingActivities.isEmpty()) {
             List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
             for (Activity activity : existingActivities) {
-                logger.info("I am act %s",activity.getName());
+                logger.info("I am act {}", activity.getName());
                 List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
                 for (int i = 0; i < phases.size(); i++) {
                     PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phases.get(i).getId(), phases.get(i).getName(), phases.get(i).getDescription(), activity.getRulesActivityTab().getEligibleForSchedules().get(i).getEligibleEmploymentTypes(),
@@ -372,47 +382,54 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     /**
-     * @Auther Pavan
      * @param staffId
      * @param shiftDTO
+     * @Auther Pavan
      */
-    public void validateShiftTime(Long staffId, ShiftDTO shiftDTO,RulesActivityTab rulesActivityTab){
-              LocalTime earliestStartTime;
-              LocalTime latestStartTime;
-              LocalTime maximumEndTime;
-              int longestTime;
-              int shortestTime;
-              StaffActivitySetting staffActivitySetting=staffActivitySettingRepository.findByStaffIdAndActivityIdAndDeletedFalse(staffId,shiftDTO.getActivityId());
-              if(staffActivitySetting!=null){
-                  earliestStartTime=staffActivitySetting.getEarliestStartTime();
-                  latestStartTime=staffActivitySetting.getLatestStartTime();
-                  maximumEndTime=staffActivitySetting.getMaximumEndTime();
-                  longestTime=staffActivitySetting.getLongestTime();
-                  shortestTime=staffActivitySetting.getShortestTime();
-              }
-              else {
-                  earliestStartTime=rulesActivityTab.getEarliestStartTime();
-                  latestStartTime=rulesActivityTab.getLatestStartTime();
-                  maximumEndTime=rulesActivityTab.getMaximumEndTime();
-                  longestTime=rulesActivityTab.getLongestTime();
-                  shortestTime=rulesActivityTab.getShortestTime();
-              }
+    public void validateShiftTime(Long staffId, ShiftDTO shiftDTO, RulesActivityTab rulesActivityTab) {
+        if (shiftDTO.getActivities().get(0).getStartDate().after(shiftDTO.getActivities().get(0).getEndDate())) {
+            exceptionService.invalidRequestException("message.date.startandend");
+        }
+        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByUnitPosition(shiftDTO.getUnitPositionId(), shiftDTO.getStartDate(), shiftDTO.getEndDate());
+        if (!shifts.isEmpty()) {
+            exceptionService.duplicateDataException("message.shift.date.startandend", shiftDTO.getStartDate(), shiftDTO.getEndDate());
+        }
+        LocalTime earliestStartTime;
+        LocalTime latestStartTime;
+        LocalTime maximumEndTime;
+        Short longestTime;
+        Short shortestTime;
+        StaffActivitySetting staffActivitySetting = staffActivitySettingRepository.findByStaffIdAndActivityIdAndDeletedFalse(staffId, shiftDTO.getActivities().get(0).getActivityId());
+        if (staffActivitySetting != null) {
+            earliestStartTime = staffActivitySetting.getEarliestStartTime();
+            latestStartTime = staffActivitySetting.getLatestStartTime();
+            maximumEndTime = staffActivitySetting.getMaximumEndTime();
+            longestTime = staffActivitySetting.getLongestTime();
+            shortestTime = staffActivitySetting.getShortestTime();
+        } else {
+            earliestStartTime = rulesActivityTab.getEarliestStartTime();
+            latestStartTime = rulesActivityTab.getLatestStartTime();
+            maximumEndTime = rulesActivityTab.getMaximumEndTime();
+            longestTime = rulesActivityTab.getLongestTime();
+            shortestTime = rulesActivityTab.getShortestTime();
+        }
 
-              if(earliestStartTime!=null && earliestStartTime.isAfter(shiftDTO.getStartTime())){
-                  exceptionService.actionNotPermittedException("error.start_time.greater_than.earliest_time");
-              }
-              if(latestStartTime!=null && latestStartTime.isBefore(shiftDTO.getStartTime())){
-                  exceptionService.actionNotPermittedException("error.start_time.less_than.latest_time");
-              }
-              if(maximumEndTime!=null && maximumEndTime.isBefore(shiftDTO.getEndTime())){
-                  exceptionService.actionNotPermittedException("error.end_time.less_than.maximum_end_time");
-              }
-              if(longestTime< (shiftDTO.getEndDate().getTime() - shiftDTO.getStartDate().getTime()) / ONE_MINUTE){
-                  exceptionService.actionNotPermittedException("error.shift.duration_exceeds_longest_time");
-              }
-              if(shortestTime > (shiftDTO.getEndDate().getTime() - shiftDTO.getStartDate().getTime()) / ONE_MINUTE){
-                  exceptionService.actionNotPermittedException("error.shift.duration.less_than.shortest_time");
-              }
+        if (earliestStartTime != null && earliestStartTime.isAfter(DateUtils.asLocalTime(shiftDTO.getActivities().get(0).getStartDate()))) {
+            exceptionService.actionNotPermittedException("error.start_time.greater_than.earliest_time");
+        }
+        if (latestStartTime != null && latestStartTime.isBefore(DateUtils.asLocalTime(shiftDTO.getActivities().get(0).getStartDate()))) {
+            exceptionService.actionNotPermittedException("error.start_time.less_than.latest_time");
+        }
+        if (maximumEndTime != null && maximumEndTime.isBefore(DateUtils.asLocalTime(shiftDTO.getActivities().get(0).getEndDate()))) {
+            exceptionService.actionNotPermittedException("error.end_time.less_than.maximum_end_time");
+        }
+        long shiftMinutes = new DateTimeInterval(shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate()).getMinutes();
+        if (longestTime < shiftMinutes) {
+            exceptionService.actionNotPermittedException("error.shift.duration_exceeds_longest_time");
+        }
+        if (shortestTime > shiftMinutes) {
+            exceptionService.actionNotPermittedException("error.shift.duration.less_than.shortest_time");
+        }
     }
 
 }

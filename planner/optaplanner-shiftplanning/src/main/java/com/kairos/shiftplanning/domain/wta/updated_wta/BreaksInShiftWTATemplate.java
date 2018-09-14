@@ -2,7 +2,7 @@ package com.kairos.shiftplanning.domain.wta.updated_wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.wta.templates.BreakTemplateValue;
+import com.kairos.dto.activity.wta.templates.BreakTemplateValue;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

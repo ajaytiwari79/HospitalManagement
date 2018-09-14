@@ -1,7 +1,7 @@
 package com.kairos.service.integration;
 
-import com.kairos.activity.activity.activity_tabs.ActivityNoTabsDTO;
-import com.kairos.activity.staffing_level.StaffingLevelPlanningDTO;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityNoTabsDTO;
+import com.kairos.dto.activity.staffing_level.StaffingLevelPlanningDTO;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.planner.PlannerRestClient;
 import com.kairos.enums.IntegrationOperation;

@@ -1,14 +1,14 @@
 package com.kairos.rule_validator.activity;
 
 
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.rule_validator.AbstractSpecification;
-import com.kairos.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.utils.ShiftValidatorService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -16,10 +16,10 @@ import java.util.Optional;
 public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWithActivityDTO> {
 
     private Phase phase;
-    private Activity activity;
+    private ActivityDTO activity;
     private StaffAdditionalInfoDTO staffAdditionalInfoDTO;
 
-    public StaffEmploymentSpecification(Phase phase, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public StaffEmploymentSpecification(Phase phase, ActivityDTO activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         this.phase = phase;
         this.activity = activity;
         this.staffAdditionalInfoDTO = staffAdditionalInfoDTO;
@@ -47,23 +47,28 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
     }
 
     @Override
-    public List<String> isSatisfiedString(ShiftWithActivityDTO shiftWithActivityDTO) {
+    public void validateRules(ShiftWithActivityDTO shift) {
         List<PhaseTemplateValue> phaseTemplateValues = activity.getRulesActivityTab().getEligibleForSchedules();
-            PhaseTemplateValue phaseTemplateValue1 = null;
-            for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-                if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
-                    phaseTemplateValue1 = phaseTemplateValue;
-                    break;
-                }
+        PhaseTemplateValue phaseTemplateValue1 = null;
+        for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
+            if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
+                phaseTemplateValue1 = phaseTemplateValue;
+                break;
             }
-            if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
-                if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && !phaseTemplateValue1.isEligibleForManagement()){
-                    return Arrays.asList("message.management.authority.phase");
-                }
-                if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
-                    return Arrays.asList("message.staff.employmentType.absent");
-                }
+        }
+        if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
+            if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && !phaseTemplateValue1.isEligibleForManagement()){
+                ShiftValidatorService.throwException("message.management.authority.phase");
             }
+            if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType().getId())) {
+                ShiftValidatorService.throwException("message.staff.employmentType.absent");
+            }
+        }
+    }
+
+    @Override
+    public List<String> isSatisfiedString(ShiftWithActivityDTO shiftWithActivityDTO) {
+
 
         return Collections.emptyList();
     }

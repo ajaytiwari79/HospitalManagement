@@ -4,13 +4,13 @@ package com.kairos.service.shift;
  *
  */
 
-import com.kairos.activity.shift.ActivityShiftStatusSettingsDTO;
-import com.kairos.activity.shift.ActivityAndShiftStatusWrapper;
+import com.kairos.dto.activity.shift.ActivityShiftStatusSettingsDTO;
+import com.kairos.dto.activity.shift.ActivityAndShiftStatusWrapper;
 import com.kairos.persistence.model.shift.ActivityShiftStatusSettings;
 import com.kairos.persistence.repository.shift.ActivityShiftStatusSettingsRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
