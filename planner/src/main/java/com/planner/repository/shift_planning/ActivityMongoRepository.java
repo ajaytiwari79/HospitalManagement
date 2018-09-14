@@ -4,8 +4,9 @@ import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
 import com.kairos.shiftplanning.domain.ShiftRequestPhase;
 import com.kairos.shiftplanning.domain.cta.CTARuleTemplate;
+import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
 import com.planner.domain.shift_planning.Shift;
-import com.planner.domain.wta.templates.WorkingTimeAgreement;
+
 import com.planner.responseDto.PlanningDto.shiftPlanningDto.ActivityDTO;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -84,7 +85,7 @@ public class ActivityMongoRepository {
      * @param unitPositionIds
      * @return
      */
-    public List<WorkingTimeAgreement> getWTARuleTemplateByUnitPositionIds(List<Long> unitPositionIds,Date fromPlanningDate,Date toPlanningDate) {
+    public List<WorkingTimeAgreement> getWTARuleTemplateByUnitPositionIds(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate) {
         Criteria endDateCriteria1=Criteria.where("endDate").exists(false);
         Criteria endDateCriteria2=Criteria.where("endDate").gte(fromPlanningDate);
         Aggregation aggregation = Aggregation.newAggregation(

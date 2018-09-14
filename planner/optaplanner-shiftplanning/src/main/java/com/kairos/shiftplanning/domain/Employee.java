@@ -4,6 +4,7 @@ import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
 import com.kairos.shiftplanning.domain.wta.*;
+import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.joda.time.DateTime;
@@ -31,7 +32,7 @@ public class Employee {
     private DateTime prevShiftEnd;
     transient private CollectiveTimeAgreement collectiveTimeAgreement;
     private Map<java.time.LocalDate,CTAResponseDTO> localDateCTAResponseDTOMap;// added 10-9-2018
-   // private Map<java.time.LocalDate,WorkingTimeAgreement> localDateWTAMap;
+    private Map<java.time.LocalDate,WorkingTimeAgreement> localDateWTAMap;
     private Location location;
     private String name;
     private Set<Skill> skillSet;
@@ -62,6 +63,14 @@ public class Employee {
 
     public void setLocalDateCTAResponseDTOMap(Map<java.time.LocalDate, CTAResponseDTO> localDateCTAResponseDTOMap) {
         this.localDateCTAResponseDTOMap = localDateCTAResponseDTOMap;
+    }
+
+    public Map<java.time.LocalDate, WorkingTimeAgreement> getLocalDateWTAMap() {
+        return localDateWTAMap;
+    }
+
+    public void setLocalDateWTAMap(Map<java.time.LocalDate, WorkingTimeAgreement> localDateWTAMap) {
+        this.localDateWTAMap = localDateWTAMap;
     }
 
     public int getTotalWeeklyMinutes() {

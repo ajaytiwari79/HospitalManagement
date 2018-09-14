@@ -5,8 +5,9 @@ import com.kairos.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
 import com.kairos.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.shiftplanning.domain.Activity;
+import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
 import com.planner.domain.shift_planning.Shift;
-import com.planner.domain.wta.templates.WorkingTimeAgreement;
+
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.responseDto.PlanningDto.shiftPlanningDto.ActivityDTO;
 import org.springframework.stereotype.Service;
@@ -113,7 +114,7 @@ public class ActivityMongoService {
      * @param toPlanningDate
      * @return
      */
-    public List<WorkingTimeAgreement> getWTARuleTemplateByUnitPositionIds(List<Long> unitPositionIds,Date fromPlanningDate,Date toPlanningDate) {
+    public List<WorkingTimeAgreement> getWTARuleTemplateByUnitPositionIds(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate) {
         return activityMongoRepository.getWTARuleTemplateByUnitPositionIds(unitPositionIds,fromPlanningDate,toPlanningDate);
     }
 

@@ -7,24 +7,20 @@ import com.kairos.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.shiftplanning.domain.Activity;
 import com.kairos.shiftplanning.domain.ActivityLineInterval;
-import com.kairos.shiftplanning.domain.ShiftRequestPhase;
 import com.kairos.shiftplanning.domain.Employee;
+import com.kairos.shiftplanning.domain.ShiftRequestPhase;
+import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
 import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
 import com.planner.domain.query_results.StaffQueryResult;
 import com.planner.domain.shift_planning.Shift;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -41,44 +37,46 @@ public class ShiftPlanningInitializationService {
 
     @Inject
     private ActivityMongoService activityMongoService;
-
     @Inject
     private UserNeo4jService userNeo4jService;
-
     @Inject
     private CTAService ctaService;
     @Inject
     private SkillService skillService;
     @Inject
     private StaffingLevelService staffingLevelService;
+    @Inject
+    private WTAService wtaService;
 
 
     /**
-     * ShiftRequestPhasePlanningSolution
+     * ShiftRequestPhasePlanningSolution(Opta-planner planning Solution)
      */
     public void initializeShiftPlanning(Long unitId, Date fromPlanningDate, Date toPlanningDate, Long[] staffIds) {
         //Prepare Data
         List<StaffQueryResult> staffWithSkillsAndUnitPostionIds = userNeo4jService.getStaffWithSkillsAndUnitPostionIds(unitId, staffIds);
         List<Long> unitPositionIds = staffWithSkillsAndUnitPostionIds.stream().map(s -> s.getStaffUnitPosition()).collect(Collectors.toList());
 
-        //1.) Initialize Employees
+        //1.) Initialize Employees(Opta-planner fact)
         List<Employee> employeeList = getAllEmployee(fromPlanningDate, toPlanningDate, staffWithSkillsAndUnitPostionIds, unitPositionIds);
-
-        //2.)Initialize shifts
-        List<ShiftRequestPhase> shiftRequestPhase = getShiftRequestPhase(unitPositionIds, fromPlanningDate, toPlanningDate, employeeList);
 
         //Prepare Data
         List<ShiftPlanningStaffingLevelDTO> shiftPlanningStaffingLevelDTOList = staffingLevelService.getShiftPlanningStaffingLevelDTOByUnitId(unitId, fromPlanningDate, toPlanningDate);
         Map<java.time.LocalDate, List<StaffingLevelTimeSlotDTO>> localDateStaffingLevelTimeSlotMap = staffingLevelService.getStaffingLevelTimeSlotByDate(shiftPlanningStaffingLevelDTOList);
         Map<java.time.LocalDate, Set<StaffingLevelActivity>> localDateStaffingLevelActivityMap = staffingLevelService.getStaffingLevelActivityByDay(localDateStaffingLevelTimeSlotMap);
 
-        //3.)Initialize activities
+        //2.)Initialize activities
         List<Activity> activityList = getActivities(localDateStaffingLevelActivityMap);
 
-        //4.)Initialize ActivityLineInterval and activitiesPerDay
+        //3.)Initialize ActivityLineInterval and activitiesPerDay
         Object[] activityLineIntervalsAndActivitiesPerDay = getActivityLineIntervalsAndActivitiesPerDay(activityList, localDateStaffingLevelTimeSlotMap);
+        //(Opta-planner Planning Variable)
         List<ActivityLineInterval> activityLineIntervalList = (List<ActivityLineInterval>) activityLineIntervalsAndActivitiesPerDay[0];
         Map<LocalDate, List<Activity>> activitiesPerDay = (Map<LocalDate, List<Activity>>) activityLineIntervalsAndActivitiesPerDay[1];
+
+        //4.)Initialize shifts(Opta-planner PlanningEntity(as fact))
+        List<ShiftRequestPhase> shiftRequestPhase = getShiftRequestPhase(unitPositionIds, fromPlanningDate, toPlanningDate, employeeList);
+
     }
 
 
@@ -86,7 +84,6 @@ public class ShiftPlanningInitializationService {
     /**
      * This method is used to get
      * All Staff/Employee with in {@param unitId}
-     * TODO Testing(This is the only applicable staff{@param staffWithSkillsAndUnitPostionIds must have unitPositionIds else filter in this function itself})
      * between
      * @param fromPlanningDate
      * @param toPlanningDate
@@ -97,8 +94,10 @@ public class ShiftPlanningInitializationService {
     public List<Employee> getAllEmployee(Date fromPlanningDate, Date toPlanningDate, List<StaffQueryResult> staffWithSkillsAndUnitPostionIds, List<Long> unitPositionIds) {
         List<Employee> employeeList = new ArrayList<>();
         if (staffWithSkillsAndUnitPostionIds.size() > 0) {
-            //Prepare CTA data
+            //Prepare CTA & WTA data
             Map<Long, Map<java.time.LocalDate, CTAResponseDTO>> unitPositionIdWithLocalDateCTAMap = ctaService.getunitPositionIdWithLocalDateCTAMap(unitPositionIds, fromPlanningDate, toPlanningDate);
+            Map<Long, Map<java.time.LocalDate,WorkingTimeAgreement>> dateWTAMap=wtaService.getunitPositionIdWithLocalDateWTAMap(unitPositionIds, fromPlanningDate, toPlanningDate);
+
             //Initialize Employee
             for (StaffQueryResult staffQueryResult : staffWithSkillsAndUnitPostionIds) {
                 if (staffQueryResult.getStaffUnitPosition() != null && unitPositionIdWithLocalDateCTAMap.containsKey(staffQueryResult.getStaffUnitPosition())) {
@@ -108,7 +107,7 @@ public class ShiftPlanningInitializationService {
                     employee.setUnitPositionId(staffQueryResult.getStaffUnitPosition());
                     employee.setLocalDateCTAResponseDTOMap(ctaService.getLocalDateCTAMapByunitPositionId(unitPositionIdWithLocalDateCTAMap, staffQueryResult.getStaffUnitPosition()));
                     employee.setSkillSet(skillService.setSkillsOfEmployee(staffQueryResult.getStaffSkills()));
-                    //employee.setLocalDateWTAMap();//TODO
+                    employee.setLocalDateWTAMap(wtaService.getLocalDateWTAMapByunitPositionId(dateWTAMap,staffQueryResult.getStaffUnitPosition()));//TODO
                     employeeList.add(employee);
                 }
             }
@@ -117,32 +116,7 @@ public class ShiftPlanningInitializationService {
     }
 
 
-    /****************************Shift Initialization**********************************************************************************/
-    /**
-     * @param unitPositionIds
-     * @param fromPlanningDate
-     * @param toPlanningDate
-     * @param employeeList
-     * @return
-     */
-    public List<ShiftRequestPhase> getShiftRequestPhase(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate, List<Employee> employeeList) {
-        List<Shift> shifts = activityMongoService.getAllShiftsByUnitPositionIds(unitPositionIds, fromPlanningDate, toPlanningDate);
-        List<ShiftRequestPhase> shiftRequestPhaseList = new ArrayList<>();
-        if (shifts.size() > 0) {
-            Map<Long, Employee> unitPositionEmployeeMap = employeeList.stream().collect(Collectors.toMap(unitPositionId -> unitPositionId.getUnitPositionId(), emp -> emp));
-            //Initiaize Shifts
-            for (Shift shift : shifts) {
-                if (unitPositionEmployeeMap.containsKey(shift.getUnitPositionId())) {
-                    ShiftRequestPhase shiftRequestPhase = new ShiftRequestPhase();
-                    shiftRequestPhase.setStartDate(shift.getStartLocalDate());
-                    shiftRequestPhase.setEndDate(shift.getEndLocalDate());
-                    shiftRequestPhase.setEmployee(unitPositionEmployeeMap.get(shift.getUnitPositionId()));
-                    shiftRequestPhaseList.add(shiftRequestPhase);
-                }
-            }
-        }
-        return shiftRequestPhaseList;
-    }
+
 /************************************ActivityList initialization****************************************/
     /**
      * @param localDateStaffingLevelActivityMap
@@ -201,5 +175,31 @@ public class ShiftPlanningInitializationService {
         activityLineIntervalsAndActivitiesPerDay[0] = activityLineIntervalList;
         activityLineIntervalsAndActivitiesPerDay[1] = activitiesPerDay;
         return activityLineIntervalsAndActivitiesPerDay;
+    }
+    /****************************Shift Initialization**********************************************************************************/
+    /**
+     * @param unitPositionIds
+     * @param fromPlanningDate
+     * @param toPlanningDate
+     * @param employeeList
+     * @return
+     */
+    public List<ShiftRequestPhase> getShiftRequestPhase(List<Long> unitPositionIds, Date fromPlanningDate, Date toPlanningDate, List<Employee> employeeList) {
+        List<Shift> shifts = activityMongoService.getAllShiftsByUnitPositionIds(unitPositionIds, fromPlanningDate, toPlanningDate);
+        List<ShiftRequestPhase> shiftRequestPhaseList = new ArrayList<>();
+        if (shifts.size() > 0) {
+            Map<Long, Employee> unitPositionEmployeeMap = employeeList.stream().collect(Collectors.toMap(unitPositionId -> unitPositionId.getUnitPositionId(), emp -> emp));
+            //Initialize Shifts
+            for (Shift shift : shifts) {
+                if (unitPositionEmployeeMap.containsKey(shift.getUnitPositionId())) {
+                    ShiftRequestPhase shiftRequestPhase = new ShiftRequestPhase();
+                    shiftRequestPhase.setStartDate(shift.getStartLocalDate());
+                    shiftRequestPhase.setEndDate(shift.getEndLocalDate());
+                    shiftRequestPhase.setEmployee(unitPositionEmployeeMap.get(shift.getUnitPositionId()));
+                    shiftRequestPhaseList.add(shiftRequestPhase);
+                }
+            }
+        }
+        return shiftRequestPhaseList;
     }
 }

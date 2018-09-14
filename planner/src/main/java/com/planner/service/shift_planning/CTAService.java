@@ -3,6 +3,7 @@ package com.planner.service.shift_planning;
 import com.kairos.activity.cta.CTAResponseDTO;
 import com.kairos.util.DateTimeInterval;
 import com.kairos.util.DateUtils;
+import com.planner.domain.wta.templates.WorkingTimeAgreement;
 import org.joda.time.chrono.ZonedChronology;
 import org.springframework.stereotype.Service;
 
@@ -119,7 +120,6 @@ public class CTAService {
         }
         return localDateSet;
     }
-
 /*********************************fetch CTA logic *****End***********************************************************/
 /*******************************************************************************************************************/
 
