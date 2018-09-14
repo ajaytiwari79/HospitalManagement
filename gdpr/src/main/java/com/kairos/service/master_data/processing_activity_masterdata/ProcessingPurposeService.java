@@ -143,29 +143,6 @@ public class ProcessingPurposeService extends MongoBaseService {
         }
     }
 
-
-    /**
-     * @param countryId
-     * @param
-     * @param name      name of ProcessingPurpose
-     * @return ProcessingPurpose object fetch on basis of  name
-     * @throws DataNotExists throw exception if ProcessingPurpose not exist for given name
-     */
-    public ProcessingPurpose getProcessingPurposeByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            ProcessingPurpose exist = processingPurposeMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
-
     /**
      *
      * @param countryId - country id
