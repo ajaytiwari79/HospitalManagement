@@ -76,6 +76,7 @@ import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -160,7 +161,6 @@ public class UnitPositionService {
     private UserToSchedulerQueueService userToSchedulerQueueService;
     @Inject
     private GenericRestClient genericRestClient;
-
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
