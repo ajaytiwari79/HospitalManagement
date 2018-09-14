@@ -19,6 +19,7 @@ import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
@@ -75,7 +76,7 @@ public class ShiftPlanningInitializationService {
         List<Activity> activityList = getActivities(localDateStaffingLevelActivityMap);
 
         //4.)Initialize ActivityLineInterval and activitiesPerDay
-        Object[] activityLineIntervalsAndActivitiesPerDay = getActivityLineIntervalsAndActivitiesPerDay(activityList, localDateStaffingLevelTimeSlotMap, localDateStaffingLevelActivityMap);
+        Object[] activityLineIntervalsAndActivitiesPerDay = getActivityLineIntervalsAndActivitiesPerDay(activityList, localDateStaffingLevelTimeSlotMap);
         List<ActivityLineInterval> activityLineIntervalList = (List<ActivityLineInterval>) activityLineIntervalsAndActivitiesPerDay[0];
         Map<LocalDate, List<Activity>> activitiesPerDay = (Map<LocalDate, List<Activity>>) activityLineIntervalsAndActivitiesPerDay[1];
     }
@@ -87,17 +88,17 @@ public class ShiftPlanningInitializationService {
      * All Staff/Employee with in {@param unitId}
      * TODO Testing(This is the only applicable staff{@param staffWithSkillsAndUnitPostionIds must have unitPositionIds else filter in this function itself})
      * between
-     *
      * @param fromPlanningDate
-     * @param toPlanningDate   Must have CTA associated with unitPositionId within planning range else Staff will be skipped in planning
-     *                         Must have WTA associated with unitPositionId within planning range else Staff will be skipped in planning //TODO attach logic
+     * @param toPlanningDate
+     * Must have CTA associated with unitPositionId within planning range else Staff will be skipped in planning
+     * Must have WTA associated with unitPositionId within planning range else Staff will be skipped in planning //TODO attach already created logic
      * @return
      */
     public List<Employee> getAllEmployee(Date fromPlanningDate, Date toPlanningDate, List<StaffQueryResult> staffWithSkillsAndUnitPostionIds, List<Long> unitPositionIds) {
         List<Employee> employeeList = new ArrayList<>();
-        //Prepare CTA data
-        Map<Long, Map<java.time.LocalDate, CTAResponseDTO>> unitPositionIdWithLocalDateCTAMap = ctaService.getunitPositionIdWithLocalDateCTAMap(unitPositionIds, fromPlanningDate, toPlanningDate);
-        if (unitPositionIdWithLocalDateCTAMap.size() > 0) {
+        if (staffWithSkillsAndUnitPostionIds.size() > 0) {
+            //Prepare CTA data
+            Map<Long, Map<java.time.LocalDate, CTAResponseDTO>> unitPositionIdWithLocalDateCTAMap = ctaService.getunitPositionIdWithLocalDateCTAMap(unitPositionIds, fromPlanningDate, toPlanningDate);
             //Initialize Employee
             for (StaffQueryResult staffQueryResult : staffWithSkillsAndUnitPostionIds) {
                 if (staffQueryResult.getStaffUnitPosition() != null && unitPositionIdWithLocalDateCTAMap.containsKey(staffQueryResult.getStaffUnitPosition())) {
@@ -106,9 +107,8 @@ public class ShiftPlanningInitializationService {
                     employee.setName(staffQueryResult.getStaffName());
                     employee.setUnitPositionId(staffQueryResult.getStaffUnitPosition());
                     employee.setLocalDateCTAResponseDTOMap(ctaService.getLocalDateCTAMapByunitPositionId(unitPositionIdWithLocalDateCTAMap, staffQueryResult.getStaffUnitPosition()));
-
                     employee.setSkillSet(skillService.setSkillsOfEmployee(staffQueryResult.getStaffSkills()));
-                    //employee.setLocalDateWTAMap();
+                    //employee.setLocalDateWTAMap();//TODO
                     employeeList.add(employee);
                 }
             }
@@ -157,44 +157,46 @@ public class ShiftPlanningInitializationService {
 
         }
         return activityMongoService.getConvertedActivityList(activityMongoService.getActivities(activityIds));
-//TODO checking
-        //return ObjectMapperUtils.copyProperties(activityMongoService.getActivities(activityIds), Activity.class);
     }
-/****************************************************************************/
-    /**
+    /***************************************************************************************************************************************/
+    /**This method creates all ActivityLineIntervals based on Demand(StaffingLevel)and DatewiseActivity Map
      * @param
      * @param activityList
      * @param localDateStaffingLevelTimeSlotMap
-     * @param localDateStaffingLevelActivityMap
      * @return
      */
-    public Object[] getActivityLineIntervalsAndActivitiesPerDay(List<Activity> activityList, Map<java.time.LocalDate, List<StaffingLevelTimeSlotDTO>> localDateStaffingLevelTimeSlotMap, Map<java.time.LocalDate, Set<StaffingLevelActivity>> localDateStaffingLevelActivityMap) {
+    public Object[] getActivityLineIntervalsAndActivitiesPerDay(List<Activity> activityList, Map<java.time.LocalDate, List<StaffingLevelTimeSlotDTO>> localDateStaffingLevelTimeSlotMap) {
         Object[] activityLineIntervalsAndActivitiesPerDay = new Object[2];
         List<ActivityLineInterval> activityLineIntervalList = new ArrayList<>();
         Map<LocalDate, List<Activity>> activitiesPerDay = new HashMap<>();
         Map<String, Activity> activityIdActivityMap = activityList.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-//Todo need loop over localDateStaffingLevelAcitivity else null pointer
         for (Map.Entry<java.time.LocalDate, List<StaffingLevelTimeSlotDTO>> localDateListEntry : localDateStaffingLevelTimeSlotMap.entrySet()) {
             LocalDate jodaLocalDate = DateUtils.asJodaLocalDate(DateUtils.asDate(localDateListEntry.getKey()));
             List<Activity> activityListPerDay = new ArrayList<>();
             for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO : localDateListEntry.getValue()) {
-                Duration duration = staffingLevelTimeSlotDTO.getStaffingLevelDuration();
-                for (StaffingLevelActivity staffingLevelActivity : localDateStaffingLevelActivityMap.get(localDateListEntry.getKey())) {
-                    for (int i = 0; i < staffingLevelActivity.getMaxNoOfStaff(); i++) {
-                        activityListPerDay.add(activityIdActivityMap.get(staffingLevelActivity.getActivityId().toString()));
-                        ActivityLineInterval activityLineInterval = new ActivityLineInterval();
-                        activityLineInterval.setActivity(activityIdActivityMap.get(staffingLevelActivity.getActivityId().toString()));
-                        activityLineInterval.setStart(new DateTime(DateUtils.getDateByLocalDateAndLocalTime(localDateListEntry.getKey(), duration.getFrom())));
-                        activityLineInterval.setDuration(duration.getFrom().get(ChronoField.MINUTE_OF_DAY) - duration.getTo().get(ChronoField.MINUTE_OF_DAY));
-                        if (i < staffingLevelActivity.getMinNoOfStaff()) activityLineInterval.setRequired(true);
-                        activityLineIntervalList.add(activityLineInterval);
+                //Create ALI only if there exist at least 1 StaffingLevelActivity for current[TimeSlot/Interval]
+                if(!staffingLevelTimeSlotDTO.getStaffingLevelActivities().isEmpty()) {
+                    Duration duration = staffingLevelTimeSlotDTO.getStaffingLevelDuration();
+                    for (StaffingLevelActivity staffingLevelActivity : staffingLevelTimeSlotDTO.getStaffingLevelActivities()) {
+                        //Prepare DateWise Required/Demanding activities for optaplanner
+                        activityListPerDay.add(activityIdActivityMap.get(staffingLevelActivity.getActivityId()));
+                        //Create ALI's for all [activity Types]
+                        for (int i = 0; i < staffingLevelActivity.getMaxNoOfStaff(); i++) {
+                            //Create same ALI till - Max demand for particular [Interval/TimeSlot]
+                            ActivityLineInterval activityLineInterval = new ActivityLineInterval();
+                            BigInteger activityId=staffingLevelActivity.getActivityId();
+                            activityLineInterval.setActivity(activityIdActivityMap.get(activityId.toString()));
+                            activityLineInterval.setStart(new DateTime(DateUtils.getDateByLocalDateAndLocalTime(localDateListEntry.getKey(), duration.getFrom())));
+                            activityLineInterval.setDuration(Math.abs(duration.getFrom().get(ChronoField.MINUTE_OF_DAY) - duration.getTo().get(ChronoField.MINUTE_OF_DAY)));
+                            if (i < staffingLevelActivity.getMinNoOfStaff()) {
+                                activityLineInterval.setRequired(true);
+                            }
+                            activityLineIntervalList.add(activityLineInterval);
+                        }
                     }
                 }
-
-
             }
-
-            activitiesPerDay.put(jodaLocalDate, activityListPerDay);
+           if(activityListPerDay.size()>0) activitiesPerDay.put(jodaLocalDate, activityListPerDay);
         }
         activityLineIntervalsAndActivitiesPerDay[0] = activityLineIntervalList;
         activityLineIntervalsAndActivitiesPerDay[1] = activitiesPerDay;
