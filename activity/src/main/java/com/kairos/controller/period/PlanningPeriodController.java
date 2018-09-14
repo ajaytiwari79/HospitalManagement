@@ -75,15 +75,14 @@ public class PlanningPeriodController {
     public ResponseEntity<Map<String, Object>> updatePlanningPeriodPhaseToNext(@PathVariable BigInteger periodId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setPlanningPeriodPhaseToNext(unitId, periodId));
     }
-
-    @ApiOperation(value = "update period's flipping Date")
-    @PutMapping(value = "/period/{periodId}/flip_phase/{schedulerPanelId}")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-
-    public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable BigInteger periodId, @PathVariable Long unitId, @PathVariable BigInteger schedulerPanelId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updateFlippingDate(periodId, unitId, schedulerPanelId));
-
-    }
+//test api
+//    @ApiOperation(value = "update period's flipping Date")
+//    @PutMapping(value = "/period/{periodId}/flip_phase/{schedulerPanelId}")
+//    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable BigInteger periodId, @PathVariable Long unitId, @PathVariable BigInteger schedulerPanelId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updateFlippingDate(periodId, unitId, schedulerPanelId));
+//
+//    }
     @ApiOperation(value = "restore shift base planning period and phase id")
     @PutMapping(value = "/period/{periodId}/reset_phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
