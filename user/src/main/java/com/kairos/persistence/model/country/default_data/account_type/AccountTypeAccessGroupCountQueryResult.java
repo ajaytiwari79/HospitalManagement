@@ -6,7 +6,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
  * CreatedBy vipulpandey on 14/9/18
  **/
 @QueryResult
-public class AccountTypeAccessGroupQueryResult {
+public class AccountTypeAccessGroupCountQueryResult {
     private Long id;
     private String name;
     private short count;
