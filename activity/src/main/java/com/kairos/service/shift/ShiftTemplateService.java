@@ -1,6 +1,8 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.persistence.model.shift.ShiftTemplate;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -163,6 +166,27 @@ public class ShiftTemplateService extends MongoBaseService {
         shiftTemplate.getIndividualShiftTemplateIds().remove(individualShiftTemplate.getId());
         save(shiftTemplate);
         return true;
+    }
+
+    public List<ShiftDTO> createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO) {
+        List<ShiftDTO> shifts = new ArrayList<>();
+        ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftDTO.getTemplateId());
+        Set<BigInteger> individualShiftTemplateIds = shiftTemplate.getIndividualShiftTemplateIds();
+        List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
+        individualShiftTemplateDTOS.forEach(individualShiftTemplateDTO -> {
+            ShiftDTO shiftDTO1 = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO, ShiftDTO.class);
+            shiftDTO1.setId(null);
+            shiftDTO1.setStaffId(shiftDTO.getStaffId());
+            shiftDTO1.setUnitPositionId(shiftDTO.getUnitPositionId());
+            LocalDate shiftStartDate = DateUtils.asLocalDate(shiftDTO.getStartDate());
+            shiftDTO1.setStartDate(DateUtils.asDate(shiftStartDate, individualShiftTemplateDTO.getStartTime()));
+            LocalDate shiftEndDate = DateUtils.asLocalDate(shiftDTO.getEndDate());
+            shiftDTO1.setEndDate(DateUtils.asDate(shiftEndDate, individualShiftTemplateDTO.getEndTime()));
+            ShiftDTO shiftQueryResult = shiftService.addSubShift(unitId, shiftDTO1, "Organization").getShifts().get(0);
+            shifts.add(shiftQueryResult);
+
+        });
+        return shifts;
     }
 
 

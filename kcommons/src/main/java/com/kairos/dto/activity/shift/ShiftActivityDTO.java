@@ -23,6 +23,7 @@ public class ShiftActivityDTO {
     private String remarks;
     private BigInteger id;
     private String timeType;
+    private String backgroundColor;
 
     //This field is only for validation
     //@JsonIgnore
@@ -44,6 +45,14 @@ public class ShiftActivityDTO {
     public ShiftActivityDTO() {
     }
 
+
+    public String getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
 
     public String getTimeType() {
         return timeType;

@@ -1,9 +1,5 @@
 package com.kairos.dto.activity.shift;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kairos.dto.activity.activity.ActivityDTO;
-
-import java.beans.Transient;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -25,6 +21,7 @@ public class ShiftActivity {
     private String remarks;
     private BigInteger id;
     private String timeType;
+    private String backgroundColor;
 
 
 
@@ -44,6 +41,14 @@ public class ShiftActivity {
     public ShiftActivity() {
     }
 
+
+    public String getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
 
     public String getTimeType() {
         return timeType;

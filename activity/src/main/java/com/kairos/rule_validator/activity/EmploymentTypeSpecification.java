@@ -38,7 +38,7 @@ public class EmploymentTypeSpecification extends AbstractSpecification<ShiftWith
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
-        employmentTypeIds.addAll(shift.getActivities().stream().flatMap(a -> a.getActivity().getEmploymentTypes().stream()).collect(Collectors.toList()));
+        employmentTypeIds.addAll(shift.getActivities().get(0).getActivity().getEmploymentTypes());
         if (!employmentTypeIds.contains(employmentType.getId())) {
             ShiftValidatorService.throwException("message.activity.employement-type-match");
         }

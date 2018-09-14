@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.shift.ShiftStatus;
@@ -182,6 +183,7 @@ public class ShiftDTO {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
     }
 
+    @JsonIgnore
     public Duration getDuration() {
         return new Interval(this.activities.get(0).getStartDate().getTime(), this.activities.get(activities.size()-1).getEndDate().getTime()).toDuration();
     }
@@ -211,11 +213,13 @@ public class ShiftDTO {
         return startDate;
     }
 
+    @JsonIgnore
     public Date getActivitiesEndDate(){
         activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         return activities.get(activities.size()-1).getEndDate();
     }
 
+    @JsonIgnore
     public Date getActivitiesStartDate(){
         activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
         return activities.get(activities.size()-1).getEndDate();
