@@ -628,7 +628,7 @@ public class WTAService extends MongoBaseService {
 
        List<CostTimeAgreement> newCTAs = new ArrayList<>();
         for(CTAResponseDTO cta:ctaResponseDTOs) {
-           CostTimeAgreement ctaDB = ObjectMapperUtils.copyPropertiesByMapper(cta,CostTimeAgreement.class);
+           CostTimeAgreement newCTA = ObjectMapperUtils.copyPropertiesByMapper(cta,CostTimeAgreement.class);
            List<CTARuleTemplate> ctaRuleTemplates =  ObjectMapperUtils.copyPropertiesOfListByMapper(cta.getRuleTemplates(),CTARuleTemplate.class);
            for(CTARuleTemplate ctaRuleTemplate:ctaRuleTemplates) {
                ctaRuleTemplate.setId(null);
@@ -638,10 +638,10 @@ public class WTAService extends MongoBaseService {
            }
 
            List<BigInteger> ctaRuleTemplateIds = ctaRuleTemplates.stream().map(ctaRuleTemplate -> ctaRuleTemplate.getId()).collect(Collectors.toList());
-           ctaDB.setRuleTemplateIds(ctaRuleTemplateIds);
-           ctaDB.setUnitPositionId(newOldunitPositionIdMap.get(cta.getUnitPositionId()));
-           ctaDB.setId(null);
-           newCTAs.add(ctaDB);
+           newCTA.setRuleTemplateIds(ctaRuleTemplateIds);
+           newCTA.setUnitPositionId(newOldunitPositionIdMap.get(cta.getUnitPositionId()));
+           newCTA.setId(null);
+           newCTAs.add(newCTA);
        }
        if(!newCTAs.isEmpty()) {
            save(newCTAs);
