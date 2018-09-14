@@ -17,7 +17,7 @@ public class AgreementSection extends MongoBaseEntity {
     @NotBlank(message = "Section Title cannot be empty")
     private String title;
 
-    // clause id are saved in sorted order index
+    // clause id are saved in order way
     private List<BigInteger> clauseIdOrderedIndex=new ArrayList<>();
 
     private List<BigInteger> subSections=new ArrayList<>();

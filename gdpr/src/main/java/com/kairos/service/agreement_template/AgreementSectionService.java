@@ -70,8 +70,7 @@ public class AgreementSectionService extends MongoBaseService {
             policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         }
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
-        //return policyAgreementTemplateRepository.getAgreementTemplateWithSectionsAndSubSections(countryId, organizationId, templateId);
-        return null;
+        return policyAgreementTemplateRepository.getAgreementTemplateWithSectionsAndSubSections(countryId, organizationId, templateId);
     }
 
 
@@ -394,7 +393,7 @@ public class AgreementSectionService extends MongoBaseService {
      * @param unitId
      * @param agreementSectionDTOs
      *///todo refactoring code
-    public List<BigInteger> createSectionClauseAndSubSectionsOfAgreementTemplate(Long countryId, Long unitId, List<AgreementSectionDTO> agreementSectionDTOs, PolicyAgreementTemplate policyAgreementTemplate) {
+    private List<BigInteger> createSectionClauseAndSubSectionsOfAgreementTemplate(Long countryId, Long unitId, List<AgreementSectionDTO> agreementSectionDTOs, PolicyAgreementTemplate policyAgreementTemplate) {
 
         Map<AgreementSection, List<AgreementSection>> agreementSubSectionListAndCoresspondingToAgreementSectionMap = new HashMap<>();
         Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap = new HashMap<>();
@@ -445,7 +444,7 @@ public class AgreementSectionService extends MongoBaseService {
      * @param globalAgreementSectionAndClauseDTOListHashMap
      * @param agreementTemplate
      *///todo refactoring code
-    public List<AgreementSection> saveAndUpdateClauseOfAgreementSection(Long countryId, Long unitId, Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap,
+    private List<AgreementSection> saveAndUpdateClauseOfAgreementSection(Long countryId, Long unitId, Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap,
                                                                         Map<AgreementSection, List<AgreementSection>> agreementSubSectionListAndCoresspondingToAgreementSectionMap, PolicyAgreementTemplate agreementTemplate) {
 
         List<Clause> clauseList = new ArrayList<>();
