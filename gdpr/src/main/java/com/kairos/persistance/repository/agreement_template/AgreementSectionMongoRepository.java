@@ -15,14 +15,14 @@ import java.util.List;
 @JaversSpringDataAuditable
 public interface AgreementSectionMongoRepository extends MongoBaseRepository<AgreementSection, BigInteger>, CustomAgreementSectionRepository {
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    AgreementSection findByIdAndNonDeleted(Long countryId, Long orgId,BigInteger id);
+    @Query("{countryId:?0,_id:?1,deleted:false}")
+    AgreementSection findByIdAndCountryId(Long countryId, BigInteger id);
 
     AgreementSection findByid(BigInteger id);
 
 
-    @Query("{countryId:?0,organizationId:?1,_id:{$in:?2},deleted:false}")
-    List<AgreementSection> findAgreementSectionByIds(Long countryId,Long unitId,List<BigInteger> ids);
+    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
+    List<AgreementSection> findAgreementSectionByIds(Long countryId,List<BigInteger> ids);
 
 
 }

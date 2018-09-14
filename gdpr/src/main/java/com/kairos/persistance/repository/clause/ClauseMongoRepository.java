@@ -19,8 +19,8 @@ public interface ClauseMongoRepository extends MongoBaseRepository<Clause, BigIn
     @Query("{deleted:false,countryId:?0,organizationId:?1,_id:?2}")
     Clause findByIdAndNonDeleted(Long countryId, Long organizationId, BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2}}")
-    List<Clause> findClauseByCountryIdAndIdList(Long countryId, Long organizationId, List<BigInteger> ClauseIds);
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
+    List<Clause> findClauseByCountryIdAndIdList(Long countryId, List<BigInteger> ClauseIds);
 
 
 }

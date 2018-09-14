@@ -12,8 +12,8 @@ import java.math.BigInteger;
 @JaversSpringDataAuditable
 public interface PolicyAgreementTemplateRepository extends MongoBaseRepository<PolicyAgreementTemplate,BigInteger>,CustomPolicyAgreementTemplateRepository {
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    PolicyAgreementTemplate findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
+    @Query("{countryId:?0,_id:?1,deleted:false}")
+    PolicyAgreementTemplate findByIdAndCountryId(Long countryId, BigInteger id);
 
     PolicyAgreementTemplate findByid(BigInteger id);
 

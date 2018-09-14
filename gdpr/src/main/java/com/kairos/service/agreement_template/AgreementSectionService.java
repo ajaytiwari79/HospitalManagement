@@ -6,7 +6,6 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.dto.gdpr.master_data.AgreementSectionDTO;
 import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistance.model.agreement_template.AgreementSection;
-import com.kairos.persistance.model.agreement_template.AgreementSectionClauseWrapper;
 import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.repository.agreement_template.AgreementSectionMongoRepository;
@@ -17,7 +16,6 @@ import com.kairos.service.clause.ClauseService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.user_context.UserContext;
-import jdk.nashorn.internal.runtime.options.Option;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +46,9 @@ public class AgreementSectionService extends MongoBaseService {
     private ClauseService clauseService;
 
 
-    public List<AgreementSectionResponseDTO> createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, Long organizationId, BigInteger templateId, List<AgreementSectionDTO> agreementSectionDTOs) {
+    public List<AgreementSectionResponseDTO> createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, BigInteger templateId, List<AgreementSectionDTO> agreementSectionDTOs) {
 
-        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, organizationId, templateId);
+        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndCountryId(countryId,  templateId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Policy Agreement Template ", templateId);
         }
@@ -62,28 +60,27 @@ public class AgreementSectionService extends MongoBaseService {
                 break;
             }
         }
-        List<BigInteger> agreementSectionIdList = flag ? updateSectionAndSubSectionOfAgreementTemplate(countryId, organizationId, agreementSectionDTOs, policyAgreementTemplate)
-                : createSectionClauseAndSubSectionsOfAgreementTemplate(countryId, organizationId, agreementSectionDTOs, policyAgreementTemplate);
+        List<BigInteger> agreementSectionIdList = flag ? updateSectionAndSubSectionOfAgreementTemplate(countryId,  agreementSectionDTOs, policyAgreementTemplate)
+                : createSectionClauseAndSubSectionsOfAgreementTemplate(countryId,  agreementSectionDTOs, policyAgreementTemplate);
         policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
-        return policyAgreementTemplateRepository.getAgreementTemplateWithSectionsAndSubSections(countryId, organizationId, templateId);
+        return policyAgreementTemplateRepository.getAgreementTemplateWithSectionsAndSubSections(countryId, templateId);
     }
 
 
     /**
      * @param countryId
-     * @param orgId
      * @param templateId - Policy Agreement template id
      * @param id         -agreement section id
      * @return -true on successful deletion of section
      */
-    public boolean deleteAgreementSection(Long countryId, Long orgId, BigInteger templateId, BigInteger id) {
+    public boolean deleteAgreementSection(Long countryId, BigInteger templateId, BigInteger id) {
 
-        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, id);
+        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndCountryId(countryId, id);
         if (!Optional.ofNullable(agreementSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + id);
         }
-        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndNonDeleted(countryId, orgId, templateId);
+        PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, templateId);
         List<BigInteger> agreementSectionIdList = policyAgreementTemplate.getAgreementSections();
         agreementSectionIdList.remove(id);
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
@@ -94,14 +91,13 @@ public class AgreementSectionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param orgId
      * @param sectionId
      * @param subSectionId
      * @return
      */
-    public boolean deleteAgreementSubSection(Long countryId, Long orgId, BigInteger sectionId, BigInteger subSectionId) {
+    public boolean deleteAgreementSubSection(Long countryId,BigInteger sectionId, BigInteger subSectionId) {
 
-        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, sectionId);
+        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndCountryId(countryId,  sectionId);
         if (!Optional.ofNullable(agreementSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + sectionId);
         }
@@ -114,17 +110,16 @@ public class AgreementSectionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param unitId
      * @param agreementSectionDTOs
      *///todo refactoring code
-    private List<BigInteger> createSectionClauseAndSubSectionsOfAgreementTemplate(Long countryId, Long unitId, List<AgreementSectionDTO> agreementSectionDTOs, PolicyAgreementTemplate policyAgreementTemplate) {
+    private List<BigInteger> createSectionClauseAndSubSectionsOfAgreementTemplate(Long countryId, List<AgreementSectionDTO> agreementSectionDTOs, PolicyAgreementTemplate policyAgreementTemplate) {
 
         Map<AgreementSection, List<AgreementSection>> agreementSubSectionListAndCoresspondingToAgreementSectionMap = new HashMap<>();
         Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap = new HashMap<>();
-        buildAgreementSectionAndSubSection(countryId, unitId, agreementSectionDTOs, agreementSubSectionListAndCoresspondingToAgreementSectionMap, globalAgreementSectionAndClauseDTOListHashMap);
+        buildAgreementSectionAndSubSection(countryId,  agreementSectionDTOs, agreementSubSectionListAndCoresspondingToAgreementSectionMap, globalAgreementSectionAndClauseDTOListHashMap);
         List<AgreementSection> agreementSectionList = new ArrayList<>();
         if (!globalAgreementSectionAndClauseDTOListHashMap.isEmpty()) {
-            agreementSectionList = saveAndUpdateClauseOfAgreementSection(countryId, unitId, globalAgreementSectionAndClauseDTOListHashMap, agreementSubSectionListAndCoresspondingToAgreementSectionMap, policyAgreementTemplate);
+            agreementSectionList = saveAndUpdateClauseOfAgreementSection(countryId, globalAgreementSectionAndClauseDTOListHashMap, agreementSubSectionListAndCoresspondingToAgreementSectionMap, policyAgreementTemplate);
         } else {
             saveAgreementSectionAndSubSectionIfClauseNotExist(agreementSectionList, agreementSubSectionListAndCoresspondingToAgreementSectionMap);
         }
@@ -133,24 +128,20 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-
     /**
      * @param countryId
-     * @param unitId
      * @param agreementSectionDTOs
      * @param agreementSubSectionsCoresspondingToAgreementSection
      * @param globalAgreementSectionAndClauseDTOListHashMap
      */
-    private void buildAgreementSectionAndSubSection(Long countryId, Long unitId, List<AgreementSectionDTO> agreementSectionDTOs, Map<AgreementSection, List<AgreementSection>> agreementSubSectionsCoresspondingToAgreementSection,
+    private void buildAgreementSectionAndSubSection(Long countryId, List<AgreementSectionDTO> agreementSectionDTOs, Map<AgreementSection, List<AgreementSection>> agreementSubSectionsCoresspondingToAgreementSection,
                                                     Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap) {
 
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOs) {
             AgreementSection agreementSection = new AgreementSection(countryId, agreementSectionDTO.getTitle(), agreementSectionDTO.getOrderedIndex());
-            agreementSection.setOrganizationId(unitId);
             List<AgreementSection> subSectionList = new ArrayList<>();
             for (AgreementSectionDTO agreementSubSectionDTO : agreementSectionDTO.getSubSections()) {
                 AgreementSection subSection = new AgreementSection(countryId, agreementSubSectionDTO.getTitle(), agreementSubSectionDTO.getOrderedIndex());
-                subSection.setOrganizationId(unitId);
                 if (!agreementSubSectionDTO.getClauses().isEmpty()) {
                     globalAgreementSectionAndClauseDTOListHashMap.put(subSection, agreementSubSectionDTO.getClauses());
                 }
@@ -165,7 +156,6 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
     /**
-     *
      * @param agreementSectionList
      * @param agreementSubSectionListAndCoresspondingToAgreementSectionMap
      */
@@ -188,34 +178,32 @@ public class AgreementSectionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param unitId
      * @param agreementSectionDTOS
      * @param policyAgreementTemplate
      *///todo update section and subsection functions
-    public List<BigInteger> updateSectionAndSubSectionOfAgreementTemplate(Long countryId, Long unitId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
+    public List<BigInteger> updateSectionAndSubSectionOfAgreementTemplate(Long countryId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
         Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap = new HashMap<>();
         List<AgreementSectionDTO> newAgreementSectionDTOList = new ArrayList<>();
         List<BigInteger> agreementSectionIdList = new ArrayList<>();
         List<BigInteger> agreementSubSectionIdList = new ArrayList<>();
-        Map<BigInteger, List<ClauseBasicDTO>> clauseBasicDTOCoresspondingToSections = new HashMap<>();
         Map<BigInteger, List<AgreementSection>> newSubSectionListCoresspondingToSection = new HashMap<>();
+        Map<BigInteger, AgreementSectionDTO> agreementSectionDTOMap = new HashMap<>();
         agreementSectionDTOS.forEach(agreementSectionDTO -> {
             if (!Optional.ofNullable(agreementSectionDTO.getId()).isPresent()) {
                 newAgreementSectionDTOList.add(agreementSectionDTO);
             } else {
+                List<AgreementSection> subSectionListCoresspondingToAgreementSection = new ArrayList<>();
                 agreementSectionIdList.add(agreementSectionDTO.getId());
-                clauseBasicDTOCoresspondingToSections.put(agreementSectionDTO.getId(), agreementSectionDTO.getClauses());
+                agreementSectionDTOMap.put(agreementSectionDTO.getId(), agreementSectionDTO);
                 if (CollectionUtils.isNotEmpty(agreementSectionDTO.getSubSections())) {
                     List<BigInteger> subSectionIdList = new ArrayList<>();
-                    List<AgreementSection> subSectionListCoresspondingToAgreementSection = new ArrayList<>();
                     for (AgreementSectionDTO agreementSubSectionDTO : agreementSectionDTO.getSubSections()) {
                         if (Optional.ofNullable(agreementSubSectionDTO.getId()).isPresent()) {
                             subSectionIdList.add(agreementSubSectionDTO.getId());
-                            clauseBasicDTOCoresspondingToSections.put(agreementSubSectionDTO.getId(), agreementSubSectionDTO.getClauses());
+                            agreementSectionDTOMap.put(agreementSubSectionDTO.getId(), agreementSubSectionDTO);
                         } else {
                             AgreementSection subSection = new AgreementSection(countryId, agreementSubSectionDTO.getTitle(), agreementSubSectionDTO.getOrderedIndex());
-                            subSection.setOrganizationId(unitId);
                             if (CollectionUtils.isNotEmpty(agreementSubSectionDTO.getClauses())) {
                                 globalAgreementSectionAndClauseDTOListHashMap.put(subSection, agreementSubSectionDTO.getClauses());
                             }
@@ -223,30 +211,36 @@ public class AgreementSectionService extends MongoBaseService {
                         }
                     }
                     agreementSubSectionIdList.addAll(subSectionIdList);
-                    newSubSectionListCoresspondingToSection.put(agreementSectionDTO.getId(), subSectionListCoresspondingToAgreementSection);
                 }
+                newSubSectionListCoresspondingToSection.put(agreementSectionDTO.getId(), subSectionListCoresspondingToAgreementSection);
             }
         });
         Map<AgreementSection, List<AgreementSection>> agreementSubSectionListCoresspondingToAgreementSection = new HashMap<>();
         if (CollectionUtils.isNotEmpty(newAgreementSectionDTOList)) {
-            buildAgreementSectionAndSubSection(countryId, unitId, newAgreementSectionDTOList, agreementSubSectionListCoresspondingToAgreementSection, globalAgreementSectionAndClauseDTOListHashMap);
+            buildAgreementSectionAndSubSection(countryId,  newAgreementSectionDTOList, agreementSubSectionListCoresspondingToAgreementSection, globalAgreementSectionAndClauseDTOListHashMap);
         }
-        List<AgreementSection> agreementSections = agreementSectionMongoRepository.findAgreementSectionByIds(countryId, unitId, agreementSectionIdList);
-        List<AgreementSection> agreementSubSectionList = agreementSectionMongoRepository.findAgreementSectionByIds(countryId, unitId, agreementSubSectionIdList);
+        List<AgreementSection> agreementSections = agreementSectionMongoRepository.findAgreementSectionByIds(countryId,  agreementSectionIdList);
+        List<AgreementSection> agreementSubSectionList = agreementSectionMongoRepository.findAgreementSectionByIds(countryId,  agreementSubSectionIdList);
         for (AgreementSection agreementSubSection : agreementSubSectionList) {
-            if (!clauseBasicDTOCoresspondingToSections.get(agreementSubSection.getId()).isEmpty()) {
-                globalAgreementSectionAndClauseDTOListHashMap.put(agreementSubSection, clauseBasicDTOCoresspondingToSections.get(agreementSubSection.getId()));
+            AgreementSectionDTO agreementSubSectionDTO = agreementSectionDTOMap.get(agreementSubSection.getId());
+            agreementSubSection.setTitle(agreementSubSectionDTO.getTitle());
+            agreementSubSection.setOrderedIndex(agreementSubSectionDTO.getOrderedIndex());
+            if (!agreementSubSectionDTO.getClauses().isEmpty()) {
+                globalAgreementSectionAndClauseDTOListHashMap.put(agreementSubSection, agreementSubSectionDTO.getClauses());
             }
         }
         for (AgreementSection agreementSection : agreementSections) {
-            if (!clauseBasicDTOCoresspondingToSections.get(agreementSection.getId()).isEmpty()) {
-                globalAgreementSectionAndClauseDTOListHashMap.put(agreementSection, clauseBasicDTOCoresspondingToSections.get(agreementSection.getId()));
+            AgreementSectionDTO agreementSectionDTO = agreementSectionDTOMap.get(agreementSection.getId());
+            agreementSection.setTitle(agreementSectionDTO.getTitle());
+            agreementSection.setOrderedIndex(agreementSectionDTO.getOrderedIndex());
+            if (!agreementSectionDTO.getClauses().isEmpty()) {
+                globalAgreementSectionAndClauseDTOListHashMap.put(agreementSection, agreementSectionDTO.getClauses());
             }
             agreementSubSectionListCoresspondingToAgreementSection.put(agreementSection, newSubSectionListCoresspondingToSection.get(agreementSection.getId()));
         }
         List<AgreementSection> agreementSectionList = new ArrayList<>();
         if (!globalAgreementSectionAndClauseDTOListHashMap.isEmpty()) {
-            agreementSectionList = saveAndUpdateClauseOfAgreementSection(countryId, unitId, globalAgreementSectionAndClauseDTOListHashMap, agreementSubSectionListCoresspondingToAgreementSection, policyAgreementTemplate);
+            agreementSectionList = saveAndUpdateClauseOfAgreementSection(countryId,  globalAgreementSectionAndClauseDTOListHashMap, agreementSubSectionListCoresspondingToAgreementSection, policyAgreementTemplate);
         } else {
             saveAgreementSectionAndSubSectionIfClauseNotExist(agreementSectionList, agreementSubSectionListCoresspondingToAgreementSection);
         }
@@ -257,11 +251,10 @@ public class AgreementSectionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param unitId
      * @param globalAgreementSectionAndClauseDTOListHashMap
      * @param agreementTemplate
      *///todo refactoring code
-    private List<AgreementSection> saveAndUpdateClauseOfAgreementSection(Long countryId, Long unitId, Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap,
+    private List<AgreementSection> saveAndUpdateClauseOfAgreementSection(Long countryId, Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap,
                                                                          Map<AgreementSection, List<AgreementSection>> agreementSubSectionListAndCoresspondingToAgreementSectionMap, PolicyAgreementTemplate agreementTemplate) {
 
         List<Clause> clauseList = new ArrayList<>();
@@ -290,13 +283,13 @@ public class AgreementSectionService extends MongoBaseService {
             }
             List<Clause> clauseRelatedToAgreementSection = new ArrayList<>();
             if (!newClauseRelatedToAgreementSection.isEmpty()) {
-                clauseRelatedToAgreementSection = buildClauseForAgreementSection(countryId, unitId, newClauseRelatedToAgreementSection, agreementTemplate);
+                clauseRelatedToAgreementSection = buildClauseForAgreementSection(countryId,  newClauseRelatedToAgreementSection, agreementTemplate);
                 clauseList.addAll(clauseRelatedToAgreementSection);
             }
             clauseListCoresspondingToAgreementSection.put(agreementSection, clauseRelatedToAgreementSection);
         });
         if (!exisitingClauseListCoresspondingToAgreementSections.isEmpty()) {
-            clauseList.addAll(updateExisingClauseListOfAgreementSection(countryId, unitId, alteredClauseIdList, exisitingClauseListCoresspondingToAgreementSections, clauseListCoresspondingToAgreementSection));
+            clauseList.addAll(updateExisingClauseListOfAgreementSection(countryId,  alteredClauseIdList, exisitingClauseListCoresspondingToAgreementSections, clauseListCoresspondingToAgreementSection));
         }
         List<AgreementSection> agreementSubSections = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(clauseList)) {
@@ -319,7 +312,6 @@ public class AgreementSectionService extends MongoBaseService {
 
 
     /**
-     *
      * @param agreementSubSectionListAndCoresspondingToAgreementSectionMap
      * @param subSections
      * @param clauseListCoresspondingToAgreementSection
@@ -355,12 +347,11 @@ public class AgreementSectionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param organizationId
      * @param clauseBasicDTOS
      * @param policyAgreementTemplate
      * @return
      */
-    private List<Clause> buildClauseForAgreementSection(Long countryId, Long organizationId, List<ClauseBasicDTO> clauseBasicDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
+    private List<Clause> buildClauseForAgreementSection(Long countryId, List<ClauseBasicDTO> clauseBasicDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
         List<Clause> clauseList = new ArrayList<>();
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
@@ -370,7 +361,7 @@ public class AgreementSectionService extends MongoBaseService {
             templateTypes.add(policyAgreementTemplate.getTemplateType());
             clause.setTemplateTypes(templateTypes);
             clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
-            clause.setOrganizationId(organizationId);
+            clause.setOrganizationId(UserContext.getUnitId());
             clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
             clauseList.add(clause);
         }
@@ -380,15 +371,14 @@ public class AgreementSectionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param unitId
      * @param existingClauseId
      * @param existingClauseMap
      * @param agreementSectionClauseList
      * @return
      *///todo refactoring code
-    private List<Clause> updateExisingClauseListOfAgreementSection(Long countryId, Long unitId, List<BigInteger> existingClauseId, Map<AgreementSection, List<ClauseBasicDTO>> existingClauseMap, Map<AgreementSection, List<Clause>> agreementSectionClauseList) {
+    private List<Clause> updateExisingClauseListOfAgreementSection(Long countryId,  List<BigInteger> existingClauseId, Map<AgreementSection, List<ClauseBasicDTO>> existingClauseMap, Map<AgreementSection, List<Clause>> agreementSectionClauseList) {
 
-        List<Clause> exisitingClauseList = clauseMongoRepository.findClauseByCountryIdAndIdList(countryId, unitId, existingClauseId);
+        List<Clause> exisitingClauseList = clauseMongoRepository.findClauseByCountryIdAndIdList(countryId,  existingClauseId);
         Map<BigInteger, Clause> clauseIdMap = exisitingClauseList.stream().collect(Collectors.toMap(Clause::getId, clause -> clause));
         existingClauseMap.forEach((agreementSection, clauseBasicDTOS) -> {
             List<Clause> clausesRelateToAgreementSection = new ArrayList<>();
@@ -407,15 +397,14 @@ public class AgreementSectionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param orgId
      * @param sectionId
      * @param clauseId
      * @return
      * @description remove clause id from Agreement section and Sub section if section contain clause and save section
      */
-    public boolean removeClauseFromAgreementSection(Long countryId, Long orgId, BigInteger sectionId, BigInteger clauseId) {
+    public boolean removeClauseFromAgreementSection(Long countryId,  BigInteger sectionId, BigInteger clauseId) {
 
-        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndNonDeleted(countryId, orgId, sectionId);
+        AgreementSection agreementSection = agreementSectionMongoRepository.findByIdAndCountryId(countryId, sectionId);
         if (!Optional.ofNullable(agreementSection).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + sectionId);
         }
