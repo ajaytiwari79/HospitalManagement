@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-
 import javax.inject.Inject;
 
 import static com.kairos.constants.AppConstants.SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC;
+
 @Component
 public class SchedulerToActivityQueueListener {
     private static final Logger logger = LoggerFactory.getLogger(SchedulerToActivityQueueListener.class);

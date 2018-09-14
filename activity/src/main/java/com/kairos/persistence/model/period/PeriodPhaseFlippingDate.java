@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class PeriodPhaseFlippingDate {
     private BigInteger phaseId;
+    private BigInteger schedulerPanelId;
     private LocalDate flippingDate;
     private LocalTime flippingTime;
 
@@ -49,5 +50,13 @@ public class PeriodPhaseFlippingDate {
 
     public void setFlippingTime(LocalTime flippingTime) {
         this.flippingTime = flippingTime;
+    }
+
+    public BigInteger getSchedulerPanelId() {
+        return schedulerPanelId;
+    }
+
+    public void setSchedulerPanelId(BigInteger schedulerPanelId) {
+        this.schedulerPanelId = schedulerPanelId;
     }
 }
