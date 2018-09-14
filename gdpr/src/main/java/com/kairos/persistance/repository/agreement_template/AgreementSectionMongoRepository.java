@@ -22,7 +22,7 @@ public interface AgreementSectionMongoRepository extends MongoBaseRepository<Agr
 
 
     @Query("{countryId:?0,organizationId:?1,_id:{$in:?2},deleted:false}")
-    List<AgreementSection> findAgreementSectionByIds(Long countryId,Long organizationId,List<BigInteger> ids);
+    List<AgreementSection> findAgreementSectionByIds(Long countryId,Long unitId,List<BigInteger> ids);
 
 
 }
