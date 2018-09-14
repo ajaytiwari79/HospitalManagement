@@ -27,7 +27,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.List;
+import java.util.*;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -273,6 +273,19 @@ public class CounterRepository {
         return mongoTemplate.findOne(query, OrgTypeKPIEntry.class);
     }
 
+    public List<BigInteger> getKPISOfAccessGroup(Long accessGroupId,Long unitId,ConfLevel level){
+        Aggregation aggregation=Aggregation.newAggregation(
+          Aggregation.match(Criteria.where("accessGroupId").is(accessGroupId).and("unitId").is(unitId).and("level").is(level)),
+           Aggregation.project().and("kpiId").as("kpiId").andExclude("_id")
+        );
+        AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,Map.class);
+        List<Map> result= results.getMappedResults();
+        List<BigInteger> kpiIds = new ArrayList<>();
+        for (Map kpi : results) {
+            kpiIds.add(new BigInteger(kpi.get("kpiId").toString()));
+        }
+        return kpiIds;
+    }
 
     public List<OrgTypeMappingDTO> getOrgTypeKPIEntryOrgTypeIds(List<Long> orgTypeIds,List<BigInteger> kpiIds ,Long countryId){
         Query query=null;

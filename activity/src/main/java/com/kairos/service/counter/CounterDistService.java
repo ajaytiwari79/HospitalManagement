@@ -26,6 +26,7 @@ import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -313,6 +314,14 @@ public class CounterDistService extends MongoBaseService {
         }
     }
 
+    public void addAndRemoveStaffAccessGroupKPISetting(Long staffId, Long unitId, Long accessGroupId, Boolean created){
+        List<BigInteger> kpiIds=counterRepository.getKPISOfAccessGroup(accessGroupId,unitId,ConfLevel.UNIT);
+        if(created){
+
+        }else{
+            counterRepository.removeApplicableKPI(Arrays.asList(staffId), kpiIds,unitId, ConfLevel.STAFF);
+        }
+    }
     //setting orgType-KPI configuration
 
 

@@ -14,11 +14,13 @@ import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.ws.rs.QueryParam;
 import java.util.List;
 import java.util.Map;
 
@@ -182,11 +184,17 @@ public class CounterDistController {
     }
 
     @GetMapping(UNIT_URL+COUNTER_DIST_URL+"/access_group/{accessGroupId}")
-    public ResponseEntity<Map<String, Object>> getInitialDataForAccessgroupKPIConfOfUnit(@PathVariable Long unitId,@PathVariable Long accessGroupId){
+    public ResponseEntity<Map<String, Object>> getInitialDataForAccessgroupKPIConfOfUnit(@PathVariable Long unitId, @PathVariable Long accessGroupId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialAccessGroupKPIDataConf(accessGroupId,unitId,ConfLevel.UNIT));
     }
 
+    @PostMapping(UNIT_URL+COUNTER_DIST_URL+"/staff/{staffId}/access_group/{accessGroupId}/update_kpi")
+    public ResponseEntity<Map<String,Object>> updateStaffAccessGroupKPISetting(@PathVariable Long unitId,@PathVariable Long accessGroupId, @PathVariable Long staffId){
+        counterManagementService.addAndRemoveStaffAccessGroupKPISetting(staffId,unitId,accessGroupId,true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
     // orgType Apis
+
 
     @GetMapping(COUNTRY_URL+COUNTER_DIST_URL+"/org_type/{orgTypeId}")
     public ResponseEntity<Map<String, Object>> getInitialDataForOrgTypeKPIConf(@PathVariable Long countryId,@PathVariable Long orgTypeId){
