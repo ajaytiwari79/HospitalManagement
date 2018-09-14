@@ -33,7 +33,7 @@ public class UserOauth2Service implements UserDetailsService {
     private ExceptionService exceptionService;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-         User user=  userGraphRepository.findByUserNameIgnoreCase(username.toLowerCase());
+         User user=  userGraphRepository.findByEmail(username.toLowerCase());
          user.setHubMember(accessPageService.isHubMember(user.getId()));
          Optional<User> loggedUser=Optional.ofNullable(user);
          String otpString=HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");

@@ -42,6 +42,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -279,19 +280,40 @@ public class CompanyCreationService {
             if (unitManagerDTO.getCprNumber() != null && unitManagerDTO.getCprNumber().length() != 10) {
                 exceptionService.actionNotPermittedException("message.cprNumber.size");
             }
+
             // user can fill any random property and we need to fetch
             User user = userGraphRepository.getUserOfOrganization(organization.getId());
             if (user != null) {
+                byte isAnotherExist = userGraphRepository.validateUserEmailAndCPRExceptCurrentUser("(?)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber(), user.getId());
+                if (isAnotherExist != 0) {
+                    exceptionService.duplicateDataException("user already exist by email or cpr");
+                }
                 user.setEmail(unitManagerDTO.getEmail());
+                user.setFirstName(unitManagerDTO.getEmail());
                 user.setCprNumber(unitManagerDTO.getCprNumber());
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
+                if (unitManagerDTO.getFirstName() != null || StringUtils.isEmpty(unitManagerDTO.getFirstName())) {
+                    user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
+                }
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
                     staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId());
                 }
             } else {
+                // No user is found its first time so we need to validate email and CPR number
+                //validate user email or name
+                if (unitManagerDTO.getCprNumber() != null || unitManagerDTO.getEmail() != null) {
+                    byte userBySameEmailOrCPR = userGraphRepository.findByEmailIgnoreCaseOrCprNumber("(?i)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber());
+                    if (userBySameEmailOrCPR != 0) {
+                        exceptionService.duplicateDataException("user already exist by email or cpr");
+                    }
+                }
                 user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail());
+                user.setFirstName(unitManagerDTO.getEmail());
+                if (unitManagerDTO.getFirstName() != null || StringUtils.isEmpty(unitManagerDTO.getFirstName())) {
+                    user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
+                }
                 userGraphRepository.save(user);
                 staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization);
 
@@ -367,9 +389,9 @@ public class CompanyCreationService {
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
         if (organizationBasicDTO.getUnitManager() != null
-                && (organizationBasicDTO.getUnitManager().getEmail()!=null||organizationBasicDTO.getUnitManager().getLastName()!=null||
-                organizationBasicDTO.getUnitManager().getFirstName()!=null|| organizationBasicDTO.getUnitManager().getCprNumber()!=null||
-                organizationBasicDTO.getUnitManager().getAccessGroupId()!=null)) {
+                && (organizationBasicDTO.getUnitManager().getEmail() != null || organizationBasicDTO.getUnitManager().getLastName() != null ||
+                organizationBasicDTO.getUnitManager().getFirstName() != null || organizationBasicDTO.getUnitManager().getCprNumber() != null ||
+                organizationBasicDTO.getUnitManager().getAccessGroupId() != null)) {
             setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
         }
         //Assign Parent Organization's level to unit
