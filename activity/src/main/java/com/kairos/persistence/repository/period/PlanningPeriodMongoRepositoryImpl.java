@@ -251,7 +251,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     }
 
     @Override
-    public Phase getCurrentPhaseByDate(Long unitId, Date dateLiesInPeriod) {
+    public Phase getCurrentPhaseByDate(Long unitId, LocalDate dateLiesInPeriod) {
         Aggregation aggregation = newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("active").is(true).
                         and("startDate").lte(dateLiesInPeriod).and("endDate").gte(dateLiesInPeriod)),
