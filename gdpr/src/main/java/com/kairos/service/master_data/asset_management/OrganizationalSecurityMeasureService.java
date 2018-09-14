@@ -145,27 +145,6 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
 
     }
 
-    /**
-     * @param countryId
-     * @param
-     * @param name      OrganizationalSecurityMeasure name
-     * @return OrganizationalSecurityMeasure fetch via name
-     * @throws DataNotExists throw exception if OrganizationalSecurityMeasure not exist for given name
-     */
-    public OrganizationalSecurityMeasure getOrganizationalSecurityMeasureByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
 
     /**
      * @description method save Organizational security measure suggested by unit

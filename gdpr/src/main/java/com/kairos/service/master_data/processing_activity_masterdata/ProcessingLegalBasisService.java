@@ -147,25 +147,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
     }
 
-    /**
-     * @param countryId
-     * @param
-     * @param name      name of ProcessingLegalBasis
-     * @return ProcessingLegalBasis object fetch on basis of  name
-     * @throws DataNotExists throw exception if ProcessingLegalBasis not exist for given name
-     */
-    public ProcessingLegalBasis getProcessingLegalBasisByName(Long countryId, String name) {
 
-        if (!StringUtils.isBlank(name)) {
-            ProcessingLegalBasis exist = legalBasisMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
 
 
     /**
