@@ -8,6 +8,7 @@ import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -41,89 +42,63 @@ public class TransferMethodController {
 
 
     @ApiOperation("add transfer Method ")
-    @PostMapping("/transfer_method/add")
+    @PostMapping("/transfer_method")
     public ResponseEntity<Object> createTransferMethod(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TransferMethodDTO> transferMethods) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.createTransferMethod(countryId, transferMethods.getRequestBody()));
-
     }
 
 
     @ApiOperation("get transfer Method by id")
-    @GetMapping("/transfer_method/{id}")
-    public ResponseEntity<Object> getTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
+    @GetMapping("/transfer_method/{transferMethodId}")
+    public ResponseEntity<Object> getTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger transferMethodId) {
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethod(countryId, id));
-
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethod(countryId, transferMethodId));
     }
 
 
     @ApiOperation("get all transfer Method")
-    @GetMapping("/transfer_method/all")
+    @GetMapping("/transfer_method")
     public ResponseEntity<Object> getAllTransferMethod(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getAllTransferMethod(countryId));
-
     }
 
-    @ApiOperation("get transfer Method by name")
-    @GetMapping("/transfer_method/name")
-    public ResponseEntity<Object> getResponsibilityTypeByName(@PathVariable Long countryId, @RequestParam String name) {
+    @ApiOperation("delete transfer Method by id")
+    @DeleteMapping("/transfer_method/{transferMethodId}")
+    public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger transferMethodId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethodByName(countryId, name));
-
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.deleteTransferMethod(countryId, transferMethodId));
     }
-
-
-    @ApiOperation("delete transfer Method by id")
-    @DeleteMapping("/transfer_method/delete/{id}")
-    public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.deleteTransferMethod(countryId, id));
-
-    }
-
 
 
     @ApiOperation("update transfer Method by id")
-    @PutMapping("/transfer_method/update/{id}")
-    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody TransferMethodDTO transferMethod) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
+    @PutMapping("/transfer_method/{transferMethodId}")
+    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger transferMethodId, @Valid @RequestBody TransferMethodDTO transferMethod) {
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.updateTransferMethod(countryId, id, transferMethod));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.updateTransferMethod(countryId, transferMethodId, transferMethod));
     }
-
 
 
     @ApiOperation("update Suggested status of Transfer methods")
     @PutMapping("/transfer_method")
     public ResponseEntity<Object> updateSuggestedStatusOfTransferMethods(@PathVariable Long countryId, @RequestBody Set<BigInteger> transferMethodIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+        if (CollectionUtils.isEmpty(transferMethodIds)) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+        } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,transferMethodDestinationService.updateSuggestedStatusOfTransferMethodList(countryId, transferMethodIds, suggestedDataStatus));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.updateSuggestedStatusOfTransferMethodList(countryId, transferMethodIds, suggestedDataStatus));
     }
 
 

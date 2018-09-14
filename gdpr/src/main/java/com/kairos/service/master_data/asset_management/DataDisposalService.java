@@ -138,28 +138,6 @@ public class DataDisposalService extends MongoBaseService {
 
     }
 
-
-    /**
-     * @param countryId
-     * @param name
-     * @return object of data disposal
-     * @throws DataNotExists if data  disposal not exist of requested name
-     * @description this method is used for get  data disposal by name
-     */
-    public DataDisposal getDataDisposalByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            DataDisposal exist = dataDisposalMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
     /**
      * @param countryId
      * @param dataDisposalDTOS

@@ -8,6 +8,7 @@ import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -40,30 +41,28 @@ public class DataSourceController {
 
 
     @ApiOperation("add dataSource")
-    @PostMapping("/data_source/add")
-    public ResponseEntity<Object> createDataSource(@PathVariable Long countryId,@Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSource) {
-       if (countryId == null) {
+    @PostMapping("/data_source")
+    public ResponseEntity<Object> createDataSource(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSource) {
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId,dataSource.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId, dataSource.getRequestBody()));
 
     }
 
 
     @ApiOperation("get dataSource by id")
-    @GetMapping("/data_source/{id}")
-    public ResponseEntity<Object> getDataSource(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } if (countryId == null) {
+    @GetMapping("/data_source/{dataSourceId}")
+    public ResponseEntity<Object> getDataSource(@PathVariable Long countryId, @PathVariable BigInteger dataSourceId) {
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(countryId,id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(countryId, dataSourceId));
     }
 
 
     @ApiOperation("get all dataSource ")
-    @GetMapping("/data_source/all")
+    @GetMapping("/data_source")
     public ResponseEntity<Object> getAllDataSource(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -71,51 +70,36 @@ public class DataSourceController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getAllDataSource(countryId));
     }
 
-    @ApiOperation("get dataSource by name")
-    @GetMapping("/data_source/name")
-    public ResponseEntity<Object> getDataSourceByName(@PathVariable Long countryId,@RequestParam String name) {
+    @ApiOperation("delete dataSource  by id")
+    @DeleteMapping("/data_source/{dataSourceId}")
+    public ResponseEntity<Object> deleteDataSource(@PathVariable Long countryId, @PathVariable BigInteger dataSourceId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSourceByName(countryId,name));
-
-    }
-
-
-    @ApiOperation("delete dataSource  by id")
-    @DeleteMapping("/data_source/delete/{id}")
-    public ResponseEntity<Object> deleteDataSource(@PathVariable Long countryId,@PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }    return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.deleteDataSource(countryId,id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.deleteDataSource(countryId, dataSourceId));
 
     }
 
     @ApiOperation("update dataSource by id")
-    @PutMapping("/data_source/update/{id}")
-    public ResponseEntity<Object> updateDataSource(@PathVariable Long countryId,@PathVariable BigInteger id, @Valid @RequestBody DataSourceDTO dataSource) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } if (countryId == null) {
+    @PutMapping("/data_source/{dataSourceId}")
+    public ResponseEntity<Object> updateDataSource(@PathVariable Long countryId, @PathVariable BigInteger dataSourceId, @Valid @RequestBody DataSourceDTO dataSource) {
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }  return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(countryId,id, dataSource));
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(countryId, dataSourceId, dataSource));
 
     }
 
     @ApiOperation("update Suggested status of Data Sources ")
     @PutMapping("/data_source")
     public ResponseEntity<Object> updateSuggestedStatusOfDataSources(@PathVariable Long countryId, @RequestBody Set<BigInteger> dataSourceIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+        if (CollectionUtils.isEmpty(dataSourceIds)) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+        } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,dataSourceService.updateSuggestedStatusOfDataSourceList(countryId, dataSourceIds, suggestedDataStatus));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateSuggestedStatusOfDataSourceList(countryId, dataSourceIds, suggestedDataStatus));
     }
-
 
 
 }

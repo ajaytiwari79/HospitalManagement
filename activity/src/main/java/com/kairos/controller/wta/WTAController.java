@@ -230,7 +230,7 @@ public class WTAController {
 
     @ApiOperation(value = "copy cta wta to new uniposition")
     @PostMapping(value = "/copy_wta_cta")
-    public ResponseEntity<Map<String, Object>> getWTAWithVersionIds(@RequestBody List<UnitPositionIdDTO> unitPositionIDs) {
+    public ResponseEntity<Map<String, Object>> copyCTAWTAForUnitPositionId(@RequestBody List<UnitPositionIdDTO> unitPositionIDs) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.copyWtaCTA(unitPositionIDs));
     }
 

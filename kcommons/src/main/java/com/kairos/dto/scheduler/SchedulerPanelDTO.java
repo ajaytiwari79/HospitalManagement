@@ -58,6 +58,18 @@ public class SchedulerPanelDTO {
         this.entityId = entityId;
     }
 
+    public SchedulerPanelDTO(JobType jobType,JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
+       this.jobType=jobType;
+        this.jobSubType = jobSubType;
+        this.oneTimeTrigger = oneTimeTrigger;
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
+        this.entityId = entityId;
+    }
+
+    public SchedulerPanelDTO(BigInteger id, LocalDateTime oneTimeTriggerDate) {
+        this.id = id;
+        this.oneTimeTriggerDate = oneTimeTriggerDate;
+    }
 
     public BigInteger getId() {
         return id;
@@ -117,8 +129,7 @@ public class SchedulerPanelDTO {
 
 
 
-
-   /* public String getRunOnce() {
+    /* public String getRunOnce() {
         return runOnce;
     }
 

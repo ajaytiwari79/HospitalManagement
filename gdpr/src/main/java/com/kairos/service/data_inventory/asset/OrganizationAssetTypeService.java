@@ -4,9 +4,7 @@ package com.kairos.service.data_inventory.asset;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.data_inventory.AssetTypeOrganizationLevelDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
-import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
-import com.kairos.persistance.model.risk_management.Risk;
 import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistance.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistance.repository.risk_management.RiskMongoRepository;
@@ -60,7 +58,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
     public AssetTypeOrganizationLevelDTO createAssetTypeAndAddSubAssetTypes(Long unitId, AssetTypeOrganizationLevelDTO assetTypeDto) {
 
 
-        AssetType previousAssetType = assetTypeMongoRepository.findByNameAndOrganizationId(unitId, assetTypeDto.getName());
+        AssetType previousAssetType = assetTypeMongoRepository.findByNameAndUnitId(unitId, assetTypeDto.getName());
         if (Optional.ofNullable(previousAssetType).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
@@ -146,17 +144,9 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      * @return return list of Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
     public List<AssetTypeRiskResponseDTO> getAllAssetType(Long organizationId) {
-        return assetTypeMongoRepository.getAllAssetTypesByUnitId(organizationId);
+        return assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByUnitId(organizationId);
     }
 
-    /**
-     * @param unitId
-     * @param assetTypeId
-     * @return
-     */
-    public List<AssetTypeRiskResponseDTO> getSubAssetTypesOfAssetTypeWithRisks(Long unitId, BigInteger assetTypeId) {
-        return assetTypeMongoRepository.getSubAssetTypesByAssetTypeIdAndUnitId(unitId, assetTypeId);
-    }
 
     /**
      * @param
@@ -164,7 +154,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      * @return return Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
     public AssetTypeResponseDTO getAssetTypeById(Long organizationId, BigInteger id) {
-        AssetTypeResponseDTO assetType = assetTypeMongoRepository.getOrganizationAssetTypesWithSubAssetTypes(organizationId, id);
+        AssetTypeResponseDTO assetType = assetTypeMongoRepository.getAssetTypesWithSubAssetTypesByIdAndUnitId(organizationId, id);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", id);
         }
@@ -183,7 +173,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      */
     public AssetTypeOrganizationLevelDTO updateAssetTypeAndSubAssetsAndAddRisks(Long unitId, BigInteger assetTypeId, AssetTypeOrganizationLevelDTO assetTypeDto) {
 
-        AssetType assetType = assetTypeMongoRepository.findByNameAndOrganizationId(unitId, assetTypeDto.getName());
+        AssetType assetType = assetTypeMongoRepository.findByNameAndUnitId(unitId, assetTypeDto.getName());
         if (Optional.ofNullable(assetType).isPresent() && !assetTypeId.equals(assetType.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
