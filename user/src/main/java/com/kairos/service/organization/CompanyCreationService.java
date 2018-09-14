@@ -509,13 +509,7 @@ public class CompanyCreationService {
         organization.setBoardingCompleted(true);
         organizationGraphRepository.save(organization);
 
-        List<Staff> staffList= new ArrayList<>();
-        staffPersonalDetailDTOS.forEach(staffPersonalDetailDTO->{
-            staffService.addStaffInChatServer(staffPersonalDetailDTO.getStaff());
-            staffList.add(staffPersonalDetailDTO.getStaff());
-        });
-        staffGraphRepository.saveAll(staffList);
-
+        addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
 
 
         // if more than 2 default things needed make a  async service Please
@@ -536,5 +530,11 @@ public class CompanyCreationService {
 
         return true;
     }
+
+    private void addStaffsInChatServer(List<Staff> staffList){
+        staffList.forEach(staff->{ staffService.addStaffInChatServer(staff); });
+        staffGraphRepository.saveAll(staffList);
+    }
+
 
 }
