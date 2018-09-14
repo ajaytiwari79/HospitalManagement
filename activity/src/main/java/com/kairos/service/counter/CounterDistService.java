@@ -609,7 +609,7 @@ public class CounterDistService extends MongoBaseService {
         kpiDashboards.stream().forEach(kpiDashboard -> {
             kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(),kpiDashboard.getParentModuleId()));
         });
-        if(!kpiCategories.isEmpty()) save(kpiDashboards);
+        if(!kpiDashboards.isEmpty()) save(kpiDashboards);
         kpiDashboards.stream().forEach(kpiDashboard  -> {
             dashboardsOldAndNewIds.put(dashboardsNameMap.get(kpiDashboard.getName()),kpiDashboard.getId());
         });
