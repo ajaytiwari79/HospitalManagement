@@ -45,13 +45,24 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
     }
 
     @Override
-    public List<AssetTypeRiskResponseDTO> getAllAssetTypesByCountryId(Long countryId) {
-
+    public List<AssetTypeRiskResponseDTO> getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
+
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("subAsset").is(false).and(DELETED).is(false)),
                 lookup("risk", "risks", "_id", "risks"),
-                sort(Sort.Direction.ASC, "name")
-                );
+                lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
+                unwind("subAssetTypes", true),
+                sort(Sort.Direction.ASC, "subAssetTypes.name"),
+                lookup("risk", "subAssetTypes.risks", "_id", "subAssetTypes.risks"),
+                group("$id")
+                        .addToSet("subAssetTypes").as("subAssetTypes")
+                        .first("risks").as("risks")
+                        .first("hasSubAsset").as("hasSubAsset")
+                        .first("name").as("name")
+                        .first("subAsset").as("subAsset"),
+                sort(Sort.Direction.ASC, "name"),
+                new CustomAggregationOperation(nonDeletedSubAssetOperation)
+        );
 
 
         AggregationResults<AssetTypeRiskResponseDTO> result = mongoTemplate.aggregate(aggregation, AssetType.class, AssetTypeRiskResponseDTO.class);
@@ -60,25 +71,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
 
     @Override
-    public List<AssetTypeRiskResponseDTO> getSubAssetTypesByAssetTypeIdAndCountryId(Long countryId, BigInteger assetTypeId) {
-        String replaceRoot="{'$replaceRoot':{'newRoot':'$subAssetTypes'}}";
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and("subAsset").is(false).and(DELETED).is(false).and("_id").is(assetTypeId)),
-                lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
-                unwind("subAssetTypes",true),
-                new CustomAggregationOperation(Document.parse(replaceRoot)),
-                lookup("risk", "risks", "_id", "risks"),
-                sort(Sort.Direction.ASC, "name")
-        );
-
-
-        AggregationResults<AssetTypeRiskResponseDTO> result = mongoTemplate.aggregate(aggregation, AssetType.class, AssetTypeRiskResponseDTO.class);
-        return result.getMappedResults();
-        }
-
-    @Override
-    public AssetTypeResponseDTO getCountryAssetTypesWithSubAssetTypes(Long countryId, BigInteger id) {
+    public AssetTypeResponseDTO getAssetTypesWithSubAssetTypesByIdAndCountryId(Long countryId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("subAsset").is(false).and(DELETED).is(false).and("_id").is(id)),
@@ -91,7 +84,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
 
     @Override
-    public AssetType findByNameAndOrganizationId(Long organizationId, String name) {
+    public AssetType findByNameAndUnitId(Long organizationId, String name) {
         Query query = new Query();
         query.addCriteria(Criteria.where(ORGANIZATION_ID).is(organizationId).and("deleted").is(false).and("name").is(name).and("subAsset").is(false));
         query.collation(Collation.of("en").
@@ -101,35 +94,34 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
 
     @Override
-    public List<AssetTypeRiskResponseDTO> getAllAssetTypesByUnitId(Long unitId) {
+    public List<AssetTypeRiskResponseDTO> getAllAssetTypeWithSubAssetTypeAndRiskByUnitId(Long unitId) {
+
         Aggregation aggregation = Aggregation.newAggregation(
+
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and("subAsset").is(false).and(DELETED).is(false)),
                 lookup("risk", "risks", "_id", "risks"),
-                sort(Sort.Direction.ASC, "name")
-        );
-
-
-        AggregationResults<AssetTypeRiskResponseDTO> result = mongoTemplate.aggregate(aggregation, AssetType.class, AssetTypeRiskResponseDTO.class);
-        return result.getMappedResults();
-    }
-
-    @Override
-    public List<AssetTypeRiskResponseDTO> getSubAssetTypesByAssetTypeIdAndUnitId(Long unitId, BigInteger assetTypeId) {
-        String replaceRoot="{'$replaceRoot':{'newRoot':'$subAssetTypes'}}";
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and("subAsset").is(false).and(DELETED).is(false).and("_id").is(assetTypeId)),
                 lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
-                unwind("subAssetTypes",true),
-                new CustomAggregationOperation(Document.parse(replaceRoot)),
-                lookup("risk", "risks", "_id", "risks"),
-                sort(Sort.Direction.ASC, "name")
+                unwind("subAssetTypes", true),
+                sort(Sort.Direction.ASC, "subAssetTypes.name"),
+                lookup("risk", "subAssetTypes.risks", "_id", "subAssetTypes.risks"),
+                group("$id")
+                        .addToSet("subAssetTypes").as("subAssetTypes")
+                        .first("risks").as("risks")
+                        .first("hasSubAsset").as("hasSubAsset")
+                        .first("name").as("name")
+                        .first("subAsset").as("subAsset"),
+                sort(Sort.Direction.ASC, "name"),
+                new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
+
+
         AggregationResults<AssetTypeRiskResponseDTO> result = mongoTemplate.aggregate(aggregation, AssetType.class, AssetTypeRiskResponseDTO.class);
         return result.getMappedResults();
     }
 
+
     @Override
-    public AssetTypeResponseDTO getOrganizationAssetTypesWithSubAssetTypes(Long organizationId, BigInteger id) {
+    public AssetTypeResponseDTO getAssetTypesWithSubAssetTypesByIdAndUnitId(Long organizationId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(ORGANIZATION_ID).is(organizationId).and("subAsset").is(false).and(DELETED).is(false).and("_id").is(id)),

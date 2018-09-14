@@ -7,6 +7,13 @@ public class LocalDateTimeIdDTO {
     private LocalDateTime dateTime;
     private BigInteger id;
 
+    public LocalDateTimeIdDTO() {
+    }
+
+    public LocalDateTimeIdDTO(BigInteger id, LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+        this.id = id;
+    }
 
     public LocalDateTime getDateTime() {
         return dateTime;

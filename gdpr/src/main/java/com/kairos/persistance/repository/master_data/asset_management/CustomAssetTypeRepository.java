@@ -11,22 +11,15 @@ public interface CustomAssetTypeRepository {
 
     AssetType findByNameAndCountryId(Long countryId,String name);
 
-    List<AssetTypeRiskResponseDTO> getAllAssetTypesByCountryId(Long countryId);
+    List<AssetTypeRiskResponseDTO> getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(Long countryId);
 
-    List<AssetTypeRiskResponseDTO> getSubAssetTypesByAssetTypeIdAndCountryId(Long countryId,BigInteger assetTypeId);
+    AssetTypeResponseDTO getAssetTypesWithSubAssetTypesByIdAndCountryId(Long countryId, BigInteger id);
 
-    AssetTypeResponseDTO getCountryAssetTypesWithSubAssetTypes(Long countryId, BigInteger id);
+    AssetType findByNameAndUnitId(Long organizationId, String name);
 
-    AssetType findByNameAndOrganizationId(Long organizationId,String name);
+    AssetTypeResponseDTO getAssetTypesWithSubAssetTypesByIdAndUnitId(Long unitId, BigInteger id);
 
-    AssetTypeResponseDTO getOrganizationAssetTypesWithSubAssetTypes( Long unitId, BigInteger id);
-
-    List<AssetTypeRiskResponseDTO> getAllAssetTypesByUnitId(Long unitId);
-
-    List<AssetTypeRiskResponseDTO> getSubAssetTypesByAssetTypeIdAndUnitId(Long unitId,BigInteger assetTypeId);
-
-
-
+    List<AssetTypeRiskResponseDTO> getAllAssetTypeWithSubAssetTypeAndRiskByUnitId(Long unitId);
 
 
 }

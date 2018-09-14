@@ -162,26 +162,6 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
     }
 
-    /**
-     * @param organizationId
-     * @param name           name of ResponsibilityType
-     * @return ResponsibilityType object fetch on basis of  name
-     * @throws DataNotExists throw exception if ResponsibilityType not exist for given name
-     */
-    public ResponsibilityType getResponsibilityTypeByName(Long organizationId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            ResponsibilityType exist = responsibilityTypeMongoRepository.findByOrganizationIdAndName(organizationId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
 
     public Map<String, List<ResponsibilityType>> saveAndSuggestResponsibilityTypes(Long countryId, Long organizationId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 

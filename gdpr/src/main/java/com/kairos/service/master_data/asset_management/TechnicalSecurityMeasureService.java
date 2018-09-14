@@ -146,28 +146,6 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
     }
 
     /**
-     * @param countryId
-     * @param
-     * @param name      name of TechnicalSecurityMeasure
-     * @return TechnicalSecurityMeasure object fetch on basis of  name
-     * @throws DataNotExists throw exception if TechnicalSecurityMeasure exist for given name
-     */
-    public TechnicalSecurityMeasure getTechnicalSecurityMeasureByName(Long countryId, String name) {
-
-        if (!StringUtils.isBlank(name)) {
-            TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByNameAndCountryId(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
-
-
-    /**
      * @description method save technical security measure  suggested by unit
      * @param countryId
      * @param technicalSecurityMeasureDTOS
