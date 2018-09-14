@@ -267,7 +267,7 @@ public class CompanyCreationService {
                 user.setLastName(unitManagerDTO.getLastName());
                 userGraphRepository.save(user);
             } else {
-                if (unitManagerDTO != null && unitManagerDTO.getCprNumber() != null) {
+                if (unitManagerDTO.getCprNumber() != null) {
                     StaffCreationDTO unitManagerData = new StaffCreationDTO(unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(),
                             unitManagerDTO.getCprNumber(),
                             null, unitManagerDTO.getEmail(), null, unitManagerDTO.getEmail(), null, unitManagerDTO.getAccessGroupId());
@@ -366,7 +366,10 @@ public class CompanyCreationService {
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
-        if (organizationBasicDTO.getUnitManager() != null) {
+        if (organizationBasicDTO.getUnitManager() != null
+                && (organizationBasicDTO.getUnitManager().getEmail()!=null||organizationBasicDTO.getUnitManager().getLastName()!=null||
+                organizationBasicDTO.getUnitManager().getFirstName()!=null|| organizationBasicDTO.getUnitManager().getCprNumber()!=null||
+                organizationBasicDTO.getUnitManager().getAccessGroupId()!=null)) {
             setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
         }
         //Assign Parent Organization's level to unit

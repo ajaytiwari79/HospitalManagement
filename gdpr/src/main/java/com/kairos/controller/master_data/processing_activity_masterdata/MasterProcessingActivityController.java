@@ -110,7 +110,7 @@ public class MasterProcessingActivityController {
     }
 
 
-    @ApiOperation(value = "Linke risk with Processing Activity And Sub Processing Activity")
+    @ApiOperation(value = "Link risk with Processing Activity And Sub Processing Activity")
     @PutMapping("/master_processing_activity/{processingActivityId}/risk")
     public ResponseEntity<Object> createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody MasterProcessingActivityRiskDTO masterProcessingActivityRiskDTO) {
 

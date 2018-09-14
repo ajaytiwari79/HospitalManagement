@@ -101,16 +101,30 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
 
 
     @Override
-    public List<AssetTypeResponseDTO> getAllOrganizationAssetTypesWithSubAssetTypes(Long organizationId) {
+    public List<AssetTypeRiskResponseDTO> getAllAssetTypesByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-
-                match(Criteria.where(ORGANIZATION_ID).is(organizationId).and("subAsset").is(false).and(DELETED).is(false)),
-                lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
-                new CustomAggregationOperation(nonDeletedSubAssetOperation)
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and("subAsset").is(false).and(DELETED).is(false)),
+                lookup("risk", "risks", "_id", "risks"),
+                sort(Sort.Direction.ASC, "name")
         );
 
 
-        AggregationResults<AssetTypeResponseDTO> result = mongoTemplate.aggregate(aggregation, AssetType.class, AssetTypeResponseDTO.class);
+        AggregationResults<AssetTypeRiskResponseDTO> result = mongoTemplate.aggregate(aggregation, AssetType.class, AssetTypeRiskResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public List<AssetTypeRiskResponseDTO> getSubAssetTypesByAssetTypeIdAndUnitId(Long unitId, BigInteger assetTypeId) {
+        String replaceRoot="{'$replaceRoot':{'newRoot':'$subAssetTypes'}}";
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and("subAsset").is(false).and(DELETED).is(false).and("_id").is(assetTypeId)),
+                lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
+                unwind("subAssetTypes",true),
+                new CustomAggregationOperation(Document.parse(replaceRoot)),
+                lookup("risk", "risks", "_id", "risks"),
+                sort(Sort.Direction.ASC, "name")
+        );
+        AggregationResults<AssetTypeRiskResponseDTO> result = mongoTemplate.aggregate(aggregation, AssetType.class, AssetTypeRiskResponseDTO.class);
         return result.getMappedResults();
     }
 

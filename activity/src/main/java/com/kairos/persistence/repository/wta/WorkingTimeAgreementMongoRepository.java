@@ -26,8 +26,8 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     @Query("{id:?0,deleted:false}")
     WorkingTimeAgreement removeOldParentWTAMapping(BigInteger wtaId);
 
-    @Query("{organization.id:?0,id:?1,deleted:false}")
-    WorkingTimeAgreement getOrganizationCopyOfWTA(Long unitId, BigInteger wtaId);
+
+    List<WorkingTimeAgreement> findAllByUnitPositionIdInAndDeletedFalse(Set<Long> unitPositionId);
 
 
     @Query("{_id:{$in:?0}, deleted:false}")

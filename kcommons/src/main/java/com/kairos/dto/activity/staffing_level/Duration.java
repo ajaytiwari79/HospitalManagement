@@ -33,7 +33,6 @@ public class Duration {
         else
             return 0;
     }
-
     public LocalTime getFrom() {
         return from;
     }

@@ -3,7 +3,9 @@ package com.kairos.dto.activity.break_settings;/*
  *
  */
 
+
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.unit_settings.FlexibleTimeSettingDTO;
 
 import java.util.List;
 
@@ -11,15 +13,17 @@ public class BreakSettingAndActivitiesWrapper {
     private List<BreakSettingsDTO> breakSettings;
     private List<ActivityDTO> paidActivities;
     private List<ActivityDTO> unpaidActivities;
+    private FlexibleTimeSettingDTO flexibleTimeSettings;
 
     public BreakSettingAndActivitiesWrapper() {
         //Default Constructor
     }
 
-    public BreakSettingAndActivitiesWrapper(List<BreakSettingsDTO> breakSettings, List<ActivityDTO> paidActivities, List<ActivityDTO> unpaidActivities) {
+    public BreakSettingAndActivitiesWrapper(List<BreakSettingsDTO> breakSettings, List<ActivityDTO> paidActivities, List<ActivityDTO> unpaidActivities, FlexibleTimeSettingDTO flexibleTimeSettings) {
         this.breakSettings = breakSettings;
         this.paidActivities = paidActivities;
         this.unpaidActivities = unpaidActivities;
+        this.flexibleTimeSettings = flexibleTimeSettings;
     }
 
     public List<BreakSettingsDTO> getBreakSettings() {
@@ -44,5 +48,13 @@ public class BreakSettingAndActivitiesWrapper {
 
     public void setUnpaidActivities(List<ActivityDTO> unpaidActivities) {
         this.unpaidActivities = unpaidActivities;
+    }
+
+    public FlexibleTimeSettingDTO getFlexibleTimeSettings() {
+        return flexibleTimeSettings;
+    }
+
+    public void setFlexibleTimeSettings(FlexibleTimeSettingDTO flexibleTimeSettings) {
+        this.flexibleTimeSettings = flexibleTimeSettings;
     }
 }
