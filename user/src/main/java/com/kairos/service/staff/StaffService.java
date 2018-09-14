@@ -2103,7 +2103,7 @@ public class StaffService {
         return true;
     }
 
-    private void addStaffInChatServer(Staff staff) {
+    public void addStaffInChatServer(Staff staff) {
         Map<String, String> auth = new HashMap<>();
         auth.put("type", "m.login.dummy");
         auth.put("session", staff.getEmail());
