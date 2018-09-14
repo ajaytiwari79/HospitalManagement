@@ -110,8 +110,6 @@ public class UnitPositionService {
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private UnitPermissionGraphRepository unitPermissionGraphRepository;
-    //@Inject
-    //private CollectiveTimeAgreementGraphRepository costTimeAgreementGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
@@ -155,7 +153,7 @@ public class UnitPositionService {
     @Inject
     private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
     @Inject
-    ExpertiseEmploymentTypeRelationshipGraphRepository expertiseEmploymentTypeRelationshipGraphRepository;
+    private ExpertiseEmploymentTypeRelationshipGraphRepository expertiseEmploymentTypeRelationshipGraphRepository;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
     @Inject
@@ -348,6 +346,10 @@ public class UnitPositionService {
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
     }
 
+    private void assignWTACTA(Long oldUnitPositionId, Long newUnitPositionId) {
+        activityIntegrationService.copyWTACTA(Collections.singletonList(new UnitPositionIdDTO(oldUnitPositionId, newUnitPositionId)));
+    }
+
     public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO, Long unitId, String type, Boolean saveAsDraft) {
 
         Organization organization = organizationService.getOrganizationDetail(unitId, type);
@@ -379,7 +381,8 @@ public class UnitPositionService {
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             oldUnitPosition.setEndDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate().minusDays(1L)));
-            unitPositionGraphRepository.save(unitPosition);
+            unitPositionGraphRepository.saveAll(Arrays.asList(unitPosition,oldUnitPosition));
+            assignWTACTA(oldUnitPosition.getId(),unitPosition.getId());
             linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         }
@@ -389,6 +392,7 @@ public class UnitPositionService {
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             unitPositionGraphRepository.save(unitPosition);
             linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
+            assignWTACTA(oldUnitPosition.getId(),unitPosition.getId());
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         }
         // calculative value is not changed but still user is publishing it it means olny end date is updated.
@@ -404,6 +408,7 @@ public class UnitPositionService {
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             unitPositionGraphRepository.save(unitPosition);
             linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
+            assignWTACTA(oldUnitPosition.getId(),unitPosition.getId());
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         } else {
             // update in current copy
@@ -411,7 +416,6 @@ public class UnitPositionService {
             if (!saveAsDraft) {
                 List<UnitPosition> oldUnitPositions
                         = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
-
                 validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
                 oldUnitPosition.setPublished(true);
             }
@@ -856,7 +860,7 @@ public class UnitPositionService {
         return unitPositionWithCtaDetailsDTO;
     }
 
-    public void convertUnitPositionObject(UnitPositionQueryResult unitPosition, com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails){
+    public void convertUnitPositionObject(UnitPositionQueryResult unitPosition, com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails) {
 
 
         unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
@@ -875,7 +879,8 @@ public class UnitPositionService {
             unitPositionDetails.setEndDateMillis(unitPosition.getEndDateMillis());
         }
     }
-    private void convertUnitPositionObject(StaffUnitPositionDetails unitPosition, com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails){
+
+    private void convertUnitPositionObject(StaffUnitPositionDetails unitPosition, com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails) {
         unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
         unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
         unitPositionDetails.setId(unitPosition.getId());
@@ -896,7 +901,7 @@ public class UnitPositionService {
 
         StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
-        convertUnitPositionObject(unitPosition,unitPositionDetails);
+        convertUnitPositionObject(unitPosition, unitPositionDetails);
         unitPositionDetails.setCountryId(countryId);
         ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(unitPositionDetails.getExpertise().getId(), unitPositionDetails.getEmploymentType().getId());
         if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
@@ -1144,9 +1149,9 @@ public class UnitPositionService {
         List<NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("upIds", upIds.toString().replace("[", "").replace("]", "")));
         CTATableSettingWrapper ctaTableSettingWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_CTA, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTATableSettingWrapper>>() {
         });
-        Map<Long,UnitPositionQueryResult> unitPositionQueryResultMap = unitPositionQueryResults.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        Map<Long, UnitPositionQueryResult> unitPositionQueryResultMap = unitPositionQueryResults.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         ctaTableSettingWrapper.getAgreements().forEach(currentCTA -> {
-            if(unitPositionQueryResultMap.containsKey(currentCTA.getUnitPositionId())) {
+            if (unitPositionQueryResultMap.containsKey(currentCTA.getUnitPositionId())) {
                 UnitPositionQueryResult currentActiveUnitPosition = unitPositionQueryResultMap.get(currentCTA.getUnitPositionId());
                 currentCTA.setUnitInfo(currentActiveUnitPosition.getUnitInfo());
                 currentCTA.setUnitPositionId(currentActiveUnitPosition.getId());
@@ -1199,13 +1204,13 @@ public class UnitPositionService {
         List<UnitPositionIdDTO> unitPositionNewOldIds = new ArrayList<>();
         unitPositionGraphRepository.saveAll(unitPositions);
         int i = 0;
-        for(UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult:unitPositionSeniorityLevelQueryResults) {
-            unitPositionNewOldIds.add(new UnitPositionIdDTO(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId(),unitPositions.get(i++).getId()));
+        for (UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult : unitPositionSeniorityLevelQueryResults) {
+            unitPositionNewOldIds.add(new UnitPositionIdDTO(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId(), unitPositions.get(i++).getId()));
         }
         unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(unitPositionEmploymentTypeRelationShips);
         activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
-      // List<CTAWTAResponseDTO> ctaWTAs =  activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
+        // List<CTAWTAResponseDTO> ctaWTAs =  activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
     }
 }

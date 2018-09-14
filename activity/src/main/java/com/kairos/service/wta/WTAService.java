@@ -607,7 +607,9 @@ public class WTAService extends MongoBaseService {
             for(WTABaseRuleTemplate wtaBaseRuleTemplate:ruleTemplates) {
                 wtaBaseRuleTemplate.setId(null);
             }
-            save(ruleTemplates);
+            if (!ruleTemplates.isEmpty()) {
+                save(ruleTemplates);
+            }
 
             List<BigInteger> ruleTemplateIds = ruleTemplates.stream().map(ruleTemplate->ruleTemplate.getId()).collect(Collectors.toList());
 
