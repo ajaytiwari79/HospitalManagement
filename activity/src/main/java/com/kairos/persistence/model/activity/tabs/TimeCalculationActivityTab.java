@@ -158,36 +158,6 @@ public class TimeCalculationActivityTab implements Serializable {
     public void setDayTypes(List<Long> dayTypes) {
         this.dayTypes = dayTypes;
     }
-
-    public TimeCalculationActivityTab(String methodForCalculatingTime, Long fixedTimeValue, Boolean multiplyWith, LocalTime defaultStartTime,Double multiplyWithValue) {
-        this.methodForCalculatingTime = methodForCalculatingTime;
-        this.fixedTimeValue = fixedTimeValue;
-        this.multiplyWith = multiplyWith;
-        this.defaultStartTime = defaultStartTime;
-        this.multiplyWithValue = multiplyWithValue;
-    }
-
-    public TimeCalculationActivityTab(String methodForCalculatingTime, TimeCalaculationType fullDayCalculationType, TimeCalaculationType fullWeekCalculationType, Boolean allowBreakReduction, Long fixedTimeValue, String methodForCalculatingTimeInMonths, List<String> balanceType,
-                                      Boolean multiplyWith, Double multiplyWithValue, Boolean multiplyByVacationFactor, Boolean multiplyByFinalSchedule, String breakTemplates, List<Long> dayTypes, DayOfWeek fullWeekStart, DayOfWeek fullWeekEnd, int historyDuration, LocalTime defaultStartTime) {
-        this.methodForCalculatingTime = methodForCalculatingTime;
-        this.fullDayCalculationType = fullDayCalculationType;
-        this.fullWeekCalculationType = fullWeekCalculationType;
-        this.allowBreakReduction = allowBreakReduction;
-        this.fixedTimeValue = fixedTimeValue;
-        this.methodForCalculatingTimeInMonths = methodForCalculatingTimeInMonths;
-        this.balanceType = balanceType;
-        this.multiplyWith = multiplyWith;
-        this.multiplyWithValue = multiplyWithValue;
-        this.multiplyByVacationFactor = multiplyByVacationFactor;
-        this.multiplyByFinalSchedule = multiplyByFinalSchedule;
-        this.breakTemplates = breakTemplates;
-        this.dayTypes = dayTypes;
-        this.fullWeekStart = fullWeekStart;
-        this.fullWeekEnd = fullWeekEnd;
-        this.historyDuration = historyDuration;
-        this.defaultStartTime = defaultStartTime;
-    }
-
     public TimeCalaculationType getFullDayCalculationType() {
         return fullDayCalculationType;
     }
@@ -203,4 +173,13 @@ public class TimeCalculationActivityTab implements Serializable {
     public void setFullWeekCalculationType(TimeCalaculationType fullWeekCalculationType) {
         this.fullWeekCalculationType = fullWeekCalculationType;
     }
+    public TimeCalculationActivityTab(String methodForCalculatingTime, Long fixedTimeValue, Boolean multiplyWith, LocalTime defaultStartTime,Double multiplyWithValue) {
+        this.methodForCalculatingTime = methodForCalculatingTime;
+        this.fixedTimeValue = fixedTimeValue;
+        this.multiplyWith = multiplyWith;
+        this.defaultStartTime = defaultStartTime;
+        this.multiplyWithValue = multiplyWithValue;
+    }
+
+
 }

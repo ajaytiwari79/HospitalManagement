@@ -149,28 +149,6 @@ public class HostingTypeService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param
-     * @param name      name of HostingType
-     * @return HostingType object fetch on the basis of name
-     * @throws DataNotExists if HostingType not exist for given name
-     */
-    public HostingType getHostingTypeByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            HostingType exist = hostingTypeMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
-
-    /**
-     * @param countryId
      * @param hostingTypeDTOS
      * @return
      * @description method save Hosting type suggested by unit

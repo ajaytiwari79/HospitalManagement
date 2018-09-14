@@ -144,26 +144,6 @@ public class TransferMethodService extends MongoBaseService {
     }
 
     /**
-     * @param countryId
-     * @param
-     * @param name      name of TransferMethod
-     * @return TransferMethod object fetch on basis of  name
-     * @throws DataNotExists throw exception if TransferMethod not exist for given name
-     */
-    public TransferMethod getTransferMethodByName(Long countryId, String name) {
-        if (!StringUtils.isBlank(name)) {
-            TransferMethod exist = transferMethodRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
-
-    /**
      * @description method save TransferMethod suggested by unit
      * @param countryId
      * @param transferMethodDTOS - transfer method suggested by unit

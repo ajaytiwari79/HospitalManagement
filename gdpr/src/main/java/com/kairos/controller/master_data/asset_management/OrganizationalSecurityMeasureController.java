@@ -8,6 +8,7 @@ import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -40,7 +41,7 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("add OrganizationalSecurityMeasure")
-    @PostMapping("/organization_security/add")
+    @PostMapping("/organization_security")
     public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<OrganizationalSecurityMeasureDTO> orgSecurityMeasures) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -51,20 +52,18 @@ public class OrganizationalSecurityMeasureController {
 
 
     @ApiOperation("get OrganizationalSecurityMeasure by id")
-    @GetMapping("/organization_security/{id}")
-    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
+    @GetMapping("/organization_security/{orgSecurityMeasureId}")
+    public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long countryId, @PathVariable BigInteger orgSecurityMeasureId) {
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(countryId, orgSecurityMeasureId));
     }
 
 
     @ApiOperation("get all OrganizationalSecurityMeasure ")
-    @GetMapping("/organization_security/all")
+    @GetMapping("/organization_security")
     public ResponseEntity<Object> getAllOrganizationalSecurityMeasure(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -72,51 +71,33 @@ public class OrganizationalSecurityMeasureController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(countryId));
     }
 
-
-    @ApiOperation("get Organizational Security Measure by name")
-    @GetMapping("/organization_security/name")
-    public ResponseEntity<Object> getOrganizationalSecurityMeasureByName(@PathVariable Long countryId, @RequestParam String name) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasureByName(countryId, name));
-
-    }
-
-
     @ApiOperation("delete OrganizationalSecurityMeasure  by id")
-    @DeleteMapping("/organization_security/delete/{id}")
-    public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
+    @DeleteMapping("/organization_security/{orgSecurityMeasureId}")
+    public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long countryId, @PathVariable BigInteger orgSecurityMeasureId) {
+         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.deleteOrganizationalSecurityMeasure(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.deleteOrganizationalSecurityMeasure(countryId, orgSecurityMeasureId));
 
     }
 
     @ApiOperation("update OrganizationalSecurityMeasure by id")
-    @PutMapping("/organization_security/update/{id}")
-    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody OrganizationalSecurityMeasureDTO orgSecurityMeasure) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
+    @PutMapping("/organization_security/{orgSecurityMeasureId}")
+    public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long countryId, @PathVariable BigInteger orgSecurityMeasureId, @Valid @RequestBody OrganizationalSecurityMeasureDTO orgSecurityMeasure) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateOrganizationalSecurityMeasure(countryId, id, orgSecurityMeasure));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateOrganizationalSecurityMeasure(countryId, orgSecurityMeasureId, orgSecurityMeasure));
     }
 
 
     @ApiOperation("update Suggested status of organizational Security measures ")
     @PutMapping("/organization_security")
     public ResponseEntity<Object> updateSuggestedStatusOFOrgSecurityMeasures(@PathVariable Long countryId, @RequestBody Set<BigInteger> orgSecurityMeasureIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+        if (CollectionUtils.isEmpty(orgSecurityMeasureIds)) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+        }else  if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateSuggestedStatusOfOrganizationalSecurityMeasures(countryId, orgSecurityMeasureIds, suggestedDataStatus));

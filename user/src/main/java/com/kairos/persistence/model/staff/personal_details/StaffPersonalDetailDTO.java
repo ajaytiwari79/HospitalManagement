@@ -47,6 +47,7 @@ public class StaffPersonalDetailDTO {
     private Long accessGroupId;
     private String accessGroupName;
     private String email;
+    private Staff staff;
     public StaffPersonalDetailDTO() {
         // default constructor
     }
@@ -290,5 +291,13 @@ public class StaffPersonalDetailDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Staff getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Staff staff) {
+        this.staff = staff;
     }
 }

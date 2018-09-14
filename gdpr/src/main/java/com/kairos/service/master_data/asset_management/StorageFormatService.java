@@ -149,27 +149,6 @@ public class StorageFormatService extends MongoBaseService {
     }
 
     /**
-     * @param countryId
-     * @param
-     * @param name      name of StorageFormat
-     * @return StorageFormat object fetch on basis of  name
-     * @throws DataNotExists throw exception if StorageFormat not exist for given name
-     */
-    public StorageFormat getStorageFormatByName(Long countryId, String name) {
-
-        if (!StringUtils.isBlank(name)) {
-            StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
-
-    /**
      * @description method save Storage format suggested by unit
      * @param countryId
      * @param storageFormatDTOS

@@ -33,7 +33,7 @@ public class OrganizationDataSourceController {
 
 
     @ApiOperation("add dataSource")
-    @PostMapping("/data_source/add")
+    @PostMapping("/data_source")
     public ResponseEntity<Object> createDataSource(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSource) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -44,19 +44,17 @@ public class OrganizationDataSourceController {
 
 
     @ApiOperation("get dataSource by id")
-    @GetMapping("/data_source/{id}")
-    public ResponseEntity<Object> getDataSource(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @GetMapping("/data_source/{dataSourceId}")
+    public ResponseEntity<Object> getDataSource(@PathVariable Long unitId, @PathVariable BigInteger dataSourceId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(unitId, dataSourceId));
     }
 
 
     @ApiOperation("get all dataSource ")
-    @GetMapping("/data_source/all")
+    @GetMapping("/data_source")
     public ResponseEntity<Object> getAllDataSource(@PathVariable Long unitId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -66,28 +64,24 @@ public class OrganizationDataSourceController {
 
 
     @ApiOperation("delete dataSource  by id")
-    @DeleteMapping("/data_source/delete/{id}")
-    public ResponseEntity<Object> deleteDataSource(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @DeleteMapping("/data_source/{dataSourceId}")
+    public ResponseEntity<Object> deleteDataSource(@PathVariable Long unitId, @PathVariable BigInteger dataSourceId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.deleteDataSource(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.deleteDataSource(unitId, dataSourceId));
 
     }
 
     @ApiOperation("update dataSource by id")
-    @PutMapping("/data_source/update/{id}")
-    public ResponseEntity<Object> updateDataSource(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody DataSourceDTO dataSource) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @PutMapping("/data_source/{dataSourceId}")
+    public ResponseEntity<Object> updateDataSource(@PathVariable Long unitId, @PathVariable BigInteger dataSourceId, @Valid @RequestBody DataSourceDTO dataSource) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(unitId, id, dataSource));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(unitId, dataSourceId, dataSource));
 
     }
 
