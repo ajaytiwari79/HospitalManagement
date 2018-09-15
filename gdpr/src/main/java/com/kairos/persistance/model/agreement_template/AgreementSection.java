@@ -17,6 +17,8 @@ public class AgreementSection extends MongoBaseEntity {
     @NotBlank(message = "Section Title cannot be empty")
     private String title;
 
+    private boolean subSection;
+
     // clause id are saved in order way
     private List<BigInteger> clauseIdOrderedIndex=new ArrayList<>();
 
@@ -26,6 +28,10 @@ public class AgreementSection extends MongoBaseEntity {
     private Integer orderedIndex;
 
     private Long countryId;
+
+    public boolean isSubSection() { return subSection; }
+
+    public void setSubSection(boolean subSection) { this.subSection = subSection; }
 
     public Long getCountryId() { return countryId; }
 
@@ -50,10 +56,11 @@ public class AgreementSection extends MongoBaseEntity {
     public AgreementSection(){ }
 
 
-    public AgreementSection(Long countryId , @NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex)
+    public AgreementSection(Long countryId , @NotBlank(message = "Section Title cannot be empty") String title, @NotNull(message = "Clause order is Not defined") Integer orderedIndex,boolean subSection)
     {
         this.title=title;
         this.countryId=countryId;
         this.orderedIndex=orderedIndex;
+        this.subSection=subSection;
     }
 }

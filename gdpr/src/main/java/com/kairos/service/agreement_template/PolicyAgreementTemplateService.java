@@ -88,7 +88,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @return
      * @description method return list of Agreement sections with sub sections of policy agreement template
      */
-    public List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(Long countryId,BigInteger agreementTemplateId) {
+    public List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(Long countryId, BigInteger agreementTemplateId) {
 
 
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAgreementTemplateWithSectionsAndSubSections(countryId, agreementTemplateId);
@@ -110,10 +110,12 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     }
 
     private void sortClauseOfAgreementSectionAndSubSectionInResponseDTO(Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS, AgreementSectionResponseDTO agreementSectionResponseDTO) {
-        List<BigInteger> clauseIdOrderedIndexs = agreementSectionResponseDTO.getClauseIdOrderedIndex();
         agreementSectionResponseDTO.getClauses().clear();
         List<ClauseBasicResponseDTO> clauses = new ArrayList<>();
-        clauseIdOrderedIndexs.stream().forEach(clauseIdOrderedIndex -> clauses.add(clauseBasicResponseDTOS.get(clauseIdOrderedIndex)));
+        List<BigInteger> clauseIdOrderIndex=agreementSectionResponseDTO.getClauseIdOrderedIndex();
+        for (int i = 0; i <clauseIdOrderIndex.size(); i++) {
+            clauses.add(clauseBasicResponseDTOS.get(clauseIdOrderIndex.get(i)));
+        }
         agreementSectionResponseDTO.setClauses(clauses);
     }
 
