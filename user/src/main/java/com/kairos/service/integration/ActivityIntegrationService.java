@@ -4,6 +4,8 @@ import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
+import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
+import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
@@ -21,6 +23,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -91,6 +94,14 @@ public class ActivityIntegrationService {
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("endDate", endDate);
         genericRestClient.publish(null, unitId, true, IntegrationOperation.DELETE, "/delete_shifts/staff/"+staffId, queryParams);
+    }
+
+    public List<CTAWTAResponseDTO> copyWTACTA(List<UnitPositionIdDTO> unitPositionIdDTOS) {
+
+
+        List<CTAWTAResponseDTO> ctawtaResponseDTOS = genericRestClient.publish(unitPositionIdDTOS,null,false,IntegrationOperation.CREATE,"/copy_wta_cta",null);
+
+        return ctawtaResponseDTOS;
     }
 
 }
