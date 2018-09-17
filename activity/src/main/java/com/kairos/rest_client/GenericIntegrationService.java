@@ -117,6 +117,7 @@ public class GenericIntegrationService {
         return value.longValue();
     }
 
+
     public AccessGroupPermissionCounterDTO getAccessGroupIdsAndCountryAdmin(Long unitId){
             return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/staff/user/accessgroup",null),AccessGroupPermissionCounterDTO.class);
     }
