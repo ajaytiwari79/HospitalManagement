@@ -11,11 +11,11 @@ public interface CustomPolicyAgreementTemplateRepository {
 
 
 
-    List<PolicyAgreementTemplateResponseDTO>  getAllPolicyAgreementTemplateByCountryId(Long countryId,Long unitId);
+    List<PolicyAgreementTemplateResponseDTO>  getAllPolicyAgreementTemplateByCountryId(Long countryId);
 
-    PolicyAgreementTemplate findByName(Long countryId,Long organizationId,String templateName);
+    PolicyAgreementTemplate findByName(Long countryId,String templateName);
 
-    List<AgreementSectionResponseDTO> getAgreementTemplateAllSectionAndSubSections(Long countryId, Long unitId, BigInteger agreementTemplateId);
+    List<AgreementSectionResponseDTO> getAgreementTemplateWithSectionsAndSubSections(Long countryId, BigInteger agreementTemplateId);
 
 
 }

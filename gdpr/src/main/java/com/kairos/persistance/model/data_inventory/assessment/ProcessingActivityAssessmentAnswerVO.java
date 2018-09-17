@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 
 @ValueObject
-public class ProcessingActivityAssessmentAnswer {
+public class ProcessingActivityAssessmentAnswerVO {
 
     @NotNull(message = "Question id can't be null for Assessment Answer")
     private BigInteger questionId;

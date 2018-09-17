@@ -76,7 +76,6 @@ import com.sun.javafx.scene.control.skin.VirtualFlow;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.bouncycastle.util.test.FixedSecureRandom;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,7 +160,7 @@ public class UnitPositionService {
     @Inject
     private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
     @Inject
-    ExpertiseEmploymentTypeRelationshipGraphRepository expertiseEmploymentTypeRelationshipGraphRepository;
+    private ExpertiseEmploymentTypeRelationshipGraphRepository expertiseEmploymentTypeRelationshipGraphRepository;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
     @Inject
@@ -170,7 +169,6 @@ public class UnitPositionService {
     private GenericRestClient genericRestClient;
     @Inject
     private KafkaProducer kafkaProducer;
-
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
@@ -356,6 +354,10 @@ public class UnitPositionService {
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
     }
 
+    private void assignWTACTA(Long oldUnitPositionId, Long newUnitPositionId) {
+        activityIntegrationService.copyWTACTA(Collections.singletonList(new UnitPositionIdDTO(oldUnitPositionId, newUnitPositionId)));
+    }
+
     public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO, Long unitId, String type, Boolean saveAsDraft) {
 
         Organization organization = organizationService.getOrganizationDetail(unitId, type);
@@ -387,7 +389,8 @@ public class UnitPositionService {
             UnitPosition unitPosition = new UnitPosition();
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             oldUnitPosition.setEndDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate().minusDays(1L)));
-            unitPositionGraphRepository.save(unitPosition);
+            unitPositionGraphRepository.saveAll(Arrays.asList(unitPosition,oldUnitPosition));
+            assignWTACTA(oldUnitPosition.getId(),unitPosition.getId());
             linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         }
@@ -397,6 +400,7 @@ public class UnitPositionService {
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             unitPositionGraphRepository.save(unitPosition);
             linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
+            assignWTACTA(oldUnitPosition.getId(),unitPosition.getId());
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         }
         // calculative value is not changed but still user is publishing it it means olny end date is updated.
@@ -412,6 +416,7 @@ public class UnitPositionService {
             createUnitPositionObject(oldUnitPosition, unitPosition, unitPositionDTO);
             unitPositionGraphRepository.save(unitPosition);
             linkUnitPositionWithEmploymentType(unitPosition, unitPositionDTO);
+            assignWTACTA(oldUnitPosition.getId(),unitPosition.getId());
             unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, unitPositionEmploymentTypeRelationShip, organization.getId(), organization.getName(), null);
         } else {
             // update in current copy
@@ -419,7 +424,6 @@ public class UnitPositionService {
             if (!saveAsDraft) {
                 List<UnitPosition> oldUnitPositions
                         = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
-
                 validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
                 oldUnitPosition.setPublished(true);
             }
@@ -883,7 +887,8 @@ public class UnitPositionService {
             unitPositionDetails.setEndDateMillis(unitPosition.getEndDateMillis());
         }
     }
-    private void convertUnitPositionObject(StaffUnitPositionDetails unitPosition, com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails){
+
+    private void convertUnitPositionObject(StaffUnitPositionDetails unitPosition, com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails) {
         unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
         unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
         unitPositionDetails.setId(unitPosition.getId());
@@ -904,7 +909,7 @@ public class UnitPositionService {
 
         StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
-        convertUnitPositionObject(unitPosition,unitPositionDetails);
+        convertUnitPositionObject(unitPosition, unitPositionDetails);
         unitPositionDetails.setCountryId(countryId);
         ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(unitPositionDetails.getExpertise().getId(), unitPositionDetails.getEmploymentType().getId());
         if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
@@ -952,11 +957,11 @@ public class UnitPositionService {
 
 
         CTAWTAWrapper ctawtaWrapper = workingTimeAgreementRestClient.getWTAByExpertise(expertise.getId());
-        if (CollectionUtils.isNotEmpty(ctawtaWrapper.getCta()) || CollectionUtils.isNotEmpty(ctawtaWrapper.getWta())) {
+        if (!CollectionUtils.isNotEmpty(ctawtaWrapper.getCta())) {
             exceptionService.dataNotFoundByIdException("message.organization.cta.notfound", organization.getId());
 
         }
-        if (CollectionUtils.isNotEmpty(ctawtaWrapper.getWta())) {
+        if (!CollectionUtils.isNotEmpty(ctawtaWrapper.getWta())) {
             exceptionService.dataNotFoundByIdException("message.wta.notFound", organization.getId());
 
         }
@@ -1152,9 +1157,9 @@ public class UnitPositionService {
         List<NameValuePair> requestParam = Arrays.asList(new BasicNameValuePair("upIds", upIds.toString().replace("[", "").replace("]", "")));
         CTATableSettingWrapper ctaTableSettingWrapper = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_VERSION_CTA, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTATableSettingWrapper>>() {
         });
-        Map<Long,UnitPositionQueryResult> unitPositionQueryResultMap = unitPositionQueryResults.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        Map<Long, UnitPositionQueryResult> unitPositionQueryResultMap = unitPositionQueryResults.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         ctaTableSettingWrapper.getAgreements().forEach(currentCTA -> {
-            if(unitPositionQueryResultMap.containsKey(currentCTA.getUnitPositionId())) {
+            if (unitPositionQueryResultMap.containsKey(currentCTA.getUnitPositionId())) {
                 UnitPositionQueryResult currentActiveUnitPosition = unitPositionQueryResultMap.get(currentCTA.getUnitPositionId());
                 currentCTA.setUnitInfo(currentActiveUnitPosition.getUnitInfo());
                 currentCTA.setUnitPositionId(currentActiveUnitPosition.getId());
