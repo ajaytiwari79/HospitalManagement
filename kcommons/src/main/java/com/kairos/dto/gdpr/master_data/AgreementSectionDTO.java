@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -24,9 +25,9 @@ public class AgreementSectionDTO {
     private Integer orderedIndex;
 
     @Valid
-    private List<ClauseBasicDTO> clauses;
+    private List<ClauseBasicDTO> clauses=new ArrayList<>();
 
-    private List<AgreementSectionDTO> subSections;
+    private List<AgreementSectionDTO> subSections=new ArrayList<>();
 
     public List<AgreementSectionDTO> getSubSections() {
         return subSections;
