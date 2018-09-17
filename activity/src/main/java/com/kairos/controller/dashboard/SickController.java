@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * CreatedBy vipulpandey on 30/8/18
@@ -25,10 +24,10 @@ public class SickController {
     @Inject
     private SickService sickService;
 
-    @ApiOperation("API is used to call the user as sick")
+    @ApiOperation("API is used to get the default data when user is sick")
     @GetMapping("/sick")
-    public ResponseEntity<Map<String, Object>> markUserAsSick(@RequestParam(value = "unitId", required = false) Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, sickService.markUserAsSick(unitId));
+    public ResponseEntity<Map<String, Object>> getDefaultDataOnUserSick(@RequestParam(value = "unitId", required = false) Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, sickService.getDefaultDataOnUserSick(unitId));
     }
 
     @ApiOperation("API is used to call the user as fine")

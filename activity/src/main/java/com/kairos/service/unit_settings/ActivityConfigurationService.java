@@ -45,10 +45,13 @@ public class ActivityConfigurationService extends MongoBaseService {
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
 
     public void createDefaultSettings(Long unitId, Long countryId, List<Phase> phases) {
+        if(activityConfigurationRepository.existsByUnitIdAndDeletedFalse(unitId)){
+            exceptionService.actionNotPermittedException("message.already.exists");
+        }
         // TODO REMOVE
         List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
         if (phases == null || phases.isEmpty())
-            phases = phaseMongoRepository.getPlanningPhasesByUnit(unitId);
+            phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         // TODO FIXME unable to find regex on $IN
         List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
         Optional<PresenceTypeDTO> normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny();
@@ -56,26 +59,15 @@ public class ActivityConfigurationService extends MongoBaseService {
         BigInteger normalPlannedTypeId = normalPlannedType.map(PresenceTypeDTO::getId).orElse(null);
         BigInteger extraTimePlannedTypeId = extraTimePlannedType.isPresent() ? normalPlannedType.get().getId() : normalPlannedTypeId;
         for (Phase phase : phases) {
-            switch (phase.getName()) {
-                case DRAFT_PHASE_NAME:
-                    createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    createDefaultAbsenceSettings(phase.getId(), extraTimePlannedTypeId, activityConfigurations, unitId);
-                    break;
-                case REQUEST_PHASE_NAME:
-                    createDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    break;
-                case CONSTRUCTION_PHASE_NAME:
-                    createDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    break;
-                case PUZZLE_PHASE_NAME:
-                    createDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    break;
-                default:
-                    // no operation
+            if(DRAFT_PHASE_NAME.equals(phase.getName())){
+                createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
+                createDefaultAbsenceSettings(phase.getId(), extraTimePlannedTypeId, activityConfigurations, unitId);
             }
+            else {
+                createDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
+                createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
+            }
+
         }
         save(activityConfigurations);
     }

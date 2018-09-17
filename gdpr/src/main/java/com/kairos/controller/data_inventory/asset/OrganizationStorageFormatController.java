@@ -34,7 +34,7 @@ public class OrganizationStorageFormatController {
 
 
     @ApiOperation("add StorageFormat")
-    @PostMapping("/storage_format/add")
+    @PostMapping("/storage_format")
     public ResponseEntity<Object> createStorageFormat(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormat) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -45,19 +45,17 @@ public class OrganizationStorageFormatController {
 
 
     @ApiOperation("get StorageFormat by id")
-    @GetMapping("/storage_format/{id}")
-    public ResponseEntity<Object> getStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @GetMapping("/storage_format/{storageFormatId}")
+    public ResponseEntity<Object> getStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger storageFormatId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormat(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormat(unitId, storageFormatId));
     }
 
 
     @ApiOperation("get all StorageFormat ")
-    @GetMapping("/storage_format/all")
+    @GetMapping("/storage_format")
     public ResponseEntity<Object> getAllStorageFormat(@PathVariable Long unitId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -67,27 +65,23 @@ public class OrganizationStorageFormatController {
 
 
     @ApiOperation("delete StorageFormat  by id")
-    @DeleteMapping("/storage_format/delete/{id}")
-    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @DeleteMapping("/storage_format/{storageFormatId}")
+    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger storageFormatId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.deleteStorageFormat(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.deleteStorageFormat(unitId, storageFormatId));
 
     }
 
 
     @ApiOperation("update StorageFormat by id")
-    @PutMapping("/storage_format/update/{id}")
-    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody StorageFormatDTO storageFormat) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @PutMapping("/storage_format/{storageFormatId}")
+    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger storageFormatId, @Valid @RequestBody StorageFormatDTO storageFormat) {
+         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateStorageFormat(unitId, id, storageFormat));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateStorageFormat(unitId, storageFormatId, storageFormat));
 
     }
 

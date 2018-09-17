@@ -43,7 +43,7 @@ public class StaffActivitySettingServiceTest {
     static String baseUrlForUnit;
 
 
-    StaffActivitySettingDTO staffActivitySettingDTO=new StaffActivitySettingDTO(new BigInteger("2594"),2424L,25,36,40,5,true);
+    StaffActivitySettingDTO staffActivitySettingDTO=new StaffActivitySettingDTO(new BigInteger("2594"),2424L,new Short("25"),new Short("36"),40,5,true);
     StaffAndActivitySettingWrapper staffAndActivitySettingWrapper=new StaffAndActivitySettingWrapper(Collections.singleton(7788L),Collections.singletonList(staffActivitySettingDTO));
     @Before
     public void setUp() throws Exception {

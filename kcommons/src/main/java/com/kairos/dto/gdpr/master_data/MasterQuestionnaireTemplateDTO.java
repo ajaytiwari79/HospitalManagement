@@ -24,6 +24,18 @@ public class MasterQuestionnaireTemplateDTO {
 
     private BigInteger assetType;
 
+    private BigInteger assetSubType;
+
+    private boolean defaultAssetTemplate;
+
+    public BigInteger getAssetSubType() { return assetSubType; }
+
+    public void setAssetSubType(BigInteger assetSubType) { this.assetSubType = assetSubType; }
+
+    public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
+
+    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.defaultAssetTemplate = defaultAssetTemplate; }
+
     public String getName() {
         return name.trim();
     }

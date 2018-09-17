@@ -3,8 +3,8 @@ package com.kairos.config.mongoEnv;
 
 import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.enums.FilterType;
-import com.kairos.persistance.model.filter.FilterGroup;
-import com.kairos.persistance.repository.filter.FilterMongoRepository;
+import com.kairos.persistence.model.filter.FilterGroup;
+import com.kairos.persistence.repository.filter.FilterMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

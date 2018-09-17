@@ -8,6 +8,7 @@ import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -40,7 +41,7 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("add ProcessingLegalBasis")
-    @PostMapping("/legal_basis/add")
+    @PostMapping("/legal_basis")
     public ResponseEntity<Object> createProcessingLegalBasis(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ProcessingLegalBasisDTO> legalBases) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -51,20 +52,18 @@ public class ProcessingLegalBasisController {
 
 
     @ApiOperation("get ProcessingLegalBasis by id")
-    @GetMapping("/legal_basis/{id}")
-    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
+    @GetMapping("/legal_basis/{processingLegalBasisId}")
+    public ResponseEntity<Object> getProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger processingLegalBasisId) {
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasis(countryId, processingLegalBasisId));
     }
 
 
     @ApiOperation("get all ProcessingLegalBasis ")
-    @GetMapping("/legal_basis/all")
+    @GetMapping("/legal_basis")
     public ResponseEntity<Object> getAllProcessingLegalBasis(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -72,55 +71,38 @@ public class ProcessingLegalBasisController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getAllProcessingLegalBasis(countryId));
     }
 
-    @ApiOperation("get ProcessingLegalBasis by name")
-    @GetMapping("/legal_basis/name")
-    public ResponseEntity<Object> getProcessingLegalBasisByName(@PathVariable Long countryId, @RequestParam String name) {
+    @ApiOperation("delete ProcessingLegalBasis  by id")
+    @DeleteMapping("/legal_basis/{processingLegalBasisId}")
+    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger processingLegalBasisId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.getProcessingLegalBasisByName(countryId, name));
 
-    }
-
-
-    @ApiOperation("delete ProcessingLegalBasis  by id")
-    @DeleteMapping("/legal_basis/delete/{id}")
-    public ResponseEntity<Object> deleteProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.deleteProcessingLegalBasis(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.deleteProcessingLegalBasis(countryId, processingLegalBasisId));
 
     }
 
 
     @ApiOperation("update ProcessingLegalBasis by id")
-    @PutMapping("/legal_basis/update/{id}")
-    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingLegalBasisDTO legalBasis) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
+    @PutMapping("/legal_basis/{processingLegalBasisId}")
+    public ResponseEntity<Object> updateProcessingLegalBasis(@PathVariable Long countryId, @PathVariable BigInteger processingLegalBasisId, @Valid @RequestBody ProcessingLegalBasisDTO legalBasis) {
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(countryId, id, legalBasis));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateProcessingLegalBasis(countryId, processingLegalBasisId, legalBasis));
     }
 
     @ApiOperation("update Suggested status of Processing Legal Basis")
     @PutMapping("/legal_basis")
     public ResponseEntity<Object> updateSuggestedStatusOfProcessingLegalBasisList(@PathVariable Long countryId, @RequestBody Set<BigInteger> processingLegalBasisIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+        if (CollectionUtils.isEmpty(processingLegalBasisIds)) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+        } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,legalBasisService.updateSuggestedStatusOfProcessingLegalBasisList(countryId, processingLegalBasisIds, suggestedDataStatus));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, legalBasisService.updateSuggestedStatusOfProcessingLegalBasisList(countryId, processingLegalBasisIds, suggestedDataStatus));
     }
-
 
 
 }

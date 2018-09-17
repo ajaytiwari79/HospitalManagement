@@ -3,12 +3,12 @@ package com.kairos.service.clause;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
-import com.kairos.persistance.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistance.model.clause.Clause;
+import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
+import com.kairos.persistence.model.clause.Clause;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
-import com.kairos.persistance.model.clause_tag.ClauseTag;
-import com.kairos.persistance.repository.clause.ClauseMongoRepository;
-import com.kairos.persistance.repository.clause_tag.ClauseTagMongoRepository;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
+import com.kairos.persistence.repository.clause.ClauseMongoRepository;
+import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.common.MongoBaseService;
@@ -128,53 +128,6 @@ public class ClauseService extends MongoBaseService {
             throw new RuntimeException(e.getMessage());
         }
         return clause;
-    }
-
-
-    public List<Clause> getClauseList(Long countryId, Long organizationId, List<BigInteger> clausesId) {
-        return clauseMongoRepository.getClauseListByIds(countryId, organizationId, clausesId);
-    }
-
-
-    /**
-     * @param countryId
-     * @param organizationId
-     * @param clauseBasicDTOS         List od Clause Dto contain basic detail ,title and description of clause.
-     * @param policyAgreementTemplate - policy agreement template contain list or organization types,Sub types,Service Category and Sub Service Category and Account types.
-     * @return
-     * @description this method create is used in Agreement section Service for creating new Clauses on creation of sections in policy agreement template.
-     */
-    public List<Clause> createNewClauseUsingAgreementTemplateMetadata(Long countryId, Long organizationId, List<ClauseBasicDTO> clauseBasicDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
-
-
-        List<String> clauseTitles = new ArrayList<>();
-        clauseBasicDTOS.forEach(
-                clauseBasicDTO -> {
-                    if (clauseTitles.contains(clauseBasicDTO.getTitle())) {
-                        exceptionService.duplicateDataException("message.duplicate", "Clause title ", clauseBasicDTO.getTitle());
-                    }
-                    clauseTitles.add(clauseBasicDTO.getTitle());
-                }
-        );
-        List<Clause> existingClause = clauseMongoRepository.findClausesByTitle(countryId, organizationId, clauseTitles);
-        if (!existingClause.isEmpty()) {
-            exceptionService.duplicateDataException("message.duplicate", " Clause " + existingClause.get(0).getTitle());
-        }
-        List<Clause> newClauseList = new ArrayList<>();
-        for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
-            Clause clause = new Clause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), countryId, policyAgreementTemplate.getOrganizationTypes(), policyAgreementTemplate.getOrganizationSubTypes()
-                    , policyAgreementTemplate.getOrganizationServices(), policyAgreementTemplate.getOrganizationSubServices());
-
-            List<BigInteger> templateTypes=new ArrayList<>();
-            templateTypes.add(policyAgreementTemplate.getTemplateType());
-            clause.setTemplateTypes(templateTypes);
-            clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
-            clause.setOrganizationId(organizationId);
-            clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
-            newClauseList.add(clause);
-
-        }
-        return clauseMongoRepository.saveAll(getNextSequence(newClauseList));
     }
 
 

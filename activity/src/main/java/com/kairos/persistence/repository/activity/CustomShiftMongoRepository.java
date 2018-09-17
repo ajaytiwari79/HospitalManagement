@@ -41,6 +41,9 @@ public interface CustomShiftMongoRepository {
     void deleteShiftsAfterDate(Long staffId, LocalDateTime employmentEndDate);
     List<Shift> findAllShiftByDynamicQuery(List<SickSettings> sickSettings, Map<BigInteger, Activity> activityMap);
 
+
     Long countByActivityId(BigInteger activityId);
+
+    Shift findShiftToBeDone(List<Long> staffIds, Date startDateMillis,Date endDateMillis);
 
 }

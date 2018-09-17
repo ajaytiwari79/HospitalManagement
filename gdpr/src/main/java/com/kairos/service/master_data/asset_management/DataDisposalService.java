@@ -1,19 +1,16 @@
 package com.kairos.service.master_data.asset_management;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
-import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
+import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
+import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -135,28 +132,6 @@ public class DataDisposalService extends MongoBaseService {
         dataDisposal.setName(dataDisposalDTO.getName());
         dataDisposalMongoRepository.save(dataDisposal);
         return dataDisposalDTO;
-
-    }
-
-
-    /**
-     * @param countryId
-     * @param name
-     * @return object of data disposal
-     * @throws DataNotExists if data  disposal not exist of requested name
-     * @description this method is used for get  data disposal by name
-     */
-    public DataDisposal getDataDisposalByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            DataDisposal exist = dataDisposalMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
 

@@ -80,14 +80,20 @@ public class StaffActivitySettingService extends MongoBaseService {
         if(staffAndActivitySettingWrapper.getStaffIds().isEmpty() || staffAndActivitySettingWrapper.getStaffActivitySettings().isEmpty()){
             exceptionService.actionNotPermittedException("error.empty.staff.or.activity.setting");
         }
+
+
         Set<BigInteger> activityIds=staffAndActivitySettingWrapper.getStaffActivitySettings().stream().map(StaffActivitySettingDTO::getActivityId).collect(Collectors.toSet());
+        Set<StaffActivitySetting> staffActivitySettings=staffActivitySettingRepository.findByStaffIdInAndActivityIdInAndDeletedFalse(staffAndActivitySettingWrapper.getStaffIds(),activityIds);
+        if(staffActivitySettings==null){
+            staffActivitySettings=new HashSet<>();
+        }
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         Map<BigInteger,Activity> activityMap=activities.stream().collect(Collectors.toMap(Activity::getId,v->v));
         List<StaffDTO> staffExpertiseWrappers= genericIntegrationService.getStaffDetailByIds(unitId,staffAndActivitySettingWrapper.getStaffIds());
         Map<Long,StaffDTO> staffExpertiseWrapperMap=staffExpertiseWrappers.stream().collect(Collectors.toMap(StaffDTO::getId,v->v));
         Map<String,List<StaffActivityResponse>> responseMap=new HashMap<>();
         for(Long currentStaffId:staffAndActivitySettingWrapper.getStaffIds()){
-            responseMap=assignActivitySettingsForCurrentStaff(responseMap,activityMap,staffExpertiseWrapperMap,currentStaffId,staffAndActivitySettingWrapper.getStaffActivitySettings(),unitId);
+            responseMap=assignActivitySettingsForCurrentStaff(responseMap,activityMap,staffExpertiseWrapperMap,currentStaffId,staffAndActivitySettingWrapper.getStaffActivitySettings(),unitId,staffActivitySettings);
         }
         return responseMap;
     }
@@ -121,10 +127,13 @@ public class StaffActivitySettingService extends MongoBaseService {
         return (!messages.isEmpty())?localeService.getMessage(messages.get(0)):null;
     }
 
-   private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap,Map<BigInteger,Activity> activityMap,Map<Long,StaffDTO> staffExpertiseWrapperMap,Long staffId,List<StaffActivitySettingDTO> staffActivitySettingDTOS,Long unitId){
+   private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap,Map<BigInteger,Activity> activityMap,Map<Long,StaffDTO> staffExpertiseWrapperMap,Long staffId,
+                                                                                         List<StaffActivitySettingDTO> staffActivitySettingDTOS,Long unitId,Set<StaffActivitySetting> staffActivitySettings){
        List<StaffActivityResponse> success=(responseMap.get("success")==null)?new ArrayList<>():responseMap.get("success");
        List<StaffActivityResponse> error=(responseMap.get("error")==null)?new ArrayList<>():responseMap.get("error");
-       List<StaffActivitySetting> staffActivitySettings=new ArrayList<>();
+       Set<StaffActivitySetting> staffActivitySettingSet=new HashSet<>();
+       Map<BigInteger,StaffActivitySettingDTO> activitySettingDTOMap=new HashMap<>();
+       Map<Long,Map<BigInteger,StaffActivitySettingDTO>> staffWiseActivityMap=new HashMap<>();
        staffActivitySettingDTOS.forEach(staffActivitySetting->{
           String validationMessage= validateActivitySettingsForCurrentStaff(staffExpertiseWrapperMap.get(staffId),activityMap.get(staffActivitySetting.getActivityId()));
            if(Optional.ofNullable(validationMessage).isPresent()){
@@ -132,16 +141,41 @@ public class StaffActivitySettingService extends MongoBaseService {
                error.add(staffActivityResponse);
                return;
            }
-            StaffActivitySetting currentStaffActivitySetting=new StaffActivitySetting(staffId,staffActivitySetting.getActivityId(),staffActivitySetting.getUnitPositionId(),
-                    unitId,staffActivitySetting.getShortestTime(),staffActivitySetting.getLongestTime(),staffActivitySetting.getMinLength(),staffActivitySetting.getMaxThisActivityPerShift(),
-                    staffActivitySetting.isEligibleForMove(),staffActivitySetting.getEarliestStartTime(),staffActivitySetting.getLatestStartTime(),staffActivitySetting.getMaximumEndTime(),
-                    activityMap.get(staffActivitySetting.getActivityId()).getRulesActivityTab().getDayTypes());
-            staffActivitySettings.add(currentStaffActivitySetting);
-           StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),localeService.getMessage("default.added"));
-            success.add(staffActivityResponse);
+           activitySettingDTOMap.put(staffActivitySetting.getActivityId(),staffActivitySetting);
+           staffWiseActivityMap.put(staffId,activitySettingDTOMap);
         });
-       if(!staffActivitySettings.isEmpty()){
-           save(staffActivitySettings);
+
+
+       staffActivitySettings.forEach(currentStaffActivitySettings->{
+           StaffActivitySettingDTO staffActivitySettingDTO=null;
+           Map<BigInteger,StaffActivitySettingDTO> staffActivitySettingDTOMap=staffWiseActivityMap.get(currentStaffActivitySettings.getStaffId());
+           if(staffActivitySettingDTOMap!=null){
+                staffActivitySettingDTO=staffActivitySettingDTOMap.get(currentStaffActivitySettings.getActivityId());
+           }
+
+           if(staffActivitySettingDTO!=null){
+               staffActivitySettingDTO.setStaffId(currentStaffActivitySettings.getStaffId());
+               staffActivitySettingDTO.setId(currentStaffActivitySettings.getId());
+               staffActivitySettingDTO.setUnitId(currentStaffActivitySettings.getUnitId());
+               currentStaffActivitySettings = ObjectMapperUtils.copyPropertiesByMapper(staffActivitySettingDTO,StaffActivitySetting.class);
+               staffActivitySettingSet.add(currentStaffActivitySettings);
+               staffWiseActivityMap.remove(currentStaffActivitySettings.getStaffId()).get(currentStaffActivitySettings.getActivityId());
+           }
+       });
+
+       activitySettingDTOMap.forEach((activityId,activitySetting)->{
+           StaffActivitySetting staffActivitySetting=new StaffActivitySetting(staffId,activitySetting.getActivityId(),activitySetting.getUnitPositionId(),
+                   unitId,activitySetting.getShortestTime(),activitySetting.getLongestTime(),activitySetting.getMinLength(),activitySetting.getMaxThisActivityPerShift(),
+                   activitySetting.isEligibleForMove(),activitySetting.getEarliestStartTime(),activitySetting.getLatestStartTime(),activitySetting.getMaximumEndTime(),
+                   activityMap.get(activitySetting.getActivityId()).getRulesActivityTab().getDayTypes());
+           staffActivitySettingSet.add(staffActivitySetting);
+           StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),localeService.getMessage("default.added"));
+           success.add(staffActivityResponse);
+
+       });
+
+       if(!staffActivitySettingSet.isEmpty()){
+           save(staffActivitySettingSet);
        }
 
        responseMap.put("success",success);

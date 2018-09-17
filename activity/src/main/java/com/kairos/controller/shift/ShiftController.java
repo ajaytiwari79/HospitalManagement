@@ -2,6 +2,7 @@ package com.kairos.controller.shift;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
+import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.dto.activity.shift.CopyShiftDTO;
@@ -178,9 +179,10 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
     @ApiOperation("API is used to add shift of user when user is sick")
-    @GetMapping("/staff/{staffId}/shift_on_sick")
-    public ResponseEntity<Map<String,Object>> markUserAsSick(@PathVariable Long unitId,@PathVariable Long staffId,@RequestParam ("activitySelected") BigInteger activityId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftSickService.createSicknessShiftsOfStaff(unitId,activityId,staffId));
+    @PostMapping("/staff/{staffId}/shift_on_sick")
+    public ResponseEntity<Map<String,Object>> markUserAsSick(@PathVariable Long unitId, @PathVariable Long staffId, @RequestParam ("activitySelected") BigInteger activityId,
+                                                             @RequestBody Duration duration){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftSickService.createSicknessShiftsOfStaff(unitId,activityId,staffId,duration));
     }
 
     @ApiOperation("shifts details by date")

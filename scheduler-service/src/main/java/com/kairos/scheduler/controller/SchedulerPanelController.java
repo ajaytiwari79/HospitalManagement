@@ -30,9 +30,9 @@ public class SchedulerPanelController {
 
     @GetMapping("/{schedulerPanelId}")
     @ApiOperation("Get Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> getSchedulerPanel(@PathVariable BigInteger controlPanelId) throws IOException {
+    public ResponseEntity<Map<String, Object>> getSchedulerPanel(@PathVariable BigInteger schedulerPanelId) throws IOException {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.findSchedulerPanelById(controlPanelId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.findSchedulerPanelById(schedulerPanelId));
 
     }
 

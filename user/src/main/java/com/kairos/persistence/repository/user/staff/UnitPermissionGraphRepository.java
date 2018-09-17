@@ -49,7 +49,7 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
     AccessPermission getAccessPermission(long organizationId, long unitId, long staffId, long accessGroupId);
 
     @Query("Match (organization:Organization),(staff:Staff) where id(organization)={0} AND id(staff)={2} with organization,staff\n" +
-            "Match (organization)-[:" + HAS_EMPLOYMENTS + "]->(employment:Employment)-[:BELONGS_TO]->(staff) with employment\n" +
+            "Match (organization)-[:" + HAS_EMPLOYMENTS + "]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff) with employment\n" +
             "Match (employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission) with unitPermission\n" +
             "match (unitPermission)-[r:" + APPLICABLE_IN_UNIT + "]->(unit:Organization) where id(unit)={1} with unitPermission\n" +
             "OPTIONAL MATCH (unitPermission)-[customPermission:" +HAS_CUSTOMIZED_PERMISSION+ "]-(ap:AccessPage) WHERE customPermission.accessGroupId={3} with unitPermission,customPermission " +
@@ -61,24 +61,29 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
     int linkUnitPermissionWithAccessPermission(long unitPermissionId, long accessPermissionId);
     
     @Query("Match (organization:Organization),(staff:Staff) where id(organization)={0} AND id(staff)={2} with organization,staff \n" +
-            "Match (organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff)  \n" +
-            "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)\n" +
-            "match(unitPermission)-[:APPLICABLE_IN_UNIT]-(co:Organization) where id(co)={1}\n" +
-//            "Match (unitPermission)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(organization)  WHERE id(ag)={3}\n" +
+            "Match (organization)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff)  \n" +
+            "Match (employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)\n" +
+            "match(unitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(co:Organization) where id(co)={1}\n" +
             "return  unitPermission")
     UnitPermission checkUnitPermissionOfStaff(Long parentOrganizationId, Long organizationId, Long staffId, Long accessGroupId);
 
     @Query("OPTIONAL Match (up:UnitPermission)-[r:HAS_ACCESS_GROUP]-(ag:AccessGroup) WHERE id(up)={0} AND id(ag)={1} RETURN CASE WHEN r IS NULL THEN false ELSE true END")
     Boolean checkUnitPermissionLinkedWithAccessGroup(Long unitPermissionId, Long accessGroupId);
 
-    // forg parent organization
+    // for parent organization
     @Query("Match (organization:Organization),(user:User) where id(organization)={0} AND id(user)={1} with organization,user \n" +
             "Match (organization)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user)  \n" +
             "Match (employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization)\n" +
             "return  unitPermission")
     UnitPermission checkUnitPermissionOfUser(Long parentOrganizationId, Long userId);
 
-    @Query("Match (emp:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]-(co:Organization) where id(emp)=(1) and id(co)={0} return unitPermission")
-    UnitPermission findUnitPermissionOfStaffByEmployment( Long organizationId, Long employmentId);
+    @Query("Match (staff:Staff) where  id(staff)={0} " +
+            "Match (staff)<-[:"+BELONGS_TO+"]-(employment:Employment) " +
+            "Match (employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission) " +
+            "Match (unitPermission)-[r:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) " +
+            "return count(r)")
+    int getAccessGroupRelationShipCountOfStaff(Long staffId);
+
+
 
 }

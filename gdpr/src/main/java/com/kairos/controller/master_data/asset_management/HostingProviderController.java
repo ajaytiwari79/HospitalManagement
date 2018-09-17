@@ -8,6 +8,7 @@ import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,7 @@ public class HostingProviderController {
 
 
     @ApiOperation("add HostingProvider")
-    @PostMapping("/hosting_provider/add")
+    @PostMapping("/hosting_provider")
     public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -52,20 +53,18 @@ public class HostingProviderController {
 
 
     @ApiOperation("get HostingProvider by id")
-    @GetMapping("/hosting_provider/{id}")
-    public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
+    @GetMapping("/hosting_provider/{hostingProviderId}")
+    public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId) {
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(countryId, hostingProviderId));
 
     }
 
 
     @ApiOperation("get all HostingProvider ")
-    @GetMapping("/hosting_provider/all")
+    @GetMapping("/hosting_provider")
     public ResponseEntity<Object> getAllHostingProvider(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -74,54 +73,36 @@ public class HostingProviderController {
 
     }
 
-    @ApiOperation("get hosting provider by name ")
-    @GetMapping("/hosting_provider/name")
-    public ResponseEntity<Object> getHostingProviderByName(@PathVariable Long countryId, @RequestParam String name) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderByName(countryId, name));
-
-    }
-
     @ApiOperation("delete HostingProvider  by id")
-    @DeleteMapping("/hosting_provider/delete/{id}")
-    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
+    @DeleteMapping("/hosting_provider/{hostingProviderId}")
+    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(countryId, hostingProviderId));
 
     }
 
     @ApiOperation("update HostingProvider by id")
-    @PutMapping("/hosting_provider/update/{id}")
-    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
+    @PutMapping("/hosting_provider/{hostingProviderId}")
+    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(countryId, id, hostingProviderDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(countryId, hostingProviderId, hostingProviderDTO));
 
     }
 
     @ApiOperation("update Suggested status of Hosting provider")
     @PutMapping("/hosting_provider")
     public ResponseEntity<Object> updateSuggestedStatusOfHostingProviders(@PathVariable Long countryId, @RequestBody Set<BigInteger> hostingProviderIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+        if (CollectionUtils.isEmpty(hostingProviderIds)) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+        } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateSuggestedStatusOfHostingProviders(countryId, hostingProviderIds, suggestedDataStatus));
     }
-
 
 
 }

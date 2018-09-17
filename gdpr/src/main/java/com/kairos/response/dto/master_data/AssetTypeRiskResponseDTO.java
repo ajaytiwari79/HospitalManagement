@@ -19,7 +19,7 @@ public class AssetTypeRiskResponseDTO {
     private String name;
     private List<RiskResponseDTO> risks=new ArrayList<>();
     private Boolean hasSubAsset;
-    private List<BigInteger> subAssetTypes=new ArrayList<>();
+    private List<AssetTypeRiskResponseDTO> subAssetTypes=new ArrayList<>();
 
 
     public BigInteger getId() { return id; }
@@ -38,7 +38,7 @@ public class AssetTypeRiskResponseDTO {
 
     public void setHasSubAsset(Boolean hasSubAsset) { this.hasSubAsset = hasSubAsset; }
 
-    public List<BigInteger> getSubAssetTypes() { return subAssetTypes; }
+    public List<AssetTypeRiskResponseDTO> getSubAssetTypes() { return subAssetTypes; }
 
-    public void setSubAssetTypes(List<BigInteger> subAssetTypes) { this.subAssetTypes = subAssetTypes; }
+    public void setSubAssetTypes(List<AssetTypeRiskResponseDTO> subAssetTypes) { this.subAssetTypes = subAssetTypes; }
 }

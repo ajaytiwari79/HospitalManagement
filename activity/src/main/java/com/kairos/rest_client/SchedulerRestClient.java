@@ -1,20 +1,30 @@
 package com.kairos.rest_client;
 
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.service.exception.ExceptionService;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.inject.Inject;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 import static com.kairos.utils.RestClientUrlUtil.getDefaultSchedulerUrl;
+import static com.kairos.utils.RestClientUrlUtil.getSchedulerBaseUrl;
 
 
 /**
@@ -25,9 +35,11 @@ public class SchedulerRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerRestClient.class);
     @Autowired
-    @Qualifier("schedulerRestTemplate")
+    //@Qualifier("schedulerRestTemplate")
     private RestTemplate restTemplate;
 
+    @Inject
+    private ExceptionService exceptionService;
     public List<Long> getAllOrganizationIds(){
         final String baseUrl=getDefaultSchedulerUrl();
 
@@ -53,10 +65,6 @@ public class SchedulerRestClient {
         }
 
     }
-
-
-
-
 
 
 }

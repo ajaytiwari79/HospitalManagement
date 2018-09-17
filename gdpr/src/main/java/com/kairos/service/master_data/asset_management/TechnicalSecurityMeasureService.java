@@ -1,19 +1,17 @@
 package com.kairos.service.master_data.asset_management;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
-import com.kairos.persistance.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
+import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
+import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.TechnicalSecurityMeasureResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -144,28 +142,6 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
 
 
     }
-
-    /**
-     * @param countryId
-     * @param
-     * @param name      name of TechnicalSecurityMeasure
-     * @return TechnicalSecurityMeasure object fetch on basis of  name
-     * @throws DataNotExists throw exception if TechnicalSecurityMeasure exist for given name
-     */
-    public TechnicalSecurityMeasure getTechnicalSecurityMeasureByName(Long countryId, String name) {
-
-        if (!StringUtils.isBlank(name)) {
-            TechnicalSecurityMeasure exist = technicalSecurityMeasureMongoRepository.findByNameAndCountryId(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
-
 
     /**
      * @description method save technical security measure  suggested by unit

@@ -136,9 +136,12 @@ public class ActivityService extends MongoBaseService {
     private ShiftTemplateService shiftTemplateService;
     @Inject
     private GenericIntegrationService genericIntegrationService;
-    @Inject private CounterRepository counterRepository;
-    @Inject private ActivityShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
-    @Inject private GenericRestClient genericRestClient;
+    @Inject
+    private CounterRepository counterRepository;
+    @Inject
+    private ActivityShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
+    @Inject
+    private GenericRestClient genericRestClient;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -233,7 +236,7 @@ public class ActivityService extends MongoBaseService {
         return activityMongoRepository.findAllActivityWithCtaWtaSettingByCountry(countryId);
     }
 
-    public List<ActivityCategory> findAllActivityCategoriesByCountry(long countryId,List<BigInteger>  activityCategoriesIds) {
+    public List<ActivityCategory> findAllActivityCategoriesByCountry(long countryId, List<BigInteger> activityCategoriesIds) {
         return activityCategoryRepository.findAllByIdsIn(activityCategoriesIds);
     }
 
@@ -437,8 +440,8 @@ public class ActivityService extends MongoBaseService {
         List<DayType> dayTypes = organizationRestClient.getDayTypesByCountryId(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         TimeCalculationActivityTab timeCalculationActivityTab = activity.getTimeCalculationActivityTab();
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes);
-
+        List<Long> rulesTabDayTypes = activity.getRulesActivityTab().getDayTypes();
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes, rulesTabDayTypes);
         return activityTabsWrapper;
     }
 
@@ -447,9 +450,9 @@ public class ActivityService extends MongoBaseService {
         if (!activity.isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", activityId);
         }
-        List<CompositeActivityDTO> compositeActivities= new ArrayList<>();
-        if (Optional.ofNullable(activity.get().getCompositeActivities()).isPresent() && !activity.get().getCompositeActivities().isEmpty()){
-             compositeActivities = activityMongoRepository.getCompositeActivities(activityId);
+        List<CompositeActivityDTO> compositeActivities = new ArrayList<>();
+        if (Optional.ofNullable(activity.get().getCompositeActivities()).isPresent() && !activity.get().getCompositeActivities().isEmpty()) {
+            compositeActivities = activityMongoRepository.getCompositeActivities(activityId);
         }
         return compositeActivities;
     }
@@ -481,11 +484,11 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", rulesActivityDTO.getActivityId());
         }
-        if(rulesActivityDTO.getCutOffIntervalUnit()!=null && rulesActivityDTO.getCutOffStartFrom()!=null){
-            if(rulesActivityDTO.getCutOffIntervalUnit().equals(DAYS) && rulesActivityDTO.getCutOffdayValue()==0){
+        if (rulesActivityDTO.getCutOffIntervalUnit() != null && rulesActivityDTO.getCutOffStartFrom() != null) {
+            if (rulesActivityDTO.getCutOffIntervalUnit().equals(DAYS) && rulesActivityDTO.getCutOffdayValue() == 0) {
                 exceptionService.invalidRequestException("error.DayValue.zero");
             }
-            List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(),rulesActivityDTO.getCutOffIntervalUnit(),rulesActivityDTO.getCutOffdayValue());
+            List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(), rulesActivityDTO.getCutOffIntervalUnit(), rulesActivityDTO.getCutOffdayValue());
             rulesActivityTab.setCutOffIntervals(cutOffIntervals);
             rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
         }
@@ -499,15 +502,15 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    private List<CutOffInterval> getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit,Integer dayValue){
+    private List<CutOffInterval> getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit, Integer dayValue) {
         LocalDate startDate = dateFrom;
         LocalDate endDate = startDate.plusYears(1);
         List<CutOffInterval> cutOffIntervals = new ArrayList<>();
-        while (startDate.isBefore(endDate)){
+        while (startDate.isBefore(endDate)) {
             LocalDate nextEndDate = startDate;
-            switch (cutOffIntervalUnit){
+            switch (cutOffIntervalUnit) {
                 case DAYS:
-                    nextEndDate = startDate.plusDays(dayValue-1);
+                    nextEndDate = startDate.plusDays(dayValue - 1);
                     break;
                 case HALF_YEARLY:
                     nextEndDate = startDate.plusMonths(6).minusDays(1);
@@ -525,7 +528,7 @@ public class ActivityService extends MongoBaseService {
                     nextEndDate = startDate.plusYears(1).minusDays(1);
                     break;
             }
-            cutOffIntervals.add(new CutOffInterval(startDate,nextEndDate));
+            cutOffIntervals.add(new CutOffInterval(startDate, nextEndDate));
             startDate = nextEndDate.plusDays(1);
         }
         return cutOffIntervals;
@@ -602,7 +605,7 @@ public class ActivityService extends MongoBaseService {
         activity.setBonusActivityTab(bonusActivityTab);
         save(activity);
         return new ActivityTabsWrapper(bonusActivityTab);
-        }
+    }
 
     public ActivityTabsWrapper getBonusTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
@@ -651,7 +654,7 @@ public class ActivityService extends MongoBaseService {
     public ActivityTabsWrapper getSkillTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         return new ActivityTabsWrapper(activity.getSkillActivityTab());
-        }
+    }
 
     // organization Mapping
     public void updateOrgMappingDetailOfActivity(OrganizationMappingActivityDTO organizationMappingActivityDTO, BigInteger activityId) {
@@ -730,7 +733,7 @@ public class ActivityService extends MongoBaseService {
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
         save(activity);
         return new ActivityTabsWrapper(optaPlannerSettingActivityTab);
-     }
+    }
 
     public ActivityTabsWrapper getOptaPlannerSettingsTabOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
@@ -753,7 +756,7 @@ public class ActivityService extends MongoBaseService {
         activity.setCtaAndWtaSettingsActivityTab(ctaAndWtaSettingsActivityTab);
         save(activity);
         return new ActivityTabsWrapper(ctaAndWtaSettingsActivityTab);
-        }
+    }
 
     public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId, String type) {
         List<DayType> dayTypes = organizationRestClient.getDayTypes(unitId);
@@ -1165,36 +1168,37 @@ public class ActivityService extends MongoBaseService {
         List<ActivityDTO> activityDTOS = activityMongoRepository.findAllActivitiesWithTimeTypes(countryId);
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
-        List<CounterDTO> counters=counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
-        ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals,counters);
+        List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
+        ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, counters);
         return activityWithTimeTypeDTO;
     }
 
 
-    public void validateActivityTimeRules(LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, Short shortestTime, Short longestTime){
-        //TODO Please don't remove this commented code as we need it
-//        if(shortestTime!=null && longestTime!=null && shortestTime>longestTime){
-//            exceptionService.actionNotPermittedException("shortest.time.greater.longest");
-//        }
-        if(Optional.ofNullable(earliestStartTime).isPresent() &&
-                Optional.ofNullable(latestStartTime).isPresent() &&
-                earliestStartTime.isAfter(latestStartTime)){
-            exceptionService.actionNotPermittedException("earliest.start.time.less.latest");
-        }
+    public void validateActivityTimeRules(LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, Short shortestTime, Short longestTime) {
 
-        if(Optional.ofNullable(earliestStartTime).isPresent() &&
-                Optional.ofNullable(latestStartTime).isPresent() && Optional.ofNullable(maximumEndTime).isPresent() && Optional.ofNullable(longestTime).isPresent() &&
-                earliestStartTime.plusMinutes(longestTime).isAfter(maximumEndTime)) {
-            exceptionService.actionNotPermittedException("longest.duration.exceed.limit");
+        if (shortestTime != null && longestTime != null && shortestTime > longestTime) {
+            exceptionService.actionNotPermittedException("shortest.time.greater.longest");
         }
+        //TODO Please don't remove this commented code as we need it
+//        if(Optional.ofNullable(earliestStartTime).isPresent() &&
+//                Optional.ofNullable(latestStartTime).isPresent() &&
+//                earliestStartTime.isAfter(latestStartTime)){
+//            exceptionService.actionNotPermittedException("earliest.start.time.less.latest");
+//        }
+//
+//        if(Optional.ofNullable(earliestStartTime).isPresent() &&
+//                Optional.ofNullable(latestStartTime).isPresent() && Optional.ofNullable(maximumEndTime).isPresent() && Optional.ofNullable(longestTime).isPresent() &&
+//                earliestStartTime.plusMinutes(longestTime).isAfter(maximumEndTime)) {
+//            exceptionService.actionNotPermittedException("longest.duration.exceed.limit");
+//        }
 
 
     }
 
-    public void copyActivityAndShiftStatusOfThisActivity(BigInteger activityId,BigInteger newActivityId){
-        List<ActivityShiftStatusSettings> activityShiftStatusSettings =activityAndShiftStatusSettingsRepository.findAllByActivityId(activityId);
-        if(!activityShiftStatusSettings.isEmpty()){
-            activityShiftStatusSettings.forEach(currentActivityAndShiftStatusSettings->{
+    public void copyActivityAndShiftStatusOfThisActivity(BigInteger activityId, BigInteger newActivityId) {
+        List<ActivityShiftStatusSettings> activityShiftStatusSettings = activityAndShiftStatusSettingsRepository.findAllByActivityId(activityId);
+        if (!activityShiftStatusSettings.isEmpty()) {
+            activityShiftStatusSettings.forEach(currentActivityAndShiftStatusSettings -> {
                 currentActivityAndShiftStatusSettings.setId(null);
                 currentActivityAndShiftStatusSettings.setActivityId(newActivityId);
             });
@@ -1203,9 +1207,9 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    public void deleteActivityAndShiftStatusOfThisActivity(BigInteger activityId){
-        Optional<ActivityShiftStatusSettings> activityAndShiftStatusSettings=activityAndShiftStatusSettingsRepository.findById(activityId);
-        if(activityAndShiftStatusSettings.isPresent()){
+    public void deleteActivityAndShiftStatusOfThisActivity(BigInteger activityId) {
+        Optional<ActivityShiftStatusSettings> activityAndShiftStatusSettings = activityAndShiftStatusSettingsRepository.findById(activityId);
+        if (activityAndShiftStatusSettings.isPresent()) {
             activityAndShiftStatusSettings.get().setDeleted(true);
             save(activityAndShiftStatusSettings.get());
         }
