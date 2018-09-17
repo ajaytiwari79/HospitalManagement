@@ -41,6 +41,7 @@ public class Phase extends MongoBaseEntity {
     private int gracePeriodByManagement;
     private String untilNextDay;
     private int realtimeDuration;
+    private String shortName;
     public Phase() {
         //default constructor
     }
@@ -194,6 +195,14 @@ public class Phase extends MongoBaseEntity {
 
     public void setRealtimeDuration(int realtimeDuration) {
         this.realtimeDuration = realtimeDuration;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     @Override

@@ -38,6 +38,7 @@ public class PhaseDTO {
     private int gracePeriodByManagement;
     private String untilNextDay;
     private int realtimeDuration;
+    private String shortName;
     public Long getOrganizationId() {
         return organizationId;
     }
@@ -213,5 +214,13 @@ public class PhaseDTO {
 
     public void setRealtimeDuration(int realtimeDuration) {
         this.realtimeDuration = realtimeDuration;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 }
