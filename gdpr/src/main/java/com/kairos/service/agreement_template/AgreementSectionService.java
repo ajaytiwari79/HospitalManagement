@@ -52,9 +52,9 @@ public class AgreementSectionService extends MongoBaseService {
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Policy Agreement Template ", templateId);
         }
+        checkForDuplicacyInTitleOfAgreementSectionAndSubSection(agreementSectionDTOs);
         boolean flag = false;
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOs) {
-
             if (Optional.ofNullable(agreementSectionDTO.getId()).isPresent()) {
                 flag = true;
                 break;
@@ -219,7 +219,7 @@ public class AgreementSectionService extends MongoBaseService {
             buildAgreementSectionAndSubSection(countryId, newAgreementSectionDTOList, agreementSubSectionListCoresspondingToAgreementSection, globalAgreementSectionAndClauseDTOListHashMap);
         }
         List<AgreementSection> agreementSections = agreementSectionMongoRepository.findAgreementSectionByIds(countryId, agreementSectionIdList);
-        updateExisitingSectionAndSUbSection(agreementSections, agreementSectionDTOMap, newSubSectionListCoresspondingToSection, globalAgreementSectionAndClauseDTOListHashMap
+        updateExistingSectionAndSubSection(agreementSections, agreementSectionDTOMap, newSubSectionListCoresspondingToSection, globalAgreementSectionAndClauseDTOListHashMap
                 , agreementSubSectionListCoresspondingToAgreementSection);
         List<AgreementSection> agreementSectionList = new ArrayList<>();
         if (!globalAgreementSectionAndClauseDTOListHashMap.isEmpty()) {
@@ -232,10 +232,17 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
 
-    private void updateExisitingSectionAndSUbSection(List<AgreementSection> agreementSections, Map<BigInteger, AgreementSectionDTO> agreementSectionDTOMap,
-                                                     Map<BigInteger, List<AgreementSection>> newSubSectionListCoresspondingToSection,
-                                                     Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap,
-                                                     Map<AgreementSection, List<AgreementSection>> agreementSubSectionListCoresspondingToAgreementSection) {
+    /**
+     * @param agreementSections
+     * @param agreementSectionDTOMap
+     * @param newSubSectionListCoresspondingToSection                - sub section list coressponding to exisitng agreement section id
+     * @param globalAgreementSectionAndClauseDTOListHashMap          - Clause DTO list coressponding to sections and sub sections
+     * @param agreementSubSectionListCoresspondingToAgreementSection list of agreement sub section coressponding to section
+     */
+    private void updateExistingSectionAndSubSection(List<AgreementSection> agreementSections, Map<BigInteger, AgreementSectionDTO> agreementSectionDTOMap,
+                                                    Map<BigInteger, List<AgreementSection>> newSubSectionListCoresspondingToSection,
+                                                    Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap,
+                                                    Map<AgreementSection, List<AgreementSection>> agreementSubSectionListCoresspondingToAgreementSection) {
         for (AgreementSection agreementSection : agreementSections) {
             AgreementSectionDTO agreementSectionDTO = agreementSectionDTOMap.get(agreementSection.getId());
             agreementSection.setTitle(agreementSectionDTO.getTitle());
@@ -367,17 +374,27 @@ public class AgreementSectionService extends MongoBaseService {
      */
     private List<Clause> buildClauseForAgreementSection(Long countryId, List<ClauseBasicDTO> clauseBasicDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
+
+        List<String> clauseTitles = new ArrayList<>();
         List<Clause> clauseList = new ArrayList<>();
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
+            if (clauseTitles.contains(clauseBasicDTO.getTitle())) {
+                exceptionService.duplicateDataException("message.duplicate", "Clause title ", clauseBasicDTO.getTitle());
+            }
+            clauseTitles.add(clauseBasicDTO.getTitle());
             Clause clause = new Clause(clauseBasicDTO.getTitle(), clauseBasicDTO.getDescription(), countryId, policyAgreementTemplate.getOrganizationTypes(), policyAgreementTemplate.getOrganizationSubTypes()
                     , policyAgreementTemplate.getOrganizationServices(), policyAgreementTemplate.getOrganizationSubServices());
             List<BigInteger> templateTypes = new ArrayList<>();
             templateTypes.add(policyAgreementTemplate.getTemplateType());
             clause.setTemplateTypes(templateTypes);
             clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
-            clause.setOrganizationId(UserContext.getUnitId());
+            clause.setOrganizationId(UserContext.getOrgId());
             clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
             clauseList.add(clause);
+        }
+        List<Clause> existingClause = clauseMongoRepository.findClausesByTitle(countryId, UserContext.getOrgId(), clauseTitles);
+        if (CollectionUtils.isNotEmpty(existingClause)) {
+            exceptionService.duplicateDataException("message.duplicate", " Clause " + existingClause.get(0).getTitle());
         }
         return clauseList;
     }
@@ -398,7 +415,7 @@ public class AgreementSectionService extends MongoBaseService {
             List<Clause> clausesRelateToAgreementSection = new ArrayList<>();
             clauseBasicDTOS.forEach(clauseBasicDTO -> {
                 Clause clause = clauseIdMap.get(clauseBasicDTO.getId());
-                ObjectMapperUtils.copyPropertiesExceptSpecific(clauseBasicDTO, clause);
+                clause.setDescription(clauseBasicDTO.getDescription());
                 clause.setOrderedIndex(clauseBasicDTO.getOrderedIndex());
                 clausesRelateToAgreementSection.add(clause);
             });
@@ -444,16 +461,16 @@ public class AgreementSectionService extends MongoBaseService {
 
     }
 
-    public void checkForDuplicacyInTitleOfAgreementSectionAndSubSection(List<AgreementSectionDTO> agreementSectionDTOS) {
+    private void checkForDuplicacyInTitleOfAgreementSectionAndSubSection(List<AgreementSectionDTO> agreementSectionDTOS) {
         List<String> titles = new ArrayList<>();
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOS) {
             if (titles.contains(agreementSectionDTO.getTitle().toLowerCase())) {
-                exceptionService.duplicateDataException("message.duplicate", "questionnaire section", agreementSectionDTO.getTitle());
+                exceptionService.duplicateDataException("message.duplicate", "Agreement Section ", agreementSectionDTO.getTitle());
             }
             if (Optional.ofNullable(agreementSectionDTO.getSubSections()).isPresent()) {
                 agreementSectionDTO.getSubSections().forEach(agreementSubSectionDTO -> {
                     if (titles.contains(agreementSubSectionDTO.getTitle().toLowerCase())) {
-                        exceptionService.duplicateDataException("message.duplicate", "questionnaire section", agreementSubSectionDTO.getTitle());
+                        exceptionService.duplicateDataException("message.duplicate", "Agreement Sub section", agreementSubSectionDTO.getTitle());
                     }
                     titles.add(agreementSubSectionDTO.getTitle());
                 });
