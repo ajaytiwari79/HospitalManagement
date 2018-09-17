@@ -1254,13 +1254,18 @@ public class StaffService {
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
             }
-            AccessPermission accessPermission = new AccessPermission(accessGroup);
-            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-            unitEmpAccessRelationship.setEnabled(true);
-            unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
-            accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
+            linkAccessOfModules(accessGroup, unitPermission);
+
         }
         unitPermissionGraphRepository.save(unitPermission);
+    }
+
+    private void linkAccessOfModules(AccessGroup accessGroup, UnitPermission unitPermission) {
+        AccessPermission accessPermission = new AccessPermission(accessGroup);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
+        unitEmpAccessRelationship.setEnabled(true);
+        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+        accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroup.getId());
     }
 
     public void setUserAndEmployment(Organization organization, User user, Long accessGroupId, boolean parentOrganization) {
@@ -1288,11 +1293,7 @@ public class StaffService {
             AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
-                AccessPermission accessPermission = new AccessPermission(accessGroup);
-                UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-                unitEmpAccessRelationship.setEnabled(true);
-                unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
-                accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
+                linkAccessOfModules(accessGroup, unitPermission);
             }
         }
         employment.getUnitPermissions().add(unitPermission);
