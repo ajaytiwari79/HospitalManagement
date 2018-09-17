@@ -8,8 +8,12 @@ import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
+import com.kairos.dto.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.auth.User;
 
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
@@ -72,6 +76,7 @@ import com.sun.javafx.scene.control.skin.VirtualFlow;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.bouncycastle.util.test.FixedSecureRandom;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +89,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -162,6 +168,8 @@ public class UnitPositionService {
     private UserToSchedulerQueueService userToSchedulerQueueService;
     @Inject
     private GenericRestClient genericRestClient;
+    @Inject
+    private KafkaProducer kafkaProducer;
 
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) {
@@ -1157,53 +1165,72 @@ public class UnitPositionService {
     }
 
 
-    public void updateSeniorityLevelOnJobTrigger() {
+    public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId) {
 
-        List<UnitPositionSeniorityLevelQueryResult> unitPositionSeniorityLevelQueryResults = unitPositionGraphRepository.findUnitPositionSeniorityLeveltoUpdate();
-        List<Long> unitPositionIds = unitPositionSeniorityLevelQueryResults.stream().map(unitPositionQueryResult -> unitPositionQueryResult.getUnitPosition().getId()).
-                collect(Collectors.toList());
+        LocalDateTime started = LocalDateTime.now();
+        KairosSchedulerLogsDTO schedulerLogsDTO;
+        LocalDateTime stopped ;
+        String log = null;
+        Result result = Result.SUCCESS;
 
-        List<UnitPositionCompleteQueryResult> unitPositionsComplete = unitPositionGraphRepository.findUnitPositionCompleteObject(unitPositionIds);
-        Map<Long, UnitPosition> unitPositionMap = new HashMap<Long, UnitPosition>();
-        for (UnitPositionCompleteQueryResult unitPositionCompleteQueryResult : unitPositionsComplete) {
-            UnitPosition unitPositionComplete = unitPositionCompleteQueryResult.getUnitPosition();
-            unitPositionComplete.setExpertise(unitPositionCompleteQueryResult.getExpertise());
-            unitPositionComplete.setFunctions(unitPositionCompleteQueryResult.getFunctions());
-            unitPositionComplete.setReasonCode(unitPositionCompleteQueryResult.getReasonCode());
-            unitPositionComplete.setStaff(unitPositionCompleteQueryResult.getStaff());
-            unitPositionComplete.setPositionCode(unitPositionCompleteQueryResult.getPositionCode());
-            unitPositionComplete.setUnit(unitPositionCompleteQueryResult.getUnit());
-            unitPositionComplete.setUnion(unitPositionCompleteQueryResult.getUnionOrg());
-            unitPositionMap.put(unitPositionComplete.getId(), unitPositionComplete);
+        try {
+
+            List<UnitPositionSeniorityLevelQueryResult> unitPositionSeniorityLevelQueryResults = unitPositionGraphRepository.findUnitPositionSeniorityLeveltoUpdate();
+            List<Long> unitPositionIds = unitPositionSeniorityLevelQueryResults.stream().map(unitPositionQueryResult -> unitPositionQueryResult.getUnitPosition().getId()).
+                    collect(Collectors.toList());
+
+            List<UnitPositionCompleteQueryResult> unitPositionsComplete = unitPositionGraphRepository.findUnitPositionCompleteObject(unitPositionIds);
+            Map<Long, UnitPosition> unitPositionMap = new HashMap<Long, UnitPosition>();
+            for (UnitPositionCompleteQueryResult unitPositionCompleteQueryResult : unitPositionsComplete) {
+                UnitPosition unitPositionComplete = unitPositionCompleteQueryResult.getUnitPosition();
+                unitPositionComplete.setExpertise(unitPositionCompleteQueryResult.getExpertise());
+                unitPositionComplete.setFunctions(unitPositionCompleteQueryResult.getFunctions());
+                unitPositionComplete.setReasonCode(unitPositionCompleteQueryResult.getReasonCode());
+                unitPositionComplete.setStaff(unitPositionCompleteQueryResult.getStaff());
+                unitPositionComplete.setPositionCode(unitPositionCompleteQueryResult.getPositionCode());
+                unitPositionComplete.setUnit(unitPositionCompleteQueryResult.getUnit());
+                unitPositionComplete.setUnion(unitPositionCompleteQueryResult.getUnionOrg());
+                unitPositionMap.put(unitPositionComplete.getId(), unitPositionComplete);
+            }
+
+            List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips = new ArrayList<>();
+            List<UnitPosition> unitPositions = new ArrayList<>();
+            for (UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult : unitPositionSeniorityLevelQueryResults) {
+                UnitPosition unitPosition = new UnitPosition();
+                UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip;
+                UnitPosition oldUnitPosition = unitPositionMap.get(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId());
+                ObjectMapperUtils.copyProperties(oldUnitPosition, unitPosition);
+                oldUnitPosition.setEndDateMillis(DateUtils.getOneDayBeforeMillis());
+                oldUnitPosition.setHistory(true);
+                oldUnitPosition.setEditable(false);
+                unitPosition.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
+                unitPosition.setSeniorityLevel(unitPositionSeniorityLevelQueryResult.getSeniorityLevel());
+                unitPosition.setParentUnitPosition(oldUnitPosition);
+                unitPositionEmploymentTypeRelationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, unitPositionSeniorityLevelQueryResult.getEmploymentType(),
+                        unitPositionSeniorityLevelQueryResult.getUnitPositionEmploymentTypeRelationShip().getEmploymentTypeCategory());
+                unitPositionEmploymentTypeRelationShips.add(unitPositionEmploymentTypeRelationShip);
+                unitPosition.setId(null);
+                unitPositions.add(unitPosition);
+            }
+            List<UnitPositionIdDTO> unitPositionNewOldIds = new ArrayList<>();
+            unitPositionGraphRepository.saveAll(unitPositions);
+            int i = 0;
+            for(UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult:unitPositionSeniorityLevelQueryResults) {
+                unitPositionNewOldIds.add(new UnitPositionIdDTO(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId(),unitPositions.get(i++).getId()));
+            }
+            unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(unitPositionEmploymentTypeRelationShips);
+            activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
+
+        }
+        catch(Exception ex) {
+            log = ex.getMessage();
+            result = Result.ERROR;
         }
 
-        List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips = new ArrayList<>();
-        List<UnitPosition> unitPositions = new ArrayList<>();
-        for (UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult : unitPositionSeniorityLevelQueryResults) {
-            UnitPosition unitPosition = new UnitPosition();
-            UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip;
-            UnitPosition oldUnitPosition = unitPositionMap.get(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId());
-            ObjectMapperUtils.copyProperties(oldUnitPosition, unitPosition);
-            oldUnitPosition.setEndDateMillis(DateUtils.getOneDayBeforeMillis());
-            oldUnitPosition.setHistory(true);
-            oldUnitPosition.setEditable(false);
-            unitPosition.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
-            unitPosition.setSeniorityLevel(unitPositionSeniorityLevelQueryResult.getSeniorityLevel());
-            unitPosition.setParentUnitPosition(oldUnitPosition);
-            unitPositionEmploymentTypeRelationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, unitPositionSeniorityLevelQueryResult.getEmploymentType(),
-                    unitPositionSeniorityLevelQueryResult.getUnitPositionEmploymentTypeRelationShip().getEmploymentTypeCategory());
-            unitPositionEmploymentTypeRelationShips.add(unitPositionEmploymentTypeRelationShip);
-            unitPosition.setId(null);
-            unitPositions.add(unitPosition);
-        }
-        List<UnitPositionIdDTO> unitPositionNewOldIds = new ArrayList<>();
-        unitPositionGraphRepository.saveAll(unitPositions);
-        int i = 0;
-        for(UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult:unitPositionSeniorityLevelQueryResults) {
-            unitPositionNewOldIds.add(new UnitPositionIdDTO(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId(),unitPositions.get(i++).getId()));
-        }
-        unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(unitPositionEmploymentTypeRelationShips);
-        activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
+        stopped = LocalDateTime.now();
+        schedulerLogsDTO = new KairosSchedulerLogsDTO(result,log,schedulerPanelId,null,DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),JobSubType.SENIORITY_LEVEL);
+
+        kafkaProducer.pushToSchedulerLogsQueue(schedulerLogsDTO);
 
       // List<CTAWTAResponseDTO> ctaWTAs =  activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
