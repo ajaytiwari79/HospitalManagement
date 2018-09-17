@@ -44,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -283,27 +284,50 @@ public class CompanyCreationService {
             if (unitManagerDTO.getCprNumber() != null && unitManagerDTO.getCprNumber().length() != 10) {
                 exceptionService.actionNotPermittedException("message.cprNumber.size");
             }
+
             // user can fill any random property and we need to fetch
             User user = userGraphRepository.getUserOfOrganization(organization.getId());
             if (user != null) {
+                byte anotherUserExistBySameEmailOrCPR = userGraphRepository.validateUserEmailAndCPRExceptCurrentUser("(?)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber(), user.getId());
+                if (anotherUserExistBySameEmailOrCPR != 0) {
+                    exceptionService.duplicateDataException("message.cprNumberEmail.notNull");
+                }
                 user.setEmail(unitManagerDTO.getEmail());
+                user.setUserName(unitManagerDTO.getEmail());
                 user.setCprNumber(unitManagerDTO.getCprNumber());
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
+                setEncryptedPasswordInUser(unitManagerDTO,user);
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
                     staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId());
                 }
             } else {
-                user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail());
+                // No user is found its first time so we need to validate email and CPR number
+                //validate user email or name
+                if (unitManagerDTO.getCprNumber() != null || unitManagerDTO.getEmail() != null) {
+                    byte userBySameEmailOrCPR = userGraphRepository.findByEmailIgnoreCaseOrCprNumber("(?i)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber());
+                    if (userBySameEmailOrCPR != 0) {
+                        exceptionService.duplicateDataException("user already exist by email or cpr");
+                    }
+                }
+                user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
+                setEncryptedPasswordInUser(unitManagerDTO,user);
                 userGraphRepository.save(user);
                 staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization);
 
             }
         }
-
         return unitManagerDTO;
     }
+
+    private void setEncryptedPasswordInUser(UnitManagerDTO unitManagerDTO,User user) {
+        if (unitManagerDTO.getFirstName() != null && StringUtils.isEmpty(unitManagerDTO.getFirstName())) {
+            user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
+        }
+
+    }
+
 
     public StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId) {
         return userGraphRepository.getUnitManagerOfOrganization(unitId);
@@ -370,10 +394,7 @@ public class CompanyCreationService {
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
-        if (organizationBasicDTO.getUnitManager() != null
-                && (organizationBasicDTO.getUnitManager().getEmail()!=null||organizationBasicDTO.getUnitManager().getLastName()!=null||
-                organizationBasicDTO.getUnitManager().getFirstName()!=null|| organizationBasicDTO.getUnitManager().getCprNumber()!=null||
-                organizationBasicDTO.getUnitManager().getAccessGroupId()!=null)) {
+        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
             setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
         }
         //Assign Parent Organization's level to unit
@@ -387,6 +408,16 @@ public class CompanyCreationService {
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         return organizationBasicDTO;
 
+    }
+
+    private boolean doesUnitManagerInfoAvailable(OrganizationBasicDTO organizationBasicDTO) {
+        if (organizationBasicDTO.getUnitManager() != null
+                && (organizationBasicDTO.getUnitManager().getEmail() != null || organizationBasicDTO.getUnitManager().getLastName() != null ||
+                organizationBasicDTO.getUnitManager().getFirstName() != null || organizationBasicDTO.getUnitManager().getCprNumber() != null ||
+                organizationBasicDTO.getUnitManager().getAccessGroupId() != null)) {
+            return true;
+        }
+        return false;
     }
 
     private void setDefaultDataFromParentOrganization(Organization unit, Organization parentOrganization, OrganizationBasicDTO organizationBasicDTO) {
@@ -406,7 +437,7 @@ public class CompanyCreationService {
         updateOrganizationDetails(organization, organizationBasicDTO, false);
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(organization, organizationBasicDTO, null);
-        if (Optional.ofNullable(organizationBasicDTO.getUnitManager()).isPresent()) {
+        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
             setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManager(), organization.isBoardingCompleted(), false);
         }
         organizationGraphRepository.save(organization);
