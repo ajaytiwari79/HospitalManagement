@@ -6,10 +6,10 @@ import com.kairos.enums.ProcessingActivityAttributeName;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.master_data.MasterQuestionDTO;
 import com.kairos.enums.QuestionType;
-import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestion;
-import com.kairos.persistance.model.master_data.questionnaire_template.MasterQuestionnaireSection;
-import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionMongoRepository;
-import com.kairos.persistance.repository.master_data.questionnaire_template.MasterQuestionnaireSectionRepository;
+import com.kairos.persistence.model.master_data.questionnaire_template.MasterQuestion;
+import com.kairos.persistence.model.master_data.questionnaire_template.MasterQuestionnaireSection;
+import com.kairos.persistence.repository.master_data.questionnaire_template.MasterQuestionMongoRepository;
+import com.kairos.persistence.repository.master_data.questionnaire_template.MasterQuestionnaireSectionRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.mongodb.MongoClientException;
@@ -41,12 +41,11 @@ public class MasterQuestionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param organizationId
      * @param masterQuestionDTOs list of questionDto which belongs to section
      * @return map contain list of questions and question ids
      * @description
      */
-    public Map<String, Object> addQuestionsToQuestionSection(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs, QuestionnaireTemplateType templateType) {
+    public Map<String, Object> addQuestionsToQuestionSection(Long countryId, List<MasterQuestionDTO> masterQuestionDTOs, QuestionnaireTemplateType templateType) {
 
         List<BigInteger> questionSectionIds = new ArrayList<>();
         Map<String, Object> result = new HashMap<>();
@@ -58,7 +57,6 @@ public class MasterQuestionService extends MongoBaseService {
                 MasterQuestion question = new MasterQuestion(masterQuestion.getQuestion().trim(), masterQuestion.getDescription(), questionType, countryId);
                 question.setNotSureAllowed(masterQuestion.getNotSureAllowed());
                 question.setRequired(masterQuestion.getRequired());
-                question.setOrganizationId(organizationId);
                 addAttributeNameToQuestion(question, masterQuestion, templateType);
                 masterQuestions.add(question);
             } else {
@@ -117,19 +115,18 @@ public class MasterQuestionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param organizationId
      * @param id             - id of question
      * @param sectionId      -sectionId id of questionnaire section
      * @return
      * @description deleted question by id ,and also remove id of question from questionnaire section.
      */
-    public Boolean deleteMasterQuestion(Long countryId, Long organizationId, BigInteger id, BigInteger sectionId) {
+    public Boolean deleteMasterQuestion(Long countryId, BigInteger id, BigInteger sectionId) {
 
-        MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+        MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (exist == null) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " question ", id);
         }
-        MasterQuestionnaireSection questionnaireSection = masterQuestionnaireSectionRepository.findByIdAndNonDeleted(countryId, organizationId, sectionId);
+        MasterQuestionnaireSection questionnaireSection = masterQuestionnaireSectionRepository.findByIdAndNonDeleted(countryId, sectionId);
         List<BigInteger> questionsIdList = questionnaireSection.getQuestions();
         if (!questionsIdList.contains(id)) {
             exceptionService.invalidRequestException("message.invalid.request", "question  not present in questionnaire section " + questionnaireSection.getTitle() + "");
@@ -143,14 +140,14 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-    public List<MasterQuestion> getAllMasterQuestion(Long countryId, Long organizationId) {
-        return questionMongoRepository.getAllMasterQuestion(countryId, organizationId);
+    public List<MasterQuestion> getAllMasterQuestion(Long countryId) {
+        return questionMongoRepository.getAllMasterQuestion(countryId);
 
     }
 
 
-    public MasterQuestion getMasterQuestion(Long countryId, Long organizationId, BigInteger id) {
-        MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, organizationId, id);
+    public MasterQuestion getMasterQuestion(Long countryId, BigInteger id) {
+        MasterQuestion exist = questionMongoRepository.findByIdAndNonDeleted(countryId, id);
         if (exist == null) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.master.question", id);
         }
@@ -161,12 +158,11 @@ public class MasterQuestionService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param organizationId
      * @param questionDTOs   contain list of Existing questions and new questions
      * @return map contain list of questions and question ids.
      * @description method update the existing question(if question contain id) and create new question questions(if not contain id)
      */
-    public Map<String, Object> updateExistingQuestionAndCreateNewQuestions(Long countryId, Long organizationId, List<MasterQuestionDTO> questionDTOs, QuestionnaireTemplateType templateType) {
+    public Map<String, Object> updateExistingQuestionAndCreateNewQuestions(Long countryId, List<MasterQuestionDTO> questionDTOs, QuestionnaireTemplateType templateType) {
 
         checkForDuplicacyInQuestion(questionDTOs);
         List<MasterQuestionDTO> updateExistingQuestions = new ArrayList<>();
@@ -185,13 +181,13 @@ public class MasterQuestionService extends MongoBaseService {
         List<MasterQuestion> masterQuestions = new ArrayList<>();
 
         if (createNewQuestions.size() != 0) {
-            newQuestions = addQuestionsToQuestionSection(countryId, organizationId, createNewQuestions, templateType);
+            newQuestions = addQuestionsToQuestionSection(countryId, createNewQuestions, templateType);
             questionIds.addAll((List<BigInteger>) newQuestions.get(IDS_LIST));
             masterQuestions.addAll((List<MasterQuestion>) newQuestions.get(QUESTION_LIST));
         }
         if (updateExistingQuestions.size() != 0) {
 
-            updatedQuestions = updateQuestionsList(countryId, organizationId, updateExistingQuestions, templateType);
+            updatedQuestions = updateQuestionsList(countryId, updateExistingQuestions, templateType);
             questionIds.addAll((List<BigInteger>) updatedQuestions.get(IDS_LIST));
             masterQuestions.addAll((List<MasterQuestion>) updatedQuestions.get(QUESTION_LIST));
         }
@@ -203,11 +199,11 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-    public Map<String, Object> updateQuestionsList(Long countryId, Long organizationId, List<MasterQuestionDTO> masterQuestionDTOs, QuestionnaireTemplateType templateType) {
+    public Map<String, Object> updateQuestionsList(Long countryId,List<MasterQuestionDTO> masterQuestionDTOs, QuestionnaireTemplateType templateType) {
 
         List<BigInteger> questionIds = new ArrayList<>();
         masterQuestionDTOs.forEach(question -> questionIds.add(question.getId()));
-        List<MasterQuestion> existingMasterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId, organizationId, questionIds);
+        List<MasterQuestion> existingMasterQuestions = questionMongoRepository.getMasterQuestionListByIds(countryId, questionIds);
 
         Map<BigInteger, Object> masterQuestionDtoCorrespondingToId = new HashMap<>();
         masterQuestionDTOs.forEach(masterQuestionDto -> {
@@ -244,9 +240,9 @@ public class MasterQuestionService extends MongoBaseService {
     }
 
 
-    public Boolean deleteAll(Long countryId, Long orgId, List<BigInteger> questionIdsList) {
+    public Boolean deleteAll(Long countryId, List<BigInteger> questionIdsList) {
 
-        List<MasterQuestion> questions = questionMongoRepository.getMasterQuestionListByIds(countryId, orgId, questionIdsList);
+        List<MasterQuestion> questions = questionMongoRepository.getMasterQuestionListByIds(countryId,  questionIdsList);
         questions.forEach(masterQuestion -> {
             masterQuestion.setDeleted(true);
         });

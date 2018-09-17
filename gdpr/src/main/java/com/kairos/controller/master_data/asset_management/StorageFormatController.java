@@ -8,6 +8,7 @@ import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,7 @@ public class StorageFormatController {
 
 
     @ApiOperation("add StorageFormat")
-    @PostMapping("/storage_format/add")
+    @PostMapping("/storage_format")
     public ResponseEntity<Object> createStorageFormat(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormat) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -52,20 +53,17 @@ public class StorageFormatController {
 
 
     @ApiOperation("get StorageFormat by id")
-    @GetMapping("/storage_format/{id}")
-    public ResponseEntity<Object> getStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
+    @GetMapping("/storage_format/{storageFormatId}")
+    public ResponseEntity<Object> getStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger storageFormatId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormat(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormat(countryId, storageFormatId));
     }
 
 
     @ApiOperation("get all StorageFormat ")
-    @GetMapping("/storage_format/all")
+    @GetMapping("/storage_format")
     public ResponseEntity<Object> getAllStorageFormat(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -74,40 +72,25 @@ public class StorageFormatController {
     }
 
 
-    @ApiOperation("get StorageFormat by name")
-    @GetMapping("/storage_format/name")
-    public ResponseEntity<Object> getStorageFormatByName(@PathVariable Long countryId, @RequestParam String name) {
+    @ApiOperation("delete StorageFormat  by id")
+    @DeleteMapping("/storage_format/{storageFormatId}")
+    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger storageFormatId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormatByName(countryId, name));
 
-    }
-
-
-    @ApiOperation("delete StorageFormat  by id")
-    @DeleteMapping("/storage_format/delete/{id}")
-    public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.deleteStorageFormat(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.deleteStorageFormat(countryId, storageFormatId));
 
     }
 
 
     @ApiOperation("update StorageFormat by id")
-    @PutMapping("/storage_format/update/{id}")
-    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody StorageFormatDTO storageFormat) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
+    @PutMapping("/storage_format/{storageFormatId}")
+    public ResponseEntity<Object> updateStorageFormat(@PathVariable Long countryId, @PathVariable BigInteger storageFormatId, @Valid @RequestBody StorageFormatDTO storageFormat) {
+        if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateStorageFormat(countryId, id, storageFormat));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateStorageFormat(countryId, storageFormatId, storageFormat));
 
     }
 
@@ -115,10 +98,9 @@ public class StorageFormatController {
     @ApiOperation("update Suggested status of Storage Format ")
     @PutMapping("/storage_format")
     public ResponseEntity<Object> updateSuggestedStatusOfStorageFormats(@PathVariable Long countryId, @RequestBody Set<BigInteger> storageFormatIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+        if (CollectionUtils.isEmpty(storageFormatIds)) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+        } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateSuggestedStatusOfStorageFormatList(countryId, storageFormatIds, suggestedDataStatus));

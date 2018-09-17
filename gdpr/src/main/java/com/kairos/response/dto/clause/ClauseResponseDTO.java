@@ -7,7 +7,7 @@ import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
 import com.kairos.response.dto.master_data.AccountTypeResponseDTO;
-import com.kairos.persistance.model.clause_tag.ClauseTag;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
 import javax.validation.constraints.NotBlank;

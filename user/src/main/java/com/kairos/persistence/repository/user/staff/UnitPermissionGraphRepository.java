@@ -70,7 +70,7 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
     @Query("OPTIONAL Match (up:UnitPermission)-[r:HAS_ACCESS_GROUP]-(ag:AccessGroup) WHERE id(up)={0} AND id(ag)={1} RETURN CASE WHEN r IS NULL THEN false ELSE true END")
     Boolean checkUnitPermissionLinkedWithAccessGroup(Long unitPermissionId, Long accessGroupId);
 
-    // forg parent organization
+    // for parent organization
     @Query("Match (organization:Organization),(user:User) where id(organization)={0} AND id(user)={1} with organization,user \n" +
             "Match (organization)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user)  \n" +
             "Match (employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization)\n" +

@@ -32,7 +32,7 @@ public class OrganizationAssetTypeController {
 
 
     @ApiOperation("add AssetType")
-    @PostMapping("/asset_type/add")
+    @PostMapping("/asset_type")
     public ResponseEntity<Object> createAssetType(@PathVariable Long unitId, @Valid @RequestBody AssetTypeOrganizationLevelDTO assetTypeDTO) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -43,29 +43,21 @@ public class OrganizationAssetTypeController {
 
 
     @ApiOperation("get AssetType by id")
-    @GetMapping("/asset_type/{id}")
-    public ResponseEntity<Object> getAssetType(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @GetMapping("/asset_type/{assetTypeId}")
+    public ResponseEntity<Object> getAssetType(@PathVariable Long unitId, @PathVariable BigInteger assetTypeId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.getAssetTypeById(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.getAssetTypeById(unitId, assetTypeId));
 
     }
 
 
     @ApiOperation("get all AssetType with risk")
-    @GetMapping("/asset_type/all")
+    @GetMapping("/asset_type")
     public ResponseEntity<Object> getAllAssetType(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.getAllAssetType(unitId));
 
-    }
-
-    @ApiOperation("get all Sub Asset Type of Asset type  with risks ")
-    @GetMapping("/asset_type/{assetTypeId}/sub_asset_type")
-    public ResponseEntity<Object> getAllSubAssetTypeOfAssetType(@PathVariable Long unitId, @PathVariable BigInteger assetTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.getSubAssetTypesOfAssetTypeWithRisks(unitId, assetTypeId));
     }
 
 
@@ -112,16 +104,14 @@ public class OrganizationAssetTypeController {
     }
 
 
-    @ApiOperation("update subAsset by id")
-    @PutMapping("/asset_type/update/{id}")
-    public ResponseEntity<Object> updateAssetType(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody AssetTypeOrganizationLevelDTO assetTypeDTO) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @ApiOperation("update Asset  type and Sub Asset type by id")
+    @PutMapping("/asset_type/{assetTypeId}")
+    public ResponseEntity<Object> updateAssetType(@PathVariable Long unitId, @PathVariable BigInteger assetTypeId, @Valid @RequestBody AssetTypeOrganizationLevelDTO assetTypeDTO) {
+         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.updateAssetTypeAndSubAssetsAndAddRisks(unitId, id, assetTypeDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.updateAssetTypeAndSubAssetsAndAddRisks(unitId, assetTypeId, assetTypeDTO));
 
     }
 

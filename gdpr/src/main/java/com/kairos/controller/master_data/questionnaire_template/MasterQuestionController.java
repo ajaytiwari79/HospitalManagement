@@ -27,58 +27,30 @@ public class MasterQuestionController {
 
     /**
      * @param countryId
-     * @param organizationId
      * @param id             id of question
      * @return return MasterQuestion on the basis of id
      */
     @ApiOperation("get question of Questionnaire section by id ")
     @GetMapping("/question_section/question/{id}")
-    public ResponseEntity<Object> getMasterQuestionById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.getMasterQuestion(countryId, organizationId, id));
+    public ResponseEntity<Object> getMasterQuestionById(@PathVariable Long countryId, @PathVariable BigInteger id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.getMasterQuestion(countryId,  id));
     }
 
     /**
      * @param countryId
-     * @param organizationId
      * @return
      */
     @ApiOperation("get All question of Questionnaire section")
     @GetMapping("/question_section/question/all")
-    public ResponseEntity<Object> getAllMasterQuestion(@PathVariable Long countryId, @PathVariable Long organizationId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        } else if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.getAllMasterQuestion(countryId, organizationId));
+    public ResponseEntity<Object> getAllMasterQuestion(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.getAllMasterQuestion(countryId));
     }
 
 
     @DeleteMapping("/question_section/{sectionId}/question/delete/{id}")
     public ResponseEntity<Object> deleteMasterQuestion(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id, @PathVariable BigInteger sectionId) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        if (sectionId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Section id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteMasterQuestion(countryId, organizationId, id,sectionId));
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteMasterQuestion(countryId, id,sectionId));
     }
 
 

@@ -3,10 +3,9 @@ package com.kairos.service.risk_management;
 
 import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
-import com.kairos.dto.user.organization.OrganizationResponseDTO;
-import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.persistance.model.risk_management.Risk;
-import com.kairos.persistance.repository.risk_management.RiskMongoRepository;
+import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.risk_management.Risk;
+import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -60,13 +59,9 @@ public class RiskService extends MongoBaseService {
                 existingRisksRelatedToObject.put(objectToWhichRiskRelated, existingRiskDTOS);
 
             }
-            List<Risk> riskRelatedTOObject=new ArrayList<>();
+            List<Risk> riskRelatedTOObject = new ArrayList<>();
             if (!newRisk.isEmpty()) {
-                if (isUnitId) {
-                    riskRelatedTOObject = buildRiskAtOrganizationLevel(countryIdOrUnitId, newRisk);
-                } else {
-                    riskRelatedTOObject = buildRiskAtCountryLevel(countryIdOrUnitId, newRisk);
-                }
+                riskRelatedTOObject = isUnitId ? buildRiskAtOrganizationLevel(countryIdOrUnitId, newRisk) : buildRiskAtCountryLevel(countryIdOrUnitId, newRisk);
                 risks.addAll(riskRelatedTOObject);
             }
             riskListRelatedToObjectMap.put(objectToWhichRiskRelated, riskRelatedTOObject);
@@ -88,13 +83,7 @@ public class RiskService extends MongoBaseService {
     private <T extends MongoBaseEntity, E extends BasicRiskDTO> List<Risk> updateExistingRisk(Long countryIdOrUnitId, boolean isUnitId,
                                                                                               List<BigInteger> existingRiskIds, Map<T, List<E>> existingRisksRelatedToObject, Map<T, List<Risk>> riskListRelatedToObjectMap) {
         Assert.notEmpty(existingRiskIds, "List can't be empty");
-        List<Risk> riskList;
-        if (isUnitId) {
-            riskList = riskMongoRepository.findRiskByUnitIdAndIds(countryIdOrUnitId, existingRiskIds);
-
-        } else {
-            riskList = riskMongoRepository.findRiskByCountryIdAndIds(countryIdOrUnitId, existingRiskIds);
-        }
+        List<Risk> riskList = isUnitId ? riskMongoRepository.findRiskByUnitIdAndIds(countryIdOrUnitId, existingRiskIds) : riskMongoRepository.findRiskByCountryIdAndIds(countryIdOrUnitId, existingRiskIds);
         Map<BigInteger, Risk> riskMap = riskList.stream().collect(Collectors.toMap(Risk::getId, risk -> risk));
         existingRisksRelatedToObject.forEach((objectToWhichRiskRelate, riskDTOS) ->
         {
