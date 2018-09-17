@@ -222,7 +222,6 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-
     private ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
         if (activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
@@ -392,11 +391,10 @@ public class ShiftService extends MongoBaseService {
 
     private BigInteger getPresencePlannedTime(Long unitId, BigInteger phaseId, Boolean managementPerson, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ActivityConfiguration activityConfiguration = activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
-        BigInteger plannedTimeId;
-        if (!Optional.ofNullable(activityConfiguration).isPresent() && !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
+        if (!Optional.ofNullable(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.activityConfiguration.notFound");
         }
-        plannedTimeId = (managementPerson) ? getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), activityConfiguration.getPresencePlannedTime().getManagementPlannedTimeId())
+        BigInteger plannedTimeId = (managementPerson) ? getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), activityConfiguration.getPresencePlannedTime().getManagementPlannedTimeId())
                 : getApplicablePlannedType(staffAdditionalInfoDTO.getUnitPosition(), activityConfiguration.getPresencePlannedTime().getStaffPlannedTimeId());
         return plannedTimeId;
     }
@@ -416,7 +414,7 @@ public class ShiftService extends MongoBaseService {
                     }
                 });
                 List<LocalDate> publicHoliday = staffAdditionalInfoDTO.getPublicHoliday().get(dayTypeId);
-                if (publicHoliday != null && !publicHoliday.isEmpty()) {
+                if (CollectionUtils.isNotEmpty(publicHoliday)) {
                     publicHolidays.addAll(publicHoliday);
                 }
             }
@@ -463,6 +461,7 @@ public class ShiftService extends MongoBaseService {
             /**
              * The first eligible break hours after.It specifies you can take first break after this duration
              **/
+            breakActivity = paid ? breakActivitiesMap.get(breakSettings1.getPaidActivityId()) : breakActivitiesMap.get(breakSettings1.getUnpaidActivityId());
             breakAllowedAfterMinute = breakSettings1.getShiftDurationInMinute();
 
             if (shiftDurationInMinute > breakAllowedAfterMinute) {
@@ -477,7 +476,6 @@ public class ShiftService extends MongoBaseService {
                 if (shiftDurationInMinute >= allowedBreakDurationInMinute) {
                     endDate = endDate.plusMinutes(allowedBreakDurationInMinute);
                     shiftActivities.add(getShiftObject(breakActivity.getName(), breakActivity.getId(), DateUtils.getDateByZoneDateTime(startDate), DateUtils.getDateByZoneDateTime(endDate)));
-
                     shiftDurationInMinute = shiftDurationInMinute - new DateTimeInterval(startDate, endDate).getMinutes();
                     startDate = endDate;
                     logger.info("Remaining shift length after break = {}", shiftDurationInMinute);
@@ -575,15 +573,14 @@ public class ShiftService extends MongoBaseService {
         Activity activityOld = activityRepository.findActivityByIdAndEnabled(shift.getActivities().get(0).getActivityId());
         WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByUnitPosition(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTO.getStartDate());
         //copy old state of activity object
-        Shift oldStateOfShift = new Shift();
-        BeanUtils.copyProperties(shift, oldStateOfShift);
+        Shift oldStateOfShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
         ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activity, ActivityDTO.class);
         ShiftWithActivityDTO shiftWithActivityDTO = buildResponse(shiftDTO, activityDTO);
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getStartDate());
         shiftWithActivityDTO.setPlannedTypeId(addPlannedTimeInShift(unitId, phase.getId(), activity, staffAdditionalInfoDTO));
         ViolatedRulesDTO violatedRulesDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO);
-        shift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
+        shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
         shift.setPlannedTimeId(shiftWithActivityDTO.getPlannedTypeId());
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
         if (violatedRulesDTO.getActivities().isEmpty() && violatedRulesDTO.getWorkTimeAgreements().isEmpty()) {
@@ -671,7 +668,7 @@ public class ShiftService extends MongoBaseService {
 
     private void updateWTACounter(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftWithViolatedInfoDTO shiftWithViolatedInfo, Shift shift) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), DateUtils.asLocalDate(shift.getStartDate()));
-        List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()),staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff());
+        List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()), staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff());
         Map<BigInteger, StaffWTACounter> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(k -> k.getRuleTemplateId(), v -> v));
         List<StaffWTACounter> updatedStaffCounters = new ArrayList<>();
         shiftWithViolatedInfo.getViolatedRules().getWorkTimeAgreements().forEach(workTimeAgreementRuleViolation -> {
@@ -1210,7 +1207,6 @@ public class ShiftService extends MongoBaseService {
         }, countryId);
         return new ShiftDetailViewDTO(shiftDTOS, realTimeShift, staffValidatedShifts, plannerValidatedShifts, reasonCodeDTOS, attendanceSetting.getAttendanceDuration().getFrom().toLocalTime(), attendanceSetting.getAttendanceDuration().getTo().toLocalTime());
     }
-
 
 
     public ShiftWithViolatedInfoDTO updateOrValidateShift(Long unitId, ShiftDTO shiftDTO, Boolean validatedByStaff, String type) {
