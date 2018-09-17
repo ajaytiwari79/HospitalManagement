@@ -22,25 +22,24 @@ public class RestingHoursCalculationService implements CounterService{
     @Inject
     ActivityMongoRepositoryImpl activityMongoRepository;
 
-    //TODO: To be updated.
-//    private List<BigInteger> getFilterredActivities(List<FilterCriteria> filters){
-//        ActivityFilterCriteria activityCriteria = ActivityFilterCriteria.getInstance();
-//        for(FilterCriteria criteria: filters){
-//            switch(criteria.getType()){
-//                case ACTIVITY_IDS: activityCriteria.setActivityIds(criteria.getValues()); break;
-//                case UNIT_IDS: activityCriteria.setUnitId(criteria.getValues()); break;
-//                case ACTIVITY_CATEGORY_TYPE: activityCriteria.setCategoryId(criteria.getValues()); break;
-//                case EMPLOYMENT_TYPE: activityCriteria.setEmploymentTypes(criteria.getValues()); break;
-//                case EXPERTISE: activityCriteria.setExpertiseCriteria(criteria.getValues()); break;
-//                case TIME_TYPE: activityCriteria.setTimeTypeList(criteria.getValues()); break;
-//                case PLANNED_TIME_TYPE: activityCriteria.setPlanneTimeType(criteria.getValues()); break;
-//                case ORGANIZATION_TYPE: activityCriteria.setOrganizationTypes(criteria.getValues()); break;
-//                default: break;
-//            }
-//        }
-//
-//        return null;
-//    }
+    private List<BigInteger> getFilterredActivities(List<FilterCriteria> filters){
+        ActivityFilterCriteria activityCriteria = ActivityFilterCriteria.getInstance();
+        for(FilterCriteria criteria: filters){
+            switch(criteria.getType()){
+                case ACTIVITY_IDS: activityCriteria.setActivityIds(criteria.getValues()); break;
+                case UNIT_IDS: activityCriteria.setUnitId(criteria.getValues()); break;
+                case ACTIVITY_CATEGORY_TYPE: activityCriteria.setCategoryId(criteria.getValues()); break;
+                case EMPLOYMENT_TYPE: activityCriteria.setEmploymentTypes(criteria.getValues()); break;
+                case EXPERTISE: activityCriteria.setExpertiseCriteria(criteria.getValues()); break;
+                case TIME_TYPE: activityCriteria.setTimeTypeList(criteria.getValues()); break;
+                case PLANNED_TIME_TYPE: activityCriteria.setPlanneTimeType(criteria.getValues()); break;
+                case ORGANIZATION_TYPE: activityCriteria.setOrganizationTypes(criteria.getValues()); break;
+                default: break;
+            }
+        }
+
+        return null;
+    }
 
     private FilterCriteria getTimeTypeCriteriaForRestingHours(Long countryId){
         List supportedTimeTypeIdList = timeTypeService.getTimeTypesByTimeTypesAndByCountryId(countryId, TimeTypes.WORKING_TYPE);
