@@ -3,6 +3,7 @@ package com.kairos.controller.counters;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIMappingDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIsDTO;
@@ -194,9 +195,9 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialAccessGroupKPIDataConf(accessGroupId,unitId,ConfLevel.UNIT));
     }
 
-    @PostMapping(UNIT_URL+COUNTER_DIST_URL+"/staff/{staffId}/access_group/{accessGroupId}/update_kpi")
-    public ResponseEntity<Map<String,Object>> updateStaffAccessGroupKPISetting(@PathVariable Long unitId,@PathVariable Long accessGroupId, @PathVariable Long staffId){
-        counterManagementService.addAndRemoveStaffAccessGroupKPISetting(staffId,unitId,accessGroupId,true);
+    @PostMapping(UNIT_URL+COUNTER_DIST_URL+"/staff/access_group/{accessGroupId}/update_kpi")
+    public ResponseEntity<Map<String,Object>> updateStaffAccessGroupKPISetting(@PathVariable Long unitId,@PathVariable Long accessGroupId,@RequestBody AccessGroupPermissionCounterDTO accessGroups,@QueryParam("created") Boolean created){
+        counterManagementService.addAndRemoveStaffAccessGroupKPISetting(unitId,accessGroupId,accessGroups,created);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
     // orgType Apis

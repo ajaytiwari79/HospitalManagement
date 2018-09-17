@@ -27,7 +27,7 @@ import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -106,7 +106,7 @@ public class CounterDistService extends MongoBaseService {
     }
 
     public StaffKPIGalleryDTO getInitialCategoryKPIDistDataForStaff(Long refId) {
-        List<BigInteger> kpiIds=null;
+        Set<BigInteger> kpiIds=null;
         List<KPIDTO> kpidtos=null;
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
         if(accessGroupPermissionCounterDTO.getCountryAdmin()){
@@ -114,7 +114,7 @@ public class CounterDistService extends MongoBaseService {
         }else{
             kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,refId,accessGroupPermissionCounterDTO.getStaffId());
         }
-        kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
+        kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toSet());
         //dont delete
        // counterRepository.removeApplicableKPI(Arrays.asList(accessGroupPermissionCounterDTO.getStaffId()),kpiIds,refId,ConfLevel.STAFF);
         List<CategoryKPIMappingDTO> categoryKPIMapping = counterRepository.getKPIsMappingForCategoriesForStaff(kpiIds,refId,ConfLevel.UNIT);
@@ -287,7 +287,7 @@ public class CounterDistService extends MongoBaseService {
         staffids.forEach(staffid->{
             staffIdKpiMap.put(staffid,new HashMap<BigInteger, BigInteger>());
         });
-        List<ApplicableKPI> applicableKPISForStaff = counterRepository.getApplicableKPIByReferenceId(AccessGroupMappingDTOS.stream().map(orgTypeMappingDTO -> orgTypeMappingDTO.getKpiId()).collect(toList()),staffids, ConfLevel.STAFF);
+        List<ApplicableKPI> applicableKPISForStaff = counterRepository.getApplicableKPIByReferenceId(AccessGroupMappingDTOS.stream().map(accessGroupMappingDTO  -> accessGroupMappingDTO.getKpiId()).collect(toList()),staffids, ConfLevel.STAFF);
         applicableKPISForStaff.forEach(applicableKPI ->{
             staffIdKpiMap.get(applicableKPI.getStaffId()).put(applicableKPI.getBaseKpiId(),applicableKPI.getBaseKpiId());
         });
@@ -313,19 +313,46 @@ public class CounterDistService extends MongoBaseService {
                 List<Long> staffIds=staffIdsDTOS.stream().flatMap(staffIdsDTO -> staffIdsDTO.getStaffIds().stream()).collect(Collectors.toList());
             counterRepository.removeApplicableKPI(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()),refId, ConfLevel.STAFF);
             counterRepository.removeTabKPIEntry(staffIds, accessGroupKPIEntry.getKpiId(), ConfLevel.STAFF);
-       //     counterRepository.removeDashboardKPIEntry(staffIds,accessGroupKPIEntry.getKpiId(),ConfLevel.STAFF);
-            counterRepository.removeEntityById(accessGroupKPIEntry.getId(), AccessGroupKPIEntry.class);
+       //     counterRepository.removeDashboardKPIEntry(staffIds,accessGroupKPIEntry.getKpiId(),ConfLevel.STAFF);counterRepository.removeEntityById(accessGroupKPIEntry.getId(), AccessGroupKPIEntry.class);
         }else{
             counterRepository.removeAccessGroupKPIEntryForCountry(accessGroupMappingDTO,refId);
         }
     }
 
-    public void addAndRemoveStaffAccessGroupKPISetting(Long staffId, Long unitId, Long accessGroupId, Boolean created){
-        List<BigInteger> kpiIds=counterRepository.getKPISOfAccessGroup(accessGroupId,unitId,ConfLevel.UNIT);
+    public void addAndRemoveStaffAccessGroupKPISetting(Long unitId, Long accessGroupId,AccessGroupPermissionCounterDTO accessGroupAndStaffDTO,Boolean created){
+        List<BigInteger> kpiIds=counterRepository.getKPISOfAccessGroup(Arrays.asList(accessGroupId),unitId,ConfLevel.UNIT);
         if(created){
-
+            List<ApplicableKPI> applicableKPISToSave = new ArrayList<>();
+            Map<Long,Map<BigInteger,BigInteger>> staffIdKpiMap=new HashMap<>();
+                staffIdKpiMap.put(accessGroupAndStaffDTO.getStaffId(),new HashMap<BigInteger, BigInteger>());
+            List<ApplicableKPI> applicableKPISForStaff = counterRepository.getApplicableKPIByReferenceId(kpiIds,Arrays.asList(accessGroupAndStaffDTO.getStaffId()), ConfLevel.STAFF);
+            applicableKPISForStaff.forEach(applicableKPI ->{
+                staffIdKpiMap.get(applicableKPI.getStaffId()).put(applicableKPI.getBaseKpiId(),applicableKPI.getBaseKpiId());
+            });
+            kpiIds.stream().forEach(kpiId ->{
+                if(staffIdKpiMap.get(accessGroupAndStaffDTO.getStaffId()).get(kpiId)==null){
+                    applicableKPISToSave.add(new ApplicableKPI(kpiId,kpiId,null, null, accessGroupAndStaffDTO.getStaffId(), ConfLevel.STAFF));
+                    staffIdKpiMap.get(accessGroupAndStaffDTO.getStaffId()).put(kpiId,kpiId);
+                }
+            });
+            if(!applicableKPISToSave.isEmpty()){
+                save(applicableKPISToSave);
+            }
         }else{
-            counterRepository.removeApplicableKPI(Arrays.asList(staffId), kpiIds,unitId, ConfLevel.STAFF);
+            List<Long> accessGroupIds=accessGroupAndStaffDTO.getAccessGroupIds().stream().filter(accessGroupIdOne -> !accessGroupIdOne.equals(accessGroupId)).collect(toList());
+            List<KPIDTO> kpidtos=counterRepository.getAccessGroupKPIDto(accessGroupIds,ConfLevel.UNIT,unitId,accessGroupAndStaffDTO.getStaffId());
+            List<BigInteger> kpiDtoIds=kpidtos.stream().map(kpidto -> kpidto.getId()).collect(toList());
+            Map<BigInteger,BigInteger> availableKpi=new HashMap<>();
+            List<BigInteger> removeAbleKPi=new ArrayList<>();
+            kpiDtoIds.stream().forEach(kpi ->{
+                availableKpi.put(kpi,kpi);
+            });
+            kpiIds.stream().forEach(kpiId ->{
+                if(availableKpi.get(kpiId)==null){
+                    removeAbleKPi.add(kpiId);
+                }
+            });
+            counterRepository.removeApplicableKPI(Arrays.asList(accessGroupAndStaffDTO.getStaffId()), removeAbleKPi,unitId, ConfLevel.STAFF);
         }
     }
     //setting orgType-KPI configuration

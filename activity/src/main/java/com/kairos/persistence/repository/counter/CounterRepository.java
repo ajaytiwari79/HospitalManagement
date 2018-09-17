@@ -150,7 +150,7 @@ public class CounterRepository {
     }
 
 
-    public List<CategoryKPIMappingDTO> getKPIsMappingForCategoriesForStaff(List<BigInteger> kpiIds,Long refId,ConfLevel level){
+    public List<CategoryKPIMappingDTO> getKPIsMappingForCategoriesForStaff(Set<BigInteger> kpiIds,Long refId,ConfLevel level){
         String queryField = (ConfLevel.COUNTRY.equals(level)) ? "countryId" : "unitId";
         Aggregation ag = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where(queryField).is(refId).and("level").is(level)),
@@ -275,9 +275,9 @@ public class CounterRepository {
         return mongoTemplate.findOne(query, OrgTypeKPIEntry.class);
     }
 
-    public List<BigInteger> getKPISOfAccessGroup(Long accessGroupId,Long unitId,ConfLevel level){
+    public List<BigInteger> getKPISOfAccessGroup(List<Long> accessGroupId,Long unitId,ConfLevel level){
         Aggregation aggregation=Aggregation.newAggregation(
-          Aggregation.match(Criteria.where("accessGroupId").is(accessGroupId).and("unitId").is(unitId).and("level").is(level)),
+          Aggregation.match(Criteria.where("accessGroupId").in(accessGroupId).and("unitId").is(unitId).and("level").is(level)),
            Aggregation.project().and("kpiId").as("kpiId").andExclude("_id")
         );
         AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,Map.class);
@@ -317,7 +317,8 @@ public class CounterRepository {
                 Aggregation.lookup("applicableKPI","kpiId","activeKpiId","applicableKpi"),
                 Aggregation.match(Criteria.where("applicableKpi.staffId").is(staffId)),
                 Aggregation.lookup("counter","applicableKpi.activeKpiId","_id","kpi"),
-                Aggregation.project().and("kpi._id").as("_id")
+                Aggregation.group("kpi._id","kpi.title","kpi.counter"),
+                Aggregation.project().and("_id").as("_id")
                         .and("kpi.title").as("title").and("kpi.counter").as("counter")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,KPIDTO.class);
