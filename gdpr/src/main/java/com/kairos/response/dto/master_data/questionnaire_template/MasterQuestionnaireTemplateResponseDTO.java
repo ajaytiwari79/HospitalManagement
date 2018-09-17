@@ -3,7 +3,7 @@ package com.kairos.response.dto.master_data.questionnaire_template;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.QuestionnaireTemplateType;
-import com.kairos.persistance.model.master_data.default_asset_setting.AssetType;
+import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 
 import java.math.BigInteger;
 import java.util.List;

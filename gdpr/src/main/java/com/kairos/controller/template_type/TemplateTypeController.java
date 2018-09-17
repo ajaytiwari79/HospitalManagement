@@ -1,5 +1,5 @@
 package com.kairos.controller.template_type;
-import com.kairos.persistance.model.template_type.TemplateType;
+import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.service.template_type.TemplateTypeService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
