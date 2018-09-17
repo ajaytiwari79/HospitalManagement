@@ -80,7 +80,7 @@ public class User extends UserBaseEntity {
     @Relationship(type = HAS_PERSONALIZED_SETTINGS)
     private UserPersonalizedSettings userPersonalizedSettings;
 
-    @Relationship(type= SELECTED_LANGUAGE)
+    @Relationship(type = SELECTED_LANGUAGE)
     private SystemLanguage userLanguage;
 
     public int getOtp() {
@@ -203,7 +203,7 @@ public class User extends UserBaseEntity {
      * @return
      */
     public String getUserName() {
-        if (userName!=null){
+        if (userName != null) {
             userName.toLowerCase();
         }
         return userName;
@@ -216,7 +216,8 @@ public class User extends UserBaseEntity {
      * @param userName
      */
     public void setUserName(String userName) {
-        this.userName = userName.toLowerCase();
+        if (userName != null)
+            this.userName = userName.toLowerCase();
     }
 
 
@@ -259,48 +260,46 @@ public class User extends UserBaseEntity {
 
     public int getAge() {
         int age = 0;
-        if (cprNumber==null){
+        if (cprNumber == null) {
             return this.age;
 
         }
-        if (cprNumber.length()==9){
-            cprNumber = "0"+cprNumber;
+        if (cprNumber.length() == 9) {
+            cprNumber = "0" + cprNumber;
         }
         //System.out.print("\n CPR: ----"+cprNumber+"---\n");
-        if (cprNumber!=null){
-            Integer year= Integer.valueOf(cprNumber.substring(4,6));
-            Integer month = Integer.valueOf(cprNumber.substring(2,4));
-            Integer day= Integer.valueOf(cprNumber.substring(0,2));
-            Integer century = Integer.parseInt(cprNumber.substring(6,7));
+        if (cprNumber != null) {
+            Integer year = Integer.valueOf(cprNumber.substring(4, 6));
+            Integer month = Integer.valueOf(cprNumber.substring(2, 4));
+            Integer day = Integer.valueOf(cprNumber.substring(0, 2));
+            Integer century = Integer.parseInt(cprNumber.substring(6, 7));
 
-            if (century>=0 && century<=3){
+            if (century >= 0 && century <= 3) {
                 century = 1900;
             }
-            if (century==4){
-                if (year<=36){
+            if (century == 4) {
+                if (year <= 36) {
                     century = 2000;
-                }
-                else {
+                } else {
                     century = 1900;
                 }
             }
-            if (century>=5 && century<=8){
-                if (year<=57){
-                    century =2000;
+            if (century >= 5 && century <= 8) {
+                if (year <= 57) {
+                    century = 2000;
                 }
-                if (year>=58 && year<=99){
+                if (year >= 58 && year <= 99) {
                     century = 1800;
                 }
             }
-            if (century==9){
-                if (year<=36){
+            if (century == 9) {
+                if (year <= 36) {
                     century = 2000;
-                }
-                else {
+                } else {
                     century = 1900;
                 }
             }
-            year = century+year;
+            year = century + year;
             LocalDate today = LocalDate.now();
             LocalDate birthday = LocalDate.of(year, month, day);
             // Calculating age in yeas from DOB
@@ -350,13 +349,13 @@ public class User extends UserBaseEntity {
     }
 
     /**
-     * @Use   while uploading multiple client in batch
      * @param firstName
      * @param lastName
      * @param cprNumber
      * @param dateOfBirth
+     * @Use while uploading multiple client in batch
      */
-    public User(String firstName, String lastName,String cprNumber,  Date dateOfBirth) {
+    public User(String firstName, String lastName, String cprNumber, Date dateOfBirth) {
         this.cprNumber = cprNumber;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -390,12 +389,14 @@ public class User extends UserBaseEntity {
     }
 
 
-    public User( String cprNumber,String firstName, String lastName, String email) {
+    public User(String cprNumber, String firstName, String lastName, String email, String userName) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.cprNumber = cprNumber;
+        this.userName = userName;
     }
+
     /**
      * Constructor for User with CountryList
      *
@@ -446,7 +447,7 @@ public class User extends UserBaseEntity {
                 ", accessToken='" + accessToken + '\'' +
                 ", otp=" + otp +
                 ", isPasswordUpdated=" + isPasswordUpdated +
-                '}'+
+                '}' +
                 '}';
     }
 
@@ -497,6 +498,7 @@ public class User extends UserBaseEntity {
     public void setUserLanguage(SystemLanguage userLanguage) {
         this.userLanguage = userLanguage;
     }
+
     public void setBasicDetail(NextToKinDTO nextToKinDTO) {
         this.setFirstName(nextToKinDTO.getFirstName());
         this.setLastName(nextToKinDTO.getLastName());

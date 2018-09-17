@@ -1250,14 +1250,14 @@ public class StaffService {
     public void setAccessGroupInUserAccount(User user, Long organizationId, Long accessGroupId) {
         UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organizationId, user.getId());
         if (accessGroupId != null) {
+            unitPermission=unitPermission==null?new UnitPermission():unitPermission;
             AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
             }
             linkAccessOfModules(accessGroup, unitPermission);
-
+            unitPermissionGraphRepository.save(unitPermission);
         }
-        unitPermissionGraphRepository.save(unitPermission);
     }
 
     private void linkAccessOfModules(AccessGroup accessGroup, UnitPermission unitPermission) {

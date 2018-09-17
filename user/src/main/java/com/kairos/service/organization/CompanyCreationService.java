@@ -289,7 +289,7 @@ public class CompanyCreationService {
                     exceptionService.duplicateDataException("user already exist by email or cpr");
                 }
                 user.setEmail(unitManagerDTO.getEmail());
-                user.setFirstName(unitManagerDTO.getEmail());
+                user.setUserName(unitManagerDTO.getEmail());
                 user.setCprNumber(unitManagerDTO.getCprNumber());
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
@@ -309,8 +309,9 @@ public class CompanyCreationService {
                         exceptionService.duplicateDataException("user already exist by email or cpr");
                     }
                 }
-                user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail());
-                user.setFirstName(unitManagerDTO.getEmail());
+                user = new
+                        User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(),unitManagerDTO.getEmail());
+
                 if (unitManagerDTO.getFirstName() != null || StringUtils.isEmpty(unitManagerDTO.getFirstName())) {
                     user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
                 }
@@ -387,10 +388,7 @@ public class CompanyCreationService {
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
-        if (organizationBasicDTO.getUnitManager() != null
-                && (organizationBasicDTO.getUnitManager().getEmail() != null || organizationBasicDTO.getUnitManager().getLastName() != null ||
-                organizationBasicDTO.getUnitManager().getFirstName() != null || organizationBasicDTO.getUnitManager().getCprNumber() != null ||
-                organizationBasicDTO.getUnitManager().getAccessGroupId() != null)) {
+        if (isAnyFieldFilledInUser(organizationBasicDTO)) {
             setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
         }
         //Assign Parent Organization's level to unit
@@ -404,6 +402,16 @@ public class CompanyCreationService {
         organizationGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         return organizationBasicDTO;
 
+    }
+
+    private boolean isAnyFieldFilledInUser(OrganizationBasicDTO organizationBasicDTO) {
+        if (organizationBasicDTO.getUnitManager() != null
+                && (organizationBasicDTO.getUnitManager().getEmail() != null || organizationBasicDTO.getUnitManager().getLastName() != null ||
+                organizationBasicDTO.getUnitManager().getFirstName() != null || organizationBasicDTO.getUnitManager().getCprNumber() != null ||
+                organizationBasicDTO.getUnitManager().getAccessGroupId() != null)) {
+            return true;
+        }
+        return false;
     }
 
     private void setDefaultDataFromParentOrganization(Organization unit, Organization parentOrganization, OrganizationBasicDTO organizationBasicDTO) {
@@ -423,7 +431,7 @@ public class CompanyCreationService {
         updateOrganizationDetails(organization, organizationBasicDTO, false);
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(organization, organizationBasicDTO, null);
-        if (Optional.ofNullable(organizationBasicDTO.getUnitManager()).isPresent()) {
+        if (isAnyFieldFilledInUser(organizationBasicDTO)) {
             setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManager(), organization.isBoardingCompleted(), false);
         }
         organizationGraphRepository.save(organization);
