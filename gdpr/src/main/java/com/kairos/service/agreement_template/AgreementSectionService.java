@@ -39,6 +39,9 @@ public class AgreementSectionService extends MongoBaseService {
     private ClauseMongoRepository clauseMongoRepository;
     @Inject
     private PolicyAgreementTemplateRepository policyAgreementTemplateRepository;
+
+    @Inject
+    private PolicyAgreementTemplateService policyAgreementTemplateService;
     @Inject
     private ExceptionService exceptionService;
 
@@ -64,7 +67,7 @@ public class AgreementSectionService extends MongoBaseService {
                 : createSectionClauseAndSubSectionsOfAgreementTemplate(countryId, agreementSectionDTOs, policyAgreementTemplate);
         policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
-        return policyAgreementTemplateRepository.getAgreementTemplateWithSectionsAndSubSections(countryId, templateId);
+        return policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(countryId, templateId);
     }
 
 
