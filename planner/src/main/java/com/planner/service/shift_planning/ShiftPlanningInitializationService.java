@@ -74,7 +74,7 @@ public class ShiftPlanningInitializationService {
         //3.)Initialize ActivityLineInterval and activitiesPerDay
         Object[] activityLineIntervalsAndActivitiesPerDay = getActivityLineIntervalsAndActivitiesPerDay(activityList, localDateStaffingLevelTimeSlotMap);
         List<ActivityLineInterval> activityLineIntervalList = (List<ActivityLineInterval>) activityLineIntervalsAndActivitiesPerDay[0];
-        Map<LocalDate, List<Activity>> activitiesPerDay = (Map<LocalDate, List<Activity>>) activityLineIntervalsAndActivitiesPerDay[1];
+        Map<LocalDate, Set<Activity>> activitiesPerDay = (Map<LocalDate, Set<Activity>>) activityLineIntervalsAndActivitiesPerDay[1];
 
         //4.)Initialize shifts(Opta-planner PlanningEntity(as fact))
         Map<java.time.LocalDate, List<ActivityLineInterval>> dateWiseALIsList = (Map<java.time.LocalDate, List<ActivityLineInterval>>) activityLineIntervalsAndActivitiesPerDay[2];
@@ -92,7 +92,7 @@ public class ShiftPlanningInitializationService {
      *
      * @param fromPlanningDate
      * @param toPlanningDate   Must have CTA associated with unitPositionId within planning range else Staff will be skipped in planning
-     *                         Must have WTA associated with unitPositionId within planning range else Staff will be skipped in planning //TODO attach already created logic
+     *                         Must have WTA associated with unitPositionId within planning range else Staff will be skipped in planning
      * @return
      */
     public List<Employee> getAllEmployee(Date fromPlanningDate, Date toPlanningDate, List<StaffQueryResult> staffWithSkillsAndUnitPostionIds, List<Long> unitPositionIds) {
@@ -147,12 +147,13 @@ public class ShiftPlanningInitializationService {
     public Object[] getActivityLineIntervalsAndActivitiesPerDay(List<Activity> activityList, Map<java.time.LocalDate, List<StaffingLevelTimeSlotDTO>> localDateStaffingLevelTimeSlotMap) {
         Object[] activityLineIntervalsAndActivitiesPerDay = new Object[3];
         List<ActivityLineInterval> activityLineIntervalList = new ArrayList<>();//arr[0]
-        Map<LocalDate, List<Activity>> activitiesPerDay = new HashMap<>();//arr[1]
+        Map<LocalDate, Set<Activity>> activitiesPerDay = new HashMap<>();//arr[1]
         Map<java.time.LocalDate, List<ActivityLineInterval>> dateWiseALIList = new HashMap<>();//arr[2]
         Map<String, Activity> activityIdActivityMap = activityList.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         for (Map.Entry<java.time.LocalDate, List<StaffingLevelTimeSlotDTO>> localDateListEntry : localDateStaffingLevelTimeSlotMap.entrySet()) {
             LocalDate jodaLocalDate = DateUtils.asJodaLocalDate(DateUtils.asDate(localDateListEntry.getKey()));
-            List<Activity> activityListPerDay = new ArrayList<>();
+            Set<Activity> activityListPerDay = new HashSet<>();
+            List<ActivityLineInterval> perDayALIList = new ArrayList<>();
             for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO : localDateListEntry.getValue()) {
                 //Create ALI only if there exist at least 1 StaffingLevelActivity for current[TimeSlot/Interval]
                 if (!staffingLevelTimeSlotDTO.getStaffingLevelActivities().isEmpty()) {
@@ -171,17 +172,20 @@ public class ShiftPlanningInitializationService {
                             if (i < staffingLevelActivity.getMinNoOfStaff()) {
                                 activityLineInterval.setRequired(true);
                             }
-                            activityLineIntervalList.add(activityLineInterval);
+                            perDayALIList.add(activityLineInterval);
                         }
                     }
                 }
             }
             if (activityListPerDay.size() > 0) activitiesPerDay.put(jodaLocalDate, activityListPerDay);
-            if (activityLineIntervalList.size() > 0)
-                dateWiseALIList.put(localDateListEntry.getKey(), activityLineIntervalList);
+            if (perDayALIList.size() > 0) {
+                dateWiseALIList.put(localDateListEntry.getKey(), perDayALIList);
+                activityLineIntervalList.addAll(perDayALIList);
+            }
         }
         activityLineIntervalsAndActivitiesPerDay[0] = activityLineIntervalList;
         activityLineIntervalsAndActivitiesPerDay[1] = activitiesPerDay;
+        activityLineIntervalsAndActivitiesPerDay[2] = dateWiseALIList;
         return activityLineIntervalsAndActivitiesPerDay;
     }
     /****************************Shift Initialization**********************************************************************************/
@@ -207,7 +211,7 @@ public class ShiftPlanningInitializationService {
                     //Set Appropriate Staff/Employee
                     shiftRequestPhase.setEmployee(unitPositionEmployeeMap.get(shift.getUnitPositionId()));
                     //Set Matched ALI/s on the basis of its [Interval/Duration]
-                    shiftRequestPhase.setActivityLineIntervals(getApplicableALIs(shift, dateWiseALIsList));
+                    //shiftRequestPhase.setActivityLineIntervals(getApplicableALIs(shift, dateWiseALIsList));
                     shiftRequestPhaseList.add(shiftRequestPhase);
                 }
             }
