@@ -336,7 +336,7 @@ public class DateUtils {
     }
 
     public static Date onlyDate(Date date) {
-        return getDateByZoneDateTime(getZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
+        return getDateByZoneDateTime(asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
     }
 
     public static Date addMinutes(final Date date, final int amount) {
@@ -462,12 +462,12 @@ public class DateUtils {
         return dateTime.toString(formatter);
     }
 
-    public static ZonedDateTime getZoneDateTime(Date date) {
+    public static ZonedDateTime asZoneDateTime(Date date) {
         return ZonedDateTime.ofInstant(date.toInstant(),
                 ZoneId.systemDefault());
     }
 
-    public static Date getDateByZonedDateTime(ZonedDateTime dateTime) {
+    public static Date asDate(ZonedDateTime dateTime) {
         return Date.from(dateTime.toInstant());
     }
 

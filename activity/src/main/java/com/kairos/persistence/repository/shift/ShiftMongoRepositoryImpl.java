@@ -101,11 +101,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("disabled").is(false).and("startDate").gte(startDate).and("endDate").lt(endDate)),
-                project("unitId", "startDate", "endDate", "activityId", "staffId", "unitPositionId", "status", "allowedBreakDurationInMinute"),
                 sort(Sort.Direction.ASC, "staffId"));
-
-
-        //AggregationResults<Object> result1 = mongoTemplate.aggregate(aggregation, Shift.class, Object.class);
         AggregationResults<ShiftDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class);
         return result.getMappedResults();
     }

@@ -18,6 +18,7 @@ import com.kairos.persistence.model.activity.tabs.CompositeActivity;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -25,13 +26,13 @@ import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
-import com.kairos.service.shift.ShiftService;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
@@ -77,11 +78,47 @@ public class ShiftValidatorService {
     private TimeBankRepository timeBankRepository;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
+    @Inject
+    private TimeAttendanceGracePeriodRepository timeAttendanceGracePeriodRepository;
+
     private static ExceptionService exceptionService;
 
     @Autowired
     public void setExceptionService(ExceptionService exceptionService) {
         this.exceptionService = exceptionService;
+    }
+
+
+    public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId) {
+        DateTimeInterval graceInterval;
+        if (validatedByStaff) {
+            graceInterval = getGracePeriodInterval(unitId, shiftDTO.getStartDate(), validatedByStaff);
+        } else {
+            if (shiftDTO.getValidatedByStaffDate() == null) {
+                exceptionService.invalidRequestException("message.shift.cannot.validated");
+            }
+            graceInterval = getGracePeriodInterval(unitId, DateUtils.asDate(shiftDTO.getValidatedByStaffDate()), validatedByStaff);
+        }
+        if (!graceInterval.contains(shiftDTO.getStartDate())) {
+            exceptionService.invalidRequestException("message.shift.cannot.update");
+        }
+        if (validatedByStaff) {
+            shiftDTO.setValidatedByStaffDate(LocalDate.now());
+        } else {
+            shiftDTO.setValidatedByPlannerDate(LocalDate.now());
+        }
+    }
+
+    public DateTimeInterval getGracePeriodInterval(Long unitId, Date date, boolean forStaff) {
+        TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
+        ZonedDateTime startDate = DateUtils.asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime endDate;
+        if (forStaff) {
+            endDate = startDate.plusDays(timeAttendanceGracePeriod.getStaffGracePeriodDays());
+        } else {
+            endDate = startDate.plusDays(timeAttendanceGracePeriod.getManagementGracePeriodDays());
+        }
+        return new DateTimeInterval(startDate, endDate);
     }
 
 
@@ -116,10 +153,6 @@ public class ShiftValidatorService {
             activitySpecification.and(activityDayTypeSpec);
         }
         activitySpecification.validateRules(shift);
-        /*if (!messages.isEmpty()) {
-            List<String> errors = new ArrayList<>(messages);
-            exceptionService.actionNotPermittedException(errors.get(0),errors.size()==2 ? errors.get(1) : "");
-        }*/
         return ruleTemplateSpecificInfo.getViolatedRules();
     }
 
@@ -132,7 +165,7 @@ public class ShiftValidatorService {
         }
         List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()));
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates());
-        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.getDateByZonedDateTime(intervalByRuleTemplates.getStart()), DateUtils.getDateByZonedDateTime(intervalByRuleTemplates.getEnd()));
+        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()));
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndBeforeDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getActivities().get(0).getStartDate());
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, sc -> sc.getCount()));
         Date endTimeOfInterval = DateUtils.getDateByZoneDateTime(ZonedDateTime.ofInstant(shift.getActivities().get(0).getEndDate().toInstant(), ZoneId.systemDefault()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
@@ -259,7 +292,7 @@ public class ShiftValidatorService {
             for (TimeSlotWrapper timeSlotWrapper : timeSlotWrappers) {
                 if (partOfDay.getValue().equals(timeSlotWrapper.getName())) {
                     TimeInterval interval = new TimeInterval(((timeSlotWrapper.getStartHour() * 60) + timeSlotWrapper.getStartMinute()), ((timeSlotWrapper.getEndHour() * 60) + timeSlotWrapper.getEndMinute()));
-                    if (interval.contains(DateUtils.getZoneDateTime(shift.getActivities().get(0).getStartDate()).get(ChronoField.MINUTE_OF_DAY))) {
+                    if (interval.contains(DateUtils.asZoneDateTime(shift.getActivities().get(0).getStartDate()).get(ChronoField.MINUTE_OF_DAY))) {
                         timeInterval = interval;
                         break;
                     }
@@ -271,7 +304,7 @@ public class ShiftValidatorService {
 
     public static List<DateTimeInterval> getDaysIntervals(DateTimeInterval dateTimeInterval) {
         List<DateTimeInterval> intervals = new ArrayList<>();
-        ZonedDateTime endDate = null;
+        ZonedDateTime endDate;
         ZonedDateTime startDate = dateTimeInterval.getStart();
         while (true) {
             if (startDate.isBefore(dateTimeInterval.getEnd())) {
@@ -292,16 +325,16 @@ public class ShiftValidatorService {
         }
         switch (intervalUnit) {
             case DAYS:
-                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getActivities().get(0).getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getActivities().get(0).getEndDate()).plusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getActivities().get(0).getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getActivities().get(0).getEndDate()).plusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
             case WEEKS:
-                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getActivities().get(0).getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getActivities().get(0).getEndDate()).plusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getActivities().get(0).getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getActivities().get(0).getEndDate()).plusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
             case MONTHS:
-                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getActivities().get(0).getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getActivities().get(0).getEndDate()).plusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getActivities().get(0).getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getActivities().get(0).getEndDate()).plusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
             case YEARS:
-                interval = new DateTimeInterval(DateUtils.getZoneDateTime(shift.getActivities().get(0).getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.getZoneDateTime(shift.getActivities().get(0).getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getActivities().get(0).getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getActivities().get(0).getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
         }
         return interval;
@@ -310,7 +343,7 @@ public class ShiftValidatorService {
     public static List<ShiftWithActivityDTO> getShiftsByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, TimeInterval timeInterval) {
         List<ShiftWithActivityDTO> updatedShifts = new ArrayList<>();
         shifts.forEach(s -> {
-            if ((dateTimeInterval.contains(s.getActivitiesStartDate()) || dateTimeInterval.contains(s.getActivitiesEndDate())) && (timeInterval == null || timeInterval.contains(DateUtils.getZoneDateTime(s.getActivitiesStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
+            if ((dateTimeInterval.contains(s.getActivitiesStartDate()) || dateTimeInterval.contains(s.getActivitiesEndDate())) && (timeInterval == null || timeInterval.contains(DateUtils.asZoneDateTime(s.getActivitiesStartDate()).get(ChronoField.MINUTE_OF_DAY)))) {
                 updatedShifts.add(s);
             }
         });
