@@ -23,12 +23,6 @@ public class ClauseBasicResponseDTO {
     @NotBlank
     private String description;
 
-    private Integer orderedIndex;
-
-    public Integer getOrderedIndex() { return orderedIndex; }
-
-    public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
-
     public BigInteger getId() {
         return id;
     }
