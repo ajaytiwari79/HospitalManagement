@@ -1181,50 +1181,53 @@ public class UnitPositionService {
         try {
 
             List<UnitPositionSeniorityLevelQueryResult> unitPositionSeniorityLevelQueryResults = unitPositionGraphRepository.findUnitPositionSeniorityLeveltoUpdate();
-            List<Long> unitPositionIds = unitPositionSeniorityLevelQueryResults.stream().map(unitPositionQueryResult -> unitPositionQueryResult.getUnitPosition().getId()).
-                    collect(Collectors.toList());
+            if(!unitPositionSeniorityLevelQueryResults.isEmpty()) {
+                List<Long> unitPositionIds = unitPositionSeniorityLevelQueryResults.stream().map(unitPositionQueryResult -> unitPositionQueryResult.getUnitPosition().getId()).
+                        collect(Collectors.toList());
 
-            List<UnitPositionCompleteQueryResult> unitPositionsComplete = unitPositionGraphRepository.findUnitPositionCompleteObject(unitPositionIds);
-            Map<Long, UnitPosition> unitPositionMap = new HashMap<Long, UnitPosition>();
-            for (UnitPositionCompleteQueryResult unitPositionCompleteQueryResult : unitPositionsComplete) {
-                UnitPosition unitPositionComplete = unitPositionCompleteQueryResult.getUnitPosition();
-                unitPositionComplete.setExpertise(unitPositionCompleteQueryResult.getExpertise());
-                unitPositionComplete.setFunctions(unitPositionCompleteQueryResult.getFunctions());
-                unitPositionComplete.setReasonCode(unitPositionCompleteQueryResult.getReasonCode());
-                unitPositionComplete.setStaff(unitPositionCompleteQueryResult.getStaff());
-                unitPositionComplete.setPositionCode(unitPositionCompleteQueryResult.getPositionCode());
-                unitPositionComplete.setUnit(unitPositionCompleteQueryResult.getUnit());
-                unitPositionComplete.setUnion(unitPositionCompleteQueryResult.getUnionOrg());
-                unitPositionMap.put(unitPositionComplete.getId(), unitPositionComplete);
-            }
+                List<UnitPositionCompleteQueryResult> unitPositionsComplete = unitPositionGraphRepository.findUnitPositionCompleteObject(unitPositionIds);
+                Map<Long, UnitPosition> unitPositionMap = new HashMap<Long, UnitPosition>();
+                for (UnitPositionCompleteQueryResult unitPositionCompleteQueryResult : unitPositionsComplete) {
+                    UnitPosition unitPositionComplete = unitPositionCompleteQueryResult.getUnitPosition();
+                    unitPositionComplete.setExpertise(unitPositionCompleteQueryResult.getExpertise());
+                    unitPositionComplete.setFunctions(unitPositionCompleteQueryResult.getFunctions());
+                    unitPositionComplete.setReasonCode(unitPositionCompleteQueryResult.getReasonCode());
+                    unitPositionComplete.setStaff(unitPositionCompleteQueryResult.getStaff());
+                    unitPositionComplete.setPositionCode(unitPositionCompleteQueryResult.getPositionCode());
+                    unitPositionComplete.setUnit(unitPositionCompleteQueryResult.getUnit());
+                    unitPositionComplete.setUnion(unitPositionCompleteQueryResult.getUnionOrg());
+                    unitPositionMap.put(unitPositionComplete.getId(), unitPositionComplete);
+                }
 
-            List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips = new ArrayList<>();
-            List<UnitPosition> unitPositions = new ArrayList<>();
-            for (UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult : unitPositionSeniorityLevelQueryResults) {
-                UnitPosition unitPosition = new UnitPosition();
-                UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip;
-                UnitPosition oldUnitPosition = unitPositionMap.get(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId());
-                ObjectMapperUtils.copyProperties(oldUnitPosition, unitPosition);
-                oldUnitPosition.setEndDateMillis(DateUtils.getOneDayBeforeMillis());
-                oldUnitPosition.setHistory(true);
-                oldUnitPosition.setEditable(false);
-                unitPosition.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
-                unitPosition.setSeniorityLevel(unitPositionSeniorityLevelQueryResult.getSeniorityLevel());
-                unitPosition.setParentUnitPosition(oldUnitPosition);
-                unitPositionEmploymentTypeRelationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, unitPositionSeniorityLevelQueryResult.getEmploymentType(),
-                        unitPositionSeniorityLevelQueryResult.getUnitPositionEmploymentTypeRelationShip().getEmploymentTypeCategory());
-                unitPositionEmploymentTypeRelationShips.add(unitPositionEmploymentTypeRelationShip);
-                unitPosition.setId(null);
-                unitPositions.add(unitPosition);
+                List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips = new ArrayList<>();
+                List<UnitPosition> unitPositions = new ArrayList<>();
+                for (UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult : unitPositionSeniorityLevelQueryResults) {
+                    UnitPosition unitPosition = new UnitPosition();
+                    UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip;
+                    UnitPosition oldUnitPosition = unitPositionMap.get(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId());
+                    ObjectMapperUtils.copyProperties(oldUnitPosition, unitPosition);
+                    oldUnitPosition.setEndDateMillis(DateUtils.getOneDayBeforeMillis());
+                    oldUnitPosition.setHistory(true);
+                    oldUnitPosition.setEditable(false);
+                    unitPosition.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
+                    unitPosition.setSeniorityLevel(unitPositionSeniorityLevelQueryResult.getSeniorityLevel());
+                    unitPosition.setParentUnitPosition(oldUnitPosition);
+                    unitPositionEmploymentTypeRelationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, unitPositionSeniorityLevelQueryResult.getEmploymentType(),
+                            unitPositionSeniorityLevelQueryResult.getUnitPositionEmploymentTypeRelationShip().getEmploymentTypeCategory());
+                    unitPositionEmploymentTypeRelationShips.add(unitPositionEmploymentTypeRelationShip);
+                    unitPosition.setId(null);
+                    unitPositions.add(unitPosition);
+                }
+                List<UnitPositionIdDTO> unitPositionNewOldIds = new ArrayList<>();
+                unitPositionGraphRepository.saveAll(unitPositions);
+                int i = 0;
+                for(UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult:unitPositionSeniorityLevelQueryResults) {
+                    unitPositionNewOldIds.add(new UnitPositionIdDTO(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId(),unitPositions.get(i++).getId()));
+                }
+                unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(unitPositionEmploymentTypeRelationShips);
+                activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
+
             }
-            List<UnitPositionIdDTO> unitPositionNewOldIds = new ArrayList<>();
-            unitPositionGraphRepository.saveAll(unitPositions);
-            int i = 0;
-            for(UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult:unitPositionSeniorityLevelQueryResults) {
-                unitPositionNewOldIds.add(new UnitPositionIdDTO(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId(),unitPositions.get(i++).getId()));
-            }
-            unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(unitPositionEmploymentTypeRelationShips);
-            activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
         }
         catch(Exception ex) {
