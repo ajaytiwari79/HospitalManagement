@@ -949,11 +949,11 @@ public class UnitPositionService {
 
 
         CTAWTAWrapper ctawtaWrapper = workingTimeAgreementRestClient.getWTAByExpertise(expertise.getId());
-        if (CollectionUtils.isNotEmpty(ctawtaWrapper.getCta()) || CollectionUtils.isNotEmpty(ctawtaWrapper.getWta())) {
+        if (!CollectionUtils.isNotEmpty(ctawtaWrapper.getCta())) {
             exceptionService.dataNotFoundByIdException("message.organization.cta.notfound", organization.getId());
 
         }
-        if (CollectionUtils.isNotEmpty(ctawtaWrapper.getWta())) {
+        if (!CollectionUtils.isNotEmpty(ctawtaWrapper.getWta())) {
             exceptionService.dataNotFoundByIdException("message.wta.notFound", organization.getId());
 
         }
