@@ -10,6 +10,7 @@ import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
 import org.javers.core.metamodel.annotation.*;
+import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -50,6 +51,7 @@ public class Clause extends MongoBaseEntity {
 
     private List<BigInteger> templateTypes;
 
+    @Transient
     private Integer orderedIndex;
 
     public List<Long> getOrganizationList() {

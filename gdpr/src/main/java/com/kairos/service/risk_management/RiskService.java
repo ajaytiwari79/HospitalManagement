@@ -59,13 +59,9 @@ public class RiskService extends MongoBaseService {
                 existingRisksRelatedToObject.put(objectToWhichRiskRelated, existingRiskDTOS);
 
             }
-            List<Risk> riskRelatedTOObject=new ArrayList<>();
+            List<Risk> riskRelatedTOObject = new ArrayList<>();
             if (!newRisk.isEmpty()) {
-                if (isUnitId) {
-                    riskRelatedTOObject = buildRiskAtOrganizationLevel(countryIdOrUnitId, newRisk);
-                } else {
-                    riskRelatedTOObject = buildRiskAtCountryLevel(countryIdOrUnitId, newRisk);
-                }
+                riskRelatedTOObject = isUnitId ? buildRiskAtOrganizationLevel(countryIdOrUnitId, newRisk) : buildRiskAtCountryLevel(countryIdOrUnitId, newRisk);
                 risks.addAll(riskRelatedTOObject);
             }
             riskListRelatedToObjectMap.put(objectToWhichRiskRelated, riskRelatedTOObject);
@@ -87,13 +83,7 @@ public class RiskService extends MongoBaseService {
     private <T extends MongoBaseEntity, E extends BasicRiskDTO> List<Risk> updateExistingRisk(Long countryIdOrUnitId, boolean isUnitId,
                                                                                               List<BigInteger> existingRiskIds, Map<T, List<E>> existingRisksRelatedToObject, Map<T, List<Risk>> riskListRelatedToObjectMap) {
         Assert.notEmpty(existingRiskIds, "List can't be empty");
-        List<Risk> riskList;
-        if (isUnitId) {
-            riskList = riskMongoRepository.findRiskByUnitIdAndIds(countryIdOrUnitId, existingRiskIds);
-
-        } else {
-            riskList = riskMongoRepository.findRiskByCountryIdAndIds(countryIdOrUnitId, existingRiskIds);
-        }
+        List<Risk> riskList = isUnitId ? riskMongoRepository.findRiskByUnitIdAndIds(countryIdOrUnitId, existingRiskIds) : riskMongoRepository.findRiskByCountryIdAndIds(countryIdOrUnitId, existingRiskIds);
         Map<BigInteger, Risk> riskMap = riskList.stream().collect(Collectors.toMap(Risk::getId, risk -> risk));
         existingRisksRelatedToObject.forEach((objectToWhichRiskRelate, riskDTOS) ->
         {

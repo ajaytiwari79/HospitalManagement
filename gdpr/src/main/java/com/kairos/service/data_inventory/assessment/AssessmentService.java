@@ -7,10 +7,10 @@ import com.kairos.enums.AssetAttributeName;
 import com.kairos.enums.ProcessingActivityAttributeName;
 import com.kairos.enums.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
+import com.kairos.persistence.model.data_inventory.assessment.AssetAssessmentAnswerVO;
+import com.kairos.persistence.model.data_inventory.assessment.ProcessingActivityAssessmentAnswerVO;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswerValueObject;
-import com.kairos.persistence.model.data_inventory.assessment.AssetAssessmentAnswer;
-import com.kairos.persistence.model.data_inventory.assessment.ProcessingActivityAssessmentAnswer;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
@@ -171,7 +171,7 @@ public class AssessmentService extends MongoBaseService {
                 }
                 break;
             case IN_PROGRESS:
-                List<AssetAssessmentAnswer> assetAssessmentAnswers = assessment.getAssetAssessmentAnswers();
+                List<AssetAssessmentAnswerVO> assetAssessmentAnswers = assessment.getAssetAssessmentAnswers();
                 Map<AssetAttributeName, Object> assetAttributeNameObjectMap = new HashMap<>();
                 assetAssessmentAnswers.forEach(assetAssessmentAnswer -> assetAttributeNameObjectMap.put(assetAssessmentAnswer.getAssetField(), assetAssessmentAnswer.getValue()));
 
@@ -215,7 +215,7 @@ public class AssessmentService extends MongoBaseService {
                 }
                 break;
             case IN_PROGRESS:
-                List<ProcessingActivityAssessmentAnswer> processingActivityAssessmentAnswers = assessment.getProcessingActivityAssessmentAnswers();
+                List<ProcessingActivityAssessmentAnswerVO> processingActivityAssessmentAnswers = assessment.getProcessingActivityAssessmentAnswers();
                 Map<ProcessingActivityAttributeName, Object> processingActivityAttributeNameObjectMap = new HashMap<>();
                 processingActivityAssessmentAnswers.forEach(processingActivityAssessmentAnswer -> processingActivityAttributeNameObjectMap.put(processingActivityAssessmentAnswer.getProcessingActivityField(), processingActivityAssessmentAnswer.getValue()));
                 for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
@@ -257,13 +257,13 @@ public class AssessmentService extends MongoBaseService {
                 } else {
                     if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
                         Asset asset = assetMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
-                        List<AssetAssessmentAnswer> assessmentAnswersForAsset = assessment.getAssetAssessmentAnswers();
+                        List<AssetAssessmentAnswerVO> assessmentAnswersForAsset = assessment.getAssetAssessmentAnswers();
                         assessmentAnswersForAsset.forEach(assetAssessmentAnswer -> saveAssessmentAnswerForAsset(assetAssessmentAnswer.getAssetField(), assetAssessmentAnswer.getValue(), asset));
                         assetMongoRepository.save(asset);
 
                     } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
                         ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
-                        List<ProcessingActivityAssessmentAnswer> assessmentAnswersForProcessingActivity = assessment.getProcessingActivityAssessmentAnswers();
+                        List<ProcessingActivityAssessmentAnswerVO> assessmentAnswersForProcessingActivity = assessment.getProcessingActivityAssessmentAnswers();
 
                         assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer
                                 -> saveAssessmentAnswerForProcessingActivity(processingActivityAssessmentAnswer.getProcessingActivityField(), processingActivityAssessmentAnswer.getValue(), processingActivity));

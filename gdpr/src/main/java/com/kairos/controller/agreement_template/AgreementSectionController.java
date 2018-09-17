@@ -38,53 +38,53 @@ public class AgreementSectionController {
 
     @ApiOperation("add section to Agreement template ")
     @PostMapping(value = "/agreement_template/{templateId}/section")
-    public ResponseEntity<Object> createAgreementSection(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId,@Valid @RequestBody ValidateRequestBodyList<AgreementSectionDTO> agreementSection) {
+    public ResponseEntity<Object> createAgreementSection(@PathVariable Long countryId,  @PathVariable BigInteger templateId,@Valid @RequestBody ValidateRequestBodyList<AgreementSectionDTO> agreementSection) {
 
         if (templateId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, " Agreement Template  id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, organizationId, templateId, agreementSection.getRequestBody()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(countryId, templateId, agreementSection.getRequestBody()));
 
     }
 
 
     @ApiOperation("deleted agreement section by id")
     @DeleteMapping(value = "/agreement_template/{templateId}/section/delete/{id}")
-    public ResponseEntity<Object> deleteAgreementSection(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger templateId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> deleteAgreementSection(@PathVariable Long countryId, @PathVariable BigInteger templateId, @PathVariable BigInteger id) {
         if (templateId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, " Agreement Template  id can't be null");
         }
         if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, " Agreement Template  id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(countryId, organizationId, templateId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSection(countryId,  templateId, id));
 
     }
 
 
     @ApiOperation("deleted clause from section ")
     @DeleteMapping(value = "/agreement_template/section/{sectionId}/clause/{clauseId}")
-    public ResponseEntity<Object> deleteClauseFromAgreementSection(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger sectionId, @PathVariable BigInteger clauseId) {
+    public ResponseEntity<Object> deleteClauseFromAgreementSection(@PathVariable Long countryId,  @PathVariable BigInteger sectionId, @PathVariable BigInteger clauseId) {
         if (sectionId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Section  id can't be null");
         }
         if (clauseId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Clause  id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.removeClauseFromAgreementSection(countryId, organizationId, sectionId, clauseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.removeClauseFromAgreementSection(countryId, sectionId, clauseId));
 
     }
 
     @ApiOperation("deleted agreement  Sub Section  ")
     @DeleteMapping(value = "/agreement_template/section/{sectionId}/sub_section/{subSectionId}")
-    public ResponseEntity<Object> deleteSubSectionFromAgreementSection(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger sectionId, @PathVariable BigInteger subSectionId) {
+    public ResponseEntity<Object> deleteSubSectionFromAgreementSection(@PathVariable Long countryId, @PathVariable BigInteger sectionId, @PathVariable BigInteger subSectionId) {
         if (sectionId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Section  id can't be null");
         }
         if (subSectionId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Agreement Sub Section  id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSubSection(countryId, organizationId, sectionId, subSectionId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementSectionService.deleteAgreementSubSection(countryId,  sectionId, subSectionId));
 
     }
 

@@ -11,15 +11,15 @@ import java.util.List;
 public class AssessmentAnswerValueObject {
 
 
-    private List<AssetAssessmentAnswer> assetAssessmentAnswers;
+    private List<AssetAssessmentAnswerVO> assetAssessmentAnswers;
 
-    private List<ProcessingActivityAssessmentAnswer> processingActivityAssessmentAnswers;
+    private List<ProcessingActivityAssessmentAnswerVO> processingActivityAssessmentAnswers;
 
-    public List<AssetAssessmentAnswer> getAssetAssessmentAnswers() { return assetAssessmentAnswers;}
+    public List<AssetAssessmentAnswerVO> getAssetAssessmentAnswers() { return assetAssessmentAnswers;}
 
-    public void setAssetAssessmentAnswers(List<AssetAssessmentAnswer> assetAssessmentAnswers) { this.assetAssessmentAnswers = assetAssessmentAnswers; }
+    public void setAssetAssessmentAnswers(List<AssetAssessmentAnswerVO> assetAssessmentAnswers) { this.assetAssessmentAnswers = assetAssessmentAnswers; }
 
-    public List<ProcessingActivityAssessmentAnswer> getProcessingActivityAssessmentAnswers() { return processingActivityAssessmentAnswers; }
+    public List<ProcessingActivityAssessmentAnswerVO> getProcessingActivityAssessmentAnswers() { return processingActivityAssessmentAnswers; }
 
-    public void setProcessingActivityAssessmentAnswers(List<ProcessingActivityAssessmentAnswer> processingActivityAssessmentAnswers) { this.processingActivityAssessmentAnswers = processingActivityAssessmentAnswers; }
+    public void setProcessingActivityAssessmentAnswers(List<ProcessingActivityAssessmentAnswerVO> processingActivityAssessmentAnswers) { this.processingActivityAssessmentAnswers = processingActivityAssessmentAnswers; }
 }
