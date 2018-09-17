@@ -2,6 +2,7 @@ package com.kairos.dto.activity.cta;
 
 
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 
@@ -28,6 +29,7 @@ public class CTAResponseDTO {
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
     private LocalDate startDate;
     private LocalDate endDate;
+    private OrganizationDTO organization;
     // Added for version of CTA
     private List<CTAResponseDTO> versions = new ArrayList<>();
     private Map<String, Object> unitInfo;
@@ -50,6 +52,14 @@ public class CTAResponseDTO {
         this.unitPositionId = unitPositionId;
     }
 
+
+    public OrganizationDTO getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(OrganizationDTO organization) {
+        this.organization = organization;
+    }
     public ExpertiseResponseDTO getExpertise() {
         return expertise;
     }
