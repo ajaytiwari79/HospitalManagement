@@ -3,10 +3,9 @@ package com.kairos.service.risk_management;
 
 import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
-import com.kairos.dto.user.organization.OrganizationResponseDTO;
-import com.kairos.persistance.model.common.MongoBaseEntity;
-import com.kairos.persistance.model.risk_management.Risk;
-import com.kairos.persistance.repository.risk_management.RiskMongoRepository;
+import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.risk_management.Risk;
+import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.ObjectMapperUtils;
