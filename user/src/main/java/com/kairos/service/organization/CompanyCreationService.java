@@ -284,18 +284,16 @@ public class CompanyCreationService {
             // user can fill any random property and we need to fetch
             User user = userGraphRepository.getUserOfOrganization(organization.getId());
             if (user != null) {
-                byte isAnotherExist = userGraphRepository.validateUserEmailAndCPRExceptCurrentUser("(?)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber(), user.getId());
-                if (isAnotherExist != 0) {
-                    exceptionService.duplicateDataException("user already exist by email or cpr");
+                byte anotherUserExistBySameEmailOrCPR = userGraphRepository.validateUserEmailAndCPRExceptCurrentUser("(?)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber(), user.getId());
+                if (anotherUserExistBySameEmailOrCPR != 0) {
+                    exceptionService.duplicateDataException("message.cprNumberEmail.notNull");
                 }
                 user.setEmail(unitManagerDTO.getEmail());
                 user.setUserName(unitManagerDTO.getEmail());
                 user.setCprNumber(unitManagerDTO.getCprNumber());
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
-                if (unitManagerDTO.getFirstName() != null || StringUtils.isEmpty(unitManagerDTO.getFirstName())) {
-                    user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
-                }
+                setEncryptedPasswordInUser(unitManagerDTO,user);
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
                     staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId());
@@ -309,12 +307,8 @@ public class CompanyCreationService {
                         exceptionService.duplicateDataException("user already exist by email or cpr");
                     }
                 }
-                user = new
-                        User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(),unitManagerDTO.getEmail());
-
-                if (unitManagerDTO.getFirstName() != null || StringUtils.isEmpty(unitManagerDTO.getFirstName())) {
-                    user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
-                }
+                user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
+                setEncryptedPasswordInUser(unitManagerDTO,user);
                 userGraphRepository.save(user);
                 staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization);
 
@@ -322,6 +316,14 @@ public class CompanyCreationService {
         }
         return unitManagerDTO;
     }
+
+    private void setEncryptedPasswordInUser(UnitManagerDTO unitManagerDTO,User user) {
+        if (unitManagerDTO.getFirstName() != null && StringUtils.isEmpty(unitManagerDTO.getFirstName())) {
+            user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
+        }
+
+    }
+
 
     public StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId) {
         return userGraphRepository.getUnitManagerOfOrganization(unitId);
@@ -388,7 +390,7 @@ public class CompanyCreationService {
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
-        if (isAnyFieldFilledInUser(organizationBasicDTO)) {
+        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
             setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
         }
         //Assign Parent Organization's level to unit
@@ -404,7 +406,7 @@ public class CompanyCreationService {
 
     }
 
-    private boolean isAnyFieldFilledInUser(OrganizationBasicDTO organizationBasicDTO) {
+    private boolean doesUnitManagerInfoAvailable(OrganizationBasicDTO organizationBasicDTO) {
         if (organizationBasicDTO.getUnitManager() != null
                 && (organizationBasicDTO.getUnitManager().getEmail() != null || organizationBasicDTO.getUnitManager().getLastName() != null ||
                 organizationBasicDTO.getUnitManager().getFirstName() != null || organizationBasicDTO.getUnitManager().getCprNumber() != null ||
@@ -431,7 +433,7 @@ public class CompanyCreationService {
         updateOrganizationDetails(organization, organizationBasicDTO, false);
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(organization, organizationBasicDTO, null);
-        if (isAnyFieldFilledInUser(organizationBasicDTO)) {
+        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
             setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManager(), organization.isBoardingCompleted(), false);
         }
         organizationGraphRepository.save(organization);
