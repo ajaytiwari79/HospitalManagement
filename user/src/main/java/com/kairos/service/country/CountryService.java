@@ -69,36 +69,7 @@ import static com.kairos.constants.AppConstants.*;
 @Service
 @Transactional
 public class CountryService {
-    /**
-     * Application name.
-     */
-    private static final String APPLICATION_NAME =
-            "Google Calendar API Java Quickstart";
-    /**
-     * Directory to store user credentials for this application.
-     */
-    private static final java.io.File DATA_STORE_DIR = new java.io.File(
-            System.getProperty("user.home"), ".credentials/calendar-java-quickstart");
-    /**
-     * Global instance of the JSON factory.
-     */
-    private static final JsonFactory JSON_FACTORY =
-            JacksonFactory.getDefaultInstance();
-    /**
-     * Global instance of the scopes required by this quickstart.
-     * <p>
-     * If modifying these scopes, delete your previously saved credentials
-     * at ~/.credentials/calendar-java-quickstart
-     */
-    private static final List<String> SCOPES = Arrays.asList(CalendarScopes.CALENDAR_READONLY);
-    /**
-     * Global instance of the {@link FileDataStoreFactory}.
-     */
-    private static FileDataStoreFactory DATA_STORE_FACTORY;
-    /**
-     * Global instance of the HTTP transport.
-     */
-    private static HttpTransport HTTP_TRANSPORT;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject
     private CountryHolidayCalenderGraphRepository countryHolidayGraphRepository;
