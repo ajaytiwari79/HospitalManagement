@@ -35,54 +35,49 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("create Agreement Template")
     @RequestMapping(value = "/agreement_template", method = RequestMethod.POST)
-    public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId, @PathVariable Long organizationId, @Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto) {
+    public ResponseEntity<Object> createPolicyAgreementTemplate(@PathVariable Long countryId, @Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto) {
 
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null ");
-        } else if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id cannot be null ");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createBasicPolicyAgreementTemplate(countryId, organizationId, agreementTemplateDto));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.createBasicPolicyAgreementTemplate(countryId, agreementTemplateDto));
 
     }
 
     @ApiOperation("get All agreement sections and Subjection of Agreement template ")
     @GetMapping(value = "/agreement_template/{agreementTemplateId}/section")
-    public ResponseEntity<Object> getAllAgreementSectionWithSubSectionsAndClausesOfAgreementTemplate(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable BigInteger agreementTemplateId) {
+    public ResponseEntity<Object> getAllAgreementSectionWithSubSectionsAndClausesOfAgreementTemplate(@PathVariable Long countryId,@PathVariable BigInteger agreementTemplateId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
         else if (agreementTemplateId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, " Agreement Template  id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(countryId,organizationId, agreementTemplateId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(countryId, agreementTemplateId));
     }
 
 
     @ApiOperation("delete Policy agreement Template By Id")
     @DeleteMapping("/agreement_template/delete/{id}")
-    public ResponseEntity<Object> deletePolicyAgreementTemplateById(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
+    public ResponseEntity<Object> deletePolicyAgreementTemplateById(@PathVariable Long countryId,  @PathVariable BigInteger id) {
 
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null ");
         } else if (id == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Agreement template id cannot be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.deletePolicyAgreementTemplate(countryId, organizationId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.deletePolicyAgreementTemplate(countryId,  id));
 
     }
 
 
     @ApiOperation("get All policy agreement Template with sections and Clauses ")
     @GetMapping("/agreement_template")
-    public ResponseEntity<Object> getPolicyAgreementTemplateWithData(@PathVariable Long countryId, @PathVariable Long organizationId) {
+    public ResponseEntity<Object> getPolicyAgreementTemplateWithData(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id cannot be null ");
-        } else if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id cannot be null ");
-
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllPolicyAgreementTemplateWithAgreementSectionAndClauses(countryId, organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllPolicyAgreementTemplate(countryId));
 
     }
 

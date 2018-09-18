@@ -1,14 +1,13 @@
 package com.kairos.service.master_data.asset_management;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
-import com.kairos.persistance.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
+import com.kairos.persistence.model.master_data.default_asset_setting.HostingProvider;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -16,7 +15,6 @@ import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -147,28 +145,7 @@ public class HostingProviderService extends MongoBaseService {
 
 
     /**
-     * @param countryId
-     * @param
-     * @param name      name of hosting provider
-     * @return return object of hosting provider
-     * @throws DataNotExists if hosting provider not exist for given name
-     */
-    public HostingProvider getHostingProviderByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            HostingProvider exist = hostingProviderMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
-
-    /**
+     **
      * @param countryId
      * @param hostingProviderDTOS
      * @return

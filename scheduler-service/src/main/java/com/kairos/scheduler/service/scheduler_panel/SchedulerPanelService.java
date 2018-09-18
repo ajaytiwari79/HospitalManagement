@@ -74,7 +74,8 @@ public class SchedulerPanelService extends MongoBaseService {
 
         for(SchedulerPanel schedulerPanel:schedulerPanels) {
             if(!(schedulerPanel.isOneTimeTrigger()&&schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
-                dynamicCronScheduler.setCronScheduling(schedulerPanel,unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
+                logger.info("Inside initSchedulerPanels"+schedulerPanel.getUnitId()+" unitId = "+unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));
+               dynamicCronScheduler.setCronScheduling(schedulerPanel,unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
             }
         }
 
