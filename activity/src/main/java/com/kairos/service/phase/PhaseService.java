@@ -223,19 +223,16 @@ public class PhaseService extends MongoBaseService {
     private void preparePlanningPhase(Phase phase, PhaseDTO phaseDTO) {
         phase.setDuration(phaseDTO.getDuration());
         phase.setDurationType(phaseDTO.getDurationType());
-        phase.setName(phase.getName());
-        phase.setSequence(phase.getSequence());
         phase.setDescription(phaseDTO.getDescription());
         phase.setColor(phaseDTO.getColor());
         phase.setFlippingDefaultTime(phaseDTO.getFlippingDefaultTime());
+        phase.setShortName(phaseDTO.getShortName());
 
     }
 
    private void prepareActualPhase(Phase phase,PhaseDTO phaseDTO){
-       phase.setName(phase.getName());
-       phase.setSequence(phase.getSequence());
-       phase.setDescription(phaseDTO.getDescription());
        phase.setColor(phaseDTO.getColor());
+       phase.setShortName(phaseDTO.getShortName());
        if(PhaseDefaultName.REALTIME.equals(phaseDTO.getPhaseEnum())) {
            phase.setRealtimeDuration(phaseDTO.getRealtimeDuration());
        }else if(PhaseDefaultName.TENTATIVE.equals(phaseDTO.getPhaseEnum())) {
@@ -259,7 +256,7 @@ public class PhaseService extends MongoBaseService {
         if (oldPhase == null) {
             exceptionService.dataNotFoundByIdException("message.phase.id.notfound", phaseDTO.getId());
         }
-        Phase phase = phaseMongoRepository.findByNameAndDisabled(unitId, phaseDTO.getName(), false);
+        Phase phase = phaseMongoRepository.findByUnitIdAndName(unitId, phaseDTO.getName());
         if (phase != null && !oldPhase.getName().equals(phaseDTO.getName())) {
             exceptionService.actionNotPermittedException("message.phase.name.alreadyexists", phaseDTO.getName());
         }
@@ -267,7 +264,7 @@ public class PhaseService extends MongoBaseService {
             preparePlanningPhase(oldPhase, phaseDTO);
         }
         if(ACTUAL.equals(oldPhase.getPhaseType())){
-            prepareActualPhase(phase,phaseDTO);
+            prepareActualPhase(oldPhase,phaseDTO);
         }
         save(oldPhase);
         return phaseDTO;

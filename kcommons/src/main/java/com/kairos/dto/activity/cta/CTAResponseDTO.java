@@ -41,7 +41,7 @@ public class CTAResponseDTO {
         //Default constructor
     }
 
-    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled,Long unitPositionId) {
+    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled,Long unitPositionId,String description,PositionCodeDTO positionCodeDTO) {
         this.id = id;
         this.name = name;
         this.expertise = expertise;
@@ -50,6 +50,8 @@ public class CTAResponseDTO {
         this.endDate = endDate;
         this.disabled = disabled;
         this.unitPositionId = unitPositionId;
+        this.description=description;
+        this.positionCode=positionCodeDTO;
     }
 
 
