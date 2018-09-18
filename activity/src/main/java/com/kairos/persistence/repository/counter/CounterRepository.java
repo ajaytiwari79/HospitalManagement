@@ -355,7 +355,8 @@ public class CounterRepository {
                 Aggregation.lookup("applicableKPI","kpiId","activeKpiId","applicableKpi"),
                 Aggregation.match(Criteria.where("applicableKpi.staffId").is(staffId)),
                 Aggregation.lookup("counter","applicableKpi.activeKpiId","_id","kpi"),
-                Aggregation.project().and("kpi._id").as("_id")
+                Aggregation.project().and("kpi").arrayElementAt(0).as("kpi"),
+                Aggregation.project("kpi._id")
         );
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,Map.class);
         return results.getMappedResults().stream().map(s-> new BigInteger(s.get("_id").toString())).collect(Collectors.toList());
