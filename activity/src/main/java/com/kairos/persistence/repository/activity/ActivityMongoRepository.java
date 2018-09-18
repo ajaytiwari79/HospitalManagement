@@ -49,6 +49,9 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Set<BigInteger> activityIds);
 
+    @Query("{_id:{$in:?0}, deleted:false}")
+    List<ActivityDTO> findAllActivitiesByIds(List<BigInteger> activityIds);
+
     List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId);
 
 }

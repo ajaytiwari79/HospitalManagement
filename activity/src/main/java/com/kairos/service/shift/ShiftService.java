@@ -7,8 +7,6 @@ import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
-import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.enums.Day;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.TimeTypes;
@@ -24,9 +22,7 @@ import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.dto.activity.shift.ShiftActivity;
-import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.model.wta.StaffWTACounter;
@@ -48,7 +44,6 @@ import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepo
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
-import com.kairos.dto.activity.shift.IndividualShiftTemplateDTO;
 import com.kairos.rest_client.*;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
@@ -76,7 +71,6 @@ import com.kairos.utils.event.ShiftNotificationEvent;
 import com.kairos.utils.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
-import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -96,14 +90,11 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
-import static com.kairos.utils.ShiftValidatorService.getIntervalByRuleTemplates;
 import static com.kairos.utils.ShiftValidatorService.getValidDays;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
@@ -213,7 +204,7 @@ public class ShiftService extends MongoBaseService {
         if ((activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) && (!bySubShift)) {
             shiftWithViolatedInfoDTO = createAbsenceTypeShift(activityWrapper, shiftDTO, staffAdditionalInfoDTO);
         } else {
-            organizationActivityService.validateShiftTime(shiftDTO.getStaffId(), shiftDTO, activity.getRulesActivityTab());
+            //organizationActivityService.validateShiftTime(shiftDTO.getStaffId(), shiftDTO, activity.getRulesActivityTab());
             shiftWithViolatedInfoDTO = saveShift(activityWrapper, staffAdditionalInfoDTO, shiftDTO);
 
         }
@@ -280,7 +271,9 @@ public class ShiftService extends MongoBaseService {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         int scheduledMinutes = 0;
         int durationMinutes = 0;
+        Map<BigInteger,ShiftTimeDetails> shiftTimeDetailsMap=new HashMap<>();
         for (ShiftActivity shiftActivity : shift.getSortedActvities()) {
+            shiftTimeDetailsMap.put(shiftActivity.getActivityId(),prepareShiftTimeDetails(shiftActivity,shiftTimeDetailsMap,activityWrapperMap.get(shiftActivity.getActivityId()).getActivity()));
             shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
             ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
             if (CollectionUtils.isNotEmpty(staffAdditionalInfoDTO.getDayTypes())) {
@@ -295,6 +288,7 @@ public class ShiftService extends MongoBaseService {
             shiftActivity.setActivityName(activityWrapper.getActivity().getName());
             shiftActivity.setTimeType(activityWrapper.getTimeType());
         }
+        shiftValidatorService.validateActivityTiming(shiftTimeDetailsMap,activityWrapperMap);
         shift.setScheduledMinutes(scheduledMinutes);
         shift.setDurationMinutes(durationMinutes);
         shift.setStartDate(shift.getActivities().get(0).getStartDate());
@@ -786,7 +780,6 @@ public class ShiftService extends MongoBaseService {
      */
 
 
-
     private List<ShiftActivity> verifyCompositeShifts(ShiftDTO shiftDTO, BigInteger shiftId, Activity activity) {
         if (shiftDTO.getActivities().size() == 1) {
             exceptionService.invalidRequestException("message.sub-shift.create");
@@ -1189,7 +1182,22 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-
+    private ShiftTimeDetails prepareShiftTimeDetails(ShiftActivity shiftActivity,Map<BigInteger,ShiftTimeDetails> shiftTimeDetailsMap,Activity activity){
+        Long shiftDurationInMinute = new DateTimeInterval(shiftActivity.getStartDate(), shiftActivity.getEndDate()).getMinutes();
+        ShiftTimeDetails shiftTimeDetails=shiftTimeDetailsMap.get(shiftActivity.getActivityId());
+        if(shiftTimeDetails==null){
+            shiftTimeDetails=new ShiftTimeDetails();
+            shiftTimeDetails.setActivityId(shiftActivity.getActivityId());
+            shiftTimeDetails.setActivityStartTime(DateUtils.asLocalTime(shiftActivity.getStartDate()));
+            shiftTimeDetails.setTotalTime(shiftDurationInMinute.shortValue());
+            shiftTimeDetailsMap.put(shiftActivity.getActivityId(),shiftTimeDetails);
+        }
+        else {
+            shiftTimeDetails.setTotalTime((short)(shiftDurationInMinute.shortValue()+shiftTimeDetails.getTotalTime()));
+            shiftTimeDetailsMap.put(shiftActivity.getActivityId(),shiftTimeDetails);
+        }
+        return shiftTimeDetails;
+    }
 
 
 }

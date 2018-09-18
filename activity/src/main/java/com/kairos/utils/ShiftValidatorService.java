@@ -1,7 +1,6 @@
 package com.kairos.utils;
 
 
-
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
@@ -14,6 +13,7 @@ import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.tabs.CompositeActivity;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
@@ -45,10 +45,7 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -206,8 +203,8 @@ public class ShiftValidatorService {
     }
 
 
-    public static void throwException(String exception,Object... param){
-        exceptionService.invalidRequestException(exception,param);
+    public static void throwException(String exception, Object... param) {
+        exceptionService.invalidRequestException(exception, param);
     }
 
     public static List<DateTimeInterval> getSortedIntervals(List<ShiftWithActivityDTO> shifts) {
@@ -445,6 +442,28 @@ public class ShiftValidatorService {
     public static boolean isValidForDay(List<Long> dayTypeIds, RuleTemplateSpecificInfo infoWrapper) {
         DayOfWeek shiftDay = DateUtils.asLocalDate(infoWrapper.getShift().getActivitiesStartDate()).getDayOfWeek();
         return getValidDays(infoWrapper.getDayTypes(), dayTypeIds).stream().filter(day -> day.equals(shiftDay)).findAny().isPresent();
+    }
+
+    public void validateActivityTiming(Map<BigInteger, ShiftTimeDetails> shiftTimeDetailsMap, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        shiftTimeDetailsMap.forEach((k, v) -> {
+            Short shortestTime = activityWrapperMap.get(k).getActivity().getRulesActivityTab().getShortestTime();
+            Short longestTime = activityWrapperMap.get(k).getActivity().getRulesActivityTab().getLongestTime();
+            LocalTime earliestStartTime = activityWrapperMap.get(k).getActivity().getRulesActivityTab().getEarliestStartTime();
+            LocalTime latestStartTime = activityWrapperMap.get(k).getActivity().getRulesActivityTab().getLatestStartTime();
+            if (shortestTime != null && v.getTotalTime() < shortestTime) {
+                exceptionService.actionNotPermittedException("error");
+            }
+            if (longestTime != null && v.getTotalTime() > longestTime) {
+                exceptionService.actionNotPermittedException("error");
+            }
+            if (earliestStartTime != null && earliestStartTime.isAfter(v.getActivityStartTime())) {
+                exceptionService.actionNotPermittedException("error");
+            }
+            if (latestStartTime != null && latestStartTime.isBefore(v.getActivityStartTime())) {
+                exceptionService.actionNotPermittedException("error");
+            }
+
+        });
     }
 
 
