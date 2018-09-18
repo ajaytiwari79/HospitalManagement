@@ -103,11 +103,11 @@ public class ShiftSickService extends MongoBaseService {
         staffOriginalShiftsOfDates.forEach(s -> s.setDisabled(true));
         List<Shift> shifts = new ArrayList<>();
         while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 0) {
-            shiftNeedsToAddForDays--;
+
             Shift currentShift = new Shift(null, null, previousDaySickShift.getStaffId(), activity.getId(), activity.getName(), previousDaySickShift.getUnitPositionId(), previousDaySickShift.getUnitId(), null, null);
             calculateShiftStartAndEndTime(currentShift, previousDaySickShift, shiftNeedsToAddForDays,  periodDTOList);
             shifts.add(currentShift);
-
+            shiftNeedsToAddForDays--;
         }
         addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts);
 
