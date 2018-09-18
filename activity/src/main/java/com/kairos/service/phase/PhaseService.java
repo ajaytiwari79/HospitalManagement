@@ -256,7 +256,7 @@ public class PhaseService extends MongoBaseService {
         if (oldPhase == null) {
             exceptionService.dataNotFoundByIdException("message.phase.id.notfound", phaseDTO.getId());
         }
-        Phase phase = phaseMongoRepository.findByName(unitId, phaseDTO.getName());
+        Phase phase = phaseMongoRepository.findByUnitIdAndName(unitId, phaseDTO.getName());
         if (phase != null && !oldPhase.getName().equals(phaseDTO.getName())) {
             exceptionService.actionNotPermittedException("message.phase.name.alreadyexists", phaseDTO.getName());
         }

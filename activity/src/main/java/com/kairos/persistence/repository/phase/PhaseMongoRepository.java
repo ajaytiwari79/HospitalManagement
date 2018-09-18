@@ -16,7 +16,7 @@ import java.util.List;
 @Repository
 public interface PhaseMongoRepository extends MongoBaseRepository<Phase, BigInteger>, CustomPhaseMongoRepository {
     @Query(value = "{organizationId:?0 ,name:?1}")
-    Phase findByName(Long unitId, String name);
+    Phase findByUnitIdAndName(Long unitId, String name);
 
     @Query(value = "{sequence:?0 ,countryId:?1 ,deleted:false}", count = true)
     long findBySequenceAndCountryIdAndDeletedFalse(Integer sequence, Long countryId);
