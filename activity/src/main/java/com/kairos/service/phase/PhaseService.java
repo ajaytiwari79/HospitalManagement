@@ -290,7 +290,7 @@ public class PhaseService extends MongoBaseService {
         LocalDate requestedDate=DateUtils.asLocalDate(date);
         Phase phase;
         if(requestedDate.isAfter(upcomingMondayDate)){
-            phase= planningPeriodMongoRepository.getCurrentPhaseByDate(unitId,date);
+            phase= planningPeriodMongoRepository.getCurrentPhaseByDateUsingPlanningPeriod(unitId,DateUtils.asLocalDate(date));
         }
         else {
             List<Phase> actualPhases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalse(unitId, ACTUAL.toString());

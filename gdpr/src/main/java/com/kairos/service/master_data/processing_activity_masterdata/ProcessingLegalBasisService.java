@@ -1,19 +1,17 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ProcessingLegalBasisDTO;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingLegalBasis;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.legal_basis.ProcessingLegalBasisMongoRepository;
 import com.kairos.response.dto.common.ProcessingLegalBasisResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -147,25 +145,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
 
     }
 
-    /**
-     * @param countryId
-     * @param
-     * @param name      name of ProcessingLegalBasis
-     * @return ProcessingLegalBasis object fetch on basis of  name
-     * @throws DataNotExists throw exception if ProcessingLegalBasis not exist for given name
-     */
-    public ProcessingLegalBasis getProcessingLegalBasisByName(Long countryId, String name) {
 
-        if (!StringUtils.isBlank(name)) {
-            ProcessingLegalBasis exist = legalBasisMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
 
 
     /**

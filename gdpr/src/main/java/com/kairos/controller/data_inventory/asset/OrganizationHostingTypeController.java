@@ -34,7 +34,7 @@ public class OrganizationHostingTypeController {
 
 
     @ApiOperation("add HostingType")
-    @PostMapping("/hosting_type/add")
+    @PostMapping("/hosting_type")
     public ResponseEntity<Object> createHostingType(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingTypeDTO> hostingTypeDTOs) {
 
         if (unitId == null) {
@@ -45,20 +45,18 @@ public class OrganizationHostingTypeController {
 
 
     @ApiOperation("get HostingType by id")
-    @GetMapping("/hosting_type/{id}")
-    public ResponseEntity<Object> getHostingType(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @GetMapping("/hosting_type/{hostingTypeId}")
+    public ResponseEntity<Object> getHostingType(@PathVariable Long unitId, @PathVariable BigInteger hostingTypeId) {
+       if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingType(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.getHostingType(unitId, hostingTypeId));
 
     }
 
 
     @ApiOperation("get all HostingType ")
-    @GetMapping("/hosting_type/all")
+    @GetMapping("/hosting_type")
     public ResponseEntity<Object> getAllHostingType(@PathVariable Long unitId) {
 
         if (unitId == null) {
@@ -68,26 +66,22 @@ public class OrganizationHostingTypeController {
     }
 
     @ApiOperation("delete HostingType  by id")
-    @DeleteMapping("/hosting_type/delete/{id}")
-    public ResponseEntity<Object> deleteHostingType(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @DeleteMapping("/hosting_type/{hostingTypeId}")
+    public ResponseEntity<Object> deleteHostingType(@PathVariable Long unitId, @PathVariable BigInteger hostingTypeId) {
+       if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.deleteHostingType(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.deleteHostingType(unitId, hostingTypeId));
 
     }
 
     @ApiOperation("update HostingType by id")
-    @PutMapping("/hosting_type/update/{id}")
-    public ResponseEntity<Object> updateHostingType(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody HostingTypeDTO hostingTypeDTO) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @PutMapping("/hosting_type/{hostingTypeId}")
+    public ResponseEntity<Object> updateHostingType(@PathVariable Long unitId, @PathVariable BigInteger hostingTypeId, @Valid @RequestBody HostingTypeDTO hostingTypeDTO) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(unitId, id, hostingTypeDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingTypeService.updateHostingType(unitId, hostingTypeId, hostingTypeDTO));
     }
 
     @ApiOperation("save Hosting type And Suggest To Country admin")

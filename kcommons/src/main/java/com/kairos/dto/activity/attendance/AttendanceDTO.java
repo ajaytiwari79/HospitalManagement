@@ -26,6 +26,9 @@ public class AttendanceDTO {
         this.reasonCode = reasonCode;
     }
 
+    public AttendanceDTO(Set<ReasonCodeDTO> reasonCode) {
+        this.reasonCode = reasonCode;
+    }
 
     public List<OrganizationCommonDTO> getOrganizationIdAndNameResults() {
         return organizationIdAndNameResults;

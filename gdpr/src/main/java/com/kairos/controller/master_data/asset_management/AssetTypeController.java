@@ -37,7 +37,7 @@ public class AssetTypeController {
 
 
     @ApiOperation("add AssetType")
-    @PostMapping("/asset_type/add")
+    @PostMapping("/asset_type")
     public ResponseEntity<Object> createAssetType(@PathVariable Long countryId, @Valid @RequestBody AssetTypeDTO assetTypes) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
@@ -48,42 +48,25 @@ public class AssetTypeController {
 
 
     @ApiOperation("get AssetType by id")
-    @GetMapping("/asset_type/{id}")
-    public ResponseEntity<Object> getAssetType(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
+    @GetMapping("/asset_type/{assetTypeId}")
+    public ResponseEntity<Object> getAssetType(@PathVariable Long countryId, @PathVariable BigInteger assetTypeId) {
+       if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAssetTypeById(countryId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAssetTypeById(countryId, assetTypeId));
 
     }
 
 
-    @ApiOperation("get all AssetType ")
-    @GetMapping("/asset_type/all")
+    @ApiOperation("get all AssetType  with sub Asset type")
+    @GetMapping("/asset_type")
     public ResponseEntity<Object> getAllAssetType(@PathVariable Long countryId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAllAssetTypeWithRisks(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getAllAssetTypeWithSubAssetTypeAndRisk(countryId));
 
     }
-
-
-    @ApiOperation("get all Sub Asset Type ")
-    @GetMapping("/asset_type/{assetTypeId}/sub_asset_type")
-    public ResponseEntity<Object> getAllSubAssetTypeOfAssetType(@PathVariable Long countryId,@PathVariable BigInteger assetTypeId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetTypeService.getSubAssetTypesOfAssetTypeWithRisksByAssetTypeId(countryId,assetTypeId));
-
-    }
-
-
-
 
     @ApiOperation("delete AssetType  by id")
     @DeleteMapping("/asset_type/{assetId}")
@@ -93,8 +76,8 @@ public class AssetTypeController {
 
     }
 
-    @ApiOperation("update subAsset by id")
-    @PutMapping("/asset_type/update/{assetTypeId}")
+    @ApiOperation("update Asset type and Sub Asset ")
+    @PutMapping("/asset_type/{assetTypeId}")
     public ResponseEntity<Object> updateAssetType(@PathVariable Long countryId, @PathVariable BigInteger assetTypeId, @Valid @RequestBody AssetTypeDTO assetType) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");

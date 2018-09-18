@@ -7,6 +7,7 @@ import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
+import com.kairos.persistence.model.country.default_data.account_type.AccountTypeAccessGroupCountQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
@@ -501,7 +502,7 @@ public class AccessGroupService {
 
     /***** Access group - COUNTRY LEVEL - STARTS HERE ******************/
 
-    public void setAccessPageRelationshipWithAccessGroupByOrgCategory(Long countryId, Long accessGroupId, OrganizationCategory organizationCategory) {
+    private void setAccessPageRelationshipWithAccessGroupByOrgCategory(Long countryId, Long accessGroupId, OrganizationCategory organizationCategory) {
         switch (organizationCategory) {
             case HUB: {
                 accessGroupRepository.setAccessPageForHubAccessGroup(countryId, accessGroupId);
@@ -588,7 +589,8 @@ public class AccessGroupService {
     public Map<String, Object> getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId) {
         List<OrganizationCategoryDTO> organizationCategoryDTOS = OrganizationCategory.getListOfOrganizationCategory();
         AccessGroupCountQueryResult accessGroupCountData = accessGroupRepository.getListOfOrgCategoryWithCountryAccessGroupCount(countryId);
-        List<AccountType> accountTypes = accountTypeGraphRepository.getAllAccountTypeByCountryId(countryId);
+        List<AccountTypeAccessGroupCountQueryResult> accountTypes
+                = accountTypeGraphRepository.getAllAccountTypeWithAccessGroupCountByCountryId(countryId);
         organizationCategoryDTOS.forEach(orgCategoryDTO -> {
             switch (OrganizationCategory.valueOf(orgCategoryDTO.getValue())) {
                 case HUB: {

@@ -2,6 +2,7 @@ package com.kairos.controller.shift;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
+import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.dto.activity.shift.CopyShiftDTO;
@@ -178,9 +179,29 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
     @ApiOperation("API is used to add shift of user when user is sick")
-    @GetMapping("/staff/{staffId}/shift_on_sick")
-    public ResponseEntity<Map<String,Object>> markUserAsSick(@PathVariable Long unitId,@PathVariable Long staffId,@RequestParam ("activitySelected") BigInteger activityId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftSickService.createSicknessShiftsOfStaff(unitId,activityId,staffId));
+    @PostMapping("/staff/{staffId}/shift_on_sick")
+    public ResponseEntity<Map<String,Object>> markUserAsSick(@PathVariable Long unitId, @PathVariable Long staffId, @RequestParam ("activitySelected") BigInteger activityId,
+                                                             @RequestBody Duration duration){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftSickService.createSicknessShiftsOfStaff(unitId,activityId,staffId,duration));
+    }
+
+    @ApiOperation("shifts details by date")
+    @GetMapping("/shift/details_by_date")
+    public ResponseEntity<Map<String,Object>> getShiftsDetailsByDate(@PathVariable Long unitId,@RequestParam Long unitPositionId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getDetailViewInfo(unitId,unitPositionId,shiftStartDate));
+    }
+
+    @ApiOperation("update shift by detail view")
+    @GetMapping("/shift/update_shift_by_details_view")
+    public ResponseEntity<Map<String,Object>> updateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody ShiftDTO shiftDTO,@RequestParam(required = false) Boolean validatedByStaff){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateOrValidateShift(unitId,shiftDTO,validatedByStaff,type));
+    }
+
+
+    @ApiOperation("validate shift by detail view")
+    @GetMapping("/shift/validate_shift_by_details_view")
+    public ResponseEntity<Map<String,Object>> validateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody ShiftDTO shiftDTO,@RequestParam(required = false) Boolean validatedByStaff){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.validateShift(shiftDTO,validatedByStaff,unitId));
     }
 
 }

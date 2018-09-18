@@ -39,7 +39,6 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.*;
 
@@ -244,8 +243,8 @@ public class VRPPlanningService extends MongoBaseService{
 
     private List<ShiftDTO> getShifts(List<EmployeeDTO> employeeList,List<Long> staffIds){
         ZonedDateTime zonedDateTime = ZonedDateTime.now();
-        Date startDate = DateUtils.getDateByZonedDateTime(zonedDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).truncatedTo(ChronoUnit.DAYS));
-        Date endDate = DateUtils.getDateByZonedDateTime(zonedDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).plusWeeks(1).truncatedTo(ChronoUnit.DAYS));
+        Date startDate = DateUtils.asDate(zonedDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).truncatedTo(ChronoUnit.DAYS));
+        Date endDate = DateUtils.asDate(zonedDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).plusWeeks(1).truncatedTo(ChronoUnit.DAYS));
         Map<Long,EmployeeDTO> employeeDTOMap = employeeList.stream().collect(Collectors.toMap(k->new Long(k.getId()),v->v));
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIds(staffIds,startDate,endDate);
         List<ShiftDTO> shiftDTOS = new ArrayList<>(shifts.size());

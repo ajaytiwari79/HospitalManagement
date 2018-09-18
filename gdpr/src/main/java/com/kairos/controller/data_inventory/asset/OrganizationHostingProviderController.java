@@ -34,7 +34,7 @@ public class OrganizationHostingProviderController {
 
 
     @ApiOperation("add HostingProvider")
-    @PostMapping("/hosting_provider/add")
+    @PostMapping("/hosting_provider")
     public ResponseEntity<Object> createHostingProvider(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -46,20 +46,18 @@ public class OrganizationHostingProviderController {
 
 
     @ApiOperation("get HostingProvider by id")
-    @GetMapping("/hosting_provider/{id}")
-    public ResponseEntity<Object> getHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @GetMapping("/hosting_provider/{hostingProviderId}")
+    public ResponseEntity<Object> getHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger hostingProviderId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(unitId, hostingProviderId));
 
     }
 
 
     @ApiOperation("get all HostingProvider ")
-    @GetMapping("/hosting_provider/all")
+    @GetMapping("/hosting_provider")
     public ResponseEntity<Object> getAllHostingProvider(@PathVariable Long unitId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -69,26 +67,22 @@ public class OrganizationHostingProviderController {
 
 
     @ApiOperation("delete HostingProvider  by id")
-    @DeleteMapping("/hosting_provider/delete/{id}")
-    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @DeleteMapping("/hosting_provider/{hostingProviderId}")
+    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger hostingProviderId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(unitId, hostingProviderId));
 
     }
 
     @ApiOperation("update HostingProvider by id")
-    @PutMapping("/hosting_provider/update/{id}")
-    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @PutMapping("/hosting_provider/{hostingProviderId}")
+    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
+       if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(unitId, id, hostingProviderDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(unitId, hostingProviderId, hostingProviderDTO));
 
     }
 

@@ -336,7 +336,7 @@ public class DateUtils {
     }
 
     public static Date onlyDate(Date date) {
-        return getDateByZoneDateTime(getZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
+        return getDateByZoneDateTime(asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
     }
 
     public static Date addMinutes(final Date date, final int amount) {
@@ -462,12 +462,12 @@ public class DateUtils {
         return dateTime.toString(formatter);
     }
 
-    public static ZonedDateTime getZoneDateTime(Date date) {
+    public static ZonedDateTime asZoneDateTime(Date date) {
         return ZonedDateTime.ofInstant(date.toInstant(),
                 ZoneId.systemDefault());
     }
 
-    public static Date getDateByZonedDateTime(ZonedDateTime dateTime) {
+    public static Date asDate(ZonedDateTime dateTime) {
         return Date.from(dateTime.toInstant());
     }
 
@@ -638,7 +638,7 @@ public class DateUtils {
     }
 
     public static Long getMillisFromLocalDateTime(LocalDateTime date) {
-        return date == null ? null : date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return  date==null?null:date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() ;
     }
 
     public static Long getOneDayBeforeMillis() {
@@ -672,8 +672,8 @@ public class DateUtils {
         return localDate.get(woy);
     }
 
-    public static Date getDateAfterDaysWithTime(short daysAfter, int startHour) {
-        return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atStartOfDay().with(LocalTime.of(startHour, 00)).toInstant(ZoneOffset.UTC));
+    public static Date getDateAfterDaysWithTime(short daysAfter, LocalTime duration) {
+        return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atTime(duration).toInstant(ZoneOffset.UTC));
     }
 
     public static LocalDate getLocalDateFromString(String receivedDate) {
@@ -686,6 +686,12 @@ public class DateUtils {
             e.printStackTrace();
         }
         return localDate;
+
+    }
+
+    public static Long getCurrentDayMidNightMillis() {
+        return ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).minusSeconds(1).toInstant().toEpochMilli();
+
 
     }
 }

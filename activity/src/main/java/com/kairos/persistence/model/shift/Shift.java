@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -57,6 +58,8 @@ public class Shift extends MongoBaseEntity {
     private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
 
     private boolean sickShift;
+    private LocalDate validatedByStaffDate;
+    private LocalDate validatedByPlannerDate;
 
     public Shift() {
         //Default Constructor
@@ -130,6 +133,22 @@ public class Shift extends MongoBaseEntity {
 
     }
 
+
+    public LocalDate getValidatedByStaffDate() {
+        return validatedByStaffDate;
+    }
+
+    public void setValidatedByStaffDate(LocalDate validatedByStaffDate) {
+        this.validatedByStaffDate = validatedByStaffDate;
+    }
+
+    public LocalDate getValidatedByPlannerDate() {
+        return validatedByPlannerDate;
+    }
+
+    public void setValidatedByPlannerDate(LocalDate validatedByPlannerDate) {
+        this.validatedByPlannerDate = validatedByPlannerDate;
+    }
 
     public Date getStartDate() {
         return startDate;
