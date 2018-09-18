@@ -31,6 +31,7 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.ActivityShiftStatusSettings;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
@@ -49,6 +50,7 @@ import com.kairos.persistence.repository.shift.ActivityShiftStatusSettingsReposi
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
+import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
@@ -194,6 +196,8 @@ public class ShiftService extends MongoBaseService {
     private MongoSequenceRepository mongoSequenceRepository;
     @Inject
     private UnitDataService unitDataService;
+    @Inject
+    private StaffActivitySettingRepository staffActivitySettingRepository;
 
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
@@ -281,6 +285,8 @@ public class ShiftService extends MongoBaseService {
     public void saveShiftsWithActivity(Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         List<BigInteger> activityIds = shift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        List<StaffActivitySetting> staffActivitySettings=staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(shift.getStaffId(),activityIds);
+        Map<BigInteger,StaffActivitySetting> staffActivitySettingMap=staffActivitySettings.stream().collect(Collectors.toMap(StaffActivitySetting::getActivityId,v->v));
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         int scheduledMinutes = 0;
         int durationMinutes = 0;
@@ -303,7 +309,7 @@ public class ShiftService extends MongoBaseService {
             shiftActivity.setActivityName(activityWrapper.getActivity().getName());
             shiftActivity.setTimeType(activityWrapper.getTimeType());
         }
-        shiftValidatorService.validateActivityTiming(shiftTimeDetailsMap,activityWrapperMap);
+        shiftValidatorService.validateActivityTiming(staffActivitySettingMap,shiftTimeDetailsMap,activityWrapperMap);
         shift.setScheduledMinutes(scheduledMinutes);
         shift.setDurationMinutes(durationMinutes);
         shift.setStartDate(shift.getActivities().get(0).getStartDate());
