@@ -675,7 +675,9 @@ public class DateUtils {
     public static Date getDateAfterDaysWithTime(short daysAfter, LocalTime duration) {
         return Date.from(DateUtils.getCurrentLocalDate().plusDays(daysAfter).atTime(duration).toInstant(ZoneOffset.UTC));
     }
-
+    public static LocalDate getLocalDateAfterDays(short daysAfter) {
+        return DateUtils.getCurrentLocalDate().plusDays(daysAfter);
+    }
     public static LocalDate getLocalDateFromString(String receivedDate) {
         SimpleDateFormat format = new SimpleDateFormat(ISO_FORMAT, Locale.US);
         format.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
