@@ -107,10 +107,22 @@ public class ShiftSickService extends MongoBaseService {
         List<Shift> shifts = new ArrayList<>();
         while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 0) {
             shiftNeedsToAddForDays--;
-            ShiftActivity shiftActivity=new ShiftActivity(activity.getId(),activity.getName());
-            Shift currentShift = new Shift(null, null, previousDaySickShift.getStaffId(),Arrays.asList(shiftActivity), previousDaySickShift.getUnitPositionId(), previousDaySickShift.getUnitId(), null, null);
-            calculateShiftStartAndEndTime(currentShift, previousDaySickShift, shiftNeedsToAddForDays,  periodDTOList);
-            shifts.add(currentShift);
+
+            ShiftActivity shiftActivity = new ShiftActivity(activity.getId(),activity.getName());
+            shiftActivity.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, DateUtils.asLocalTime(previousDaySickShift.getStartDate())));
+            shiftActivity.setEndDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, DateUtils.asLocalTime(previousDaySickShift.getEndDate())));
+
+
+            LocalDate shiftAdditionDate = DateUtils.getLocalDateAfterDays(shiftNeedsToAddForDays);
+            PeriodDTO planningPeriodForSameDate = periodDTOList.stream().filter(periodDTO -> (
+                    (periodDTO.getStartDate().isAfter(shiftAdditionDate) || periodDTO.getStartDate().isEqual(shiftAdditionDate))
+                            && (periodDTO.getEndDate().isBefore(shiftAdditionDate) || periodDTO.getEndDate().isEqual(shiftAdditionDate)))).findAny().orElse(null);
+            if (planningPeriodForSameDate != null) {
+                Shift shift = new Shift(null, null, previousDaySickShift.getStaffId(), Arrays.asList(shiftActivity), previousDaySickShift.getUnitPositionId(), previousDaySickShift.getUnitId(), planningPeriodForSameDate.getPhaseId(), planningPeriodForSameDate.getId());
+                shift.setDurationMinutes(previousDaySickShift.getDurationMinutes());
+                shifts.add(shift);
+            }
+
         }
         addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts);
 
@@ -123,7 +135,6 @@ public class ShiftSickService extends MongoBaseService {
             shiftService.saveShiftWithActivity(shifts,staffAdditionalInfoDTO);
         }
     }
-
 
     private void calculateShiftStartAndEndTime(Shift currentShift, Shift previousDayShift, short shiftNeedsToAddForDays,  List<PeriodDTO> periodDTOList) {
         currentShift.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, DateUtils.asLocalTime(previousDayShift.getStartDate())));
@@ -139,6 +150,7 @@ public class ShiftSickService extends MongoBaseService {
             currentShift.setPhaseId(planningPeriodForSameDate.getPhaseId());
         }
     }
+
 
     private void createSicknessShiftsOfStaff(Long staffId, Long unitId, Activity activity, StaffUnitPositionDetails staffUnitPositionDetails, List<Shift> staffOriginalShiftsOfDates, Duration duration, PlanningPeriod planningPeriod) {
         short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();

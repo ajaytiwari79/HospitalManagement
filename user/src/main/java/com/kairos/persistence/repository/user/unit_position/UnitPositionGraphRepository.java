@@ -265,4 +265,6 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes")
     UnitPositionQueryResult getUnitPositionOfStaff(Long staffId,Long unitId,Long currentDateMillies);
 
+    @Query("Match(up:UnitPosition)-[:HAS_POSITION_CODE]-(pc:PositionCode) where id(up)={0} return up.published as published ,pc as positionCode")
+    UnitPositionQueryResult findByUnitPositionId(Long unitPositionId);
 }
