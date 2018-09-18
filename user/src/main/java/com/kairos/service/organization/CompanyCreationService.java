@@ -322,7 +322,7 @@ public class CompanyCreationService {
     }
     //It checks null as well
     private void setEncryptedPasswordInUser(UnitManagerDTO unitManagerDTO,User user) {
-        if (StringUtils.isEmpty(unitManagerDTO.getFirstName())) {
+        if (StringUtils.isNotEmpty(unitManagerDTO.getFirstName())) {
             user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
         }
 
