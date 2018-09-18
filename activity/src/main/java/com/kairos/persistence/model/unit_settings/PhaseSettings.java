@@ -13,13 +13,14 @@ public class PhaseSettings extends MongoBaseEntity {
     private boolean managementEligibleForUnderStaffing;
     private boolean managementEligibleForOverStaffing;
     private Long unitId;
+    private int sequence;
 
     public PhaseSettings() {
         //Default Constructor
     }
 
     public PhaseSettings(BigInteger phaseId, String name, String description, boolean staffEligibleForUnderStaffing, boolean staffEligibleForOverStaffing,
-                         boolean managementEligibleForUnderStaffing, boolean managementEligibleForOverStaffing, Long unitId) {
+                         boolean managementEligibleForUnderStaffing, boolean managementEligibleForOverStaffing, Long unitId, int sequence) {
         this.phaseId = phaseId;
         this.name = name;
         this.description = description;
@@ -28,6 +29,7 @@ public class PhaseSettings extends MongoBaseEntity {
         this.managementEligibleForUnderStaffing = managementEligibleForUnderStaffing;
         this.managementEligibleForOverStaffing = managementEligibleForOverStaffing;
         this.unitId = unitId;
+        this.sequence = sequence;
     }
 
     public BigInteger getPhaseId() {
@@ -92,5 +94,13 @@ public class PhaseSettings extends MongoBaseEntity {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }
