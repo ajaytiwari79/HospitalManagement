@@ -19,6 +19,7 @@ import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.model.counter.KPIDashboard;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import org.bouncycastle.crypto.tls.MACAlgorithm;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -29,7 +30,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -175,6 +178,18 @@ public class CounterRepository {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,TabKPIConf.class),TabKPIMappingDTO.class);
     }
 
+    public List<BigInteger> getTabKPIIdsByTabIds(List<String> tabIds,List<BigInteger> kpiIds, Long refId, ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Criteria criteria=Criteria.where("tabId").in(tabIds).and(refQueryField).is(refId).and("level").is(level);
+        if(!kpiIds.isEmpty()) {
+            criteria=criteria.and("kpiId").in(kpiIds);
+            }
+        Aggregation aggregation=Aggregation.newAggregation(Aggregation.match(criteria),
+                Aggregation.project("id"));
+        AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,TabKPIConf.class,Map.class);
+        return results.getMappedResults().stream().map(o->new BigInteger(o.get("_").toString())).collect(Collectors.toList());
+    }
+
     public List<TabKPIDTO> getTabKPIForStaffByTabAndStaffId(List<String> tabIds,List<BigInteger> kpiIds,Long staffId,Long unitId,ConfLevel level){
         Criteria criteria;
         if(kpiIds.isEmpty()) {
@@ -269,7 +284,7 @@ public class CounterRepository {
     }
 
 
-    public List<OrgTypeMappingDTO> getOrgTypeKPIEntryOrgTypeIds(List<Long> orgTypeIds,List<BigInteger> kpiIds ,Long countryId){
+    public List<OrgTypeMappingDTO> getOrgTypeKPIEntryOrgTypeIds(List<Long> orgTypeIds,List<BigInteger> kpiIds){
         Query query=null;
         if(kpiIds.isEmpty()){
             query = new Query(Criteria.where("orgTypeId").in(orgTypeIds));
@@ -278,6 +293,21 @@ public class CounterRepository {
         }
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,OrgTypeKPIEntry.class),OrgTypeMappingDTO.class);
     }
+
+
+    public List<BigInteger> getOrgTypeKPIIdsOrgTypeIds(List<Long> orgTypeIds,List<BigInteger> kpiIds){
+        Criteria criteria=Criteria.where("orgTypeId").in(orgTypeIds);
+        if(!kpiIds.isEmpty()){
+            criteria=criteria.and("kpiId").in(kpiIds);
+        }
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(criteria),
+                Aggregation.project("id")
+                );
+        AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,OrgTypeKPIEntry.class, Map.class);
+        return results.getMappedResults().stream().map(s ->new BigInteger(s.get("_id").toString())).collect(Collectors.toList());
+    }
+
 
     public List<AccessGroupMappingDTO> getAccessGroupKPIEntryAccessGroupIds(List<Long> accessGroupIds ,List<BigInteger> kpiIds, ConfLevel level, Long refId){
         String queryField = getRefQueryField(level);
@@ -288,6 +318,20 @@ public class CounterRepository {
             query=new Query(Criteria.where("accessGroupId").in(accessGroupIds).and("kpiId").in(kpiIds).and(queryField).is(refId));
         }
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,AccessGroupKPIEntry.class),AccessGroupMappingDTO.class);
+    }
+
+    public List<BigInteger> getAccessGroupKPIIdsAccessGroupIds(List<Long> accessGroupIds ,List<BigInteger> kpiIds, ConfLevel level, Long refId) {
+        String queryField = getRefQueryField(level);
+        Criteria criteria = Criteria.where("accessGroupId").in(accessGroupIds).and(queryField).is(refId);
+        if (!kpiIds.isEmpty()) {
+            criteria = criteria.and("kpiId").in(kpiIds);
+        }
+      Aggregation aggregation=Aggregation.newAggregation(
+              Aggregation.match(criteria),
+              Aggregation.project("id")
+      );
+       AggregationResults<Map> result=mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,Map.class);
+       return result.getMappedResults().stream().map(o -> new BigInteger(o.get("_id").toString())).collect(Collectors.toList());
     }
 
     public List<KPIDTO> getAccessGroupKPIDto(List<Long> accessGroupIds , ConfLevel level, Long refId,Long staffId){
@@ -304,6 +348,19 @@ public class CounterRepository {
         return results.getMappedResults();
     }
 
+    public List<BigInteger> getAccessGroupKPIIds(List<Long> accessGroupIds , ConfLevel level, Long refId,Long staffId){
+        String refQueryField = getRefQueryField(level);
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
+                Aggregation.lookup("applicableKPI","kpiId","activeKpiId","applicableKpi"),
+                Aggregation.match(Criteria.where("applicableKpi.staffId").is(staffId)),
+                Aggregation.lookup("counter","applicableKpi.activeKpiId","_id","kpi"),
+                Aggregation.project().and("kpi._id").as("_id")
+        );
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,Map.class);
+        return results.getMappedResults().stream().map(s-> new BigInteger(s.get("_id").toString())).collect(Collectors.toList());
+    }
+
     public List<ApplicableKPI> getApplicableKPIByReferenceId(List<BigInteger> kpiIds,List<Long> refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Query query=null;
@@ -313,6 +370,21 @@ public class CounterRepository {
             query=new Query(Criteria.where(refQueryField).in(refId).and("level").is(level).and("activeKpiId").in(kpiIds));
         }
         return mongoTemplate.find(query,ApplicableKPI.class);
+    }
+
+
+    public List<BigInteger> getApplicableKPIIdsByReferenceId(List<BigInteger> kpiIds,List<Long> refId, ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Criteria criteria=Criteria.where(refQueryField).in(refId).and("level").is(level);
+        if(!kpiIds.isEmpty()){
+            criteria=criteria.and("activeKpiId").in(kpiIds);
+        }
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(criteria),
+                Aggregation.project("id"));
+        AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,ApplicableKPI.class,Map.class);
+        List<BigInteger> applicableKpis= results.getMappedResults().stream().map(s->new BigInteger(s.get("_id").toString())).collect(Collectors.toList());;
+        return applicableKpis;
     }
 
     public List<TabKPIConf> findTabKPIIdsByKpiIdAndUnitOrCountry(List<BigInteger> kpiIds,Long refid,ConfLevel level){
