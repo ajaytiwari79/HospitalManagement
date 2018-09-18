@@ -137,8 +137,6 @@ public class ShiftSickService extends MongoBaseService {
         while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 0) {
             shiftNeedsToAddForDays--;
             ShiftActivity shiftActivity = new ShiftActivity(activity.getId(), activity.getName());
-
-            Duration calculatedDuration = calculateShiftStartAndEndTime(shiftActivity, activity.getTimeCalculationActivityTab(), staffUnitPositionDetails, duration);
             Shift currentShift = new Shift(null, null, staffId, Arrays.asList(shiftActivity), staffUnitPositionDetails.getId(), unitId);
             shifts.add(currentShift);
         }

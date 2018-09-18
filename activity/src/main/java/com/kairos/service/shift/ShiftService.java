@@ -285,10 +285,12 @@ public class ShiftService extends MongoBaseService {
         int scheduledMinutes = 0;
         int durationMinutes = 0;
         Map<BigInteger,ShiftTimeDetails> shiftTimeDetailsMap=new HashMap<>();
+
         for (ShiftActivity shiftActivity : shift.getSortedActvities()) {
-            shiftTimeDetailsMap.put(shiftActivity.getActivityId(),prepareShiftTimeDetails(shiftActivity,shiftTimeDetailsMap,activityWrapperMap.get(shiftActivity.getActivityId()).getActivity()));
+            shiftTimeDetailsMap.put(shiftActivity.getActivityId(),prepareShiftTimeDetails(shiftActivity,shiftTimeDetailsMap));
             shiftActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
             ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
+
             if (CollectionUtils.isNotEmpty(staffAdditionalInfoDTO.getDayTypes())) {
                 Set<DayOfWeek> activityDayTypes = getValidDays(staffAdditionalInfoDTO.getDayTypes(), activityWrapper.getActivity().getTimeCalculationActivityTab().getDayTypes());
                 if (activityDayTypes.contains(DateUtils.asLocalDate(shiftActivity.getStartDate()).getDayOfWeek())) {
@@ -1138,30 +1140,7 @@ public class ShiftService extends MongoBaseService {
         return shiftMongoRepository.findAllByIds(shiftIds);
     }
 
-    public ShiftQueryResult getShiftByStaffIdAndDate(List<Long> staffIds, Date date) {
-        return shiftMongoRepository.findShiftByStaffIdsAndDate(staffIds, date);
-    }
-
-    /*public void setShiftTimeType(List<ShiftQueryResult> shifts) {
-        Set<BigInteger> activityIds = shifts.stream().map(shift -> shift.getActivityId()).collect(Collectors.toSet());
-        activityIds.addAll(shifts.stream().flatMap(activitie -> activitie.getSubShifts().stream().map(subShiftId -> subShiftId.getActivityId())).collect(Collectors.toSet()));
-        List<TimeTypeAndActivityIdDTO> timeTypeAndActivityIdDTOS = activityRepository.findAllTimeTypeByActivityIds(activityIds);
-        Map<BigInteger, String> activityIdAndtimeTypes = timeTypeAndActivityIdDTOS.stream().collect(Collectors.toMap(timeTypeAndActivityIdDTO -> timeTypeAndActivityIdDTO.getActivityId(), timeTypeAndActivityIdDTO -> timeTypeAndActivityIdDTO.getTimeType()));
-        shifts.forEach(shift -> {
-            if (activityIdAndtimeTypes.containsKey(shift.getActivityId())) {
-                shift.setTimeType(activityIdAndtimeTypes.get(shift.getActivityId()));
-            }
-            if (!shift.getSubShifts().isEmpty()) {
-                shift.getSubShifts().forEach(subShift -> {
-                    if (activityIdAndtimeTypes.containsKey(subShift.getActivityId())) {
-                        subShift.setTimeType(activityIdAndtimeTypes.get(subShift.getActivityId()));
-                    }
-                });
-            }
-        });
-    }*/
-
-    public void deleteShiftsAndOpenShiftsOnEmploymentEnd(Long staffId, LocalDateTime employmentEndDate, Long unitId) {
+     public void deleteShiftsAndOpenShiftsOnEmploymentEnd(Long staffId, LocalDateTime employmentEndDate, Long unitId) {
 
         shiftMongoRepository.deleteShiftsAfterDate(staffId, employmentEndDate);
         List<OpenShift> openShifts = openShiftMongoRepository.findAllOpenShiftsByInterestedStaff(staffId, employmentEndDate);
@@ -1197,19 +1176,15 @@ public class ShiftService extends MongoBaseService {
 
 
 
-    private ShiftTimeDetails prepareShiftTimeDetails(ShiftActivity shiftActivity,Map<BigInteger,ShiftTimeDetails> shiftTimeDetailsMap,Activity activity) {
+    private ShiftTimeDetails prepareShiftTimeDetails(ShiftActivity shiftActivity,Map<BigInteger,ShiftTimeDetails> shiftTimeDetailsMap) {
         Long shiftDurationInMinute = new DateTimeInterval(shiftActivity.getStartDate(), shiftActivity.getEndDate()).getMinutes();
         ShiftTimeDetails shiftTimeDetails = shiftTimeDetailsMap.get(shiftActivity.getActivityId());
         if (shiftTimeDetails == null) {
-            shiftTimeDetails = new ShiftTimeDetails();
-            shiftTimeDetails.setActivityId(shiftActivity.getActivityId());
-            shiftTimeDetails.setActivityStartTime(DateUtils.asLocalTime(shiftActivity.getStartDate()));
-            shiftTimeDetails.setTotalTime(shiftDurationInMinute.shortValue());
-            shiftTimeDetailsMap.put(shiftActivity.getActivityId(), shiftTimeDetails);
+            shiftTimeDetails = new ShiftTimeDetails(shiftActivity.getActivityId(),DateUtils.asLocalTime(shiftActivity.getStartDate()),shiftDurationInMinute.shortValue());
         } else {
             shiftTimeDetails.setTotalTime((short) (shiftDurationInMinute.shortValue() + shiftTimeDetails.getTotalTime()));
-            shiftTimeDetailsMap.put(shiftActivity.getActivityId(), shiftTimeDetails);
         }
+        shiftTimeDetailsMap.put(shiftActivity.getActivityId(), shiftTimeDetails);
         return shiftTimeDetails;
     }
     public ShiftDetailViewDTO getDetailViewInfo(Long unitId, Long unitPositionId, Date shiftStartDate) {

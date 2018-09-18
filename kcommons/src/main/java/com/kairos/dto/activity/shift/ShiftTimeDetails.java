@@ -11,6 +11,13 @@ public class ShiftTimeDetails {
     private LocalTime activityStartTime;
     private Short totalTime;
 
+
+    public ShiftTimeDetails(BigInteger activityId, LocalTime activityStartTime, Short totalTime) {
+        this.activityId = activityId;
+        this.activityStartTime = activityStartTime;
+        this.totalTime = totalTime;
+    }
+
     public ShiftTimeDetails() {
         //Default Constructor
     }
