@@ -3,6 +3,7 @@ package com.kairos.scheduler.service;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.unit_settings.UnitTimeZoneMapping;
 import com.kairos.scheduler.persistence.repository.UnitTimeZoneMappingRepository;
+import com.kairos.scheduler.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -13,10 +14,16 @@ public class UnitTimeZoneMappingService extends MongoBaseService {
 
     @Inject
     private UnitTimeZoneMappingRepository unitTimezoneMappingRepository;
+    @Inject
+    private ExceptionService exceptionService;
 
     public UnitTimeZoneMapping createUnitTimezoneMapping(Long unitId, String timezone) {
+        UnitTimeZoneMapping unitTimeZoneMapping = unitTimezoneMappingRepository.findByUnitId(unitId);
+        if(Optional.ofNullable(unitTimeZoneMapping).isPresent()) {
+            exceptionService.duplicateDataException("message.duplicate.unitTimezoneMapping",unitId);
+        }
 
-        UnitTimeZoneMapping unitTimeZoneMapping = new UnitTimeZoneMapping(unitId,timezone);
+        unitTimeZoneMapping = new UnitTimeZoneMapping(unitId,timezone);
         save(unitTimeZoneMapping);
         return unitTimeZoneMapping;
     }
@@ -25,7 +32,7 @@ public class UnitTimeZoneMappingService extends MongoBaseService {
 
         UnitTimeZoneMapping unitTimeZoneMapping = unitTimezoneMappingRepository.findByUnitId(unitId);
         if(Optional.ofNullable(unitTimeZoneMapping).isPresent()) {
-            throw new DataNotFoundByIdException("unit timezone mapping not found by unitId-----> "+unitId);
+            exceptionService.dataNotFoundByIdException("message.duplicate.unitTimezoneMapping",unitId);
         }
         unitTimeZoneMapping.setTimezone(timezone);
         save(unitTimeZoneMapping);
@@ -36,7 +43,7 @@ public class UnitTimeZoneMappingService extends MongoBaseService {
 
         UnitTimeZoneMapping unitTimeZoneMapping = unitTimezoneMappingRepository.findByUnitId(unitId);
         if(Optional.ofNullable(unitTimeZoneMapping).isPresent()) {
-            throw new DataNotFoundByIdException("unit timezone mapping not found by unitId-----> "+unitId);
+            exceptionService.dataNotFoundByIdException("message.unitTimeZoneMapping.notfound",unitId);
         }
         return unitTimeZoneMapping;
     }

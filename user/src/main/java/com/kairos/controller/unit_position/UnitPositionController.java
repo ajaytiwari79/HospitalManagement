@@ -142,10 +142,11 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllCTAOfStaff(unitId, staffId));
     }
 
-    @ApiOperation(value = "update senioritylevel")
+    //Do not remove, required for local testing.
+    /*@ApiOperation(value = "update senioritylevel")
     @RequestMapping(value = "/seniority_level_update", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> updateSeniorityLevel() {
         unitPositionService.updateSeniorityLevelOnJobTrigger();
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null );
-    }
+    }*/
 }
