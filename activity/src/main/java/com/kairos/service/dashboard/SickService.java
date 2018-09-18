@@ -3,14 +3,18 @@ package com.kairos.service.dashboard;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
+import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
+import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.GenericRestClient;
@@ -53,6 +57,8 @@ public class SickService {
     private ShiftSickService shiftSickService;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
+    @Inject
+    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
 
     public UserSickDataWrapper getDefaultDataOnUserSick(Long unitId) {
         UserSickDataWrapper userSickDataWrapper = new UserSickDataWrapper();
@@ -98,7 +104,8 @@ public class SickService {
             Set<BigInteger> activityIds = sickSettings.stream().map(SickSettings::getActivityId).collect(Collectors.toSet());
             List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
             Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(MongoBaseEntity::getId, Function.identity()));
-
+            short maximumDayDifference = activities.stream().max(Comparator.comparingInt(aa -> aa.getRulesActivityTab().getRecurrenceDays())).get().getRulesActivityTab().getRecurrenceDays();
+            List<PeriodDTO> planningPeriods = planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId, DateUtils.getCurrentLocalDate(), DateUtils.getLocalDateAfterDays(maximumDayDifference));
             List<Shift> shifts = shiftMongoRepository.findAllShiftByDynamicQuery(sickSettings, activityMap);
             Set<Long> staffIds = sickSettings.stream().map(SickSettings::getStaffId).collect(Collectors.toSet());
             logger.info("last date iso string {} , {}", DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MIN), DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MAX));
@@ -123,7 +130,7 @@ public class SickService {
                     logger.info("The current user is still sick so we need to add more shifts {}", differenceOfDaysFromCurrentDateToLastSickDate);
                     if (staffWisePreviousDayShiftMap.get(currentSickSettings.getStaffId()) != null) {
                         List<Shift> currentStaffShifts = staffWiseShiftMap.get(currentSickSettings.getStaffId()) != null ? staffWiseShiftMap.get(currentSickSettings.getStaffId()) : new ArrayList<>();
-                        shiftSickService.createSicknessShiftsOfStaff(activity, currentStaffShifts, staffWisePreviousDayShiftMap.get(currentSickSettings.getStaffId()));
+                        shiftSickService.createSicknessShiftsOfStaff(activity, currentStaffShifts, staffWisePreviousDayShiftMap.get(currentSickSettings.getStaffId()),planningPeriods);
                     }
                 }
             });
