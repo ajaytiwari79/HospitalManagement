@@ -31,7 +31,7 @@ public class PhaseTemplateValue {
         //Default Constructor
     }
 
-    public PhaseTemplateValue(int phaseId, String phaseName, short staffValue, short managementValue, boolean disabled, boolean staffCanIgnore, boolean managementCanIgnore) {
+    public PhaseTemplateValue(int phaseId, String phaseName, short staffValue, short managementValue, boolean disabled, boolean staffCanIgnore, boolean managementCanIgnore, int sequence) {
         this.phaseId = phaseId;
         this.phaseName = phaseName;
         this.staffValue = staffValue;
@@ -39,6 +39,7 @@ public class PhaseTemplateValue {
         this.disabled = disabled;
         this.staffCanIgnore = staffCanIgnore;
         this.managementCanIgnore = managementCanIgnore;
+        this.sequence = sequence;
     }
 
     public String getPhaseName() {

@@ -91,14 +91,14 @@ public class RuleTemplateService extends MongoBaseService {
         AgeRange range = new AgeRange(0, 0, 0);
 
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-        phaseTemplateValues.add(new PhaseTemplateValue(1, "REQUEST", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(2, "PUZZLE", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(3, "DRAFT", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(4, "CONSTRUCTION", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(5, "REALTIME", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(6, "TIME & ATTENDANCE", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(7, "TENTATIVE", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(8, "PAYROLL", (short) 0, (short) 0, true, false, false));
+        phaseTemplateValues.add(new PhaseTemplateValue(1, "REQUEST", (short) 0, (short) 0, true, false, false,1));
+        phaseTemplateValues.add(new PhaseTemplateValue(2, "PUZZLE", (short) 0, (short) 0, true, false, false,2));
+        phaseTemplateValues.add(new PhaseTemplateValue(4, "CONSTRUCTION", (short) 0, (short) 0, true, false, false,3));
+        phaseTemplateValues.add(new PhaseTemplateValue(3, "DRAFT", (short) 0, (short) 0, true, false, false,4));
+        phaseTemplateValues.add(new PhaseTemplateValue(7, "TENTATIVE", (short) 0, (short) 0, true, false, false,5));
+        phaseTemplateValues.add(new PhaseTemplateValue(5, "REALTIME", (short) 0, (short) 0, true, false, false,6));
+        phaseTemplateValues.add(new PhaseTemplateValue(6, "TIME & ATTENDANCE", (short) 0, (short) 0, true, false, false,7));
+        phaseTemplateValues.add(new PhaseTemplateValue(8, "PAYROLL", (short) 0, (short) 0, true, false, false,8));
 
         ShiftLengthWTATemplate shiftLengthWTATemplate = new ShiftLengthWTATemplate("Maximum night shift’s length", "Maximum night shift’s length", 400);
         shiftLengthWTATemplate.setCountryId(countryDTO.getId());

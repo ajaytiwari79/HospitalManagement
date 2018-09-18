@@ -113,6 +113,7 @@ public class SickService {
             logger.info("Total number of shifts found {} ", shifts.size());
 
             sickSettings.forEach(currentSickSettings -> {
+                logger.info("Processing on sickSetting {} with activityId {}" ,currentSickSettings.getId(),currentSickSettings.getActivityId());
                 Activity activity = activityMap.get(currentSickSettings.getActivityId());
                 int differenceOfDaysFromCurrentDateToLastSickDate = DateUtils.getDifferenceBetweenDatesInDays(currentSickSettings.getStartDate(), DateUtils.getCurrentLocalDate());
                 List<Integer> validRepetitionDays = new ArrayList<>();
