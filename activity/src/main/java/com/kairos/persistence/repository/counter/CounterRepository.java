@@ -257,9 +257,9 @@ public class CounterRepository {
         mongoTemplate.remove(query, ApplicableKPI.class);
     }
 
-    public void removeTabKPIEntry(List<Long> refIds,BigInteger kpiId,ConfLevel level){
+    public void removeTabKPIEntry(List<Long> refIds,List<BigInteger> kpiId,ConfLevel level){
         String refQueryField = getRefQueryField(level);
-        Query query = new Query(Criteria.where(refQueryField).in(refIds).and("kpiId").is(kpiId));
+        Query query = new Query(Criteria.where(refQueryField).in(refIds).and("kpiId").in(kpiId));
         mongoTemplate.remove(query, TabKPIConf.class);
     }
 

@@ -312,7 +312,7 @@ public class CounterDistService extends MongoBaseService {
                List<StaffIdsDTO> staffIdsDTOS = genericIntegrationService.getStaffIdsByunitAndAccessGroupId(accessGroupKPIEntry.getUnitId(),Arrays.asList(accessGroupKPIEntry.getAccessGroupId()));
                 List<Long> staffIds=staffIdsDTOS.stream().flatMap(staffIdsDTO -> staffIdsDTO.getStaffIds().stream()).collect(Collectors.toList());
             counterRepository.removeApplicableKPI(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()),refId, ConfLevel.STAFF);
-            counterRepository.removeTabKPIEntry(staffIds, accessGroupKPIEntry.getKpiId(), ConfLevel.STAFF);
+            counterRepository.removeTabKPIEntry(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()), ConfLevel.STAFF);
        //     counterRepository.removeDashboardKPIEntry(staffIds,accessGroupKPIEntry.getKpiId(),ConfLevel.STAFF);counterRepository.removeEntityById(accessGroupKPIEntry.getId(), AccessGroupKPIEntry.class);
         }else{
             counterRepository.removeAccessGroupKPIEntryForCountry(accessGroupMappingDTO,refId);
@@ -353,6 +353,7 @@ public class CounterDistService extends MongoBaseService {
                 }
             });
             counterRepository.removeApplicableKPI(Arrays.asList(accessGroupAndStaffDTO.getStaffId()), removeAbleKPi,unitId, ConfLevel.STAFF);
+            counterRepository.removeTabKPIEntry(Arrays.asList(accessGroupAndStaffDTO.getStaffId()), removeAbleKPi, ConfLevel.STAFF);
         }
     }
     //setting orgType-KPI configuration
@@ -418,7 +419,7 @@ public class CounterDistService extends MongoBaseService {
         List<Long> unitIds=orgTypeDTOS.stream().flatMap(orgTypeDTO -> orgTypeDTO.getUnitIds().stream()).collect(toList());
         counterRepository.removeCategoryKPIEntry(unitIds,orgTypeKPIEntry.getKpiId());
         counterRepository.removeAccessGroupKPIEntry(unitIds,orgTypeKPIEntry.getKpiId());
-        counterRepository.removeTabKPIEntry(unitIds,orgTypeKPIEntry.getKpiId(),ConfLevel.UNIT);
+        counterRepository.removeTabKPIEntry(unitIds,Arrays.asList(orgTypeKPIEntry.getKpiId()),ConfLevel.UNIT);
        // counterRepository.removeDashboardKPIEntry(unitIds,orgTypeKPIEntry.getKpiId(),ConfLevel.STAFF);
         counterRepository.removeApplicableKPI(unitIds,Arrays.asList(orgTypeKPIEntry.getKpiId()),null,ConfLevel.UNIT);
         counterRepository.removeEntityById(orgTypeKPIEntry.getId(),OrgTypeKPIEntry.class);
