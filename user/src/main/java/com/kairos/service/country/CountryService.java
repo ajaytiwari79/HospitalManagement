@@ -346,7 +346,7 @@ public class CountryService {
         levelToUpdate.setName(level.getName());
         levelToUpdate.setDescription(level.getDescription());
         // TODO FIX MAKE REPOS
-        //.save(levelToUpdate);
+        levelGraphRepository.save(levelToUpdate);
         return null;
     }
 

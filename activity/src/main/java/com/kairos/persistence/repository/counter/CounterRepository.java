@@ -185,9 +185,9 @@ public class CounterRepository {
             criteria=criteria.and("kpiId").in(kpiIds);
             }
         Aggregation aggregation=Aggregation.newAggregation(Aggregation.match(criteria),
-                Aggregation.project("id"));
+                Aggregation.project("id","kpiId"));
         AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,TabKPIConf.class,Map.class);
-        return results.getMappedResults().stream().map(o->new BigInteger(o.get("_").toString())).collect(Collectors.toList());
+        return results.getMappedResults().stream().map(o->new BigInteger(o.get("kpiId").toString())).collect(Collectors.toList());
     }
 
     public List<TabKPIDTO> getTabKPIForStaffByTabAndStaffId(List<String> tabIds,List<BigInteger> kpiIds,Long staffId,Long unitId,ConfLevel level){
@@ -302,10 +302,10 @@ public class CounterRepository {
         }
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(criteria),
-                Aggregation.project("id")
+                Aggregation.project("id","kpiId")
                 );
         AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,OrgTypeKPIEntry.class, Map.class);
-        return results.getMappedResults().stream().map(s ->new BigInteger(s.get("_id").toString())).collect(Collectors.toList());
+        return results.getMappedResults().stream().map(s ->new BigInteger(s.get("kpiId").toString())).collect(Collectors.toList());
     }
 
 
@@ -328,10 +328,10 @@ public class CounterRepository {
         }
       Aggregation aggregation=Aggregation.newAggregation(
               Aggregation.match(criteria),
-              Aggregation.project("id")
+              Aggregation.project("id","kpiId")
       );
        AggregationResults<Map> result=mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,Map.class);
-       return result.getMappedResults().stream().map(o -> new BigInteger(o.get("_id").toString())).collect(Collectors.toList());
+       return result.getMappedResults().stream().map(o -> new BigInteger(o.get("kpiId").toString())).collect(Collectors.toList());
     }
 
     public List<KPIDTO> getAccessGroupKPIDto(List<Long> accessGroupIds , ConfLevel level, Long refId,Long staffId){
@@ -381,9 +381,9 @@ public class CounterRepository {
         }
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(criteria),
-                Aggregation.project("id"));
+                Aggregation.project("id","activeKpiId"));
         AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,ApplicableKPI.class,Map.class);
-        List<BigInteger> applicableKpis= results.getMappedResults().stream().map(s->new BigInteger(s.get("_id").toString())).collect(Collectors.toList());;
+        List<BigInteger> applicableKpis= results.getMappedResults().stream().map(s->new BigInteger(s.get("activeKpiId").toString())).collect(Collectors.toList());;
         return applicableKpis;
     }
 
