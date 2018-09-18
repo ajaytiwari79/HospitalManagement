@@ -165,6 +165,16 @@ public class CounterDistService extends MongoBaseService {
         List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(Arrays.asList(moduleId),kpiIds,accessGroupPermissionCounterDTO.getStaffId(),unitId,level);
         return tabKPIDTOS;
     }
+    public List<TabKPIDTO> getInitialTabKPIDataConfForStaffPriority(String moduleId,Long unitId, ConfLevel level){
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+        List<BigInteger> kpiIds=new ArrayList<>();
+        if(!accessGroupPermissionCounterDTO.getCountryAdmin()){
+            List<KPIDTO> kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,unitId,accessGroupPermissionCounterDTO.getStaffId());
+            kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
+        }
+        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(Arrays.asList(moduleId),kpiIds,accessGroupPermissionCounterDTO.getStaffId(),accessGroupPermissionCounterDTO.getCountryId(),unitId,level);
+        return tabKPIDTOS;
+    }
 
     public List<TabKPIDTO> addTabKPIEntriesOfStaff(List<TabKPIMappingDTO> tabKPIMappingDTOS,Long unitId,ConfLevel level){
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
@@ -221,7 +231,6 @@ public class CounterDistService extends MongoBaseService {
     }
     public void updateTabKPIEntries(List<TabKPIMappingDTO> tabKPIMappingDTOS,String tabId,Long unitId, ConfLevel level) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
-//        Long staffId=genericIntegrationService.getStaffIdByUserId(unitId);
         List<BigInteger> kpiIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
         List<TabKPIConf> tabKPIConfs=counterRepository.findTabKPIConfigurationByTabIds(tabId,kpiIds,accessGroupPermissionCounterDTO.getStaffId(),level);
         Map<BigInteger,TabKPIMappingDTO> tabKPIMappingDTOMap=new HashMap<>();

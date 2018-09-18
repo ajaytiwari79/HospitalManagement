@@ -114,6 +114,11 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConfForStaff(tabId,unitId, ConfLevel.STAFF));
     }
 
+    @GetMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/priority/tab/{tabId}")
+    public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaffPriority(@PathVariable Long unitId, @PathVariable String tabId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConfForStaffPriority(tabId,unitId, ConfLevel.STAFF));
+    }
+
     @PostMapping(COUNTRY_URL+COUNTER_DIST_URL+"/tab/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addTabKPIsEntryForCounty(@RequestBody TabKPIEntryConfDTO tabKPIEntry,@PathVariable Long countryId){
         counterManagementService.addTabKPIEntries(tabKPIEntry,countryId,null,null,ConfLevel.COUNTRY);

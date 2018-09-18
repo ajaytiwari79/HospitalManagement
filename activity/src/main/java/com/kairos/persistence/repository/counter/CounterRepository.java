@@ -13,12 +13,14 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.model.counter.KPIDashboard;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -193,6 +195,24 @@ public class CounterRepository {
         AggregationResults<TabKPIDTO> aggregationResults=mongoTemplate.aggregate(aggregation,TabKPIConf.class,TabKPIDTO.class);
         return aggregationResults.getMappedResults();
     };
+
+    public List<TabKPIDTO> getTabKPIForStaffByTabAndStaffIdPriority(List<String> tabIds,List<BigInteger> kpiIds,Long staffId,Long countryId,Long unitId,ConfLevel level){
+        Criteria criteria1=Criteria.where("tabId").in(tabIds).orOperator(Criteria.where("unitId").is(unitId),Criteria.where("countryId").is(countryId),Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level").is(ConfLevel.UNIT.toString())
+               ,Criteria.where("kpiValidity").is(KPIValidity.MANDATORY.toString()),Criteria.where("kpiValidity").is(KPIValidity.OPTIONAL.toString()));
+        Criteria criteria=Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level);
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.lookup("counter","kpiId","_id","kpis"),
+                Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpis"),
+                Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis.title").as("kpi.title").
+                        and("kpis._id").as("kpi._id").and("kpis.counter").as("kpi.counter"),
+                Aggregation.sort(Sort.Direction.ASC,"priority")
+
+        );
+        AggregationResults<TabKPIDTO> aggregationResults=mongoTemplate.aggregate(aggregation,TabKPIConf.class,TabKPIDTO.class);
+        return aggregationResults.getMappedResults();
+    };
+
+
 
     public List<TabKPIConf> findTabKPIConfigurationByTabIds( String tabId,List<BigInteger> kpiIds,Long staffId,ConfLevel level){
         Query query=new Query(Criteria.where("tabId").is(tabId).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level));
