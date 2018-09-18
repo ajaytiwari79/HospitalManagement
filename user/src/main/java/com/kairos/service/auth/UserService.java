@@ -339,7 +339,7 @@ public class UserService {
     }
 
     public boolean updatePassword(FirstTimePasswordUpdateDTO firstTimePasswordUpdateDTO) {
-        User user = userGraphRepository.findByEmail(firstTimePasswordUpdateDTO.getEmail());
+        User user = userGraphRepository.findByEmail("(?i)"+firstTimePasswordUpdateDTO.getEmail());
         if (user == null) {
             logger.error("User not found belongs to this email " + firstTimePasswordUpdateDTO.getEmail());
             exceptionService.dataNotFoundByIdException("message.user.email.notFound", firstTimePasswordUpdateDTO.getEmail());
