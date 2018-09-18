@@ -459,10 +459,11 @@ public class UnitPositionService {
 
 
     public UnitPositionQueryResult getUnitPosition(Long unitPositionId) {
-        UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId, 0);
-        UnitPositionQueryResult unitPositionQueryResult = new UnitPositionQueryResult();
-        unitPositionQueryResult.setPublished(unitPosition.isPublished());
-        unitPositionQueryResult.setId(unitPosition.getId());
+        UnitPositionQueryResult unitPositionQueryResult=unitPositionGraphRepository.findByUnitPositionId(unitPositionId);
+//        UnitPositionQueryResult unitPositionQueryResult = new UnitPositionQueryResult();
+//        unitPositionQueryResult.setPublished(unitPosition.isPublished());
+//        unitPositionQueryResult.setId(unitPosition.getId());
+//        unitPositionQueryResult.setPositionCode(unitPosition.getPositionCode());
         return unitPositionQueryResult;
     }
 
