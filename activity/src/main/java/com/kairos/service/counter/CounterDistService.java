@@ -314,6 +314,7 @@ public class CounterDistService extends MongoBaseService {
             counterRepository.removeApplicableKPI(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()),refId, ConfLevel.STAFF);
             counterRepository.removeTabKPIEntry(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()), ConfLevel.STAFF);
        //     counterRepository.removeDashboardKPIEntry(staffIds,accessGroupKPIEntry.getKpiId(),ConfLevel.STAFF);counterRepository.removeEntityById(accessGroupKPIEntry.getId(), AccessGroupKPIEntry.class);
+            counterRepository.removeEntityById(accessGroupKPIEntry.getId(), AccessGroupKPIEntry.class);
         }else{
             counterRepository.removeAccessGroupKPIEntryForCountry(accessGroupMappingDTO,refId);
         }
