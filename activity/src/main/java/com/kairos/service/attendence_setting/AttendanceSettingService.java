@@ -186,7 +186,7 @@ public class AttendanceSettingService extends MongoBaseService {
         FlexibleTimeSettingDTO flexibleTimeSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(shift.getUnitId()).getFlexibleTimeSettings();
         if (flexibleTimeSettingDTO != null) {
             Short checkInFlexibleTime = flexibleTimeSettingDTO.getCheckInFlexibleTime();
-             return  (Math.abs((shift.getStartDate().getTime() - DateUtils.getCurrentMillis()) / ONE_MINUTE) < checkInFlexibleTime || reasonCodeId != null);
+             return  (Math.abs((shift.getEndDate().getTime() - DateUtils.getCurrentMillis()) / ONE_MINUTE) < checkInFlexibleTime || reasonCodeId != null);
             }
         return false;
     }
