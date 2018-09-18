@@ -648,6 +648,7 @@ public class WTAService extends MongoBaseService {
        if(!newCTAs.isEmpty()) {
            save(newCTAs);
        }
+
         Map<Long,CostTimeAgreement> ctaMap =  newCTAs.stream().collect(Collectors.toMap(k->k.getUnitPositionId(),v->v));
         List<CTAWTAResponseDTO> ctaWtas = new ArrayList<>();
         for(WorkingTimeAgreement wta:newWtas) {
