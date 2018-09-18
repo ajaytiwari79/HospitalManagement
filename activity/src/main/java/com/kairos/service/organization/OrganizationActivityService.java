@@ -425,12 +425,7 @@ public class OrganizationActivityService extends MongoBaseService {
             exceptionService.actionNotPermittedException("error.end_time.less_than.maximum_end_time");
         }
         long shiftMinutes = new DateTimeInterval(shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate()).getMinutes();
-        if (longestTime < shiftMinutes) {
-            exceptionService.actionNotPermittedException("error.shift.duration_exceeds_longest_time");
-        }
-        if (shortestTime > shiftMinutes) {
-            exceptionService.actionNotPermittedException("error.shift.duration.less_than.shortest_time");
-        }
+
     }
 
 }
