@@ -37,7 +37,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.IntegrationService;
-import com.kairos.service.kafka.UserToSchedulerQueueService;
+import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.utils.DateConverter;
 import com.kairos.utils.DateUtil;
@@ -216,101 +216,24 @@ public class EmploymentService {
                 unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
             }
             AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-//            unitPermission = new UnitPermission();
-//            unitPermission.setOrganization(unit);
-//            unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
             unitPermission.setAccessGroup(accessGroup);
             employment.getUnitPermissions().add(unitPermission);
             employmentGraphRepository.save(employment);
-//            AccessPermission accessPermission = new AccessPermission(accessGroup);
-//            accessPermissionGraphRepository.save(accessPermission);
             logger.info(unitPermission.getId() + " Currently created Unit Permission ");
-//            unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
-//            accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
-//            accessPageQueryResults = getAccessPages(accessPermission);
-//            response.put("accessPage", accessPageQueryResults);
             response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
             response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
             response.put("id", unitPermission.getId());
 
 
-            /*unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId);
-            if (Optional.ofNullable(unitPermission).isPresent()) {
-                throw new DataNotFoundByIdException("Unit permission already exist" + staffId);
-            }
-            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-            unitPermission = new UnitPermission();
-            unitPermission.setOrganization(unit);
-            unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
-            employment.getUnitPermissions().add(unitPermission);
-            employmentGraphRepository.save(employment);
-            AccessPermission accessPermission = new AccessPermission(accessGroup);
-            accessPermissionGraphRepository.save(accessPermission);
-            logger.info(unitPermission.getId() + " Currently created Unit Permission ");
-            unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
-            accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
-            accessPageQueryResults = getAccessPages(accessPermission);
-            response.put("accessPage", accessPageQueryResults);
-            response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
-            response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
-            response.put("id", unitPermission.getId());*/
-
         } else {
             // need to remove unit permission
+            if(unitPermissionGraphRepository.getAccessGroupRelationShipCountOfStaff(staffId)<=1){
+                exceptionService.actionNotPermittedException("error.permission.remove");
+            }
             unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
-
         }
-//                if (parentOrganization == null) {
-//                    unit.getEmployments().add(employment);
-//                    organizationGraphRepository.save(unit);
-//                } else {
-//                    parentOrganization.getEmployments().add(employment);
-//                    organizationGraphRepository.save(parentOrganization);
-//                }
-//                if (accessGroup.isTypeOfTaskGiver())
-//                    flsSyncStatus = syncStaffInVisitour(staff, unitId, flsCredentials);
-        //     }
-            /*else {
-                AccessPermission accessPermission;
-                if (parentOrganization == null) {
-                    accessPermission = unitPermissionGraphRepository.getAccessPermission(unit.getId(), unitId, staffId, accessGroupId);
-                } else {
-                    accessPermission = unitPermissionGraphRepository.getAccessPermission(parentOrganization.getId(), unitId, staffId, accessGroupId);
-                }
-                AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-                if (accessPermission == null) {
-                    accessPermission = new AccessPermission(accessGroup);
-                    accessPermissionGraphRepository.save(accessPermission);
-                    unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
-                    accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
-                    accessPageQueryResults = getAccessPages(accessPermission);
-                    if (accessGroup.isTypeOfTaskGiver())
-                        flsSyncStatus = syncStaffInVisitour(staff, unitId, flsCredentials);
-                } else {
-                    if (parentOrganization == null) {
-                        unitPermissionGraphRepository.updateUnitPermission(unit.getId(), unitId, staffId, accessGroupId, true);
-                    } else {
-                        unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, true);
-                    }
-                    accessPageQueryResults = Collections.emptyList();
-                    if (accessGroup.isTypeOfTaskGiver())
-                        flsSyncStatus = syncStaffInVisitour(staff, unitId, flsCredentials);
-                }
-            }
-        } else {
-            if (parentOrganization == null) {
-                unitPermissionGraphRepository.updateUnitPermission(unit.getId(), unitId, staffId, accessGroupId, false);
-            } else {
-                unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
-            }
-            flsSyncStatus = removeStaffFromFls(staff, flsCredentials);
-            accessPageQueryResults = Collections.emptyList();
 
-        }
-        if (flsSyncStatus) {
-            staff.setVisitourId(staff.getId());
-            staffGraphRepository.save(staff);
-        }*/
+
 
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);

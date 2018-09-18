@@ -2,14 +2,14 @@ package com.kairos.service.common;
 
 
 import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
-import com.kairos.persistance.model.data_inventory.asset.Asset;
-import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivity;
-import com.kairos.persistance.model.master_data.default_asset_setting.MasterAsset;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
-import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
-import com.kairos.persistance.repository.master_data.asset_management.MasterAssetMongoRepository;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
+import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
+import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

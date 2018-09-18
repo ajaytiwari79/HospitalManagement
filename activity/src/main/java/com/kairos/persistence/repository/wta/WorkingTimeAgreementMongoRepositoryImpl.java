@@ -1,7 +1,9 @@
 package com.kairos.persistence.repository.wta;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
+import com.kairos.wrapper.wta.CTAWTADTO;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -204,10 +206,10 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     public List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> upIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitPositionId").in(upIds).and("deleted").is(false).and("disabled").is(true)),
-                graphLookup("workingTimeAgreement").startWith("parentWTA").connectFrom("parentWTA").connectTo("_id").as("versions"),
-                unwind("versions"),
-                project("versions").andExclude("_id"),
-                replaceRoot("versions"),
+                //graphLookup("workingTimeAgreement").startWith("parentWTA").connectFrom("parentWTA").connectTo("_id").as("versions"),
+               // unwind("versions"),
+               // project("versions").andExclude("_id"),
+               // replaceRoot("versions"),
                 lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
@@ -223,4 +225,22 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }
+
+
+
+    @Override
+    public List<WTAQueryResultDTO> getWTAByUnitPositionIds(List<Long> unitPositionIds,Date date) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
+                project("name", "description", "disabled", "expertise", "organizationType", "organizationSubType", "countryId", "organization", "parentWTA", "countryParentWTA", "organizationParentWTA", "tags", "startDate", "endDate", "expiryDate", "ruleTemplates","unitPositionId")
+        );
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
+        return result.getMappedResults();
+    }
+
+
+
+
 }

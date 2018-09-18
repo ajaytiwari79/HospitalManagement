@@ -1,19 +1,17 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ResponsibilityTypeDTO;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityType;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -148,26 +146,6 @@ public class ResponsibilityTypeService extends MongoBaseService {
 
     }
 
-    /**
-     * @param countryId
-     * @param name      name of ResponsibilityType
-     * @return ResponsibilityType object fetch on basis of  name
-     * @throws DataNotExists throw exception if ResponsibilityType not exist for given name
-     */
-    public ResponsibilityType getResponsibilityTypeByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            ResponsibilityType exist = responsibilityTypeMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
 
     /**
      * @description method save ResponsibilityType suggested by unit
@@ -177,15 +155,15 @@ public class ResponsibilityTypeService extends MongoBaseService {
      */
     public List<ResponsibilityType> saveSuggestedResponsibilityTypesFromUnit(Long countryId, List<ResponsibilityTypeDTO> responsibilityTypeDTOS) {
 
-        Set<String> responsibilitytTypeNameList = new HashSet<>();
+        Set<String> responsibilityTypeNameList = new HashSet<>();
         for (ResponsibilityTypeDTO ResponsibilityType : responsibilityTypeDTOS) {
-            responsibilitytTypeNameList.add(ResponsibilityType.getName());
+            responsibilityTypeNameList.add(ResponsibilityType.getName());
         }
-        List<ResponsibilityType> existingResponsibilityTypes = findMetaDataByNamesAndCountryId(countryId, responsibilitytTypeNameList, ResponsibilityType.class);
-        responsibilitytTypeNameList = ComparisonUtils.getNameListForMetadata(existingResponsibilityTypes, responsibilitytTypeNameList);
+        List<ResponsibilityType> existingResponsibilityTypes = findMetaDataByNamesAndCountryId(countryId, responsibilityTypeNameList, ResponsibilityType.class);
+        responsibilityTypeNameList = ComparisonUtils.getNameListForMetadata(existingResponsibilityTypes, responsibilityTypeNameList);
         List<ResponsibilityType> responsibilityTypeList = new ArrayList<>();
-        if (!responsibilitytTypeNameList.isEmpty()) {
-            for (String name : responsibilitytTypeNameList) {
+        if (!responsibilityTypeNameList.isEmpty()) {
+            for (String name : responsibilityTypeNameList) {
 
                 ResponsibilityType responsibilityType = new ResponsibilityType(name);
                 responsibilityType.setCountryId(countryId);

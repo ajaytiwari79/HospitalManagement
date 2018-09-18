@@ -12,17 +12,29 @@ public class MasterQuestionnaireTemplateDTO {
 
     private BigInteger id;
 
-    @NotBlank(message = "name.cannot.be.empty.or.null")
-    @Pattern(message = "Number and Special character are not allowed for Title",regexp ="^[a-zA-Z\\s]+$" )
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
 
-    @NotBlank(message = "Description cannot be empty")
+    @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
     @NotBlank(message = "Template type cannot be empty ")
     private String templateType;
 
     private BigInteger assetType;
+
+    private BigInteger assetSubType;
+
+    private boolean defaultAssetTemplate;
+
+    public BigInteger getAssetSubType() { return assetSubType; }
+
+    public void setAssetSubType(BigInteger assetSubType) { this.assetSubType = assetSubType; }
+
+    public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
+
+    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.defaultAssetTemplate = defaultAssetTemplate; }
 
     public String getName() {
         return name.trim();

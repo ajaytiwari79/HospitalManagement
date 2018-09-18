@@ -2,18 +2,20 @@ package com.kairos.persistence.repository.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
-import com.kairos.dto.activity.break_settings.BreakActivitiesDTO;
-import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
-import com.kairos.enums.ActivityStateEnum;
-import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.repository.common.CustomAggregationOperation;
-import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
-import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
+import com.kairos.dto.activity.break_settings.BreakActivitiesDTO;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
+import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
+import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.repository.common.CustomAggregationOperation;
+import com.kairos.service.counter.ActivityFilterCriteria;
 import com.kairos.wrapper.activity.ActivityTagDTO;
+import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -26,10 +28,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
@@ -434,10 +433,35 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
+    public List<BigInteger> getActivityIdsByFilter(List<FilterCriteria> filters){
+        ActivityFilterCriteria activityCriteria = ActivityFilterCriteria.getInstance();
+        for(FilterCriteria criteria: filters){
+            switch(criteria.getType()){
+                case ACTIVITY_IDS: activityCriteria.setActivityIds(criteria.getValues()); break;
+                case UNIT_IDS: activityCriteria.setUnitId(criteria.getValues()); break;
+                case ACTIVITY_CATEGORY_TYPE: activityCriteria.setCategoryId(criteria.getValues()); break;
+                case EMPLOYMENT_TYPE: activityCriteria.setEmploymentTypes(criteria.getValues()); break;
+                case EXPERTISE: activityCriteria.setExpertiseCriteria(criteria.getValues()); break;
+                case TIME_TYPE: activityCriteria.setTimeTypeList(criteria.getValues()); break;
+                case PLANNED_TIME_TYPE: activityCriteria.setPlanneTimeType(criteria.getValues()); break;
+                case ORGANIZATION_TYPE: activityCriteria.setOrganizationTypes(criteria.getValues()); break;
+                default: break;
+            }
+        }
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(activityCriteria.getFilterCriteria()),
+                group("0").push("$_id").as("activityIds"),
+                project("activities")
+        );
+        AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Activity.class, Map.class);
+        if(result.getMappedResults().isEmpty()) return new ArrayList<>();
+        return (List<BigInteger>)result.getMappedResults().get(0).get("activityIds");
+    }
+
     public List<ActivityDTO> findAllByTimeTypeIdAndUnitId(Set<BigInteger> timeTypeIds,Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("balanceSettingsActivityTab.timeTypeId").in(timeTypeIds).and("rulesActivityTab.allowedAutoAbsence").is(true).and("deleted").is(false).and("unitId").is(unitId)),
-                project().and("id").as("id").and("name").as("name"));
+                project().and("id").as("id").and("name").as("name").and("timeCalculationActivityTab").as("timeCalculationActivityTab"));
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }

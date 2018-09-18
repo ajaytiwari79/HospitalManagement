@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,17 +17,17 @@ public class AgreementSectionDTO {
 
     private BigInteger id;
 
-    @Pattern(message = "Numbers and special character are not allowed",regexp = "^[a-zA-Z\\s]+$")
-    @NotBlank(message = "Section Name can't be Empty")
+    @NotBlank(message = "error.message.name.notNull.orEmpty")
+    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
     @NotNull(message = "Section order is Not defined")
     private Integer orderedIndex;
 
     @Valid
-    private List<ClauseBasicDTO> clauses;
+    private List<ClauseBasicDTO> clauses=new ArrayList<>();
 
-    private List<AgreementSectionDTO> subSections;
+    private List<AgreementSectionDTO> subSections=new ArrayList<>();
 
     public List<AgreementSectionDTO> getSubSections() {
         return subSections;

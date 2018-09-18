@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 
 /*
@@ -23,12 +22,6 @@ public class ClauseBasicResponseDTO {
 
     @NotBlank
     private String description;
-
-    private Integer orderedIndex;
-
-    public Integer getOrderedIndex() { return orderedIndex; }
-
-    public void setOrderedIndex(Integer orderedIndex) { this.orderedIndex = orderedIndex; }
 
     public BigInteger getId() {
         return id;

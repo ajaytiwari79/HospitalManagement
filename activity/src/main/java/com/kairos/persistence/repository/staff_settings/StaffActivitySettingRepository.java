@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface StaffActivitySettingRepository extends MongoBaseRepository<StaffActivitySetting, BigInteger> {
@@ -19,5 +20,7 @@ public interface StaffActivitySettingRepository extends MongoBaseRepository<Staf
     StaffActivitySettingDTO findByIdAndUnitIdAndDeletedFalse(BigInteger staffActivitySettingId,Long unitId);
 
     StaffActivitySetting findByStaffIdAndActivityIdAndDeletedFalse(Long staffId,BigInteger activityId);
+
+    Set<StaffActivitySetting> findByStaffIdInAndActivityIdInAndDeletedFalse(Set<Long> staffIds, Set<BigInteger> activityIds);
 
 }

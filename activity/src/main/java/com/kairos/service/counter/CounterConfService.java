@@ -1,7 +1,8 @@
 package com.kairos.service.counter;
 
-import com.kairos.dto.activity.counter.FilterCriteria;
-import com.kairos.dto.activity.counter.KPICategoryDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryUpdationDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterType;
@@ -9,7 +10,6 @@ import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

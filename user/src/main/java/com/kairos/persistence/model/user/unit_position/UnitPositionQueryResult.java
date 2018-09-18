@@ -205,8 +205,7 @@ public class UnitPositionQueryResult {
     }
 
     public int getTotalWeeklyMinutes() {
-        this.totalWeeklyMinutes = this.totalWeeklyMinutes % 60;
-        return totalWeeklyMinutes;
+        return this.totalWeeklyMinutes;
 
     }
 

@@ -1,6 +1,6 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
-
+import com.kairos.dto.gdpr.MasterProcessingActivityRiskDTO;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.service.master_data.processing_activity_masterdata.MasterProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
@@ -109,19 +109,76 @@ public class MasterProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityListWithSubProcessing(countryId, organizationId));
     }
 
-    @ApiOperation(value = "get MasterProcessingActivity of unit by id")
-    @GetMapping(UNIT_URL + "/master_processing_activity/{id}")
-    public ResponseEntity<Object> getMasterProcessingActivityOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+
+    @ApiOperation(value = "Link risk with Processing Activity And Sub Processing Activity")
+    @PutMapping("/master_processing_activity/{processingActivityId}/risk")
+    public ResponseEntity<Object> createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody MasterProcessingActivityRiskDTO masterProcessingActivityRiskDTO) {
+
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(countryId, organizationId, processingActivityId, masterProcessingActivityRiskDTO));
+    }
+
+
+    @ApiOperation(value = "unlink risk from Processing Activity ")
+    @DeleteMapping("/master_processing_activity/{processingActivityId}/risk/{riskId}")
+    public ResponseEntity<Object> unlinkRiskFromProcessingActivityAndDeletedRisk(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
+
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(countryId, organizationId, processingActivityId, riskId));
+    }
+
+
+    @ApiOperation(value = "unlink risk from Sub Processing Activity ")
+    @DeleteMapping("/master_processing_activity/sub_Process/{subProcessingActivityId}/risk/{riskId}")
+    public ResponseEntity<Object> unlinkRiskFromSubProcessingActivityAndDeleteRisk(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger subProcessingActivityId, @PathVariable BigInteger riskId) {
+
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        } else if (organizationId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(countryId, organizationId, subProcessingActivityId, riskId));
+    }
+
+
+    @ApiOperation(value = "get All Processing Activity And linked risk ")
+    @GetMapping("/master_processing_activity/risk")
+    public ResponseEntity<Object> getMasterProcessingActivityAndLinkedRisks(@PathVariable Long countryId, @PathVariable Long organizationId) {
         if (countryId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
         }
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId  can't be null");
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getAllMasterProcessingActivityAndLinkedRisks(countryId, organizationId));
+    }
+
+
+    @ApiOperation(value = "get All Sub Processing Activity of Processing Activity And  risks linked with sub processing activity ")
+    @GetMapping("/master_processing_activity/{processingActivityId}/sub_Process/risk")
+    public ResponseEntity<Object> getAllSubProcessingActivityWithLinkedRisks(@PathVariable Long countryId, @PathVariable Long organizationId,@PathVariable(required = true) BigInteger processingActivityId) {
+        if (countryId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
+        }else if (processingActivityId==null)
+        { return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Processing Activity id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithSubProcessing(countryId, unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getAllSubProcessingActivityAndLinkedRisksByProcessingActivityId(countryId, organizationId,processingActivityId));
+    }
+
+
+
+    @ApiOperation(value = "get MasterProcessingActivity of unit by id")
+    @GetMapping(UNIT_URL + "/master_processing_activity/{processingActivityId}")
+    public ResponseEntity<Object> getMasterProcessingActivityOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
+        if (processingActivityId == null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Processing Activity id can't be null");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithSubProcessing(countryId, unitId, processingActivityId));
     }
 
     @ApiOperation(value = "get MasterProcessingActivity list with SubProcessing Activity of unit ")

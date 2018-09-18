@@ -4,8 +4,8 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.activity_tabs.GeneralActivityTabDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PermissionsActivityTabDTO;
-import com.kairos.dto.activity.counter.CounterDTO;
-import com.kairos.dto.activity.counter.ModuleType;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
+import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
@@ -272,7 +272,8 @@ public class OrganizationActivityService extends MongoBaseService {
         List<DayType> dayTypes = organizationRestClient.getDayTypes(unitId);
         Activity activity = activityMongoRepository.findOne(activityId);
         TimeCalculationActivityTab timeCalculationActivityTab = activity.getTimeCalculationActivityTab();
-        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes);
+        List<Long> rulesTabDayTypes= activity.getRulesActivityTab().getDayTypes();
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes,rulesTabDayTypes);
         return activityTabsWrapper;
     }
 

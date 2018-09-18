@@ -3,10 +3,14 @@ package com.kairos.persistence.repository.period;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.persistence.model.period.PlanningPeriod;
+import com.kairos.persistence.model.phase.Phase;
 import com.mongodb.client.result.UpdateResult;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by prerna on 6/4/18.
@@ -25,4 +29,8 @@ public interface CustomPlanningPeriodMongoRepository {
     List<PlanningPeriod> findAllPeriodsOfUnitByRequestPhaseId(Long unitId, String requestPhaseName);
     List<PeriodDTO> findAllPeriodsByStartDateAndLastDate(Long unitId, LocalDate startDate, LocalDate endDate);
     PlanningPeriod findCurrentDatePlanningPeriod(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate);
+
+    Phase getCurrentPhaseByDateUsingPlanningPeriod(Long unitId, LocalDate date);
+
+    List<PlanningPeriod> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
 }

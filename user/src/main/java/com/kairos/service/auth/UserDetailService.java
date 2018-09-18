@@ -38,8 +38,8 @@ public class UserDetailService {
      * @return
      * @throws UsernameNotFoundException
      */
-    public User loadUserByUsername(String userName , String password) throws UsernameNotFoundException {
-        User user=  userRepository.findByUserNameIgnoreCase(userName);
+    public User loadUserByEmail(String userName , String password) throws UsernameNotFoundException {
+        User user=  userRepository.findByEmail("(?i)"+userName);
          if (user == null) {
               logger.info("User is null");
                return null;
