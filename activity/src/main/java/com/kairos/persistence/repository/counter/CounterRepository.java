@@ -185,7 +185,7 @@ public class CounterRepository {
             criteria=criteria.and("kpiId").in(kpiIds);
             }
         Aggregation aggregation=Aggregation.newAggregation(Aggregation.match(criteria),
-                Aggregation.project("id","kpiId"));
+                Aggregation.project("kpiId"));
         AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,TabKPIConf.class,Map.class);
         return results.getMappedResults().stream().map(o->new BigInteger(o.get("kpiId").toString())).collect(Collectors.toList());
     }
@@ -302,7 +302,7 @@ public class CounterRepository {
         }
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(criteria),
-                Aggregation.project("id","kpiId")
+                Aggregation.project("kpiId")
                 );
         AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,OrgTypeKPIEntry.class, Map.class);
         return results.getMappedResults().stream().map(s ->new BigInteger(s.get("kpiId").toString())).collect(Collectors.toList());
@@ -328,7 +328,7 @@ public class CounterRepository {
         }
       Aggregation aggregation=Aggregation.newAggregation(
               Aggregation.match(criteria),
-              Aggregation.project("id","kpiId")
+              Aggregation.project("kpiId")
       );
        AggregationResults<Map> result=mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,Map.class);
        return result.getMappedResults().stream().map(o -> new BigInteger(o.get("kpiId").toString())).collect(Collectors.toList());
@@ -381,7 +381,7 @@ public class CounterRepository {
         }
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(criteria),
-                Aggregation.project("id","activeKpiId"));
+                Aggregation.project("activeKpiId"));
         AggregationResults<Map> results=mongoTemplate.aggregate(aggregation,ApplicableKPI.class,Map.class);
         List<BigInteger> applicableKpis= results.getMappedResults().stream().map(s->new BigInteger(s.get("activeKpiId").toString())).collect(Collectors.toList());;
         return applicableKpis;
