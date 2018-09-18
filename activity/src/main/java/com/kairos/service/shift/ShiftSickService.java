@@ -120,7 +120,7 @@ public class ShiftSickService extends MongoBaseService {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
         shifts.addAll(staffOriginalShiftsOfDates);
         if (!shifts.isEmpty()) {
-            shiftService.saveShiftsWithActivity(shifts,staffAdditionalInfoDTO);
+            shiftService.saveShiftWithActivity(shifts,staffAdditionalInfoDTO);
         }
     }
 

@@ -22,6 +22,7 @@ public class ShiftActivity {
     private BigInteger id;
     private String timeType;
     private String backgroundColor;
+    private boolean haltBreak;
 
 
 
@@ -41,6 +42,14 @@ public class ShiftActivity {
     public ShiftActivity() {
     }
 
+
+    public boolean isHaltBreak() {
+        return haltBreak;
+    }
+
+    public void setHaltBreak(boolean haltBreak) {
+        this.haltBreak = haltBreak;
+    }
 
     public String getBackgroundColor() {
         return backgroundColor;
