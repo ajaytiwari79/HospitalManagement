@@ -48,7 +48,7 @@ public class Shift extends MongoBaseEntity {
     private String externalId;
 
     private Long unitPositionId;
-    private Set<ShiftStatus> status;
+    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
     private BigInteger parentOpenShiftId;
     private Long allowedBreakDurationInMinute;

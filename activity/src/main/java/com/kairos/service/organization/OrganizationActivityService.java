@@ -391,10 +391,6 @@ public class OrganizationActivityService extends MongoBaseService {
         if (shiftDTO.getActivities().get(0).getStartDate().after(shiftDTO.getActivities().get(0).getEndDate())) {
             exceptionService.invalidRequestException("message.date.startandend");
         }
-        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByUnitPosition(shiftDTO.getUnitPositionId(), shiftDTO.getStartDate(), shiftDTO.getEndDate());
-        if (!shifts.isEmpty()) {
-            exceptionService.duplicateDataException("message.shift.date.startandend", shiftDTO.getStartDate(), shiftDTO.getEndDate());
-        }
         LocalTime earliestStartTime;
         LocalTime latestStartTime;
         LocalTime maximumEndTime;
