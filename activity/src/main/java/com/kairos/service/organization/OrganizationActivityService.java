@@ -382,46 +382,5 @@ public class OrganizationActivityService extends MongoBaseService {
         return true;
     }
 
-    /**
-     * @param staffId
-     * @param shiftDTO
-     * @Auther Pavan
-     */
-    public void validateShiftTime(Long staffId, ShiftDTO shiftDTO, RulesActivityTab rulesActivityTab) {
-        if (shiftDTO.getActivities().get(0).getStartDate().after(shiftDTO.getActivities().get(0).getEndDate())) {
-            exceptionService.invalidRequestException("message.date.startandend");
-        }
-        LocalTime earliestStartTime;
-        LocalTime latestStartTime;
-        LocalTime maximumEndTime;
-        Short longestTime;
-        Short shortestTime;
-        StaffActivitySetting staffActivitySetting = staffActivitySettingRepository.findByStaffIdAndActivityIdAndDeletedFalse(staffId, shiftDTO.getActivities().get(0).getActivityId());
-        if (staffActivitySetting != null) {
-            earliestStartTime = staffActivitySetting.getEarliestStartTime();
-            latestStartTime = staffActivitySetting.getLatestStartTime();
-            maximumEndTime = staffActivitySetting.getMaximumEndTime();
-            longestTime = staffActivitySetting.getLongestTime();
-            shortestTime = staffActivitySetting.getShortestTime();
-        } else {
-            earliestStartTime = rulesActivityTab.getEarliestStartTime();
-            latestStartTime = rulesActivityTab.getLatestStartTime();
-            maximumEndTime = rulesActivityTab.getMaximumEndTime();
-            longestTime = rulesActivityTab.getLongestTime();
-            shortestTime = rulesActivityTab.getShortestTime();
-        }
-
-        if (earliestStartTime != null && earliestStartTime.isAfter(DateUtils.asLocalTime(shiftDTO.getActivities().get(0).getStartDate()))) {
-            exceptionService.actionNotPermittedException("error.start_time.greater_than.earliest_time");
-        }
-        if (latestStartTime != null && latestStartTime.isBefore(DateUtils.asLocalTime(shiftDTO.getActivities().get(0).getStartDate()))) {
-            exceptionService.actionNotPermittedException("error.start_time.less_than.latest_time");
-        }
-        if (maximumEndTime != null && maximumEndTime.isBefore(DateUtils.asLocalTime(shiftDTO.getActivities().get(0).getEndDate()))) {
-            exceptionService.actionNotPermittedException("error.end_time.less_than.maximum_end_time");
-        }
-        long shiftMinutes = new DateTimeInterval(shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate()).getMinutes();
-
-    }
 
 }

@@ -89,7 +89,9 @@ public class Shift extends MongoBaseEntity {
         this.scheduledMinutes = scheduledMinutes;
     }
 
-    public Shift(Date startDate, Date endDate, Long staffId, List<ShiftActivity> activities, Long unitPositionId, Long unitId,BigInteger phaseId,BigInteger planningPeriodId) {
+
+    // This is used in absance shift
+    public Shift(Date startDate, Date endDate, Long staffId,List<ShiftActivity> activities,Long unitPositionId,Long unitId,BigInteger phaseId,BigInteger planningPeriodId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.staffId = staffId;

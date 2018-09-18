@@ -1,7 +1,6 @@
 package com.kairos.utils;
 
 
-
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
@@ -14,9 +13,11 @@ import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.tabs.CompositeActivity;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
 import com.kairos.persistence.model.wta.StaffWTACounter;
@@ -25,6 +26,7 @@ import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
@@ -46,10 +48,7 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -80,6 +79,8 @@ public class ShiftValidatorService {
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
     private TimeAttendanceGracePeriodRepository timeAttendanceGracePeriodRepository;
+    @Inject
+    private StaffActivitySettingRepository staffActivitySettingRepository;
 
     private static ExceptionService exceptionService;
 
@@ -163,7 +164,7 @@ public class ShiftValidatorService {
         if (planningPeriod == null) {
             exceptionService.actionNotPermittedException("message.shift.planning.period.exit", shift.getActivities().get(0).getStartDate());
         }
-        List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()),staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff());
+        List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()), staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff());
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates());
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()));
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByUnitPositionAndBeforeDate(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getActivities().get(0).getStartDate());
@@ -239,8 +240,8 @@ public class ShiftValidatorService {
     }
 
 
-    public static void throwException(String exception,Object... param){
-        exceptionService.invalidRequestException(exception,param);
+    public static void throwException(String exception, Object... param) {
+        exceptionService.invalidRequestException(exception, param);
     }
 
     public static List<DateTimeInterval> getSortedIntervals(List<ShiftWithActivityDTO> shifts) {
@@ -392,8 +393,7 @@ public class ShiftValidatorService {
         Integer counterValue = null;
         if (infoWrapper.getUser().getStaff() && phaseTemplateValue.isStaffCanIgnore()) {
             counterValue = ruleTemplate.getStaffCanIgnoreCounter();
-        }
-        else if (infoWrapper.getUser().getManagement() && phaseTemplateValue.isManagementCanIgnore()) {
+        } else if (infoWrapper.getUser().getManagement() && phaseTemplateValue.isManagementCanIgnore()) {
             counterValue = ruleTemplate.getManagementCanIgnoreCounter();
         }
         return counterValue != null ? infoWrapper.getCounterMap().getOrDefault(ruleTemplate.getId(), counterValue) : null;
@@ -478,6 +478,32 @@ public class ShiftValidatorService {
     public static boolean isValidForDay(List<Long> dayTypeIds, RuleTemplateSpecificInfo infoWrapper) {
         DayOfWeek shiftDay = DateUtils.asLocalDate(infoWrapper.getShift().getActivitiesStartDate()).getDayOfWeek();
         return getValidDays(infoWrapper.getDayTypes(), dayTypeIds).stream().filter(day -> day.equals(shiftDay)).findAny().isPresent();
+    }
+
+    /**
+     * @param shiftTimeDetailsMap
+     * @param activityWrapperMap
+     * @Auther Pavan
+     */
+    public void validateActivityTiming(Map<BigInteger, StaffActivitySetting> staffActivitySettingMap, Map<BigInteger, ShiftTimeDetails> shiftTimeDetailsMap, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        shiftTimeDetailsMap.forEach((k, v) -> {
+            Short shortestTime = staffActivitySettingMap.get(k) == null ? activityWrapperMap.get(k).getActivity().getRulesActivityTab().getShortestTime() : staffActivitySettingMap.get(k).getShortestTime();
+            Short longestTime = staffActivitySettingMap.get(k) == null ? activityWrapperMap.get(k).getActivity().getRulesActivityTab().getLongestTime() : staffActivitySettingMap.get(k).getLongestTime();
+            LocalTime earliestStartTime = staffActivitySettingMap.get(k) == null ? activityWrapperMap.get(k).getActivity().getRulesActivityTab().getEarliestStartTime() : staffActivitySettingMap.get(k).getEarliestStartTime();
+            LocalTime latestStartTime = staffActivitySettingMap.get(k) == null ? activityWrapperMap.get(k).getActivity().getRulesActivityTab().getLatestStartTime() : staffActivitySettingMap.get(k).getLatestStartTime();
+            if (shortestTime != null && v.getTotalTime() < shortestTime) {
+                exceptionService.actionNotPermittedException("error.shift.duration.less_than.shortest_time");
+            }
+            if (longestTime != null && v.getTotalTime() > longestTime) {
+                exceptionService.actionNotPermittedException("error.shift.duration_exceeds_longest_time");
+            }
+            if (earliestStartTime != null && earliestStartTime.isAfter(v.getActivityStartTime())) {
+                exceptionService.actionNotPermittedException("error.start_time.greater_than.earliest_time");
+            }
+            if (latestStartTime != null && latestStartTime.isBefore(v.getActivityStartTime())) {
+                exceptionService.actionNotPermittedException("error.start_time.less_than.latest_time");
+            }
+        });
     }
 
 
