@@ -4,6 +4,7 @@ package com.kairos.service.cta;
 import com.kairos.dto.activity.cta.*;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
+import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.enums.FixedValueType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.RuleTemplateCategoryType;
@@ -278,9 +279,10 @@ public class CostTimeAgreementService extends MongoBaseService {
             costTimeAgreement.setOrganizationSubType(oldCTA.getOrganizationSubType());
             costTimeAgreement.setOrganization(oldCTA.getOrganization());
             costTimeAgreement.setUnitPositionId(unitPositionId);
+            costTimeAgreement.setDescription(ctaDTO.getDescription());
             List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
             ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
-            responseCTA = new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false,unitPositionId);
+            responseCTA = new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false,unitPositionId,costTimeAgreement.getDescription(),ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionCode(), PositionCodeDTO.class));
             responseCTA.setParentCTAId(oldCTA.getId());
             save(costTimeAgreement);
         } else {
@@ -291,10 +293,11 @@ public class CostTimeAgreementService extends MongoBaseService {
             oldCTA.setRuleTemplateIds(ruleTemplateIds);
             oldCTA.setStartDate(ctaDTO.getStartDate());
             oldCTA.setEndDate(ctaDTO.getEndDate());
+            oldCTA.setDescription(ctaDTO.getDescription());
             save(oldCTA);
             List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
             ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldCTA.getExpertise(), ExpertiseResponseDTO.class);
-            responseCTA = new CTAResponseDTO(oldCTA.getId(), oldCTA.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, oldCTA.getStartDate(), oldCTA.getEndDate(), false,unitPositionId);
+            responseCTA = new CTAResponseDTO(oldCTA.getId(), oldCTA.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, oldCTA.getStartDate(), oldCTA.getEndDate(), false,unitPositionId,oldCTA.getDescription(),ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionCode(), PositionCodeDTO.class));
 
         }
         unitPosition.setCostTimeAgreement(responseCTA);

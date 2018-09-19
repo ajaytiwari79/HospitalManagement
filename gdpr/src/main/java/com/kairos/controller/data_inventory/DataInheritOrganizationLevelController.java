@@ -15,7 +15,7 @@ import javax.validation.Valid;
 import static com.kairos.constants.ApiConstant.*;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
 public class DataInheritOrganizationLevelController {
 
 

@@ -21,10 +21,10 @@ public class BasicRiskDTO {
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     protected String description;
 
-    @NotBlank(message = "Mention Risk Recommendation")
+    @NotBlank(message = "error.message.risk.recommendation")
     protected String riskRecommendation;
 
-    @NotNull(message = "Risk Level can't be empty")
+    @NotNull(message = "error.message.risk.level")
     protected RiskSeverity riskLevel;
 
     public String getName() { return name.trim(); }

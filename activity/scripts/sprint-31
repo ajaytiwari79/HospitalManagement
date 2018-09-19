@@ -1,0 +1,5 @@
+#To change state of activity documents at unit level
+
+db.getCollection('activities').update({"state":"DRAFT","countryId":{$exists:false}},{$set:{"state":"PUBLISHED"}},{ multi: true })
+
+

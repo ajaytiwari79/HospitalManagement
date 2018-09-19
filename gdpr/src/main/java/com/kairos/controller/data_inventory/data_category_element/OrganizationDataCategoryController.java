@@ -16,12 +16,12 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.AppConstant.*;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class OrganizationDataCategoryController {
 
 
