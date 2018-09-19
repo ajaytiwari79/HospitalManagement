@@ -6,12 +6,13 @@ public class OpenShiftPhase {
     private BigInteger phaseId;
     private String phaseName;
     private boolean solveUnderStaffingOverStaffing;
+    private int sequence;
 
     public OpenShiftPhase() {
         //Default Constructor
     }
 
-    public OpenShiftPhase(BigInteger phaseId, String phaseName, boolean solveUnderStaffingOverStaffing) {
+    public OpenShiftPhase(BigInteger phaseId, String phaseName, boolean solveUnderStaffingOverStaffing, int sequence) {
         this.phaseId = phaseId;
         this.phaseName = phaseName;
         this.solveUnderStaffingOverStaffing = solveUnderStaffingOverStaffing;
@@ -39,5 +40,13 @@ public class OpenShiftPhase {
 
     public void setSolveUnderStaffingOverStaffing(boolean solveUnderStaffingOverStaffing) {
         this.solveUnderStaffingOverStaffing = solveUnderStaffingOverStaffing;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

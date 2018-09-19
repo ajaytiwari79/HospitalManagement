@@ -16,13 +16,13 @@ import javax.validation.Valid;
 
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 import static com.kairos.constants.ApiConstant.UNIT_URL;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
+@Api(API_ORGANIZATION_COUNTRY_URL)
 public class DataElementController {
 
 

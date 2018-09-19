@@ -106,17 +106,18 @@ public class SickService {
             List<PeriodDTO> planningPeriods = planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId, DateUtils.getCurrentLocalDate(), DateUtils.getLocalDateAfterDays(maximumDayDifference));
             List<Shift> shifts = shiftMongoRepository.findAllShiftByDynamicQuery(sickSettings, activityMap);
             Set<Long> staffIds = sickSettings.stream().map(SickSettings::getStaffId).collect(Collectors.toSet());
-            logger.info("last date iso string {} , {}", DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MIN), DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MAX));
-            List<Shift> previousDaySickShifts = shiftMongoRepository.findAllByStaffIdInAndSickShiftTrueAndDeletedFalseAndStartDateGreaterThanEqualAndEndDateLessThanEqual(staffIds, DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MIN), DateUtils.getDateAfterDaysWithTime((short) -1, LocalTime.MAX));
+            logger.info("last date iso string {} , {}", DateUtils.getDateAfterDaysWithTime((short) 0, LocalTime.MIN), DateUtils.getDateAfterDaysWithTime((short) 0, LocalTime.MAX));
+            List<Shift> previousDaySickShifts = shiftMongoRepository.findAllByStaffIdInAndSickShiftTrueAndDeletedFalseAndStartDateGreaterThanEqualAndEndDateLessThanEqual(staffIds, DateUtils.getDateAfterDaysWithTime((short) 0, LocalTime.MIN), DateUtils.getDateAfterDaysWithTime((short) 0, LocalTime.MAX));
             Map<Long, Shift> staffWisePreviousDayShiftMap = previousDaySickShifts.stream().collect(Collectors.toMap(Shift::getStaffId, Function.identity(),(firstShift,secondShift)->firstShift));
             Map<Long, List<Shift>> staffWiseShiftMap = shifts.stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
             logger.info("Total number of shifts found {} ", shifts.size());
 
             sickSettings.forEach(currentSickSettings -> {
+                logger.info("Processing on sickSetting {} with activityId {}" ,currentSickSettings.getId(),currentSickSettings.getActivityId());
                 Activity activity = activityMap.get(currentSickSettings.getActivityId());
                 int differenceOfDaysFromCurrentDateToLastSickDate = DateUtils.getDifferenceBetweenDatesInDays(currentSickSettings.getStartDate(), DateUtils.getCurrentLocalDate());
                 List<Integer> validRepetitionDays = new ArrayList<>();
-                if (!activity.getRulesActivityTab().isAllowedAutoAbsence() || differenceOfDaysFromCurrentDateToLastSickDate <= 0) {
+                if (!activity.getRulesActivityTab().isAllowedAutoAbsence() || differenceOfDaysFromCurrentDateToLastSickDate < 0) {
                     logger.info("either activity is not allowed for break  {} or days is in -ve {}", activity.getRulesActivityTab().isAllowedAutoAbsence(), differenceOfDaysFromCurrentDateToLastSickDate);
                     return;
                 }

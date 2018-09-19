@@ -467,10 +467,11 @@ public class UnitPositionService {
 
 
     public UnitPositionQueryResult getUnitPosition(Long unitPositionId) {
-        UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId, 0);
-        UnitPositionQueryResult unitPositionQueryResult = new UnitPositionQueryResult();
-        unitPositionQueryResult.setPublished(unitPosition.isPublished());
-        unitPositionQueryResult.setId(unitPosition.getId());
+        UnitPositionQueryResult unitPositionQueryResult=unitPositionGraphRepository.findByUnitPositionId(unitPositionId);
+//        UnitPositionQueryResult unitPositionQueryResult = new UnitPositionQueryResult();
+//        unitPositionQueryResult.setPublished(unitPosition.isPublished());
+//        unitPositionQueryResult.setId(unitPosition.getId());
+//        unitPositionQueryResult.setPositionCode(unitPosition.getPositionCode());
         return unitPositionQueryResult;
     }
 
@@ -873,7 +874,6 @@ public class UnitPositionService {
 
         unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
         unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
-
         unitPositionDetails.setId(unitPosition.getId());
         unitPositionDetails.setFullTimeWeeklyMinutes(unitPosition.getFullTimeWeeklyMinutes());
         unitPositionDetails.setTotalWeeklyMinutes(unitPosition.getTotalWeeklyMinutes());

@@ -541,7 +541,7 @@ public class ActivityService extends MongoBaseService {
         Activity activity = activityMongoRepository.findOne(activityId);
 
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
-
+        rulesActivityTab.getEligibleForSchedules().sort(Comparator.comparingInt(PhaseTemplateValue::getSequence));
         return new ActivityTabsWrapper(rulesActivityTab, dayTypes, employmentTypeDTOS);
     }
 
@@ -1112,7 +1112,6 @@ public class ActivityService extends MongoBaseService {
         ObjectMapperUtils.copyPropertiesExceptSpecific(activityFromDatabase.get(), activityCopied, "id");
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
-        activityCopied.setState(ActivityStateEnum.DRAFT);
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
         save(activityCopied);

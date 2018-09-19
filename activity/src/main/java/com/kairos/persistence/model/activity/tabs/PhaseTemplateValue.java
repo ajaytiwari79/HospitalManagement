@@ -19,6 +19,7 @@ public class PhaseTemplateValue implements Serializable {
     private boolean managementCanDelete;
     private boolean staffCanSell;
     private boolean managementCanSell;
+    private int sequence;
 
     public BigInteger getPhaseId() {
         return phaseId;
@@ -107,5 +108,13 @@ public class PhaseTemplateValue implements Serializable {
 
     public void setManagementCanSell(boolean managementCanSell) {
         this.managementCanSell = managementCanSell;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }
