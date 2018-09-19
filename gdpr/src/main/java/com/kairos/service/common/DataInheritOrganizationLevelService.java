@@ -44,7 +44,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
      */
     public Boolean inheritDataFromParentOrganization(Long countryId, Long parentOrganizationId, Long unitId, OrganizationMetaDataDTO organizationMetaData) {
 
-        List<MasterAsset> masterAssetList = masterAssetMongoRepository.getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(countryId, parentOrganizationId, organizationMetaData);
+        List<MasterAsset> masterAssetList = masterAssetMongoRepository.getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaData);
 
         if (!masterAssetList.isEmpty()) {
             Boolean activeStatus = false;
@@ -59,7 +59,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             assetMongoRepository.saveAll(getNextSequence(organizationAssetList));
         }
 
-        List<MasterProcessingActivity> masterProcessingActivityList = masterProcessingActivityRepository.getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(countryId, parentOrganizationId, organizationMetaData);
+        List<MasterProcessingActivity> masterProcessingActivityList = masterProcessingActivityRepository.getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaData);
 
 
         if (!masterProcessingActivityList.isEmpty()) {

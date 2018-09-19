@@ -395,7 +395,7 @@ public class AgreementSectionService extends MongoBaseService {
             clause.setAccountTypes(policyAgreementTemplate.getAccountTypes());
             clauseList.add(clause);
         }
-        List<Clause> existingClause = clauseMongoRepository.findClausesByTitle(countryId, UserContext.getOrgId(), clauseTitles);
+        List<Clause> existingClause = clauseMongoRepository.findClausesByTitle(countryId, clauseTitles);
         if (CollectionUtils.isNotEmpty(existingClause)) {
             exceptionService.duplicateDataException("message.duplicate", " Clause " + existingClause.get(0).getTitle());
         }

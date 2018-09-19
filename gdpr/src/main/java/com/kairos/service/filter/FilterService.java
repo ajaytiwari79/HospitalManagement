@@ -53,15 +53,15 @@ public class FilterService {
     private MasterProcessingActivityRepository masterProcessingActivityRepository;
 
     //get fields with distinct values on which filter is applicable
-    public FilterAndFavouriteFilterDTO getFilterCategories(Long countryId, Long organizationId, String moduleId) {
+    public FilterAndFavouriteFilterDTO getFilterCategories(Long countryId,  String moduleId) {
 
-        Map<String, AggregationOperation> filterCriteria = new HashMap<>();
+        Map<String, AggregationOperation> filterCriteria ;
         FilterGroup filterGroup = filterMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
         List<FilterResponseDTO> filterResponseData = new ArrayList<>();
         FilterAndFavouriteFilterDTO filterAndFavouriteFilterDto = new FilterAndFavouriteFilterDTO();
         if (Optional.ofNullable(filterGroup).isPresent()) {
             List<FilterType> filterTypes = filterGroup.getFilterTypes();
-            filterCriteria = filterMongoRepository.getFilterCriteria(countryId, organizationId, filterTypes, filterGroup);
+            filterCriteria = filterMongoRepository.getFilterCriteria(countryId, filterTypes, filterGroup);
             Aggregation aggregation = filterMongoRepository.createAggregationQueryForFilterCategory(filterCriteria);
             AggregationResults<FilterCategoryResult> result = filterMongoRepository.getFilterAggregationResult(aggregation, filterGroup, moduleId);
             FilterCategoryResult filterQueryResult = result.getUniqueMappedResult();
@@ -104,7 +104,7 @@ public class FilterService {
 
 
     //get filter data on the bases of selection of data and get filter Group By moduleId
-    public FilterResponseWithData getFilterDataWithFilterSelection(Long countryId, Long organizationId, String moduleId, FilterSelectionDTO filterSelectionDto) {
+    public FilterResponseWithData getFilterDataWithFilterSelection(Long countryId, String moduleId, FilterSelectionDTO filterSelectionDto) {
         FilterGroup filterGroup = filterMongoRepository.findFilterGroupByModuleId(moduleId, countryId);
         if (!Optional.ofNullable(filterGroup).isPresent()) {
             exceptionService.invalidRequestException("filter group not exists for " + moduleId);
@@ -118,26 +118,26 @@ public class FilterService {
                 }
             }
         }
-        return getFilterDataByModuleName(countryId, organizationId, domainName, filterSelectionDto);
+        return getFilterDataByModuleName(countryId, domainName, filterSelectionDto);
 
     }
 
 
-    public FilterResponseWithData getFilterDataByModuleName(Long countryId, Long organizationId, String moduleName, FilterSelectionDTO filterSelectionDto) {
+    public FilterResponseWithData getFilterDataByModuleName(Long countryId,  String moduleName, FilterSelectionDTO filterSelectionDto) {
 
         switch (moduleName) {
             case CLAUSE_MODULE_NAME:
-                List<ClauseResponseDTO> clauses = clauseMongoRepository.getClauseDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
+                List<ClauseResponseDTO> clauses = clauseMongoRepository.getClauseDataWithFilterSelection(countryId, filterSelectionDto);
                 FilterResponseWithData<List<ClauseResponseDTO>> clauseFilterData = new FilterResponseWithData<>();
                 clauseFilterData.setData(clauses);
                 return clauseFilterData;
             case ASSET_MODULE_NAME:
-                List<MasterAssetResponseDTO> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, organizationId, filterSelectionDto);
+                List<MasterAssetResponseDTO> masterAssets = masterAssetMongoRepository.getMasterAssetDataWithFilterSelection(countryId, filterSelectionDto);
                 FilterResponseWithData<List<MasterAssetResponseDTO>> assetFilterData = new FilterResponseWithData<>();
                 assetFilterData.setData(masterAssets);
                 return assetFilterData;
             case MASTER_PROCESSING_ACTIVITY_MODULE_NAME:
-                List<MasterProcessingActivityResponseDTO> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, organizationId, filterSelectionDto);
+                List<MasterProcessingActivityResponseDTO> processingActivities = masterProcessingActivityRepository.getMasterProcessingActivityWithFilterSelection(countryId, filterSelectionDto);
                 FilterResponseWithData<List<MasterProcessingActivityResponseDTO>> processingActivityFilterData = new FilterResponseWithData<>();
                 processingActivityFilterData.setData(processingActivities);
                 return processingActivityFilterData;
