@@ -2,7 +2,6 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.dto.gdpr.data_inventory.AssetTypeOrganizationLevelDTO;
-import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.service.data_inventory.asset.OrganizationAssetTypeService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -17,11 +16,11 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class OrganizationAssetTypeController {
 
 

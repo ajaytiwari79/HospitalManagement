@@ -55,7 +55,7 @@ public class AgreementSectionService extends MongoBaseService {
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Policy Agreement Template ", templateId);
         }
-        checkForDuplicacyInTitleOfAgreementSectionAndSubSection(agreementSectionDTOs);
+        checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementSectionDTOs);
         boolean flag = false;
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOs) {
             if (Optional.ofNullable(agreementSectionDTO.getId()).isPresent()) {
@@ -464,23 +464,40 @@ public class AgreementSectionService extends MongoBaseService {
 
     }
 
-    private void checkForDuplicacyInTitleOfAgreementSectionAndSubSection(List<AgreementSectionDTO> agreementSectionDTOS) {
-        List<String> titles = new ArrayList<>();
+    private void checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(List<AgreementSectionDTO> agreementSectionDTOS) {
+        Set<String> titles = new HashSet<>();
+        Set<String> clauseTitles = new HashSet<>();
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOS) {
             if (titles.contains(agreementSectionDTO.getTitle().toLowerCase())) {
                 exceptionService.duplicateDataException("message.duplicate", "Agreement Section ", agreementSectionDTO.getTitle());
+            }
+            if (Optional.ofNullable(agreementSectionDTO.getClauses()).isPresent() && !agreementSectionDTO.getClauses().isEmpty()) {
+                checkDuplicateClauseInAgreementSection(agreementSectionDTO.getClauses(), clauseTitles, agreementSectionDTO.getTitle());
             }
             if (Optional.ofNullable(agreementSectionDTO.getSubSections()).isPresent()) {
                 agreementSectionDTO.getSubSections().forEach(agreementSubSectionDTO -> {
                     if (titles.contains(agreementSubSectionDTO.getTitle().toLowerCase())) {
                         exceptionService.duplicateDataException("message.duplicate", "Agreement Sub section", agreementSubSectionDTO.getTitle());
                     }
-                    titles.add(agreementSubSectionDTO.getTitle());
+                    if (Optional.ofNullable(agreementSubSectionDTO.getClauses()).isPresent() && !agreementSubSectionDTO.getClauses().isEmpty()) {
+                        checkDuplicateClauseInAgreementSection(agreementSubSectionDTO.getClauses(), clauseTitles, agreementSubSectionDTO.getTitle());
+                    }
+                    titles.add(agreementSubSectionDTO.getTitle().toLowerCase());
                 });
             }
             titles.add(agreementSectionDTO.getTitle().toLowerCase());
         }
     }
 
+    private void checkDuplicateClauseInAgreementSection(List<ClauseBasicDTO> clauseBasicDTOS, Set<String> clauseTitles, String sectionName) {
+        for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
+
+            if (clauseTitles.contains(clauseBasicDTO.getTitle())) {
+                exceptionService.duplicateDataException("message.duplicate.clause.agreement.section", clauseBasicDTO.getTitle(), sectionName);
+            }
+            clauseTitles.add(clauseBasicDTO.getTitle().toLowerCase());
+        }
+
+    }
 }
 
