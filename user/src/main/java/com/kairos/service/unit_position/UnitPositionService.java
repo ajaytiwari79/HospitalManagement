@@ -874,7 +874,7 @@ public class UnitPositionService {
 
         unitPositionDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
         unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
-
+        unitPositionDetails.setUnitId(unitPosition.getUnitId());
         unitPositionDetails.setId(unitPosition.getId());
         unitPositionDetails.setFullTimeWeeklyMinutes(unitPosition.getFullTimeWeeklyMinutes());
         unitPositionDetails.setTotalWeeklyMinutes(unitPosition.getTotalWeeklyMinutes());
