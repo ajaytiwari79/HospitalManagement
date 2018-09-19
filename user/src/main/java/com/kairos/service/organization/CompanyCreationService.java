@@ -297,7 +297,7 @@ public class CompanyCreationService {
                 user.setCprNumber(unitManagerDTO.getCprNumber());
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
-                setEncryptedPasswordInUser(unitManagerDTO,user);
+                setEncryptedPasswordInUser(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
                     staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId());
@@ -312,7 +312,7 @@ public class CompanyCreationService {
                     }
                 }
                 user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
-                setEncryptedPasswordInUser(unitManagerDTO,user);
+                setEncryptedPasswordInUser(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization);
 
@@ -320,8 +320,9 @@ public class CompanyCreationService {
         }
         return unitManagerDTO;
     }
+
     //It checks null as well
-    private void setEncryptedPasswordInUser(UnitManagerDTO unitManagerDTO,User user) {
+    private void setEncryptedPasswordInUser(UnitManagerDTO unitManagerDTO, User user) {
         if (StringUtils.isNotEmpty(unitManagerDTO.getFirstName())) {
             user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
         }
@@ -430,17 +431,17 @@ public class CompanyCreationService {
     }
 
     public OrganizationBasicDTO updateUnit(OrganizationBasicDTO organizationBasicDTO, Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
-        updateOrganizationDetails(organization, organizationBasicDTO, false);
+        updateOrganizationDetails(unit, organizationBasicDTO, false);
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
-        setOrganizationTypeAndSubTypeInOrganization(organization, organizationBasicDTO, null);
+        setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO, null);
         if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
-            setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManager(), organization.isBoardingCompleted(), false);
+            setUserInfoInOrganization(unitId, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
         }
-        organizationGraphRepository.save(organization);
+        organizationGraphRepository.save(unit);
         return organizationBasicDTO;
 
     }
@@ -525,12 +526,14 @@ public class CompanyCreationService {
         validateBasicDetails(organizations, exceptionService);
 
         List<Long> unitIds = organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
-        unitIds.add(organizationId);
 
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds);
+
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
+        unitIds.add(organizationId);
         if (staffPersonalDetailDTOS.size() != unitIds.size()) {
             exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
         }
+
         validateUserDetails(staffPersonalDetailDTOS, exceptionService);
 
         List<OrganizationContactAddress> organizationContactAddresses = organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
@@ -562,8 +565,10 @@ public class CompanyCreationService {
         return true;
     }
 
-    private void addStaffsInChatServer(List<Staff> staffList){
-        staffList.forEach(staff->{ staffService.addStaffInChatServer(staff); });
+    private void addStaffsInChatServer(List<Staff> staffList) {
+        staffList.forEach(staff -> {
+            staffService.addStaffInChatServer(staff);
+        });
         staffGraphRepository.saveAll(staffList);
     }
 
