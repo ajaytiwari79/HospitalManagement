@@ -92,12 +92,20 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "return  id(org) as organizationId ,id(user) as id, user.email as email,user.firstName as firstName,ag.name as accessGroupName,id(ag) as accessGroupId,user.lastName as lastName ,user.cprNumber as cprNumber,user.creationDate as creationDate ORDER BY user.creationDate DESC LIMIT 1" )
     StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId);
 
-    @Query("Match (org:Organization) where id(org) IN {0}" +
+    @Query("Match (org:Organization) where id(org)  = {1}" +
             "Optional Match (emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) with org,unitPermission,emp\n" +
             "Optional Match (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) with org,unitPermission,emp,r1,ag\n" +
             "Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
-            "return  id(org) as organizationId ,user.email as email,id(user) as id,ag.name as accessGroupName,id(ag) as accessGroupId, user.firstName as firstName,user.lastName as lastName ,user.cprNumber as cprNumber,staff as staff,user.creationDate as creationDate " )
-    List<StaffPersonalDetailDTO> getUnitManagerOfOrganization(List<Long> unitId);
+            "return  id(org) as organizationId ,user.email as email,id(user) as id,ag.name as accessGroupName,id(ag) as accessGroupId, user.firstName as firstName,user.lastName as lastName ,user.cprNumber as cprNumber,staff as staff,user.creationDate as creationDate " +
+            "UNION " +
+            "Match (org:Organization),(child:Organization) where id(org) IN {1} and id(child) IN {0}\n" +
+            " Optional Match (org)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission) with child,emp,unitPermission\n" +
+            " MATCH (unitPermission)-[:APPLICABLE_IN_UNIT]->(child) with  unitPermission,emp,child\n" +
+            "Optional Match (unitPermission)-[r1:HAS_ACCESS_GROUP]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) with child,emp,ag\n" +
+            "Match (emp)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]-(user:User) \n" +
+            "return  id(child) as organizationId ,user.email as email,id(user) as id,ag.name as accessGroupName,id(ag) as accessGroupId, user.firstName as firstName,user.lastName as lastName,user.cprNumber as cprNumber,staff as staff,user.creationDate as creationDate " )
+
+    List<StaffPersonalDetailDTO> getUnitManagerOfOrganization(List<Long> unitId,Long parentOrganizationId);
 
     @Query("Match (org:Organization) where id(org)={0}" +
             "Optional Match (emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) with emp"+
