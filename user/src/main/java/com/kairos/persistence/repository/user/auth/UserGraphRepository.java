@@ -98,7 +98,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "return  id(org) as organizationId ,user.email as email,id(user) as id,ag.name as accessGroupName,id(ag) as accessGroupId, user.firstName as firstName,user.lastName as lastName ,user.cprNumber as cprNumber,staff as staff,user.creationDate as creationDate " +
             "UNION " +
-            "Match (org:Organization),(child:Organization) where id(org) IN {1} and id(child) IN {0}\n" +
+            "Match (org:Organization),(child:Organization) where id(org) = {1} and id(child) IN {0}\n" +
             " Optional Match (org)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission) with child,emp,unitPermission\n" +
             " MATCH (unitPermission)-[:APPLICABLE_IN_UNIT]->(child) with  unitPermission,emp,child\n" +
             "Optional Match (unitPermission)-[r1:HAS_ACCESS_GROUP]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) with child,emp,ag\n" +
