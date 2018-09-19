@@ -196,23 +196,24 @@ public class CounterRepository {
         return aggregationResults.getMappedResults();
     };
 
-    public List<TabKPIDTO> getTabKPIForStaffByTabAndStaffIdPriority(List<String> tabIds,List<BigInteger> kpiIds,Long staffId,Long countryId,Long unitId,ConfLevel level){
-        Criteria criteria1=Criteria.where("tabId").in(tabIds).orOperator(Criteria.where("unitId").is(unitId),Criteria.where("countryId").is(countryId),Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level").is(ConfLevel.UNIT.toString())
-               ,Criteria.where("kpiValidity").is(KPIValidity.MANDATORY.toString()),Criteria.where("kpiValidity").is(KPIValidity.OPTIONAL.toString()));
-        Criteria criteria=Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level);
+    public List<TabKPIDTO> getTabKPIForStaffByTabAndStaffIdPriority(String tabId,List<BigInteger> kpiIds,Long staffId,Long countryId,Long unitId,ConfLevel level){
+        Criteria criteria=Criteria.where("tabId").is(tabId).orOperator(Criteria.where("unitId").is(unitId).and("level").is(ConfLevel.UNIT).and("kpiValidity").in(KPIValidity.MANDATORY,KPIValidity.OPTIONAL),Criteria.where("countryId").is(countryId).and("level").is(ConfLevel.COUNTRY).and("kpiValidity").in(KPIValidity.MANDATORY,KPIValidity.OPTIONAL),Criteria.where("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level));
         Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(criteria),
                 Aggregation.lookup("counter","kpiId","_id","kpis"),
                 Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpis"),
                 Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis.title").as("kpi.title").
                         and("kpis._id").as("kpi._id").and("kpis.counter").as("kpi.counter"),
                 Aggregation.sort(Sort.Direction.ASC,"priority")
-
         );
         AggregationResults<TabKPIDTO> aggregationResults=mongoTemplate.aggregate(aggregation,TabKPIConf.class,TabKPIDTO.class);
         return aggregationResults.getMappedResults();
     };
 
-
+/*
+Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level").is()
+               ,Criteria.where("kpiValidity").is(KPIValidity.MANDATORY.toString()),Criteria.where("kpiValidity").is(KPIValidity.OPTIONAL.toString()));
+ */
 
     public List<TabKPIConf> findTabKPIConfigurationByTabIds( String tabId,List<BigInteger> kpiIds,Long staffId,ConfLevel level){
         Query query=new Query(Criteria.where("tabId").is(tabId).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level));

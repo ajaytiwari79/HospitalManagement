@@ -165,6 +165,7 @@ public class CounterDistService extends MongoBaseService {
         List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(Arrays.asList(moduleId),kpiIds,accessGroupPermissionCounterDTO.getStaffId(),unitId,level);
         return tabKPIDTOS;
     }
+
     public List<TabKPIDTO> getInitialTabKPIDataConfForStaffPriority(String moduleId,Long unitId, ConfLevel level){
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
         List<BigInteger> kpiIds=new ArrayList<>();
@@ -172,7 +173,7 @@ public class CounterDistService extends MongoBaseService {
             List<KPIDTO> kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,unitId,accessGroupPermissionCounterDTO.getStaffId());
             kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
         }
-        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(Arrays.asList(moduleId),kpiIds,accessGroupPermissionCounterDTO.getStaffId(),accessGroupPermissionCounterDTO.getCountryId(),unitId,level);
+        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId,kpiIds,accessGroupPermissionCounterDTO.getStaffId(),accessGroupPermissionCounterDTO.getCountryId(),unitId,level);
         return tabKPIDTOS;
     }
 
