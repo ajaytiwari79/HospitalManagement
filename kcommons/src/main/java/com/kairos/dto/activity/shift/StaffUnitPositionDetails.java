@@ -53,6 +53,9 @@ public class StaffUnitPositionDetails {
 
     }
 
+    public StaffUnitPositionDetails(Long unitId) {
+        this.unitId = unitId;
+    }
 
     public Date getEndDate() {
         return endDate;
