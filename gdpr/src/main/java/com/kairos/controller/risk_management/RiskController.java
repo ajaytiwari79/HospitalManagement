@@ -22,7 +22,7 @@ public class RiskController {
 
     @ApiOperation(value = "get All risk Severity Level")
     @GetMapping("/risk/level")
-    public ResponseEntity<Object> getRisKlevels(@PathVariable Long countryId) {
+    public ResponseEntity<Object> getRiskLevels(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, RiskSeverity.values());
 
     }
