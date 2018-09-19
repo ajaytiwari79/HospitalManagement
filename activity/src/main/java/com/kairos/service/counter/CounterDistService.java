@@ -191,7 +191,20 @@ public class CounterDistService extends MongoBaseService {
             kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,unitId,accessGroupPermissionCounterDTO.getStaffId());
         }
         List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId,kpiIds,accessGroupPermissionCounterDTO.getStaffId(),4l,unitId,level);
-        return tabKPIDTOS;
+        Map<BigInteger,TabKPIDTO> filterResults=new HashMap<>();
+        tabKPIDTOS.stream().forEach(tabKPIDTO -> {
+            filterResults.put(tabKPIDTO.getKpi().getId(),tabKPIDTO);
+        });
+        tabKPIDTOS.stream().forEach(tabKPIDTO -> {
+            if(filterResults.get(tabKPIDTO.getKpi().getId()).getKpi().getId().equals(tabKPIDTO.getKpi().getId())){
+                if(filterResults.get(tabKPIDTO.getKpi().getId()).getPriority()>tabKPIDTO.getPriority()){
+                    filterResults.put(tabKPIDTO.getKpi().getId(),tabKPIDTO);
+                }
+            }else{
+                filterResults.put(tabKPIDTO.getKpi().getId(),tabKPIDTO);
+            }
+        });
+        return filterResults.entrySet().stream().map(filterResult -> filterResult.getValue()).collect(toList());
     }
 
     public List<TabKPIDTO> getInitialTabKPIDataConfForStaffPriority(String moduleId,Long unitId, ConfLevel level){
