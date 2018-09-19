@@ -18,7 +18,7 @@ import javax.validation.Valid;
 
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 /*
  *
  *  created by bobby 10/5/2018
@@ -26,8 +26,8 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
+@Api(API_ORGANIZATION_COUNTRY_URL)
 public class AgreementSectionController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgreementSectionController.class);
