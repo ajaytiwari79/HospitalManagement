@@ -12,6 +12,7 @@ public class TabKPIDTO {
     private BigInteger id;
     private String tabId;
     private KPIDTO kpi;
+    private BigInteger kpiId;
     private String data;
     private KPIPosition position;
     private CounterSize size;
@@ -100,5 +101,13 @@ public class TabKPIDTO {
 
     public void setPriority(int priority) {
         this.priority = priority;
+    }
+
+    public BigInteger getKpiId() {
+        return kpiId;
+    }
+
+    public void setKpiId(BigInteger kpiId) {
+        this.kpiId = kpiId;
     }
 }

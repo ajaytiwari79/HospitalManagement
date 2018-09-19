@@ -1,6 +1,7 @@
 package com.kairos.service.counter;
 
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
@@ -20,6 +21,8 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.KPIValidity;
+import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -38,6 +41,9 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 /*
@@ -161,9 +167,21 @@ public class CounterDistService extends MongoBaseService {
         return tabKPIMappingIds.stream().map(tabKPIDTO -> new BigInteger(tabKPIDTO.getKpi().getId().toString())).collect(Collectors.toList());
     }
 
-    public List<TabKPIDTO> updateInitialTabKPIDataConf(TabKPIDTO tabKPIDTO,Long unitId,ConfLevel level){
+    public TabKPIDTO updateInitialTabKPIDataConf(TabKPIDTO tabKPIDTO,Long unitId,ConfLevel level){
+        TabKPIConf tabKPIConf=counterRepository.findTabKPIConfigurationByTabId(tabKPIDTO.getTabId(),Arrays.asList(tabKPIDTO.getKpiId()),unitId,level);
+            if(tabKPIConf.getTabId().equals(tabKPIDTO.getTabId())&&tabKPIConf.getKpiId().equals(tabKPIDTO.getKpiId())){
+                tabKPIConf.setLocationType(tabKPIDTO.getLocationType());
+                tabKPIConf.setKpiValidity(tabKPIDTO.getKpiValidity());
+                tabKPIConf.setPriority(calculatePriority(level,tabKPIDTO.getKpiValidity(),tabKPIDTO.getLocationType()));
+            }
+        save(tabKPIConf);
+        return ObjectMapperUtils.copyPropertiesByMapper(tabKPIConf,TabKPIDTO.class);
 
-        return null;
+    }
+
+    public int calculatePriority(ConfLevel level, KPIValidity validity, LocationType type){
+        int priority=level.value+validity.value+type.value;
+        return priority;
     }
 
     public List<TabKPIDTO> getInitialTabKPIDataConfForStaff(String moduleId,Long unitId, ConfLevel level){
@@ -172,16 +190,15 @@ public class CounterDistService extends MongoBaseService {
         if(!accessGroupPermissionCounterDTO.getCountryAdmin()){
             kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,unitId,accessGroupPermissionCounterDTO.getStaffId());
         }
-        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffId(Arrays.asList(moduleId),kpiIds,accessGroupPermissionCounterDTO.getStaffId(),unitId,level);
+        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId,kpiIds,accessGroupPermissionCounterDTO.getStaffId(),4l,unitId,level);
         return tabKPIDTOS;
     }
 
     public List<TabKPIDTO> getInitialTabKPIDataConfForStaffPriority(String moduleId,Long unitId, ConfLevel level){
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
-        List<BigInteger> kpiIds=new ArrayList<>();
+        List<BigInteger> kpiIds=new ArrayList<>();;
         if(!accessGroupPermissionCounterDTO.getCountryAdmin()){
-            List<KPIDTO> kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,unitId,accessGroupPermissionCounterDTO.getStaffId());
-            kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toList());
+            kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,unitId,accessGroupPermissionCounterDTO.getStaffId());
         }
         List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId,kpiIds,accessGroupPermissionCounterDTO.getStaffId(),accessGroupPermissionCounterDTO.getCountryId(),unitId,level);
         return tabKPIDTOS;
@@ -195,7 +212,7 @@ public class CounterDistService extends MongoBaseService {
         Map<String, Map<BigInteger, BigInteger>> tabKpiMap=setTabKPIEntries(tabIds,kpiIds,entriesToSave,null,null,accessGroupPermissionCounterDTO.getStaffId(),level,accessGroupPermissionCounterDTO.getCountryAdmin());
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
             if(tabKpiMap.get(tabKPIMappingDTO.getTabId()).get(tabKPIMappingDTO.getKpiId())==null){
-                entriesToSave.add(new TabKPIConf(tabKPIMappingDTO.getTabId(),tabKPIMappingDTO.getKpiId(),null,unitId,accessGroupPermissionCounterDTO.getStaffId(),level,tabKPIMappingDTO.getPosition()));
+                entriesToSave.add(new TabKPIConf(tabKPIMappingDTO.getTabId(),tabKPIMappingDTO.getKpiId(),null,unitId,accessGroupPermissionCounterDTO.getStaffId(),level,tabKPIMappingDTO.getPosition(),KPIValidity.BASIC,LocationType.FIX,calculatePriority(ConfLevel.UNIT,KPIValidity.BASIC,LocationType.FIX)));
             }
         });
         if (entriesToSave.isEmpty()) {
@@ -210,7 +227,7 @@ public class CounterDistService extends MongoBaseService {
         Map<String, Map<BigInteger, BigInteger>> tabKpiMap=setTabKPIEntries(tabKPIEntries.getTabIds(),tabKPIEntries.getKpiIds(),entriesToSave,countryId,unitId,staffId,level,false);
         tabKPIEntries.getTabIds().forEach(tabId->{tabKPIEntries.getKpiIds().forEach(kpiId->{
             if(tabKpiMap.get(tabId).get(kpiId)==null){
-                entriesToSave.add(new TabKPIConf(tabId,kpiId,countryId,unitId,staffId,level,null));
+                entriesToSave.add(new TabKPIConf(tabId,kpiId,countryId,unitId,staffId,level,null,KPIValidity.BASIC,LocationType.FIX,calculatePriority(level,KPIValidity.BASIC,LocationType.FIX)));
             }
         });});
         if (entriesToSave.isEmpty()) {
@@ -552,7 +569,7 @@ public class CounterDistService extends MongoBaseService {
         if(!tabKPIConf.isEmpty()){
             defaultKPISettingDTO.getStaffIds().forEach(staffId -> {
                 tabKPIConf.stream().forEach(tabKPIConfKPI -> {
-                    tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, unitId, staffId, ConfLevel.STAFF,tabKPIConfKPI.getPosition()));
+                    tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(), tabKPIConfKPI.getKpiId(), null, unitId, staffId, ConfLevel.STAFF,tabKPIConfKPI.getPosition(),KPIValidity.BASIC,LocationType.FIX,calculatePriority(ConfLevel.STAFF,KPIValidity.BASIC,LocationType.FIX)));
                 });
 //                dashboardKPIConfList.stream().forEach(dashboardKPIConf  -> {
 //                    dashboardKPIConfToSave.add(new DashboardKPIConf(dashboardKPIConf.getKpiId(),dashboardsOldAndNewIds.get(dashboardKPIConf.getDashboardId()),dashboardKPIConf.getModuleId(),null,unitId,staffId,ConfLevel.STAFF,dashboardKPIConf.getPosition()));
@@ -591,7 +608,7 @@ public class CounterDistService extends MongoBaseService {
         });
         List<TabKPIConf> tabKPIConf=counterRepository.findTabKPIIdsByKpiIdAndUnitOrCountry(applicableKpiIds,refId,level);
         tabKPIConf.stream().forEach(tabKPIConfKPI->{
-            tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(),tabKPIConfKPI.getKpiId(),null,unitId,null,ConfLevel.UNIT,null));
+            tabKPIConfKPIEntries.add(new TabKPIConf(tabKPIConfKPI.getTabId(),tabKPIConfKPI.getKpiId(),null,unitId,null,ConfLevel.UNIT,null,KPIValidity.BASIC,LocationType.FIX,calculatePriority(ConfLevel.UNIT,KPIValidity.BASIC,LocationType.FIX)));
         });
           List<KPICategoryDTO> kpiCategoryDTOS = counterRepository.getKPICategory(null, level, refId);
            Map<String,BigInteger> categoriesNameMap=new HashMap<>();

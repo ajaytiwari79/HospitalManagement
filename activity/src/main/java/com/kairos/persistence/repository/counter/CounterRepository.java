@@ -221,6 +221,11 @@ public class CounterRepository {
         Criteria criteria=Criteria.where("tabId").is(tabId).orOperator(Criteria.where("unitId").is(unitId).and("level").is(ConfLevel.UNIT).
                 and("kpiValidity").in(KPIValidity.MANDATORY,KPIValidity.OPTIONAL),Criteria.where("countryId").is(countryId).and("level").is(ConfLevel.COUNTRY).and("kpiValidity").
                 in(KPIValidity.MANDATORY,KPIValidity.OPTIONAL),Criteria.where("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level));
+        if(kpiIds.isEmpty()){
+            criteria=Criteria.where("tabId").is(tabId).orOperator(Criteria.where("unitId").is(unitId).and("level").is(ConfLevel.UNIT).
+                    and("kpiValidity").in(KPIValidity.MANDATORY,KPIValidity.OPTIONAL),Criteria.where("countryId").is(countryId).and("level").is(ConfLevel.COUNTRY).and("kpiValidity").
+                    in(KPIValidity.MANDATORY,KPIValidity.OPTIONAL),Criteria.where("staffId").is(staffId).and("level").is(level));
+        }
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(criteria),
                 Aggregation.lookup("counter","kpiId","_id","kpis"),
@@ -238,9 +243,16 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
                ,Criteria.where("kpiValidity").is(KPIValidity.MANDATORY.toString()),Criteria.where("kpiValidity").is(KPIValidity.OPTIONAL.toString()));
  */
 
-    public List<TabKPIConf> findTabKPIConfigurationByTabIds( String tabId,List<BigInteger> kpiIds,Long staffId,ConfLevel level){
-        Query query=new Query(Criteria.where("tabId").is(tabId).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level));
+    public List<TabKPIConf> findTabKPIConfigurationByTabIds( String tabId,List<BigInteger> kpiIds,Long refId,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query=new Query(Criteria.where("tabId").is(tabId).and("kpiId").in(kpiIds).and(refQueryField).is(refId).and("level").is(level));
         return mongoTemplate.find(query,TabKPIConf.class);
+    }
+
+    public TabKPIConf findTabKPIConfigurationByTabId( String tabId,List<BigInteger> kpiIds,Long refId,ConfLevel level){
+        String refQueryField = getRefQueryField(level);
+        Query query=new Query(Criteria.where("tabId").is(tabId).and("kpiId").in(kpiIds).and(refQueryField).is(refId).and("level").is(level));
+        return mongoTemplate.findOne(query,TabKPIConf.class);
     }
 
     public void removeTabKPIConfiguration(TabKPIMappingDTO entry,Long refId,ConfLevel level){
