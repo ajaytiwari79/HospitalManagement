@@ -222,13 +222,13 @@ public class CounterRepository {
 
     //accessGroupKPI distribution crud
 
-    public List<AccessGroupKPIEntry> getAccessGroupKPIByUnitIdAndKpiIds(List<BigInteger> kpiIds,Long unitId){
-        Query query = new Query(Criteria.where("kpiId").in(kpiIds).and("unitId").is(unitId));
+    public List<AccessGroupKPIEntry> getAccessGroupKPIByUnitId(AccessGroupMappingDTO entry,Long unitId,ConfLevel level){
+        Query query = new Query(Criteria.where("unitId").is(unitId).and("accessGroupId").nin(entry.getAccessGroupId()).and("level").is(level));
         return mongoTemplate.find(query, AccessGroupKPIEntry.class);
     }
 
-    public AccessGroupKPIEntry getAccessGroupKPIEntry(AccessGroupMappingDTO entry,Long unitId){
-        Query query = new Query(Criteria.where("accessGroupId").is(entry.getAccessGroupId()).and("kpiId").is(entry.getKpiId()).and("unitId").is(unitId));
+    public AccessGroupKPIEntry getAccessGroupKPIEntry(AccessGroupMappingDTO entry,Long unitId,ConfLevel level){
+        Query query = new Query(Criteria.where("accessGroupId").is(entry.getAccessGroupId()).and("kpiId").is(entry.getKpiId()).and("unitId").is(unitId).and("level").is(level));
        return mongoTemplate.findOne(query, AccessGroupKPIEntry.class);
     }
 
