@@ -141,8 +141,8 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
     public List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate) {
 
-        Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
-        Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
+       // Date startDate = DateUtils.getDateFromLocalDate(startLocalDate);
+       // Date endDate = DateUtils.getDateFromLocalDate(endLocalDate);
         ProjectionOperation projectionOperation = Aggregation.project().
                 and("id").as("id").
                 andInclude("name").
@@ -151,9 +151,12 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 andInclude("phaseFlippingDate").
                 and("current_phase_data.name").as("currentPhase").
                 and("next_phase_data.name").as("nextPhase");
-
+        Criteria criteria=Criteria.where("deleted").is(false).and("active").is(true).and("unitId").is(unitId).and("startDate").gte(startLocalDate);
+        if(endLocalDate!=null){
+            criteria=criteria.and("endDate").lte(endLocalDate);
+        }
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("active").is(true).and("unitId").is(unitId).and("startDate").gte(startDate).and("endDate").lte(endDate)),
+                match(criteria),
                 lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
                 lookup("phases", "nextPhaseId", "_id", "next_phase_data"),
                 sort(Sort.Direction.ASC, "startDate"),
