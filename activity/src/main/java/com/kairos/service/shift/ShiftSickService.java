@@ -41,6 +41,8 @@ import static java.time.temporal.ChronoUnit.MINUTES;
  **/
 @Service
 public class ShiftSickService extends MongoBaseService {
+    private static final Logger logger = LoggerFactory.getLogger(ShiftSickService.class);
+
     @Inject
     private ActivityMongoRepository activityRepository;
     @Inject
@@ -57,7 +59,7 @@ public class ShiftSickService extends MongoBaseService {
     @Inject
     private SickSettingsRepository sickSettingsRepository;
     @Inject private ShiftService shiftService;
-    private static final Logger logger = LoggerFactory.getLogger(ShiftSickService.class);
+
 
 
     public Map<String, Long> createSicknessShiftsOfStaff(Long unitId, BigInteger activityId, Long staffId, Duration duration) {
@@ -133,7 +135,7 @@ public class ShiftSickService extends MongoBaseService {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
         shifts.addAll(staffOriginalShiftsOfDates);
         if (!shifts.isEmpty()) {
-            save(shifts);
+            shiftService.saveShiftWithActivity(shifts,staffAdditionalInfoDTO);
         }
     }
 
@@ -160,25 +162,26 @@ public class ShiftSickService extends MongoBaseService {
         List<Shift> shifts = new ArrayList<>();
         while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 0) {
             shiftNeedsToAddForDays--;
-            Shift currentShift = new Shift(null, null, staffId, activity.getId(), activity.getName(), staffUnitPositionDetails.getId(), unitId, planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
-            Duration calculatedDuration = calculateShiftStartAndEndTime(currentShift, activity.getTimeCalculationActivityTab(), staffUnitPositionDetails, duration);
-            currentShift.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, calculatedDuration.getFrom()));
-            currentShift.setEndDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, calculatedDuration.getTo()));
+            ShiftActivity shiftActivity = calculateShiftStartAndEndTime(shiftNeedsToAddForDays,activity.getTimeCalculationActivityTab(), staffUnitPositionDetails, duration);
+            shiftActivity.setActivityId(activity.getId());
+            shiftActivity.setActivityName(activity.getName());
+            Shift currentShift = new Shift(null, null, staffId, Arrays.asList(shiftActivity), staffUnitPositionDetails.getId(), unitId, planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
             shifts.add(currentShift);
         }
         addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts);
     }
 
-    private Duration calculateShiftStartAndEndTime(Shift shift, TimeCalculationActivityTab timeCalculationActivityTab, StaffUnitPositionDetails unitPosition, Duration duration) {
+    private ShiftActivity calculateShiftStartAndEndTime(short shiftNeedsToAddForDays,TimeCalculationActivityTab timeCalculationActivityTab, StaffUnitPositionDetails unitPosition, Duration duration) {
         int scheduledMinutes = 0;
         int weeklyMinutes;
         int shiftDurationInMinute = 0;
+        ShiftActivity shiftActivity = new ShiftActivity();
         switch (timeCalculationActivityTab.getMethodForCalculatingTime()) {
             case ENTERED_MANUALLY:
                 shiftDurationInMinute = (int) MINUTES.between(duration.getFrom(), duration.getTo());
                 scheduledMinutes = new Double(shiftDurationInMinute * timeCalculationActivityTab.getMultiplyWithValue()).intValue();
-                shift.setDurationMinutes(shiftDurationInMinute);
-                shift.setScheduledMinutes(scheduledMinutes);
+                shiftActivity.setDurationMinutes(shiftDurationInMinute);
+                shiftActivity.setScheduledMinutes(scheduledMinutes);
                 break;
             case FULL_DAY_CALCULATION:
             case FULL_WEEK:
@@ -193,10 +196,11 @@ public class ShiftSickService extends MongoBaseService {
             default:
                 exceptionService.illegalArgumentException("error.activity.timeCalculation.InvalidArgument");
         }
-        shift.setDurationMinutes(shiftDurationInMinute);
-        shift.setScheduledMinutes(scheduledMinutes);
-
-        return duration;
+        shiftActivity.setDurationMinutes(shiftDurationInMinute);
+        shiftActivity.setScheduledMinutes(scheduledMinutes);
+        shiftActivity.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, duration.getFrom()));
+        shiftActivity.setEndDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, duration.getTo()));
+        return shiftActivity;
     }
 
     public void disableSicknessShiftsOfStaff(Long staffId, Long unitId) {

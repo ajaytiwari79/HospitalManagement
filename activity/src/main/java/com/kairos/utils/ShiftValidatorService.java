@@ -187,41 +187,6 @@ public class ShiftValidatorService {
     }
 
 
-    public void validateTimingOfShifts(ShiftDTO shiftDTO, Activity activity) {
-        Date parentShiftStartDateTime = shiftDTO.getStartDate();
-        Date parentShiftEndDateTime = shiftDTO.getEndDate();
-        Map<BigInteger, CompositeActivity> compositeActivityMap = activity.getCompositeActivities().stream().collect(Collectors.toMap(CompositeActivity::getActivityId, Function.identity()));
-        logger.info(shiftDTO.getActivities().size() + "multiple activities size");
-
-       /* for (ShiftActivity shiftActivity : shiftDTO.getActivities()) {
-            CompositeActivity compositeActivity = compositeActivityMap.get(shiftActivity.getActivityId());
-            if (shiftDTO.getActivities().get(0).equals(shiftActivity)) {
-                if ((!parentShiftStartDateTime.equals(shiftActivity.getStartDate())) || (parentShiftEndDateTime.before(shiftActivity.getStartDate()))) {
-                    logger.info("start " + parentShiftStartDateTime + "-" + shiftActivity.getStartDate()
-                            + "end " + parentShiftEndDateTime + "-" + shiftActivity.getStartDate() + "shift data");
-                    exceptionService.invalidRequestException("message.shift.date.startandend.incorrect");
-                }
-
-                if (compositeActivity != null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedBefore()) {
-                    exceptionService.invalidRequestException("message.shift.notAllowedBefore", shiftActivity.getActivityName(), activity.getName());
-                }
-
-
-            } else {
-                if ((!parentShiftEndDateTime.equals(shiftActivity.getStartDate())) || (shiftDTO.getEndDate().before(shiftActivity.getStartDate()))) {
-                    logger.info("start " + (parentShiftStartDateTime) + "-" + shiftActivity.getStartDate()
-                            + "end " + (parentShiftEndDateTime) + "-" + shiftActivity.getStartDate() + "shift data");
-                    exceptionService.invalidRequestException("message.shift.date.startandend.incorrect",parentShiftStartDateTime);
-                }
-                if (compositeActivity != null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedAfter()) {
-                    exceptionService.invalidRequestException("message.shift.notAllowedAfter", shiftActivity.getActivityName(), activity.getName());
-                }
-            }
-            // making the calculating the previous  object as parent
-            parentShiftEndDateTime = shiftActivity.getStartDate();
-        }*/
-    }
-
 
     public void validateStatusOfShiftOnUpdate(Shift shift,ShiftDTO shiftDTO){
         Map<BigInteger,ShiftActivity> shiftActivityMap = shiftDTO.getActivities().stream().collect(Collectors.toMap(k->k.getActivityId(),v->v));
