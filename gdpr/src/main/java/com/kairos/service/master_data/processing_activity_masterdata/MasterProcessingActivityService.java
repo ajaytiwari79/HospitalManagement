@@ -52,7 +52,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @return master processing Activity with Sub processing activity .
      * create Master processing activity and new Sub processing activity list and set ids to master processing activities
      */
-    public MasterProcessingActivityDTO createMasterProcessingActivity(Long countryId,MasterProcessingActivityDTO masterProcessingActivityDto) {
+    public MasterProcessingActivityDTO createMasterProcessingActivity(Long countryId, MasterProcessingActivityDTO masterProcessingActivityDto) {
 
         if (masterProcessingActivityRepository.findByName(countryId, masterProcessingActivityDto.getName()) != null) {
             exceptionService.duplicateDataException("message.duplicate", "processing activity", masterProcessingActivityDto.getName().toLowerCase());
@@ -86,7 +86,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @param parentProcessingActivity required to get organization types ,sub types and Services category and Sub Service Category list for sub processing activity
      * @return return map of Sub processing activities list and ids of sub processing activity
      */
-    public Map<String, Object> createNewSubProcessingActivity(Long countryId,  List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityDTO parentProcessingActivity) {
+    public Map<String, Object> createNewSubProcessingActivity(Long countryId, List<MasterProcessingActivityDTO> subProcessingActivities, MasterProcessingActivityDTO parentProcessingActivity) {
 
         List<String> checkDuplicateInSubProcess = new ArrayList<>();
         List<MasterProcessingActivity> subProcessingActivityList = new ArrayList<>();
@@ -293,7 +293,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
     }
 
 
-    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessing(Long countryId,BigInteger id) {
+    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessing(Long countryId, BigInteger id) {
         MasterProcessingActivityResponseDTO result = masterProcessingActivityRepository.getMasterProcessingActivityWithSubProcessingActivity(countryId, id);
         if (!Optional.of(result).isPresent()) {
             throw new DataNotFoundByIdException("MasterProcessingActivity not Exist for id " + id);
@@ -339,7 +339,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             processingActivityList.addAll(subProcessingActivityList);
         }
         if (!riskListCorrespondingToProcessingActivity.isEmpty()) {
-            Map<MasterProcessingActivity, List<BigInteger>> riskIdListCorresponsingProcessingActivities = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId,false,riskListCorrespondingToProcessingActivity);
+            Map<MasterProcessingActivity, List<BigInteger>> riskIdListCorresponsingProcessingActivities = riskService.saveRiskAtCountryLevelOrOrganizationLevel(countryId, false, riskListCorrespondingToProcessingActivity);
             processingActivityList.forEach(processingActivity -> processingActivity.setRisks(riskIdListCorresponsingProcessingActivities.get(processingActivity)));
         }
         masterProcessingActivityRepository.saveAll(getNextSequence(processingActivityList));
@@ -352,7 +352,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @param processingActivityId
      * @return
      */
-    public Boolean deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(Long countryId,  BigInteger processingActivityId, BigInteger riskId) {
+    public Boolean deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(Long countryId, BigInteger processingActivityId, BigInteger riskId) {
         MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByIdAndCountryIdAndNonDeleted(countryId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
@@ -370,18 +370,16 @@ public class MasterProcessingActivityService extends MongoBaseService {
      * @param countryId
      * @return -method return list of Processing Activity and Risks linked with them
      */
-    public List<MasterProcessingActivityRiskResponseDTO> getAllMasterProcessingActivityAndLinkedRisks(Long countryId) {
-        return masterProcessingActivityRepository.getAllProcessingActivityWithLinkedRisks(countryId);
-    }
+    public List<MasterProcessingActivityRiskResponseDTO> getAllMasterProcessingActivityWithSubProcessingActivitiesAndRisks(Long countryId) {
+        List<MasterProcessingActivityRiskResponseDTO> masterProcessingActivityRiskResponseDTOS = masterProcessingActivityRepository.getAllProcessingActivityWithLinkedRisksAndSubProcessingActivitiesByCountryId(countryId);
+        masterProcessingActivityRiskResponseDTOS.forEach(masterProcessingActivity -> {
+            masterProcessingActivity.getProcessingActivities().add(0,new MasterProcessingActivityRiskResponseDTO(masterProcessingActivity.getId(), masterProcessingActivity.getName(), true,masterProcessingActivity.getRisks()));
+            masterProcessingActivity.setMainParent(true);
+            masterProcessingActivity.setRisks(new ArrayList<>());
+        });
+        return masterProcessingActivityRiskResponseDTOS;
 
 
-    /**
-     * @param countryId
-     * @param processingActivityId processing Activity id
-     * @return - method return list of Sub Processing Activity of Master Processing Activity with risks
-     */
-    public List<MasterProcessingActivityRiskResponseDTO> getAllSubProcessingActivityAndLinkedRisksByProcessingActivityId(Long countryId, BigInteger processingActivityId) {
-        return masterProcessingActivityRepository.getAllSubProcessingActivityWithLinkedRisksByProcessingActivityId(countryId,  processingActivityId);
     }
 
 

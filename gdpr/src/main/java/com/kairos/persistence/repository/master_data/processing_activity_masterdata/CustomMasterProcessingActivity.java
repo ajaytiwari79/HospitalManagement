@@ -27,9 +27,7 @@ public interface CustomMasterProcessingActivity {
 
    List<MasterProcessingActivity> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId,  OrganizationMetaDataDTO organizationMetaDataDTO);
 
-   List<MasterProcessingActivityRiskResponseDTO>  getAllProcessingActivityWithLinkedRisks(Long countryId);
-
-   List<MasterProcessingActivityRiskResponseDTO> getAllSubProcessingActivityWithLinkedRisksByProcessingActivityId(Long countryId,BigInteger processingActivityId);
+   List<MasterProcessingActivityRiskResponseDTO> getAllProcessingActivityWithLinkedRisksAndSubProcessingActivitiesByCountryId(Long countryId);
 
 
 }
