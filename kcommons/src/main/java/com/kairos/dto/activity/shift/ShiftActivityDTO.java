@@ -1,9 +1,11 @@
 package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.enums.shift.ShiftStatus;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @author pradeep
@@ -24,6 +26,9 @@ public class ShiftActivityDTO {
     private BigInteger id;
     private String timeType;
     private String backgroundColor;
+    private Set<ShiftStatus> status;
+    private String message;
+    private boolean success;
 
     //This field is only for validation
     //@JsonIgnore
@@ -37,6 +42,13 @@ public class ShiftActivityDTO {
     }
 
 
+    public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success) {
+        this.activityName = activityName;
+        this.id = id;
+        this.message = message;
+        this.success = success;
+    }
+
     public ShiftActivityDTO(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
@@ -45,6 +57,30 @@ public class ShiftActivityDTO {
     public ShiftActivityDTO() {
     }
 
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public Set<ShiftStatus> getStatus() {
+        return status;
+    }
+
+    public void setStatus(Set<ShiftStatus> status) {
+        this.status = status;
+    }
 
     public String getBackgroundColor() {
         return backgroundColor;

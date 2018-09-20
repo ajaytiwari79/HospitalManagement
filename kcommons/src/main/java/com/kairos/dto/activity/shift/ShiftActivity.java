@@ -1,7 +1,9 @@
 package com.kairos.dto.activity.shift;
 
+import com.kairos.enums.shift.ShiftStatus;
+
 import java.math.BigInteger;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @author pradeep
@@ -23,6 +25,7 @@ public class ShiftActivity {
     private String timeType;
     private String backgroundColor;
     private boolean haltBreak;
+    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
 
 
@@ -42,7 +45,13 @@ public class ShiftActivity {
     public ShiftActivity() {
     }
 
+    public Set<ShiftStatus> getStatus() {
+        return status;
+    }
 
+    public void setStatus(Set<ShiftStatus> status) {
+        this.status = status;
+    }
     public boolean isHaltBreak() {
         return haltBreak;
     }

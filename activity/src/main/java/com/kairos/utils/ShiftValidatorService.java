@@ -10,6 +10,7 @@ import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.activity.Activity;
@@ -17,6 +18,7 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.tabs.CompositeActivity;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.unit_settings.TimeAttendanceGracePeriod;
@@ -191,7 +193,7 @@ public class ShiftValidatorService {
         Map<BigInteger, CompositeActivity> compositeActivityMap = activity.getCompositeActivities().stream().collect(Collectors.toMap(CompositeActivity::getActivityId, Function.identity()));
         logger.info(shiftDTO.getActivities().size() + "multiple activities size");
 
-        for (ShiftActivity shiftActivity : shiftDTO.getActivities()) {
+       /* for (ShiftActivity shiftActivity : shiftDTO.getActivities()) {
             CompositeActivity compositeActivity = compositeActivityMap.get(shiftActivity.getActivityId());
             if (shiftDTO.getActivities().get(0).equals(shiftActivity)) {
                 if ((!parentShiftStartDateTime.equals(shiftActivity.getStartDate())) || (parentShiftEndDateTime.before(shiftActivity.getStartDate()))) {
@@ -209,7 +211,7 @@ public class ShiftValidatorService {
                 if ((!parentShiftEndDateTime.equals(shiftActivity.getStartDate())) || (shiftDTO.getEndDate().before(shiftActivity.getStartDate()))) {
                     logger.info("start " + (parentShiftStartDateTime) + "-" + shiftActivity.getStartDate()
                             + "end " + (parentShiftEndDateTime) + "-" + shiftActivity.getStartDate() + "shift data");
-                    exceptionService.invalidRequestException("message.shift.date.startandend.incorrect");
+                    exceptionService.invalidRequestException("message.shift.date.startandend.incorrect",parentShiftStartDateTime);
                 }
                 if (compositeActivity != null && !compositeActivity.getActivityId().equals(activity.getId()) && !compositeActivity.isAllowedAfter()) {
                     exceptionService.invalidRequestException("message.shift.notAllowedAfter", shiftActivity.getActivityName(), activity.getName());
@@ -217,7 +219,30 @@ public class ShiftValidatorService {
             }
             // making the calculating the previous  object as parent
             parentShiftEndDateTime = shiftActivity.getStartDate();
+        }*/
+    }
+
+
+    public void validateStatusOfShiftOnUpdate(Shift shift,ShiftDTO shiftDTO){
+        Map<BigInteger,ShiftActivity> shiftActivityMap = shiftDTO.getActivities().stream().collect(Collectors.toMap(k->k.getActivityId(),v->v));
+        for (ShiftActivity shiftActivity : shift.getActivities()) {
+            ShiftActivity updateShiftActivitiy = shiftActivityMap.get(shiftActivity.getActivityId());
+            boolean notValid = (shiftActivity.getStatus().contains(ShiftStatus.FIXED) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISHED) || shiftActivity.getStatus().contains(ShiftStatus.LOCKED)) && (updateShiftActivitiy==null || updateShiftActivitiy.getStartDate().equals(shift.getStartDate()) || updateShiftActivitiy.getEndDate().equals(shift.getEndDate()));
+            if (notValid) {
+                exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
+            }
         }
+
+    }
+
+    public void validateStatusOfShiftOnDelete(Shift shift){
+        for (ShiftActivity shiftActivity : shift.getActivities()) {
+            boolean notValid = shiftActivity.getStatus().contains(ShiftStatus.FIXED) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISHED) || shiftActivity.getStatus().contains(ShiftStatus.LOCKED);
+            if (notValid) {
+                exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
+            }
+        }
+
     }
 
     public static int getConsecutiveDaysInDate(List<LocalDate> localDates) {

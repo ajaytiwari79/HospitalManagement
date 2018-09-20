@@ -45,7 +45,6 @@ public class ShiftDTO {
     private LocalDate shiftDate;
     private Long allowedBreakDurationInMinute;
     private BigInteger templateId;
-    private Set<ShiftStatus> status = new HashSet<>();
     private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger plannedTimeId;
     private Long expertiseId;
@@ -103,13 +102,6 @@ public class ShiftDTO {
         this.expertiseId = expertiseId;
     }
 
-    public Set<ShiftStatus> getStatus() {
-        return status;
-    }
-
-    public void setStatus(Set<ShiftStatus> status) {
-        this.status = status;
-    }
 
     public List<ShiftActivity> getActivities() {
         return activities;
