@@ -3,7 +3,7 @@ package com.kairos.persistence.model.staff.personal_details;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.Gender;
-import com.kairos.util.CPRUtil;
+import com.kairos.utils.CPRUtil;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
@@ -47,6 +47,7 @@ public class StaffPersonalDetailDTO {
     private Long accessGroupId;
     private String accessGroupName;
     private String email;
+    private Staff staff;
     public StaffPersonalDetailDTO() {
         // default constructor
     }
@@ -290,5 +291,13 @@ public class StaffPersonalDetailDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Staff getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Staff staff) {
+        this.staff = staff;
     }
 }

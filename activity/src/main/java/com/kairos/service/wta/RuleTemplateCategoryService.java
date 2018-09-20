@@ -1,8 +1,10 @@
 package com.kairos.service.wta;
 
-import com.kairos.activity.tags.TagDTO;
-import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.activity.wta.rule_template_category.*;
+import com.kairos.dto.activity.tags.TagDTO;
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateAndCategoryResponseDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryRequestDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
@@ -17,11 +19,10 @@ import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.basic_details.CountryDTO;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

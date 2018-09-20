@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.attendence_setting;
 
 import com.kairos.persistence.model.attendence_setting.SickSettings;
-import com.kairos.response.dto.web.attendance.SickSettingsDTO;
-import com.kairos.util.DateUtils;
+import com.kairos.dto.activity.attendance.SickSettingsDTO;
+import com.kairos.commons.utils.DateUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -12,6 +12,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
+
+import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 
@@ -32,5 +34,11 @@ public class SickSettingsRepository {
         );
         AggregationResults<SickSettingsDTO> results = mongoTemplate.aggregate(aggregation, SickSettings.class, SickSettingsDTO.class);
         return results.getMappedResults().size() > 0 ? results.getMappedResults().get(0) : null;
+    }
+
+    public List<SickSettings> findAllSickUsersOfUnit(Long unitId) {
+        Query query = new Query(Criteria.where("unitId").is(unitId).and("endDate").is(null));
+        List<SickSettings> results = mongoTemplate.find(query, SickSettings.class);
+        return results;
     }
 }

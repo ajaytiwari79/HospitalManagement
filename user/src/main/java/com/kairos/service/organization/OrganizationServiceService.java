@@ -11,7 +11,7 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.DateUtil;
+import com.kairos.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

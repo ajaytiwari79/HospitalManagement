@@ -1,13 +1,13 @@
 package com.kairos.controller.web_socket;
 
-import com.kairos.activity.staffing_level.Duration;
-import com.kairos.activity.staffing_level.StaffingLevelActivity;
-import com.kairos.activity.staffing_level.StaffingLevelSetting;
-import com.kairos.activity.staffing_level.StaffingLevelTimeSlotDTO;
-import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.Duration;
+import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
+import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
+import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.constants.ApiConstants;
 import com.kairos.service.staffing_level.StaffingLevelService;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

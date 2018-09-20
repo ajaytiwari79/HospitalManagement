@@ -8,7 +8,7 @@ import com.kairos.wrapper.TaskWrapper;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.CustomTaskMongoRepository;
 
-import com.kairos.vrp.task.VRPTaskDTO;
+import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.slf4j.Logger;

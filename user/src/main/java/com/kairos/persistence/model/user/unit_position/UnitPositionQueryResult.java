@@ -3,8 +3,8 @@ package com.kairos.persistence.model.user.unit_position;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.cta.CTAResponseDTO;
-import com.kairos.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
@@ -205,8 +205,7 @@ public class UnitPositionQueryResult {
     }
 
     public int getTotalWeeklyMinutes() {
-        this.totalWeeklyMinutes = this.totalWeeklyMinutes % 60;
-        return totalWeeklyMinutes;
+        return this.totalWeeklyMinutes;
 
     }
 

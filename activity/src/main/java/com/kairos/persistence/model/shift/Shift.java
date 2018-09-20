@@ -4,8 +4,8 @@ package com.kairos.persistence.model.shift;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.activity.shift.ShiftQueryResult;
-import com.kairos.util.DateTimeInterval;
+import com.kairos.dto.activity.shift.ShiftQueryResult;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftStatus;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -81,7 +81,8 @@ public class Shift extends MongoBaseEntity {
         this.activityId = activityId;
 
     }
-    public Shift(Date startDate, Date endDate, Long staffId,BigInteger activityId,String name,Long unitPositionId,Long unitId) {
+    // This is used in absance shift
+    public Shift(Date startDate, Date endDate, Long staffId,BigInteger activityId,String name,Long unitPositionId,Long unitId,BigInteger phaseId,BigInteger planningPeriodId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.staffId = staffId;
@@ -90,6 +91,8 @@ public class Shift extends MongoBaseEntity {
         this.unitPositionId=unitPositionId;
         this.unitId=unitId;
         this.sickShift=true;
+        this.phaseId=phaseId;
+        this.planningPeriodId=planningPeriodId;
 
     }
     public List<BigInteger> getBrokenRuleTemplateIds() {

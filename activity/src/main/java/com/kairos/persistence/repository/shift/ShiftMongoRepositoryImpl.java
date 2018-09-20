@@ -1,10 +1,16 @@
 package com.kairos.persistence.repository.shift;
 
 
-import com.kairos.activity.shift.ShiftCountDTO;
-import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.shift.ShiftCountDTO;
+import com.kairos.dto.activity.shift.ShiftQueryResult;
+import com.kairos.dto.activity.shift.ShiftTimeDTO;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
+import com.kairos.service.counter.ShiftFilterCriteria;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import com.mongodb.client.result.UpdateResult;
@@ -14,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -21,10 +28,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -37,20 +43,19 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    @Override
-    public void updatePhasesOfActivities(Long orgId, Date startDateInISO, Date endDateInISO, String phaseName, String PhaseDescription) {
+    public List<Shift> findAllShiftByDynamicQuery(List<SickSettings> sickSettings, Map<BigInteger, Activity> activityMap) {
+        LocalDate currentLocalDate = DateUtils.getCurrentLocalDate();
+        Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false);
+        List<Criteria> dynamicCriteria = new ArrayList<Criteria>();
+        sickSettings.forEach(currentSickSettings -> {
+            dynamicCriteria.add(new Criteria().and("staffId").is(currentSickSettings.getStaffId())
+                    .and("startDate").gte(currentLocalDate)
+                    .lte(DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activityMap.get(currentSickSettings.getActivityId()).getRulesActivityTab().getRecurrenceDays() - 1)));
+        });
 
-        Query query = new Query();
-        query.addCriteria(Criteria.where("disabled").is(false).and("unitId").is(orgId).and("startDate").gte(startDateInISO).and("endDate").lte(endDateInISO));
-        Update update = new Update();
-        update.set("phase.name", phaseName);
-        update.set("phase.description", PhaseDescription);
-
-
-        UpdateResult updateResult = mongoTemplate.updateMulti(query, update, Shift.class);
-
-        logger.info(query.toString() + " " + updateResult.toString());
-
+        criteria.orOperator(dynamicCriteria.toArray(new Criteria[dynamicCriteria.size()]));
+        Query query = new Query(criteria);
+        return mongoTemplate.find(query, Shift.class);
     }
 
     public List<ShiftQueryResult> findAllShiftsBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId) {
@@ -167,4 +172,31 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     }
 
+    public List<ShiftTimeDTO> getShiftTimeDTO(List<FilterCriteria> filters){
+        ShiftFilterCriteria shiftFilterCriteria = ShiftFilterCriteria.getInstance();
+        for(FilterCriteria filter: filters){
+            switch (filter.getType()){
+                case STAFF_IDS: shiftFilterCriteria.setStaffIds(filter.getValues()); break;
+                case ACTIVITY_IDS: shiftFilterCriteria.setActivityIds(filter.getValues()); break;
+                case UNIT_IDS: shiftFilterCriteria.setUnitId(filter.getValues()); break;
+                case TIME_INTERVAL: shiftFilterCriteria.setTimeInterval(filter.getValues()); break;
+                default: break;
+            }
+        }
+        List<AggregationOperation> aggregationOperations = shiftFilterCriteria.getMatchOperations();
+        //aggregationOperations.add(Aggregation.group(""))
+        return new ArrayList<>();
+    }
+
+    @Override
+    public Shift findShiftToBeDone(List<Long> staffIds, Date startDateMillis,Date endDateMillis) {
+        Query query=new Query();
+        Criteria startDateCriteria=Criteria.where("startDate").gte(startDateMillis).lte(endDateMillis);
+        Criteria endDateCriteria=Criteria.where("endDate").gte(startDateMillis).lte(endDateMillis);
+        query.addCriteria(Criteria.where("staffId").in(staffIds).and("deleted").is(false).and("isMainShift").is(true)
+                .and("disabled").is(false).orOperator(startDateCriteria,endDateCriteria));
+        sort(Sort.Direction.ASC,"startDate");
+        query.limit(1);
+        return mongoTemplate.findOne(query,Shift.class);
+    }
 }

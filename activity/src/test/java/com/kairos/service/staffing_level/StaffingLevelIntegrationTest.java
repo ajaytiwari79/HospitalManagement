@@ -2,9 +2,10 @@ package com.kairos.service.staffing_level;
 
 import com.kairos.KairosActivityApplication;
 import com.kairos.activity.staffing_level.*;
-import com.kairos.activity.staffing_level.presence.PresenceStaffingLevelDto;
+import com.kairos.dto.activity.staffing_level.*;
+import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.service.activity.ActivityService;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

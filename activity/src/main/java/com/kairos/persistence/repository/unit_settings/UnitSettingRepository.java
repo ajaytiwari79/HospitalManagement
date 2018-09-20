@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.unit_settings;
 
 import com.kairos.persistence.model.unit_settings.UnitSetting;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.activity.unit_settings.UnitSettingDTO;
+import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +17,11 @@ public interface UnitSettingRepository extends MongoBaseRepository<UnitSetting,B
 
     @Query(value = "{'deleted' : false, 'unitId':?0}",fields = "{'openShiftPhaseSetting.minOpenShiftHours': 1}")
     UnitSettingDTO getMinOpenShiftHours(Long unitId);
+
+    @Query(value = "{'deleted' : false, 'unitId':?0}",fields = "{'flexibleTimeSettings': 1}")
+    UnitSettingDTO getFlexibleTimingByUnit(Long unitId);
+
+    UnitSetting findByUnitIdAndDeletedFalse(Long unitId);
+
+
 }

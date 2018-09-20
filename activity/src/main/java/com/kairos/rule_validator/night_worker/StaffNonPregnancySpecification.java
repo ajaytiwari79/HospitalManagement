@@ -3,7 +3,7 @@ package com.kairos.rule_validator.night_worker;
 
 import com.kairos.enums.Gender;
 import com.kairos.rule_validator.activity.AbstractActivitySpecification;
-import com.kairos.user.staff.StaffDTO;
+import com.kairos.dto.user.staff.StaffDTO;
 
 import java.util.List;
 

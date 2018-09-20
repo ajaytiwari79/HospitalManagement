@@ -1,6 +1,6 @@
 package com.kairos.wrapper;
 
-import com.kairos.activity.task.EscalateTaskWrapper;
+import com.kairos.dto.activity.task.EscalateTaskWrapper;
 
 import java.util.List;
 

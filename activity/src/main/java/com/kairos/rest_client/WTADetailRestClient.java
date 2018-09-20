@@ -1,8 +1,8 @@
 package com.kairos.rest_client;
 
-import com.kairos.activity.wta.basic_details.WTABasicDetailsDTO;
-import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
-import com.kairos.util.RestClientUrlUtil;
+import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
+import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.utils.RestClientUrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;

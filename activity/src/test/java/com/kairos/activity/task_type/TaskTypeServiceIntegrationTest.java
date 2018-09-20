@@ -1,6 +1,8 @@
 package com.kairos.activity.task_type;
 
 import com.kairos.KairosActivityApplication;
+import com.kairos.dto.activity.task_type.TaskTypeCopyDTO;
+import com.kairos.dto.activity.task_type.TaskTypeDTO;
 import com.kairos.persistence.model.task_type.TaskTypeResource;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.wrapper.task_type.TaskTypeResourceDTO;

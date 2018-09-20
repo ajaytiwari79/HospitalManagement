@@ -1,11 +1,11 @@
 package com.kairos.service.unit_settings;
 
-import com.kairos.activity.presence_type.PresenceTypeDTO;
-import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.activity.unit_settings.activity_configuration.AbsencePlannedTime;
-import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
-import com.kairos.activity.unit_settings.activity_configuration.ActivityConfigurationWrapper;
-import com.kairos.activity.unit_settings.activity_configuration.PresencePlannedTime;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.AbsencePlannedTime;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationWrapper;
+import com.kairos.dto.activity.unit_settings.activity_configuration.PresencePlannedTime;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
@@ -15,15 +15,13 @@ import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepo
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.agreement.cta.cta_response.PhaseResponseDTO;
-import com.kairos.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
@@ -45,10 +43,13 @@ public class ActivityConfigurationService extends MongoBaseService {
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
 
     public void createDefaultSettings(Long unitId, Long countryId, List<Phase> phases) {
+        if(activityConfigurationRepository.existsByUnitIdAndDeletedFalse(unitId)){
+            exceptionService.actionNotPermittedException("message.already.exists");
+        }
         // TODO REMOVE
         List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
         if (phases == null || phases.isEmpty())
-            phases = phaseMongoRepository.getPlanningPhasesByUnit(unitId);
+            phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         // TODO FIXME unable to find regex on $IN
         List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
         Optional<PresenceTypeDTO> normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny();
@@ -56,26 +57,15 @@ public class ActivityConfigurationService extends MongoBaseService {
         BigInteger normalPlannedTypeId = normalPlannedType.map(PresenceTypeDTO::getId).orElse(null);
         BigInteger extraTimePlannedTypeId = extraTimePlannedType.isPresent() ? normalPlannedType.get().getId() : normalPlannedTypeId;
         for (Phase phase : phases) {
-            switch (phase.getName()) {
-                case DRAFT_PHASE_NAME:
-                    createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    createDefaultAbsenceSettings(phase.getId(), extraTimePlannedTypeId, activityConfigurations, unitId);
-                    break;
-                case REQUEST_PHASE_NAME:
-                    createDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    break;
-                case CONSTRUCTION_PHASE_NAME:
-                    createDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    break;
-                case PUZZLE_PHASE_NAME:
-                    createDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
-                    break;
-                default:
-                    // no operation
+            if(DRAFT_PHASE_NAME.equals(phase.getName())){
+                createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
+                createDefaultAbsenceSettings(phase.getId(), extraTimePlannedTypeId, activityConfigurations, unitId);
             }
+            else {
+                createDefaultAbsenceSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
+                createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId);
+            }
+
         }
         save(activityConfigurations);
     }
@@ -127,11 +117,17 @@ public class ActivityConfigurationService extends MongoBaseService {
     }
 
     public List<ActivityConfigurationDTO> getAbsenceActivityConfiguration(Long unitId) {
-        return activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
+        List<ActivityConfigurationDTO> activityConfigurationDTOS =  activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
+        List<ActivityConfigurationDTO> modifiableList = new ArrayList<>(activityConfigurationDTOS);
+        modifiableList.sort((a1,a2)->Integer.compare(a1.getPhase().getSequence(),(a2.getPhase().getSequence())));
+        return modifiableList;
     }
 
     public List<ActivityConfigurationDTO> getPresenceActivityConfiguration(Long unitId) {
-        return activityConfigurationRepository.findPresenceConfigurationByUnitId(unitId);
+        List<ActivityConfigurationDTO> activityConfigurationDTOS = activityConfigurationRepository.findPresenceConfigurationByUnitId(unitId);
+        List<ActivityConfigurationDTO> modifiableList = new ArrayList<>(activityConfigurationDTOS);
+        modifiableList.sort((a1,a2)->Integer.compare(a1.getPhase().getSequence(),(a2.getPhase().getSequence())));
+        return modifiableList;
     }
 
     public ActivityConfigurationWrapper getDefaultData(Long unitId) {

@@ -4,7 +4,7 @@ import com.kairos.rest_client.CountryRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

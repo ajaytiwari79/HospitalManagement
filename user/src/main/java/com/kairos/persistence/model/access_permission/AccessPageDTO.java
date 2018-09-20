@@ -98,6 +98,7 @@ public class AccessPageDTO {
         this.accessibleForOrganization = accessibleForOrganization;
     }
 
+
     public List<OrganizationCategory> getAccessibleFor() {
         return accessibleFor;
     }

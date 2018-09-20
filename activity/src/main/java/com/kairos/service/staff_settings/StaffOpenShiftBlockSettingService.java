@@ -9,12 +9,11 @@ import com.kairos.persistence.repository.staff_settings.StaffOpenShiftBlockSetti
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.staff.staff.StaffPreferencesDTO;
+import com.kairos.dto.user.staff.staff.StaffPreferencesDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.DayOfWeek;
-import java.util.Optional;
 
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
 

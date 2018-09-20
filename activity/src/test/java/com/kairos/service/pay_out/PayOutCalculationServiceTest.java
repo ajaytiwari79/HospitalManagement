@@ -1,33 +1,18 @@
 package com.kairos.service.pay_out;
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.pay_out.UnitPositionWithCtaDetailsDTO;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
-import com.kairos.persistence.model.pay_out.PayOut;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.util.DateUtils;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import com.kairos.util.DateTimeInterval;
-
-import static org.mockito.Mockito.when;
+import com.kairos.commons.utils.DateTimeInterval;
 
 
 @RunWith(MockitoJUnitRunner.class)

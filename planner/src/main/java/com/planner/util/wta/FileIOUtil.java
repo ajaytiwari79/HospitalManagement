@@ -1,13 +1,8 @@
 package com.planner.util.wta;
 
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.kairos.util.ObjectMapperUtils;
 import com.kairos.planner.vrp.taskplanning.model.LocationPair;
 import com.kairos.planner.vrp.taskplanning.model.LocationPairDifference;
 import com.kairos.planner.vrp.taskplanning.solution.VrpTaskPlanningSolution;
-import com.kairos.planning.domain.*;
-import com.kairos.planning.solution.TaskPlanningSolution;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.kairos.shiftplanning.utils.JodaLocalDateConverter;
 import com.kairos.shiftplanning.utils.JodaLocalTimeConverter;
@@ -25,7 +20,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.time.LocalDate;
 
 public class FileIOUtil {
     private static Logger log= LoggerFactory.getLogger(PlannerService.class);

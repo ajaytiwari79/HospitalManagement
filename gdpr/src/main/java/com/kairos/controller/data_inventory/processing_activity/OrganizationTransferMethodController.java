@@ -1,6 +1,6 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
-import com.kairos.gdpr.metadata.TransferMethodDTO;
+import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
 import com.kairos.service.data_inventory.processing_activity.OrganizationTransferMethodService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -16,12 +16,12 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class OrganizationTransferMethodController {
 
 
@@ -32,7 +32,7 @@ public class OrganizationTransferMethodController {
 
 
     @ApiOperation("add transfer Method ")
-    @PostMapping("/transfer_method/add")
+    @PostMapping("/transfer_method")
     public ResponseEntity<Object> createTransferMethod(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TransferMethodDTO> transferMethods) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -43,20 +43,18 @@ public class OrganizationTransferMethodController {
 
 
     @ApiOperation("get transfer Method by id")
-    @GetMapping("/transfer_method/{id}")
-    public ResponseEntity<Object> getTransferMethod(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @GetMapping("/transfer_method/{transferMethodId}")
+    public ResponseEntity<Object> getTransferMethod(@PathVariable Long unitId, @PathVariable BigInteger transferMethodId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethod(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethod(unitId, transferMethodId));
 
     }
 
 
     @ApiOperation("get all transfer Method")
-    @GetMapping("/transfer_method/all")
+    @GetMapping("/transfer_method")
     public ResponseEntity<Object> getAllTransferMethod(@PathVariable Long unitId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -67,26 +65,22 @@ public class OrganizationTransferMethodController {
 
 
     @ApiOperation("delete transfer Method by id")
-    @DeleteMapping("/transfer_method/delete/{id}")
-    public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @DeleteMapping("/transfer_method/{transferMethodId}")
+    public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long unitId, @PathVariable BigInteger transferMethodId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.deleteTransferMethod(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.deleteTransferMethod(unitId, transferMethodId));
 
     }
 
     @ApiOperation("update transfer Method by id")
-    @PutMapping("/transfer_method/update/{id}")
-    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody TransferMethodDTO transferMethod) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @PutMapping("/transfer_method/{transferMethodId}")
+    public ResponseEntity<Object> updateTransferMethod(@PathVariable Long unitId, @PathVariable BigInteger transferMethodId, @Valid @RequestBody TransferMethodDTO transferMethod) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.updateTransferMethod(unitId, id, transferMethod));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.updateTransferMethod(unitId, transferMethodId, transferMethod));
 
     }
 
@@ -100,5 +94,5 @@ public class OrganizationTransferMethodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.saveAndSuggestTransferMethods(countryId, unitId, transferMethodDTOs.getRequestBody()));
 
     }
-    
+
 }

@@ -1,9 +1,9 @@
 package com.kairos.controller.unit_settings;
 
 import com.kairos.service.unit_settings.ActivityConfigurationService;
-import com.kairos.activity.unit_settings.activity_configuration.AbsencePlannedTime;
-import com.kairos.activity.unit_settings.activity_configuration.PresencePlannedTime;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.dto.activity.unit_settings.activity_configuration.AbsencePlannedTime;
+import com.kairos.dto.activity.unit_settings.activity_configuration.PresencePlannedTime;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -50,7 +50,7 @@ public class ActivityConfigurationController {
     @ApiOperation("CREATE Activity Configuration ")
     @PostMapping(value = UNIT_ACTIVITY_CONFIGURATION)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createDefaultPhaseSettings(@PathVariable Long unitId, @RequestParam("countryId") Long countryId) {
+    public ResponseEntity<Map<String, Object>> createDefaultSettings(@PathVariable Long unitId, @RequestParam("countryId") Long countryId) {
         activityConfigurationService.createDefaultSettings(unitId, countryId, null);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }

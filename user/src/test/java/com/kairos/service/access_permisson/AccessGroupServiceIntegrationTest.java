@@ -1,7 +1,7 @@
 package com.kairos.service.access_permisson;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.enums.OrganizationCategory;
@@ -12,11 +12,11 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.user.access_group.CountryAccessGroupDTO;
-import com.kairos.user.access_permission.AccessGroupPermissionDTO;
-import com.kairos.user.access_permission.AccessGroupRole;
-import com.kairos.user.access_permission.AccessPermissionDTO;
-import com.kairos.user.organization.OrganizationCategoryDTO;
+import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
+import com.kairos.dto.user.access_permission.AccessGroupPermissionDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.access_permission.AccessPermissionDTO;
+import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ import java.util.Optional;
 
 public class AccessGroupServiceIntegrationTest {
 
-    private Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
+    private Logger logger = LoggerFactory.getLogger(AccessGroupServiceIntegrationTest.class);
 
     @Value("${server.host.http.url}")
     private String url ;

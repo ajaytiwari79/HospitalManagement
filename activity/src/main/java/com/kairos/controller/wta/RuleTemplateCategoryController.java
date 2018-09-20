@@ -1,10 +1,9 @@
 package com.kairos.controller.wta;
 
-import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
-import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryRequestDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryRequestDTO;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.service.wta.RuleTemplateCategoryService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

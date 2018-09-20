@@ -1,7 +1,7 @@
 package com.kairos.scheduler.kafka.producer;
 
 
-import com.kairos.dto.KairosSchedulerExecutorDTO;
+import com.kairos.dto.scheduler.KairosSchedulerExecutorDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -17,17 +17,20 @@ public class KafkaProducer {
 
 
     @Inject
-    private KafkaTemplate<Integer,KairosSchedulerExecutorDTO> kafkaTemplate;
+    private KafkaTemplate<Integer, KairosSchedulerExecutorDTO> kafkaTemplate;
 
     private static Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
+
     public void pushToUserQueue(KairosSchedulerExecutorDTO job) {
-        logger.info("Pushing to ScheduleTOUserQueue----------->"+job.getId());
-      kafkaTemplate.send(SCHEDULER_TO_USER_QUEUE_TOPIC,job);
+        logger.info("Pushing to ScheduleTOUserQueue----------->" + job.getId());
+        kafkaTemplate.send(SCHEDULER_TO_USER_QUEUE_TOPIC, job);
     }
 
     public void pushToActivityQueue(KairosSchedulerExecutorDTO job) {
-        logger.info("Pushing to ScheduleTOUserQueue----------->"+job.getId());
-        kafkaTemplate.send(SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC,job);
+
+        logger.info("Pushing to Activity q {}  of type {}" + job.getId(), job.getJobSubType());
+        kafkaTemplate.send(SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC, job);
+
     }
    /* public KafkaMessageListenerContainer<Integer, QueueDTO> kafkaContainer() {
         ContainerProperties containerProps = new ContainerProperties("userSchedulerQueue");

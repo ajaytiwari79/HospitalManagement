@@ -1,11 +1,9 @@
 package com.kairos.service.staff_settings;
 
 import com.kairos.KairosActivityApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.service.activity.ShiftIntegrationServiceTest;
-import com.kairos.user.reason_code.ReasonCodeDTO;
-import com.kairos.user.staff.staff_settings.StaffActivitySettingDTO;
-import com.kairos.user.staff.staff_settings.StaffAndActivitySettingWrapper;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
+import com.kairos.dto.user.staff.staff_settings.StaffAndActivitySettingWrapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -29,8 +27,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.math.BigInteger;
 import java.util.Collections;
 
-import static com.kairos.util.RestClientUrlUtil.getBaseUrl;
-import static org.junit.Assert.*;
+import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -45,7 +43,7 @@ public class StaffActivitySettingServiceTest {
     static String baseUrlForUnit;
 
 
-    StaffActivitySettingDTO staffActivitySettingDTO=new StaffActivitySettingDTO(new BigInteger("2594"),2424L,25,36,40,5,true);
+    StaffActivitySettingDTO staffActivitySettingDTO=new StaffActivitySettingDTO(new BigInteger("2594"),2424L,new Short("25"),new Short("36"),40,5,true);
     StaffAndActivitySettingWrapper staffAndActivitySettingWrapper=new StaffAndActivitySettingWrapper(Collections.singleton(7788L),Collections.singletonList(staffActivitySettingDTO));
     @Before
     public void setUp() throws Exception {

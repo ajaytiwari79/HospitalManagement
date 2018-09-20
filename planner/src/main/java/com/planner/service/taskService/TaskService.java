@@ -1,6 +1,6 @@
 package com.planner.service.taskService;
 
-import com.kairos.util.ObjectUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.planner.domain.task.Task;
 import com.planner.repository.taskRepository.TaskRepository;
 import com.planner.service.locationService.LocationService;

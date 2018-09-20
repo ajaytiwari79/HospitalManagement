@@ -1,10 +1,10 @@
 package com.kairos.service.planner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.activity.task.BulkUpdateTaskDTO;
-import com.kairos.activity.task.TaskActiveUpdationDTO;
-import com.kairos.activity.task.TaskDTO;
-import com.kairos.activity.task.TaskRestrictionDto;
+import com.kairos.dto.activity.task.BulkUpdateTaskDTO;
+import com.kairos.dto.activity.task.TaskActiveUpdationDTO;
+import com.kairos.dto.activity.task.TaskDTO;
+import com.kairos.dto.activity.task.TaskRestrictionDto;
 import com.kairos.rest_client.ClientRestClient;
 import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.persistence.enums.task_type.DelayPenalty;
@@ -29,8 +29,8 @@ import com.kairos.service.restrcition_freuency.RestrictionFrequencyService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.rule_validator.TaskSpecification;
 import com.kairos.rule_validator.task.TaskStaffTypeSpecification;
-import com.kairos.util.DateUtils;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.task.TaskGanttDTO;
 import de.tourenserver.ArrayOfFixedCall;
 import de.tourenserver.CallInfoRec;
@@ -62,8 +62,8 @@ import static com.kairos.enums.task_type.TaskTypeEnum.TaskTypeStaff.EXCLUDED_EMP
 import static com.kairos.enums.task_type.TaskTypeEnum.TaskTypeStaff.PREFERRED_EMPLOYEES;
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.SICK;
 import static com.kairos.persistence.model.constants.TaskConstants.*;
-import static com.kairos.util.DateUtils.ISO_FORMAT;
-import static com.kairos.util.DateUtils.ONLY_DATE;
+import static com.kairos.commons.utils.DateUtils.ISO_FORMAT;
+import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 import static java.time.ZoneId.systemDefault;
 
 /**

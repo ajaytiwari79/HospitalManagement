@@ -7,6 +7,7 @@ import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
+import com.kairos.persistence.model.country.default_data.account_type.AccountTypeAccessGroupCountQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
@@ -22,14 +23,14 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import com.kairos.user.access_group.CountryAccessGroupDTO;
-import com.kairos.user.access_group.UserAccessRoleDTO;
-import com.kairos.user.access_permission.AccessGroupRole;
-import com.kairos.user.access_permission.AccessPermissionDTO;
-import com.kairos.user.country.agreement.cta.cta_response.AccessGroupDTO;
-import com.kairos.user.organization.OrganizationCategoryDTO;
-import com.kairos.util.DateUtil;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.access_permission.AccessPermissionDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
+import com.kairos.dto.user.organization.OrganizationCategoryDTO;
+import com.kairos.utils.DateUtil;
+import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -501,7 +502,7 @@ public class AccessGroupService {
 
     /***** Access group - COUNTRY LEVEL - STARTS HERE ******************/
 
-    public void setAccessPageRelationshipWithAccessGroupByOrgCategory(Long countryId, Long accessGroupId, OrganizationCategory organizationCategory) {
+    private void setAccessPageRelationshipWithAccessGroupByOrgCategory(Long countryId, Long accessGroupId, OrganizationCategory organizationCategory) {
         switch (organizationCategory) {
             case HUB: {
                 accessGroupRepository.setAccessPageForHubAccessGroup(countryId, accessGroupId);
@@ -588,7 +589,8 @@ public class AccessGroupService {
     public Map<String, Object> getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId) {
         List<OrganizationCategoryDTO> organizationCategoryDTOS = OrganizationCategory.getListOfOrganizationCategory();
         AccessGroupCountQueryResult accessGroupCountData = accessGroupRepository.getListOfOrgCategoryWithCountryAccessGroupCount(countryId);
-        List<AccountType> accountTypes = accountTypeGraphRepository.getAllAccountTypeByCountryId(countryId);
+        List<AccountTypeAccessGroupCountQueryResult> accountTypes
+                = accountTypeGraphRepository.getAllAccountTypeWithAccessGroupCountByCountryId(countryId);
         organizationCategoryDTOS.forEach(orgCategoryDTO -> {
             switch (OrganizationCategory.valueOf(orgCategoryDTO.getValue())) {
                 case HUB: {

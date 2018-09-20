@@ -1,8 +1,9 @@
 package com.kairos.controller.data_inventory.processing_activity;
 
 
-import com.kairos.gdpr.data_inventory.ProcessingActivityDTO;
-import com.kairos.persistance.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
+import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
+import com.kairos.dto.gdpr.data_inventory.ProcessingActivityRiskDTO;
+import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivityRelatedDataSubject;
 import com.kairos.service.data_inventory.processing_activity.ProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -14,20 +15,15 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
 
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
-import static com.kairos.constants.AppConstant.IS_SUCCESS;
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class ProcessingActivityController {
 
 
@@ -151,16 +147,10 @@ public class ProcessingActivityController {
     @ApiOperation(value = "Link Asset to processing activity")
     @PutMapping("/processing_activity/{processingActivityId}/asset")
     public ResponseEntity<Object> linkAssetToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestParam(value = "assetId") BigInteger assetId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
-        if (assetId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Asset id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.mapAssetWithProcessingActivity(unitId, processingActivityId, assetId));
     }
 
-    @ApiOperation(value = "get all Asset linked with Perocessing Activity")
+    @ApiOperation(value = "get all Asset linked with Processing Activity")
     @GetMapping("/processing_activity/{processingActivityId}/asset")
     public ResponseEntity<Object> getAllMappedAssetWithProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
         if (unitId == null) {
@@ -184,13 +174,27 @@ public class ProcessingActivityController {
     @ApiOperation(value = "Remove Data Subject from processing activity ")
     @DeleteMapping("/processing_activity/{processingActivityId}/data_subject/{dataSubjectId}")
     public ResponseEntity<Object> removeRelatedDataSubjectFromProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger dataSubjectId) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        } else if (processingActivityId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.removeLinkedDataSubjectFromProcessingActivity(unitId, processingActivityId, dataSubjectId));
+    }
+
+
+    @ApiOperation(value = "Create And Link Risk to processing activity And Sub Processing Activity")
+    @PostMapping("/processing_activity/{processingActivityId}/risk")
+    public ResponseEntity<Object> createAndLinkRiskWithProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody ValidateRequestBodyList<ProcessingActivityRiskDTO> processingActivityRiskDTOs) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.createRiskAndLinkWithProcessingActivities(unitId, processingActivityId, processingActivityRiskDTOs.getRequestBody()));
+    }
+
+    @ApiOperation(value = "Get Risk linked processing activity And Sub Processing Activity")
+    @GetMapping("/processing_activity/{processingActivityId}/risk")
+    public ResponseEntity<Object> getRiskRelatedTorProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityWithRiskAndSubProcessingActivities(unitId, processingActivityId));
+    }
+
+
+    @ApiOperation(value = "unlink  risk form Processing activity and Sub Processing Activity")
+    @DeleteMapping("/processing_activity/{processingActivityId}/risk/{riskId}")
+    public ResponseEntity<Object> unLinkRiskDromProcessingOrSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(unitId, processingActivityId, riskId));
     }
 
 

@@ -7,9 +7,10 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
-import com.kairos.activity.presence_type.PresenceTypeDTO;
-import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
@@ -41,10 +42,9 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.google_calender.GoogleCalenderService;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.user.country.agreement.cta.cta_response.*;
-import com.kairos.user.country.basic_details.CountryDTO;
-import com.kairos.user.country.time_slot.TimeSlotDTO;
-import com.kairos.util.FormatUtil;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.joda.time.DateTime;
@@ -69,36 +69,7 @@ import static com.kairos.constants.AppConstants.*;
 @Service
 @Transactional
 public class CountryService {
-    /**
-     * Application name.
-     */
-    private static final String APPLICATION_NAME =
-            "Google Calendar API Java Quickstart";
-    /**
-     * Directory to store user credentials for this application.
-     */
-    private static final java.io.File DATA_STORE_DIR = new java.io.File(
-            System.getProperty("user.home"), ".credentials/calendar-java-quickstart");
-    /**
-     * Global instance of the JSON factory.
-     */
-    private static final JsonFactory JSON_FACTORY =
-            JacksonFactory.getDefaultInstance();
-    /**
-     * Global instance of the scopes required by this quickstart.
-     * <p>
-     * If modifying these scopes, delete your previously saved credentials
-     * at ~/.credentials/calendar-java-quickstart
-     */
-    private static final List<String> SCOPES = Arrays.asList(CalendarScopes.CALENDAR_READONLY);
-    /**
-     * Global instance of the {@link FileDataStoreFactory}.
-     */
-    private static FileDataStoreFactory DATA_STORE_FACTORY;
-    /**
-     * Global instance of the HTTP transport.
-     */
-    private static HttpTransport HTTP_TRANSPORT;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject
     private CountryHolidayCalenderGraphRepository countryHolidayGraphRepository;
@@ -375,7 +346,7 @@ public class CountryService {
         levelToUpdate.setName(level.getName());
         levelToUpdate.setDescription(level.getDescription());
         // TODO FIX MAKE REPOS
-        //.save(levelToUpdate);
+        levelGraphRepository.save(levelToUpdate);
         return null;
     }
 

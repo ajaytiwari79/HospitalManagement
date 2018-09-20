@@ -1,14 +1,14 @@
 package com.kairos.service.absencePlanning;
 
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.activity.task.AbsencePlanningStatus;
-import com.kairos.activity.task.TaskDTO;
-import com.kairos.activity.task_type.TaskTypeDTO;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.activity.task.AbsencePlanningStatus;
+import com.kairos.dto.activity.task.TaskDTO;
+import com.kairos.dto.activity.task_type.TaskTypeDTO;
 import com.kairos.rest_client.AbsenceTypeRestClient;
 import com.kairos.rest_client.IntegrationRestClient;
 import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.rest_client.StaffRestClient;
-import com.kairos.user.staff.StaffDTO;
+import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;
@@ -26,7 +26,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.tpa.TaskReportService;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import com.mongodb.BasicDBObject;
 import de.tourenserver.CallInfoRec;
 import de.tourenserver.FixScheduleResponse;

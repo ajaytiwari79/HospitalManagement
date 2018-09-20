@@ -1,19 +1,17 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.DataSourceDTO;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.DataSource;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
+import com.kairos.dto.gdpr.metadata.DataSourceDTO;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.DataSource;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -141,25 +139,6 @@ public class DataSourceService extends MongoBaseService {
 
     }
 
-    /**
-     * @param countryId
-     * @param name      name of DataSource
-     * @return DataSource object fetch on basis of  name
-     * @throws DataNotExists throw exception if DataSource not exist for given name
-     */
-    public DataSource getDataSourceByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            DataSource exist = dataSourceMongoRepository.findByNameAndCountryId(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
 
     /**
      * @description method save Data Source suggested by unit

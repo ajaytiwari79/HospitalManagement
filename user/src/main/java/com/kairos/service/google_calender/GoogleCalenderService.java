@@ -14,6 +14,7 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
+import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
@@ -43,34 +44,14 @@ public class GoogleCalenderService {
 
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(GoogleCalenderService.class);
 
-    private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
-
-    /** Directory to store user credentials for this application. */
-    private static final File DATA_STORE_DIR = new File(
-            System.getProperty("user.home"), ".credentials/calendar-java-quickstart");
-
-    /** Global instance of the {@link FileDataStoreFactory}. */
-    private static FileDataStoreFactory DATA_STORE_FACTORY;
-
-    /** Global instance of the JSON factory. */
-    private static final JsonFactory JSON_FACTORY =JacksonFactory.getDefaultInstance();
 
 
-    /** Global instance of the HTTP transport. */
-    private static HttpTransport HTTP_TRANSPORT;
 
-
-    /** Global instance of the scopes required by this quickstart.
-     *
-     * If modifying these scopes, delete your previously saved credentials
-     * at ~/.credentials/calendar-java-quickstart
-     */
-    private static final List<String> SCOPES =  Arrays.asList(CalendarScopes.CALENDAR_READONLY);
 
     static {
         try {
-            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR);
+            AppConstants.HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            AppConstants.DATA_STORE_FACTORY = new FileDataStoreFactory(AppConstants.DATA_STORE_DIR);
         } catch (Throwable t) {
             t.printStackTrace();
             System.exit(1);
@@ -116,12 +97,12 @@ public class GoogleCalenderService {
 
 
         // load client secrets
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(AppConstants.JSON_FACTORY,
                 new InputStreamReader(GoogleCalenderService.class.getResourceAsStream("/client_secret.json")));
         // set up authorization code flow
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets,
-                Collections.singleton(CalendarScopes.CALENDAR)).setDataStoreFactory(DATA_STORE_FACTORY)
+                AppConstants.HTTP_TRANSPORT, AppConstants.JSON_FACTORY, clientSecrets,
+                Collections.singleton(CalendarScopes.CALENDAR)).setDataStoreFactory(AppConstants.DATA_STORE_FACTORY)
                 .build();
         // authorize
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
@@ -143,7 +124,7 @@ public class GoogleCalenderService {
 
 
             // Initialize Calendar service with valid OAuth credentials
-            service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build();
+            service = new Calendar.Builder(AppConstants.HTTP_TRANSPORT, AppConstants.JSON_FACTORY, credential).setApplicationName(AppConstants.APPLICATION_NAME).build();
             String pageToken = null;
             CountryHolidayCalender holidayCalender = null;
             List<CountryHolidayCalender> calenderList= new ArrayList<>();

@@ -8,18 +8,17 @@ import com.kairos.persistence.model.solver_config.ConstraintValue;
 import com.kairos.persistence.model.solver_config.SolverConfig;
 import com.kairos.persistence.repository.solver_config.ConstraintRepository;
 import com.kairos.persistence.repository.solver_config.SolverConfigRepository;
-import com.kairos.planner.solverconfig.ConstraintDTO;
-import com.kairos.planner.solverconfig.DefaultContraintsDTO;
-import com.kairos.planner.solverconfig.SolverConfigConstraintWrapper;
-import com.kairos.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.ConstraintDTO;
+import com.kairos.dto.planner.solverconfig.DefaultContraintsDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigConstraintWrapper;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 

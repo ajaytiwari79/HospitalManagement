@@ -2,7 +2,7 @@ package com.kairos.controller.restrcition_freuency;
 
 import com.kairos.persistence.model.restrcition_freuency.RestrictionFrequency;
 import com.kairos.service.restrcition_freuency.RestrictionFrequencyService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,7 +1,7 @@
 package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.open_shift.DurationField;
+import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.PQLSettings;
 import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;

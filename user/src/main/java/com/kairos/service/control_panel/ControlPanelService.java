@@ -1,7 +1,7 @@
 package com.kairos.service.control_panel;
-import com.kairos.client.dto.ControlPanelDTO;
 import com.kairos.config.scheduler.DynamicCronScheduler;
-import com.kairos.kafka.producer.KafkaProducer;
+import com.kairos.dto.activity.control_panel.ControlPanelDTO;
+import com.kairos.dto.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.model.user.control_panel.jobDetails.JobDetails;
@@ -11,7 +11,7 @@ import com.kairos.persistence.repository.user.control_panel.ControlPanelGraphRep
 import com.kairos.persistence.repository.user.control_panel.jobDetails.JobDetailsRepository;
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
 import com.kairos.service.integration.IntegrationService;
-import com.kairos.util.external_plateform_shift.Transstatus;
+import com.kairos.utils.external_plateform_shift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;

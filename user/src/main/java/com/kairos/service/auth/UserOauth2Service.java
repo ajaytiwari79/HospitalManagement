@@ -5,8 +5,8 @@ import com.kairos.persistence.model.auth.UserPrincipal;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.HttpRequestHolder;
-import com.kairos.util.OptionalUtility;
+import com.kairos.utils.HttpRequestHolder;
+import com.kairos.utils.OptionalUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class UserOauth2Service implements UserDetailsService {
     private ExceptionService exceptionService;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-         User user=  userGraphRepository.findByUserNameIgnoreCase(username.toLowerCase());
+         User user=  userGraphRepository.findByEmail("(?i)"+username.toLowerCase());
          user.setHubMember(accessPageService.isHubMember(user.getId()));
          Optional<User> loggedUser=Optional.ofNullable(user);
          String otpString=HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");

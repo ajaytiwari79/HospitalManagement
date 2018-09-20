@@ -1,19 +1,19 @@
 package com.kairos.service.organization;
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.activity.activity.activity_tabs.GeneralActivityTabDTO;
-import com.kairos.activity.activity.activity_tabs.PermissionsActivityTabDTO;
-import com.kairos.activity.counter.CounterDTO;
-import com.kairos.activity.enums.counter.ModuleType;
-import com.kairos.activity.open_shift.OpenShiftIntervalDTO;
-import com.kairos.activity.phase.PhaseDTO;
-import com.kairos.activity.presence_type.PresenceTypeDTO;
-import com.kairos.activity.presence_type.PresenceTypeWithTimeTypeDTO;
-import com.kairos.activity.shift.ShiftDTO;
-import com.kairos.activity.time_type.TimeTypeDTO;
-import com.kairos.activity.unit_settings.TAndAGracePeriodSettingDTO;
-import com.kairos.activity.unit_settings.UnitSettingDTO;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
+import com.kairos.dto.activity.activity.activity_tabs.GeneralActivityTabDTO;
+import com.kairos.dto.activity.activity.activity_tabs.PermissionsActivityTabDTO;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
+import com.kairos.dto.activity.counter.enums.ModuleType;
+import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
+import com.kairos.dto.activity.unit_settings.UnitSettingDTO;
 import com.kairos.constants.AppConstants;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.Activity;
@@ -41,16 +41,15 @@ import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
-import com.kairos.service.staff_settings.StaffActivitySettingService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.service.unit_settings.PhaseSettingsService;
 import com.kairos.service.unit_settings.TimeAttendanceGracePeriodService;
 import com.kairos.service.unit_settings.UnitSettingService;
 import com.kairos.service.user_service_data.UnitDataService;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.user.country.day_type.DayTypeEmploymentTypeWrapper;
-import com.kairos.user.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithSelectedDTO;
@@ -283,8 +282,8 @@ public class OrganizationActivityService extends MongoBaseService {
         List<DayType> dayTypes = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeEmploymentTypeWrapper.getDayTypes(), DayType.class);
         Activity activity = activityMongoRepository.findOne(activityId);
         RulesActivityTab rulesActivityTab = activity.getRulesActivityTab();
+        rulesActivityTab.getEligibleForSchedules().sort(Comparator.comparingInt(PhaseTemplateValue::getSequence));
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(rulesActivityTab, dayTypes, dayTypeEmploymentTypeWrapper.getEmploymentTypes());
-
         return activityTabsWrapper;
     }
 

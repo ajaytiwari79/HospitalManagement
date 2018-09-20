@@ -1,7 +1,7 @@
 package com.kairos.scheduler.controller;
 
-import com.kairos.dto.SchedulerPanelDTO;
-import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
+import com.kairos.dto.scheduler.LocalDateTimeIdDTO;
+import com.kairos.dto.scheduler.SchedulerPanelDTO;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
 import com.kairos.scheduler.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -15,6 +15,8 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
 import static com.kairos.scheduler.constants.ApiConstants.API_SCHEDULER_URL;
 
@@ -28,9 +30,9 @@ public class SchedulerPanelController {
 
     @GetMapping("/{schedulerPanelId}")
     @ApiOperation("Get Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> getSchedulerPanel(@PathVariable BigInteger controlPanelId) throws IOException {
+    public ResponseEntity<Map<String, Object>> getSchedulerPanel(@PathVariable BigInteger schedulerPanelId) throws IOException {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.findSchedulerPanelById(controlPanelId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.findSchedulerPanelById(schedulerPanelId));
 
     }
 
@@ -45,11 +47,9 @@ public class SchedulerPanelController {
 
     @PostMapping("")
     @ApiOperation("Create Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@RequestParam(value = "integrationConfigurationId", required = false)
-                                                                             BigInteger integrationConfigurationId, @PathVariable  long unitId,
-                                                                 @RequestBody SchedulerPanelDTO schedulerPanelDTO) throws IOException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTO,
-                integrationConfigurationId));
+    public ResponseEntity<Map<String, Object>> addSchedulerPanel(@PathVariable  long unitId,
+                                                                 @RequestBody List<SchedulerPanelDTO> schedulerPanelDTOs) throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(unitId, schedulerPanelDTOs));
     }
 
     @PutMapping("/{schedulerPanelId}")
@@ -58,16 +58,22 @@ public class SchedulerPanelController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanel(schedulerPanelDTO,schedulerPanelId));
     }
 
+    @PutMapping("/update_date_only")
+    @ApiOperation("Update Scheduler Panel ")
+    public ResponseEntity<Map<String, Object>> updateSchedulerPanelOneTimeTriggerDate(@RequestBody List<LocalDateTimeIdDTO> localDateTimeIdDTOs, @PathVariable Long unitId) throws IOException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelsOneTimeTriggerDate(localDateTimeIdDTOs,unitId));
+    }
+
     @GetMapping("/jobDetails/{schedulerPanelId}")
     @ApiOperation("Get job details ")
     public ResponseEntity<Map<String, Object>> getJobDetails(@PathVariable BigInteger schedulerPanelId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getJobDetails(schedulerPanelId));
     }
 
-    @DeleteMapping("/{schedulerPanelId}")
+    @DeleteMapping("")
     @ApiOperation("Delete Scheduler Panel ")
-    public ResponseEntity<Map<String, Object>> deleteJob(@PathVariable BigInteger schedulerPanelId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelId));
+    public ResponseEntity<Map<String, Object>> deleteJob(@RequestBody Set<BigInteger> schedulerPanelIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelIds));
     }
 
     /**

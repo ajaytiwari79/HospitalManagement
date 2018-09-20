@@ -1,9 +1,9 @@
 package com.kairos.controller.shift;
 
-import com.kairos.response.dto.web.shift.IndividualShiftTemplateDTO;
-import com.kairos.response.dto.web.shift.ShiftTemplateDTO;
+import com.kairos.dto.activity.shift.IndividualShiftTemplateDTO;
+import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.service.shift.ShiftTemplateService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

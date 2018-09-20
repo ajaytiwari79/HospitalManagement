@@ -2,7 +2,7 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.controller.master_data.asset_management.HostingProviderController;
-import com.kairos.gdpr.metadata.HostingProviderDTO;
+import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
 import com.kairos.service.data_inventory.asset.OrganizationHostingProviderService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
@@ -18,12 +18,12 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class OrganizationHostingProviderController {
 
 
@@ -34,70 +34,45 @@ public class OrganizationHostingProviderController {
 
 
     @ApiOperation("add HostingProvider")
-    @PostMapping("/hosting_provider/add")
+    @PostMapping("/hosting_provider")
     public ResponseEntity<Object> createHostingProvider(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(unitId, hostingProviderDTOs.getRequestBody()));
 
     }
 
 
     @ApiOperation("get HostingProvider by id")
-    @GetMapping("/hosting_provider/{id}")
-    public ResponseEntity<Object> getHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(unitId, id));
+    @GetMapping("/hosting_provider/{hostingProviderId}")
+    public ResponseEntity<Object> getHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger hostingProviderId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(unitId, hostingProviderId));
 
     }
 
 
     @ApiOperation("get all HostingProvider ")
-    @GetMapping("/hosting_provider/all")
+    @GetMapping("/hosting_provider")
     public ResponseEntity<Object> getAllHostingProvider(@PathVariable Long unitId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getAllHostingProvider(unitId));
     }
 
 
     @ApiOperation("delete HostingProvider  by id")
-    @DeleteMapping("/hosting_provider/delete/{id}")
-    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(unitId, id));
+    @DeleteMapping("/hosting_provider/{hostingProviderId}")
+    public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger hostingProviderId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(unitId, hostingProviderId));
 
     }
 
     @ApiOperation("update HostingProvider by id")
-    @PutMapping("/hosting_provider/update/{id}")
-    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(unitId, id, hostingProviderDTO));
+    @PutMapping("/hosting_provider/{hostingProviderId}")
+    public ResponseEntity<Object> updateHostingProvider(@PathVariable Long unitId, @PathVariable BigInteger hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(unitId, hostingProviderId, hostingProviderDTO));
 
     }
 
     @ApiOperation("save Hosting Provider And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/hosting_provider/suggest")
     public ResponseEntity<Object> saveHostingProviderAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.saveAndSuggestHostingProviders(countryId, unitId, hostingProviderDTOs.getRequestBody()));
 
     }

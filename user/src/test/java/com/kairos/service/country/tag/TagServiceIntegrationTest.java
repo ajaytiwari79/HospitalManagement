@@ -1,12 +1,12 @@
 package com.kairos.service.country.tag;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.country.tag.ShowCountryTagSetting;
-import com.kairos.user.country.tag.TagDTO;
+import com.kairos.dto.user.country.tag.ShowCountryTagSetting;
+import com.kairos.dto.user.country.tag.TagDTO;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

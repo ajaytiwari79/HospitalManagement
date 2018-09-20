@@ -1,15 +1,15 @@
 package com.kairos.service.wta;
 
 
-import com.kairos.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
-import com.kairos.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
-import com.kairos.activity.wta.rule_template_category.RuleTemplateWrapper;
-import com.kairos.activity.wta.AgeRange;
-import com.kairos.activity.wta.templates.PhaseTemplateValue;
-import com.kairos.enums.PartOfDay;
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateWrapper;
+import com.kairos.dto.activity.wta.AgeRange;
+import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
+import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.RuleTemplateCategoryType;
-import com.kairos.enums.WTATemplateType;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.WTABuilderService;
@@ -21,11 +21,11 @@ import com.kairos.rest_client.OrganizationRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
-import com.kairos.user.country.basic_details.CountryDTO;
-import com.kairos.user.organization.OrganizationDTO;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.user_context.CurrentUserDetails;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.user_context.CurrentUserDetails;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -91,14 +91,14 @@ public class RuleTemplateService extends MongoBaseService {
         AgeRange range = new AgeRange(0, 0, 0);
 
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-        phaseTemplateValues.add(new PhaseTemplateValue(1, "REQUEST", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(2, "PUZZLE", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(3, "DRAFT", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(4, "CONSTRUCTION", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(5, "REALTIME", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(6, "TIME & ATTENDANCE", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(7, "TENTATIVE", (short) 0, (short) 0, true, false, false));
-        phaseTemplateValues.add(new PhaseTemplateValue(8, "PAYROLL", (short) 0, (short) 0, true, false, false));
+        phaseTemplateValues.add(new PhaseTemplateValue(1, "REQUEST", (short) 0, (short) 0, true, false, false,1));
+        phaseTemplateValues.add(new PhaseTemplateValue(2, "PUZZLE", (short) 0, (short) 0, true, false, false,2));
+        phaseTemplateValues.add(new PhaseTemplateValue(4, "CONSTRUCTION", (short) 0, (short) 0, true, false, false,3));
+        phaseTemplateValues.add(new PhaseTemplateValue(3, "DRAFT", (short) 0, (short) 0, true, false, false,4));
+        phaseTemplateValues.add(new PhaseTemplateValue(7, "TENTATIVE", (short) 0, (short) 0, true, false, false,5));
+        phaseTemplateValues.add(new PhaseTemplateValue(5, "REALTIME", (short) 0, (short) 0, true, false, false,6));
+        phaseTemplateValues.add(new PhaseTemplateValue(6, "TIME & ATTENDANCE", (short) 0, (short) 0, true, false, false,7));
+        phaseTemplateValues.add(new PhaseTemplateValue(8, "PAYROLL", (short) 0, (short) 0, true, false, false,8));
 
         ShiftLengthWTATemplate shiftLengthWTATemplate = new ShiftLengthWTATemplate("Maximum night shift’s length", "Maximum night shift’s length", 400);
         shiftLengthWTATemplate.setCountryId(countryDTO.getId());

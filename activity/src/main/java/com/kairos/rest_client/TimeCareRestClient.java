@@ -1,7 +1,7 @@
 package com.kairos.rest_client;
 
-import com.kairos.user.organization.address.TimeCareOrganizationDTO;
-import com.kairos.util.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.dto.user.organization.address.TimeCareOrganizationDTO;
+import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import static com.kairos.util.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
 public class TimeCareRestClient {

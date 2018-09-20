@@ -1,7 +1,7 @@
 package com.planner.service.staffinglevel;
 
-import com.kairos.activity.staffing_level.StaffingLevelPlanningDTO;
-import com.kairos.util.DateUtils;
+import com.kairos.dto.activity.staffing_level.StaffingLevelPlanningDTO;
+import com.kairos.commons.utils.DateUtils;
 import com.planner.domain.staffinglevel.StaffingLevel;
 import com.planner.repository.staffinglevel.StaffingLevelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 public class StaffingLevelService {
-    @Autowired
+    /*@Autowired
     private StaffingLevelRepository staffingLevelRepository;
     public void createStaffingLevel(Long unitId,  StaffingLevelPlanningDTO staffingLevelPlanningDto) {
         StaffingLevel sl = new StaffingLevel(BigInteger.valueOf(unitId), staffingLevelPlanningDto.getPhaseId(),DateUtils.getLocalDateFromDate(staffingLevelPlanningDto.getCurrentDate())
@@ -37,5 +37,5 @@ public class StaffingLevelService {
             staffingLevels.add(sl);
         }
         staffingLevelRepository.saveAll(staffingLevels);
-    }
+    }*/
 }

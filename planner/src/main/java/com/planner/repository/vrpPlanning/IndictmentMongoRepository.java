@@ -1,6 +1,6 @@
 package com.planner.repository.vrpPlanning;
 
-import com.kairos.vrp.vrpPlanning.VRPIndictmentDTO;
+import com.kairos.dto.planner.vrp.vrpPlanning.VRPIndictmentDTO;
 import com.planner.domain.vrpPlanning.VRPIndictment;
 import com.planner.repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;

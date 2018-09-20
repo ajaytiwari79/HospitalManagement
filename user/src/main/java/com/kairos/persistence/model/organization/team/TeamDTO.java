@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.organization.team;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.user.organization.AddressDTO;
+import com.kairos.dto.user.organization.AddressDTO;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;

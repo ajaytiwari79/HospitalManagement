@@ -2,10 +2,10 @@ package com.kairos.response.dto.master_data;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.gdpr.OrganizationSubType;
-import com.kairos.gdpr.OrganizationType;
-import com.kairos.gdpr.ServiceCategory;
-import com.kairos.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.OrganizationSubType;
+import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.ServiceCategory;
+import com.kairos.dto.gdpr.SubServiceCategory;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -35,78 +35,42 @@ public class MasterProcessingActivityResponseDTO {
 
     private Boolean hasSubProcessingActivity;
 
-    public Boolean getHasSubProcessingActivity() {
-        return hasSubProcessingActivity;
-    }
+    public Boolean getHasSubProcessingActivity() { return hasSubProcessingActivity; }
 
-    public void setHasSubProcessingActivity(Boolean hasSubProcessingActivity) {
-        this.hasSubProcessingActivity = hasSubProcessingActivity;
-    }
+    public void setHasSubProcessingActivity(Boolean hasSubProcessingActivity) { this.hasSubProcessingActivity = hasSubProcessingActivity; }
 
-    public BigInteger getId() {
-        return id;
-    }
+    public BigInteger getId() { return id; }
 
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
+    public void setId(BigInteger id) { this.id = id; }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setName(String name) { this.name = name; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getDescription() { return description; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public void setDescription(String description) { this.description = description; }
 
 
-    public List<MasterProcessingActivityResponseDTO> getSubProcessingActivities() {
-        return subProcessingActivities;
-    }
+    public List<MasterProcessingActivityResponseDTO> getSubProcessingActivities() { return subProcessingActivities; }
 
-    public void setSubProcessingActivities(List<MasterProcessingActivityResponseDTO> subProcessingActivities) {
-        this.subProcessingActivities = subProcessingActivities;
-    }
+    public void setSubProcessingActivities(List<MasterProcessingActivityResponseDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
-    }
+    public List<OrganizationType> getOrganizationTypes() { return organizationTypes; }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes; }
 
-    public List<OrganizationSubType> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
+    public List<OrganizationSubType> getOrganizationSubTypes() { return organizationSubTypes; }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
-    public List<ServiceCategory> getOrganizationServices() {
-        return organizationServices;
-    }
+    public List<ServiceCategory> getOrganizationServices() { return organizationServices; }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
 
-    public List<SubServiceCategory> getOrganizationSubServices() {
-        return organizationSubServices;
-    }
+    public List<SubServiceCategory> getOrganizationSubServices() { return organizationSubServices; }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
-    }
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
     public MasterProcessingActivityResponseDTO() {
     }
