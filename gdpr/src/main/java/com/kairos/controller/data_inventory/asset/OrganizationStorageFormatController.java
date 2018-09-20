@@ -36,9 +36,6 @@ public class OrganizationStorageFormatController {
     @ApiOperation("add StorageFormat")
     @PostMapping("/storage_format")
     public ResponseEntity<Object> createStorageFormat(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormat) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.createStorageFormat(unitId, storageFormat.getRequestBody()));
 
     }
@@ -47,9 +44,6 @@ public class OrganizationStorageFormatController {
     @ApiOperation("get StorageFormat by id")
     @GetMapping("/storage_format/{storageFormatId}")
     public ResponseEntity<Object> getStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger storageFormatId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getStorageFormat(unitId, storageFormatId));
     }
 
@@ -57,9 +51,6 @@ public class OrganizationStorageFormatController {
     @ApiOperation("get all StorageFormat ")
     @GetMapping("/storage_format")
     public ResponseEntity<Object> getAllStorageFormat(@PathVariable Long unitId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.getAllStorageFormat(unitId));
     }
 
@@ -67,9 +58,6 @@ public class OrganizationStorageFormatController {
     @ApiOperation("delete StorageFormat  by id")
     @DeleteMapping("/storage_format/{storageFormatId}")
     public ResponseEntity<Object> deleteStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger storageFormatId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.deleteStorageFormat(unitId, storageFormatId));
 
     }
@@ -78,9 +66,6 @@ public class OrganizationStorageFormatController {
     @ApiOperation("update StorageFormat by id")
     @PutMapping("/storage_format/{storageFormatId}")
     public ResponseEntity<Object> updateStorageFormat(@PathVariable Long unitId, @PathVariable BigInteger storageFormatId, @Valid @RequestBody StorageFormatDTO storageFormat) {
-         if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.updateStorageFormat(unitId, storageFormatId, storageFormat));
 
     }
@@ -89,9 +74,6 @@ public class OrganizationStorageFormatController {
     @ApiOperation("save Storage Format And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/storage_format/suggest")
     public ResponseEntity<Object> saveStorageFormatAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<StorageFormatDTO> storageFormatDTOs) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, storageFormatService.saveAndSuggestStorageFormats(countryId, unitId, storageFormatDTOs.getRequestBody()));
 
     }

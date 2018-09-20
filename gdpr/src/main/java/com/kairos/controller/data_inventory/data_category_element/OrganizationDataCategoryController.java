@@ -32,11 +32,7 @@ public class OrganizationDataCategoryController {
     @ApiOperation(value = "create Multiple data category with  data Elements")
     @PostMapping("/data_category")
     ResponseEntity<Object> createDataCategoryAndDataElements(@PathVariable Long unitId, @RequestBody @Valid ValidateRequestBodyList<DataCategoryDTO> dataCategoryDTOs) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataCategoryService.createDataCategoryWithDataElements(unitId
+          return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataCategoryService.createDataCategoryWithDataElements(unitId
                 , dataCategoryDTOs.getRequestBody()));
     }
 
@@ -44,7 +40,6 @@ public class OrganizationDataCategoryController {
     @ApiOperation(value = "Delete Data category by id")
     @DeleteMapping("/data_category/delete/{id}")
     public ResponseEntity<Object> deleteDataCategoryById(@PathVariable Long unitId, @PathVariable BigInteger id) {
-
         Map<String, Object> result = organizationDataCategoryService.deleteDataCategoryAndDataElement(unitId, id);
         if (result.get(IS_SUCCESS).equals(true)) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
@@ -56,22 +51,12 @@ public class OrganizationDataCategoryController {
     @ApiOperation(value = "Delete Data category by id")
     @GetMapping("/data_category/all")
     public ResponseEntity<Object> getAllDataCategoryWithDataElement(@PathVariable Long unitId) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, false, organizationDataCategoryService.getAllDataCategoryWithDataElementByUnitId(unitId));
+      return ResponseHandler.generateResponse(HttpStatus.OK, false, organizationDataCategoryService.getAllDataCategoryWithDataElementByUnitId(unitId));
     }
 
     @ApiOperation(value = "Delete Data category by id")
     @GetMapping("/data_category/{dataCategoryId}")
     public ResponseEntity<Object> getDataCategoryWithDataElementById(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-
         return ResponseHandler.generateResponse(HttpStatus.OK, false, organizationDataCategoryService.getDataCategoryWithDataElementByUnitIdAndId(unitId, dataCategoryId));
     }
 

@@ -34,79 +34,40 @@ public class ClauseTagController {
 
     @ApiOperation("add clauseTag")
     @PostMapping("/clause_tag/add")
-    public ResponseEntity<Object> createClauseTag(@PathVariable Long countryId,@PathVariable Long organizationId,@RequestParam  String clauseTag) {
-        if (StringUtils.isBlank(clauseTag)) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "name can't be empty ");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.createClauseTag(countryId,organizationId,clauseTag));
+    public ResponseEntity<Object> createClauseTag(@PathVariable Long countryId,@RequestParam  String clauseTag) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.createClauseTag(countryId,clauseTag));
 
     }
 
 
     @ApiOperation("get clauseTag by id")
     @GetMapping("/clause_tag/{id}")
-    public ResponseEntity<Object> getClauseTagById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.getClauseTagById(countryId,organizationId,id));
+    public ResponseEntity<Object> getClauseTagById(@PathVariable Long countryId,@PathVariable BigInteger id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.getClauseTagById(countryId,id));
 
     }
 
 
     @ApiOperation("get all clauseTag ")
     @GetMapping("/clause_tag/all")
-    public ResponseEntity<Object> getAllClauseTag(@PathVariable Long countryId,@PathVariable Long organizationId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.getAllClauseTag(countryId,organizationId));
+    public ResponseEntity<Object> getAllClauseTag(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.getAllClauseTag(countryId));
 
     }
 
 
     @ApiOperation("delete clauseTag  by id")
     @DeleteMapping("/clause_tag/delete/{id}")
-    public ResponseEntity<Object> deleteClauseTagById(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.deleteClauseTagById(countryId,organizationId,id));
+    public ResponseEntity<Object> deleteClauseTagById(@PathVariable Long countryId,@PathVariable BigInteger id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.deleteClauseTagById(countryId,id));
 
     }
 
     @ApiOperation("update clauseTag by id")
     @PutMapping("/clause_tag/update/{id}")
-    public ResponseEntity<Object> updateClauseTag(@PathVariable Long countryId,@PathVariable Long organizationId,@PathVariable BigInteger id, @RequestParam  String clauseTag) {
+    public ResponseEntity<Object> updateClauseTag(@PathVariable Long countryId,@PathVariable BigInteger id, @RequestParam  String clauseTag) {
 
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.updateClauseTag(countryId,organizationId,id, clauseTag));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.updateClauseTag(countryId,id, clauseTag));
 
     }
 

@@ -32,18 +32,12 @@ public class DataCategoryController {
     @ApiOperation("add data category ")
     @PostMapping("/data_category/add")
     public ResponseEntity<Object> addDataCategoryAndDataElement(@PathVariable Long countryId, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.addDataCategoryAndDataElement(countryId, dataCategoryDto));
     }
 
     @ApiOperation("get data category by id with data Elements ")
     @GetMapping("/data_category/{dataCategoryId}")
     public ResponseEntity<Object> getDataCategoryWithDataElements(@PathVariable Long countryId, @PathVariable BigInteger dataCategoryId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.getDataCategoryWithDataElement(countryId, dataCategoryId));
 
     }
@@ -51,9 +45,6 @@ public class DataCategoryController {
     @ApiOperation("get all data category ")
     @GetMapping("/data_category/all")
     public ResponseEntity<Object> getAllDataCategoryWithDataElements(@PathVariable Long countryId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.getAllDataCategoryWithDataElement(countryId));
 
     }
@@ -61,39 +52,20 @@ public class DataCategoryController {
     @ApiOperation("delete data category by id ")
     @DeleteMapping("/data_category/delete/{dataCategoryId}")
     public ResponseEntity<Object> deleteDataCategory(@PathVariable Long countryId, @PathVariable BigInteger dataCategoryId) {
-        if (dataCategoryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.deleteDataCategory(countryId, dataCategoryId));
+          return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.deleteDataCategory(countryId, dataCategoryId));
 
     }
 
     @ApiOperation("update data category by id ")
     @PutMapping("/data_category/update/{id}")
     public ResponseEntity<Object> updateDataCategoryAndDataElement(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody DataCategoryDTO dataCategoryDto) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndDataElement(countryId, id, dataCategoryDto));
+       return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.updateDataCategoryAndDataElement(countryId, id, dataCategoryDto));
 
     }
 
     @ApiOperation("get data category by id with data Elements ")
     @GetMapping(UNIT_URL + "/data_category/{dataCategoryId}")
     public ResponseEntity<Object> getDataCategoryWithDataElementOfUnitById(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId) {
-        if (dataCategoryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.getDataCategoryWithDataElementOnLeftHierarchySelectionById(unitId, dataCategoryId));
 
     }
@@ -101,9 +73,7 @@ public class DataCategoryController {
     @ApiOperation("get all data category ")
     @GetMapping(UNIT_URL + "/data_category/all")
     public ResponseEntity<Object> getAllDataCategoryWithDataElementsOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
+
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataCategoryService.getAllDataCategoryWithDataElementOnLeftHierarchySelection(unitId));
 
     }

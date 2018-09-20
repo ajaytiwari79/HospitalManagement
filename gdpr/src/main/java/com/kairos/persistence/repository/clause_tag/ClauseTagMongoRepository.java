@@ -13,21 +13,21 @@ import java.util.List;
 @JaversSpringDataAuditable
 public interface ClauseTagMongoRepository extends MongoBaseRepository<ClauseTag,BigInteger> {
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    ClauseTag findByIdAndNonDeleted(Long countryId,Long organizationId,BigInteger id);
+    @Query("{countryId:?0,_id:?1,deleted:false}")
+    ClauseTag findByIdAndNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1}")
-    List<ClauseTag> findAllClauseTag(Long countryId,Long organizationId);
+    @Query("{deleted:false,countryId:?0}")
+    List<ClauseTag> findAllClauseTag(Long countryId);
 
-    @Query("{countryId:?0,organizationId:?1,_id:{$in:?2},deleted:false}")
-    List<ClauseTag> findAllClauseTagByIds(Long countryId,Long organizationId,List<BigInteger> ids);
-
-
-    @Query("{deleted:false,countryId:?0,organizationId:?1,name:{$in:?2}}")
-    List<ClauseTag> findTagByNames(Long countryId,Long organizationId,List<String> names);
+    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
+    List<ClauseTag> findAllClauseTagByIds(Long countryId,List<BigInteger> ids);
 
 
-    ClauseTag findByNameAndCountryId(Long countryId,Long organizationId,String name);
+    @Query("{deleted:false,countryId:?0,name:{$in:?1}}")
+    List<ClauseTag> findTagByNames(Long countryId,List<String> names);
+
+
+    ClauseTag findByNameAndCountryId(Long countryId,String name);
     ClauseTag findByid(BigInteger id);
 
 }
