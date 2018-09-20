@@ -188,7 +188,7 @@ public class UnitPositionService {
         }
         if (!saveAsDraft) {
             List<UnitPosition> oldUnitPositions = unitPositionGraphRepository.getStaffUnitPositionsByExpertise(organization.getId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId());
-            //validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
+            validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
         }
         UnitPosition unitPosition = new UnitPosition();
 
