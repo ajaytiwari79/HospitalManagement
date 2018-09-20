@@ -48,27 +48,20 @@ public class ClauseController {
     @ApiOperation("get clause by id")
     @GetMapping("/clause/{id}")
     public ResponseEntity<Object> getClause(@PathVariable Long countryId, @PathVariable BigInteger id) {
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseById(countryId, id));
-
-
     }
 
 
     @ApiOperation("delete clause by id")
     @DeleteMapping("/clause/delete/{id}")
     public ResponseEntity<Object> deleteClause(@PathVariable Long countryId, @PathVariable BigInteger id) {
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(countryId,id));
-
     }
 
     @ApiOperation("update clause description")
     @PutMapping("/clause/update/{clauseId}")
     public ResponseEntity<Object> updateClause(@PathVariable Long countryId,@PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDTO clauseDto)  {
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(countryId,  clauseId, clauseDto));
-
     }
 
 

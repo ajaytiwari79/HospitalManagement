@@ -43,7 +43,6 @@ public class ClauseTagController {
     @ApiOperation("get clauseTag by id")
     @GetMapping("/clause_tag/{id}")
     public ResponseEntity<Object> getClauseTagById(@PathVariable Long countryId,@PathVariable BigInteger id) {
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseTagService.getClauseTagById(countryId,id));
 
     }

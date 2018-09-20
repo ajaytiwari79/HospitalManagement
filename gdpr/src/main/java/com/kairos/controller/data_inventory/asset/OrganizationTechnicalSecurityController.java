@@ -36,9 +36,6 @@ public class OrganizationTechnicalSecurityController {
     @ApiOperation("add TechnicalSecurityMeasure")
     @PostMapping("/technical_security")
     public ResponseEntity<Object> createTechnicalSecurityMeasure(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> securityMeasures) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.createTechnicalSecurityMeasure(unitId, securityMeasures.getRequestBody()));
 
     }
@@ -47,9 +44,6 @@ public class OrganizationTechnicalSecurityController {
     @ApiOperation("get TechnicalSecurityMeasure by id")
     @GetMapping("/technical_security/{techSecurityMeasureId}")
     public ResponseEntity<Object> getTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger techSecurityMeasureId) {
-      if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getTechnicalSecurityMeasure(unitId, techSecurityMeasureId));
     }
 
@@ -57,18 +51,12 @@ public class OrganizationTechnicalSecurityController {
     @ApiOperation("get all TechnicalSecurityMeasure ")
     @GetMapping("/technical_security")
     public ResponseEntity<Object> getAllTechnicalSecurityMeasure(@PathVariable Long unitId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.getAllTechnicalSecurityMeasure(unitId));
     }
 
     @ApiOperation("delete TechnicalSecurityMeasure  by id")
     @DeleteMapping("/technical_security/{techSecurityMeasureId}")
     public ResponseEntity<Object> deleteTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger techSecurityMeasureId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.deleteTechnicalSecurityMeasure(unitId, techSecurityMeasureId));
 
     }
@@ -76,10 +64,6 @@ public class OrganizationTechnicalSecurityController {
     @ApiOperation("update TechnicalSecurityMeasure by id")
     @PutMapping("/technical_security/{techSecurityMeasureId}")
     public ResponseEntity<Object> updateTechnicalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger techSecurityMeasureId, @Valid @RequestBody TechnicalSecurityMeasureDTO securityMeasure) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.updateTechnicalSecurityMeasure(unitId, techSecurityMeasureId, securityMeasure));
 
     }
@@ -88,9 +72,6 @@ public class OrganizationTechnicalSecurityController {
     @ApiOperation("save technical security And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/technical_security/suggest")
     public ResponseEntity<Object> saveTechnicalSecurityAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<TechnicalSecurityMeasureDTO> technicalSecurityDTOs) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, technicalSecurityMeasureService.saveAndSuggestTechnicalSecurityMeasures(countryId, unitId, technicalSecurityDTOs.getRequestBody()));
 
     }

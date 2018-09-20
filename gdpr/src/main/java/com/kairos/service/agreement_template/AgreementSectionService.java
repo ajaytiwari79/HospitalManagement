@@ -56,15 +56,7 @@ public class AgreementSectionService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Policy Agreement Template ", templateId);
         }
         checkForDuplicacyInTitleOfAgreementSectionAndSubSectionAndClauseTitle(agreementSectionDTOs);
-        boolean flag = false;
-        for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOs) {
-            if (Optional.ofNullable(agreementSectionDTO.getId()).isPresent()) {
-                flag = true;
-                break;
-            }
-        }
-        List<BigInteger> agreementSectionIdList = flag ? updateSectionAndSubSectionOfAgreementTemplate(countryId, agreementSectionDTOs, policyAgreementTemplate)
-                : createSectionClauseAndSubSectionsOfAgreementTemplate(countryId, agreementSectionDTOs, policyAgreementTemplate);
+        List<BigInteger> agreementSectionIdList = createOrupdateSectionAndSubSectionOfAgreementTemplate(countryId, agreementSectionDTOs, policyAgreementTemplate);
         policyAgreementTemplate.setAgreementSections(agreementSectionIdList);
         policyAgreementTemplateRepository.save(policyAgreementTemplate);
         return policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(countryId, templateId);
@@ -109,27 +101,6 @@ public class AgreementSectionService extends MongoBaseService {
         agreementSectionMongoRepository.save(agreementSection);
         return true;
     }
-
-
-    /**
-     * @param countryId
-     * @param agreementSectionDTOs
-     *///todo refactoring code
-    private List<BigInteger> createSectionClauseAndSubSectionsOfAgreementTemplate(Long countryId, List<AgreementSectionDTO> agreementSectionDTOs, PolicyAgreementTemplate policyAgreementTemplate) {
-
-        Map<AgreementSection, List<AgreementSection>> agreementSubSectionListAndCoresspondingToAgreementSectionMap = new HashMap<>();
-        Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap = new HashMap<>();
-        buildAgreementSectionAndSubSection(countryId, agreementSectionDTOs, agreementSubSectionListAndCoresspondingToAgreementSectionMap, globalAgreementSectionAndClauseDTOListHashMap);
-        List<AgreementSection> agreementSectionList = new ArrayList<>();
-        if (!globalAgreementSectionAndClauseDTOListHashMap.isEmpty()) {
-            agreementSectionList = saveAndUpdateClauseOfAgreementSection(countryId, globalAgreementSectionAndClauseDTOListHashMap, agreementSubSectionListAndCoresspondingToAgreementSectionMap, policyAgreementTemplate);
-        } else {
-            saveAgreementSectionAndSubSectionIfClauseNotExist(agreementSectionList, agreementSubSectionListAndCoresspondingToAgreementSectionMap);
-        }
-        agreementSectionMongoRepository.saveAll(getNextSequence(agreementSectionList));
-        return agreementSectionList.stream().map(AgreementSection::getId).collect(Collectors.toList());
-    }
-
 
     /**
      * @param countryId
@@ -180,11 +151,15 @@ public class AgreementSectionService extends MongoBaseService {
     }
 
     /**
+     * @description
+     * newAgreementSectionDTOList  - for first time call of save operation Section list equals to newAgreementSectionDTOList,
+     * and if save call is second time and section contain id then sections with no id equals to newAgreementSectionDTOList.
+     * method create section ,Sub Section clause and update clauses,section ,sub section.
      * @param countryId
      * @param agreementSectionDTOS
      * @param policyAgreementTemplate
      *///todo update section and subsection functions
-    public List<BigInteger> updateSectionAndSubSectionOfAgreementTemplate(Long countryId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
+    public List<BigInteger> createOrupdateSectionAndSubSectionOfAgreementTemplate(Long countryId, List<AgreementSectionDTO> agreementSectionDTOS, PolicyAgreementTemplate policyAgreementTemplate) {
 
         Map<AgreementSection, List<ClauseBasicDTO>> globalAgreementSectionAndClauseDTOListHashMap = new HashMap<>();
         List<AgreementSectionDTO> newAgreementSectionDTOList = new ArrayList<>();

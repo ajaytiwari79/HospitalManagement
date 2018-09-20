@@ -44,9 +44,6 @@ public class TransferMethodController {
     @ApiOperation("add transfer Method ")
     @PostMapping("/transfer_method")
     public ResponseEntity<Object> createTransferMethod(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<TransferMethodDTO> transferMethods) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.createTransferMethod(countryId, transferMethods.getRequestBody()));
     }
 
@@ -54,9 +51,6 @@ public class TransferMethodController {
     @ApiOperation("get transfer Method by id")
     @GetMapping("/transfer_method/{transferMethodId}")
     public ResponseEntity<Object> getTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger transferMethodId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getTransferMethod(countryId, transferMethodId));
     }
 
@@ -64,18 +58,12 @@ public class TransferMethodController {
     @ApiOperation("get all transfer Method")
     @GetMapping("/transfer_method")
     public ResponseEntity<Object> getAllTransferMethod(@PathVariable Long countryId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.getAllTransferMethod(countryId));
     }
 
     @ApiOperation("delete transfer Method by id")
     @DeleteMapping("/transfer_method/{transferMethodId}")
     public ResponseEntity<Object> deleteTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger transferMethodId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.deleteTransferMethod(countryId, transferMethodId));
     }
 
@@ -83,9 +71,6 @@ public class TransferMethodController {
     @ApiOperation("update transfer Method by id")
     @PutMapping("/transfer_method/{transferMethodId}")
     public ResponseEntity<Object> updateTransferMethod(@PathVariable Long countryId, @PathVariable BigInteger transferMethodId, @Valid @RequestBody TransferMethodDTO transferMethod) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, transferMethodDestinationService.updateTransferMethod(countryId, transferMethodId, transferMethod));
     }
 
@@ -94,7 +79,7 @@ public class TransferMethodController {
     @PutMapping("/transfer_method")
     public ResponseEntity<Object> updateSuggestedStatusOfTransferMethods(@PathVariable Long countryId, @RequestBody Set<BigInteger> transferMethodIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(transferMethodIds)) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Transfer Method is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
