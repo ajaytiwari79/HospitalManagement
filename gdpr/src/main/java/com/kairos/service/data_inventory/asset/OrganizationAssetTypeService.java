@@ -16,6 +16,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.risk_management.RiskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
