@@ -21,9 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
@@ -119,11 +117,17 @@ public class ActivityConfigurationService extends MongoBaseService {
     }
 
     public List<ActivityConfigurationDTO> getAbsenceActivityConfiguration(Long unitId) {
-        return activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
+        List<ActivityConfigurationDTO> activityConfigurationDTOS =  activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
+        List<ActivityConfigurationDTO> modifiableList = new ArrayList<>(activityConfigurationDTOS);
+        modifiableList.sort((a1,a2)->Integer.compare(a1.getPhase().getSequence(),(a2.getPhase().getSequence())));
+        return modifiableList;
     }
 
     public List<ActivityConfigurationDTO> getPresenceActivityConfiguration(Long unitId) {
-        return activityConfigurationRepository.findPresenceConfigurationByUnitId(unitId);
+        List<ActivityConfigurationDTO> activityConfigurationDTOS = activityConfigurationRepository.findPresenceConfigurationByUnitId(unitId);
+        List<ActivityConfigurationDTO> modifiableList = new ArrayList<>(activityConfigurationDTOS);
+        modifiableList.sort((a1,a2)->Integer.compare(a1.getPhase().getSequence(),(a2.getPhase().getSequence())));
+        return modifiableList;
     }
 
     public ActivityConfigurationWrapper getDefaultData(Long unitId) {

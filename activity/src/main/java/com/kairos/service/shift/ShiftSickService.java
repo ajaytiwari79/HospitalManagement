@@ -106,7 +106,6 @@ public class ShiftSickService extends MongoBaseService {
         staffOriginalShiftsOfDates.forEach(s -> s.setDisabled(true));
         List<Shift> shifts = new ArrayList<>();
         while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 0) {
-            shiftNeedsToAddForDays--;
 
             ShiftActivity shiftActivity = new ShiftActivity(activity.getId(),activity.getName());
             shiftActivity.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, DateUtils.asLocalTime(previousDaySickShift.getStartDate())));
@@ -122,6 +121,8 @@ public class ShiftSickService extends MongoBaseService {
                 shift.setDurationMinutes(previousDaySickShift.getDurationMinutes());
                 shifts.add(shift);
             }
+            shiftNeedsToAddForDays--;
+
 
         }
         addPreviousShiftAndSaveShift(staffOriginalShiftsOfDates, shifts);
@@ -132,7 +133,7 @@ public class ShiftSickService extends MongoBaseService {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
         shifts.addAll(staffOriginalShiftsOfDates);
         if (!shifts.isEmpty()) {
-            shiftService.saveShiftWithActivity(shifts,staffAdditionalInfoDTO);
+            save(shifts);
         }
     }
 
@@ -151,7 +152,6 @@ public class ShiftSickService extends MongoBaseService {
         }
     }
 
-
     private void createSicknessShiftsOfStaff(Long staffId, Long unitId, Activity activity, StaffUnitPositionDetails staffUnitPositionDetails, List<Shift> staffOriginalShiftsOfDates, Duration duration, PlanningPeriod planningPeriod) {
         short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
         logger.info(staffOriginalShiftsOfDates.size() + "", " shifts found for days");
@@ -160,8 +160,7 @@ public class ShiftSickService extends MongoBaseService {
         List<Shift> shifts = new ArrayList<>();
         while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 0) {
             shiftNeedsToAddForDays--;
-            ShiftActivity shiftActivity=new ShiftActivity(activity.getId(),activity.getName());
-            Shift currentShift = new Shift(null, null, staffId, Arrays.asList(shiftActivity), staffUnitPositionDetails.getId(), unitId, planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
+            Shift currentShift = new Shift(null, null, staffId, activity.getId(), activity.getName(), staffUnitPositionDetails.getId(), unitId, planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
             Duration calculatedDuration = calculateShiftStartAndEndTime(currentShift, activity.getTimeCalculationActivityTab(), staffUnitPositionDetails, duration);
             currentShift.setStartDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, calculatedDuration.getFrom()));
             currentShift.setEndDate(DateUtils.getDateAfterDaysWithTime(shiftNeedsToAddForDays, calculatedDuration.getTo()));

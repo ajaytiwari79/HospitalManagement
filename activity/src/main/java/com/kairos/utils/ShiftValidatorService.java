@@ -299,7 +299,7 @@ public class ShiftValidatorService {
     public static Set<DayOfWeek> getValidDays(List<DayTypeDTO> dayTypeDTOS, List<Long> dayTypeIds) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         Map<Long, DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-        List<Day> days = dayTypeIds.stream().flatMap(dayTypeId -> dayTypeDTOMap.get(dayTypeId).getValidDays().stream()).collect(Collectors.toList());
+        List<Day> days = dayTypeIds.stream().filter(s->dayTypeDTOMap.containsKey(s)).flatMap(dayTypeId -> dayTypeDTOMap.get(dayTypeId).getValidDays().stream()).collect(Collectors.toList());
         days.forEach(day -> {
             if (!day.equals(Day.EVERYDAY)) {
                 dayOfWeeks.add(DayOfWeek.valueOf(day.name()));

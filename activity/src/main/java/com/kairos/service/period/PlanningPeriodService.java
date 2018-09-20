@@ -405,9 +405,10 @@ public class PlanningPeriodService extends MongoBaseService {
         // Check if period is in request phase (Changes for start date and end date can be done in Request Phase
         // We are checking request phase by its name, can be done by sequence, need to ask
         // We know here that sequence of request phase is 0
-        if (!phaseMongoRepository.checkPhaseBySequence(planningPeriod.getCurrentPhaseId(), AppConstants.REQUEST_PHASE_SEQUENCE)) {
-            exceptionService.actionNotPermittedException("message.period.phase.request.name", planningPeriod.getName());
-        }
+        //TODO not delete harish
+//        if (!phaseMongoRepository.checkPhaseBySequence(planningPeriod.getCurrentPhaseId(), AppConstants.REQUEST_PHASE_SEQUENCE)) {
+//            exceptionService.actionNotPermittedException("message.period.phase.request.name", planningPeriod.getName());
+//        }
         //Check if startDate and endDate is different from the original one
         if (!planningPeriodDTO.getStartDate().isEqual(planningPeriod.getStartDate()) &&
                 !planningPeriodDTO.getEndDate().isEqual(planningPeriod.getStartDate())) {

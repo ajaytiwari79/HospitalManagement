@@ -11,15 +11,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
+@Api(API_ORGANIZATION_COUNTRY_URL)
 public class FilterController {
 
 
@@ -35,18 +35,11 @@ public class FilterController {
 
     @ApiOperation("get category or values of Properties on which filter apply by module id")
     @GetMapping("/filter/category/{moduleId}")
-    public ResponseEntity<Object> getFilterData(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable String moduleId) {
-
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
+    public ResponseEntity<Object> getFilterData(@PathVariable Long countryId, @PathVariable String moduleId) {
         if (StringUtils.isBlank(moduleId)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "module id is empty or null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getFilterCategories(countryId, organizationId, moduleId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getFilterCategories(countryId, moduleId));
     }
 
 
@@ -58,18 +51,9 @@ public class FilterController {
      */
     @ApiOperation("get  filter data by filter selection value")
     @PostMapping("/filter/data/{moduleId}")
-    public ResponseEntity<Object> getMetaDataFilterResult(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable String moduleId, @Valid @RequestBody FilterSelectionDTO filterSelectionDto) {
+    public ResponseEntity<Object> getMetaDataFilterResult(@PathVariable Long countryId,  @PathVariable String moduleId, @Valid @RequestBody FilterSelectionDTO filterSelectionDto) {
 
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        if (StringUtils.isBlank(moduleId)) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, true, "module id is empty or null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getFilterDataWithFilterSelection(countryId, organizationId, moduleId, filterSelectionDto).getData());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getFilterDataWithFilterSelection(countryId, moduleId, filterSelectionDto).getData());
     }
 
 

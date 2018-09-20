@@ -1249,7 +1249,7 @@ public class StaffService {
 
     public void setAccessGroupInUserAccount(User user, Long organizationId, Long accessGroupId) {
         UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organizationId, user.getId());
-        if (accessGroupId != null) {
+
             unitPermission=unitPermission==null?new UnitPermission():unitPermission;
             AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
@@ -1257,7 +1257,7 @@ public class StaffService {
             }
             linkAccessOfModules(accessGroup, unitPermission);
             unitPermissionGraphRepository.save(unitPermission);
-        }
+
     }
 
     private void linkAccessOfModules(AccessGroup accessGroup, UnitPermission unitPermission) {
@@ -1689,7 +1689,7 @@ public class StaffService {
         staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));
         staffAdditionalInfoDTO.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
         List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
-        Map<Long, List<LocalDate>> publicHolidayMap = publicHolidaysResult.stream().collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.mapping(o -> DateUtils.getLocalDate((Long) o.get("holidayDate")), Collectors.toList())));
+        Map<Long, List<LocalDate>> publicHolidayMap = publicHolidaysResult.stream().filter(d->d.get("dayTypeId")!=null).collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.mapping(o -> DateUtils.getLocalDate((Long) o.get("holidayDate")), Collectors.toList())));
         staffAdditionalInfoDTO.setPublicHoliday(publicHolidayMap);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         staffAdditionalInfoDTO.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, DayTypeDTO.class));
@@ -1718,7 +1718,7 @@ public class StaffService {
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionOfStaff(staffId, unitId, DateUtils.getCurrentDayStartMillis());
         StaffUnitPositionDetails unitPositionDetails = null;
         if (Optional.ofNullable(unitPosition).isPresent()) {
-            unitPositionDetails = new StaffUnitPositionDetails();
+            unitPositionDetails = new StaffUnitPositionDetails(unitId);
             unitPositionService.convertUnitPositionObject(unitPosition, unitPositionDetails);
         }
         return unitPositionDetails;

@@ -21,7 +21,7 @@ import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 
 /*
  *
@@ -30,8 +30,8 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
+@Api(API_ORGANIZATION_COUNTRY_URL)
 public class DataSourceController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceController.class);
@@ -43,9 +43,6 @@ public class DataSourceController {
     @ApiOperation("add dataSource")
     @PostMapping("/data_source")
     public ResponseEntity<Object> createDataSource(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataSourceDTO> dataSource) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.createDataSource(countryId, dataSource.getRequestBody()));
 
     }
@@ -54,9 +51,6 @@ public class DataSourceController {
     @ApiOperation("get dataSource by id")
     @GetMapping("/data_source/{dataSourceId}")
     public ResponseEntity<Object> getDataSource(@PathVariable Long countryId, @PathVariable BigInteger dataSourceId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getDataSource(countryId, dataSourceId));
     }
 
@@ -64,18 +58,12 @@ public class DataSourceController {
     @ApiOperation("get all dataSource ")
     @GetMapping("/data_source")
     public ResponseEntity<Object> getAllDataSource(@PathVariable Long countryId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.getAllDataSource(countryId));
     }
 
     @ApiOperation("delete dataSource  by id")
     @DeleteMapping("/data_source/{dataSourceId}")
     public ResponseEntity<Object> deleteDataSource(@PathVariable Long countryId, @PathVariable BigInteger dataSourceId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.deleteDataSource(countryId, dataSourceId));
 
     }
@@ -83,9 +71,6 @@ public class DataSourceController {
     @ApiOperation("update dataSource by id")
     @PutMapping("/data_source/{dataSourceId}")
     public ResponseEntity<Object> updateDataSource(@PathVariable Long countryId, @PathVariable BigInteger dataSourceId, @Valid @RequestBody DataSourceDTO dataSource) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSourceService.updateDataSource(countryId, dataSourceId, dataSource));
 
     }
@@ -94,7 +79,7 @@ public class DataSourceController {
     @PutMapping("/data_source")
     public ResponseEntity<Object> updateSuggestedStatusOfDataSources(@PathVariable Long countryId, @RequestBody Set<BigInteger> dataSourceIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(dataSourceIds)) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Data Source is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }

@@ -24,7 +24,9 @@ public final class ApiConstants {
     public static final String TIMEBANK_URL = API_ORGANIZATION_UNIT_URL+"/timeBank";
     public static final String PAYOUT_URL = API_ORGANIZATION_UNIT_URL+"/payOut";
     public static final String COUNTER_DIST_URL = "/counter/dist";
-    public static final String COUNTER_UNIT_DIST_URL = API_ORGANIZATION_UNIT_URL+"/counter/dist";
+    public static final String COUNTER_COUNTRY_DIST_URL=COUNTRY_URL+COUNTER_DIST_URL;
+    public static final String COUNTER_UNIT_DIST_URL = UNIT_URL+COUNTER_DIST_URL;
+    public static final String COUNTER_STAFF_UNIT_DIST_URL = UNIT_URL+STAFF_URL+COUNTER_DIST_URL;
     public static final String COUNTER_CONF_URL = "/counter/conf";
     public static final String COUNTER_DATA_URL = API_ORGANIZATION_UNIT_URL+"/counters/data";
     public static final String ORDER_URL = API_V1 + PARENT_ORGANIZATION_URL + UNIT_URL + "/orders";
@@ -33,7 +35,11 @@ public final class ApiConstants {
     public static final String UNIT_ACTIVITY_CONFIGURATION=UNIT_URL+"/activity_configuration";
     public static final String ACTIVITY_SHIFT_STATUS_SETTINGS_URL =UNIT_URL+"/activity_shift_status_settings";
     public static final String DASHBOARD_URL="/dashboard_tab";
-
+    public static final String COUNTERS="/counters";
+    public static final String CATEGORY="/category";
+    public static final String TAB="/tab";
+    public static final String ACCESS_GROUP="/access_group";
+    public static final String ORG_TYPE="/org_type";
     //RestClientURL
     public static final String CTA_BASIC_INFO = COUNTRY_URL+"/cta_basic_info";
     public static final String GET_UNIT_POSITION = "/unit_position/{unitPositionId}";

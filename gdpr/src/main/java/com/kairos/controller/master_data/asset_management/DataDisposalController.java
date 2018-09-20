@@ -20,7 +20,7 @@ import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 
 /*
  *
@@ -29,8 +29,8 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
+@Api(API_ORGANIZATION_COUNTRY_URL)
 public class DataDisposalController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDisposalController.class);
@@ -42,9 +42,6 @@ public class DataDisposalController {
     @ApiOperation("add DataDisposal")
     @PostMapping("/data_disposal")
     public ResponseEntity<Object> createDataDisposal(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<DataDisposalDTO> dataDisposalDTOs) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.createDataDisposal(countryId, dataDisposalDTOs.getRequestBody()));
 
     }
@@ -53,10 +50,6 @@ public class DataDisposalController {
     @ApiOperation("get DataDisposal by id")
     @GetMapping("/data_disposal/{dataDisposalId}")
     public ResponseEntity<Object> getDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger dataDisposalId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getDataDisposalById(countryId, dataDisposalId));
 
     }
@@ -65,9 +58,6 @@ public class DataDisposalController {
     @ApiOperation("get all DataDisposal ")
     @GetMapping("/data_disposal")
     public ResponseEntity<Object> getAllDataDisposal(@PathVariable Long countryId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.getAllDataDisposal(countryId));
 
     }
@@ -76,10 +66,6 @@ public class DataDisposalController {
     @ApiOperation("delete data disposal by id")
     @DeleteMapping("/data_disposal/{dataDisposalId}")
     public ResponseEntity<Object> deleteDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger dataDisposalId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.deleteDataDisposalById(countryId, dataDisposalId));
 
     }
@@ -87,9 +73,6 @@ public class DataDisposalController {
     @ApiOperation("update DataDisposal by id")
     @PutMapping("/data_disposal/{dataDisposalId}")
     public ResponseEntity<Object> updateDataDisposal(@PathVariable Long countryId, @PathVariable BigInteger dataDisposalId, @Valid @RequestBody DataDisposalDTO dataDisposalDTO) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dataDisposalService.updateDataDisposal(countryId, dataDisposalId, dataDisposalDTO));
     }
 
@@ -97,7 +80,7 @@ public class DataDisposalController {
     @PutMapping("/data_disposal")
     public ResponseEntity<Object> updateSuggestedStatusOfDataDisposals(@PathVariable Long countryId, @RequestBody Set<BigInteger> dataDisposalIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(dataDisposalIds)) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Data Disposal is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }

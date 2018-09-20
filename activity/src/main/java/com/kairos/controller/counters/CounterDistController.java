@@ -3,6 +3,7 @@ package com.kairos.controller.counters;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIMappingDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIsDTO;
@@ -17,11 +18,13 @@ import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.ws.rs.QueryParam;
 import java.util.List;
 import java.util.Map;
 
@@ -54,103 +57,103 @@ public class CounterDistController {
     public ResponseEntity<Map<String,Object>> getKPIEnabledTabsForModuleOfUnit(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,counterManagementService.getKPIAccessPageListForUnit(unitId,ConfLevel.UNIT));
     }
-    @GetMapping(COUNTRY_URL+COUNTER_DIST_URL+"/counters")
+    @GetMapping(COUNTER_COUNTRY_DIST_URL+COUNTERS)
     public ResponseEntity<Map<String, Object>> getAvailableKPIsListForCountry(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList(countryId, ConfLevel.COUNTRY));
     }
 
-    @GetMapping(UNIT_URL+COUNTER_DIST_URL+"/counters")
+    @GetMapping(COUNTER_UNIT_DIST_URL+COUNTERS)
     public ResponseEntity<Map<String, Object>> getAvailableKPIsListForUnit(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList(unitId,ConfLevel.UNIT));
     }
 
-    @GetMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/counters")
+    @GetMapping(COUNTER_STAFF_UNIT_DIST_URL+COUNTERS)
     public ResponseEntity<Map<String, Object>> getAvailableKPIsListForStaff(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getKPIsList(unitId, ConfLevel.STAFF));
     }
 
     //category KPI
-    @GetMapping(COUNTRY_URL+COUNTER_DIST_URL+"/category")
+    @GetMapping(COUNTER_COUNTRY_DIST_URL+CATEGORY)
     public ResponseEntity<Map<String, Object>> getInitialCategoryKPIDistributionDataForCountry(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistData(countryId, ConfLevel.COUNTRY));
     }
 
-    @PostMapping(COUNTRY_URL+COUNTER_DIST_URL+"/category")
+    @PostMapping(COUNTER_COUNTRY_DIST_URL+CATEGORY)
     public ResponseEntity<Map<String, Object>> saveCategoryKPIDistributionForCountry(@RequestBody CategoryKPIsDTO categorieKPIsDetails, @PathVariable Long countryId){
         counterManagementService.addCategoryKPIsDistribution(categorieKPIsDetails, ConfLevel.COUNTRY, countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @GetMapping(UNIT_URL+COUNTER_DIST_URL+"/category")
+    @GetMapping(COUNTER_UNIT_DIST_URL+CATEGORY)
     public ResponseEntity<Map<String, Object>> getInitialCategoryKPIDistributionDataForUnit(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistData(unitId, ConfLevel.UNIT));
     }
 
-    @PostMapping(UNIT_URL+COUNTER_DIST_URL+"/category")
+    @PostMapping(COUNTER_UNIT_DIST_URL+CATEGORY)
     public ResponseEntity<Map<String, Object>> saveCategoryKPIDistributionUnit(@RequestBody CategoryKPIsDTO categorieKPIsDetails, @PathVariable Long unitId){
         counterManagementService.addCategoryKPIsDistribution(categorieKPIsDetails, ConfLevel.UNIT, unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @GetMapping(UNIT_URL+COUNTER_DIST_URL+"/staff/category")
+    @GetMapping(COUNTER_UNIT_DIST_URL+"/staff/category")
     public ResponseEntity<Map<String, Object>> getInitialCategoryKPIDistributionDataForStaff(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialCategoryKPIDistDataForStaff(unitId));
     }
 
     //Tab kpi Apis
 
-    @GetMapping(COUNTRY_URL+COUNTER_DIST_URL+"/tab/{tabId}")
+    @GetMapping(COUNTER_COUNTRY_DIST_URL+TAB+"/{tabId}")
     public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForCountry(@PathVariable Long countryId, @PathVariable String tabId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(tabId, countryId, ConfLevel.COUNTRY));
     }
 
-    @GetMapping(UNIT_URL+COUNTER_DIST_URL+"/tab/{tabId}")
+    @GetMapping(COUNTER_UNIT_DIST_URL+TAB+"/{tabId}")
     public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForUnit(@PathVariable Long unitId, @PathVariable String tabId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConf(tabId, unitId, ConfLevel.UNIT));
     }
 
-    @GetMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/{tabId}")
+    @GetMapping(COUNTER_STAFF_UNIT_DIST_URL+TAB+"/{tabId}")
     public ResponseEntity<Map<String, Object>> getInitialTabKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String tabId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialTabKPIDataConfForStaff(tabId,unitId, ConfLevel.STAFF));
     }
 
-    @PostMapping(COUNTRY_URL+COUNTER_DIST_URL+"/tab/create_dist_entry")
+    @PostMapping(COUNTER_COUNTRY_DIST_URL+TAB+"/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addTabKPIsEntryForCounty(@RequestBody TabKPIEntryConfDTO tabKPIEntry,@PathVariable Long countryId){
         counterManagementService.addTabKPIEntries(tabKPIEntry,countryId,null,null,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PostMapping(UNIT_URL+COUNTER_DIST_URL+"/tab/create_dist_entry")
+    @PostMapping(COUNTER_UNIT_DIST_URL+TAB+"/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addTabKPIsEntryForUnit(@RequestBody TabKPIEntryConfDTO tabKPIEntry,@PathVariable Long unitId){
         counterManagementService.addTabKPIEntries(tabKPIEntry,null,unitId,null,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
     //staff will send list of KPITabMappings
-    @PostMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/create_dist_entry")
+    @PostMapping(COUNTER_STAFF_UNIT_DIST_URL+TAB+"/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addTabKPIsEntryForStaff(@PathVariable Long unitId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,counterManagementService.addTabKPIEntriesOfStaff(tabKPIMappingDTOS,unitId,ConfLevel.STAFF));
     }
 
-    @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/{tabId}/update_dist_entry")
+    @PutMapping(COUNTER_STAFF_UNIT_DIST_URL+TAB+"/{tabId}/update_dist_entry")
     public ResponseEntity<Map<String, Object>> updateTabKPIsEntryForStaff(@PathVariable String tabId,@PathVariable Long unitId,@RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS){
         counterManagementService.updateTabKPIEntries(tabKPIMappingDTOS,tabId,unitId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
-    @PutMapping(COUNTRY_URL+COUNTER_DIST_URL+"/tab/remove_dist_entry")
+    @PutMapping(COUNTER_COUNTRY_DIST_URL+TAB+"/remove_dist_entry")
     public ResponseEntity<Map<String, Object>> removeTabKPIEntryForCountry(@PathVariable Long countryId, @RequestBody TabKPIMappingDTO tabKPIMappingDTO){
         counterManagementService.removeTabKPIEntries(tabKPIMappingDTO,countryId,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-   @PutMapping(UNIT_URL+COUNTER_DIST_URL+"/tab/remove_dist_entry")
+   @PutMapping(COUNTER_UNIT_DIST_URL+TAB+"/remove_dist_entry")
     public ResponseEntity<Map<String, Object>> removeTabKPIEntryForUnit(@PathVariable Long unitId, @RequestBody TabKPIMappingDTO tabKPIMappingDTO){
         counterManagementService.removeTabKPIEntries(tabKPIMappingDTO,unitId,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/tab/remove_dist_entry")
+    @PutMapping(COUNTER_STAFF_UNIT_DIST_URL+TAB+"/remove_dist_entry")
     public ResponseEntity<Map<String, Object>> removeTabKPIEntryForStaff(@PathVariable Long unitId,@RequestBody TabKPIMappingDTO tabKPIMappingDTO){
         counterManagementService.removeTabKPIEntries(tabKPIMappingDTO,unitId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
@@ -158,54 +161,59 @@ public class CounterDistController {
 
     // accessGroup Apis
 
-    @PostMapping(COUNTRY_URL+COUNTER_DIST_URL+"/access_group/create_dist_entry")
+    @PostMapping(COUNTER_COUNTRY_DIST_URL+ACCESS_GROUP+"/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addAccessGroupKPIEntryForCountry(@PathVariable Long countryId ,@RequestBody AccessGroupKPIConfDTO accessGroupKPIConf){
         counterManagementService.addAccessGroupKPIEntries(accessGroupKPIConf,countryId,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PostMapping(UNIT_URL+COUNTER_DIST_URL+"/access_group/create_dist_entry")
+    @PostMapping(COUNTER_UNIT_DIST_URL+ACCESS_GROUP+"/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addAccessGroupKPIEntryForUnit(@PathVariable Long unitId,@RequestBody AccessGroupKPIConfDTO accessGroupKPIConf){
         counterManagementService.addAccessGroupKPIEntries(accessGroupKPIConf,unitId,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(COUNTRY_URL+COUNTER_DIST_URL+"/access_group/remove_dist_entry")
+    @PutMapping(COUNTER_COUNTRY_DIST_URL+ACCESS_GROUP+"/remove_dist_entry")
     public ResponseEntity<Map<String, Object>> removeAccessGroupKPIEntryByCounty(@PathVariable Long countryId,@RequestBody AccessGroupMappingDTO accessGroupMappingDTO){
         counterManagementService.removeAccessGroupKPIEntries(accessGroupMappingDTO,countryId,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(UNIT_URL+COUNTER_DIST_URL+"/access_group/remove_dist_entry")
+    @PutMapping(COUNTER_UNIT_DIST_URL+ACCESS_GROUP+"/remove_dist_entry")
     public ResponseEntity<Map<String, Object>> removeAccessGroupKPIEntryByUnit(@PathVariable Long unitId,@RequestBody AccessGroupMappingDTO accessGroupMappingDTO){
         counterManagementService.removeAccessGroupKPIEntries(accessGroupMappingDTO,unitId,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @GetMapping(COUNTRY_URL+COUNTER_DIST_URL+"/access_group/{accessGroupId}")
+    @GetMapping(COUNTER_COUNTRY_DIST_URL+ACCESS_GROUP+"/{accessGroupId}")
     public ResponseEntity<Map<String, Object>> getInitialDataForAccessGroupKPIConfOfCountry(@PathVariable Long countryId,@PathVariable Long accessGroupId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,  counterManagementService.getInitialAccessGroupKPIDataConf(accessGroupId,countryId,ConfLevel.COUNTRY));
     }
 
-    @GetMapping(UNIT_URL+COUNTER_DIST_URL+"/access_group/{accessGroupId}")
+    @GetMapping(COUNTER_UNIT_DIST_URL+ACCESS_GROUP+"/{accessGroupId}")
     public ResponseEntity<Map<String, Object>> getInitialDataForAccessgroupKPIConfOfUnit(@PathVariable Long unitId,@PathVariable Long accessGroupId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialAccessGroupKPIDataConf(accessGroupId,unitId,ConfLevel.UNIT));
     }
 
+    @PostMapping(UNIT_URL+COUNTER_DIST_URL+"/staff/access_group/{accessGroupId}/update_kpi")
+    public ResponseEntity<Map<String,Object>> updateStaffAccessGroupKPISetting(@PathVariable Long unitId,@PathVariable Long accessGroupId,@RequestBody AccessGroupPermissionCounterDTO accessGroups,@QueryParam("created") Boolean created){
+        counterManagementService.addAndRemoveStaffAccessGroupKPISetting(unitId,accessGroupId,accessGroups,created);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
     // orgType Apis
 
-    @GetMapping(COUNTRY_URL+COUNTER_DIST_URL+"/org_type/{orgTypeId}")
+    @GetMapping(COUNTER_COUNTRY_DIST_URL+ORG_TYPE+"/{orgTypeId}")
     public ResponseEntity<Map<String, Object>> getInitialDataForOrgTypeKPIConf(@PathVariable Long countryId,@PathVariable Long orgTypeId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialOrgTypeKPIDataConf(orgTypeId,countryId));
     }
 
-    @PostMapping(COUNTRY_URL+COUNTER_DIST_URL+"/org_type/create_dist_entry")
+    @PostMapping(COUNTER_COUNTRY_DIST_URL+ORG_TYPE+"/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addOrgTypeKPIEntry(@PathVariable Long countryId,@RequestBody OrgTypeKPIConfDTO orgTypeKPIConf){
         counterManagementService.addOrgTypeKPIEntries(orgTypeKPIConf,countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
-    @PutMapping(COUNTRY_URL+COUNTER_DIST_URL+"/org_type/remove_dist_entry")
+    @PutMapping(COUNTER_COUNTRY_DIST_URL+ORG_TYPE+"/remove_dist_entry")
     public ResponseEntity<Map<String, Object>> removeOrgTypeKPIEntry(@PathVariable Long countryId, @RequestBody OrgTypeMappingDTO orgTypeMappingDTO){
         counterManagementService.removeOrgTypeKPIEntries(orgTypeMappingDTO,countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
@@ -218,54 +226,54 @@ public class CounterDistController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dynamicTabService.getDashboardTabOfRef(organizationId,ConfLevel.STAFF));
     }
 
-    @GetMapping(COUNTRY_URL+COUNTER_DIST_URL+"/dashboard")
+    @GetMapping(COUNTER_COUNTRY_DIST_URL+"/dashboard")
     public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistributionDataForCountry(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDistData(countryId, ConfLevel.COUNTRY));
     }
 
-    @PostMapping(COUNTRY_URL+COUNTER_DIST_URL+"/dashboard")
+    @PostMapping(COUNTER_COUNTRY_DIST_URL+"/dashboard")
     public ResponseEntity<Map<String, Object>> saveDashboardKPIDistributionForCountry(@RequestBody DashboardKPIsDTO dashboardKPIsDTO, @PathVariable Long countryId){
         counterManagementService.addDashboradKPIsDistribution(dashboardKPIsDTO, ConfLevel.COUNTRY, countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @GetMapping(UNIT_URL+COUNTER_DIST_URL+"/dashboard")
+    @GetMapping(COUNTER_UNIT_DIST_URL+"/dashboard")
     public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistributionDataForUnit(@PathVariable Long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDistData(unitId, ConfLevel.UNIT));
     }
 
-    @PostMapping(UNIT_URL+COUNTER_DIST_URL+"/dashboard")
+    @PostMapping(COUNTER_UNIT_DIST_URL+"/dashboard")
     public ResponseEntity<Map<String, Object>> saveDashboardKPIDistributionUnit(@RequestBody DashboardKPIsDTO dashboardKPIsDTO, @PathVariable Long unitId){
         counterManagementService.addDashboradKPIsDistribution(dashboardKPIsDTO, ConfLevel.UNIT, unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
 
-    @PutMapping(COUNTRY_URL+COUNTER_DIST_URL+"/dashboard/remove_dist_entry")
+    @PutMapping(COUNTER_COUNTRY_DIST_URL+"/dashboard/remove_dist_entry")
     public ResponseEntity<Map<String, Object>> removeDashboardKPIEntryForCountry(@PathVariable Long countryId, @RequestBody DashboardKPIMappingDTO dashboardKPIMappingDTO){
         counterManagementService.removeDashboradKPIEntries(dashboardKPIMappingDTO,countryId,ConfLevel.COUNTRY);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PutMapping(UNIT_URL+COUNTER_DIST_URL+"/dashboard/remove_dist_entry")
+    @PutMapping(COUNTER_UNIT_DIST_URL+"/dashboard/remove_dist_entry")
     public ResponseEntity<Map<String, Object>> removeDashboardKPIEntryForUnit(@PathVariable Long unitId, @RequestBody DashboardKPIMappingDTO dashboardKPIMappingDTO){
         counterManagementService.removeDashboradKPIEntries(dashboardKPIMappingDTO,unitId,ConfLevel.UNIT);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @GetMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/{moduleId}")
+    @GetMapping(COUNTER_STAFF_UNIT_DIST_URL+"/dashboard/{moduleId}")
     public ResponseEntity<Map<String, Object>> getInitialDashboardKPIDistConfForStaff(@PathVariable Long unitId, @PathVariable String moduleId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.getInitialDashboardKPIDataConfForStaff(moduleId,unitId, ConfLevel.STAFF));
     }
 
 
-    @PutMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/{moduleId}/update_dist_entry")
+    @PutMapping(COUNTER_STAFF_UNIT_DIST_URL+"/dashboard/{moduleId}/update_dist_entry")
     public ResponseEntity<Map<String, Object>> updateDashboardKPIsEntryForStaff(@PathVariable String moduleId,@PathVariable Long unitId,@RequestBody List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS){
         counterManagementService.updateDashboardKPIEntries(dashboardKPIMappingDTOS,moduleId,unitId,ConfLevel.STAFF);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
-    @PostMapping(UNIT_URL+STAFF_URL+COUNTER_DIST_URL+"/dashboard/create_dist_entry")
+    @PostMapping(COUNTER_STAFF_UNIT_DIST_URL+"/dashboard/create_dist_entry")
     public ResponseEntity<Map<String, Object>> addDashboardKPIsEntryForStaff(@PathVariable Long unitId,@RequestBody List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,counterManagementService.addDashboardKPIEntriesOfStaff(dashboardKPIMappingDTOS,unitId,ConfLevel.STAFF));
     }
@@ -273,13 +281,13 @@ public class CounterDistController {
 
     //defalut setting for unit and staff
 
-    @PostMapping(UNIT_URL+COUNTER_DIST_URL+"/default_kpi_setting")
+    @PostMapping(COUNTER_UNIT_DIST_URL+"/default_kpi_setting")
     public ResponseEntity<Map<String, Object>> createDefaluSettingForUnit(@PathVariable Long unitId, @RequestBody DefaultKPISettingDTO defaultKPISettingDTO){
             counterManagementService.createDefaultKpiSetting(unitId, defaultKPISettingDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @PostMapping(UNIT_URL+COUNTER_DIST_URL+"/staff_default_kpi_setting")
+    @PostMapping(COUNTER_UNIT_DIST_URL+"/staff_default_kpi_setting")
     public ResponseEntity<Map<String, Object>> createDefaluSettingForStaff(@PathVariable Long unitId, @RequestBody DefaultKPISettingDTO defaultKPISettingDTO){
         counterManagementService.createDefaultStaffKPISetting(unitId, defaultKPISettingDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
