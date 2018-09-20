@@ -21,6 +21,7 @@ import com.kairos.persistence.model.counter.KPIDashboard;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.commons.utils.ObjectMapperUtils;
 
+import com.mongodb.client.result.DeleteResult;
 import org.springframework.data.domain.Sort;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -255,10 +256,10 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         return mongoTemplate.findOne(query,TabKPIConf.class);
     }
 
-    public void removeTabKPIConfiguration(TabKPIMappingDTO entry,Long refId,ConfLevel level){
+    public DeleteResult removeTabKPIConfiguration(TabKPIMappingDTO entry, Long refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Query query = new Query(Criteria.where("tabId").is(entry.getTabId()).and("kpiId").is(entry.getKpiId()).and(refQueryField).is(refId).and("level").is(level));
-        mongoTemplate.remove(query, TabKPIConf.class);
+        return mongoTemplate.remove(query, TabKPIConf.class);
     }
 
 

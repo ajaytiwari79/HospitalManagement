@@ -32,6 +32,7 @@ import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import com.mongodb.client.result.DeleteResult;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,13 +164,17 @@ public class CounterDistService extends MongoBaseService {
         if(ConfLevel.UNIT.equals(level)){
             countryId=genericRestClient.publishRequest(null, refId, true, IntegrationOperation.GET, "/countryId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>(){});
         }
-        List<TabKPIDTO> tabKPIMappingIds=counterRepository.getTabKPIIdsByTabIds(moduleId,refId,countryId,level);
-        if (tabKPIMappingIds == null || tabKPIMappingIds.isEmpty()) return new ArrayList<>();
-        return tabKPIMappingIds.stream().map(tabKPIDTO -> new BigInteger(tabKPIDTO.getKpi().getId().toString())).collect(Collectors.toList());
+        List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIIdsByTabIds(moduleId,refId,countryId,level);
+        List<TabKPIDTO> tabKPIDTOSResult=filterTabKpiDate(tabKPIDTOS);
+        if (tabKPIDTOS == null || tabKPIDTOS.isEmpty()) return new ArrayList<>();
+        return tabKPIDTOS.stream().map(tabKPIDTO -> new BigInteger(tabKPIDTO.getKpi().getId().toString())).collect(Collectors.toList());
     }
 
     public TabKPIDTO updateInitialTabKPIDataConf(TabKPIDTO tabKPIDTO,Long unitId,ConfLevel level){
         TabKPIConf tabKPIConf=counterRepository.findTabKPIConfigurationByTabId(tabKPIDTO.getTabId(),Arrays.asList(tabKPIDTO.getKpiId()),unitId,level);
+           if(!Optional.ofNullable(tabKPIConf).isPresent()){
+               exceptionService.invalidRequestException("error.kpi.invalidData");
+           }
             if(tabKPIConf.getTabId().equals(tabKPIDTO.getTabId())&&tabKPIConf.getKpiId().equals(tabKPIDTO.getKpiId())){
                 tabKPIConf.setLocationType(tabKPIDTO.getLocationType());
                 tabKPIConf.setKpiValidity(tabKPIDTO.getKpiValidity());
@@ -192,6 +197,10 @@ public class CounterDistService extends MongoBaseService {
             kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,unitId,accessGroupPermissionCounterDTO.getStaffId());
         }
         List<TabKPIDTO> tabKPIDTOS=counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId,kpiIds,accessGroupPermissionCounterDTO.getStaffId(),4l,unitId,level);
+        return filterTabKpiDate(tabKPIDTOS);
+    }
+
+    public List<TabKPIDTO> filterTabKpiDate(List<TabKPIDTO> tabKPIDTOS){
         Map<BigInteger,TabKPIDTO> filterResults=new HashMap<>();
         tabKPIDTOS.stream().forEach(tabKPIDTO -> {
             filterResults.put(tabKPIDTO.getKpi().getId(),tabKPIDTO);
@@ -274,6 +283,9 @@ public class CounterDistService extends MongoBaseService {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
         List<BigInteger> kpiIds=tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
         List<TabKPIConf> tabKPIConfs=counterRepository.findTabKPIConfigurationByTabIds(tabId,kpiIds,accessGroupPermissionCounterDTO.getStaffId(),level);
+        if(Optional.ofNullable(tabKPIConfs).isPresent()){
+            exceptionService.invalidRequestException("error.kpi.invalidData");
+        }
         Map<BigInteger,TabKPIMappingDTO> tabKPIMappingDTOMap=new HashMap<>();
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> {
             tabKPIMappingDTOMap.put(tabKPIMappingDTO.getId(),tabKPIMappingDTO);
@@ -291,7 +303,10 @@ public class CounterDistService extends MongoBaseService {
             AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
             refId=accessGroupPermissionCounterDTO.getStaffId();
         }
-       counterRepository.removeTabKPIConfiguration(tabKPIMappingDTO,refId,level);
+       DeleteResult result=counterRepository.removeTabKPIConfiguration(tabKPIMappingDTO,refId,level);
+        if(result.getDeletedCount()<1){
+            exceptionService.invalidRequestException("error.kpi.invalidData");
+        }
     }
 
     //setting accessGroup-KPI configuration
