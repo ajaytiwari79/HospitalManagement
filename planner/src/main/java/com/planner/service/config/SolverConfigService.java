@@ -330,7 +330,7 @@ public class SolverConfigService {
 
 
 
-    public SolverConfig getSolverConfigByDTO(SolverConfigDTO solverConfigDTO){
+    /*public SolverConfig getSolverConfigByDTO(SolverConfigDTO solverConfigDTO){
         SolverConfig solverConfig = new SolverConfig();
         solverConfig.setTerminationSeconds(solverConfigDTO.getTerminationTime());
         solverConfig.setUnitId(solverConfigDTO.getUnitId());
@@ -358,6 +358,6 @@ public class SolverConfigService {
             }
         }
         return solverConfig;
-    }
+    }*/
 
 }

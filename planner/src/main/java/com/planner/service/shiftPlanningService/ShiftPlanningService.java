@@ -236,7 +236,7 @@ public class ShiftPlanningService {
         for (com.planner.domain.activity.Activity activity:activities){
             //TODO gotta consider timetupes presence ot absence
             Activity act= new Activity(activity.getId(),null,0,activity.getName(),null,0,0,activity.getExpertises());
-            activityKariosIdMap.put(activity.getKairosId().longValue(),act);
+            activityKariosIdMap.put(null,act);
             acts.add(act);
         }
         /*Map<String, Activity> activityMap=new HashMap<>();

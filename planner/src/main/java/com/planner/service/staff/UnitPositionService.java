@@ -26,7 +26,7 @@ public class UnitPositionService  {
         WorkingTimeAgreement wta= createWTA(unitPositionWtaDTO.getWtaResponseDTO());
         BeanUtils.copyProperties(unitPositionWtaDTO,unitPosition,"id","wtaResponseDTO");
         unitPosition.setWorkingTimeAgreement(wta);
-        unitPosition.setKairosId(BigInteger.valueOf(unitPositionWtaDTO.getId()));
+        //unitPosition.setKairosId(BigInteger.valueOf(unitPositionWtaDTO.getId()));
         unitPositionRepository.save(unitPosition);
     }
     public void addUnitPositions( Long unitId, List<UnitPositionWtaDTO> unitPositionWtaDTOs) {
@@ -36,7 +36,7 @@ public class UnitPositionService  {
             WorkingTimeAgreement wta= createWTA(unitPositionWtaDTO.getWtaResponseDTO());
             BeanUtils.copyProperties(unitPositionWtaDTO,unitPosition,"id","wtaResponseDTO");
             unitPosition.setWorkingTimeAgreement(wta);
-            unitPosition.setKairosId(BigInteger.valueOf(unitPositionWtaDTO.getId()));
+            //unitPosition.setKairosId(BigInteger.valueOf(unitPositionWtaDTO.getId()));
             unitPositions.add(unitPosition);
         }
 
@@ -48,7 +48,7 @@ public class UnitPositionService  {
         WorkingTimeAgreement wta= createWTA(unitPositionWtaDTO.getWtaResponseDTO());
         BeanUtils.copyProperties(unitPositionWtaDTO,unitPosition,"id","wtaResponseDTO");
         unitPosition.setWorkingTimeAgreement(wta);
-        unitPosition.setKairosId(BigInteger.valueOf(unitPositionWtaDTO.getId()));
+        //unitPosition.setKairosId(BigInteger.valueOf(unitPositionWtaDTO.getId()));
         unitPositionRepository.save(unitPosition);
     }
 

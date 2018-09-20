@@ -95,7 +95,7 @@ public class VRPGeneratorService {
         List<Employee> employees = (List<Employee>)objects[1];
         problem.setSolverConfigId(vrpTaskPlanningDTO.getSolverConfig().getId());
 
-        SolverConfig solverConfig = solverConfigService.getSolverConfigByDTO(vrpTaskPlanningDTO.getSolverConfig());
+        SolverConfig solverConfig = null;//solverConfigService.getSolverConfigByDTO(vrpTaskPlanningDTO.getSolverConfig());
         problem.setConstraint(solverConfig.getConstraint());
         problem.setTasks(tasks);
         Map<LocationPair,Boolean> onArriveSideMatrix=tomTomService.getOnArriveSideMatrix();

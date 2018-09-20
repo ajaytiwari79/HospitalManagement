@@ -77,7 +77,7 @@ public class WTABuilderService {
             default:
                 throw new IllegalStateException("Invalid TEMPLATE");
         }
-        wtaBaseRuleTemplate.setKairosId(ruleTemplate.getId());
+        //wtaBaseRuleTemplate.setKairosId(ruleTemplate.getId());
         return wtaBaseRuleTemplate;
     }
 

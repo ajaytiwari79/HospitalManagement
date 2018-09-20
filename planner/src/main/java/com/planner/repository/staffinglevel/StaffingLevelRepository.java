@@ -1,15 +1,12 @@
 package com.planner.repository.staffinglevel;
 
 import com.planner.domain.staffinglevel.StaffingLevel;
-import com.planner.repository.MongoBaseRepository;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import com.planner.repository.common.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface StaffingLevelRepository extends MongoBaseRepository<StaffingLevel,String> {

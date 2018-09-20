@@ -4,18 +4,25 @@ import org.bson.codecs.pojo.annotations.BsonId;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigInteger;
+import java.util.Date;
+
 public class MongoBaseEntity {
-    @BsonId
-    protected String id;
-    protected BigInteger kairosId;
+    @Id
+    protected BigInteger id;
+    protected Boolean deleted;
+    protected Date createdAt;
+    protected Date updatedAt;
 
-    public BigInteger getKairosId() {
-        return kairosId;
+
+    //Setters and Getters
+    public BigInteger getId() {
+        return id;
     }
 
-    public void setKairosId(BigInteger kairosId) {
-        this.kairosId = kairosId;
+    public void setId(BigInteger id) {
+        this.id = id;
     }
+
     public Boolean getDeleted() {
         return deleted;
     }
@@ -24,11 +31,19 @@ public class MongoBaseEntity {
         this.deleted = deleted;
     }
 
-    protected Boolean deleted;
-    public String getId() {
-        return id;
+    public Date getCreatedAt() {
+        return createdAt;
     }
-    public void setId(String id) {
-        this.id = id;
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
