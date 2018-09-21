@@ -4,7 +4,7 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistence.model.clause.Clause;
-import com.kairos.enums.FilterType;
+import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
@@ -24,7 +24,6 @@ import java.util.List;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.ID;
 import static com.kairos.constants.AppConstant.DELETED;
 

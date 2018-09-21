@@ -12,7 +12,7 @@ import com.kairos.persistence.repository.data_inventory.asset.AssetMongoReposito
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
-import com.kairos.persistence.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
@@ -80,7 +80,7 @@ public class ProcessingActivityService extends MongoBaseService {
     private AssessmentMongoRepository assessmentMongoRepository;
 
     @Inject
-    private MasterQuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
+    private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
 
     @Inject
     private RiskService riskService;
@@ -523,7 +523,7 @@ public class ProcessingActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
         processingActivity.getRisks().remove(riskId);
-        riskMongoRepository.findByIdAndSafeDelete(riskId);
+        riskMongoRepository.safeDelete(riskId);
         processingActivityMongoRepository.save(processingActivity);
         return true;
     }

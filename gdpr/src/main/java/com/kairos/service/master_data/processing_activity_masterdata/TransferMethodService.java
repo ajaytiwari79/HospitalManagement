@@ -4,7 +4,7 @@ package com.kairos.service.master_data.processing_activity_masterdata;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TransferMethodDTO;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.TransferMethod;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;

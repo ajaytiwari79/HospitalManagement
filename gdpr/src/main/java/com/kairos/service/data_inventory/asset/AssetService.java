@@ -8,7 +8,7 @@ import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMon
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
-import com.kairos.persistence.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
@@ -56,7 +56,7 @@ public class AssetService extends MongoBaseService {
     private AssessmentMongoRepository assessmentMongoRepository;
 
     @Inject
-    private MasterQuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
+    private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
 
 
     public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
@@ -64,7 +64,7 @@ public class AssetService extends MongoBaseService {
         if (Optional.ofNullable(previousAsset).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
         }
-        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(organizationId, assetDTO.getAssetType());
+        AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset  type", assetDTO.getAssetType());
         } else {
@@ -194,7 +194,7 @@ public class AssetService extends MongoBaseService {
         } else if (!asset.isActive()) {
             exceptionService.invalidRequestException("message.asset.inactive");
         }
-        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(organizationId, assetDTO.getAssetType());
+        AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetDTO.getAssetType());
 
