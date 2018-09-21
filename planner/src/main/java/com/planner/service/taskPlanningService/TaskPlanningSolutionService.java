@@ -147,11 +147,11 @@ public class TaskPlanningSolutionService {
         Map<String,Location> locationMap = new HashMap<>();
         for (PlanningLocation planningLocation:planningLocations) {
             Location location = new Location();
-            location.setId(planningLocation.getId());
+           // location.setId(planningLocation.getId());
             location.setLatitude(planningLocation.getLatitude());
             location.setLongitude(planningLocation.getLongitude());
             location.setLocationInfos(distanceMap.get(planningLocation.getId()));
-            locationMap.put(planningLocation.getId(),location);
+           // locationMap.put(planningLocation.getId(),location);
         }
         return locationMap;
     }
@@ -276,7 +276,7 @@ public class TaskPlanningSolutionService {
                 employees.add(employee);
                 availabilityRequest.setStartTime(new DateTime(planningShift.getStartTime()));
                 availabilityRequest.setEndTime(new DateTime(planningShift.getEndTime()));
-                availabilityRequest.setId(planningShift.getId());
+               // availabilityRequest.setId(planningShift.getId());
 //                availabilityRequest.setExternalId(planningShift.getExternalId());
                 availabilityRequests.add(availabilityRequest);
 

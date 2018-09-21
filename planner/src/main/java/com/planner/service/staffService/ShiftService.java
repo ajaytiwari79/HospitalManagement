@@ -48,7 +48,7 @@ public class ShiftService {
                 planningShift.setStartTime(optaShiftDto.getStartDateTime());
                 planningShift.setEndTime(optaShiftDto.getEndDateTime());
                 //planningShift = (PlanningShift) shiftRepository.save(planningShift);
-                optaShiftDto.setOptaPlannerId(planningShift.getId());
+                //optaShiftDto.setOptaPlannerId(planningShift.getId());
             }else{
                 log.warn("shift's staff not exits"+optaShiftDto.getStaffId());
             }
@@ -97,7 +97,7 @@ public class ShiftService {
         planningShift.setStartTime(optaShiftDTO.getStartDateTime());
         planningShift.setEndTime(optaShiftDTO.getEndDateTime());
         //planningShift = (PlanningShift) shiftRepository.save(planningShift);
-        optaShiftDTO.setOptaPlannerId(planningShift.getId());
+       // optaShiftDTO.setOptaPlannerId(planningShift.getId());
         return optaShiftDTO;
     }
 
@@ -114,7 +114,7 @@ public class ShiftService {
             planningShift.setStartTime(optaShiftDTO.getStartDateTime());
             planningShift.setEndTime(optaShiftDTO.getEndDateTime());
            // planningShift = (PlanningShift) shiftRepository.save(planningShift);
-            optaShiftDTO.setOptaPlannerId(planningShift.getId());
+            //optaShiftDTO.setOptaPlannerId(planningShift.getId());
             }
             updatedOptaShiftDtos.add(optaShiftDTO);
         }

@@ -28,7 +28,7 @@ public class StaffingLevel extends MongoBaseEntity {
         this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
         this.absenceStaffingLevelInterval = absenceStaffingLevelInterval;
         this.unitId=unitId;
-        this.kairosId=kariosId;
+        //this.kairosId=kariosId;
     }
 
     public Long getPhaseId() {

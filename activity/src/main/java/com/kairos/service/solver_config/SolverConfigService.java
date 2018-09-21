@@ -1,3 +1,4 @@
+/*
 package com.kairos.service.solver_config;
 
 import com.kairos.enums.solver_config.ConstraintCategory;
@@ -22,10 +23,12 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+*/
 /**
  * @author pradeep
  * @date - 20/6/18
- */
+ *//*
+
 @Service
 public class SolverConfigService extends MongoBaseService {
 
@@ -67,10 +70,12 @@ public class SolverConfigService extends MongoBaseService {
 
 
     public SolverConfigDTO updateSolverConfig(Long unitId,BigInteger solverConfigId, SolverConfigDTO solverConfigDTO) {
-        /*Boolean exists = solverConfigRepository.existsSolverConfigByNameAndUnitIdAndSolverConfigId(unitId,solverConfigDTO.getName(),solverConfigDTO.getId());
+        */
+/*Boolean exists = solverConfigRepository.existsSolverConfigByNameAndUnitIdAndSolverConfigId(unitId,solverConfigDTO.getName(),solverConfigDTO.getId());
         if(exists){
             exceptionService.duplicateDataException("message.solverConfig.exists",solverConfigDTO.getName());
-        }*/
+        }*//*
+
         if (solverConfigDTO.isDefault()) {
             exceptionService.invalidRequestException("message.solverConfig.default.update");
         }
@@ -167,3 +172,4 @@ public class SolverConfigService extends MongoBaseService {
 
 
 }
+*/

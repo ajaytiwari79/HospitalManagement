@@ -76,8 +76,8 @@ public class PlanningTaskService {
                 } else {
                     PlanningLocation planningLocation = locationService.saveLocation(optaTaskDto.getAddress());
                     isNewPlanningLocation = true;
-                    planningTask.setLocationId(planningLocation.getId());
-                    locationIdsMap.put(Double.toString(planningLocation.getLatitude())+"-"+Double.toString(planningLocation.getLongitude()),planningLocation.getId());
+                   // planningTask.setLocationId(planningLocation.getId());
+                    locationIdsMap.put(Double.toString(planningLocation.getLatitude())+"-"+Double.toString(planningLocation.getLongitude()),null);
                 }
                 planningTask = (PlanningTask) planningTaskRepository.save(planningTask);
                 optaTaskDto.setOptaPlannerId(planningTask.getId());
@@ -114,7 +114,7 @@ public class PlanningTaskService {
         List<PlanningLocation> planningLocations = locationService.getAllPlanningLocations();
         Map<String, String> locationIdsMap = new HashMap<>(planningLocations.size());
         for (PlanningLocation planningLocation:planningLocations) {
-            locationIdsMap.put(Double.toString(planningLocation.getLatitude())+"-"+Double.toString(planningLocation.getLongitude()),planningLocation.getId());
+           // locationIdsMap.put(Double.toString(planningLocation.getLatitude())+"-"+Double.toString(planningLocation.getLongitude()),planningLocation.getId());
         }
         return locationIdsMap;
     }
@@ -176,10 +176,10 @@ public class PlanningTaskService {
             planningTask.setSecondEndSlaDurationMin(optaTaskDto.getSlaEndDuration());
             PlanningLocation planningLocation = locationService.getLocationByLatLong(optaTaskDto.getAddress().getLatitude(), optaTaskDto.getAddress().getLongitude());
             if (planningLocation != null) {
-                planningTask.setLocationId(planningLocation.getId());
+               // planningTask.setLocationId(planningLocation.getId());
             } else {
                 planningLocation = locationService.saveLocation(optaTaskDto.getAddress());
-                planningTask.setLocationId(planningLocation.getId());
+                //planningTask.setLocationId(planningLocation.getId());
             }
             planningTask = (PlanningTask) planningTaskRepository.save(planningTask);
             optaTaskDto.setOptaPlannerId(planningTask.getId());
@@ -223,11 +223,11 @@ public class PlanningTaskService {
             planningTask.setRelatedTaskid(optaTaskDto.getRelatedOptaTaskId());
             PlanningLocation planningLocation = locationService.getLocationByLatLong(optaTaskDto.getAddress().getLatitude(), optaTaskDto.getAddress().getLongitude());
             if (planningLocation != null) {
-                planningTask.setLocationId(planningLocation.getId());
+               // planningTask.setLocationId(planningLocation.getId());
             } else {
                 planningLocation = locationService.saveLocation(optaTaskDto.getAddress());
                 isNewPlanningLocation = true;
-                planningTask.setLocationId(planningLocation.getId());
+                //planningTask.setLocationId(planningLocation.getId());
             }
             planningTask = (PlanningTask) planningTaskRepository.save(planningTask);
             optaTaskDto.setOptaPlannerId(planningTask.getId());
@@ -256,10 +256,10 @@ public class PlanningTaskService {
             planningTask.setSecondStartSlaDurationMin(optaTaskDto.getSlaStartDuration());
             planningTask.setSecondEndSlaDurationMin(optaTaskDto.getSlaEndDuration());
             PlanningLocation planningLocation = locationService.getLocationByLatLong(optaTaskDto.getAddress().getLatitude(), optaTaskDto.getAddress().getLongitude());
-            if (planningLocation != null) planningTask.setLocationId(planningLocation.getId());
+            if (planningLocation != null) planningTask.setLocationId(null);
             else {
                 planningLocation = locationService.saveLocation(optaTaskDto.getAddress());
-                planningTask.setLocationId(planningLocation.getId());
+                //planningTask.setLocationId(planningLocation.getId());
             }
             planningTask = (PlanningTask) planningTaskRepository.save(planningTask);
             optaTaskDto.setOptaPlannerId(planningTask.getId());
@@ -286,10 +286,10 @@ public class PlanningTaskService {
                 planningTask.setSecondStartSlaDurationMin(optaTaskDto.getSlaStartDuration());
                 planningTask.setSecondEndSlaDurationMin(optaTaskDto.getSlaEndDuration());
                 PlanningLocation planningLocation = locationService.getLocationByLatLong(optaTaskDto.getAddress().getLatitude(), optaTaskDto.getAddress().getLongitude());
-                if (planningLocation != null) planningTask.setLocationId(planningLocation.getId());
+                if (planningLocation != null) planningTask.setLocationId(null);
                 else {
                     planningLocation = locationService.saveLocation(optaTaskDto.getAddress());
-                    planningTask.setLocationId(planningLocation.getId());
+                    //planningTask.setLocationId(planningLocation.getId());
                 }
                 planningTask = (PlanningTask) planningTaskRepository.save(planningTask);
                 updatedOptaTaskDtos.add(optaTaskDto);

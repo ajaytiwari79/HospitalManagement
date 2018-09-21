@@ -2,7 +2,6 @@ package com.planner.service.shiftPlanningService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.planning.utils.JodaTimeConverter;
@@ -23,7 +22,6 @@ import com.planner.repository.taskPlanningRepository.PlanningRepository;
 import com.planner.responseDto.PlanningDto.shiftPlanningDto.RecomendationPlanningDTO;
 import com.planner.responseDto.config.SolverConfigDTO;
 import com.planner.service.config.DroolsConfigService;
-import com.planner.service.config.SolverConfigService;
 import com.planner.service.config.XmlConfigService;
 import com.thoughtworks.xstream.XStream;
 import org.joda.time.DateTime;
@@ -32,7 +30,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class ShiftPlanningService {
     private static Logger logger = LoggerFactory.getLogger(ShiftPlanningService.class);
 
     @Autowired private DroolsConfigService droolsConfigService;
-    @Autowired private SolverConfigService solverConfigService;
+    //@Autowired private SolverConfigService solverConfigService;
     @Autowired private PlanningRepository planningRepository;
     @Autowired private XmlConfigService xmlConfigService;
     @Autowired private ShiftRequestPhasePlanningSolutionService shiftPlanningSolutionService;
@@ -224,18 +225,18 @@ public class ShiftPlanningService {
         List<String> staffIds=unitPositions.stream().map(up->up.getStaffId()).collect(Collectors.toList());
         Iterable<Staff> staff= staffRepository.findAllById(staffIds);
         Map<String, Staff> staffMap=new HashMap<>();
-        staff.forEach(st->staffMap.put(st.getId(),st));
+       // staff.forEach(st->staffMap.put(st.getId(),st));
         List<Employee> employees= new ArrayList<>();
         for(UnitPosition unitPosition:unitPositions){
             Staff stf=staffMap.get(unitPosition.getStaffId());
-            Employee employee= new Employee(stf.getId(),stf.getFirstName(),null, unitPosition.getExpertiseId(),unitPosition.getTotalWeeklyMinutes(),unitPosition.getWorkingDaysInWeek(),unitPosition.getPaidOutFrequencyEnum(), unitPosition.getEmploymentTypeId());
+            Employee employee= null;//new Employee(stf.getId(),stf.getFirstName(),null, unitPosition.getExpertiseId(),unitPosition.getTotalWeeklyMinutes(),unitPosition.getWorkingDaysInWeek(),unitPosition.getPaidOutFrequencyEnum(), unitPosition.getEmploymentTypeId());
             employees.add(employee);
         }
         List<Activity> acts= new ArrayList<>();
         Map<Long, Activity> activityKariosIdMap=new HashMap<>();
         for (com.planner.domain.activity.Activity activity:activities){
             //TODO gotta consider timetupes presence ot absence
-            Activity act= new Activity(activity.getId(),null,0,activity.getName(),null,0,0,activity.getExpertises());
+            Activity act=null;// new Activity(activity.getId(),null,0,activity.getName(),null,0,0,activity.getExpertises());
             activityKariosIdMap.put(null,act);
             acts.add(act);
         }

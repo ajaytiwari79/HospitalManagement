@@ -2,83 +2,36 @@ package com.kairos.dto.planner.solverconfig;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.solver_config.PlanningType;
-import com.kairos.enums.solver_config.SolverConfigStatus;
 
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 
 /**
- * @author pradeep
- * @date - 20/6/18
+ * @author mohit
+ * @date - 21/9/18
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SolverConfigDTO {
-
     private BigInteger id;
-    private String name;
+    private String name;//Unique
+    private String description;
     private Long unitId;
-    private boolean isTemplate;
-    private PlanningType phase;
-    private BigInteger parentSolverConfigId;
-    private Integer terminationTime;
-    private List<ConstraintValueDTO> constraints;
-    private int numberOfThread;
-    private int plannerNumber;
-    private SolverConfigStatus status;
-    private boolean isDefault;
-    private Date lastSubmittedDate;
+    private Long countryId;
+    private Long phaseId;
+    private Long planningPeriodId;
+    private byte threadCount;
+    private short terminationTimeInMinutes;
+    private Long planningProblemId;
+    private List<BigInteger> constraintIds;
+    private Long organizationServiceCategoryId;
 
+    //Constructors
+    public SolverConfigDTO() {
 
-    public Date getLastSubmittedDate() {
-        return lastSubmittedDate;
     }
 
-    public void setLastSubmittedDate(Date lastSubmittedDate) {
-        this.lastSubmittedDate = lastSubmittedDate;
-    }
-
-    public int getNumberOfThread() {
-        return numberOfThread;
-    }
-
-    public void setNumberOfThread(int numberOfThread) {
-        this.numberOfThread = numberOfThread;
-    }
-
-    public int getPlannerNumber() {
-        return plannerNumber;
-    }
-
-    public void setPlannerNumber(int plannerNumber) {
-        this.plannerNumber = plannerNumber;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public SolverConfigStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(SolverConfigStatus status) {
-        this.status = status;
-    }
-
-    public List<ConstraintValueDTO> getConstraints() {
-        return constraints;
-    }
-
-    public void setConstraints(List<ConstraintValueDTO> constraints) {
-        this.constraints = constraints;
-    }
+    //Setters and Getters
 
     public BigInteger getId() {
         return id;
@@ -96,44 +49,139 @@ public class SolverConfigDTO {
         this.name = name;
     }
 
-    public boolean isTemplate() {
-        return isTemplate;
+    public String getDescription() {
+        return description;
     }
 
-    public void setTemplate(boolean template) {
-        isTemplate = template;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public PlanningType getPhase() {
-        return phase;
+    public Long getUnitId() {
+        return unitId;
     }
 
-    public void setPhase(PlanningType phase) {
-        this.phase = phase;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 
-
-    public BigInteger getParentSolverConfigId() {
-        return parentSolverConfigId;
+    public Long getCountryId() {
+        return countryId;
     }
 
-    public void setParentSolverConfigId(BigInteger parentSolverConfigId) {
-        this.parentSolverConfigId = parentSolverConfigId;
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 
-    public Integer getTerminationTime() {
-        return terminationTime;
+    public Long getPhaseId() {
+        return phaseId;
     }
 
-    public void setTerminationTime(Integer terminationTime) {
-        this.terminationTime = terminationTime;
+    public void setPhaseId(Long phaseId) {
+        this.phaseId = phaseId;
     }
 
-    public boolean isDefault() {
-        return isDefault;
+    public Long getPlanningPeriodId() {
+        return planningPeriodId;
     }
 
-    public void setDefault(boolean aDefault) {
-        isDefault = aDefault;
+    public void setPlanningPeriodId(Long planningPeriodId) {
+        this.planningPeriodId = planningPeriodId;
     }
+
+    public byte getThreadCount() {
+        return threadCount;
+    }
+
+    public void setThreadCount(byte threadCount) {
+        this.threadCount = threadCount;
+    }
+
+    public short getTerminationTimeInMinutes() {
+        return terminationTimeInMinutes;
+    }
+
+    public void setTerminationTimeInMinutes(short terminationTimeInMinutes) {
+        this.terminationTimeInMinutes = terminationTimeInMinutes;
+    }
+
+    public Long getPlanningProblemId() {
+        return planningProblemId;
+    }
+
+    public void setPlanningProblemId(Long planningProblemId) {
+        this.planningProblemId = planningProblemId;
+    }
+
+    public List<BigInteger> getConstraintIds() {
+        return constraintIds;
+    }
+
+    public void setConstraintIds(List<BigInteger> constraintIds) {
+        this.constraintIds = constraintIds;
+    }
+
+    public Long getOrganizationServiceCategoryId() {
+        return organizationServiceCategoryId;
+    }
+
+    public void setOrganizationServiceCategoryId(Long organizationServiceCategoryId) {
+        this.organizationServiceCategoryId = organizationServiceCategoryId;
+    }
+
+    /*****************************SolverConfigDTO Builder****************************************/
+//    public SolverConfigDTO setNameBuilder(String name) {
+//        this.name = name;
+//        return this;
+//    }
+//
+//    public SolverConfigDTO setDescriptionBuilder(String description) {
+//        this.description = description;
+//        return this;
+//    }
+//
+//    public SolverConfigDTO setUnitIdBuilder(Long unitId) {
+//        this.unitId = unitId;
+//        return this;
+//    }
+//
+//    public SolverConfigDTO setCountryIdBuilder(Long countryId) {
+//        this.countryId = countryId;
+//        return this;
+//    }
+//
+//    public SolverConfigDTO setPhaseIdBuilder(Long phaseId) {
+//        this.phaseId = phaseId;
+//        return this;
+//    }
+//
+//    public SolverConfigDTO setPlanningPeriodIdBuilder(Long planningPeriodId) {
+//        this.planningPeriodId = planningPeriodId;
+//        return this;
+//    }
+//
+//    public SolverConfigDTO setThreadCountBuilder(byte threadCount) {
+//        this.threadCount = threadCount;
+//        return this;
+//    }
+//
+//    public SolverConfigDTO setTerminationTimeInMinutesBuilder(short terminationTimeInMinutes) {
+//        this.terminationTimeInMinutes = terminationTimeInMinutes;
+//        return this;
+//    }
+//
+//    public SolverConfigDTO setPlanningProblemIdBuilder(Long planningProblemId) {
+//        this.planningProblemId = planningProblemId;
+//        return this;
+//    }
+//
+//    public SolverConfigDTO setConstraintIdsBuilder(List<BigInteger> constraintIds) {
+//        this.constraintIds = constraintIds;
+//        return this;
+//    }
+//
+//    public SolverConfigDTO setOrganizationServiceCategoryIdBuilder(Long organizationServiceCategoryId) {
+//        this.organizationServiceCategoryId = organizationServiceCategoryId;
+//        return this;
+//    }
 }

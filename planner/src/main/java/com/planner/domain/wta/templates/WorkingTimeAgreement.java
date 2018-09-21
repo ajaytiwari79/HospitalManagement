@@ -25,7 +25,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.templates = templates;
-        this.kairosId=kairosId;
+        //this.kairosId=kairosId;
     }
 
     public String getName() {

@@ -1,10 +1,11 @@
 package com.planner.domain.solverconfig;
 
 import com.planner.domain.MongoBaseEntity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.List;
-
+@Document
 public class SolverConfig extends MongoBaseEntity {
 
     private String name;//Unique
@@ -29,98 +30,147 @@ public class SolverConfig extends MongoBaseEntity {
         return name;
     }
 
-    public SolverConfig setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public SolverConfig setDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
-        return this;
     }
 
     public Long getUnitId() {
         return unitId;
     }
 
-    public SolverConfig setUnitId(Long unitId) {
+    public void setUnitId(Long unitId) {
         this.unitId = unitId;
-        return this;
     }
 
     public Long getCountryId() {
         return countryId;
     }
 
-    public SolverConfig setCountryId(Long countryId) {
+    public void setCountryId(Long countryId) {
         this.countryId = countryId;
-        return this;
     }
 
     public Long getPhaseId() {
         return phaseId;
     }
 
-    public SolverConfig setPhaseId(Long phaseId) {
+    public void setPhaseId(Long phaseId) {
         this.phaseId = phaseId;
-        return this;
     }
 
     public Long getPlanningPeriodId() {
         return planningPeriodId;
     }
 
-    public SolverConfig setPlanningPeriodId(Long planningPeriodId) {
+    public void setPlanningPeriodId(Long planningPeriodId) {
         this.planningPeriodId = planningPeriodId;
-        return this;
     }
 
     public byte getThreadCount() {
         return threadCount;
     }
 
-    public SolverConfig setThreadCount(byte threadCount) {
+    public void setThreadCount(byte threadCount) {
         this.threadCount = threadCount;
-        return this;
     }
 
     public short getTerminationTimeInMinutes() {
         return terminationTimeInMinutes;
     }
 
-    public SolverConfig setTerminationTimeInMinutes(short terminationTimeInMinutes) {
+    public void setTerminationTimeInMinutes(short terminationTimeInMinutes) {
         this.terminationTimeInMinutes = terminationTimeInMinutes;
-        return this;
     }
 
     public Long getPlanningProblemId() {
         return planningProblemId;
     }
 
-    public SolverConfig setPlanningProblemId(Long planningProblemId) {
+    public void setPlanningProblemId(Long planningProblemId) {
         this.planningProblemId = planningProblemId;
-        return this;
     }
 
     public List<BigInteger> getConstraintIds() {
         return constraintIds;
     }
 
-    public SolverConfig setConstraintIds(List<BigInteger> constraintIds) {
+    public void setConstraintIds(List<BigInteger> constraintIds) {
         this.constraintIds = constraintIds;
-        return this;
     }
 
     public Long getOrganizationServiceCategoryId() {
         return organizationServiceCategoryId;
     }
 
-    public SolverConfig setOrganizationServiceCategoryId(Long organizationServiceCategoryId) {
+    public void setOrganizationServiceCategoryId(Long organizationServiceCategoryId) {
         this.organizationServiceCategoryId = organizationServiceCategoryId;
-        return this;
     }
+
+    /*****************************SolverConfig Builder****************************************/
+//    public SolverConfig setIdBuilder(String id) {
+//        this.id = id;
+//        return this;
+//    }
+//    public SolverConfig setNameBuilder(String name) {
+//        this.name = name;
+//        return this;
+//    }
+//
+//    public SolverConfig setDescriptionBuilder(String description) {
+//        this.description = description;
+//        return this;
+//    }
+//
+//    public SolverConfig setUnitIdBuilder(Long unitId) {
+//        this.unitId = unitId;
+//        return this;
+//    }
+//
+//    public SolverConfig setCountryIdBuilder(Long countryId) {
+//        this.countryId = countryId;
+//        return this;
+//    }
+//
+//    public SolverConfig setPhaseIdBuilder(Long phaseId) {
+//        this.phaseId = phaseId;
+//        return this;
+//    }
+//
+//    public SolverConfig setPlanningPeriodIdBuilder(Long planningPeriodId) {
+//        this.planningPeriodId = planningPeriodId;
+//        return this;
+//    }
+//
+//    public SolverConfig setThreadCountBuilder(byte threadCount) {
+//        this.threadCount = threadCount;
+//        return this;
+//    }
+//
+//    public SolverConfig setTerminationTimeInMinutesBuilder(short terminationTimeInMinutes) {
+//        this.terminationTimeInMinutes = terminationTimeInMinutes;
+//        return this;
+//    }
+//
+//    public SolverConfig setPlanningProblemIdBuilder(Long planningProblemId) {
+//        this.planningProblemId = planningProblemId;
+//        return this;
+//    }
+//
+//    public SolverConfig setConstraintIdsBuilder(List<BigInteger> constraintIds) {
+//        this.constraintIds = constraintIds;
+//        return this;
+//    }
+//
+//    public SolverConfig setOrganizationServiceCategoryIdBuilder(Long organizationServiceCategoryId) {
+//        this.organizationServiceCategoryId = organizationServiceCategoryId;
+//        return this;
+//    }
 }

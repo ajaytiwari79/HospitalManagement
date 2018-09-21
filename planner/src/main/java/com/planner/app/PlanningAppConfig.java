@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.planner.appConfig.UserContextInterceptor;
 import com.planner.constants.AppConstants;
+import com.planner.repository.common.MongoBaseRepositoryImpl;
 import com.planner.repository.staffinglevel.StaffingLevelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ import java.util.jar.JarFile;
 @SpringBootApplication
 @EnableEurekaClient
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@EnableMongoRepositories(basePackages ={"com.planner.repository"})
+@EnableMongoRepositories(basePackages ={"com.planner.repository"},repositoryBaseClass = MongoBaseRepositoryImpl.class)
 public class PlanningAppConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(PlanningAppConfig.class);
