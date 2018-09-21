@@ -1390,28 +1390,28 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Update Unit settings")
-    @PutMapping(value = "/unit/{unitId}/updateOrganizationSettings")
+    @PutMapping(value = PARENT_ORGANIZATION_URL+"/unit/{unitId}/updateOrganizationSettings")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateOrganizationSettings(@PathVariable Long unitId,@RequestBody OrganizationSettingDTO organizationSettingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateOrganizationSettings(organizationSettingDTO,unitId));
     }
 
     @ApiOperation(value = "get Unit settings")
-    @GetMapping(value = "/unit/{unitId}/getOrganizationSettings")
+    @GetMapping(value = PARENT_ORGANIZATION_URL+"/unit/{unitId}/getOrganizationSettings")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationSettings(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationSettings(unitId));
     }
 
     @ApiOperation(value = "get Unit and Parent Organization and Country Id")
-    @GetMapping(value = "/unit/parent_org_and_country")
+    @GetMapping(value = PARENT_ORGANIZATION_URL+"/unit/parent_org_and_country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getParentOrganizationAndCountryIdsOfUnit() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getParentOrganizationAndCountryIdsOfUnit());
     }
 
     @ApiOperation(value = "Create Prefered Time window")
-    @PostMapping(value = "/unit/{unitId}/prefer_time_window")
+    @PostMapping(value = PARENT_ORGANIZATION_URL+"/unit/{unitId}/prefer_time_window")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createPreferedTimeWindow(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -1419,7 +1419,7 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "get Prefered Time window")
-    @GetMapping(value = "/unit/{unitId}/prefer_time_window")
+    @GetMapping(value = PARENT_ORGANIZATION_URL+"/unit/{unitId}/prefer_time_window")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPreferedTimeWindow(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -1428,7 +1428,7 @@ public class OrganizationController {
 
 
     @ApiOperation(value = "get Cta basic info")
-    @GetMapping(value = COUNTRY_URL+"/cta_basic_info")
+    @GetMapping(value = PARENT_ORGANIZATION_URL+COUNTRY_URL+"/cta_basic_info")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCTABasicDetailInfo(@PathVariable Long countryId,@RequestParam(required = false) Long expertiseId,@RequestParam(required = false) Long organizationSubTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -1436,7 +1436,7 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "get organization ids by orgSubType ids")
-    @PostMapping(value = "/orgtype/get_organization_ids")
+    @PostMapping(value = PARENT_ORGANIZATION_URL+"/orgtype/get_organization_ids")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationIdsBySubOrgTypeId(@RequestBody List<Long> orgTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
