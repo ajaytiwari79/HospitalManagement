@@ -85,7 +85,9 @@ public class QuestionnaireSectionService extends MongoBaseService {
             } else {
                 QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionDTO.getTitle(), countryId);
                 questionnaireSections.add(questionnaireSection);
-                questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
+                if (CollectionUtils.isNotEmpty(questionnaireSectionDTO.getQuestions())) {
+                    questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
+                }
             }
         }
         if (CollectionUtils.isNotEmpty(existingSectionIdList)) {
@@ -94,7 +96,9 @@ public class QuestionnaireSectionService extends MongoBaseService {
             questionnaireSections.forEach(questionnaireSection -> {
                 QuestionnaireSectionDTO questionnaireSectionDTO = questionnaireSectionIdDTOMap.get(questionnaireSection.getId());
                 questionnaireSection.setTitle(questionnaireSectionDTO.getTitle());
-                questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
+                if (CollectionUtils.isNotEmpty(questionnaireSectionDTO.getQuestions())) {
+                    questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
+                }
             });
         }
         List<BigInteger> sectionIdList;
@@ -163,8 +167,9 @@ public class QuestionnaireSectionService extends MongoBaseService {
                 QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionDTO.getTitle());
                 questionnaireSection.setOrganizationId(unitId);
                 questionnaireSections.add(questionnaireSection);
-                questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
-
+                if (CollectionUtils.isNotEmpty(questionnaireSectionDTO.getQuestions())) {
+                    questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
+                }
             }
         }
         if (CollectionUtils.isNotEmpty(existingSectionIdList)) {
@@ -173,7 +178,9 @@ public class QuestionnaireSectionService extends MongoBaseService {
             questionnaireSections.forEach(questionnaireSection -> {
                 QuestionnaireSectionDTO questionnaireSectionDTO = questionnaireSectionIdDTOMap.get(questionnaireSection.getId());
                 questionnaireSection.setTitle(questionnaireSectionDTO.getTitle());
-                questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
+                if (CollectionUtils.isNotEmpty(questionnaireSectionDTO.getQuestions())) {
+                    questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
+                }
             });
         }
         List<BigInteger> sectionIdList;

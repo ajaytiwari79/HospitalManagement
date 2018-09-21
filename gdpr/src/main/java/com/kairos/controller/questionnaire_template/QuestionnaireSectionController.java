@@ -35,7 +35,7 @@ public class QuestionnaireSectionController {
     public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger templateId, @Validated @RequestBody ValidateRequestBodyList<QuestionnaireSectionDTO> questionnaireSectionsDto) {
 
         if (CollectionUtils.isEmpty(questionnaireSectionsDto.getRequestBody())) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true,"Section List Must Not Be Empty\"" );
+            return ResponseHandler.invalidResponse(HttpStatus.OK, true,"Section List Must Not Be Empty\"" );
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.addMasterQuestionnaireSectionToQuestionnaireTemplate(countryId, templateId, questionnaireSectionsDto.getRequestBody()));
     }
@@ -52,7 +52,7 @@ public class QuestionnaireSectionController {
     @PostMapping(UNIT_URL + "/questionnaire_template/{templateId}/section")
     public ResponseEntity<Object> saveQuestionnaireSectionToQuestionnaireTemplateOfUnit(@PathVariable Long unitId, @PathVariable BigInteger templateId, @Validated @RequestBody ValidateRequestBodyList<QuestionnaireSectionDTO> questionnaireSectionsDto) {
         if (CollectionUtils.isEmpty(questionnaireSectionsDto.getRequestBody())) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true,"Section List Must Not Be Empty" );
+            return ResponseHandler.invalidResponse(HttpStatus.OK, true,"Section List Must Not Be Empty" );
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplateOfUnit(unitId, templateId, questionnaireSectionsDto.getRequestBody()));
     }
