@@ -376,6 +376,17 @@ public class CounterRepository {
         return results.getMappedResults().stream().map(s-> new BigInteger(s.get("_id").toString())).collect(Collectors.toList());
     }
 
+    public List<AccessGroupMappingDTO> getAccessGroupAndKpiId(Set<Long> accessGroupIds , ConfLevel level, Long refId){
+        String refQueryField = getRefQueryField(level);
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
+                Aggregation.group("id","accessGroupId").push("kpiId").as("kpiIds")
+        );
+        AggregationResults<AccessGroupMappingDTO> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,AccessGroupMappingDTO.class);
+        return results.getMappedResults();
+
+    }
+
     public List<ApplicableKPI> getApplicableKPIByReferenceId(List<BigInteger> kpiIds,List<Long> refId, ConfLevel level){
         String refQueryField = getRefQueryField(level);
         Query query=null;

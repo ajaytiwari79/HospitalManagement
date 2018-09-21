@@ -243,4 +243,10 @@ public class AccessGroupController {
     public ResponseEntity<Map<String, Object>> getStaffIdsByUnitIdAndAccessGroupId(@PathVariable Long unitId,@RequestBody List<Long> accessGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId));
     }
+
+    @ApiOperation("get staff ids by unit id and accessgroup id")
+    @PostMapping(value = UNIT_URL+"/staffs/access_groups")
+    public ResponseEntity<Map<String, Object>> getStaffIdAndAccessGroupsByUnitIdAndAccessGroupId(@PathVariable Long unitId,@RequestBody List<Long> accessGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getStaffAndAccessGroupsByUnitId(unitId,accessGroupId));
+    }
 }

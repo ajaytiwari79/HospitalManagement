@@ -20,22 +20,28 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
+import com.kairos.rest_client.GenericRestClient;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com
@@ -50,7 +56,8 @@ public class CounterDistService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject
     private GenericIntegrationService genericIntegrationService;
-
+    @Inject
+    private GenericRestClient genericRestClient;
     private final static Logger logger = LoggerFactory.getLogger(CounterDistService.class);
 
     //get access group page and dashboard tab
@@ -303,15 +310,27 @@ public class CounterDistService extends MongoBaseService {
             if(!Optional.ofNullable(accessGroupKPIEntry).isPresent()){
                 exceptionService.dataNotFoundByIdException("message.accessgroup.kpi.notfound");
             }
-//            List<AccessGroupKPIEntry> accessGroupKPIEntries=counterRepository.getAccessGroupKPIByUnitId(accessGroupMappingDTO,refId,level);
-//            boolean isExist=accessGroupKPIEntries.stream().anyMatch(accessGroupKPI -> accessGroupKPI.getKpiId().equals(accessGroupKPIEntry.getKpiId()));
-//            if(!isExist) {
-                List<StaffIdsDTO> staffIdsDTOS = genericIntegrationService.getStaffIdsByunitAndAccessGroupId(accessGroupKPIEntry.getUnitId(), Arrays.asList(accessGroupKPIEntry.getAccessGroupId()));
-                List<Long> staffIds = staffIdsDTOS.stream().flatMap(staffIdsDTO -> staffIdsDTO.getStaffIds().stream()).collect(Collectors.toList());
+                List<AccessGroupPermissionCounterDTO> staffAndAccessGroups=genericRestClient.publishRequest(Arrays.asList(accessGroupKPIEntry.getAccessGroupId()), accessGroupKPIEntry.getUnitId(), true, IntegrationOperation.CREATE, "/staffs/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AccessGroupPermissionCounterDTO>>>(){});
+                Set<Long> accessGroupsIds=staffAndAccessGroups.stream().flatMap(accessGroupDTO -> accessGroupDTO.getAccessGroupIds().stream().filter(accessGroup ->!(accessGroup.equals(accessGroupMappingDTO.getAccessGroupId())))).collect(toSet());
+                List<AccessGroupMappingDTO> accessGroupMappingDTOS=counterRepository.getAccessGroupAndKpiId(accessGroupsIds,level,refId);
+                Map<Long,List<BigInteger>> staffKpiMap=new HashMap<>();
+                Map<Long,List<BigInteger>> accessGroupKpiMap=new HashMap<>();
+                List<Long> staffIds=new ArrayList<>();
+                accessGroupMappingDTOS.stream().forEach(accessGroupDTO -> {
+                    accessGroupKpiMap.put(accessGroupDTO.getAccessGroupId(),accessGroupDTO.getKpiIds());
+                });
+                staffAndAccessGroups.stream().forEach(accessGroupDTO -> {
+                    staffKpiMap.put(accessGroupDTO.getStaffId(),new ArrayList<>());
+                });
+                staffAndAccessGroups.stream().forEach(accessGroupsDTO ->accessGroupsDTO.getAccessGroupIds().stream().forEach(accessGroupId -> {
+                    if(accessGroupId!=accessGroupMappingDTO.getAccessGroupId())
+                    staffKpiMap.get(accessGroupsDTO.getStaffId()).addAll((accessGroupKpiMap.getOrDefault(accessGroupId,new ArrayList<>())));
+                        }));
+                 staffIds=(List)staffKpiMap.entrySet().stream().filter(o->!(o.getValue().equals(accessGroupMappingDTO.getKpiId()))).collect(toList());
+                 List<StaffIdsDTO> staffIdsDTOS = genericIntegrationService.getStaffIdsByunitAndAccessGroupId(accessGroupKPIEntry.getUnitId(), Arrays.asList(accessGroupKPIEntry.getAccessGroupId()));
                 counterRepository.removeApplicableKPI(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()), refId, ConfLevel.STAFF);
                 counterRepository.removeTabKPIEntry(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()), ConfLevel.STAFF);
-           // }
-            counterRepository.removeEntityById(accessGroupKPIEntry.getId(), AccessGroupKPIEntry.class);
+                counterRepository.removeEntityById(accessGroupKPIEntry.getId(), AccessGroupKPIEntry.class);
         }else{
             counterRepository.removeAccessGroupKPIEntryForCountry(accessGroupMappingDTO,refId);
         }
