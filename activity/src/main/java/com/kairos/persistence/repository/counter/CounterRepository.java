@@ -192,10 +192,8 @@ public class CounterRepository {
         }
         Aggregation aggregation=Aggregation.newAggregation(Aggregation.match(criteria),
                 Aggregation.lookup("counter","kpiId","_id","kpis"),
-                Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpis"),
-                Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis.title").as("kpi.title").
-                        and("kpis._id").as("kpi._id").and("kpis.counter").as("kpi.counter"),
-                Aggregation.sort(Sort.Direction.ASC,"priority"));
+                Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpi"),
+         Aggregation.sort(Sort.Direction.ASC,"priority"));
         AggregationResults<TabKPIDTO> results=mongoTemplate.aggregate(aggregation,TabKPIConf.class,TabKPIDTO.class);
         return results.getMappedResults();
     }
@@ -210,9 +208,7 @@ public class CounterRepository {
         Aggregation aggregation=Aggregation.newAggregation(
           Aggregation.match(criteria),
           Aggregation.lookup("counter","kpiId","_id","kpis"),
-          Aggregation.project("tabId","position","id").and("kpis").arrayElementAt(0).as("kpis"),
-          Aggregation.project("tabId","position","id").and("kpis.title").as("kpi.title").
-                  and("kpis._id").as("kpi._id").and("kpis.counter").as("kpi.counter")
+          Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpi")
         );
         AggregationResults<TabKPIDTO> aggregationResults=mongoTemplate.aggregate(aggregation,TabKPIConf.class,TabKPIDTO.class);
         return aggregationResults.getMappedResults();
@@ -230,9 +226,7 @@ public class CounterRepository {
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(criteria),
                 Aggregation.lookup("counter","kpiId","_id","kpis"),
-                Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpis"),
-                Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis.title").as("kpi.title").
-                        and("kpis._id").as("kpi._id").and("kpis.counter").as("kpi.counter"),
+                Aggregation.project("tabId","position","id","size","kpiValidity","locationType","priority","level").and("kpis").arrayElementAt(0).as("kpi"),
                 Aggregation.sort(Sort.Direction.ASC,"priority")
         );
         AggregationResults<TabKPIDTO> aggregationResults=mongoTemplate.aggregate(aggregation,TabKPIConf.class,TabKPIDTO.class);

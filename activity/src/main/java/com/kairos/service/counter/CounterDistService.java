@@ -201,7 +201,7 @@ public class CounterDistService extends MongoBaseService {
     }
 
     public List<TabKPIDTO> filterTabKpiDate(List<TabKPIDTO> tabKPIDTOS){
-        Map<BigInteger,TabKPIDTO> filterResults=new HashMap<>();
+        Map<BigInteger,TabKPIDTO> filterResults=new LinkedHashMap<>();
         tabKPIDTOS.stream().forEach(tabKPIDTO -> {
             filterResults.put(tabKPIDTO.getKpi().getId(),tabKPIDTO);
         });
