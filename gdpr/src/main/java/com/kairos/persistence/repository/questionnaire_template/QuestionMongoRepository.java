@@ -15,7 +15,7 @@ public interface QuestionMongoRepository extends MongoBaseRepository<Question, B
     Question findByNameAndCountryId(Long countryId, String name);
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
-    Question findByIdAndNonDeleted(Long countryId, BigInteger id);
+    Question findByCountryIdAndId(Long countryId, BigInteger id);
 
     Question findByid(BigInteger id);
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.QuestionType;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -20,7 +21,7 @@ public class QuestionDTO {
 
     private boolean required;
 
-    @NotBlank(message = "Question type Must be Text ,Yes no May")
+    @NotNull(message = "Question type Must be Text ,Yes no May")
     private QuestionType questionType;
 
     private String attributeName;

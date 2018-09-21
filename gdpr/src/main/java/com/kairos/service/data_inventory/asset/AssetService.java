@@ -160,9 +160,9 @@ public class AssetService extends MongoBaseService {
      * @description method return audit history of asset , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId, int size, int skip) {
+    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId) {
 
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class).limit(size).skip(skip);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
         return javersCommonService.getHistoryMap(changes, assetId, Asset.class);

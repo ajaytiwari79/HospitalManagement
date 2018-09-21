@@ -39,45 +39,37 @@ public class Question extends MongoBaseEntity {
 
     public String getAttributeName() { return attributeName; }
 
-    public void setAttributeName(String attributeName) { this.attributeName = attributeName; }
+    public Question setAttributeName(String attributeName) { this.attributeName = attributeName;  return this;}
 
     public Long getCountryId() {
         return countryId;
     }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
+    public void  setCountryId(Long countryId) { this.countryId = countryId; }
 
     public String getQuestion() {
         return question;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
-    }
+    public Question setQuestion(String question) { this.question = question; return this;}
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public Question setDescription(String description) { this.description = description; return this; }
 
     public QuestionType getQuestionType() { return questionType; }
 
-    public void setQuestionType(QuestionType questionType) {
-        this.questionType = questionType;
-    }
+    public Question setQuestionType(QuestionType questionType) { this.questionType = questionType; return this; }
 
     public boolean isRequired() { return required; }
 
-    public void setRequired(boolean required) { this.required = required; }
+    public Question setRequired(boolean required) { this.required = required; return this; }
 
-    public boolean isNotSureAllowed() { return notSureAllowed; }
+    public boolean isNotSureAllowed() { return notSureAllowed;}
 
-    public void setNotSureAllowed(boolean notSureAllowed) { this.notSureAllowed = notSureAllowed; }
+    public Question setNotSureAllowed(boolean notSureAllowed) { this.notSureAllowed = notSureAllowed;  return this;}
 
     public Question() {
     }

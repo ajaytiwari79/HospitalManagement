@@ -94,7 +94,7 @@ public class QuestionnaireTemplateController {
     @ApiOperation(value = "get questionnaire template With Sections by Id of unit")
     @GetMapping(UNIT_URL+"/questionnaire_template/{questionnaireTemplateId}")
     public ResponseEntity<Object> getQuestionnaireTemplateWithSectionAndQuestionById(@PathVariable Long unitId, @PathVariable BigInteger questionnaireTemplateId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getQuestionnaireTemplateWithSectionById(unitId, questionnaireTemplateId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getQuestionnaireTemplateWithSectionByUnitIdAndId(unitId, questionnaireTemplateId));
     }
 
 

@@ -15,24 +15,25 @@ public class QuestionBasicResponseDTO {
 
     @NotBlank(message = "Name can't be empty")
     private String question;
-
     private String description;
-
     private Object assessmentQuestionValues;
-
     private QuestionType questionType;
-
     private String attributeName;
+    private boolean required;
+    private boolean notSureAllowed;
 
-    private boolean isRequired;
+
+    public boolean isNotSureAllowed() { return notSureAllowed; }
+
+    public void setNotSureAllowed(boolean notSureAllowed) { this.notSureAllowed = notSureAllowed; }
 
     public String getAttributeName() { return attributeName; }
 
     public void setAttributeName(String attributeName) { this.attributeName = attributeName; }
 
-    public boolean isRequired() { return isRequired; }
+    public boolean isRequired() { return required; }
 
-    public void setRequired(boolean required) { isRequired = required; }
+    public void setRequired(boolean required) { this.required = required; }
 
     public BigInteger getId() {
         return id;

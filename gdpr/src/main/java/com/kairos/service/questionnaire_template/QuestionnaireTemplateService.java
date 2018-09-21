@@ -264,7 +264,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
      * That why  we are not using JsonInclude.NON_EMPTY so we can get response of section as [{id=null,name=null,description=null}] instead of section [{}]
      * and filter section in application layer and send empty array of section []
      */
-    public QuestionnaireTemplateResponseDTO getQuestionnaireTemplateWithSectionById(Long unitId, BigInteger questionnaireTemplateId) {
+    public QuestionnaireTemplateResponseDTO getQuestionnaireTemplateWithSectionByUnitIdAndId(Long unitId, BigInteger questionnaireTemplateId) {
         QuestionnaireTemplateResponseDTO templateResponseDto = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, questionnaireTemplateId);
         if (templateResponseDto.getSections().get(0).getId() == null) {
             templateResponseDto.setSections(new ArrayList<>());

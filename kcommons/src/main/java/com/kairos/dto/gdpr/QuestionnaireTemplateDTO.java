@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
@@ -20,7 +21,7 @@ public class QuestionnaireTemplateDTO {
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
-    @NotBlank(message = "Template type cannot be empty ")
+    @NotNull(message = "Template type cannot be empty ")
     private QuestionnaireTemplateType templateType;
 
     private BigInteger assetType;
