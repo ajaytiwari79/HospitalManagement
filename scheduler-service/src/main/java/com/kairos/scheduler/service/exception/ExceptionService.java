@@ -40,4 +40,7 @@ public class ExceptionService {
     public void duplicateDataException(String message, Object... params) {
         throw new DuplicateDataException(convertMessage(message, params));
     }
+    public void internalError(String message, Object... params) {
+        throw new InternalError(convertMessage(message, params));
+    }
     }
