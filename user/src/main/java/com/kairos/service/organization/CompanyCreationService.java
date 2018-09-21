@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
+import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
@@ -547,8 +548,8 @@ public class CompanyCreationService {
 
 
         // if more than 2 default things needed make a  async service Please
-
-        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.createDefaultAccessGroups(organization);
+        List<AccessGroup> accessGroups=accountTypeGraphRepository.getAccessGroupsByAccountTypeId(organization.getAccountType().getId());
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap=accessGroupService.createDefaultAccessGroupsInOrganization(organization,accessGroups);
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
@@ -559,7 +560,7 @@ public class CompanyCreationService {
         CompletableFuture.allOf(hasUpdated).join();
 
         CompletableFuture<Boolean> createdInUnit = companyDefaultDataService
-                .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);
+                .createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots,accessGroups);
         CompletableFuture.allOf(createdInUnit).join();
 
         return true;
