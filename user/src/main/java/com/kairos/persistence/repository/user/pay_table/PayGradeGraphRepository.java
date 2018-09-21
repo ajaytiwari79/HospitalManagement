@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_BASE_PAY_GRADE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PAY_GROUP_AREA;
 
 /**
@@ -35,4 +36,7 @@ public interface PayGradeGraphRepository extends Neo4jBaseRepository<PayGrade, L
     @Query("MATCH (payGrade:PayGrade{deleted:false}) where id(payGrade) IN {0}\n" +
             "return payGrade")
     List<PayGrade> getAllPayGradesById(Set<Long> payGradeIds);
+
+    @Query("Match(pg:PayGrade)-[:"+HAS_BASE_PAY_GRADE+"]-(sl:SeniorityLevel) where id(sl)={0} return pg")
+    PayGrade getPayGradeBySeniorityLevelId(Long id);
 }

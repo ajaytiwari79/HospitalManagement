@@ -426,7 +426,11 @@ public class ShiftService extends MongoBaseService {
             Set<DayOfWeek> dayOfWeeks = new HashSet<>();
             List<LocalDate> publicHolidays = new ArrayList<>();
             for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
-                daytypesMap.get(dayTypeId).forEach(day -> {
+                List<Day> currentDay=daytypesMap.get(dayTypeId);
+                if (currentDay==null){
+                    exceptionService.dataNotFoundByIdException("error.dayType.notFound",dayTypeId);
+                }
+                currentDay.forEach(day -> {
                     if (!day.name().equals(EVERYDAY)) {
                         dayOfWeeks.add(DayOfWeek.valueOf(day.name()));
                     } else {
