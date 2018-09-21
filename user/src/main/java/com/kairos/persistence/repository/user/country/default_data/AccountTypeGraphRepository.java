@@ -36,7 +36,7 @@ public interface AccountTypeGraphRepository extends Neo4jBaseRepository<AccountT
             "RETURN id(accountType) as id,accountType.name as name,count(ag) as count")
     List<AccountTypeAccessGroupCountQueryResult> getAllAccountTypeWithAccessGroupCountByCountryId(Long countryId);
 
-    @Query("(MATCH (accountType:AccountType{deleted:false}) where id(accountType)={0} " +
+    @Query("MATCH (accountType:AccountType{deleted:false}) where id(accountType)={0} " +
             "MATCH (ag:AccessGroup{deleted:false})-[:" + HAS_ACCOUNT_TYPE + "]->(accountType)" +
             "RETURN ag")
     List<AccessGroup> getAccessGroupsByAccountTypeId(Long accountTypeId);
