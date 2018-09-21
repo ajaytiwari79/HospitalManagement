@@ -25,7 +25,7 @@ public class RestClientUrlUtil {
             return baseUrl;
         }else {
             if (hasUnitInUrl) {
-                String baseUrl = new StringBuilder(userServiceUrl).append("organization/24").append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+                String baseUrl = new StringBuilder(userServiceUrl).append("unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 return baseUrl;
             } else {
                 String baseUrl = new StringBuilder(userServiceUrl).append("country/").append(id).toString();
