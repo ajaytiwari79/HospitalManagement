@@ -73,6 +73,18 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "create unique (orgAccessGroup)-[orgAccessPageRel:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:r.read, write:r.write}]->(accessPage) return orgAccessPageRel")
     List<Map<String,Object>> setAccessPagePermissionForAccessGroup(Long countryAccessGroupId, Long orgAccessGroupId);
 
+    /**
+     * @Desc   Its a substitute of the above method
+     * @Author vipul
+     * @param  List<accessPageId>
+     * @param  List<organizationAccessGroups>
+     */
+    @Query("Match (accessGroup:AccessGroup) where id(accessGroup) IN {0} \n" +
+            "Match (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]->(accessPage:AccessPage) \n" +
+            "Match (orgAccessGroup:AccessGroup) where id(orgAccessGroup) IN {1} \n" +
+            "create unique (orgAccessGroup)-[orgAccessPageRel:"+HAS_ACCESS_OF_TABS+"{isEnabled:true, read:r.read, write:r.write}]->(accessPage) ")
+    void setAccessPagePermissionForAccessGroup(List<Long> countryAccessGroupId, List<Long> orgAccessGroupId);
+
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:SUB_PAGE*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
             "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage\n" +

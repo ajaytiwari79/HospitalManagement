@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.country.default_data;
 
 
+import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountTypeAccessGroupCountQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -34,4 +35,10 @@ public interface AccountTypeGraphRepository extends Neo4jBaseRepository<AccountT
             "Optional MATCH (ag:AccessGroup{deleted:false})-[:" + HAS_ACCOUNT_TYPE + "]->(accountType)" +
             "RETURN id(accountType) as id,accountType.name as name,count(ag) as count")
     List<AccountTypeAccessGroupCountQueryResult> getAllAccountTypeWithAccessGroupCountByCountryId(Long countryId);
+
+    @Query("MATCH (accountType:AccountType{deleted:false}) where id(accountType)={0} " +
+            "MATCH (ag:AccessGroup{deleted:false})-[:" + HAS_ACCOUNT_TYPE + "]->(accountType)" +
+            "RETURN ag")
+    List<AccessGroup> getAccessGroupsByAccountTypeId(Long accountTypeId);
+
 }
