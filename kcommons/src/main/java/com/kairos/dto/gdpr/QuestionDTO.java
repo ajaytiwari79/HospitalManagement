@@ -2,6 +2,7 @@ package com.kairos.dto.gdpr;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.gdpr.QuestionType;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
@@ -17,22 +18,18 @@ public class QuestionDTO {
     @NotBlank(message = "Description  can't be  Empty")
     private String description;
 
-    private Boolean isRequired=false;
+    private boolean required;
 
     @NotBlank(message = "Question type Must be Text ,Yes no May")
-    private String questionType;
+    private QuestionType questionType;
 
     private String attributeName;
 
-    private Boolean isNotSureAllowed=false;
+    private boolean notSureAllowed;
 
-    private Boolean isNotApplicableAllowed=false;
+    public String getAttributeName() { return attributeName; }
 
-    public String getAttributeName() {
-        return attributeName; }
-
-    public void setAttributeName(String attributeName) {
-        this.attributeName = attributeName; }
+    public void setAttributeName(String attributeName) { this.attributeName = attributeName; }
 
     public BigInteger getId() {
         return id;
@@ -40,14 +37,6 @@ public class QuestionDTO {
 
     public void setId(BigInteger id) {
         this.id = id;
-    }
-
-    public Boolean getNotApplicableAllowed() {
-        return isNotApplicableAllowed;
-    }
-
-    public void setNotApplicableAllowed(Boolean notApplicableAllowed) {
-        isNotApplicableAllowed = notApplicableAllowed;
     }
 
     public String getQuestion() {
@@ -66,27 +55,16 @@ public class QuestionDTO {
         this.description = description;
     }
 
-    public Boolean getRequired() {
-        return isRequired;
-    }
+    public QuestionType getQuestionType() { return questionType; }
 
-    public void setRequired(Boolean required) {
-        isRequired = required;
-    }
+    public void setQuestionType(QuestionType questionType) { this.questionType = questionType; }
 
-    public String getQuestionType() {
-        return questionType;
-    }
+    public boolean isRequired() { return required; }
 
-    public void setQuestionType(String questionType) {
-        this.questionType = questionType;
-    }
+    public void setRequired(boolean required) { this.required = required; }
 
-    public Boolean getNotSureAllowed() {
-        return isNotSureAllowed;
-    }
+    public boolean isNotSureAllowed() { return notSureAllowed; }
 
-    public void setNotSureAllowed(Boolean notSureAllowed) {
-        isNotSureAllowed = notSureAllowed;
-    }
+    public void setNotSureAllowed(boolean notSureAllowed) { this.notSureAllowed = notSureAllowed; }
+
 }

@@ -14,14 +14,22 @@ import java.util.List;
 @Document(collection = "questionnaire_section")
 public class QuestionnaireSection extends MongoBaseEntity {
 
-    @NotBlank(message = "Title can't be empty")
     private String title;
-
-    @NotNull(message = "list.cannot.be.null")
-    @NotEmpty(message = "list.cannot.be.empty")
     private List<BigInteger> questions=new ArrayList<>();
-
     private Long countryId;
+
+
+    public QuestionnaireSection(String title, Long countryId) {
+        this.title = title;
+        this.countryId = countryId;
+    }
+
+
+    public QuestionnaireSection(String title) {
+        this.title = title;
+    }
+    public QuestionnaireSection() {
+    }
 
     public Long getCountryId() {
         return countryId;
@@ -47,11 +55,6 @@ public class QuestionnaireSection extends MongoBaseEntity {
         this.questions = questions;
     }
 
-    public QuestionnaireSection(String title, Long countryId) {
-        this.title = title;
-        this.countryId = countryId;
-    }
 
-    public QuestionnaireSection() {
-    }
+
 }

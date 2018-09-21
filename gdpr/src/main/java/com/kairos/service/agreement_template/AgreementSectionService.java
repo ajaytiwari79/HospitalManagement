@@ -290,11 +290,8 @@ public class AgreementSectionService extends MongoBaseService {
         agreementSubSections.clear();
         agreementSubSectionListAndCoresspondingToAgreementSectionMap.forEach((agreementSection, subSectionList) -> {
             if (!agreementSection.isSubSection()) {
-                List<BigInteger> subSectionsIdList = new ArrayList<>();
-                subSectionList.forEach(subSection -> subSectionsIdList.add(subSection.getId()));
-                agreementSection.getSubSections().addAll(subSectionsIdList);
+                agreementSection.getSubSections().addAll(subSectionList.stream().map(AgreementSection::getId).collect(Collectors.toList()));
                 agreementSubSections.add(agreementSection);
-
             }
         });
         return agreementSubSections;

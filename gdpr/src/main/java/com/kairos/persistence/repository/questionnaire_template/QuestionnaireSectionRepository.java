@@ -22,7 +22,10 @@ public interface QuestionnaireSectionRepository extends MongoBaseRepository<Ques
     QuestionnaireSection findByIdAndNonDeleted(Long countryId, BigInteger id);
 
     @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
-    List<QuestionnaireSection> getQuestionnaireSectionListByIds(Long countryId, List<BigInteger> ids);
+    List<QuestionnaireSection> findSectionByCountryIdAndIds(Long countryId, List<BigInteger> ids);
+
+    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
+    List<QuestionnaireSection> findSectionByUnitIdAndIds(Long countryId, List<BigInteger> ids);
 
     QuestionnaireSection findByid(BigInteger id);
 

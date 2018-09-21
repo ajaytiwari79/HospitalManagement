@@ -23,8 +23,10 @@ public interface QuestionMongoRepository extends MongoBaseRepository<Question, B
     List<Question> getAllMasterQuestion(Long countryId);
 
     @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
-    List<Question> getMasterQuestionListByIds(Long countryId, List<BigInteger> ids);
+    List<Question> getMasterQuestionByCountryIdAndIds(Long countryId, List<BigInteger> questionIds);
 
+    @Query("{organizationId:?0,_id:{$in:?1},deleted:false}")
+    List<Question> getQuestionByUnitIdAndIds(Long unitId, List<BigInteger> questionIds);
 
 
 }

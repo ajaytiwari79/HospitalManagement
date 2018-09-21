@@ -14,7 +14,10 @@ import java.math.BigInteger;
 public interface QuestionnaireTemplateMongoRepository extends MongoBaseRepository<QuestionnaireTemplate,BigInteger>,CustomQuestionnaireTemplateRepository {
 
     @Query("{deleted:false,countryId:?0,_id:?1}")
-    QuestionnaireTemplate findByIdAndCountryId(Long countryId, BigInteger id);
+    QuestionnaireTemplate findByCountryIdAndId(Long countryId, BigInteger questionnaireTemplateId);
+
+    @Query("{deleted:false,organizationId:?0,_id:?1}")
+    QuestionnaireTemplate findByUnitIdAndId(Long countryId, BigInteger questionnaireTemplateId);
 
     QuestionnaireTemplate findByid(BigInteger id);
 

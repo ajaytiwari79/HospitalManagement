@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -19,7 +20,7 @@ public class QuestionnaireSectionDTO {
     private String title;
 
     @Valid
-    private List<QuestionDTO> questions;
+    private List<QuestionDTO> questions=new ArrayList<>();
 
     private Boolean deleted;
 

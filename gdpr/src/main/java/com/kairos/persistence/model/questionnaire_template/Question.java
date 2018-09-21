@@ -13,20 +13,29 @@ public class Question extends MongoBaseEntity {
 
     @NotBlank(message = "Question cant'be empty")
     private String question;
-
     @NotBlank(message = "Description can't be empty")
     private String description;
-
-    private Boolean isRequired=false;
-
+    private boolean required;
     @NotNull
     private QuestionType questionType;
-
-    private boolean isNotSureAllowed=false;
-
+    private boolean notSureAllowed;
     private String attributeName;
-
     private Long countryId;
+
+    public Question(String question, String description,  boolean required,QuestionType questionType, boolean notSureAllowed, Long countryId) {
+        this.question = question;
+        this.description = description;
+        this.questionType = questionType;
+        this.countryId = countryId;
+    }
+
+    public Question( String question, String description, boolean required, QuestionType questionType, boolean notSureAllowed) {
+        this.question = question;
+        this.description = description;
+        this.required = required;
+        this.questionType = questionType;
+        this.notSureAllowed = notSureAllowed;
+    }
 
     public String getAttributeName() { return attributeName; }
 
@@ -56,32 +65,19 @@ public class Question extends MongoBaseEntity {
         this.description = description;
     }
 
-    public Boolean getRequired() {
-        return isRequired;
-    }
-
-    public void setRequired(Boolean required) { isRequired = required; }
-
-    public void setNotSureAllowed(Boolean notSureAllowed) {
-        isNotSureAllowed = notSureAllowed;
-    }
-
     public QuestionType getQuestionType() { return questionType; }
 
     public void setQuestionType(QuestionType questionType) {
         this.questionType = questionType;
     }
 
-    public boolean isNotSureAllowed() { return isNotSureAllowed; }
+    public boolean isRequired() { return required; }
 
-    public void setNotSureAllowed(boolean notSureAllowed) { isNotSureAllowed = notSureAllowed; }
+    public void setRequired(boolean required) { this.required = required; }
 
-    public Question(String question, String description, QuestionType questionType, Long countryId) {
-        this.question = question;
-        this.description = description;
-        this.questionType = questionType;
-        this.countryId = countryId;
-    }
+    public boolean isNotSureAllowed() { return notSureAllowed; }
+
+    public void setNotSureAllowed(boolean notSureAllowed) { this.notSureAllowed = notSureAllowed; }
 
     public Question() {
     }
