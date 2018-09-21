@@ -1,7 +1,11 @@
 package com.kairos.controller.organization;
 
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.persistence.model.client.ClientStaffDTO;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Organization;
@@ -29,15 +33,9 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.service.unit_position.UnitPositionService;
-import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
-
-import com.kairos.dto.user.staff.client.ClientFilterDTO;
-import com.kairos.utils.response.ResponseHandler;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.utils.response.ResponseHandler;
 import com.kairos.utils.user_context.UserContext;
-import com.sun.deploy.ui.UITextArea;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -49,12 +47,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import javax.inject.Inject;
-import javax.validation.UnexpectedTypeException;
 import javax.validation.Valid;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
