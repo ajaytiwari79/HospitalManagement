@@ -323,11 +323,10 @@ public class CounterDistService extends MongoBaseService {
                     staffKpiMap.put(accessGroupDTO.getStaffId(),new ArrayList<>());
                 });
                 staffAndAccessGroups.stream().forEach(accessGroupsDTO ->accessGroupsDTO.getAccessGroupIds().stream().forEach(accessGroupId -> {
-                    if(accessGroupId!=accessGroupMappingDTO.getAccessGroupId())
+                    if(accessGroupMappingDTO.getAccessGroupId()!=accessGroupId)
                     staffKpiMap.get(accessGroupsDTO.getStaffId()).addAll((accessGroupKpiMap.getOrDefault(accessGroupId,new ArrayList<>())));
                         }));
-                 staffIds=(List)staffKpiMap.entrySet().stream().filter(o->!(o.getValue().equals(accessGroupMappingDTO.getKpiId()))).collect(toList());
-                 List<StaffIdsDTO> staffIdsDTOS = genericIntegrationService.getStaffIdsByunitAndAccessGroupId(accessGroupKPIEntry.getUnitId(), Arrays.asList(accessGroupKPIEntry.getAccessGroupId()));
+                staffIds=(List)staffKpiMap.entrySet().stream().filter(o->!(o.getValue().equals(accessGroupMappingDTO.getKpiId()))).collect(toList());
                 counterRepository.removeApplicableKPI(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()), refId, ConfLevel.STAFF);
                 counterRepository.removeTabKPIEntry(staffIds, Arrays.asList(accessGroupKPIEntry.getKpiId()), ConfLevel.STAFF);
                 counterRepository.removeEntityById(accessGroupKPIEntry.getId(), AccessGroupKPIEntry.class);
