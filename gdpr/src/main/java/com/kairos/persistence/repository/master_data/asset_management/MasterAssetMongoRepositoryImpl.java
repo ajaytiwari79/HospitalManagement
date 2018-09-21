@@ -39,9 +39,9 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
 
 
     @Override
-    public MasterAsset findByName(Long countryId, Long organizationId, String name) {
+    public MasterAsset findByName(Long countryId,  String name) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name).and(ORGANIZATION_ID).is(organizationId));
+        query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name));
         query.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         return mongoTemplate.findOne(query, MasterAsset.class);
@@ -50,9 +50,9 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
 
 
     @Override
-    public List<MasterAssetResponseDTO> getAllMasterAssetWithAssetTypeAndSubAssetType(Long countryId, Long organizationId) {
+    public List<MasterAssetResponseDTO> getAllMasterAssetWithAssetTypeAndSubAssetType(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
                 new CustomAggregationOperation(masterAssetProjectionOperation)
@@ -65,9 +65,9 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
 
 
     @Override
-    public MasterAssetResponseDTO getMasterAssetWithAssetTypeAndSubAssetTypeById(Long countryId, Long organizationId, BigInteger id) {
+    public MasterAssetResponseDTO getMasterAssetWithAssetTypeAndSubAssetTypeById(Long countryId, BigInteger id) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("_id").is(id)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("_id").is(id)),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
                 new CustomAggregationOperation(masterAssetProjectionOperation)
@@ -81,9 +81,9 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
 
 
     @Override
-    public List<MasterAssetResponseDTO> getMasterAssetDataWithFilterSelection(Long countryId, Long organizationId, FilterSelectionDTO filterSelectionDto) {
+    public List<MasterAssetResponseDTO> getMasterAssetDataWithFilterSelection(Long countryId, FilterSelectionDTO filterSelectionDto) {
 
-        Criteria criteria = Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId);
+        Criteria criteria = Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false);
 
         List<Criteria> clauseCriteria = new ArrayList<>(filterSelectionDto.getFiltersData().size());
         filterSelectionDto.getFiltersData().forEach(filterSelection -> {
@@ -133,10 +133,9 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     }
 
     @Override
-    public List<MasterAsset> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long countryId, Long organizationId, OrganizationMetaDataDTO organizationMetaDataDTO) {
+    public List<MasterAsset> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long countryId,  OrganizationMetaDataDTO organizationMetaDataDTO) {
 
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
-                .and(ORGANIZATION_ID).is(organizationId)
                 .and(DELETED).is(false));
         query.addCriteria(Criteria.where("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationService().getId()));
         query.addCriteria(Criteria.where("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubType().getId()));

@@ -15,21 +15,19 @@ import java.util.List;
 public interface CustomMasterProcessingActivity {
 
 
-   MasterProcessingActivity findByName(Long countryId,Long unitId,String name);
+   MasterProcessingActivity findByName(Long countryId,String name);
 
-   MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId,Long unitId, BigInteger id);
+   MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId, BigInteger id);
 
-   List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId,Long unitId);
+   List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityListWithSubProcessingActivity(Long countryId);
 
-   List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityWithFilterSelection(Long countryId,Long unitId,FilterSelectionDTO filterSelectionDto);
+   List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityWithFilterSelection(Long countryId,FilterSelectionDTO filterSelectionDto);
 
    Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType);
 
-   List<MasterProcessingActivity> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO);
+   List<MasterProcessingActivity> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId,  OrganizationMetaDataDTO organizationMetaDataDTO);
 
-   List<MasterProcessingActivityRiskResponseDTO>  getAllProcessingActivityWithLinkedRisks(Long countryId,Long unitId);
-
-   List<MasterProcessingActivityRiskResponseDTO> getAllSubProcessingActivityWithLinkedRisksByProcessingActivityId(Long countryId,Long unitId,BigInteger processingActivityId);
+   List<MasterProcessingActivityRiskResponseDTO> getAllProcessingActivityWithLinkedRisksAndSubProcessingActivitiesByCountryId(Long countryId);
 
 
 }

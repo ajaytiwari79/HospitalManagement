@@ -39,13 +39,13 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Map<String, AggregationOperation> getFilterCriteria(Long countryId, Long organizationId, List<FilterType> filterTypes, FilterGroup filterGroup) {
+    public Map<String, AggregationOperation> getFilterCriteria(Long countryId,  List<FilterType> filterTypes, FilterGroup filterGroup) {
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
         if (filterGroup.getAccessModule().get(0).getModuleId().equals(MASTER_PROCESSING_ACTIVITY_MODULE_ID)) {
-            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId).and("isSubProcess").is(false)));
+            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false)));
 
         } else {
-            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
+            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)));
         }
         filterTypes.forEach(filterType -> {
                     buildAggregationQuery(filterType,aggregationOperations);

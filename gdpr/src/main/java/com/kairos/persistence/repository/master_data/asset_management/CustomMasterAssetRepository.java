@@ -14,18 +14,18 @@ import java.util.List;
 public interface CustomMasterAssetRepository {
 
 
-    MasterAsset findByName(Long countryId, Long organizationId, String name);
+    MasterAsset findByName(Long countryId, String name);
 
 
-    List<MasterAssetResponseDTO> getMasterAssetDataWithFilterSelection(Long countryId, Long organizationId, FilterSelectionDTO filterSelectionDto);
+    List<MasterAssetResponseDTO> getMasterAssetDataWithFilterSelection(Long countryId, FilterSelectionDTO filterSelectionDto);
 
     Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType);
 
-    List<MasterAssetResponseDTO> getAllMasterAssetWithAssetTypeAndSubAssetType(Long  countryId,Long organizationId);
+    List<MasterAssetResponseDTO> getAllMasterAssetWithAssetTypeAndSubAssetType(Long  countryId);
 
-    MasterAssetResponseDTO getMasterAssetWithAssetTypeAndSubAssetTypeById(Long  countryId, Long organizationId, BigInteger id);
+    MasterAssetResponseDTO getMasterAssetWithAssetTypeAndSubAssetTypeById(Long  countryId, BigInteger id);
 
-    List<MasterAsset> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId, Long organizationId, OrganizationMetaDataDTO organizationMetaDataDTO);
+    List<MasterAsset> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId, OrganizationMetaDataDTO organizationMetaDataDTO);
 
 
 }

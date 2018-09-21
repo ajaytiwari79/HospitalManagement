@@ -43,9 +43,6 @@ public class ResponsibilityTypeController {
     @ApiOperation("add ResponsibilityType  ")
     @PostMapping("/responsibility_type")
     public ResponseEntity<Object> createResponsibilityType(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<ResponsibilityTypeDTO> responsibilityTypes) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.createResponsibilityType(countryId, responsibilityTypes.getRequestBody()));
 
     }
@@ -54,9 +51,6 @@ public class ResponsibilityTypeController {
     @ApiOperation("get ResponsibilityType  by id")
     @GetMapping("/responsibility_type/{responsibilityTypeId}")
     public ResponseEntity<Object> getResponsibilityType(@PathVariable Long countryId, @PathVariable BigInteger responsibilityTypeId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(countryId, responsibilityTypeId));
     }
 
@@ -64,9 +58,6 @@ public class ResponsibilityTypeController {
     @ApiOperation("get all ResponsibilityType ")
     @GetMapping("/responsibility_type")
     public ResponseEntity<Object> getAllResponsibilityType(@PathVariable Long countryId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getAllResponsibilityType(countryId));
 
     }
@@ -74,11 +65,7 @@ public class ResponsibilityTypeController {
     @ApiOperation("delete ResponsibilityType  by id")
     @DeleteMapping("/responsibility_type/{responsibilityTypeId}")
     public ResponseEntity<Object> deleteResponsibilityType(@PathVariable Long countryId, @PathVariable BigInteger responsibilityTypeId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.deleteResponsibilityType(countryId, responsibilityTypeId));
+          return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.deleteResponsibilityType(countryId, responsibilityTypeId));
 
     }
 
@@ -86,11 +73,7 @@ public class ResponsibilityTypeController {
     @ApiOperation("update ResponsibilityType  by id")
     @PutMapping("/responsibility_type/{responsibilityTypeId}")
     public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long countryId, @PathVariable BigInteger responsibilityTypeId, @Valid @RequestBody ResponsibilityTypeDTO responsibilityType) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(countryId, responsibilityTypeId, responsibilityType));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(countryId, responsibilityTypeId, responsibilityType));
 
     }
 
@@ -99,7 +82,7 @@ public class ResponsibilityTypeController {
     @PutMapping("/responsibility_type")
     public ResponseEntity<Object> updateSuggestedStatusOfResponsibilityTypes(@PathVariable Long countryId, @RequestBody Set<BigInteger> responsibilityTypeIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(responsibilityTypeIds)) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Responsibility Type is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }

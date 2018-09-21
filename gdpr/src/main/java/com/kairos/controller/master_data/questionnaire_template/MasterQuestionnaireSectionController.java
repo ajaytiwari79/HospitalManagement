@@ -36,9 +36,7 @@ public class MasterQuestionnaireSectionController {
     @ApiOperation(value = "create and add questionnaire section to questionnaire template ")
     @PostMapping("/questionnaire_template/{templateId}/section")
     public ResponseEntity<Object> addMasterQuestionnaireSectionToQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger templateId, @Validated @RequestBody ValidateRequestBodyList<MasterQuestionnaireSectionDTO> questionnaireSectionsDto) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
+
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.addMasterQuestionnaireSectionToQuestionnaireTemplate(countryId, templateId, questionnaireSectionsDto.getRequestBody()));
 
 
@@ -53,7 +51,6 @@ public class MasterQuestionnaireSectionController {
     @ApiOperation("delete questionnaire section by id ")
     @DeleteMapping("/questionnaire_template/{templateId}/section/{id}")
     public ResponseEntity<Object> deleteMasterQuestionnaireSection(@PathVariable Long countryId,  @PathVariable BigInteger id,@PathVariable BigInteger templateId) {
-
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireSectionService.deleteQuestionnaireSection(countryId, id,templateId));
     }
 
