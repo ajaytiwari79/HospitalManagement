@@ -5,6 +5,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.util.Set;
 
 public class AccessGroupDTO {
     private Long id;
@@ -13,6 +15,10 @@ public class AccessGroupDTO {
     private String description;
     private AccessGroupRole role;
     private boolean enabled = true;
+    @NotNull(message = "error.startDate.notnull")
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private Set<Long> dayTypeIds;
     public AccessGroupDTO() {
         //default constructor
     }
@@ -62,6 +68,30 @@ public class AccessGroupDTO {
 
     public void setRole(AccessGroupRole role) {
         this.role = role;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public Set<Long> getDayTypeIds() {
+        return dayTypeIds;
+    }
+
+    public void setDayTypeIds(Set<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
     }
 
     @AssertTrue(message = "Access group can't be blank")

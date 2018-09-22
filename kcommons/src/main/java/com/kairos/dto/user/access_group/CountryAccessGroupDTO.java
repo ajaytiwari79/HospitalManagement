@@ -7,6 +7,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +27,10 @@ public class CountryAccessGroupDTO {
     private AccessGroupRole role;
     private boolean enabled = true;
     private Set<Long> accountTypeIds = new HashSet<>();
+    @NotNull(message = "error.startDate.notnull")
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private Set<Long> dayTypeIds;
 
     public CountryAccessGroupDTO() {
         // default constructor
@@ -92,6 +97,30 @@ public class CountryAccessGroupDTO {
 
     public void setAccountTypeIds(Set<Long> accountTypeIds) {
         this.accountTypeIds = accountTypeIds;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public Set<Long> getDayTypeIds() {
+        return dayTypeIds;
+    }
+
+    public void setDayTypeIds(Set<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
     }
 
     @AssertTrue(message = "Access group can't be blank")
