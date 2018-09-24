@@ -1,4 +1,4 @@
-package com.kairos.planner.config.mongo;
+package com.planner.appConfig.dbConfig;
 
 import com.kairos.activity.config.mongo_converter.*;
 import com.mongodb.DB;
@@ -19,18 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * Created by prabjot on 4/10/16.
- */
+
 @Configuration
-@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
-public class MongoConfig extends AbstractMongoConfiguration implements EnvironmentAware {
-    @Value("spring.data.mongodb.database")
+@PropertySource({"classpath:application-${spring.profiles.active}.properties" })
+public class MongoConfig extends AbstractMongoConfiguration {
+    @Value("${spring.data.mongodb.database}")
     private String DB_NAME;
-    @Value("spring.data.mongodb.uri")
+    @Value("${spring.data.mongodb.uri}")
     private String MONGO_URI;
 
-    Environment environment;
 
     @Override
     protected String getDatabaseName() {
@@ -38,7 +35,7 @@ public class MongoConfig extends AbstractMongoConfiguration implements Environme
     }
     @Override
     public MongoClient mongoClient() {
-        return new MongoClient(new MongoClientURI(this.environment.getProperty(MONGO_URI)));
+        return new MongoClient(new MongoClientURI(MONGO_URI));
     }
     @Bean
     public DB getDb(){
@@ -56,9 +53,9 @@ public class MongoConfig extends AbstractMongoConfiguration implements Environme
         converterList.add(new LocalDateTimeReadConverter());
         return new MongoCustomConversions(converterList);
     }
-
+/*
     @Override
     public void setEnvironment(Environment environment) {
         this.environment = environment;
-    }
+    }*/
 }
