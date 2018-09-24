@@ -491,6 +491,8 @@ public class PlanningPeriodService extends MongoBaseService {
         planningPeriod.setNextPhaseId(Optional.ofNullable(toBeNextPhase).isPresent() && toBeNextPhase.size() > 0 ? toBeNextPhase.get(0).getId() : null);
         PeriodPhaseFlippingDate periodPhaseFlippingDate=planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDates -> periodPhaseFlippingDates.getPhaseId().equals(planningPeriod.getCurrentPhaseId())).findFirst().get();
         periodPhaseFlippingDate.setSchedulerPanelId(null);
+        periodPhaseFlippingDate.setFlippingDate(LocalDate.now());
+        periodPhaseFlippingDate.setFlippingTime(LocalTime.now());
         flipShiftAndCreateShiftState(shifts, planningPeriod.getCurrentPhaseId());
         save(planningPeriod);
         List<BigInteger> schedulerPanelIds=planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDates -> periodPhaseFlippingDates.getPhaseId().equals(initialNextPhase.getId())).map(periodPhaseFlippingDates -> periodPhaseFlippingDate.getSchedulerPanelId()).collect(Collectors.toList());
