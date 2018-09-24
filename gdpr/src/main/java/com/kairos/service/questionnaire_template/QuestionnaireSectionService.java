@@ -63,7 +63,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
         }
         checkForDuplicacyInTitleOfSectionsAndQuestionTitle(masterQuestionnaireSectionDto);
-        List<BigInteger> sectionIdList = createAndUpdateMasterQuestionnaireSectionsAndMasterQuestions(countryId, masterQuestionnaireSectionDto, questionnaireTemplate.getTemplateType());
+        List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(countryId,false, masterQuestionnaireSectionDto, questionnaireTemplate.getTemplateType());
         questionnaireTemplate.setSections(sectionIdList);
         questionnaireTemplateMongoRepository.save(questionnaireTemplate);
         return questionnaireTemplateService.getMasterQuestionnaireTemplateWithSectionById(countryId, questionnaireTemplate.getId());
@@ -71,7 +71,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
     }
 
 
-    public List<BigInteger> createAndUpdateMasterQuestionnaireSectionsAndMasterQuestions(Long countryId, List<QuestionnaireSectionDTO> questionnaireSectionDTOS, QuestionnaireTemplateType templateType) {
+    public List<BigInteger> createAndUpdateQuestionnaireSectionsAndQuestions(Long referenceId, boolean isReferenceIdUnitId, List<QuestionnaireSectionDTO> questionnaireSectionDTOS, QuestionnaireTemplateType templateType) {
 
         List<BigInteger> existingSectionIdList = new ArrayList<>();
         Map<BigInteger, QuestionnaireSectionDTO> questionnaireSectionIdDTOMap = new HashMap<>();
@@ -85,7 +85,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
                 existingSectionIdList.add(questionnaireSectionDTO.getId());
                 questionnaireSectionIdDTOMap.put(questionnaireSectionDTO.getId(), questionnaireSectionDTO);
             } else {
-                QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionDTO.getTitle(), countryId);
+                QuestionnaireSection questionnaireSection = buildQuestionnaireSection(questionnaireSectionDTO,referenceId,isReferenceIdUnitId);
                 newQuestionnaireSections.add(questionnaireSection);
                 if (CollectionUtils.isNotEmpty(questionnaireSectionDTO.getQuestions())) {
                     questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
@@ -93,7 +93,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
             }
         }
         if (CollectionUtils.isNotEmpty(existingSectionIdList)) {
-            List<QuestionnaireSection> previousQuestionnaireSections = questionnaireSectionRepository.findSectionByCountryIdAndIds(countryId, existingSectionIdList);
+            List<QuestionnaireSection> previousQuestionnaireSections = isReferenceIdUnitId ? questionnaireSectionRepository.findSectionByUnitIdAndIds(referenceId, existingSectionIdList) : questionnaireSectionRepository.findSectionByCountryIdAndIds(referenceId, existingSectionIdList);
             previousQuestionnaireSections.forEach(questionnaireSection -> {
                 QuestionnaireSectionDTO questionnaireSectionDTO = questionnaireSectionIdDTOMap.get(questionnaireSection.getId());
                 questionnaireSection.setTitle(questionnaireSectionDTO.getTitle());
@@ -105,7 +105,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
         }
         List<BigInteger> sectionIdList;
         if (!questionDTOListCoresspondingToSection.isEmpty()) {
-            questionService.saveAndUpdateQuestionAndAddToQuestionnaireSection(countryId, false, questionDTOListCoresspondingToSection, templateType);
+            questionService.saveAndUpdateQuestionAndAddToQuestionnaireSection(referenceId, false, questionDTOListCoresspondingToSection, templateType);
             globalQuestionnaireSections.addAll(newQuestionnaireSections);
             sectionIdList = questionnaireSectionRepository.saveAll(getNextSequence(globalQuestionnaireSections)).stream().map(QuestionnaireSection::getId).collect(Collectors.toList());
 
@@ -116,6 +116,17 @@ public class QuestionnaireSectionService extends MongoBaseService {
         return sectionIdList;
     }
 
+
+    private QuestionnaireSection buildQuestionnaireSection(QuestionnaireSectionDTO questionnaireSectionDTO, Long referenceId, boolean isReferenceIdUnitId) {
+        if (isReferenceIdUnitId) {
+            QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionDTO.getTitle());
+            questionnaireSection.setOrganizationId(referenceId);
+            return questionnaireSection;
+        } else {
+            QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionDTO.getTitle(), referenceId);
+            return questionnaireSection;
+        }
+    }
 
     /**
      * @param countryId
@@ -134,7 +145,13 @@ public class QuestionnaireSectionService extends MongoBaseService {
     }
 
 
-    //todo  add save and update method sections
+    /**
+     *
+     * @param unitId
+     * @param questionnaireTemplateId
+     * @param questionnaireSectionDTOS
+     * @return
+     */
     public QuestionnaireTemplateResponseDTO createOrUpdateQuestionnaireSectionAndAddToQuestionnaireTemplateOfUnit(Long unitId, BigInteger questionnaireTemplateId, List<QuestionnaireSectionDTO> questionnaireSectionDTOS) {
 
         QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateMongoRepository.findByUnitIdAndId(unitId, questionnaireTemplateId);
@@ -142,64 +159,10 @@ public class QuestionnaireSectionService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template", questionnaireTemplateId);
         }
         checkForDuplicacyInTitleOfSectionsAndQuestionTitle(questionnaireSectionDTOS);
-        List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestionsOfUnit(unitId, questionnaireSectionDTOS, questionnaireTemplate.getTemplateType());
+        List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(unitId,true, questionnaireSectionDTOS, questionnaireTemplate.getTemplateType());
         questionnaireTemplate.setSections(sectionIdList);
         questionnaireTemplateMongoRepository.save(questionnaireTemplate);
         return questionnaireTemplateService.getQuestionnaireTemplateWithSectionByUnitIdAndId(unitId, questionnaireTemplate.getId());
-    }
-
-
-    /**
-     * @param unitId
-     * @param questionnaireSectionDTOS
-     * @param templateType
-     * @return
-     */
-    public List<BigInteger> createAndUpdateQuestionnaireSectionsAndQuestionsOfUnit(Long unitId, List<QuestionnaireSectionDTO> questionnaireSectionDTOS, QuestionnaireTemplateType templateType) {
-
-        List<BigInteger> existingSectionIdList = new ArrayList<>();
-        Map<BigInteger, QuestionnaireSectionDTO> questionnaireSectionIdDTOMap = new HashMap<>();
-        Map<QuestionnaireSection, List<QuestionDTO>> questionDTOListCoresspondingToSection = new HashMap<>();
-        List<QuestionnaireSection> globalQuestionnaireSections = new ArrayList<>();
-        List<QuestionnaireSection> newQuestionnaireSections = new ArrayList<>();
-
-        for (QuestionnaireSectionDTO questionnaireSectionDTO : questionnaireSectionDTOS) {
-            if (Optional.ofNullable(questionnaireSectionDTO.getId()).isPresent()) {
-                existingSectionIdList.add(questionnaireSectionDTO.getId());
-                questionnaireSectionIdDTOMap.put(questionnaireSectionDTO.getId(), questionnaireSectionDTO);
-
-            } else {
-                QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionDTO.getTitle());
-                questionnaireSection.setOrganizationId(unitId);
-                newQuestionnaireSections.add(questionnaireSection);
-                if (CollectionUtils.isNotEmpty(questionnaireSectionDTO.getQuestions())) {
-                    questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
-                }
-            }
-        }
-        if (CollectionUtils.isNotEmpty(existingSectionIdList)) {
-            List<QuestionnaireSection> previousQuestionnaireSections = questionnaireSectionRepository.findSectionByUnitIdAndIds(unitId, existingSectionIdList);
-            previousQuestionnaireSections.forEach(questionnaireSection -> {
-                QuestionnaireSectionDTO questionnaireSectionDTO = questionnaireSectionIdDTOMap.get(questionnaireSection.getId());
-                questionnaireSection.setTitle(questionnaireSectionDTO.getTitle());
-                if (CollectionUtils.isNotEmpty(questionnaireSectionDTO.getQuestions())) {
-                    questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
-                }
-            });
-            globalQuestionnaireSections.addAll(previousQuestionnaireSections);
-
-        }
-        List<BigInteger> sectionIdList;
-        if (!questionDTOListCoresspondingToSection.isEmpty()) {
-            questionService.saveAndUpdateQuestionAndAddToQuestionnaireSection(unitId, true, questionDTOListCoresspondingToSection, templateType);
-            globalQuestionnaireSections.addAll(newQuestionnaireSections);
-            sectionIdList = questionnaireSectionRepository.saveAll(getNextSequence(globalQuestionnaireSections)).stream().map(QuestionnaireSection::getId).collect(Collectors.toList());
-
-        } else {
-            globalQuestionnaireSections.addAll(newQuestionnaireSections);
-            sectionIdList = questionnaireSectionRepository.saveAll(getNextSequence(globalQuestionnaireSections)).stream().map(QuestionnaireSection::getId).collect(Collectors.toList());
-        }
-        return sectionIdList;
     }
 
 

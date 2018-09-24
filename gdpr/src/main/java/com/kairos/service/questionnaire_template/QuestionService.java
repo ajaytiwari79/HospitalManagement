@@ -38,12 +38,12 @@ public class QuestionService extends MongoBaseService {
 
     /**
      * @param referenceId
-     * @param isUnit
+     * @param isReferenceIdUnitId
      * @param sectionAndQuestionDTOListMap
      * @param templateType
      * @return
      */
-    public List<QuestionnaireSection> saveAndUpdateQuestionAndAddToQuestionnaireSection(Long referenceId, boolean isUnit, Map<QuestionnaireSection, List<QuestionDTO>> sectionAndQuestionDTOListMap, QuestionnaireTemplateType templateType) {
+    public List<QuestionnaireSection> saveAndUpdateQuestionAndAddToQuestionnaireSection(Long referenceId, boolean isReferenceIdUnitId, Map<QuestionnaireSection, List<QuestionDTO>> sectionAndQuestionDTOListMap, QuestionnaireTemplateType templateType) {
 
         List<BigInteger> questionIdList = new ArrayList<>();
         List<Question> globalQuestionList = new ArrayList<>();
@@ -62,14 +62,14 @@ public class QuestionService extends MongoBaseService {
                 }
             });
             if (CollectionUtils.isNotEmpty(questionListCoresspondingToSection)) {
-                List<Question> questions = isUnit ? buildQuestionForQuestionnaireSectionAtUnitLevel(referenceId, questionListCoresspondingToSection, templateType) : buildQuestionForMasterQuestionnaireSection(referenceId, questionListCoresspondingToSection, templateType);
+                List<Question> questions = isReferenceIdUnitId ? buildQuestionForQuestionnaireSectionAtUnitLevel(referenceId, questionListCoresspondingToSection, templateType) : buildQuestionForMasterQuestionnaireSection(referenceId, questionListCoresspondingToSection, templateType);
                 sectionQuestionListMap.put(questionnaireSection, questions);
                 globalQuestionList.addAll(questions);
             }
             questionnaireSections.add(questionnaireSection);
         });
         if (CollectionUtils.isNotEmpty(questionIdList)) {
-            List<Question> existingQuestionList = isUnit ? questionMongoRepository.getQuestionByUnitIdAndIds(referenceId, questionIdList) : questionMongoRepository.getMasterQuestionByCountryIdAndIds(referenceId, questionIdList);
+            List<Question> existingQuestionList = isReferenceIdUnitId ? questionMongoRepository.getQuestionByUnitIdAndIds(referenceId, questionIdList) : questionMongoRepository.getMasterQuestionByCountryIdAndIds(referenceId, questionIdList);
             existingQuestionList.forEach(question -> {
                 QuestionDTO questionDTO = questionDTOAndIdMap.get(question.getId());
                 question.setQuestion(questionDTO.getQuestion()).setDescription(questionDTO.getDescription()).
