@@ -233,12 +233,17 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> copyCTAWTAForUnitPositionId(@RequestBody List<UnitPositionIdDTO> unitPositionIDs) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.copyWtaCTA(unitPositionIDs));
     }
-
+    @ApiOperation(value = "get Wta rule template By wta Id")
+    @GetMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/wta/{wtaId}/rule_templates")
+    public ResponseEntity<Map<String, Object>> getwtaRuletemplates(@PathVariable BigInteger wtaId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getwtaRuletemplates(wtaId));
+    }
 
 
    /* @ApiOperation(value = "check scheduler load balncing")
     @GetMapping(value = UNIT_URL + "/check_load_balancing_scheduler")
-    public ResponseEntity<Map<String, Object>> checkSchedulerLoadBalancing(@PathVariable Long unitId) {
+    pu
+    blic ResponseEntity<Map<String, Object>> checkSchedulerLoadBalancing(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, genericIntegrationService.checkSchedulerLoadBalanceWorking());
     }
 */
