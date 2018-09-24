@@ -154,8 +154,8 @@ public class AssetTypeService extends MongoBaseService {
      * @param
      * @return return Asset types with sub Asset types if exist and if sub asset not exist then return empty array
      */
-    public AssetTypeResponseDTO getAssetTypeById(Long countryId, BigInteger id) {
-        AssetTypeResponseDTO assetType = assetTypeMongoRepository.getAssetTypesWithSubAssetTypesByIdAndCountryId(countryId, id);
+    public AssetType getAssetTypeById(Long countryId, BigInteger id) {
+        AssetType assetType = assetTypeMongoRepository.findByIdAndCountryId(countryId, id);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", id);
         }

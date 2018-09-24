@@ -308,9 +308,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
 
         Map<String, AssetTypeBasicDTO> result = createAssetTypeAndSubAssetTypeWithBasicDetail(unitId, assetTypeBasicDTO);
         AssetTypeBasicDTO acceptedByCountryAdmin = assetTypeService.saveSuggestedAssetTypeAndSubAssetTypeFromUnit(countryId, assetTypeBasicDTO);
-        if (Optional.ofNullable(acceptedByCountryAdmin).isPresent()) {
-            result.put("SuggestedData", acceptedByCountryAdmin);
-        }
+        result.put("SuggestedData", acceptedByCountryAdmin);
         return result;
     }
 

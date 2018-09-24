@@ -13,6 +13,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -52,7 +53,7 @@ public class MasterAssetDTO {
     @NotNull(message = "Asset Type Can't be empty")
     private BigInteger assetTypeId;
 
-    private List<BigInteger> assetSubTypes;
+    private List<BigInteger> assetSubTypes=new ArrayList<>();
 
     public List<BigInteger> getAssetSubTypes() { return assetSubTypes; }
 
