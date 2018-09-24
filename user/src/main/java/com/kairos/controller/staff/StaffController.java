@@ -27,6 +27,7 @@ import com.kairos.utils.DateConverter;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -539,6 +540,7 @@ public class StaffController {
      * @auther anil maurya
      * this endpoint is called from task micro service
      */
+
     @RequestMapping(value = "/getStaffInfo", method = RequestMethod.GET)
     @ApiOperation("Get loggedin Staff Info")
     public ResponseEntity<Map<String, Object>> getStaffInfo(OAuth2Authentication user) {
