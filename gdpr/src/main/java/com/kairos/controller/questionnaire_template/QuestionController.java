@@ -39,16 +39,16 @@ public class QuestionController {
     }
 
 
-    @DeleteMapping(COUNTRY_URL+"/question_section/{sectionId}/question/delete/{id}")
-    public ResponseEntity<Object> deleteMasterQuestion(@PathVariable Long countryId, @PathVariable BigInteger id, @PathVariable BigInteger sectionId) {
+    @DeleteMapping(COUNTRY_URL+"/question_section/{sectionId}/question/{questionId}")
+    public ResponseEntity<Object> deleteMasterQuestion(@PathVariable Long countryId, @PathVariable BigInteger questionId, @PathVariable BigInteger sectionId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteMasterQuestion(countryId, id,sectionId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteMasterQuestion(countryId, questionId,sectionId));
     }
 
-    @DeleteMapping(UNIT_URL+"/question_section/{sectionId}/question/delete/{id}")
-    public ResponseEntity<Object> deleteQuestionOfQuestionnaireSection(@PathVariable Long unitId, @PathVariable BigInteger id, @PathVariable BigInteger sectionId) {
+    @DeleteMapping(UNIT_URL+"/question_section/{sectionId}/question/{questionId}")
+    public ResponseEntity<Object> deleteQuestionOfQuestionnaireSection(@PathVariable Long unitId, @PathVariable BigInteger questionId, @PathVariable BigInteger sectionId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteQuestionOfQuestionnaireSectionOfUnit(unitId, id,sectionId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionService.deleteQuestionOfQuestionnaireSectionOfUnit(unitId, questionId,sectionId));
     }
 
 

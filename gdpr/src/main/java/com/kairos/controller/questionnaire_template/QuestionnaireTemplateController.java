@@ -32,26 +32,26 @@ public class QuestionnaireTemplateController {
 
 
     @ApiOperation(value = "add questionnaire template basic data ")
-    @PostMapping(COUNTRY_URL+"/questionnaire_template/add")
+    @PostMapping(COUNTRY_URL+"/questionnaire_template")
     public ResponseEntity<Object> addMasterQuestionnaireTemplate(@PathVariable Long countryId,@Valid @RequestBody QuestionnaireTemplateDTO templateDto) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.saveMasterQuestionnaireTemplate(countryId,  templateDto));
 
     }
 
     @ApiOperation(value = "get all questionnaire template basic response ")
-    @GetMapping(COUNTRY_URL+"/questionnaire_template/all")
+    @GetMapping(COUNTRY_URL+"/questionnaire_template")
     public ResponseEntity<Object> getAllMasterQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getAllMasterQuestionnaireTemplateWithSection(countryId));
     }
 
     @ApiOperation(value = "get questionnaire template With Sections by Id ")
-    @GetMapping(COUNTRY_URL+"/questionnaire_template/{id}")
-    public ResponseEntity<Object> getMasterQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getMasterQuestionnaireTemplateWithSectionById(countryId, id));
+    @GetMapping(COUNTRY_URL+"/questionnaire_template/{questionnaireTemplateId}")
+    public ResponseEntity<Object> getMasterQuestionnaireTemplateWithSectionAndQuestion(@PathVariable Long countryId, @PathVariable BigInteger questionnaireTemplateId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getMasterQuestionnaireTemplateWithSectionById(countryId, questionnaireTemplateId));
     }
 
     @ApiOperation(value = "delete questionnaire template by id ")
-    @DeleteMapping(COUNTRY_URL+"/questionnaire_template/delete/{questionnaireTemplateId}")
+    @DeleteMapping(COUNTRY_URL+"/questionnaire_template/{questionnaireTemplateId}")
     public ResponseEntity<Object> deleteMasterQuestionnaireTemplate(@PathVariable Long countryId,  @PathVariable BigInteger questionnaireTemplateId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.deleteMasterQuestionnaireTemplate(countryId,  questionnaireTemplateId));
     }
@@ -64,7 +64,7 @@ public class QuestionnaireTemplateController {
     }
 
     @ApiOperation(value = "get Questionnaire template Attribute List Acc to Template type")
-    @GetMapping(COUNTRY_URL+"/questionnaire_template/attributes")
+    @GetMapping("/questionnaire_template/attributes")
     public ResponseEntity<Object> getQuestionnaireTemplateAttributeNames(@RequestParam String templateType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.getQuestionnaireTemplateAttributeNames(templateType));
     }
