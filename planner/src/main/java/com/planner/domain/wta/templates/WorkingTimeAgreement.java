@@ -1,8 +1,6 @@
 package com.planner.domain.wta.templates;
 
 import com.planner.domain.MongoBaseEntity;
-import com.planner.domain.wta.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.Date;

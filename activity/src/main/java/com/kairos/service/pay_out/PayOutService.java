@@ -3,6 +3,7 @@ package com.kairos.service.pay_out;
 
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
@@ -65,9 +66,9 @@ public class PayOutService extends MongoBaseService {
      *
      * @param staffAdditionalInfoDTO
      * @param shift
-     * @param activity
+     * @param activityWrapperMap
      */
-    public void savePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Activity activity) {
+    public void savePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger,ActivityWrapper> activityWrapperMap) {
         ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
         List<PayOut> payOuts = new ArrayList<>();
@@ -78,7 +79,7 @@ public class PayOutService extends MongoBaseService {
             if(lastPayOut!=null) {
                 payOut.setPayoutBeforeThisDate(lastPayOut.getPayoutBeforeThisDate() + lastPayOut.getTotalPayOutMin());
             }
-            payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activity, payOut);
+            payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activityWrapperMap, payOut);
             if(payOut.getTotalPayOutMin()>0) {
                 payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
                 payOuts.add(payOut);
@@ -99,7 +100,7 @@ public class PayOutService extends MongoBaseService {
      */
     public void savePayOuts(StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<Shift> shifts, List<Activity> activities) {
         List<PayOut> payOuts = new ArrayList<>();
-        Map<BigInteger,Activity> activityMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        Map<BigInteger,ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k->k.getId(),v->new ActivityWrapper(v,"")));
         for (Shift shift : shifts) {
             ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
             ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
@@ -110,8 +111,7 @@ public class PayOutService extends MongoBaseService {
                 if(lastPayOut!=null) {
                     payOut.setPayoutBeforeThisDate(lastPayOut.getPayoutBeforeThisDate() + lastPayOut.getTotalPayOutMin());
                 }
-                Activity activity = activityMap.get(shift.getActivityId());
-                payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activity, payOut);
+                payOut = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getUnitPosition(), shift, activityWrapperMap, payOut);
                 if(payOut.getTotalPayOutMin()>0) {
                     payOutRepository.updatePayOut(payOut.getUnitPositionId(),(int) payOut.getTotalPayOutMin());
                     payOuts.add(payOut);
@@ -165,7 +165,7 @@ public class PayOutService extends MongoBaseService {
      * @param shift
      * @param activity
      */
-    public void updatePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Activity activity) {
+    /*public void updatePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Activity activity) {
         ZonedDateTime startDate = DateUtils.getZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.getZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS);
         List<PayOut> payOuts = payOutRepository.findAllByShiftId(shift.getId());
@@ -190,7 +190,7 @@ public class PayOutService extends MongoBaseService {
             save(payOuts);
         }
 
-    }
+    }*/
 
     /**
      *

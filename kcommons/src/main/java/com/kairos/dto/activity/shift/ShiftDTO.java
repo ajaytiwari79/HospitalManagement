@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.shift.ShiftStatus;
@@ -21,8 +22,8 @@ import java.util.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftDTO {
+
     private BigInteger id;
-    private String name;
     private Date startDate;
     private Date endDate;
     private long bid;
@@ -33,9 +34,6 @@ public class ShiftDTO {
     private long accumulatedTimeBankInMinutes;
     private String remarks;
     private BigInteger parentOpenShiftId;
-    @Range(min = 0)
-    @NotNull(message = "error.ShiftDTO.activityId.notnull")
-    private BigInteger activityId;
     private Long unitId;
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.staffId.notnull")
@@ -43,86 +41,72 @@ public class ShiftDTO {
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
     private Long unitPositionId;
-    private int scheduledMinutes;
-    private int durationMinutes;
     @JsonFormat(pattern = "YYYY-MM-DD")
     private LocalDate shiftDate;
-    @JsonFormat(pattern = "YYYY-MM-DD")
-    private LocalDate startLocalDate;
-    @JsonFormat(pattern = "YYYY-MM-DD")
-    private LocalDate endLocalDate;
-    @JsonFormat(pattern = "HH:mm")
-    private LocalTime startTime;
-    @JsonFormat(pattern = "HH:mm")
-    private LocalTime endTime;
     private Long allowedBreakDurationInMinute;
-    private List<ShiftDTO> subShifts = new ArrayList<>();
     private BigInteger templateId;
-    private String timeType;
     private Set<ShiftStatus> status = new HashSet<>();
+    private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger plannedTimeId;
+    private Long expertiseId;
 
-    public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
-        this.activityId = activityId;
+    public ShiftDTO(List<ShiftActivity> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
+        this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
         this.unitPositionId = unitPositionId;
     }
 
-    public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId,LocalDate startLocalDate,LocalDate endLocalDate,LocalTime startTime,LocalTime endTime) {
-        this.activityId = activityId;
-        this.unitId = unitId;
+
+
+    public ShiftDTO(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.bid = bid;
+        this.pId = pId;
+        this.bonusTimeBank = bonusTimeBank;
+        this.amount = amount;
+        this.probability = probability;
+        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
+        this.remarks = remarks;
+        this.activities = activities;
         this.staffId = staffId;
-        this.unitPositionId = unitPositionId;
-        this.startLocalDate=startLocalDate;
-        this.endLocalDate=endLocalDate;
-        this.startTime=startTime;
-        this.endTime=endTime;
-    }
-
-    public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
-            Long unitPositionId,LocalDate startLocalDate,LocalDate endLocalDate,LocalTime startTime,LocalTime endTime,List<ShiftDTO> subShifts) {
-        this.activityId = activityId;
         this.unitId = unitId;
-        this.staffId = staffId;
         this.unitPositionId = unitPositionId;
-        this.startLocalDate=startLocalDate;
-        this.endLocalDate=endLocalDate;
-        this.startTime=startTime;
-        this.endTime=endTime;
-        this.subShifts=subShifts;
     }
 
-    public LocalDate getStartLocalDate() {
-        return startLocalDate;
+
+    public Long getExpertiseId() {
+        return expertiseId;
     }
 
-    public void setStartLocalDate(LocalDate startLocalDate) {
-        this.startLocalDate = startLocalDate;
+    public void setExpertiseId(Long expertiseId) {
+        this.expertiseId = expertiseId;
     }
 
-    public LocalDate getEndLocalDate() {
-        return endLocalDate;
+    public Set<ShiftStatus> getStatus() {
+        return status;
     }
 
-    public void setEndLocalDate(LocalDate endLocalDate) {
-        this.endLocalDate = endLocalDate;
+    public void setStatus(Set<ShiftStatus> status) {
+        this.status = status;
     }
 
-    public LocalTime getStartTime() {
-        return startTime;
+    public List<ShiftActivity> getActivities() {
+        return activities;
     }
 
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
+    public void setActivities(List<ShiftActivity> activities) {
+        this.activities = activities;
     }
 
-    public LocalTime getEndTime() {
-        return endTime;
+    public BigInteger getPlannedTimeId() {
+        return plannedTimeId;
     }
 
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
+    public void setPlannedTimeId(BigInteger plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
     }
 
     public LocalDate getShiftDate() {
@@ -133,23 +117,14 @@ public class ShiftDTO {
         this.shiftDate = shiftDate;
     }
 
-    public int getScheduledMinutes() {
-        return scheduledMinutes;
+
+
+    public List<ShiftActivity> sortShifts() {
+        if (Optional.ofNullable(activities).isPresent()) {
+            activities.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
+        }
+        return activities;
     }
-
-    public void setScheduledMinutes(int scheduledMinutes) {
-        this.scheduledMinutes = scheduledMinutes;
-    }
-
-    public int getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
-
 
     public BigInteger getId() {
         return id;
@@ -157,14 +132,6 @@ public class ShiftDTO {
 
     public void setId(BigInteger id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
 
@@ -216,8 +183,9 @@ public class ShiftDTO {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
     }
 
+    @JsonIgnore
     public Duration getDuration() {
-        return new Interval(this.getStartDate().getTime(), this.getEndDate().getTime()).toDuration();
+        return new Interval(this.activities.get(0).getStartDate().getTime(), this.activities.get(activities.size()-1).getEndDate().getTime()).toDuration();
     }
 
     public String getRemarks() {
@@ -228,13 +196,6 @@ public class ShiftDTO {
         this.remarks = remarks;
     }
 
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
 
     public Long getStaffId() {
         return staffId;
@@ -249,7 +210,19 @@ public class ShiftDTO {
     }
 
     public Date getStartDate() {
-        return startLocalDate != null && startTime != null ? DateUtils.getDateByLocalDateAndLocalTime(startLocalDate, startTime) : null;
+        return startDate;
+    }
+
+    @JsonIgnore
+    public Date getActivitiesEndDate(){
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+        return activities.get(activities.size()-1).getEndDate();
+    }
+
+    @JsonIgnore
+    public Date getActivitiesStartDate(){
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+        return activities.get(activities.size()-1).getEndDate();
     }
 
     public void setStartDate(Date startDate) {
@@ -257,15 +230,17 @@ public class ShiftDTO {
     }
 
     public Date getEndDate() {
-        return startLocalDate != null && startTime != null ? DateUtils.getDateByLocalDateAndLocalTime(endLocalDate, endTime) : null;
+        return endDate;
     }
+
+
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
-    public ShiftQueryResult getQueryResults(){
-        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id, this.name,
+    /*public ShiftQueryResult getQueryResults(){
+        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id,
                 this.startDate,
                 this.endDate,
                 this.bid,
@@ -275,20 +250,17 @@ public class ShiftDTO {
                 this.probability,
                 this.accumulatedTimeBankInMinutes,
                 this.remarks,
-                this.activityId, this.staffId, this.unitId, this.unitPositionId);
-        shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
-        shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
+                this.activities, this.staffId, this.unitId, this.unitPositionId);
         shiftQueryResult.setStatus(this.status);
         shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
         shiftQueryResult.setPlannedTimeId(this.plannedTimeId);
         return shiftQueryResult;
-    }
+    }*/
 
     @Override
     public String toString() {
         return "ShiftDTO{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", bid=" + bid +
@@ -298,19 +270,11 @@ public class ShiftDTO {
                 ", probability=" + probability +
                 ", accumulatedTimeBankInMinutes=" + accumulatedTimeBankInMinutes +
                 ", remarks='" + remarks + '\'' +
-                ", activityId=" + activityId +
                 ", unitId=" + unitId +
                 ", staffId=" + staffId +
                 '}';
     }
 
-    public List<ShiftDTO> getSubShifts() {
-        return subShifts;
-    }
-
-    public void setSubShifts(List<ShiftDTO> subShifts) {
-        this.subShifts = subShifts;
-    }
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
@@ -355,11 +319,4 @@ public class ShiftDTO {
         this.templateId = templateId;
     }
 
-    public String getTimeType() {
-        return timeType;
-    }
-
-    public void setTimeType(String timeType) {
-        this.timeType = timeType;
-    }
 }

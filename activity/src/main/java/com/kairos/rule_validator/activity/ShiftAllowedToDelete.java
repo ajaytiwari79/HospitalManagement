@@ -1,6 +1,6 @@
 package com.kairos.rule_validator.activity;
 
-import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 

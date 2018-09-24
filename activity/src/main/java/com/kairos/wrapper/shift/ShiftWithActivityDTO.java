@@ -2,6 +2,8 @@ package com.kairos.wrapper.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.phase.Phase;
@@ -34,19 +36,16 @@ public class ShiftWithActivityDTO {
     private long probability;
     private long accumulatedTimeBankInMinutes;
     private String remarks;
-    private BigInteger activityId;
     private Long unitPositionId;
     private Long staffId;
     private Phase phase;
     private Integer weekCount;
     private static boolean overrideWeekCount;
     private Long unitId;
-    private Activity activity;
     private int scheduledMinutes;
     private int durationMinutes;
-    private ShiftWithActivityDTO subShift;
+    private List<ShiftActivityDTO> activities = new ArrayList<>();
     private List<ShiftStatus> status;
-    private List<BigInteger> brokenRuleTemplateIds = new ArrayList<>();
     private BigInteger plannedTypeId ;
     private String timeType;
 
@@ -66,16 +65,9 @@ public class ShiftWithActivityDTO {
     }
 
 
-    public List<BigInteger> getBrokenRuleTemplateIds() {
-        return brokenRuleTemplateIds;
-    }
-
-    public void setBrokenRuleTemplateIds(List<BigInteger> brokenRuleTemplateIds) {
-        this.brokenRuleTemplateIds = brokenRuleTemplateIds;
-    }
 
 
-    public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitPositionId, Long unitId, Activity activity) {
+    public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,List<ShiftActivityDTO> activities, Long staffId, Long unitPositionId, Long unitId) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
@@ -85,17 +77,24 @@ public class ShiftWithActivityDTO {
         this.probability = probability;
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
         this.remarks = remarks;
-        this.activityId = activityId;
+        this.activities = activities;
         this.unitPositionId = unitPositionId;
         this.staffId = staffId;
         this.unitId = unitId;
-        this.activity = activity;
     }
 
     public ShiftWithActivityDTO(Date startDate, Date endDate, Activity activity) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.activity = activity;
+        this.activities = activities;
+    }
+
+    public List<ShiftActivityDTO> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<ShiftActivityDTO> activities) {
+        this.activities = activities;
     }
 
     public void setUnitPositionId(Long unitPositionId) {
@@ -122,13 +121,6 @@ public class ShiftWithActivityDTO {
         this.durationMinutes = durationMinutes;
     }
 
-    public ShiftWithActivityDTO getSubShift() {
-        return subShift;
-    }
-
-    public void setSubShift(ShiftWithActivityDTO subShift) {
-        this.subShift = subShift;
-    }
 
     public BigInteger getId() {
         return id;
@@ -156,6 +148,16 @@ public class ShiftWithActivityDTO {
 
     public Date getEndDate() {
         return endDate;
+    }
+
+    public Date getActivitiesEndDate(){
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+        return activities.get(activities.size()-1).getEndDate();
+    }
+
+    public Date getActivitiesStartDate(){
+        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+        return activities.get(activities.size()-1).getEndDate();
     }
 
     public void setEndDate(Date endDate) {
@@ -203,14 +205,6 @@ public class ShiftWithActivityDTO {
         this.remarks = remarks;
     }
 
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
-
     public Long getStaffId() {
         return staffId;
     }
@@ -251,13 +245,6 @@ public class ShiftWithActivityDTO {
         this.unitId = unitId;
     }
 
-    public Activity getActivity() {
-        return activity;
-    }
-
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
 
     public DateTimeInterval getDateTimeInterval(){
        return new DateTimeInterval(startDate.getTime(),endDate.getTime());

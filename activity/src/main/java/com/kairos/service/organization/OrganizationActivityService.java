@@ -1,9 +1,12 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.activity_tabs.GeneralActivityTabDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PermissionsActivityTabDTO;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
@@ -21,11 +24,13 @@ import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.open_shift.OrderAndActivityDTO;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
@@ -64,8 +69,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.*;
-
-import static javax.management.timer.Timer.ONE_MINUTE;
 
 /**
  * Created by vipul on 5/12/17.
@@ -122,6 +125,7 @@ public class OrganizationActivityService extends MongoBaseService {
     private CounterRepository counterRepository;
     @Inject
     private StaffActivitySettingRepository staffActivitySettingRepository;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
 
 
     public ActivityDTO copyActivity(Long unitId, BigInteger activityId, boolean checked) {
@@ -357,7 +361,7 @@ public class OrganizationActivityService extends MongoBaseService {
         if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
             existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubType(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
         } else {
-            existingActivities= activityMongoRepository.findAllByUnitIdAndDeletedFalse(orgTypeAndSubTypeDTO.getParentOrganizationId());
+            existingActivities = activityMongoRepository.findAllByUnitIdAndDeletedFalse(orgTypeAndSubTypeDTO.getParentOrganizationId());
         }
         if (!existingActivities.isEmpty()) {
             List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
@@ -383,43 +387,50 @@ public class OrganizationActivityService extends MongoBaseService {
      * @param shiftDTO
      * @Auther Pavan
      */
-    public void validateShiftTime(Long staffId, ShiftDTO shiftDTO,RulesActivityTab rulesActivityTab){
-              LocalTime earliestStartTime;
-              LocalTime latestStartTime;
-              LocalTime maximumEndTime;
-              Short longestTime;
-              Short shortestTime;
-              StaffActivitySetting staffActivitySetting=staffActivitySettingRepository.findByStaffIdAndActivityIdAndDeletedFalse(staffId,shiftDTO.getActivityId());
-              if(staffActivitySetting!=null){
-                  earliestStartTime=staffActivitySetting.getEarliestStartTime();
-                  latestStartTime=staffActivitySetting.getLatestStartTime();
-                  maximumEndTime=staffActivitySetting.getMaximumEndTime();
-                  longestTime=staffActivitySetting.getLongestTime();
-                  shortestTime=staffActivitySetting.getShortestTime();
-              }
-              else {
-                  earliestStartTime=rulesActivityTab.getEarliestStartTime();
-                  latestStartTime=rulesActivityTab.getLatestStartTime();
-                  maximumEndTime=rulesActivityTab.getMaximumEndTime();
-                  longestTime=rulesActivityTab.getLongestTime();
-                  shortestTime=rulesActivityTab.getShortestTime();
-              }
+    public void validateShiftTime(Long staffId, ShiftDTO shiftDTO, RulesActivityTab rulesActivityTab) {
+        if (shiftDTO.getActivities().get(0).getStartDate().after(shiftDTO.getActivities().get(0).getEndDate())) {
+            exceptionService.invalidRequestException("message.date.startandend");
+        }
+        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByUnitPosition(shiftDTO.getUnitPositionId(), shiftDTO.getStartDate(), shiftDTO.getEndDate());
+        if (!shifts.isEmpty()) {
+            exceptionService.duplicateDataException("message.shift.date.startandend", shiftDTO.getStartDate(), shiftDTO.getEndDate());
+        }
+        LocalTime earliestStartTime;
+        LocalTime latestStartTime;
+        LocalTime maximumEndTime;
+        Short longestTime;
+        Short shortestTime;
+        StaffActivitySetting staffActivitySetting = staffActivitySettingRepository.findByStaffIdAndActivityIdAndDeletedFalse(staffId, shiftDTO.getActivities().get(0).getActivityId());
+        if (staffActivitySetting != null) {
+            earliestStartTime = staffActivitySetting.getEarliestStartTime();
+            latestStartTime = staffActivitySetting.getLatestStartTime();
+            maximumEndTime = staffActivitySetting.getMaximumEndTime();
+            longestTime = staffActivitySetting.getLongestTime();
+            shortestTime = staffActivitySetting.getShortestTime();
+        } else {
+            earliestStartTime = rulesActivityTab.getEarliestStartTime();
+            latestStartTime = rulesActivityTab.getLatestStartTime();
+            maximumEndTime = rulesActivityTab.getMaximumEndTime();
+            longestTime = rulesActivityTab.getLongestTime();
+            shortestTime = rulesActivityTab.getShortestTime();
+        }
 
-              if(earliestStartTime!=null && earliestStartTime.isAfter(shiftDTO.getStartTime())){
-                  exceptionService.actionNotPermittedException("error.start_time.greater_than.earliest_time");
-              }
-              if(latestStartTime!=null && latestStartTime.isBefore(shiftDTO.getStartTime())){
-                  exceptionService.actionNotPermittedException("error.start_time.less_than.latest_time");
-              }
-              if(maximumEndTime!=null && maximumEndTime.isBefore(shiftDTO.getEndTime())){
-                  exceptionService.actionNotPermittedException("error.end_time.less_than.maximum_end_time");
-              }
-              if(longestTime!=null && longestTime< (shiftDTO.getEndDate().getTime() - shiftDTO.getStartDate().getTime()) / ONE_MINUTE){
-                  exceptionService.actionNotPermittedException("error.shift.duration_exceeds_longest_time");
-              }
-              if(shortestTime!=null && shortestTime > (shiftDTO.getEndDate().getTime() - shiftDTO.getStartDate().getTime()) / ONE_MINUTE){
-                  exceptionService.actionNotPermittedException("error.shift.duration.less_than.shortest_time");
-              }
+        if (earliestStartTime != null && earliestStartTime.isAfter(DateUtils.asLocalTime(shiftDTO.getActivities().get(0).getStartDate()))) {
+            exceptionService.actionNotPermittedException("error.start_time.greater_than.earliest_time");
+        }
+        if (latestStartTime != null && latestStartTime.isBefore(DateUtils.asLocalTime(shiftDTO.getActivities().get(0).getStartDate()))) {
+            exceptionService.actionNotPermittedException("error.start_time.less_than.latest_time");
+        }
+        if (maximumEndTime != null && maximumEndTime.isBefore(DateUtils.asLocalTime(shiftDTO.getActivities().get(0).getEndDate()))) {
+            exceptionService.actionNotPermittedException("error.end_time.less_than.maximum_end_time");
+        }
+        long shiftMinutes = new DateTimeInterval(shiftDTO.getActivities().get(0).getStartDate(),shiftDTO.getActivities().get(0).getEndDate()).getMinutes();
+        if (longestTime < shiftMinutes) {
+            exceptionService.actionNotPermittedException("error.shift.duration_exceeds_longest_time");
+        }
+        if (shortestTime > shiftMinutes) {
+            exceptionService.actionNotPermittedException("error.shift.duration.less_than.shortest_time");
+        }
     }
 
 }

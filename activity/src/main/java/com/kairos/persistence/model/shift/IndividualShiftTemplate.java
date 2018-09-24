@@ -1,19 +1,20 @@
 package com.kairos.persistence.model.shift;
 
+import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Set;
 
 public class IndividualShiftTemplate extends MongoBaseEntity {
     private String name;
     private String remarks;
-    private BigInteger activityId;
     private LocalTime startTime;
     private LocalTime endTime;
     private boolean mainShift;
-    private Set<BigInteger> subShiftIds;
+    private List<ShiftActivity> activities;
     private int durationMinutes;
 
     public IndividualShiftTemplate() {
@@ -37,14 +38,7 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
     public void setRemarks(String remarks) {
         this.remarks = remarks;
     }
-
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
+    
 
     public LocalTime getStartTime() {
         return startTime;
@@ -70,12 +64,12 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
         this.mainShift = mainShift;
     }
 
-    public Set<BigInteger> getSubShiftIds() {
-        return subShiftIds;
+    public List<ShiftActivity> getActivities() {
+        return activities;
     }
 
-    public void setSubShiftIds(Set<BigInteger> subShiftIds) {
-        this.subShiftIds = subShiftIds;
+    public void setActivities(List<ShiftActivity> activities) {
+        this.activities = activities;
     }
 
     public int getDurationMinutes() {

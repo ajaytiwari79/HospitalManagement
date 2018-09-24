@@ -1,9 +1,7 @@
 package com.planner.util.wta;
 
-import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.commons.utils.ObjectMapperUtils;
-
-import com.planner.domain.wta.WTABaseRuleTemplate;
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.planner.domain.wta.templates.*;
 import org.springframework.stereotype.Service;
 
@@ -51,13 +49,13 @@ public class WTABuilderService {
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,ChildCareDayCheckWTATemplate.class);
                 break;*/
             case DAILY_RESTING_TIME:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, DailyRestingTimeWTATemplate.class);
+              //  wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, DailyRestingTimeWTATemplate.class);
                 break;
             case DURATION_BETWEEN_SHIFTS:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, DurationBetweenShiftsWTATemplate.class);
                 break;
             case WEEKLY_REST_PERIOD:
-                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WeeklyRestPeriodWTATemplate.class);
+               // wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WeeklyRestPeriodWTATemplate.class);
                 break;
             case SHORTEST_AND_AVERAGE_DAILY_REST:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ShortestAndAverageDailyRestWTATemplate.class);

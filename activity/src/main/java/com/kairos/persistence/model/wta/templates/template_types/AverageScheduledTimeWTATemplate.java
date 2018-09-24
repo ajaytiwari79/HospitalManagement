@@ -126,7 +126,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled()  && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && (plannedTimeIds.contains(infoWrapper.getShift().getPlannedTypeId()) && timeTypeIds.contains(infoWrapper.getShift().getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))){
+        if(!isDisabled()  && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && (plannedTimeIds.contains(infoWrapper.getShift().getPlannedTypeId()) && timeTypeIds.contains(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))){
             DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
             List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(),timeTypeIds,plannedTimeIds,null);
             shifts = getShiftsByInterval(interval,infoWrapper.getShifts(),null);
@@ -137,7 +137,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                 int totalMin = 0;
                 for (ShiftWithActivityDTO shift : shifts) {
                     if(dateTimeInterval.overlaps(shift.getDateTimeInterval())){
-                        totalMin +=dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
+                        totalMin += (int) dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
                     }
                 }
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin/(60*(int)dateTimeInterval.getDays()));

@@ -17,7 +17,7 @@ public class ShiftPlanningStaffingLevelDTO {
     private LocalDate currentDate;
     private Integer weekCount;
     private StaffingLevelSetting staffingLevelSetting;
-    private List<StaffingLevelTimeSlotDTO> staffingLevelInterval=new ArrayList<>();
+    private List<StaffingLevelTimeSlotDTO> presenceStaffingLevelInterval=new ArrayList<>();
 
     public ShiftPlanningStaffingLevelDTO() {
         //default constructor
@@ -71,11 +71,11 @@ public class ShiftPlanningStaffingLevelDTO {
         this.staffingLevelSetting = staffingLevelSetting;
     }
 
-    public List<StaffingLevelTimeSlotDTO> getStaffingLevelInterval() {
-        return staffingLevelInterval;
+    public List<StaffingLevelTimeSlotDTO> getPresenceStaffingLevelInterval() {
+        return presenceStaffingLevelInterval;
     }
 
-    public void setStaffingLevelInterval(List<StaffingLevelTimeSlotDTO> staffingLevelInterval) {
-        this.staffingLevelInterval = staffingLevelInterval;
+    public void setPresenceStaffingLevelInterval(List<StaffingLevelTimeSlotDTO> presenceStaffingLevelInterval) {
+        this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 }

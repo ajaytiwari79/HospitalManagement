@@ -45,6 +45,7 @@ import com.kairos.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.planner.TasksMergingService;
+import com.kairos.service.shift.ShiftService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.rule_validator.task.MergeTaskSpecification;
 import com.kairos.rule_validator.task.TaskDaySpecification;
@@ -179,6 +180,7 @@ public class TaskService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject private ShiftService shiftService;
 
     public List<Long> getClientTaskServices(Long clientId, long orgId) {
         logger.info("Fetching tasks for ClientId: " + clientId);
@@ -719,22 +721,14 @@ public class TaskService extends MongoBaseService {
             if (!Optional.ofNullable(activity).isPresent()) {
                 skippedShiftsWhileSave.add(timeCareShift.getId());
             } else {
-                shift.setName(activity.getName());
-                shift.setActivityId(activity.getId());
                 shift.setStaffId(staffId);
                 shift.setUnitPositionId(unitPositionDTO.getId());
-                if (staffAdditionalInfoDTO.getDayTypes() != null && !staffAdditionalInfoDTO.getDayTypes().isEmpty()) {
-                    Set<DayOfWeek> activityDayTypes = ShiftValidatorService.getValidDays(staffAdditionalInfoDTO.getDayTypes(), activity.getTimeCalculationActivityTab().getDayTypes());
-                    if (activityDayTypes.contains(DateUtils.asLocalDate(shift.getStartDate()).getDayOfWeek())) {
-                        timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
-                    }
-                }
                 shiftsToCreate.add(shift);
             }
 
         }
         if (!shiftsToCreate.isEmpty()) {
-            save(shiftsToCreate);
+            shiftService.saveShiftsWithActivity(shiftsToCreate,staffAdditionalInfoDTO);
             timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shiftsToCreate);
             payOutService.savePayOuts(staffAdditionalInfoDTO, shiftsToCreate,activities);
         }

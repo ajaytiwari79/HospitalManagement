@@ -17,10 +17,9 @@ import com.planner.repository.taskPlanningRepository.PlanningRepository;
 import com.planner.repository.vrpPlanning.IndictmentMongoRepository;
 import com.planner.repository.vrpPlanning.VRPPlanningMongoRepository;
 import com.planner.responseDto.PlanningDto.taskplanning.TaskPlanningDTO;
-import com.planner.service.Client.PlannerRestClient;
 import com.planner.service.config.DroolsConfigService;
 import com.planner.service.config.PathProvider;
-import com.planner.service.shiftPlanningService.ShiftPlanningService;
+import com.planner.service.rest_client.PlannerRestClient;
 import com.planner.service.tomtomService.TomTomService;
 import com.planner.service.vrpService.VRPGeneratorService;
 import com.planner.util.wta.FileIOUtil;
@@ -43,11 +42,8 @@ public class PlannerService {
 
     @Autowired
     private PlanningRepository planningRepository;
-    @Autowired private TaskPlanningSolutionService taskPlanningSolutionService;
     @Autowired private DroolsConfigService droolsConfigService;
-    //@Autowired private SolverConfigService solverConfigService;
     @Autowired private SolverConfigRepository solverConfigRepository;
-    @Autowired private ShiftPlanningService shiftPlanningService;
     @Autowired
     private PathProvider pathProvider;
     @Autowired
@@ -111,7 +107,7 @@ public class PlannerService {
 
 
     public PlanningSubmissonResponseDTO submitShiftPlanningProblem(Long unitId, PlanningSubmissionDTO planningSubmissionDTO) {
-        ShiftRequestPhasePlanningSolution problem=shiftPlanningService.createShiftPlanningProblem(unitId,planningSubmissionDTO.getDates());
+        ShiftRequestPhasePlanningSolution problem=null;//shiftPlanningService.createShiftPlanningProblem(unitId,planningSubmissionDTO.getDates());
         FileIOUtil.writeShiftPlanningXMLToFile(problem,pathProvider.getProblemXmlpath());
         Document solverConfig=null;//solverConfigService.createShiftPlanningSolverConfig(planningSubmissionDTO.getSolverConfigId());
         FileIOUtil.writeXMLDocumentToFile(solverConfig,pathProvider.getProblemXmlpath());

@@ -13,32 +13,16 @@ public class IndividualShiftTemplateDTO {
     private BigInteger id;
     private String name;
     private String remarks;
-    @Range(min = 0)
-    @NotNull(message = "error.shiftTemplate.activityId.notnull")
-    private BigInteger activityId;
     @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
     private boolean mainShift;
-    private List<IndividualShiftTemplateDTO> subShifts;
-    private String timeType;
+    private List<ShiftActivity> activities;
     private int durationMinutes;
 
     public IndividualShiftTemplateDTO() {
         //Default Constructor
-    }
-
-    public IndividualShiftTemplateDTO(BigInteger id, String name, String remarks, @Range(min = 0) @NotNull(message = "error.shiftTemplate.activityId.notnull") BigInteger activityId
-                               , LocalTime startTime, LocalTime endTime,
-                                      List<IndividualShiftTemplateDTO> subShifts) {
-        this.id = id;
-        this.name = name;
-        this.remarks = remarks;
-        this.activityId = activityId;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.subShifts = subShifts;
     }
 
     public BigInteger getId() {
@@ -65,13 +49,6 @@ public class IndividualShiftTemplateDTO {
         this.remarks = remarks;
     }
 
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
 
     public LocalTime getStartTime() {
         return startTime;
@@ -89,12 +66,12 @@ public class IndividualShiftTemplateDTO {
         this.endTime = endTime;
     }
 
-    public List<IndividualShiftTemplateDTO> getSubShifts() {
-        return subShifts=Optional.ofNullable(subShifts).orElse(new ArrayList<>());
+    public List<ShiftActivity> getActivities() {
+        return activities;
     }
 
-    public void setSubShifts(List<IndividualShiftTemplateDTO> subShifts) {
-        this.subShifts = subShifts;
+    public void setActivities(List<ShiftActivity> activities) {
+        this.activities = activities;
     }
 
     public boolean isMainShift() {
@@ -105,13 +82,6 @@ public class IndividualShiftTemplateDTO {
         this.mainShift = mainShift;
     }
 
-    public String getTimeType() {
-        return timeType;
-    }
-
-    public void setTimeType(String timeType) {
-        this.timeType = timeType;
-    }
 
     public int getDurationMinutes() {
         return durationMinutes;

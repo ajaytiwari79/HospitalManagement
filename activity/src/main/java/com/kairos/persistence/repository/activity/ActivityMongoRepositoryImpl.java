@@ -404,6 +404,37 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
     }
 
+    @Override
+    public List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(List<BigInteger> activityIds) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("id").in(activityIds).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                        "timeType"),
+                project().and("id").as("activity._id").and("name").as("activity.name").and("description").as("activity.description")
+                        .and("countryId").as("activity.countryId").and("expertises").as("activity.expertises")
+                        .and("id").as("activity.id")
+                        .and("organizationTypes").as("activity.organizationTypes").and("organizationSubTypes").as("activity.organizationSubTypes")
+                        .and("regions").as("activity.regions").and("levels").as("activity.levels")
+                        .and("employmentTypes").as("activity.employmentTypes").and("tags").as("activity.tags")
+                        .and("state").as("activity.state").and("unitId").as("activity.unitId").
+                        and("parentId").as("activity.parentId").and("isParentActivity").as("activity.isParentActivity").and("generalActivityTab").as("activity.generalActivityTab")
+                        .and("balanceSettingsActivityTab").as("activity.balanceSettingsActivityTab")
+                        .and("rulesActivityTab").as("activity.rulesActivityTab").and("individualPointsActivityTab").as("activity.individualPointsActivityTab")
+                        .and("timeCalculationActivityTab").as("activity.timeCalculationActivityTab").
+                        and("compositeActivities").as("activity.compositeActivities")
+                        .and("notesActivityTab").as("activity.notesActivityTab")
+                        .and("communicationActivityTab").as("activity.communicationActivityTab")
+                        .and("bonusActivityTab").as("activity.bonusActivityTab")
+                        .and("skillActivityTab").as("activity.skillActivityTab")
+                        .and("optaPlannerSettingActivityTab").as("activity.optaPlannerSettingActivityTab")
+                        .and("ctaAndWtaSettingsActivityTab").as("activity.ctaAndWtaSettingsActivityTab")
+                        .and("locationActivityTab").as("activity.locationActivityTab")
+                        .and("permissionsActivityTab").as("activity.permissionsActivityTab")
+                        .and("timeType").arrayElementAt(0).as("timeType").and("timeType.timeTypes").as("timeType")
+        );
+        AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
+        return result.getMappedResults();
+    }
     public List<TimeTypeAndActivityIdDTO> findAllTimeTypeByActivityIds(Set<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("id").in(activityIds).and("deleted").is(false)),

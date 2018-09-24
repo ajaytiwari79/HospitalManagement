@@ -4,6 +4,15 @@ public class ActivityWrapper {
     private Activity activity;
     private String timeType;
 
+
+    public ActivityWrapper() {
+    }
+
+    public ActivityWrapper(Activity activity, String timeType) {
+        this.activity = activity;
+        this.timeType = timeType;
+    }
+
     public Activity getActivity() {
         return activity;
     }

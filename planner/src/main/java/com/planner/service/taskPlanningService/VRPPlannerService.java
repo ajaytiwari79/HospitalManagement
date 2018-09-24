@@ -18,7 +18,7 @@ import com.planner.domain.vrpPlanning.VRPIndictment;
 import com.planner.domain.vrpPlanning.VRPPlanningSolution;
 import com.planner.repository.vrpPlanning.IndictmentMongoRepository;
 import com.planner.repository.vrpPlanning.VRPPlanningMongoRepository;
-import com.planner.service.Client.PlannerRestClient;
+import com.planner.service.rest_client.PlannerRestClient;
 import com.planner.service.vrpService.VRPGeneratorService;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 import org.optaplanner.core.api.score.constraint.ConstraintMatchTotal;

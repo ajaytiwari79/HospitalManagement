@@ -345,16 +345,16 @@ public class ShiftPlanningGenerator {
 
    public CollectiveTimeAgreement getCTA(List<Activity> activities){
         CollectiveTimeAgreement collectiveTimeAgreement = new CollectiveTimeAgreement();
-        List<CTARuleTemplate> ctaRuleTemplates = new ArrayList<CTARuleTemplate>();
+        /*List<CTARuleTemplate> ctaRuleTemplates = new ArrayList<CTARuleTemplate>();
         ctaRuleTemplates.add(getWorkingEveningShift(activities));
         ctaRuleTemplates.add(getWorkingNightShift(activities));
         ctaRuleTemplates.add(getWorkingOnPublicHoliday(activities));
         ctaRuleTemplates.add(getWorkingOnHalfPublicHoliday(activities));
         ctaRuleTemplates.add(getWorkingOnSaturday(activities));
         ctaRuleTemplates.add(getWorkingOnSunday(activities));
-       /* WorkingExtraTimeCtaRuleTemplate workingExtraTime = new WorkingExtraTimeCtaRuleTemplate();
-        collectiveTimeAgreement.setWorkingExtraTime(workingExtraTime);*/
-        collectiveTimeAgreement.setCtaRuleTemplates(ctaRuleTemplates);
+       *//* WorkingExtraTimeCtaRuleTemplate workingExtraTime = new WorkingExtraTimeCtaRuleTemplate();
+        collectiveTimeAgreement.setWorkingExtraTime(workingExtraTime);*//*
+        collectiveTimeAgreement.setCtaRuleTemplates(ctaRuleTemplates);*/
        return collectiveTimeAgreement;
    }
 
