@@ -380,7 +380,8 @@ public class CounterRepository {
         String refQueryField = getRefQueryField(level);
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
-                Aggregation.group("id","accessGroupId").push("kpiId").as("kpiIds")
+                Aggregation.group("accessGroupId").push("kpiId").as("kpiIds"),
+                Aggregation.project().and("_id").as("accessGroupId").and("kpiIds").as("kpiIds")
         );
         AggregationResults<AccessGroupMappingDTO> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,AccessGroupMappingDTO.class);
         return results.getMappedResults();
