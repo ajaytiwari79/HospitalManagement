@@ -242,8 +242,7 @@ public class WTAController {
 
    /* @ApiOperation(value = "check scheduler load balncing")
     @GetMapping(value = UNIT_URL + "/check_load_balancing_scheduler")
-    pu
-    blic ResponseEntity<Map<String, Object>> checkSchedulerLoadBalancing(@PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> checkSchedulerLoadBalancing(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, genericIntegrationService.checkSchedulerLoadBalanceWorking());
     }
 */
