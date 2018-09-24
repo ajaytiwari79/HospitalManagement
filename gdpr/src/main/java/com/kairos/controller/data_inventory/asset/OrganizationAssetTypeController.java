@@ -96,7 +96,7 @@ public class OrganizationAssetTypeController {
     }
 
 
-    @ApiOperation("add AssetType")
+    @ApiOperation("save and suggest AssetType to country admin ")
     @PostMapping(COUNTRY_URL+"/asset_type/suggest")
     public ResponseEntity<Object> saveAssetTypeAndSubAssetTypeAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId,@Valid @RequestBody AssetTypeBasicDTO assetTypeDTO) {
 
