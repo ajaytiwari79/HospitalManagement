@@ -16,6 +16,7 @@ import com.kairos.service.master_data.processing_activity_masterdata.ProcessingP
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -89,7 +90,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long organizationId) {
-        return processingPurposeMongoRepository.findAllOrganizationProcessingPurposes(organizationId);
+        return processingPurposeMongoRepository.findAllOrganizationProcessingPurposes(organizationId,new Sort(Sort.Direction.DESC, "_id"));
     }
 
     /**

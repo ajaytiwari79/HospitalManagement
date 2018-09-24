@@ -39,7 +39,7 @@ public class MasterProcessingActivity extends MongoBaseEntity {
 
     private List<BigInteger> risks=new ArrayList<>();
 
-    private Boolean isSubProcess=false;
+    private Boolean subProcess=false;
 
     private Boolean hasSubProcessingActivity=false;
 
@@ -49,13 +49,9 @@ public class MasterProcessingActivity extends MongoBaseEntity {
 
     public void setHasSubProcessingActivity(Boolean hasSubProcessingActivity) { this.hasSubProcessingActivity = hasSubProcessingActivity; }
 
-    public Boolean getSubProcess() {
-        return isSubProcess;
-    }
+    public Boolean getSubProcess() { return subProcess; }
 
-    public void setSubProcess(Boolean subProcess) {
-        isSubProcess = subProcess;
-    }
+    public void setSubProcess(Boolean subProcess) { this.subProcess = subProcess; }
 
     public Long getCountryId() {
         return countryId;

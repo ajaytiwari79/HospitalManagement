@@ -86,46 +86,10 @@ public class MasterProcessingActivityController {
     }
 
 
-    @ApiOperation(value = "unlink risk from Sub Processing Activity ")
-    @DeleteMapping("/master_processing_activity/sub_Process/{subProcessingActivityId}/risk/{riskId}")
-    public ResponseEntity<Object> unlinkRiskFromSubProcessingActivityAndDeleteRisk(@PathVariable Long countryId, @PathVariable BigInteger subProcessingActivityId, @PathVariable BigInteger riskId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.deleteRiskAndUnlinkFromProcessingActivityOrSubProcessingActivity(countryId, subProcessingActivityId, riskId));
-    }
-
-
-    @ApiOperation(value = "get All Processing Activity And linked risk ")
+    @ApiOperation(value = "get All Processing Activity And linked risk and Sub Processing Activity")
     @GetMapping("/master_processing_activity/risk")
-    public ResponseEntity<Object> getMasterProcessingActivityAndLinkedRisks(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getAllMasterProcessingActivityAndLinkedRisks(countryId));
+    public ResponseEntity<Object> getMasterProcessingActivityWithSubProcessingActivitiesAndLinkedRisks(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getAllMasterProcessingActivityWithSubProcessingActivitiesAndRisks(countryId));
     }
-
-
-    @ApiOperation(value = "get All Sub Processing Activity of Processing Activity And  risks linked with sub processing activity ")
-    @GetMapping("/master_processing_activity/{processingActivityId}/sub_Process/risk")
-    public ResponseEntity<Object> getAllSubProcessingActivityWithLinkedRisks(@PathVariable Long countryId,@PathVariable(required = true) BigInteger processingActivityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getAllSubProcessingActivityAndLinkedRisksByProcessingActivityId(countryId,processingActivityId));
-    }
-
-
-/*
-    @ApiOperation(value = "get MasterProcessingActivity of unit by id")
-    @GetMapping(UNIT_URL + "/master_processing_activity/{processingActivityId}")
-    public ResponseEntity<Object> getMasterProcessingActivityOfUnitById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
-        if (processingActivityId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Processing Activity id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityWithSubProcessing(countryId, unitId, processingActivityId));
-    }
-
-    @ApiOperation(value = "get MasterProcessingActivity list with SubProcessing Activity of unit ")
-    @GetMapping(UNIT_URL + "/master_processing_activity/all")
-    public ResponseEntity<Object> getMasterProcessingActivityListWithSubProcessingActivityOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        } else if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getMasterProcessingActivityListWithSubProcessing(countryId, unitId));
-    }*/
 
 }

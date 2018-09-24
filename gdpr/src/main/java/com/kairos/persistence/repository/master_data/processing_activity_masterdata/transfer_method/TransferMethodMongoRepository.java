@@ -5,6 +5,7 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Tr
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.TransferMethodResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +26,7 @@ public interface TransferMethodMongoRepository extends MongoBaseRepository<Trans
     TransferMethod findByName(Long countryId, String name);
 
     @Query("{deleted:false,countryId:?0}")
-    List<TransferMethodResponseDTO> findAllTransferMethods(Long countryId);
+    List<TransferMethodResponseDTO> findAllTransferMethods(Long countryId, Sort sort);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<TransferMethod> getTransferMethodListByIds(Long countryId, Set<BigInteger> transferMethodIds);
@@ -35,7 +36,7 @@ public interface TransferMethodMongoRepository extends MongoBaseRepository<Trans
 
 
     @Query("{organizationId:?0,deleted:false}")
-    List<TransferMethodResponseDTO> findAllOrganizationTransferMethods(Long organizationId);
+    List<TransferMethodResponseDTO> findAllOrganizationTransferMethods(Long organizationId,Sort  sort);
 
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")

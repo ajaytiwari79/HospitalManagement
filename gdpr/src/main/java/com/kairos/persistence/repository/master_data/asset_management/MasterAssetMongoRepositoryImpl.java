@@ -10,6 +10,7 @@ import com.kairos.persistence.repository.client_aggregator.CustomAggregationOper
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -55,7 +56,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
-                new CustomAggregationOperation(masterAssetProjectionOperation)
+                new CustomAggregationOperation(masterAssetProjectionOperation),
+                sort(Sort.Direction.DESC,"id")
 
         );
 
@@ -98,7 +100,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
                 match(criteria),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
-                new CustomAggregationOperation(masterAssetProjectionOperation)
+                new CustomAggregationOperation(masterAssetProjectionOperation),
+                sort(Sort.Direction.DESC,"id")
 
 
         );

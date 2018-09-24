@@ -9,6 +9,7 @@ import com.kairos.persistence.repository.client_aggregator.CustomAggregationOper
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -65,9 +66,11 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("template_type", "templateTypes", "_id", "templateTypes"),
-                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
+                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
+                sort(Sort.Direction.DESC, "id")
 
-        );
+
+                );
 
 
         AggregationResults<ClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseResponseDTO.class);
@@ -104,9 +107,10 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("template_type", "templateTypes", "_id", "templateTypes"),
-                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation)
+                new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
+                sort(Sort.Direction.DESC, "id")
 
-        );
+                );
 
         AggregationResults<ClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseResponseDTO.class);
         return result.getMappedResults();
