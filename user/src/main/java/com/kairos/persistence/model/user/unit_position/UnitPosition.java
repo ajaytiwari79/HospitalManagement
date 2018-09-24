@@ -63,6 +63,17 @@ public class UnitPosition extends UserBaseEntity {
     private UnitPosition parentUnitPosition;
 
     public UnitPosition() {
+
+    }
+
+    public UnitPosition(PositionCode positionCode, Organization unit, Long startDateMillis, Long timeCareExternalId,boolean published) {
+        this.positionCode = positionCode;
+        this.unit = unit;
+        this.startDateMillis = startDateMillis;
+        this.timeCareExternalId = timeCareExternalId;
+        this.editable=true;
+        this.history=false;
+        this.published=published;
     }
 
     public PositionCode getPositionCode() {

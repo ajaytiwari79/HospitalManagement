@@ -19,6 +19,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -36,7 +37,7 @@ public class UnitPositionController {
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unit_position")
-    public ResponseEntity<Map<String, Object>> createUnitPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitPositionDTO position, @RequestParam("saveAsDraft") Boolean saveAsDraft) {
+    public ResponseEntity<Map<String, Object>> createUnitPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitPositionDTO position, @RequestParam("saveAsDraft") Boolean saveAsDraft)  throws InterruptedException ,ExecutionException     {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.createUnitPosition(unitId, type, position, false, saveAsDraft));
     }
 
