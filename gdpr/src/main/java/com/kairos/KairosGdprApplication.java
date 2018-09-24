@@ -32,10 +32,16 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableAspectJAutoProxy
 @EnableCircuitBreaker
 @SpringBootApplication
-@EnableMongoRepositories(basePackages = "com.kairos.persistence.repository",repositoryBaseClass = MongoBaseRepositoryImpl.class)
+@EnableMongoRepositories(basePackages = "com.kairos.persistence.repository", repositoryBaseClass = MongoBaseRepositoryImpl.class)
 public class KairosGdprApplication {
 
     public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");
+
+    static {
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+        System.setProperty("user.timezone", "UTC");
+    }
+
 
     public static void main(String args[]) {
         SpringApplication.run(KairosGdprApplication.class, args);
@@ -74,7 +80,7 @@ public class KairosGdprApplication {
         return mappingJackson2HttpMessageConverter;
     }
 
-    @Profile({"development","qa","production"})
+    @Profile({"development", "qa", "production"})
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
@@ -95,9 +101,6 @@ public class KairosGdprApplication {
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
     }
-
-
-
 
 
 }

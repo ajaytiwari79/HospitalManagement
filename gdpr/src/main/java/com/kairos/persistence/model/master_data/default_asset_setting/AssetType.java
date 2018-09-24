@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -26,7 +27,7 @@ public class AssetType extends MongoBaseEntity {
 
     private List<BigInteger> risks;
 
-    private List<BigInteger> subAssetTypes;
+    private List<BigInteger> subAssetTypes=new ArrayList<>();
 
     public String getSuggestedDataStatus() { return suggestedDataStatus; }
 

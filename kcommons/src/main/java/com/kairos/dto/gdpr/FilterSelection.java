@@ -1,7 +1,7 @@
 package com.kairos.dto.gdpr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.FilterType;
+import com.kairos.enums.gdpr.FilterType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
