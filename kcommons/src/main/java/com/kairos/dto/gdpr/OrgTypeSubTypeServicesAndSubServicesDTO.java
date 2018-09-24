@@ -9,15 +9,15 @@ import java.util.List;
 @JsonIgnoreProperties
 public class OrgTypeSubTypeServicesAndSubServicesDTO {
 
-    private BigInteger id;
+    private Long id;
     private String name;
     private List<OrganizationSubType> organizationSubTypes;
     private List<ServiceCategory> organizationServices;
     private List<SubServiceCategory> organizationSubServices;
 
-    public BigInteger getId() { return id; }
+    public Long getId() { return id; }
 
-    public void setId(BigInteger id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
 

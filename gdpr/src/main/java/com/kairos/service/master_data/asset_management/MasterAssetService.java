@@ -1,18 +1,24 @@
 package com.kairos.service.master_data.asset_management;
 
 
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.custom_exception.*;
+import com.kairos.dto.gdpr.OrgTypeSubTypeServicesAndSubServicesDTO;
+import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
 import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.dto.gdpr.master_data.MasterAssetDTO;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
+import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -34,6 +40,9 @@ public class MasterAssetService extends MongoBaseService {
 
     @Inject
     private AssetTypeService assetTypeService;
+
+    @Inject
+    private GenericRestClient restClient;
 
 
     /**
@@ -132,12 +141,13 @@ public class MasterAssetService extends MongoBaseService {
         if (Optional.ofNullable(previousAsset).isPresent()) {
             return null;
         }
-
+        OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO = restClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/organization_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrgTypeSubTypeServicesAndSubServicesDTO>>() {
+        });
         MasterAsset masterAsset = new MasterAsset(assetDTO.getName(), assetDTO.getDescription(), countryId, LocalDate.now(), SuggestedDataStatus.PENDING)
-                .setOrganizationTypes(null)
-                .setOrganizationSubTypes(null)
-                .setOrganizationServices(null)
-                .setOrganizationSubServices(null);
+                .setOrganizationTypes(Arrays.asList(new OrganizationType(orgTypeSubTypeServicesAndSubServicesDTO.getId(), orgTypeSubTypeServicesAndSubServicesDTO.getName())))
+                .setOrganizationSubTypes(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypes())
+                .setOrganizationServices(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices())
+                .setOrganizationSubServices(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices());
         masterAssetMongoRepository.save(masterAsset);
         assetDTO.setId(masterAsset.getId());
         return assetDTO;
