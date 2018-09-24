@@ -63,7 +63,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "questionnaire  template", templateId);
         }
         checkForDuplicacyInTitleOfSectionsAndQuestionTitle(masterQuestionnaireSectionDto);
-        List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(countryId,false, masterQuestionnaireSectionDto, questionnaireTemplate.getTemplateType());
+        List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(countryId, false, masterQuestionnaireSectionDto, questionnaireTemplate.getTemplateType());
         questionnaireTemplate.setSections(sectionIdList);
         questionnaireTemplateMongoRepository.save(questionnaireTemplate);
         return questionnaireTemplateService.getMasterQuestionnaireTemplateWithSectionById(countryId, questionnaireTemplate.getId());
@@ -85,7 +85,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
                 existingSectionIdList.add(questionnaireSectionDTO.getId());
                 questionnaireSectionIdDTOMap.put(questionnaireSectionDTO.getId(), questionnaireSectionDTO);
             } else {
-                QuestionnaireSection questionnaireSection = buildQuestionnaireSection(questionnaireSectionDTO,referenceId,isReferenceIdUnitId);
+                QuestionnaireSection questionnaireSection = buildQuestionnaireSection(questionnaireSectionDTO, referenceId, isReferenceIdUnitId);
                 newQuestionnaireSections.add(questionnaireSection);
                 if (CollectionUtils.isNotEmpty(questionnaireSectionDTO.getQuestions())) {
                     questionDTOListCoresspondingToSection.put(questionnaireSection, questionnaireSectionDTO.getQuestions());
@@ -123,8 +123,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
             questionnaireSection.setOrganizationId(referenceId);
             return questionnaireSection;
         } else {
-            QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionDTO.getTitle(), referenceId);
-            return questionnaireSection;
+            return new QuestionnaireSection(questionnaireSectionDTO.getTitle(), referenceId);
         }
     }
 
@@ -146,7 +145,6 @@ public class QuestionnaireSectionService extends MongoBaseService {
 
 
     /**
-     *
      * @param unitId
      * @param questionnaireTemplateId
      * @param questionnaireSectionDTOS
@@ -159,7 +157,7 @@ public class QuestionnaireSectionService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Questionnaire Template", questionnaireTemplateId);
         }
         checkForDuplicacyInTitleOfSectionsAndQuestionTitle(questionnaireSectionDTOS);
-        List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(unitId,true, questionnaireSectionDTOS, questionnaireTemplate.getTemplateType());
+        List<BigInteger> sectionIdList = createAndUpdateQuestionnaireSectionsAndQuestions(unitId, true, questionnaireSectionDTOS, questionnaireTemplate.getTemplateType());
         questionnaireTemplate.setSections(sectionIdList);
         questionnaireTemplateMongoRepository.save(questionnaireTemplate);
         return questionnaireTemplateService.getQuestionnaireTemplateWithSectionByUnitIdAndId(unitId, questionnaireTemplate.getId());
