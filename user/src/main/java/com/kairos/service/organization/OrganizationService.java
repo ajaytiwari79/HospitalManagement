@@ -1491,4 +1491,9 @@ public class OrganizationService {
         return organizationGraphRepository.getOrganizationIdsBySubOrgTypeId(orgTypeId);
     }
 
+    public List<UnitTimeZoneMappingDTO> getTimeZoneStringsOfAllUnits() {
+
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(organizationGraphRepository.findTimezoneforAllorganizations(),UnitTimeZoneMappingDTO.class);
+
+    }
 }
