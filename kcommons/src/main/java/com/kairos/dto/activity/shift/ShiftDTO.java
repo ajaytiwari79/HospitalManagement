@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.commons.utils.DateUtils;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
@@ -13,7 +11,6 @@ import org.joda.time.Interval;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -44,7 +41,7 @@ public class ShiftDTO {
     @JsonFormat(pattern = "YYYY-MM-DD")
     private LocalDate shiftDate;
     private Long allowedBreakDurationInMinute;
-    private BigInteger templateId;
+    private ShiftTemplateDTO template;
     private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger plannedTimeId;
     private Long expertiseId;
@@ -321,12 +318,12 @@ public class ShiftDTO {
         this.parentOpenShiftId = parentOpenShiftId;
     }
 
-    public BigInteger getTemplateId() {
-        return templateId;
+    public ShiftTemplateDTO getTemplate() {
+        return template;
     }
 
-    public void setTemplateId(BigInteger templateId) {
-        this.templateId = templateId;
+    public void setTemplate(ShiftTemplateDTO template) {
+        this.template = template;
     }
 
 }

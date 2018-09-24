@@ -11,7 +11,7 @@ import java.util.List;
 public class ShiftActivitiesIdDTO {
 
     private BigInteger shiftId;
-    private List<BigInteger> activitieIds;
+    private List<BigInteger> activityIds;
 
     public BigInteger getShiftId() {
         return shiftId;
@@ -21,11 +21,11 @@ public class ShiftActivitiesIdDTO {
         this.shiftId = shiftId;
     }
 
-    public List<BigInteger> getActivitieIds() {
-        return activitieIds;
+    public List<BigInteger> getActivityIds() {
+        return activityIds;
     }
 
-    public void setActivitieIds(List<BigInteger> activitieIds) {
-        this.activitieIds = activitieIds;
+    public void setActivityIds(List<BigInteger> activityIds) {
+        this.activityIds = activityIds;
     }
 }

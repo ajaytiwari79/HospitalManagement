@@ -125,15 +125,16 @@ public class ShiftValidatorService {
     }
 
 
-    public ViolatedRulesDTO validateShiftWithActivity(Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public ShiftWithViolatedInfoDTO validateShiftWithActivity(Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        List<String> errorMessages = new ArrayList<>();
         if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.unit.position");
+            errorMessages.add(exceptionService.convertMessage("message.unit.position"));
         }
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.wta.notFound");
+            errorMessages.add(exceptionService.convertMessage("message.wta.notFound"));
         }
         if (wtaQueryResultDTO.getEndDate() != null && new DateTime(wtaQueryResultDTO.getEndDate()).isBefore(shift.getActivitiesEndDate().getTime())) {
-            throw new ActionNotPermittedException("WTA is Expired for unit employment.");
+            errorMessages.add(exceptionService.convertMessage("message.wta.expired-unit"));
         }
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO);
         List<Long> dayTypeIds = shift.getActivities().get(0).getActivity().getRulesActivityTab().getDayTypes();
@@ -156,7 +157,9 @@ public class ShiftValidatorService {
             activitySpecification.and(activityDayTypeSpec);
         }
         activitySpecification.validateRules(shift);
-        return ruleTemplateSpecificInfo.getViolatedRules();
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
+        shiftWithViolatedInfoDTO.getErrorMessages().addAll(errorMessages);
+        return shiftWithViolatedInfoDTO;
     }
 
 
@@ -164,7 +167,7 @@ public class ShiftValidatorService {
         logger.info("Current phase is " + phase.getName() + " for date " + new DateTime(shift.getActivities().get(0).getStartDate()));
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()));
         if (planningPeriod == null) {
-            exceptionService.actionNotPermittedException("message.shift.planning.period.exit", shift.getActivities().get(0).getStartDate());
+            exceptionService.convertMessage("message.shift.planning.period.exit", shift.getActivities().get(0).getStartDate());
         }
         List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()), staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff());
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates());
@@ -189,12 +192,12 @@ public class ShiftValidatorService {
 
 
     public void validateStatusOfShiftOnUpdate(Shift shift,ShiftDTO shiftDTO){
-        Map<BigInteger,ShiftActivity> shiftActivityMap = shiftDTO.getActivities().stream().collect(Collectors.toMap(k->k.getActivityId(),v->v));
-        for (ShiftActivity shiftActivity : shift.getActivities()) {
-            ShiftActivity updateShiftActivitiy = shiftActivityMap.get(shiftActivity.getActivityId());
-            boolean notValid = (shiftActivity.getStatus().contains(ShiftStatus.FIXED) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISHED) || shiftActivity.getStatus().contains(ShiftStatus.LOCKED)) && (updateShiftActivitiy==null || updateShiftActivitiy.getStartDate().equals(shift.getStartDate()) || updateShiftActivitiy.getEndDate().equals(shift.getEndDate()));
-            if (notValid) {
-                exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
+        for (ShiftActivity updateShiftActivitiy : shiftDTO.getActivities()) {
+            for (ShiftActivity shiftActivity : shift.getActivities()) {
+                boolean notValid = (shiftActivity.getStatus().contains(ShiftStatus.FIXED) || shiftActivity.getStatus().contains(ShiftStatus.PUBLISHED) || shiftActivity.getStatus().contains(ShiftStatus.LOCKED)) && (updateShiftActivitiy==null || updateShiftActivitiy.getStartDate().equals(shift.getStartDate()) || updateShiftActivitiy.getEndDate().equals(shift.getEndDate()));
+                if (notValid) {
+                    exceptionService.actionNotPermittedException("message.shift.state.update", shiftActivity.getStatus());
+                }
             }
         }
 

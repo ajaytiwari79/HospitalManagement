@@ -1,7 +1,6 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
@@ -15,7 +14,6 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.utils.user_context.UserContext;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,8 +88,8 @@ public class ShiftTemplateService extends MongoBaseService {
         shiftTemplateDTOS.forEach(shiftTemplateDTO -> {
             shiftTemplateDTO.getIndividualShiftTemplateIds().forEach(individualShiftTemplateId->{
                 IndividualShiftTemplateDTO individualShiftTemplateDTO = individualShiftTemplateDTOMap.get(individualShiftTemplateId);
-                individualShiftTemplateDTO.getActivities().forEach(subShift->{
-                    subShift.setTimeType(timeTypeMap.get(subShift.getActivityId()));
+                individualShiftTemplateDTO.getActivities().forEach(shiftActivity->{
+                    shiftActivity.setTimeType(timeTypeMap.get(shiftActivity.getActivityId()));
                 });
                 shiftTemplateDTO.getShiftList().add(individualShiftTemplateDTO);
             });
@@ -170,7 +168,7 @@ public class ShiftTemplateService extends MongoBaseService {
 
     public List<ShiftDTO> createShiftUsingTemplate(Long unitId, ShiftDTO shiftDTO) {
         List<ShiftDTO> shifts = new ArrayList<>();
-        ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftDTO.getTemplateId());
+        ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftDTO.getTemplate().getId());
         Set<BigInteger> individualShiftTemplateIds = shiftTemplate.getIndividualShiftTemplateIds();
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
         individualShiftTemplateDTOS.forEach(individualShiftTemplateDTO -> {
@@ -178,12 +176,14 @@ public class ShiftTemplateService extends MongoBaseService {
             shiftDTO1.setId(null);
             shiftDTO1.setStaffId(shiftDTO.getStaffId());
             shiftDTO1.setUnitPositionId(shiftDTO.getUnitPositionId());
-            LocalDate shiftStartDate = DateUtils.asLocalDate(shiftDTO.getStartDate());
-            shiftDTO1.setStartDate(DateUtils.asDate(shiftStartDate, individualShiftTemplateDTO.getStartTime()));
-            LocalDate shiftEndDate = DateUtils.asLocalDate(shiftDTO.getEndDate());
-            shiftDTO1.setEndDate(DateUtils.asDate(shiftEndDate, individualShiftTemplateDTO.getEndTime()));
-            ShiftDTO shiftQueryResult = shiftService.addSubShift(unitId, shiftDTO1, "Organization").getShifts().get(0);
-            shifts.add(shiftQueryResult);
+            shiftDTO1.getActivities().forEach(s->{
+                Date startDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), DateUtils.asLocalTime(s.getStartDate()));
+                Date endDate = DateUtils.asDate(shiftDTO.getTemplate().getStartDate(), DateUtils.asLocalTime(s.getEndDate()));
+                s.setStartDate(startDate);
+                s.setEndDate(endDate);
+            });
+            ShiftDTO shiftDTO2 = shiftService.createShift(unitId, shiftDTO1, "Organization",false).getShifts().get(0);
+            shifts.add(shiftDTO2);
 
         });
         return shifts;

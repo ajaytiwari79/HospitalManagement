@@ -10,6 +10,7 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.utils.user_context.UserContext;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -35,7 +36,6 @@ public class Shift extends MongoBaseEntity {
     private long accumulatedTimeBankInMinutes = 0;
     private String remarks;
     private Long staffId;
-    private Phase phase;// todo REMOVE VIPUL
     private BigInteger phaseId;
     private BigInteger planningPeriodId;
     private Integer weekCount;
@@ -60,6 +60,7 @@ public class Shift extends MongoBaseEntity {
     private boolean sickShift;
     private LocalDate validatedByStaffDate;
     private LocalDate validatedByPlannerDate;
+    private Long createdBy = UserContext.getUserDetails().getId();
 
     public Shift() {
         //Default Constructor
@@ -72,6 +73,14 @@ public class Shift extends MongoBaseEntity {
         this.unitPositionId = unitPositionId;
     }
 
+
+    public Long getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
+    }
 
     public int getDurationMinutes() {
         return durationMinutes;
@@ -263,7 +272,6 @@ public class Shift extends MongoBaseEntity {
                 ", accumulatedTimeBankInMinutes=" + accumulatedTimeBankInMinutes +
                 ", remarks='" + remarks + '\'' +
                 ", staffId=" + staffId +
-                ", phase=" + phase +
                 ", weekCount=" + weekCount +
                 ", unitId=" + unitId +
                 '}';
@@ -273,13 +281,6 @@ public class Shift extends MongoBaseEntity {
         this.staffId = staffId;
     }
 
-    public Phase getPhase() {
-        return phase;
-    }
-
-    public void setPhase(Phase phase) {
-        this.phase = phase;
-    }
 
     public Integer getWeekCount() {
         return weekCount;
@@ -411,13 +412,12 @@ public class Shift extends MongoBaseEntity {
         this.planningPeriodId = planningPeriodId;
     }
 
-    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId, Phase phase, Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
+    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.remarks = remarks;
         this.activities = activities;
         this.staffId = staffId;
-        this.phase = phase;
         this.unitId = unitId;
         this.externalId = externalId;
         this.unitPositionId = unitPositionId;
