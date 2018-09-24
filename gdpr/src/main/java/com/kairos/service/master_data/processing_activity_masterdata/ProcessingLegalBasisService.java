@@ -14,6 +14,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -87,7 +88,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
      */
 
     public List<ProcessingLegalBasisResponseDTO> getAllProcessingLegalBasis(Long countryId) {
-        return legalBasisMongoRepository.findAllProcessingLegalBases(countryId);
+        return legalBasisMongoRepository.findAllProcessingLegalBases(countryId,new Sort(Sort.Direction.DESC, "_id"));
     }
 
     /**

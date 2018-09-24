@@ -71,7 +71,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("subProcess").is(false)),
                 lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
                 , new CustomAggregationOperation(projectionOperation),
-                sort(Sort.Direction.DESC,"createdAt")
+                sort(Sort.Direction.DESC,"id")
         );
         AggregationResults<MasterProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDTO.class);
         return result.getMappedResults();
@@ -98,8 +98,10 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
                 match(criteria),
                 lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
-                , new CustomAggregationOperation(projectionOperation)
-        );
+                , new CustomAggregationOperation(projectionOperation),
+                sort(Sort.Direction.DESC, "id")
+
+                );
         AggregationResults<MasterProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDTO.class);
         return result.getMappedResults();
 
@@ -154,7 +156,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
               unwind("subProcessingActivities",true),
               lookup("risk","subProcessingActivities.risks","_id","subProcessingActivities.risks"),
               new CustomAggregationOperation(Document.parse(groupSubProcessingActivities)),
-              sort(Sort.Direction.DESC,"createdAt"),
+              sort(Sort.Direction.DESC,"id"),
                 new CustomAggregationOperation(Document.parse(addNonDeletedRisks))
       );
       AggregationResults<MasterProcessingActivityRiskResponseDTO> result=mongoTemplate.aggregate(aggregation,MasterProcessingActivity.class,MasterProcessingActivityRiskResponseDTO.class);
