@@ -16,6 +16,7 @@ import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -94,7 +95,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long organizationId) {
-        return technicalSecurityMeasureMongoRepository.findAllOrganizationTechnicalSecurityMeasures(organizationId);
+        return technicalSecurityMeasureMongoRepository.findAllOrganizationTechnicalSecurityMeasures(organizationId,new Sort(Sort.Direction.DESC, "_id"));
     }
 
 

@@ -5,6 +5,7 @@ import com.kairos.persistence.repository.client_aggregator.CustomAggregationOper
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -107,8 +108,10 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
                         .first("name").as("name")
                         .first("description").as("description")
                         .first(COUNTRY_ID).as(COUNTRY_ID)
-                        .addToSet("dataCategories").as("dataCategories")
-        );
+                        .addToSet("dataCategories").as("dataCategories"),
+                sort(Sort.Direction.DESC, "id")
+
+                );
         AggregationResults<DataSubjectMappingResponseDTO> result = mongoTemplate.aggregate(aggregation, DataSubjectMapping.class, DataSubjectMappingResponseDTO.class);
         return result.getMappedResults();
     }
@@ -131,8 +134,10 @@ public class DataSubjectMappingRepositoryImpl implements CustomDataSubjectMappin
                         .first("name").as("name")
                         .first("description").as("description")
                         .first(COUNTRY_ID).as(COUNTRY_ID)
-                        .addToSet("dataCategories").as("dataCategories")
-        );
+                        .addToSet("dataCategories").as("dataCategories"),
+                sort(Sort.Direction.DESC, "id")
+
+                );
         AggregationResults<DataSubjectMappingResponseDTO> result = mongoTemplate.aggregate(aggregation, DataSubjectMapping.class, DataSubjectMappingResponseDTO.class);
         return result.getMappedResults();
     }
