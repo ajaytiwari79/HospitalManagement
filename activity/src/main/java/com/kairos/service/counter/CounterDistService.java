@@ -560,7 +560,7 @@ public class CounterDistService extends MongoBaseService {
         accessGroupMappingDTOS.forEach(accessGroupMappingDTO -> {
             accessGroupKPIEntries.add(new AccessGroupKPIEntry(defalutKPISettingDTO.getCountryAndOrgAccessGroupIdsMap().get(accessGroupMappingDTO.getAccessGroupId()), accessGroupMappingDTO.getKpiId(), null, unitId, ConfLevel.UNIT));
         });
-        List<KPIAccessPageDTO> kpiAccessPageDTOS=genericIntegrationService.getKPIEnabledTabsForModuleForUnit(refId);
+        List<KPIAccessPageDTO> kpiAccessPageDTOS=genericIntegrationService.getKPIEnabledTabsForModuleForUnit(unitId);
         List<String> tabIds=kpiAccessPageDTOS.stream().flatMap(kpiAccessPageDTO -> kpiAccessPageDTO.getChild().stream().map(kpiAccessPage->kpiAccessPage.getModuleId())).collect(Collectors.toList());
         List<TabKPIConf> tabKPIConf=counterRepository.findTabKPIConfigurationByTabIds(tabIds,applicableKpiIds,refId,level);
         tabKPIConf.stream().forEach(tabKPIConfKPI->{
