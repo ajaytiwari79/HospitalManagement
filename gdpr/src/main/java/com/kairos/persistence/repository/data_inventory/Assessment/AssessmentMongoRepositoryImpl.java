@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.data_inventory.Assessment;
 
-import com.kairos.enums.AssessmentStatus;
+import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.response.dto.data_inventory.AssessmentResponseDTO;
 import org.springframework.data.mongodb.core.MongoTemplate;

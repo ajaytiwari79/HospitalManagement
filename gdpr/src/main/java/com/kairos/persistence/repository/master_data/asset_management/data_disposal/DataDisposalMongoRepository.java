@@ -5,6 +5,7 @@ import com.kairos.persistence.model.master_data.default_asset_setting.DataDispos
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -32,10 +33,10 @@ public interface DataDisposalMongoRepository extends MongoBaseRepository<DataDis
     List<DataDisposal> getDataDisposalListByIds(Long countryId,Set<BigInteger> dataDisposalIds);
 
     @Query("{deleted:false,countryId:?0}")
-    List<DataDisposalResponseDTO> findAllDataDisposals(Long countryId);
+    List<DataDisposalResponseDTO> findAllDataDisposals(Long countryId, Sort sort);
 
     @Query("{deleted:false,organizationId:?0}")
-    List<DataDisposalResponseDTO> findAllOrganizationDataDisposals(Long organizationId);
+    List<DataDisposalResponseDTO> findAllOrganizationDataDisposals(Long organizationId,Sort sort);
 
     @Query("{deleted:false,organizationId:?0,_id:?1}")
     DataDisposal findByOrganizationIdAndId(Long organizationId,BigInteger id);

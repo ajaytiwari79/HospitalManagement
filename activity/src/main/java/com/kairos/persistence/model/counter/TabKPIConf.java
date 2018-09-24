@@ -3,6 +3,8 @@ package com.kairos.persistence.model.counter;
 import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterSize;
+import com.kairos.dto.activity.counter.enums.KPIValidity;
+import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -14,14 +16,17 @@ public class TabKPIConf extends MongoBaseEntity {
     private Long unitId;
     private Long staffId;
     private ConfLevel level;
+    private KPIValidity kpiValidity;
+    private LocationType locationType;
     private CounterSize size;
     private KPIPosition position;
+    private int priority;
 
     public TabKPIConf() {
 
     }
 
-    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level,KPIPosition position) {
+    public TabKPIConf(String tabId, BigInteger kpiId, Long countryId, Long unitId, Long staffId, ConfLevel level,KPIPosition position,KPIValidity kpiValidity,LocationType locationType,int priority) {
         this.tabId = tabId;
         this.kpiId = kpiId;
         this.countryId = countryId;
@@ -29,6 +34,9 @@ public class TabKPIConf extends MongoBaseEntity {
         this.staffId = staffId;
         this.level = level;
         this.position = position;
+        this.kpiValidity=kpiValidity;
+        this.locationType=locationType;
+        this.priority=priority;
     }
 
 
@@ -95,5 +103,29 @@ public class TabKPIConf extends MongoBaseEntity {
 
     public void setPosition(KPIPosition position) {
         this.position = position;
+    }
+
+    public KPIValidity getKpiValidity() {
+        return kpiValidity;
+    }
+
+    public void setKpiValidity(KPIValidity kpiValidity) {
+        this.kpiValidity = kpiValidity;
+    }
+
+    public LocationType getLocationType() {
+        return locationType;
+    }
+
+    public void setLocationType(LocationType locationType) {
+        this.locationType = locationType;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 }

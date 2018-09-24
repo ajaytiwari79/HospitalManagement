@@ -16,6 +16,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.risk_management.RiskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -177,7 +178,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         if (Optional.ofNullable(assetType).isPresent() && !assetTypeId.equals(assetType.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Asset Type", assetTypeDto.getName());
         }
-        assetType = assetTypeMongoRepository.findByUnitIdAndId(unitId, assetTypeId);
+        assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.duplicateDataException("message.dataNotFound", "Asset Type", assetTypeId);
         }
@@ -235,7 +236,7 @@ public class OrganizationAssetTypeService extends MongoBaseService {
             assetsLinkedWithAssetType.forEach(asset -> assetNames.append(asset.getName() + ","));
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Asset Type", assetNames);
         }
-        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(unitId, assetTypeId);
+        AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
         if (!Optional.ofNullable(assetType).isPresent() && !assetType.isSubAsset()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetType);
         }
@@ -253,13 +254,13 @@ public class OrganizationAssetTypeService extends MongoBaseService {
             assetsLinkedWithAssetSubType.forEach(asset -> assetNames.append(asset.getName() + ","));
             exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", assetNames);
         }
-        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(unitId, assetTypeId);
+        AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetType);
         } else {
             assetType.getSubAssetTypes().remove(subAssetTypeId);
             assetTypeMongoRepository.save(assetType);
-            AssetType subAssetType = assetTypeMongoRepository.findByUnitIdAndId(unitId, subAssetTypeId);
+            AssetType subAssetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, subAssetTypeId);
             if (!Optional.ofNullable(subAssetType).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub AssetType", subAssetType);
             }
@@ -279,12 +280,12 @@ public class OrganizationAssetTypeService extends MongoBaseService {
      */
     public boolean unlinkRiskFromAssetTypeOrSubAssetTypeAndDeletedRisk(Long unitId, BigInteger assetTypeId, BigInteger riskId) {
 
-        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(unitId, assetTypeId);
+        AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetTypeId);
         }
         assetType.getRisks().remove(riskId);
-        riskMongoRepository.findByIdAndSafeDelete(riskId);
+        riskMongoRepository.safeDelete(riskId);
         assetTypeMongoRepository.save(assetType);
         return true;
     }

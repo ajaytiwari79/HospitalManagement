@@ -35,13 +35,17 @@ public class Neo4jConfig  implements EnvironmentAware {
     private Environment environment;
 
     @Bean
-    public SessionFactory getSessionFactory() {
+    public SessionFactory sessionFactory() {
         return  new SessionFactory(configuration(),"com.kairos.persistence.model");
     }
-
+//    @Bean
+//    public SessionFactory sessionFactory() {
+//        // with domain entity base package(s)
+//        return new SessionFactory(configuration(),"com.kairos.persistence.model");
+//    }
     @Bean
     public Neo4jTransactionManager transactionManager() {
-        return new Neo4jTransactionManager(getSessionFactory());
+        return new Neo4jTransactionManager(sessionFactory());
     }
     @Bean
     public org.neo4j.ogm.config.Configuration configuration() {
@@ -49,6 +53,7 @@ public class Neo4jConfig  implements EnvironmentAware {
                 .connectionPoolSize(Integer.parseInt(this.environment.getProperty(CONNECTION_POOL_SIZE)))
                 .uri(this.environment.getProperty(NEO4J_URI))
                 .credentials(this.environment.getProperty(NEO4J_USER_NAME),this.environment.getProperty(NEO4J_PASSWORD))
+                .verifyConnection(true)
                  .build();
 
         return configuration;

@@ -5,6 +5,7 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Da
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.DataSourceResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -31,10 +32,10 @@ public interface DataSourceMongoRepository extends MongoBaseRepository<DataSourc
     List<DataSource> getDataSourceListByIds(Long countryId, Set<BigInteger> dataSourceIds);
 
     @Query("{deleted:false,countryId:?0}")
-    List<DataSourceResponseDTO> findAllDataSources(Long countryId);
+    List<DataSourceResponseDTO> findAllDataSources(Long countryId, Sort sort);
 
       @Query("{organizationId:?0,deleted:false}")
-    List<DataSourceResponseDTO> findAllOrganizationDataSources(Long organizationId);
+    List<DataSourceResponseDTO> findAllOrganizationDataSources(Long organizationId,Sort sort);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
     DataSource findByOrganizationIdAndId(Long organizationId,BigInteger id);

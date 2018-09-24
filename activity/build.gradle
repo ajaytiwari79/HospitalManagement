@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.0.2.RELEASE'
+        springBootVersion = '2.0.5.RELEASE'
         swaggerVersion = '2.6.1'
         jacksonVersion = '2.9.2'
         projectVersion = "0.0.1"
@@ -9,8 +9,7 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url "https://repo.spring.io/snapshot" }
-        maven { url "https://repo.spring.io/milestone" }
+        maven{url "https://plugins.gradle.org/m2/"}
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -32,15 +31,14 @@ mainClassName = 'com.kairos.KairosActivityApplication'
 repositories {
     jcenter()
     mavenCentral()
-    maven { url "https://repo.spring.io/snapshot" }
-    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://plugins.gradle.org/m2/" }
+    maven{url "https://repo.spring.io/plugins-release"}
 }
 
 task wrapper(type: Wrapper) { gradleVersion = '4.1' }
 
-
 ext {
-    springCloudVersion = 'Finchley.M8'
+    springCloudVersion = 'Finchley.SR1'
 }
 
 dependencies {

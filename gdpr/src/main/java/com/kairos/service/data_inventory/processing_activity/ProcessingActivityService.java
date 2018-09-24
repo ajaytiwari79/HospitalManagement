@@ -12,7 +12,7 @@ import com.kairos.persistence.repository.data_inventory.asset.AssetMongoReposito
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
-import com.kairos.persistence.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
@@ -80,7 +80,7 @@ public class ProcessingActivityService extends MongoBaseService {
     private AssessmentMongoRepository assessmentMongoRepository;
 
     @Inject
-    private MasterQuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
+    private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
 
     @Inject
     private RiskService riskService;
@@ -297,9 +297,9 @@ public class ProcessingActivityService extends MongoBaseService {
      * @description method return audit history of Processing Activity , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getProcessingActivityActivitiesHistory(BigInteger processingActivityId, int size, int skip) {
+    public List<Map<String, Object>> getProcessingActivityActivitiesHistory(BigInteger processingActivityId) {
 
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingActivityId, ProcessingActivity.class).limit(size).skip(skip);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(processingActivityId, ProcessingActivity.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
         return javersCommonService.getHistoryMap(changes, processingActivityId, ProcessingActivity.class);
@@ -523,7 +523,7 @@ public class ProcessingActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Activity", processingActivityId);
         }
         processingActivity.getRisks().remove(riskId);
-        riskMongoRepository.findByIdAndSafeDelete(riskId);
+        riskMongoRepository.safeDelete(riskId);
         processingActivityMongoRepository.save(processingActivity);
         return true;
     }
