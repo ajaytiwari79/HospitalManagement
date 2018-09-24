@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.unit_position;
+package com.kairos.persistence.model.user.unit_position.query_result;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

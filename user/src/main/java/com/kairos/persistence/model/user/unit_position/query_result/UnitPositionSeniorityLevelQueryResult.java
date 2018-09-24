@@ -1,7 +1,9 @@
-package com.kairos.persistence.model.user.unit_position;
+package com.kairos.persistence.model.user.unit_position.query_result;
 
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
+import com.kairos.persistence.model.user.unit_position.UnitPosition;
+import com.kairos.persistence.model.user.unit_position.UnitPositionEmploymentTypeRelationShip;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 @QueryResult

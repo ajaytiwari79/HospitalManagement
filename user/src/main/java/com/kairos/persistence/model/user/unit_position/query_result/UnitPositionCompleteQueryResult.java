@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.unit_position;
+package com.kairos.persistence.model.user.unit_position.query_result;
 
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.Function;
@@ -7,6 +7,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

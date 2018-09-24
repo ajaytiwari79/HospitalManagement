@@ -13,7 +13,9 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -28,13 +30,11 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
 
-
     @Relationship(type = HAS_POSITION_CODE)
     private PositionCode positionCode;
 
     @Relationship(type = BELONGS_TO_STAFF, direction = "INCOMING")
     private Staff staff;
-
 
     @Relationship(type = SUPPORTED_BY_UNION)
     private Organization union;
@@ -54,72 +54,15 @@ public class UnitPosition extends UserBaseEntity {
     private Long startDateMillis;
     private Long endDateMillis;
     private Long lastWorkingDateMillis;
-    private int totalWeeklyMinutes;
-    private int fullTimeWeeklyMinutes;
-
-    private float avgDailyWorkingHours;
-    private int workingDaysInWeek;
-    private float hourlyWages;
-
-    private Double salary;
     private Long timeCareExternalId;
     private boolean history;
     private boolean editable;
     private boolean published;
+    private List<PositionLine> positionLines;
     @Relationship(type = PARENT_UNIT_POSITION)
     private UnitPosition parentUnitPosition;
 
     public UnitPosition() {
-    }
-
-
-
-    public int getFullTimeWeeklyMinutes() {
-        return fullTimeWeeklyMinutes;
-    }
-
-    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-    }
-
-    public int getTotalWeeklyMinutes() {
-        return totalWeeklyMinutes;
-    }
-
-    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-    }
-
-    public float getAvgDailyWorkingHours() {
-        return avgDailyWorkingHours;
-    }
-
-    public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-    }
-
-    public int getWorkingDaysInWeek() {
-        return workingDaysInWeek;
-    }
-
-    public void setWorkingDaysInWeek(int workingDaysInWeek) {
-        this.workingDaysInWeek = workingDaysInWeek;
-    }
-
-    public float getHourlyWages() {
-        return hourlyWages;
-    }
-
-    public void setHourlyWages(float hourlyWages) {
-        this.hourlyWages = hourlyWages;
-    }
-
-    public Double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Double salary) {
-        this.salary = salary;
     }
 
     public PositionCode getPositionCode() {
@@ -137,7 +80,6 @@ public class UnitPosition extends UserBaseEntity {
     public void setExpertise(Expertise expertise) {
         this.expertise = expertise;
     }
-
 
 
     public Long getStartDateMillis() {
@@ -255,15 +197,17 @@ public class UnitPosition extends UserBaseEntity {
         this.published = published;
     }
 
+    public List<PositionLine> getPositionLines() {
+        return Optional.ofNullable(positionLines).orElse(new ArrayList<>());
+    }
+
+    public void setPositionLines(List<PositionLine> positionLines) {
+        this.positionLines = positionLines;
+    }
 
     public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary) {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.hourlyWages = hourlyWages;
-        this.salary = salary;
     }
 
     @Override
@@ -280,12 +224,6 @@ public class UnitPosition extends UserBaseEntity {
                 ", startDateMillis=" + startDateMillis +
                 ", endDateMillis=" + endDateMillis +
                 ", lastWorkingDateMillis=" + lastWorkingDateMillis +
-                ", totalWeeklyMinutes=" + totalWeeklyMinutes +
-                ", fullTimeWeeklyMinutes=" + fullTimeWeeklyMinutes +
-                ", avgDailyWorkingHours=" + avgDailyWorkingHours +
-                ", workingDaysInWeek=" + workingDaysInWeek +
-                ", hourlyWages=" + hourlyWages +
-                ", salary=" + salary +
                 ", timeCareExternalId=" + timeCareExternalId +
                 ", history=" + history +
                 ", editable=" + editable +

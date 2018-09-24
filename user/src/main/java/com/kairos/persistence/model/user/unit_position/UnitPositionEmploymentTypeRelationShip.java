@@ -19,18 +19,18 @@ public class UnitPositionEmploymentTypeRelationShip extends UserBaseEntity {
 
 
     @StartNode
-    private UnitPosition unitPosition;
+    private PositionLine positionLine;
     @EndNode
     private EmploymentType employmentType;
     @Property
     private EmploymentCategory employmentTypeCategory;
 
-    public UnitPosition getUnitPosition() {
-        return unitPosition;
+    public PositionLine getPositionLine() {
+        return positionLine;
     }
 
-    public void setUnitPosition(UnitPosition unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setPositionLine(PositionLine positionLine) {
+        this.positionLine = positionLine;
     }
 
     public EmploymentType getEmploymentType() {
@@ -53,8 +53,8 @@ public class UnitPositionEmploymentTypeRelationShip extends UserBaseEntity {
 
     }
 
-    public UnitPositionEmploymentTypeRelationShip(UnitPosition unitPosition, EmploymentType employmentType, EmploymentCategory employmentTypeCategory) {
-        this.unitPosition = unitPosition;
+    public UnitPositionEmploymentTypeRelationShip(PositionLine positionLine, EmploymentType employmentType, EmploymentCategory employmentTypeCategory) {
+        this.positionLine=positionLine;
         this.employmentType = employmentType;
         this.employmentTypeCategory = employmentTypeCategory;
     }

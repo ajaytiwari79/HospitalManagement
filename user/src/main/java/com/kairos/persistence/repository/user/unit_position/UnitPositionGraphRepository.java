@@ -2,8 +2,11 @@ package com.kairos.persistence.repository.user.unit_position;
 
 
 import com.kairos.persistence.model.staff.employment.EmploymentUnitPositionQueryResult;
-import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.unit_position.*;
+import com.kairos.persistence.model.user.unit_position.query_result.StaffUnitPositionDetails;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionCompleteQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionSeniorityLevelQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
