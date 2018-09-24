@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MasterProcessingActivityRiskResponseDTO {
 
 
     private BigInteger id;
     private String name;
-    private boolean mainParent;
+    private Boolean mainParent;
     private List<RiskResponseDTO> risks=new ArrayList<>();
     private List<MasterProcessingActivityRiskResponseDTO>  processingActivities=new ArrayList<>();
 
@@ -36,9 +36,9 @@ public class MasterProcessingActivityRiskResponseDTO {
 
     public BigInteger getId() { return id; }
 
-    public boolean isMainParent() { return mainParent; }
+    public Boolean getMainParent() { return mainParent; }
 
-    public void setMainParent(boolean mainParent) { this.mainParent = mainParent; }
+    public void setMainParent(Boolean mainParent) { this.mainParent = mainParent; }
 
     public void setId(BigInteger id) { this.id = id; }
 

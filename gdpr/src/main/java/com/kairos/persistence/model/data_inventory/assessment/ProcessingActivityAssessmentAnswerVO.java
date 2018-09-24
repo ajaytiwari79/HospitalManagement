@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.data_inventory.assessment;
 
 
-import com.kairos.enums.ProcessingActivityAttributeName;
+import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import org.javers.core.metamodel.annotation.ValueObject;
 
 import javax.validation.constraints.NotNull;
