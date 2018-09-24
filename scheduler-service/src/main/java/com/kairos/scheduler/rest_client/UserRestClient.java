@@ -101,23 +101,4 @@ public class UserRestClient {
         }
         return null;
     }
-
-
-
-
-    public static <T> String getURI(T t,String uri,Map<String,Object> queryParams){
-        URIBuilder builder = new URIBuilder();
-
-        if(Optional.ofNullable(queryParams).isPresent()){
-            queryParams.entrySet().forEach(e->{
-                builder.addParameter(e.getKey(),e.getValue().toString());
-            });
-        }
-        try {
-            uri= uri+builder.build().toString();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return uri;
-    }
 }
