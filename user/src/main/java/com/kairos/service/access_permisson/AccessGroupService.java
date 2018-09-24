@@ -2,6 +2,8 @@ package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user.access_group.AccessGroupWrapper;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.access_permission.*;
@@ -12,6 +14,7 @@ import com.kairos.persistence.model.country.default_data.account_type.AccountTyp
 import com.kairos.persistence.model.country.default_data.account_type.AccountTypeAccessGroupCountQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.user.access_permission.AccessGroupByCategoryWrapper;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -195,9 +198,13 @@ public class AccessGroupService {
         return countryAndOrgAccessGroupIdsMap;
     }
 
-    public List<AccessGroup> getAccessGroupsForUnit(long organizationId) {
-
-        return accessGroupRepository.getAccessGroupsForUnit(organizationId);
+    public AccessGroupWrapper getAccessGroupsForUnit(long organizationId) {
+        Long countryId=organizationGraphRepository.getCountryId(organizationId);
+        List<DayType> dayTypes=dayTypeGraphRepository.findByCountryId(countryId);
+        List<AccessGroup> accessGroups= accessGroupRepository.getAccessGroupsForUnit(organizationId);
+        List<AccessGroupDTO> accessGroupDTOS=ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroups,AccessGroupDTO.class);
+        List<DayTypeDTO> dayTypeDTOS=  ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, DayTypeDTO.class);
+        return new AccessGroupWrapper(accessGroupDTOS,dayTypeDTOS);
     }
 
     public List<AccessGroup> getAccessGroups(long organizationId) {
@@ -659,7 +666,7 @@ public class AccessGroupService {
         return accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, organizationCategory.toString());
     }
 
-    public List<AccessGroupsByCategoryDTO> getCountryAccessGroupsOfAllCategories(Long countryId) {
+    public AccessGroupByCategoryWrapper getCountryAccessGroupsOfAllCategories(Long countryId) {
 
         List<AccessGroupsByCategoryDTO> accessGroupsData = new ArrayList<>();
         accessGroupsData.add(new AccessGroupsByCategoryDTO(OrganizationCategory.HUB,
@@ -670,7 +677,11 @@ public class AccessGroupService {
 
         accessGroupsData.add(new AccessGroupsByCategoryDTO(OrganizationCategory.UNION,
                 accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.UNION.toString())));
-        return accessGroupsData;
+
+        List<DayType> dayTypes=dayTypeGraphRepository.findByCountryId(countryId);
+        List<DayTypeDTO> dayTypeDTOS=ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes,DayTypeDTO.class);
+
+        return new AccessGroupByCategoryWrapper(accessGroupsData,dayTypeDTOS);
     }
 
     /***** Access group - COUNTRY LEVEL - ENDS HERE ******************/

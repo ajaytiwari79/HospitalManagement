@@ -1,11 +1,13 @@
 package com.kairos.dto.user.country.agreement.cta.cta_response;
 
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 public class AccessGroupDTO {
@@ -16,6 +18,7 @@ public class AccessGroupDTO {
     private AccessGroupRole role;
     private boolean enabled = true;
     @NotNull(message = "error.startDate.notnull")
+    private List<AccountTypeDTO> accountTypes;
     private LocalDate startDate;
     private LocalDate endDate;
     private Set<Long> dayTypeIds;
@@ -92,6 +95,14 @@ public class AccessGroupDTO {
 
     public void setDayTypeIds(Set<Long> dayTypeIds) {
         this.dayTypeIds = dayTypeIds;
+    }
+
+    public List<AccountTypeDTO> getAccountTypes() {
+        return accountTypes;
+    }
+
+    public void setAccountTypes(List<AccountTypeDTO> accountTypes) {
+        this.accountTypes = accountTypes;
     }
 
     @AssertTrue(message = "Access group can't be blank")
