@@ -14,6 +14,7 @@ import com.kairos.scheduler.persistence.repository.SchedulerPanelRepository;
 import com.kairos.scheduler.persistence.repository.UnitTimeZoneMappingRepository;
 import com.kairos.scheduler.service.MongoBaseService;
 
+import com.kairos.scheduler.service.UserIntegrationService;
 import com.kairos.scheduler.service.exception.ExceptionService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -56,6 +57,8 @@ public class SchedulerPanelService extends MongoBaseService {
     private UnitTimeZoneMappingRepository unitTimeZoneMappingRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private UserIntegrationService userIntegrationService;
 
 
 
@@ -131,7 +134,7 @@ public class SchedulerPanelService extends MongoBaseService {
             schedulerPanels.add(schedulerPanel);
         }
         save(schedulerPanels);
-        String timezone = unitTimeZoneMappingRepository.findByUnitId(unitId).getTimezone();
+        String timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
 
         //schedulerPanels.stream().map(schedulerPanel-> dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone));
         for(SchedulerPanel schedulerPanel:schedulerPanels) {
@@ -177,7 +180,7 @@ public class SchedulerPanelService extends MongoBaseService {
         }
 
         save(panel);
-        String timezone = unitTimeZoneMappingRepository.findByUnitId(schedulerPanelDTO.getUnitId()).getTimezone();
+        String timezone = userIntegrationService.getTimeZoneOfUnit(schedulerPanelDTO.getUnitId());
 
         dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
         dynamicCronScheduler.startCronJob(panel,timezone);
@@ -215,7 +218,6 @@ public class SchedulerPanelService extends MongoBaseService {
         if(!Optional.ofNullable(schedulerPanelDB).isPresent()) {
             createSchedulerPanel(schedulerPanelDTO.getUnitId(),Stream.of(schedulerPanelDTO).collect(Collectors.toList()));
         }
-
         else {
 
             String interval;
@@ -237,7 +239,7 @@ public class SchedulerPanelService extends MongoBaseService {
                 schedulerPanelDB.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());           }
 
             save(schedulerPanelDB);
-            String timezone = unitTimeZoneMappingRepository.findByUnitId(schedulerPanelDTO.getUnitId()).getTimezone();
+            String timezone = userIntegrationService.getTimeZoneOfUnit(schedulerPanelDTO.getUnitId());
 
             dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanelDB.getId());
             dynamicCronScheduler.startCronJob(schedulerPanelDB,timezone);
