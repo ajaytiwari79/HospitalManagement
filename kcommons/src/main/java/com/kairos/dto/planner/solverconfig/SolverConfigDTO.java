@@ -13,17 +13,21 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SolverConfigDTO {
+    //Common
     private BigInteger id;
     private String name;//Unique
     private String description;
-    private Long unitId;
-    private Long countryId;
     private Long phaseId;
     private Long planningPeriodId;
     private byte threadCount;
     private short terminationTimeInMinutes;
     private Long planningProblemId;
     private List<BigInteger> constraintIds;
+    //Unit properties
+    private Long unitId;
+    //Country Properties
+    private Long countryId;
+    private Long parentCountryId;
     private Long organizationServiceCategoryId;
 
     //Constructors
@@ -129,6 +133,14 @@ public class SolverConfigDTO {
         this.organizationServiceCategoryId = organizationServiceCategoryId;
     }
 
+    public Long getParentCountryId() {
+        return parentCountryId;
+    }
+
+    public void setParentCountryId(Long parentCountryId) {
+        this.parentCountryId = parentCountryId;
+    }
+
     /*****************************SolverConfigDTO Builder****************************************/
     public SolverConfigDTO setNameBuilder(String name) {
         this.name = name;
@@ -184,4 +196,9 @@ public class SolverConfigDTO {
         this.organizationServiceCategoryId = organizationServiceCategoryId;
         return this;
     }
+    public SolverConfigDTO setParentCountryIdBuilder(Long parentCountryId) {
+        this.parentCountryId = parentCountryId;
+        return this;
+    }
+
 }

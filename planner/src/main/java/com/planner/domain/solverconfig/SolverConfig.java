@@ -8,26 +8,31 @@ import java.util.List;
 
 @Document
 public class SolverConfig extends MongoBaseEntity {
-
+    //common properties at both Country and Unit
     private String name;//Unique
     private String parentId;//copiedFromId;
     private String description;
-    private Long unitId;
-    private Long countryId;
     private Long phaseId;
     private Long planningPeriodId;
     private byte threadCount;
     private short terminationTimeInMinutes;
     private Long planningProblemId;
     private List<BigInteger> constraintIds;
-    private Long organizationServiceCategoryId;
+
+    //Unit properties
+    private Long unitId;
+
+    //Country properties
+    private Long countryId;
+    private Long parentCountryId;
+    private Long organizationServiceCategoryId;//null at unit level{During creation of SolverConfig at country level}
 
     //Constructors
     public SolverConfig() {
 
     }
 
-    //Setters using Builder Patten and Getters
+    //Setters and Getters
     public String getName() {
         return name;
     }
@@ -124,6 +129,14 @@ public class SolverConfig extends MongoBaseEntity {
         this.organizationServiceCategoryId = organizationServiceCategoryId;
     }
 
+    public Long getParentCountryId() {
+        return parentCountryId;
+    }
+
+    public void setParentCountryId(Long parentCountryId) {
+        this.parentCountryId = parentCountryId;
+    }
+
     /*****************************SolverConfig Builder****************************************/
     public SolverConfig setIdBuilder(String id) {
         this.id = id;
@@ -134,6 +147,7 @@ public class SolverConfig extends MongoBaseEntity {
         this.name = name;
         return this;
     }
+
     public SolverConfig setParentIdBuilder(String parentId) {
         this.parentId = parentId;
         return this;
@@ -188,4 +202,9 @@ public class SolverConfig extends MongoBaseEntity {
         this.organizationServiceCategoryId = organizationServiceCategoryId;
         return this;
     }
+    public SolverConfig setParentCountryIdBuilder(Long parentCountryId) {
+        this.parentCountryId = parentCountryId;
+        return this;
+    }
+
 }

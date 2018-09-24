@@ -23,7 +23,7 @@ public class UnitSolverConfigService {
         }
 
     }
-
+/*************************************************************************/
     public SolverConfigDTO getUnitSolverConfig(String solverConfigId) {
         SolverConfigDTO solverConfigDTO = null;
         Optional<SolverConfig> solverConfigOptional = solverConfigRepository.findById(solverConfigId);
@@ -33,12 +33,12 @@ public class UnitSolverConfigService {
         }
         return solverConfigDTO;
     }
-
+    /*************************************************************************/
     public List<SolverConfigDTO> getAllUnitSolverConfig() {
         List<SolverConfig> solverConfigList = solverConfigRepository.findAllNotDeleted();
         return ObjectMapperUtils.copyPropertiesOfListByMapper(solverConfigList, SolverConfigDTO.class);
     }
-
+    /*************************************************************************/
     //Only update if present
     public SolverConfigDTO updateUnitSolverConfig(SolverConfigDTO solverConfigDTO) {
         Optional<SolverConfig> solverConfigOptional = solverConfigRepository.findById(solverConfigDTO.getId()+"");
@@ -50,7 +50,7 @@ public class UnitSolverConfigService {
         }
         return solverConfigDTO;
     }
-
+    /*************************************************************************/
     //Soft Delete
     public boolean deleteUnitSolverConfig(String solverConfigId) {
         boolean isPresent = solverConfigRepository.findById(solverConfigId).isPresent();

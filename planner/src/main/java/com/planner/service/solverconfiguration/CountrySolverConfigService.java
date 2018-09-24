@@ -16,17 +16,33 @@ public class CountrySolverConfigService {
     @Inject
     private SolverConfigRepository solverConfigRepository;
 
-
+    /**
+     *
+     * @param solverConfigDTO
+     */
     public void createCountrySolverConfig(SolverConfigDTO solverConfigDTO) {
         boolean nameExists = solverConfigRepository.isNameExists(solverConfigDTO.getName());
         if (!nameExists) {
             SolverConfig solverConfig = ObjectMapperUtils.copyPropertiesByMapper(solverConfigDTO, SolverConfig.class);
             solverConfigRepository.saveObject(solverConfig);
+            if(solverConfigDTO.getOrganizationServiceCategoryId()!=null) {
+                //Now copy same solverConfig at {unit/s} associated with {organizationServiceCategoryId}
+                copyUnitSolverConfigByOrganizationServiceCategory(solverConfigDTO.getOrganizationServiceCategoryId());
+            }
         }
     }
 
-    /***************************************************************/
-    //copy(create) solverConfig
+    /**
+     * copy(create) solverConfig at Unit Level By organizationServiceCategoryId
+     */
+    private void copyUnitSolverConfigByOrganizationServiceCategory(Long organizationServiceCategoryId) {
+
+
+        }
+
+
+    /***********************************************************************************************************************/
+    //copy(create) solverConfig at country Level itself
     public void copyCountrySolverConfig(SolverConfigDTO solverConfigDTO) {
         Optional<SolverConfig> solverConfigOptional = solverConfigRepository.findById(solverConfigDTO.getId() + "");
         if (solverConfigOptional.isPresent()) {
