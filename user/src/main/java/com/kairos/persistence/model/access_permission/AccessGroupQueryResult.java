@@ -2,6 +2,9 @@ package com.kairos.persistence.model.access_permission;
 
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.time.LocalDate;
+import java.util.List;
+
 /**
  * Created by prerna on 5/3/18.
  */
@@ -15,6 +18,9 @@ public class AccessGroupQueryResult {
     private String description;
     private String role;
     private boolean enabled = true;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private List<Long> dayTypeIds;
 
     public long getId() {
         return id;
@@ -70,5 +76,29 @@ public class AccessGroupQueryResult {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public List<Long> getDayTypeIds() {
+        return dayTypeIds;
+    }
+
+    public void setDayTypeIds(List<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
     }
 }

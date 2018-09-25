@@ -136,8 +136,7 @@ public class AccessGroupController {
     @RequestMapping(value = COUNTRY_URL+"/access_group", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createCountryAccessGroup(@PathVariable long countryId,@Valid @RequestBody CountryAccessGroupDTO accessGroupDTO) {
-        AccessGroup accessGroup = accessGroupService.createCountryAccessGroup(countryId, accessGroupDTO);
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroup);
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroupService.createCountryAccessGroup(countryId, accessGroupDTO));
     }
 
     @RequestMapping(value = COUNTRY_URL+"/access_group/{accessGroupId}", method = RequestMethod.PUT)

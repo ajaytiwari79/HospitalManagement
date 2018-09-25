@@ -30,6 +30,7 @@ public class CountryAccessGroupDTO {
     @NotNull(message = "error.startDate.notnull")
     private LocalDate startDate;
     private LocalDate endDate;
+    @NotNull(message = "error.dayTypeIds.notnull")
     private Set<Long> dayTypeIds;
 
     public CountryAccessGroupDTO() {
