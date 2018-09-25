@@ -64,7 +64,7 @@ public class SchedulerPanelService extends MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(SchedulerPanelService.class);
 
 
-    @PostConstruct
+
     public void initSchedulerPanels() {
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByDeletedFalse();
         logger.debug("Inside initSchedulerPanels");

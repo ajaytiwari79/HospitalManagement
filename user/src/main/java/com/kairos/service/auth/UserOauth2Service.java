@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +51,8 @@ public class UserOauth2Service implements UserDetailsService {
     }
 
     private List<GrantedAuthority> getPermission(User user){
-       List<GrantedAuthority> permissions = userService.getTabPermission(user.getId());
+        // TODO As discussed with Arvind Das, We dont need to append tab permissions in AuthToken. 
+       List<GrantedAuthority> permissions = Collections.emptyList();//userService.getTabPermission(user.getId());
         return permissions;
     }
 }
