@@ -7,9 +7,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 //import com.planner.appConfig.UserContextInterceptor;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.kairos.scheduler.utils.user_context.SchedulerUserContextInterceptor;
 import com.kairos.scheduler.utils.user_context.UserContextInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -139,4 +141,28 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
                 .build();
         return template;
     }
+
+    @Profile({"local", "test"})
+    @Bean(name="schedulerServiceRestTemplate")
+    public RestTemplate getRestTemplateWithoutUserContextLocal(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
+
+        RestTemplate template =restTemplateBuilder
+                .interceptors(new SchedulerUserContextInterceptor(authorization))
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
+
+    @Profile({"development","qa","production"})
+    @LoadBalanced
+    @Bean(name="schedulerServiceRestTemplate")
+    public RestTemplate getRestTemplateWithoutUserContext(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
+
+        RestTemplate template =restTemplateBuilder
+                .interceptors(new SchedulerUserContextInterceptor(authorization))
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
+
 }

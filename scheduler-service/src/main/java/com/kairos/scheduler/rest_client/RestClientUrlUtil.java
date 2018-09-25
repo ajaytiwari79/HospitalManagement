@@ -1,25 +1,17 @@
 package com.kairos.scheduler.rest_client;
 
 import com.kairos.scheduler.utils.user_context.UserContext;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 /**
  * Created by vipul on 19/9/17.
  */
-@Component
 public class RestClientUrlUtil {
 
-    private static  String userServiceUrl;
 
-    @Value("${gateway.userservice.url}")
-    public  void setUserServiceUrl(String userServiceUrl) {
-        RestClientUrlUtil.userServiceUrl = userServiceUrl;
-    }
 
-    public final static String getBaseUrl(boolean hasUnitInUrl, Long id) {
+    public final static String getBaseUrl(boolean hasUnitInUrl, Long id,String userServiceUrl) {
         if(!Optional.ofNullable(id).isPresent()) {
             String baseUrl = userServiceUrl;
             return baseUrl;
