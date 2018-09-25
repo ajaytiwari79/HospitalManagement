@@ -41,4 +41,6 @@ public class AppConstants {
     public static final String BELONGS_TO_STAFF="BELONGS_TO_STAFF";
     public static final String HAS_EXPERTISE_IN="HAS_EXPERTISE_IN";
     public static final String IN_UNIT="IN_UNIT";
+    public static final String HAS_ORGANIZATION_SERVICES="HAS_ORGANIZATION_SERVICES";
+    public static final String ORGANIZATION_SUB_SERVICE="ORGANIZATION_SUB_SERVICE";
 }

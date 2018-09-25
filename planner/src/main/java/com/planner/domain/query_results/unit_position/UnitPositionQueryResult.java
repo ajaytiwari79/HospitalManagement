@@ -1,4 +1,4 @@
-package com.planner.domain.query_results;
+package com.planner.domain.query_results.unit_position;
 
 import org.springframework.data.neo4j.annotation.QueryResult;
 

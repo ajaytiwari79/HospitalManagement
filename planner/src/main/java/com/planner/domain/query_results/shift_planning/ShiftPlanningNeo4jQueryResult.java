@@ -1,6 +1,6 @@
-package com.planner.domain.query_results;
+package com.planner.domain.query_results.shift_planning;
 
-import org.springframework.data.neo4j.annotation.Query;
+import com.planner.domain.query_results.staff.StaffQueryResult;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

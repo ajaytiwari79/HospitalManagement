@@ -65,4 +65,14 @@ public class CountrySolverConfigController {
         return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
     }
 
+    /**
+     * Requires this data so that can send id of Sub OrganizationServicesId
+     * @param countryId
+     * @return
+     */
+    @GetMapping("/default_data")
+    @ApiOperation("Get DefaultData")
+    public ResponseEntity<Map<String, Object>> getDefaultData(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,countrySolverConfigService.getDefaultData(countryId));
+    }
 }
