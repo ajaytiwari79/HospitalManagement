@@ -438,7 +438,6 @@ public class PlanningPeriodService extends MongoBaseService {
         boolean valid = !((puzzleFlippingDateTime==null || (puzzleFlippingDateTime!=null && constructionFlippingDate!=null && constructionFlippingDate.isAfter(puzzleFlippingDateTime))) && (constructionFlippingDate==null || (constructionFlippingDate!=null && draftFlippingDate!=null && draftFlippingDate.isAfter(constructionFlippingDate))));
         /*Optional.ofNullable(draftFlippingDate).isPresent() && Optional.ofNullable(constructionFlippingDate).isPresent() && (!isPastDate(constructionFlippingDate)) && draftFlippingDate.isBefore(constructionFlippingDate) || !isPastDate(draftFlippingDate) && draftFlippingDate.isEqual(constructionFlippingDate)
                 || Optional.ofNullable(constructionFlippingDate).isPresent() && Optional.ofNullable(puzzleFlippingDateTime).isPresent() && !isPastDate(constructionFlippingDate) && constructionFlippingDate.isBefore(puzzleFlippingDateTime) || !isPastDate(puzzleFlippingDateTime) && constructionFlippingDate.isEqual(puzzleFlippingDateTime);*/
-
         if (valid) {
             exceptionService.actionNotPermittedException("message.period.invalid.flippingdate");
         }
