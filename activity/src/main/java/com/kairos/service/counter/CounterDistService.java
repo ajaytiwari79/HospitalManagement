@@ -105,12 +105,12 @@ public class CounterDistService extends MongoBaseService {
         Set<BigInteger> kpiIds=null;
         List<KPIDTO> kpidtos=null;
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
-        if(accessGroupPermissionCounterDTO.getAccessGroupIds()==null){
-            exceptionService.dataNotFoundException("message.staff.invalid.unit");
-        }
         if(accessGroupPermissionCounterDTO.getCountryAdmin()){
              kpidtos=counterRepository.getCounterListForReferenceId(refId,ConfLevel.UNIT);
         }else{
+            if(accessGroupPermissionCounterDTO.getAccessGroupIds()==null){
+                exceptionService.dataNotFoundException("message.staff.invalid.unit");
+            }
             kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(),ConfLevel.UNIT,refId,accessGroupPermissionCounterDTO.getStaffId());
         }
         kpiIds=kpidtos.stream().map(kpidto ->kpidto.getId()).collect(Collectors.toSet());
