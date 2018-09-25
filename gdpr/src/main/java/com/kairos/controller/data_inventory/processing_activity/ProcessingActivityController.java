@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 
 @RestController
@@ -196,6 +197,14 @@ public class ProcessingActivityController {
     public ResponseEntity<Object> unLinkRiskDromProcessingOrSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(unitId, processingActivityId, riskId));
     }
+
+
+    @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")
+    @PostMapping(COUNTRY_URL+"/processing_activity/suggest")
+    public ResponseEntity<Object> saveProcessingActivityAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.saveProcessingActivityAndSuggestToCountryAdmin(unitId, countryId, processingActivityDTO));
+    }
+
 
 
 }

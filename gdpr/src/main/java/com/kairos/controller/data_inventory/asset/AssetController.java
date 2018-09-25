@@ -17,6 +17,7 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 
@@ -117,5 +118,13 @@ public class AssetController {
     public ResponseEntity<Object> getAllActiveAsset(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllActiveAsset(unitId));
     }
+
+
+    @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")
+    @PostMapping(COUNTRY_URL + "/processing_activity/suggest")
+    public ResponseEntity<Object> saveProcessingActivityAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId, @Valid @RequestBody AssetDTO assetDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.saveAssetAndSuggestToCountryAdmin(unitId, countryId, assetDTO));
+    }
+
 
 }

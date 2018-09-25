@@ -88,6 +88,9 @@ public class ProcessingActivityService extends MongoBaseService {
     @Inject
     private RiskMongoRepository riskMongoRepository;
 
+    @Inject
+    private MasterProcessingActivityService masterProcessingActivityService;
+
 
     public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
 
@@ -526,6 +529,19 @@ public class ProcessingActivityService extends MongoBaseService {
         riskMongoRepository.safeDelete(riskId);
         processingActivityMongoRepository.save(processingActivity);
         return true;
+    }
+
+
+
+    public Map<String, ProcessingActivityDTO> saveProcessingActivityAndSuggestToCountryAdmin(Long unitId, Long countryId, ProcessingActivityDTO processingActivityDTO) {
+
+        Map<String, ProcessingActivityDTO> result = new HashMap<>();
+        processingActivityDTO = createProcessingActivity(unitId, processingActivityDTO);
+        ProcessingActivityDTO masterProcessingActivity = masterProcessingActivityService.saveSuggestedAssetDataFromUnit(countryId, unitId, processingActivityDTO);
+        result.put("new", processingActivityDTO);
+        result.put("SuggestedData", masterProcessingActivity);
+        return result;
+
     }
 
 

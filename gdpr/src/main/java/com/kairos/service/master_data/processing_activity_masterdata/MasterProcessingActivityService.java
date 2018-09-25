@@ -1,26 +1,37 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.MasterProcessingActivityRiskDTO;
 import com.kairos.dto.gdpr.BasicRiskDTO;
+import com.kairos.dto.gdpr.OrgTypeSubTypeServicesAndSubServicesDTO;
+import com.kairos.dto.gdpr.OrganizationType;
+import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityRiskResponseDTO;
+import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.risk_management.RiskService;
 import com.mongodb.MongoClientException;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 import static com.kairos.constants.AppConstant.IDS_LIST;
@@ -44,6 +55,9 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
     @Inject
     private RiskMongoRepository riskMongoRepository;
+
+    @Inject
+    private GenericRestClient restClient;
 
 
     /**
@@ -385,6 +399,44 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
     }
 
+
+    /**
+     * @param countryId             -country id
+     * @param unitId                -unit id which suggest Processing Activity to country admin
+     * @param processingActivityDTO -contain basic detail about Processing Activity ,name and description
+     * @return
+     */
+    public ProcessingActivityDTO saveSuggestedAssetDataFromUnit(Long countryId, Long unitId, ProcessingActivityDTO processingActivityDTO) {
+        MasterProcessingActivity previousProcessingActivity = masterProcessingActivityRepository.findByName(countryId, processingActivityDTO.getName());
+        if (Optional.ofNullable(previousProcessingActivity).isPresent()) {
+            return null;
+        }
+        OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO = restClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/organization_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrgTypeSubTypeServicesAndSubServicesDTO>>() {
+        });
+        MasterProcessingActivity processingActivity = buildSuggestedProcessingActivityAndSubProcessingActivity(countryId, processingActivityDTO, orgTypeSubTypeServicesAndSubServicesDTO);
+        if (Optional.ofNullable(processingActivityDTO.getSubProcessingActivities()).isPresent() && CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
+            List<MasterProcessingActivity> subProcessingActivities = new ArrayList<>();
+            processingActivityDTO.getSubProcessingActivities().forEach(subProcessingActivityDTO -> {
+                processingActivity.setHasSubProcessingActivity(true);
+                subProcessingActivities.add(buildSuggestedProcessingActivityAndSubProcessingActivity(countryId, subProcessingActivityDTO, orgTypeSubTypeServicesAndSubServicesDTO)
+                        .setSubProcess(true));
+
+            });
+            processingActivity.setSubProcessingActivityIds(masterProcessingActivityRepository.saveAll(getNextSequence(subProcessingActivities)).stream().map(MasterProcessingActivity::getId).collect(Collectors.toList()));
+        }
+        masterProcessingActivityRepository.save(processingActivity);
+        return processingActivityDTO;
+    }
+
+
+    private MasterProcessingActivity buildSuggestedProcessingActivityAndSubProcessingActivity(Long countryId, ProcessingActivityDTO processingActivityDTO, OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO) {
+        MasterProcessingActivity processingActivity = new MasterProcessingActivity(processingActivityDTO.getName(), processingActivityDTO.getDescription(), countryId, SuggestedDataStatus.PENDING, LocalDate.now());
+        processingActivity.setOrganizationServices(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationServices())
+                .setOrganizationTypes(Arrays.asList(new OrganizationType(orgTypeSubTypeServicesAndSubServicesDTO.getId(), orgTypeSubTypeServicesAndSubServicesDTO.getName())))
+                .setOrganizationSubTypes(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubTypes())
+                .setOrganizationSubServices(orgTypeSubTypeServicesAndSubServicesDTO.getOrganizationSubServices());
+        return processingActivity;
+    }
 
     private void checkForDuplicacyInName(List<MasterProcessingActivityDTO> processingActivityDTOs) {
         List<String> names = new ArrayList<>();
