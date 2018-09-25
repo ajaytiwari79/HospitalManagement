@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.filter;
 
-import com.kairos.enums.FilterType;
+import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.filter.FilterGroup;
 import com.kairos.response.dto.filter.FilterCategoryResult;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;

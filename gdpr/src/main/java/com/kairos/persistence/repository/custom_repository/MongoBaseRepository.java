@@ -8,8 +8,9 @@ import java.io.Serializable;
 
 @NoRepositoryBean
 public interface MongoBaseRepository<T extends MongoBaseEntity, ID extends Serializable> extends MongoRepository<T, ID> {
-    // T findOne(ID id);
 
-     boolean findByIdAndSafeDelete(ID id);
+     T findOne(ID id);
+
+     boolean safeDelete(ID id);
 
 }

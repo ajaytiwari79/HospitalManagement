@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ProcessingLegalBasisDTO;
 import com.kairos.service.master_data.processing_activity_masterdata.ProcessingLegalBasisService;
 import com.kairos.utils.ResponseHandler;

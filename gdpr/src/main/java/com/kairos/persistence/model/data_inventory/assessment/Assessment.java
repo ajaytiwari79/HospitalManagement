@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.data_inventory.assessment;
 
 
-import com.kairos.enums.AssessmentStatus;
+import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;

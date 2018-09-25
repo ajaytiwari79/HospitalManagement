@@ -1,7 +1,6 @@
 package com.kairos.service.agreement_template;
 
 
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.dto.gdpr.master_data.AgreementSectionDTO;
 import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
@@ -97,7 +96,7 @@ public class AgreementSectionService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement section " + sectionId);
         }
         agreementSection.getSubSections().remove(subSectionId);
-        agreementSectionMongoRepository.findByIdAndSafeDelete(subSectionId);
+        agreementSectionMongoRepository.safeDelete(subSectionId);
         agreementSectionMongoRepository.save(agreementSection);
         return true;
     }
@@ -291,11 +290,8 @@ public class AgreementSectionService extends MongoBaseService {
         agreementSubSections.clear();
         agreementSubSectionListAndCoresspondingToAgreementSectionMap.forEach((agreementSection, subSectionList) -> {
             if (!agreementSection.isSubSection()) {
-                List<BigInteger> subSectionsIdList = new ArrayList<>();
-                subSectionList.forEach(subSection -> subSectionsIdList.add(subSection.getId()));
-                agreementSection.getSubSections().addAll(subSectionsIdList);
+                agreementSection.getSubSections().addAll(subSectionList.stream().map(AgreementSection::getId).collect(Collectors.toList()));
                 agreementSubSections.add(agreementSection);
-
             }
         });
         return agreementSubSections;

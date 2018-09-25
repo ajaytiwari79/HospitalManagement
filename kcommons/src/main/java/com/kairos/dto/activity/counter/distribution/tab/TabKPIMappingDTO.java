@@ -1,6 +1,9 @@
 package com.kairos.dto.activity.counter.distribution.tab;
 
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterSize;
+import com.kairos.dto.activity.counter.enums.KPIValidity;
+import com.kairos.dto.activity.counter.enums.LocationType;
 
 import java.math.BigInteger;
 
@@ -10,6 +13,10 @@ public class TabKPIMappingDTO {
     private BigInteger kpiId;
     private CounterSize size;
     private KPIPosition position;
+    private ConfLevel level;
+    private KPIValidity kpiValidity;
+    private LocationType locationType;
+    private int priority;
 
     public TabKPIMappingDTO() {
     }
@@ -64,5 +71,37 @@ public class TabKPIMappingDTO {
 
     public void setId(BigInteger id) {
         this.id = id;
+    }
+
+    public ConfLevel getLevel() {
+        return level;
+    }
+
+    public void setLevel(ConfLevel level) {
+        this.level = level;
+    }
+
+    public KPIValidity getKpiValidity() {
+        return kpiValidity;
+    }
+
+    public void setKpiValidity(KPIValidity kpiValidity) {
+        this.kpiValidity = kpiValidity;
+    }
+
+    public LocationType getLocationType() {
+        return locationType;
+    }
+
+    public void setLocationType(LocationType locationType) {
+        this.locationType = locationType;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 }

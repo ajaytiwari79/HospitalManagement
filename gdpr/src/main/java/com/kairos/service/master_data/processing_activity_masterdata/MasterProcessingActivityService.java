@@ -359,7 +359,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
 
         }
         processingActivity.getRisks().remove(riskId);
-        riskMongoRepository.findByIdAndSafeDelete(riskId);
+        riskMongoRepository.safeDelete(riskId);
         masterProcessingActivityRepository.save(processingActivity);
         return true;
 
@@ -373,7 +373,10 @@ public class MasterProcessingActivityService extends MongoBaseService {
     public List<MasterProcessingActivityRiskResponseDTO> getAllMasterProcessingActivityWithSubProcessingActivitiesAndRisks(Long countryId) {
         List<MasterProcessingActivityRiskResponseDTO> masterProcessingActivityRiskResponseDTOS = masterProcessingActivityRepository.getAllProcessingActivityWithLinkedRisksAndSubProcessingActivitiesByCountryId(countryId);
         masterProcessingActivityRiskResponseDTOS.forEach(masterProcessingActivity -> {
-            masterProcessingActivity.getProcessingActivities().add(0,new MasterProcessingActivityRiskResponseDTO(masterProcessingActivity.getId(), masterProcessingActivity.getName(), true,masterProcessingActivity.getRisks()));
+            if (!Optional.ofNullable(masterProcessingActivity.getProcessingActivities().get(0).getId()).isPresent()) {
+                masterProcessingActivity.setProcessingActivities(new ArrayList<>());
+            }
+            masterProcessingActivity.getProcessingActivities().add(0, new MasterProcessingActivityRiskResponseDTO(masterProcessingActivity.getId(), masterProcessingActivity.getName(), true, masterProcessingActivity.getRisks()));
             masterProcessingActivity.setMainParent(true);
             masterProcessingActivity.setRisks(new ArrayList<>());
         });
