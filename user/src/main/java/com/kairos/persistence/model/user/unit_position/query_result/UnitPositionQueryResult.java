@@ -50,7 +50,7 @@ public class UnitPositionQueryResult {
     private Map<String, Object> unitInfo;
     private WTAResponseDTO workingTimeAgreement;
     private BigInteger costTimeAgreementId;
-
+    private Object data;
 
     private Boolean history;
     private Boolean editable;
@@ -316,6 +316,14 @@ public class UnitPositionQueryResult {
 
     public void setHourlyCost(BigDecimal hourlyCost) {
         this.hourlyCost = hourlyCost;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 
     public UnitPositionQueryResult() {
