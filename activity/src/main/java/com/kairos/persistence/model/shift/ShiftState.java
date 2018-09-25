@@ -8,6 +8,15 @@ import java.math.BigInteger;
 public class ShiftState extends Shift {
 
     private BigInteger shiftId;
+    private Shift previousShiftState;
+
+    public Shift getPreviousShiftState() {
+        return previousShiftState;
+    }
+
+    public void setPreviousShiftState(Shift previousShiftState) {
+        this.previousShiftState = previousShiftState;
+    }
 
     public BigInteger getShiftId() {
         return shiftId;

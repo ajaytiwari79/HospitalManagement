@@ -41,9 +41,6 @@ public class OrganizationServiceService{
     //TODO move this dependency in task
    @Inject
     private OrganizationExternalServiceRelationshipRepository organizationExternalServiceRelationshipRepository;
-   /* @Inject
-    private TaskTypeMongoRepository taskTypeMongoRepository;
-    @Inject*/
     @Inject
     private TeamGraphRepository teamGraphRepository;
 
@@ -68,9 +65,6 @@ public class OrganizationServiceService{
         return organizationServiceRepository.findOne(id);
     }
 
-    public List<OrganizationService> getOrganizationServiceByName(Long countryId, String name) {
-        return organizationServiceRepository.getByServiceName(countryId, name);
-    }
 
     public List<Object> getAllOrganizationService(long countryId) {
         List<Map<String, Object>> map = organizationServiceRepository.getOrganizationServicesByCountryId(countryId);

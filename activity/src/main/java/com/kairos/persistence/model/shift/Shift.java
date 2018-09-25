@@ -55,7 +55,6 @@ public class Shift extends MongoBaseEntity {
 
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
-    private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
 
     private boolean sickShift;
     private LocalDate validatedByStaffDate;
@@ -313,7 +312,6 @@ public class Shift extends MongoBaseEntity {
                 this.remarks,
                 this.activities, this.staffId, this.unitId, this.unitPositionId);
         shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
-        shiftQueryResult.setPlannedTimeId(this.plannedTimeId);
         return shiftQueryResult;
     }
 
@@ -330,7 +328,6 @@ public class Shift extends MongoBaseEntity {
                 this.remarks,
                 this.activities, this.staffId, this.unitId, this.unitPositionId);
         shiftDTO.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
-        shiftDTO.setPlannedTimeId(this.plannedTimeId);
         return shiftDTO;
     }
 
@@ -380,13 +377,6 @@ public class Shift extends MongoBaseEntity {
         this.copiedFromShiftId = copiedFromShiftId;
     }
 
-    public BigInteger getPlannedTimeId() {
-        return plannedTimeId;
-    }
-
-    public void setPlannedTimeId(BigInteger plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
-    }
 
     public boolean isSickShift() {
         return sickShift;

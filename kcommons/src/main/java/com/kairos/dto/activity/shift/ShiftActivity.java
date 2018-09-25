@@ -25,6 +25,7 @@ public class ShiftActivity {
     private String timeType;
     private String backgroundColor;
     private boolean haltBreak;
+    private BigInteger plannedTimeId;
     private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.UNPUBLISHED));
 
 
@@ -40,6 +41,15 @@ public class ShiftActivity {
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
+    }
+
+
+    public BigInteger getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(BigInteger plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
     }
 
     public ShiftActivity() {

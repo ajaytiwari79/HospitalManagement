@@ -26,6 +26,7 @@ public class ShiftActivityDTO {
     private BigInteger id;
     private String timeType;
     private String backgroundColor;
+    private BigInteger plannedTimeId;
     private Set<ShiftStatus> status;
     private String message;
     private boolean success;
@@ -57,6 +58,14 @@ public class ShiftActivityDTO {
     public ShiftActivityDTO() {
     }
 
+
+    public BigInteger getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(BigInteger plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
+    }
 
     public String getMessage() {
         return message;

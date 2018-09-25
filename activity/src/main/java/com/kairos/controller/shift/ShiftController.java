@@ -192,14 +192,14 @@ public class ShiftController {
     }
 
     @ApiOperation("update shift by detail view")
-    @GetMapping("/shift/update_shift_by_details_view")
+    @PutMapping("/shift/update_shift_by_details_view")
     public ResponseEntity<Map<String,Object>> updateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody ShiftDTO shiftDTO,@RequestParam(required = false) Boolean validatedByStaff){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateOrValidateShift(unitId,shiftDTO,validatedByStaff,type));
     }
 
 
     @ApiOperation("validate shift by detail view")
-    @GetMapping("/shift/validate_shift_by_details_view")
+    @PostMapping("/shift/validate_shift_by_details_view")
     public ResponseEntity<Map<String,Object>> validateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody ShiftDTO shiftDTO,@RequestParam(required = false) Boolean validatedByStaff){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.validateShift(shiftDTO,validatedByStaff,unitId));
     }
