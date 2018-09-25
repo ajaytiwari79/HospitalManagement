@@ -113,7 +113,6 @@ public class CostTimeAgreementService extends MongoBaseService {
         CountryDTO countryDTO = countryRestClient.getCountryById(countryId);
         ctaRuleTemplateDTO.setId(null);
         ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplateDTO.getName());
-        ctaRuleTemplateDTO.setStaffFunctions(null);
         CTARuleTemplate ctaRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ctaRuleTemplateDTO, CTARuleTemplate.class);
         this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, false, countryDTO);
         Long userId = UserContext.getUserDetails().getId();

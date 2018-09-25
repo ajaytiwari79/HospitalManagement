@@ -85,17 +85,6 @@ public class AccessGroup extends UserBaseEntity {
         this.endDate=endDate;
     }
 
-    public AccessGroup(@NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull") String name, boolean enabled, boolean typeOfTaskGiver, String description, AccessGroupRole role, List<AccountType> accountType, @NotNull(message = "error.startDate.notnull") LocalDate startDate, LocalDate endDate, List<DayType> dayTypes) {
-        this.name = name;
-        this.enabled = enabled;
-        this.typeOfTaskGiver = typeOfTaskGiver;
-        this.description = description;
-        this.role = role;
-        this.accountType = accountType;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.dayTypes = dayTypes;
-    }
 
     public void setName(String name) {
         this.name = name;

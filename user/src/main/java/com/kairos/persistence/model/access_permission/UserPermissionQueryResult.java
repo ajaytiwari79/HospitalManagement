@@ -12,7 +12,6 @@ public class UserPermissionQueryResult {
     private boolean parentOrganization;
     private List<Long> accessibleTabs;  // in case of unit te accessible tabs needs to be filtered
     private List<AccessPageQueryResult> permission = new ArrayList<>();
-    private List<AccessGroup> accessGroups;
 
     public UserPermissionQueryResult(){
         // default constructor
@@ -50,11 +49,4 @@ public class UserPermissionQueryResult {
         this.accessibleTabs = accessibleTabs;
     }
 
-    public List<AccessGroup> getAccessGroups() {
-        return accessGroups;
-    }
-
-    public void setAccessGroups(List<AccessGroup> accessGroups) {
-        this.accessGroups = accessGroups;
-    }
 }

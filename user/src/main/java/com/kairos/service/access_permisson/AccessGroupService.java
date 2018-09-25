@@ -1,10 +1,14 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user.access_group.AccessGroupWrapper;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
+import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.access_permission.AccessPermissionDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
+import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.access_permission.*;
@@ -15,7 +19,6 @@ import com.kairos.persistence.model.country.default_data.account_type.AccountTyp
 import com.kairos.persistence.model.country.default_data.account_type.AccountTypeAccessGroupCountQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.user.access_permission.AccessGroupByCategoryWrapper;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -30,12 +33,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
-import com.kairos.dto.user.access_group.UserAccessRoleDTO;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.dto.user.access_permission.AccessPermissionDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
-import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 import com.kairos.utils.DateUtil;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
@@ -45,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
 
@@ -715,7 +711,7 @@ public class AccessGroupService {
         return accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, organizationCategory.toString());
     }
 
-    public AccessGroupByCategoryWrapper getCountryAccessGroupsOfAllCategories(Long countryId) {
+    public List<AccessGroupsByCategoryDTO> getCountryAccessGroupsOfAllCategories(Long countryId) {
 
         List<AccessGroupsByCategoryDTO> accessGroupsData = new ArrayList<>();
         accessGroupsData.add(new AccessGroupsByCategoryDTO(OrganizationCategory.HUB,
@@ -726,11 +722,7 @@ public class AccessGroupService {
 
         accessGroupsData.add(new AccessGroupsByCategoryDTO(OrganizationCategory.UNION,
                 accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, OrganizationCategory.UNION.toString())));
-
-        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, DayTypeDTO.class);
-
-        return new AccessGroupByCategoryWrapper(accessGroupsData, dayTypeDTOS);
+        return accessGroupsData;
     }
 
     /***** Access group - COUNTRY LEVEL - ENDS HERE ******************/
