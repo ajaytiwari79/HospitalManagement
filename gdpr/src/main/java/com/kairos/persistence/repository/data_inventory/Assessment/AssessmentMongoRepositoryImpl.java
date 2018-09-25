@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.data_inventory.Assessment;
 
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
-import com.kairos.response.dto.data_inventory.AssessmentResponseDTO;
+import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -36,15 +36,15 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
     }
 
     @Override
-    public List<AssessmentResponseDTO> getAllLaunchedAssessmentAssignToRespondent(Long unitId) {
+    public List<AssessmentBasicResponseDTO> getAllLaunchedAssessmentAssignToRespondent(Long unitId,Long loggedInUserId) {
         List<AssessmentStatus> assessmentStatusList = new ArrayList<>();
         assessmentStatusList.add(AssessmentStatus.NEW);
         assessmentStatusList.add(AssessmentStatus.IN_PROGRESS);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("assessmentStatus").in(assessmentStatusList))
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("assessmentStatus").in(assessmentStatusList).and("assignee._id").is(loggedInUserId))
 
         );
-        AggregationResults<AssessmentResponseDTO> result = mongoTemplate.aggregate(aggregation, Assessment.class, AssessmentResponseDTO.class);
+        AggregationResults<AssessmentBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Assessment.class, AssessmentBasicResponseDTO.class);
        return result.getMappedResults();
     }
 }
