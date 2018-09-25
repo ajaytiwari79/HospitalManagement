@@ -1,6 +1,6 @@
 package com.kairos.service.activity;
 
-import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.planned_time_type.PresenceTypeDTO;
 import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
 import com.kairos.rest_client.CountryRestClient;

@@ -137,12 +137,12 @@ public class CountrySolverConfigService {
     }
 
     /**
-     *
+     *@param countryId
      * @return
      */
     private List<PhaseDTO> getAllPhases(Long countryId)
     {
-        List<PhaseDTO> phaseDTOS=activityMongoRepository.getAllPhases(countryId);;
+        List<PhaseDTO> phaseDTOS=activityMongoRepository.getAllPhasesByCountryId(countryId);;
       return phaseDTOS;
     }
 

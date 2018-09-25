@@ -54,4 +54,11 @@ public class UnitSolverConfigController {
         unitSolverConfigService.deleteUnitSolverConfig(solverConfigId);
         return ResponseHandler.generateResponse("Success", HttpStatus.GONE);
     }
+
+
+    @GetMapping("/default_data")
+    @ApiOperation("Get DefaultData")
+    public ResponseEntity<Map<String, Object>> getDefaultData(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.FOUND,unitSolverConfigService.getDefaultData(unitId));
+    }
 }

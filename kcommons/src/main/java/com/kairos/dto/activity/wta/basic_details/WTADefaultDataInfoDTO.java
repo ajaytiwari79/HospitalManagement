@@ -2,7 +2,7 @@ package com.kairos.dto.activity.wta.basic_details;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.planned_time_type.PresenceTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 
