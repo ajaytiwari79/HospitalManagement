@@ -40,7 +40,10 @@ public class DateUtils {
         return LocalDate.now();
 
     }
+    public static LocalTime getCurrentLocalTime() {
+        return LocalTime.now();
 
+    }
     public static LocalDate getLocalDateFromDate(Date date) {
 
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
