@@ -1,14 +1,12 @@
 package com.planner.service.shift_planning;
 
-import com.planner.domain.query_results.StaffQueryResult;
+import com.planner.domain.query_results.staff.StaffQueryResult;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
-import com.planner.repository.shift_planning.UserNeo4jRepository;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 @Service

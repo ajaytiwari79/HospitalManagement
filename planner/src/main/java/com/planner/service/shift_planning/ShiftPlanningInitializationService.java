@@ -1,9 +1,7 @@
 package com.planner.service.shift_planning;
 
 import com.kairos.commons.utils.DateUtils;
-
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.activity.staffing_level.ShiftPlanningStaffingLevelDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
@@ -13,7 +11,7 @@ import com.kairos.shiftplanning.domain.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.Employee;
 import com.kairos.shiftplanning.domain.ShiftRequestPhase;
 import com.kairos.shiftplanning.domain.wta.updated_wta.WorkingTimeAgreement;
-import com.planner.domain.query_results.StaffQueryResult;
+import com.planner.domain.query_results.staff.StaffQueryResult;
 import com.planner.domain.shift_planning.Shift;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.temporal.ChronoField;
-import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.stream.Collectors;
 

@@ -2,8 +2,10 @@ package com.planner.service.solverconfiguration;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import com.planner.domain.query_results.organization_service.OrganizationServiceQueryResult;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.config.SolverConfigRepository;
+import com.planner.repository.shift_planning.UserNeo4jRepo;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -15,9 +17,10 @@ public class CountrySolverConfigService {
 
     @Inject
     private SolverConfigRepository solverConfigRepository;
+    @Inject
+    private UserNeo4jRepo userNeo4jRepo;
 
     /**
-     *
      * @param solverConfigDTO
      */
     public void createCountrySolverConfig(SolverConfigDTO solverConfigDTO) {
@@ -25,7 +28,7 @@ public class CountrySolverConfigService {
         if (!nameExists) {
             SolverConfig solverConfig = ObjectMapperUtils.copyPropertiesByMapper(solverConfigDTO, SolverConfig.class);
             solverConfigRepository.saveObject(solverConfig);
-            if(solverConfigDTO.getOrganizationServiceCategoryId()!=null) {
+            if (solverConfigDTO.getOrganizationServiceCategoryId() != null) {
                 //Now copy same solverConfig at {unit/s} associated with {organizationServiceCategoryId}
                 copyUnitSolverConfigByOrganizationServiceCategory(solverConfigDTO.getOrganizationServiceCategoryId());
             }
@@ -38,7 +41,7 @@ public class CountrySolverConfigService {
     private void copyUnitSolverConfigByOrganizationServiceCategory(Long organizationServiceCategoryId) {
 
 
-        }
+    }
 
 
     /***********************************************************************************************************************/
@@ -92,5 +95,13 @@ public class CountrySolverConfigService {
         }
         return isPresent;
     }
+/******************************Country Default Data***********************************************/
+    public List<OrganizationServiceQueryResult> getDefaultData(Long countryId) {
+        //get all organizationServices by countryId
+        return getOrganizationServicesAndItsSubServices(countryId);
+    }
 
+    private List<OrganizationServiceQueryResult> getOrganizationServicesAndItsSubServices(Long countryId) {
+        return userNeo4jRepo.getAllOrganizationServices(countryId);
+    }
 }
