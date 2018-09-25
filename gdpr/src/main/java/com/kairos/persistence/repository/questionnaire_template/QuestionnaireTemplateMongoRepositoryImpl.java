@@ -66,7 +66,7 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
     @Override
     public List<QuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(Long countryId) {
 
-    Aggregation aggregation = Aggregation.newAggregation(
+        Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("questionnaire_section", "sections", "_id", "sections"),
@@ -76,9 +76,10 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
                 new CustomAggregationOperation(questionsAddFieldOperation),
+                sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation),
-                new CustomAggregationOperation(groupDataOperation),
-                sort(Sort.Direction.DESC,"id")
+                new CustomAggregationOperation(groupDataOperation)
+
         );
         AggregationResults<QuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, QuestionnaireTemplate.class, QuestionnaireTemplateResponseDTO.class);
         return result.getMappedResults();
@@ -108,9 +109,9 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
 
 
     @Override
-    public BigInteger getMasterQuestionnaireTemplateIdListByTemplateType(Long countryId,QuestionnaireTemplateType templateType) {
+    public BigInteger getMasterQuestionnaireTemplateIdListByTemplateType(Long countryId, QuestionnaireTemplateType templateType) {
         Query query = new Query(Criteria.where(DELETED).is(false).and(COUNTRY_ID).is(countryId).and("templateType").is(QuestionnaireTemplateType.ASSET_TYPE));
-       return mongoTemplate.findOne(query,QuestionnaireTemplate.class).getId();
+        return mongoTemplate.findOne(query, QuestionnaireTemplate.class).getId();
     }
 
 
@@ -165,9 +166,10 @@ public class QuestionnaireTemplateMongoRepositoryImpl implements CustomQuestionn
                 unwind("sections", true),
                 lookup("question", "sections.questions", "_id", "questions"),
                 new CustomAggregationOperation(questionsAddFieldOperation),
+                sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation),
-                new CustomAggregationOperation(groupDataOperation),
-                sort(Sort.Direction.DESC,"id")
+                new CustomAggregationOperation(groupDataOperation)
+
         );
         AggregationResults<QuestionnaireTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, QuestionnaireTemplate.class, QuestionnaireTemplateResponseDTO.class);
         return result.getMappedResults();

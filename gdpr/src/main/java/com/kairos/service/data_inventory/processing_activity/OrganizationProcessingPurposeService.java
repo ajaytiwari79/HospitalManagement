@@ -90,7 +90,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long organizationId) {
-        return processingPurposeMongoRepository.findAllOrganizationProcessingPurposes(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return processingPurposeMongoRepository.findAllOrganizationProcessingPurposes(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

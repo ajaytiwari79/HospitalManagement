@@ -66,7 +66,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("template_type", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
-                sort(Sort.Direction.DESC, "id")
+                sort(Sort.Direction.DESC, "createdAt")
 
 
                 );
@@ -107,7 +107,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                 match(criteria),
                 lookup("template_type", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
-                sort(Sort.Direction.DESC, "id")
+                sort(Sort.Direction.DESC, "createdAt")
 
                 );
 
