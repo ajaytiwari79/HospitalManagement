@@ -2,10 +2,10 @@ package com.kairos.service.data_inventory.assessment;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.enums.AssessmentStatus;
-import com.kairos.enums.AssetAttributeName;
-import com.kairos.enums.ProcessingActivityAttributeName;
-import com.kairos.enums.QuestionnaireTemplateType;
+import com.kairos.enums.gdpr.AssessmentStatus;
+import com.kairos.enums.gdpr.AssetAttributeName;
+import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
+import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.AssetAssessmentAnswerVO;
 import com.kairos.persistence.model.data_inventory.assessment.ProcessingActivityAssessmentAnswerVO;
@@ -16,13 +16,13 @@ import com.kairos.persistence.model.data_inventory.processing_activity.Processin
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
-import com.kairos.persistence.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.response.dto.data_inventory.AssessmentResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionBasicResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireSectionResponseDTO;
-import com.kairos.response.dto.master_data.questionnaire_template.MasterQuestionnaireTemplateResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -49,7 +49,7 @@ public class AssessmentService extends MongoBaseService {
 
 
     @Inject
-    private MasterQuestionnaireTemplateMongoRepository masterQuestionnaireTemplateMongoRepository;
+    private QuestionnaireTemplateMongoRepository masterQuestionnaireTemplateMongoRepository;
 
     @Inject
     private ObjectMapper objectMapper;
@@ -129,14 +129,14 @@ public class AssessmentService extends MongoBaseService {
      * @param assessmentId
      * @return
      */
-    public List<MasterQuestionnaireSectionResponseDTO> getAssessmentById(Long countryId, Long unitId, BigInteger assessmentId) {
+    public List<QuestionnaireSectionResponseDTO> getAssessmentById(Long countryId, Long unitId, BigInteger assessmentId) {
 
         Assessment assessment = assessmentMongoRepository.findByIdAndNonDeleted(unitId, assessmentId);
         if (!Optional.ofNullable(assessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
         }
-        MasterQuestionnaireTemplateResponseDTO assessmentQuestionnaireTemplate = masterQuestionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsByCountryIdAndId(countryId, assessment.getQuestionnaireTemplateId());
-        List<MasterQuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = assessmentQuestionnaireTemplate.getSections();
+        QuestionnaireTemplateResponseDTO assessmentQuestionnaireTemplate = masterQuestionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsByCountryIdAndId(countryId, assessment.getQuestionnaireTemplateId());
+        List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = assessmentQuestionnaireTemplate.getSections();
         if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
             getAssetAssessmentQuestionAndValuesById(unitId, assessment.getAssessmentStatus(), assessment, assessmentQuestionnaireSections);
         } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
@@ -152,7 +152,7 @@ public class AssessmentService extends MongoBaseService {
      * @param assessment
      * @param assessmentQuestionnaireSections
      */
-    private void getAssetAssessmentQuestionAndValuesById(Long unitId, AssessmentStatus assessmentStatus, Assessment assessment, List<MasterQuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
+    private void getAssetAssessmentQuestionAndValuesById(Long unitId, AssessmentStatus assessmentStatus, Assessment assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
 
         switch (assessmentStatus) {
             case NEW:
@@ -162,8 +162,8 @@ public class AssessmentService extends MongoBaseService {
                 }
 
                 Map<String, Object> props = objectMapper.convertValue(asset, Map.class);
-                for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
-                    for (MasterQuestionBasicResponseDTO assetAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
+                for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
+                    for (QuestionBasicResponseDTO assetAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
                         if (props.containsKey(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
                             assetAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(props.get(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
                         }
@@ -175,8 +175,8 @@ public class AssessmentService extends MongoBaseService {
                 Map<AssetAttributeName, Object> assetAttributeNameObjectMap = new HashMap<>();
                 assetAssessmentAnswers.forEach(assetAssessmentAnswer -> assetAttributeNameObjectMap.put(assetAssessmentAnswer.getAssetField(), assetAssessmentAnswer.getValue()));
 
-                for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
-                    for (MasterQuestionBasicResponseDTO assetAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
+                for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
+                    for (QuestionBasicResponseDTO assetAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
                         if (assetAttributeNameObjectMap.containsKey(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName()))) {
                             assetAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(assetAttributeNameObjectMap.get(AssetAttributeName.valueOf(assetAssessmentQuestionBasicResponseDTO.getAttributeName())));
                         }
@@ -197,7 +197,7 @@ public class AssessmentService extends MongoBaseService {
      * @param assessment
      * @param assessmentQuestionnaireSections
      */
-    private void getProcessingActivityAssessmentQuestionAndValuesById(Long unitId, AssessmentStatus assessmentStatus, Assessment assessment, List<MasterQuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
+    private void getProcessingActivityAssessmentQuestionAndValuesById(Long unitId, AssessmentStatus assessmentStatus, Assessment assessment, List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections) {
 
         switch (assessmentStatus) {
             case NEW:
@@ -206,8 +206,8 @@ public class AssessmentService extends MongoBaseService {
                     exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assessment.getProcessingActivityId());
                 }
                 Map<String, Object> props = objectMapper.convertValue(processingActivity, Map.class);
-                for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
-                    for (MasterQuestionBasicResponseDTO processingActivityAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
+                for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
+                    for (QuestionBasicResponseDTO processingActivityAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
                         if (props.containsKey(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value)) {
                             processingActivityAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(props.get(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName())));
                         }
@@ -218,8 +218,8 @@ public class AssessmentService extends MongoBaseService {
                 List<ProcessingActivityAssessmentAnswerVO> processingActivityAssessmentAnswers = assessment.getProcessingActivityAssessmentAnswers();
                 Map<ProcessingActivityAttributeName, Object> processingActivityAttributeNameObjectMap = new HashMap<>();
                 processingActivityAssessmentAnswers.forEach(processingActivityAssessmentAnswer -> processingActivityAttributeNameObjectMap.put(processingActivityAssessmentAnswer.getProcessingActivityField(), processingActivityAssessmentAnswer.getValue()));
-                for (MasterQuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
-                    for (MasterQuestionBasicResponseDTO processingActivityAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
+                for (QuestionnaireSectionResponseDTO questionnaireSectionResponseDTO : assessmentQuestionnaireSections) {
+                    for (QuestionBasicResponseDTO processingActivityAssessmentQuestionBasicResponseDTO : questionnaireSectionResponseDTO.getQuestions()) {
                         if (processingActivityAttributeNameObjectMap.containsKey(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()))) {
                             processingActivityAssessmentQuestionBasicResponseDTO.setAssessmentQuestionValues(processingActivityAttributeNameObjectMap.get(ProcessingActivityAttributeName.valueOf(processingActivityAssessmentQuestionBasicResponseDTO.getAttributeName()).value));
                         }

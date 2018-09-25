@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.clause;
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistence.model.clause.Clause;
-import com.kairos.enums.FilterType;
+import com.kairos.enums.gdpr.FilterType;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import org.springframework.data.mongodb.core.query.Criteria;
 

@@ -80,8 +80,8 @@ public class AssetController {
 
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/asset/{assetId}/history")
-    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger assetId, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int skip) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetActivitiesHistory(assetId, size, skip));
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger assetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetActivitiesHistory(assetId));
     }
 
 

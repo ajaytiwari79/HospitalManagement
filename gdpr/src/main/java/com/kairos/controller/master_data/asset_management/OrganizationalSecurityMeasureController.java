@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
 import com.kairos.service.master_data.asset_management.OrganizationalSecurityMeasureService;
 import com.kairos.utils.ResponseHandler;
