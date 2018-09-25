@@ -1326,6 +1326,13 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getTimeZoneStringOfUnit(unitId));
     }
+    @GetMapping("/time_zone")
+    @ApiOperation("Get Time Zone of all Organizations")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTimeZoneOfAllUnits() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getTimeZoneStringsOfAllUnits());
+    }
 //    @Pavan
 //    Add Apis for Time slots for Shift planning
 
