@@ -9,6 +9,7 @@ import com.planner.repository.shift_planning.UserNeo4jRepo;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,19 +29,29 @@ public class CountrySolverConfigService {
         if (!nameExists) {
             SolverConfig solverConfig = ObjectMapperUtils.copyPropertiesByMapper(solverConfigDTO, SolverConfig.class);
             solverConfigRepository.saveObject(solverConfig);
-            if (solverConfigDTO.getOrganizationServiceCategoryId() != null) {
-                //Now copy same solverConfig at {unit/s} associated with {organizationServiceCategoryId}
-                copyUnitSolverConfigByOrganizationServiceCategory(solverConfigDTO.getOrganizationServiceCategoryId());
+            if (solverConfigDTO.getOrganizationSubServiceId() != null) {
+                //Now copy same solverConfig at {unit/s} associated with {organizationSubServiceId}
+                copyUnitSolverConfigByOrganizationSubService(solverConfigDTO.getOrganizationSubServiceId(), solverConfig);
             }
         }
     }
 
     /**
-     * copy(create) solverConfig at Unit Level By organizationServiceCategoryId
+     * copy(create) solverConfig at Unit Level
+     * (which is OrganizationSubServices at country Level)
+     * by organizationSubServiceId.
+     * we need just to find all unitId/s associated with all{OrganizationSubServices}.
+     * Then for corresponding unitId/s create this same {@link SolverConfig}
+     *
+     * @param organizationSubServiceId
+     * @param solverConfig
      */
-    private void copyUnitSolverConfigByOrganizationServiceCategory(Long organizationServiceCategoryId) {
-
-
+    private void copyUnitSolverConfigByOrganizationSubService(Long organizationSubServiceId, SolverConfig solverConfig) {
+        List<Long> applicableUnitIdForSolverConfig = userNeo4jRepo.getUnitIdsByOrganizationSubServiceId(organizationSubServiceId);
+        for (Long unitId : applicableUnitIdForSolverConfig) {
+            solverConfig.setUnitIdBuilder(unitId).setIdBuilder(null);//Unset Id
+            solverConfigRepository.saveObject(solverConfig);
+        }
     }
 
 
@@ -95,7 +106,8 @@ public class CountrySolverConfigService {
         }
         return isPresent;
     }
-/******************************Country Default Data***********************************************/
+
+    /******************************Country Default Data***********************************************/
     public List<OrganizationServiceQueryResult> getDefaultData(Long countryId) {
         //get all organizationServices by countryId
         return getOrganizationServicesAndItsSubServices(countryId);

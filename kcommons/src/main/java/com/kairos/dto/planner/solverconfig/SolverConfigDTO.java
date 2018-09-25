@@ -28,7 +28,7 @@ public class SolverConfigDTO {
     //Country Properties
     private Long countryId;
     private Long parentCountryId;
-    private Long organizationServiceCategoryId;
+    private Long organizationSubServiceId;
 
     //Constructors
     public SolverConfigDTO() {
@@ -125,12 +125,12 @@ public class SolverConfigDTO {
         this.constraintIds = constraintIds;
     }
 
-    public Long getOrganizationServiceCategoryId() {
-        return organizationServiceCategoryId;
+    public Long getOrganizationSubServiceId() {
+        return organizationSubServiceId;
     }
 
-    public void setOrganizationServiceCategoryId(Long organizationServiceCategoryId) {
-        this.organizationServiceCategoryId = organizationServiceCategoryId;
+    public void setOrganizationSubServiceId(Long organizationSubServiceId) {
+        this.organizationSubServiceId = organizationSubServiceId;
     }
 
     public Long getParentCountryId() {
@@ -192,8 +192,8 @@ public class SolverConfigDTO {
         return this;
     }
 
-    public SolverConfigDTO setOrganizationServiceCategoryIdBuilder(Long organizationServiceCategoryId) {
-        this.organizationServiceCategoryId = organizationServiceCategoryId;
+    public SolverConfigDTO setOrganizationSubServiceIdBuilder(Long organizationSubServiceId) {
+        this.organizationSubServiceId = organizationSubServiceId;
         return this;
     }
     public SolverConfigDTO setParentCountryIdBuilder(Long parentCountryId) {

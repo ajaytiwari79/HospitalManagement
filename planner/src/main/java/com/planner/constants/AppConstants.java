@@ -43,4 +43,5 @@ public class AppConstants {
     public static final String IN_UNIT="IN_UNIT";
     public static final String HAS_ORGANIZATION_SERVICES="HAS_ORGANIZATION_SERVICES";
     public static final String ORGANIZATION_SUB_SERVICE="ORGANIZATION_SUB_SERVICE";
+    public static final String PROVIDE_SERVICE="PROVIDE_SERVICE";
 }

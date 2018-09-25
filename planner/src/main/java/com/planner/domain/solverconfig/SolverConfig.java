@@ -8,8 +8,8 @@ import java.util.List;
 
 @Document
 public class SolverConfig extends MongoBaseEntity {
-    //common properties at both Country and Unit
-    private String name;//Unique
+    //Properties applicable common to both Country and Unit(Organization)
+    private String name;//Unique(but not when copying)
     private String parentId;//copiedFromId;
     private String description;
     private Long phaseId;
@@ -18,20 +18,18 @@ public class SolverConfig extends MongoBaseEntity {
     private short terminationTimeInMinutes;
     private Long planningProblemId;
     private List<BigInteger> constraintIds;
-
-    //Unit properties
+    //Properties applicable only at Unit(Organization) level else null
     private Long unitId;
-
-    //Country properties
+    //Properties applicable only at Country level else null
     private Long countryId;
     private Long parentCountryId;
-    private Long organizationServiceCategoryId;//null at unit level{During creation of SolverConfig at country level}
+    private Long organizationSubServiceId;
 
     //Constructors
     public SolverConfig() {
 
     }
-
+   /***********************************************/
     //Setters and Getters
     public String getName() {
         return name;
@@ -121,12 +119,12 @@ public class SolverConfig extends MongoBaseEntity {
         this.constraintIds = constraintIds;
     }
 
-    public Long getOrganizationServiceCategoryId() {
-        return organizationServiceCategoryId;
+    public Long getOrganizationSubServiceId() {
+        return organizationSubServiceId;
     }
 
-    public void setOrganizationServiceCategoryId(Long organizationServiceCategoryId) {
-        this.organizationServiceCategoryId = organizationServiceCategoryId;
+    public void setOrganizationSubServiceId(Long organizationSubServiceId) {
+        this.organizationSubServiceId = organizationSubServiceId;
     }
 
     public Long getParentCountryId() {
@@ -198,8 +196,8 @@ public class SolverConfig extends MongoBaseEntity {
         return this;
     }
 
-    public SolverConfig setOrganizationServiceCategoryIdBuilder(Long organizationServiceCategoryId) {
-        this.organizationServiceCategoryId = organizationServiceCategoryId;
+    public SolverConfig setOrganizationSubServiceIdBuilder(Long organizationSubServiceId) {
+        this.organizationSubServiceId = organizationSubServiceId;
         return this;
     }
     public SolverConfig setParentCountryIdBuilder(Long parentCountryId) {
