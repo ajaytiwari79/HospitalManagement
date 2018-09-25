@@ -7,7 +7,6 @@ import com.kairos.enums.gdpr.AssetAttributeName;
 import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.data_inventory.assessment.AssetAssessmentAnswerVO;
 import com.kairos.persistence.model.data_inventory.assessment.ProcessingActivityAssessmentAnswerVO;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
@@ -27,6 +26,7 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireS
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -51,7 +51,7 @@ public class AssessmentService extends MongoBaseService {
 
 
     @Inject
-    private QuestionnaireTemplateMongoRepository masterQuestionnaireTemplateMongoRepository;
+    private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
 
     @Inject
     private ObjectMapper objectMapper;
@@ -111,14 +111,17 @@ public class AssessmentService extends MongoBaseService {
         switch (templateType) {
             case ASSET_TYPE:
                 Asset asset = (Asset) entity;
-                if (Optional.ofNullable(asset.getAssetType()).isPresent()) {
-                    questionnaireTemplateType = masterQuestionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetType(unitId, asset.getAssetType(), asset.getAssetSubTypes());
+                if (Optional.ofNullable(asset.getAssetType()).isPresent() && CollectionUtils.isEmpty(asset.getAssetSubTypes())) {
+                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndUnitId(unitId, asset.getAssetType());
+                } else if (Optional.ofNullable(asset.getAssetType()).isPresent() && CollectionUtils.isNotEmpty(asset.getAssetSubTypes())) {
+                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetType(unitId, asset.getAssetType(), asset.getAssetSubTypes());
                 } else {
-                    questionnaireTemplateType = masterQuestionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);
+                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);
+
                 }
                 break;
             default:
-                questionnaireTemplateType = masterQuestionnaireTemplateMongoRepository.getQuestionnaireTemplateByTemplateTypeByUnitId(unitId, templateType);
+                questionnaireTemplateType = questionnaireTemplateMongoRepository.getQuestionnaireTemplateByTemplateTypeByUnitId(unitId, templateType);
                 break;
 
         }
@@ -145,7 +148,7 @@ public class AssessmentService extends MongoBaseService {
         if (!Optional.ofNullable(assessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
         }
-        QuestionnaireTemplateResponseDTO assessmentQuestionnaireTemplate = masterQuestionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsByUnitIdAndId(unitId, assessment.getQuestionnaireTemplateId());
+        QuestionnaireTemplateResponseDTO assessmentQuestionnaireTemplate = questionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsByUnitIdAndId(unitId, assessment.getQuestionnaireTemplateId());
         List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = assessmentQuestionnaireTemplate.getSections();
         if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
             getAssetAssessmentQuestionAndValuesById(unitId, assessment.getAssessmentStatus(), assessment, assessmentQuestionnaireSections);
