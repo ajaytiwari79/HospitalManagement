@@ -533,14 +533,13 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         List<ShiftState> shiftStates=new ArrayList<>();
         shifts.stream().forEach(shift ->{
-            shift.setPhaseId(currentPhaseId);
             ShiftState shiftState = ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftState.class);
             shiftState.setShiftId(shift.getId());
+            shiftState.setShiftStatePhaseId(currentPhaseId);
             shiftState.setId(null);
             shiftStates.add(shiftState);
         } );
             save(shiftStates);
-            save(shifts);
     }
 
     /**
@@ -552,7 +551,8 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.dataNotFoundException("message.periodsetting.notFound");
         }
         List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
-            restoreShifts(shiftStates);
+        restoreShifts(shiftStates);
+        shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
         return true;
     }
 
@@ -566,7 +566,7 @@ public class PlanningPeriodService extends MongoBaseService {
             return;
         }
         List<Shift> shifts=new ArrayList<>();
-        shiftStates.stream().forEach(shiftState -> {
+        shiftStates.forEach(shiftState -> {
             Shift shift=ObjectMapperUtils.copyPropertiesByMapper(shiftState,Shift.class);
             shift.setId(shiftState.getShiftId());
             shifts.add(shift);
