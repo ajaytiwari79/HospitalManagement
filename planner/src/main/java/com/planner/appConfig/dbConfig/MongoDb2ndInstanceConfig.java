@@ -43,12 +43,13 @@ public class MongoDb2ndInstanceConfig extends AbstractMongoConfiguration {
     @Override
     @Bean("ActivityMongoTemplate")
     public MongoTemplate mongoTemplate() throws Exception {
-        MongoTemplate mongoTemplate = new MongoTemplate(mongoDbFactory(), mappingMongoConverter());
+        MongoTemplate mongoTemplate = new MongoTemplate(this.mongoDbFactory(), this.mappingMongoConverter());
         return mongoTemplate;
     }
     @Override
+    @Bean("kairosMongoDbFactory")
     public MongoDbFactory mongoDbFactory() {
-        return new SimpleMongoDbFactory(mongoClient(), this.getDatabaseName());
+        return new SimpleMongoDbFactory(this.mongoClient(), this.getDatabaseName());
     }
 
     @Override
@@ -65,7 +66,6 @@ public class MongoDb2ndInstanceConfig extends AbstractMongoConfiguration {
 
     @Override
     public MappingMongoConverter mappingMongoConverter() throws Exception {
-
         DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDbFactory());
         MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext());
         converter.setCustomConversions(customConversions());

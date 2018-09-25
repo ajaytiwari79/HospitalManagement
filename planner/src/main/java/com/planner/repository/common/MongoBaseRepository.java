@@ -7,14 +7,18 @@ import org.springframework.data.repository.NoRepositoryBean;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+
 @NoRepositoryBean
-public interface MongoBaseRepository<T,ID> extends MongoRepository<T,ID> {
+public interface MongoBaseRepository<T, ID> extends MongoRepository<T, ID> {
     Optional<T> findByKairosId(BigInteger kairosId);
+
     List<T> findAllNotDeleted();
+
     <T extends MongoBaseEntity> T saveObject(T entity);
+
     boolean safeDeleteById(String id);
 
     boolean isNameExists(String name);
 
-    <T extends MongoBaseEntity>boolean safeDeleteByObject(T o);
+    <T extends MongoBaseEntity> boolean safeDeleteByObject(T o);
 }

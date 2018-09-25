@@ -1,15 +1,19 @@
 package com.planner.service.solverconfiguration;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.planner.domain.query_results.organization_service.OrganizationServiceQueryResult;
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.config.SolverConfigRepository;
+import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
+import com.planner.service.shift_planning.ActivityMongoService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +22,8 @@ public class CountrySolverConfigService {
 
     @Inject
     private SolverConfigRepository solverConfigRepository;
+    @Inject
+    private ActivityMongoRepository activityMongoRepository;
     @Inject
     private UserNeo4jRepo userNeo4jRepo;
 
@@ -108,12 +114,36 @@ public class CountrySolverConfigService {
     }
 
     /******************************Country Default Data***********************************************/
-    public List<OrganizationServiceQueryResult> getDefaultData(Long countryId) {
-        //get all organizationServices by countryId
-        return getOrganizationServicesAndItsSubServices(countryId);
+    public DefaultDataDTO getDefaultData(Long countryId) {
+        DefaultDataDTO defaultDataDTO=new DefaultDataDTO()
+                //get all organizationServices by countryId
+                .setOrganizationServiceDTOSBuilder(getOrganizationServicesAndItsSubServices(countryId))
+                //get All Phases
+                .setPhaseDTOSBuilder(getAllPhases(countryId));
+
+        return defaultDataDTO;
     }
 
-    private List<OrganizationServiceQueryResult> getOrganizationServicesAndItsSubServices(Long countryId) {
-        return userNeo4jRepo.getAllOrganizationServices(countryId);
+    /**
+     *
+     * @param countryId
+     * @return
+     */
+    private List<OrganizationServiceDTO> getOrganizationServicesAndItsSubServices(Long countryId) {
+        List<OrganizationServiceQueryResult> organizationServiceQueryResults=userNeo4jRepo.getAllOrganizationServices(countryId);
+        List<OrganizationServiceDTO> organizationServiceDTOS=ObjectMapperUtils.copyPropertiesOfListByMapper(organizationServiceQueryResults,OrganizationServiceDTO.class);
+
+        return organizationServiceDTOS;
     }
+
+    /**
+     *
+     * @return
+     */
+    private List<PhaseDTO> getAllPhases(Long countryId)
+    {
+        List<PhaseDTO> phaseDTOS=activityMongoRepository.getAllPhases(countryId);;
+      return phaseDTOS;
+    }
+
 }
