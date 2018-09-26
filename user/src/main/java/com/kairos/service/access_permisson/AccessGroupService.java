@@ -130,10 +130,10 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupId);
 
         }
-//        if (accessGroupRepository.isOrganizationAccessGroupExistWithNameExceptId(unitId, accessGroupDTO.getName(), accessGroupId)) {
-//            exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
-//
-//        }
+        if (accessGroupRepository.isOrganizationAccessGroupExistWithNameExceptId(unitId, accessGroupDTO.getName(), accessGroupId)) {
+            exceptionService.duplicateDataException("message.duplicate", "access-group", accessGroupDTO.getName());
+
+        }
         List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(accessGroupDTO.getDayTypeIds());
         if (CollectionUtils.isEmpty(dayTypes)) {
             exceptionService.actionNotPermittedException("error.dayTypes.not.found");
