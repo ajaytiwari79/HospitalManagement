@@ -1,7 +1,6 @@
 package com.kairos.service.period;
 
 
-import com.kairos.dto.activity.cta.UnitPositionDTO;
 import com.kairos.dto.activity.period.FlippingDateDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PeriodPhaseDTO;
@@ -37,13 +36,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -486,7 +483,7 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         Phase initialNextPhase = phaseMongoRepository.findOne(planningPeriod.getNextPhaseId());
         List<PhaseDTO> toBeNextPhase = phaseMongoRepository.getNextApplicablePhasesOfUnitBySequence(unitId, initialNextPhase.getSequence());
-        List<Shift> shifts=shiftMongoRepository.findAllShiftsPlanningPeriodAndPhaseId(periodId,unitId);
+        List<Shift> shifts=shiftMongoRepository.findAllShiftsByPlanningPeriod(periodId,unitId);
         planningPeriod.setCurrentPhaseId(initialNextPhase.getId());
         planningPeriod.setNextPhaseId(Optional.ofNullable(toBeNextPhase).isPresent() && toBeNextPhase.size() > 0 ? toBeNextPhase.get(0).getId() : null);
         PeriodPhaseFlippingDate periodPhaseFlippingDate=planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDates -> periodPhaseFlippingDates.getPhaseId().equals(planningPeriod.getCurrentPhaseId())).findFirst().get();
@@ -509,7 +506,7 @@ public class PlanningPeriodService extends MongoBaseService {
         BigInteger nextPhaseId = null;
         for (PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()) {
             if (phaseFlippingDate.getSchedulerPanelId().equals(schedulerPanelId)) {
-                shifts=shiftMongoRepository.findAllShiftsPlanningPeriodAndPhaseId(planningPeriod.getId(),unitId);
+                shifts=shiftMongoRepository.findAllShiftsByPlanningPeriod(planningPeriod.getId(),unitId);
                 planningPeriod.setCurrentPhaseId(phaseFlippingDate.getPhaseId());
                 updateCurrentAndNextPhases = true;
                 break;

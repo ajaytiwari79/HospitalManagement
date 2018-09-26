@@ -615,28 +615,28 @@ public class CounterDistService extends MongoBaseService {
             save(tabKPIConfKPIEntries);
         }
     }
-
-    private Map<String,String> dashboardsOldAndNewIds(Long staffId,Long unitId,ConfLevel level,List<KPIDashboardDTO> kpiDashboardDTOS){
-        Map<String,String> dashboardsNameMap=new HashMap<>();
-        Map<String,String> dashboardsOldAndNewIds=new HashMap<>();
-        kpiDashboardDTOS.stream().forEach(kpiDashboardDTO  -> {
-            dashboardsNameMap.put(kpiDashboardDTO.getName(),kpiDashboardDTO.getModuleId());
-        });
-        List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,staffId,level)).collect(Collectors.toList());
-        if(!kpiDashboards.isEmpty()){
-            save(kpiDashboards);
-        }
-        kpiDashboards.stream().forEach(kpiDashboard -> {
-            kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(),kpiDashboard.getParentModuleId()));
-        });
-        if(!kpiDashboards.isEmpty()) save(kpiDashboards);
-        kpiDashboards.stream().forEach(kpiDashboard  -> {
-            if(dashboardsNameMap.get(kpiDashboard.getName())!=null) {
-                dashboardsOldAndNewIds.put(dashboardsNameMap.get(kpiDashboard.getName()),kpiDashboard.getModuleId());
-            }
-        });
-        return dashboardsOldAndNewIds;
-    }
+        // todo not delete harish
+//    private Map<String,String> dashboardsOldAndNewIds(Long staffId,Long unitId,ConfLevel level,List<KPIDashboardDTO> kpiDashboardDTOS){
+//        Map<String,String> dashboardsNameMap=new HashMap<>();
+//        Map<String,String> dashboardsOldAndNewIds=new HashMap<>();
+//        kpiDashboardDTOS.stream().forEach(kpiDashboardDTO  -> {
+//            dashboardsNameMap.put(kpiDashboardDTO.getName(),kpiDashboardDTO.getModuleId());
+//        });
+//        List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(),dashboard.getModuleId(),dashboard.getName(),null,unitId,staffId,level)).collect(Collectors.toList());
+//        if(!kpiDashboards.isEmpty()){
+//            save(kpiDashboards);
+//        }
+//        kpiDashboards.stream().forEach(kpiDashboard -> {
+//            kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(),kpiDashboard.getParentModuleId()));
+//        });
+//        if(!kpiDashboards.isEmpty()) save(kpiDashboards);
+//        kpiDashboards.stream().forEach(kpiDashboard  -> {
+//            if(dashboardsNameMap.get(kpiDashboard.getName())!=null) {
+//                dashboardsOldAndNewIds.put(dashboardsNameMap.get(kpiDashboard.getName()),kpiDashboard.getModuleId());
+//            }
+//        });
+//        return dashboardsOldAndNewIds;
+//    }
 
     private String createModuleId(BigInteger id, String parentModuleId) {
         return parentModuleId+"_"+id;
