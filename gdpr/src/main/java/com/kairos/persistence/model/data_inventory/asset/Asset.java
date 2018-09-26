@@ -5,6 +5,7 @@ import com.kairos.enums.RiskSeverity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -20,62 +21,37 @@ public class Asset extends MongoBaseEntity {
 
     @NotBlank(message = "Name can 't be empty")
     private String name;
-
     @NotBlank(message = "description can't be empty")
     private String description;
-
     private Long countryId;
-
     @NotBlank(message = "Hosting Location can't be empty")
     private String hostingLocation;
-
     @NotNull(message = "Managing department can't be empty")
     private ManagingOrganization managingDepartment;
-
     @NotNull(message = "Asset Owner can't be Empty")
     private Staff assetOwner;
-
     private List<BigInteger> storageFormats;
-
     private List<BigInteger> orgSecurityMeasures;
-
     private List<BigInteger> technicalSecurityMeasures;
-
     private BigInteger hostingProvider;
-
     private BigInteger hostingType;
-
     private BigInteger dataDisposal;
-
     @NotNull(message = "Asset Type can't be empty")
     private BigInteger assetType;
-
-    private List<BigInteger> assetSubTypes;
-
+    private List<BigInteger> assetSubTypes=new ArrayList<>();
     private Set<BigInteger> processingActivities;
-
     private Set<BigInteger> subProcessingActivities;
-
     private Integer dataRetentionPeriod;
-
     private Long minDataSubjectVolume;
-
     private Long maxDataSubjectVolume;
-
     private RiskSeverity riskLevel;
-
     @NotNull(message = "Status can't be empty")
     private boolean active=true;
-
-    private List<BigInteger> assessments=new ArrayList<>();
 
     public boolean isActive() { return active; }
 
     public void setActive(boolean active) { this.active = active; }
 
-    public List<BigInteger> getAssessments() { return assessments; }
-
-    public void setAssessments(List<BigInteger> assessments) { this.assessments = assessments; }
 
     public Set<BigInteger> getProcessingActivities() { return processingActivities; }
 

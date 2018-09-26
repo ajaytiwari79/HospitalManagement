@@ -21,7 +21,7 @@ public class ClauseBasicDTO {
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
-    private Boolean requireUpdate=false;
+    private boolean requireUpdate;
 
     @NotNull(message = "Clause order is Not defined")
     private Integer orderedIndex;
@@ -50,13 +50,9 @@ public class ClauseBasicDTO {
         this.description = description;
     }
 
-    public Boolean getRequireUpdate() {
-        return requireUpdate;
-    }
+    public boolean isRequireUpdate() { return requireUpdate; }
 
-    public void setRequireUpdate(Boolean requireUpdate) {
-        this.requireUpdate = requireUpdate;
-    }
+    public void setRequireUpdate(boolean requireUpdate) { this.requireUpdate = requireUpdate; }
 
     public Integer getOrderedIndex() { return orderedIndex; }
 

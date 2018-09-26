@@ -49,5 +49,4 @@ public interface AssetMongoRepository extends MongoBaseRepository<Asset,BigInteg
 
 
 
-
 }
