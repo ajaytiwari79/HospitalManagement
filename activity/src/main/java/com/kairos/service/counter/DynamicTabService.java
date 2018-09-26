@@ -97,9 +97,10 @@ public class DynamicTabService extends MongoBaseService {
         return dashboardTabsName;
     }
 
-    public List<KPICategoryDTO> updateDashboardTabs(Long refId,KPIDashboardUpdationDTO dashboardTabs,ConfLevel level){
+    public List<KPIDashboardDTO> updateDashboardTabs(Long refId,KPIDashboardUpdationDTO dashboardTabs,ConfLevel level){
         if(ConfLevel.STAFF.equals(level)){
-            refId=genericIntegrationService.getStaffIdByUserId(refId);
+            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
+            refId=accessGroupPermissionCounterDTO.getStaffId();
         }
         Set<String> dashboardTabNames = dashboardTabs.getUpdateDashboardTab().stream().map(category -> category.getName().trim().toLowerCase()).collect(Collectors.toSet());
         if(dashboardTabNames.size() != dashboardTabs.getUpdateDashboardTab().size())  exceptionService.duplicateDataException("error.kpi_category.duplicate");

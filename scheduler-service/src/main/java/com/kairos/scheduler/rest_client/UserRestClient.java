@@ -18,6 +18,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
@@ -77,6 +78,7 @@ public class UserRestClient {
                             new HttpEntity<>(t), typeReference,pathParams);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
+                logger.error("not valid code"+restExchange.getStatusCode());
                 exceptionService.internalError(response.getMessage());
             }
             return response.getData();
@@ -84,7 +86,7 @@ public class UserRestClient {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
-        }
+       }
 
     }
 
