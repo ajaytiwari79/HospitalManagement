@@ -151,7 +151,7 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public FlippingDateDTO setFlippingDateAndTime(FlippingDateDTO flippingDateDTO, PeriodPhaseDTO flippingDateTime) {
-        return flippingDateDTO = (Optional.ofNullable(flippingDateTime.getFlippingDate()).isPresent()) ? new FlippingDateDTO(flippingDateTime.getFlippingDate(), flippingDateTime.getFlippingTime().getHour(), flippingDateTime.getFlippingTime().getMinute()) : null;
+        return flippingDateDTO = (Optional.ofNullable(flippingDateTime.getFlippingDate()).isPresent()) ? new FlippingDateDTO(flippingDateTime.getFlippingDate(), flippingDateTime.getFlippingTime().getHour(), flippingDateTime.getFlippingTime().getMinute(),flippingDateTime.getFlippingTime().getSecond()) : null;
     }
 
 
@@ -424,15 +424,12 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.period.startdate.enddate.notupdate");
         }
         LocalDateTime puzzleFlippingDateTime = (Optional.ofNullable(planningPeriodDTO.getRequestToPuzzleDate()).isPresent()) ? DateUtils.getLocalDateTime(planningPeriodDTO.getRequestToPuzzleDate().getDate(),
-                planningPeriodDTO.getRequestToPuzzleDate().getHours(), planningPeriodDTO.getRequestToPuzzleDate().getMinutes()) : null;
+                planningPeriodDTO.getRequestToPuzzleDate().getHours(), planningPeriodDTO.getRequestToPuzzleDate().getMinutes(),planningPeriodDTO.getRequestToPuzzleDate().getSeconds()) : null;
         LocalDateTime constructionFlippingDate = (Optional.ofNullable(planningPeriodDTO.getPuzzleToConstructionDate()).isPresent()) ? DateUtils.getLocalDateTime(planningPeriodDTO.getPuzzleToConstructionDate().getDate(),
-                planningPeriodDTO.getPuzzleToConstructionDate().getHours(), planningPeriodDTO.getPuzzleToConstructionDate().getMinutes()) : null;
+                planningPeriodDTO.getPuzzleToConstructionDate().getHours(), planningPeriodDTO.getPuzzleToConstructionDate().getMinutes(),planningPeriodDTO.getPuzzleToConstructionDate().getSeconds()) : null;
         LocalDateTime draftFlippingDate = (Optional.ofNullable(planningPeriodDTO.getConstructionToDraftDate()).isPresent()) ? DateUtils.getLocalDateTime(planningPeriodDTO.getConstructionToDraftDate().getDate(), planningPeriodDTO.getConstructionToDraftDate().getHours(),
-                planningPeriodDTO.getConstructionToDraftDate().getMinutes()) : null;
-        //boolean valid =!((puzzleFlippingDateTime==null || (puzzleFlippingDateTime!=null && constructionFlippingDate!=null &&!(isPastDate(constructionFlippingDate))&&constructionFlippingDate.isAfter(puzzleFlippingDateTime))) && (constructionFlippingDate==null || (constructionFlippingDate!=null && draftFlippingDate!=null &&!isPastDate(draftFlippingDate)&&draftFlippingDate.isAfter(constructionFlippingDate))));
-        /*Optional.ofNullable(draftFlippingDate).isPresent() && Optional.ofNullable(constructionFlippingDate).isPresent() && (!isPastDate(constructionFlippingDate)) && draftFlippingDate.isBefore(constructionFlippingDate) || !isPastDate(draftFlippingDate) && draftFlippingDate.isEqual(constructionFlippingDate)
-                || Optional.ofNullable(constructionFlippingDate).isPresent() && Optional.ofNullable(puzzleFlippingDateTime).isPresent() && !isPastDate(constructionFlippingDate) && constructionFlippingDate.isBefore(puzzleFlippingDateTime) || !isPastDate(puzzleFlippingDateTime) && constructionFlippingDate.isEqual(puzzleFlippingDateTime);*/
-        boolean valid =((puzzleFlippingDateTime==null || (puzzleFlippingDateTime!=null && constructionFlippingDate!=null &&!(isPastDate(constructionFlippingDate))&&constructionFlippingDate.isAfter(puzzleFlippingDateTime))) && (constructionFlippingDate==null || (constructionFlippingDate!=null && draftFlippingDate!=null &&!isPastDate(draftFlippingDate)&&draftFlippingDate.isAfter(constructionFlippingDate))));
+                planningPeriodDTO.getConstructionToDraftDate().getMinutes(),planningPeriodDTO.getConstructionToDraftDate().getSeconds()) : null;
+        boolean valid =!((puzzleFlippingDateTime==null || (puzzleFlippingDateTime!=null && constructionFlippingDate!=null &&constructionFlippingDate.isAfter(puzzleFlippingDateTime))) && (constructionFlippingDate==null || (constructionFlippingDate!=null && draftFlippingDate!=null && draftFlippingDate.isAfter(constructionFlippingDate))));
         if (valid) {
             exceptionService.actionNotPermittedException("message.period.invalid.flippingdate");
         }
