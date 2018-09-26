@@ -4,7 +4,7 @@ package com.kairos.service.master_data.asset_management;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.TechnicalSecurityMeasureDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.TechnicalSecurityMeasure;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
@@ -82,7 +82,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long countryId) {
-        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(countryId,new Sort(Sort.Direction.DESC, "_id"));
+        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

@@ -288,7 +288,7 @@ public class CounterDistService extends MongoBaseService {
     public void updateTabKPIEntries(List<TabKPIMappingDTO> tabKPIMappingDTOS, String tabId, Long unitId, ConfLevel level) {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
         List<BigInteger> kpiIds = tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
-        List<TabKPIConf> tabKPIConfs = counterRepository.findTabKPIConfigurationByTabIds(tabId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), level);
+        List<TabKPIConf> tabKPIConfs = counterRepository.findTabKPIConfigurationByTabIds(Arrays.asList(tabId), kpiIds, accessGroupPermissionCounterDTO.getStaffId(), level);
         if (Optional.ofNullable(tabKPIConfs).isPresent()) {
             exceptionService.invalidRequestException("error.kpi.invalidData");
         }
@@ -520,113 +520,6 @@ public class CounterDistService extends MongoBaseService {
 
     //dashboard setting for all level
 
-
-    public InitailKPIDashboardDistDataDTO getInitialDashboardKPIDistData(Long refId, ConfLevel level) {
-        List<KPIDashboardDTO> dashboards = counterRepository.getKPIDashboard(null, level, refId);
-        List<BigInteger> dashboardIds = dashboards.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(toList());
-        List<DashboardKPIMappingDTO> dashboardKPIMapping = counterRepository.getKPIsMappingForDashboards(dashboardIds);
-        return new InitailKPIDashboardDistDataDTO(dashboards, dashboardKPIMapping);
-    }
-
-    public List<DashboardKPIDTO> getInitialDashboardKPIDataConfForStaff(String moduleId, Long unitId, ConfLevel level) {
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
-        List<DashboardKPIDTO> dashboardKPIDTOS = counterRepository.getDashboardKPIForStaffByTabAndStaffId(Arrays.asList(moduleId), new ArrayList<>(), accessGroupPermissionCounterDTO.getStaffId(), unitId, level);
-        return dashboardKPIDTOS;
-    }
-
-
-    public void addDashboradKPIsDistribution(DashboardKPIsDTO dashboardKPIsDTO, ConfLevel level, Long refId) {
-        Long countryId = ConfLevel.COUNTRY.equals(level) ? refId : null;
-        Long unitId = ConfLevel.UNIT.equals(level) ? refId : null;
-        if (ConfLevel.STAFF.equals(level)) {
-            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
-            refId = accessGroupPermissionCounterDTO.getStaffId();
-        }
-        List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(dashboardKPIsDTO.getKpiIds(), level, refId);
-        if (applicableKPIS.isEmpty()) {
-            exceptionService.dataNotFoundByIdException("message.counter.kpi.notfound");
-        }
-        List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, level, refId);
-        List<BigInteger> dashboardIds = kpiDashboardDTOS.stream().map(kpiDashboardDTO -> kpiDashboardDTO.getId()).collect(Collectors.toList());
-        if (!dashboardIds.contains(dashboardKPIsDTO.getDashboardId())) {
-            exceptionService.dataNotFoundByIdException("error.kpi_dashboard.availability");
-        }
-        List<DashboardKPIConf> dashboardKPIConfs = counterRepository.getDashboardKPIConfs(dashboardKPIsDTO.getKpiIds(), dashboardIds, refId, level);
-//      List<BigInteger> availableDashboardIds = dashboardKPIConfs.stream().map(dashboardKPIConf -> dashboardKPIConf.getDashboardId()).collect(toList());
-//      if (availableDashboardIds.contains(dashboardKPIsDTO.getDashboardId())) {
-//          exceptionService.invalidOperationException("error.dist.category_kpi.invalid_operation");
-//      }
-        List<DashboardKPIConf> newDashboardKPIConf = new ArrayList<>();
-        applicableKPIS.parallelStream().forEach(applicableKPI -> newDashboardKPIConf.add(new DashboardKPIConf(applicableKPI.getActiveKpiId(), dashboardKPIsDTO.getDashboardId(), dashboardKPIsDTO.getModuleId(), countryId, unitId, null, level, null)));
-        if (!newDashboardKPIConf.isEmpty()) {
-            save(newDashboardKPIConf);
-            //   counterRepository.removeDashboardKPIEntries(availableDashboardIds, dashboardKPIsDTO.getKpiIds());
-        }
-    }
-
-    public void removeDashboradKPIEntries(DashboardKPIMappingDTO dashboardKPIMappingDTO, Long refId, ConfLevel level) {
-        if (ConfLevel.STAFF.equals(level)) {
-            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
-            refId = accessGroupPermissionCounterDTO.getStaffId();
-        }
-        counterRepository.removeDashboardKPIConfiguration(dashboardKPIMappingDTO, refId, level);
-    }
-
-    public List<DashboardKPIDTO> addDashboardKPIEntriesOfStaff(List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS, Long unitId, ConfLevel level) {
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
-        List<DashboardKPIConf> entriesToSave = new ArrayList<>();
-        List<String> dashboardIds = dashboardKPIMappingDTOS.stream().map(dashboardKPIMappingDTO -> dashboardKPIMappingDTO.getModuleId()).collect(toList());
-        List<BigInteger> kpiIds = dashboardKPIMappingDTOS.stream().map(dashboardKPIMappingDTO -> dashboardKPIMappingDTO.getKpiId()).collect(toList());
-        Map<String, Map<BigInteger, BigInteger>> tabKpiMap = setDashboardKPIEntries(dashboardIds, kpiIds, entriesToSave, null, null, accessGroupPermissionCounterDTO.getStaffId(), level, accessGroupPermissionCounterDTO.getCountryAdmin());
-        dashboardKPIMappingDTOS.stream().forEach(dashboardKPIMappingDTO -> {
-            if (tabKpiMap.get(dashboardKPIMappingDTO.getModuleId()).get(dashboardKPIMappingDTO.getKpiId()) == null) {
-                entriesToSave.add(new DashboardKPIConf(dashboardKPIMappingDTO.getKpiId(), dashboardKPIMappingDTO.getModuleId(), null, unitId, accessGroupPermissionCounterDTO.getStaffId(), level, dashboardKPIMappingDTO.getPosition()));
-            }
-        });
-        if (entriesToSave.isEmpty()) {
-            exceptionService.invalidRequestException("error.kpi.invalidData");
-        }
-        save(entriesToSave);
-        return counterRepository.getDashboardKPIForStaffByTabAndStaffId(dashboardIds, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), unitId, level);
-    }
-
-    public Map<String, Map<BigInteger, BigInteger>> setDashboardKPIEntries(List<String> dashboardsIds, List<BigInteger> kpiIds, List<DashboardKPIConf> entriesToSave, Long countryId, Long unitId, Long staffId, ConfLevel level, boolean isCountryAdmin) {
-        Long refId = ConfLevel.COUNTRY.equals(level) ? countryId : unitId;
-        if (ConfLevel.STAFF.equals(level)) {
-            refId = staffId;
-        }
-        List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS = counterRepository.getDashboardKPIConfigurationByTabIds(dashboardsIds, kpiIds, refId, level);
-        if (!isCountryAdmin) {
-            List<ApplicableKPI> applicableKPIS = counterRepository.getKPIByKPIId(kpiIds, refId, level);
-            if (kpiIds.size() != applicableKPIS.size()) {
-                exceptionService.actionNotPermittedException("message.counter.kpi.notfound");
-            }
-        }
-        Map<String, Map<BigInteger, BigInteger>> dashboardKpiMap = new HashMap<>();
-        dashboardsIds.forEach(tabKpiId -> {
-            dashboardKpiMap.put(tabKpiId, new HashMap<BigInteger, BigInteger>());
-        });
-        dashboardKPIMappingDTOS.forEach(dashboardKPIMappingDTO -> {
-            dashboardKpiMap.get(dashboardKPIMappingDTO.getModuleId()).put(dashboardKPIMappingDTO.getKpiId(), dashboardKPIMappingDTO.getKpiId());
-        });
-        return dashboardKpiMap;
-    }
-
-    public void updateDashboardKPIEntries(List<DashboardKPIMappingDTO> dashboardKPIMappingDTOS, String tabId, Long unitId, ConfLevel level) {
-        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
-        List<BigInteger> kpiIds = dashboardKPIMappingDTOS.stream().map(dashboardKPIMappingDTO -> dashboardKPIMappingDTO.getKpiId()).collect(Collectors.toList());
-        List<DashboardKPIConf> dashboardKPIConfs = counterRepository.findDashboardKPIConfigurationByTabIds(tabId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), level);
-        Map<String, DashboardKPIMappingDTO> dashboardKPIMappingDTOMap = new HashMap<>();
-        dashboardKPIMappingDTOS.stream().forEach(dashboardKPIMappingDTO -> {
-            dashboardKPIMappingDTOMap.put(dashboardKPIMappingDTO.getModuleId(), dashboardKPIMappingDTO);
-        });
-        dashboardKPIConfs.stream().forEach(dashboardKPIConf -> {
-            DashboardKPIMappingDTO dashboardKPIMappingDTO = dashboardKPIMappingDTOMap.get(dashboardKPIConf.getModuleId());
-            dashboardKPIConf.setPosition(dashboardKPIMappingDTO.getPosition());
-        });
-        if (dashboardKPIConfs.isEmpty()) exceptionService.invalidRequestException("error.kpi.invalidData");
-        save(dashboardKPIConfs);
-    }
 
 
     //default setting

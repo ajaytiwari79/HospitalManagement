@@ -1,7 +1,7 @@
 package com.kairos.controller.data_inventory.assessment;
 
 
-import com.kairos.enums.AssessmentStatus;
+import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.AssessmentAnswerValueObject;
 import com.kairos.service.data_inventory.assessment.AssessmentService;
@@ -33,32 +33,32 @@ public class AssessmentController {
 
 
     @ApiOperation(value = "Add assessment to Asset")
-    @PostMapping(COUNTRY_URL + "/assessment/asset/{assetId}")
-    public ResponseEntity<Object> addAssessmentToAsset(@PathVariable Long unitId, @PathVariable Long countryId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentForAsset(unitId, countryId, assetId, assessmentDTO));
+    @PostMapping( "/assessment/asset/{assetId}")
+    public ResponseEntity<Object> addAssessmentToAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentForAsset(unitId,  assetId, assessmentDTO));
 
     }
 
 
     @ApiOperation(value = "Add assessment to Processing Activity")
-    @PostMapping(COUNTRY_URL + "/assessment/processing_activity/{processingActivityId}")
-    public ResponseEntity<Object> addAssessmentToProcessingActivity(@PathVariable Long unitId, @PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentForProcessingActivity(unitId, countryId, processingActivityId, assessmentDTO));
+    @PostMapping( "/assessment/processing_activity/{processingActivityId}")
+    public ResponseEntity<Object> addAssessmentToProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @RequestBody @Valid AssessmentDTO assessmentDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.saveAssessmentForProcessingActivity(unitId,  processingActivityId, assessmentDTO));
 
     }
 
 
     @ApiOperation(value = "get Assessment  By Id")
-    @GetMapping(COUNTRY_URL + "/assessment/{assessmentId}")
-    public ResponseEntity<Object> getAssetAssessmentById(@PathVariable Long countryId, @PathVariable Long unitId, @PathVariable BigInteger assessmentId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAssessmentById(countryId, unitId, assessmentId));
+    @GetMapping( "/assessment/{assessmentId}")
+    public ResponseEntity<Object> getAssetAssessmentById( @PathVariable Long unitId, @PathVariable BigInteger assessmentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAssessmentById( unitId, assessmentId));
     }
 
 
     @ApiOperation(value = "get All launched Assessment Assign to respondent and are in New and InProgress state")
     @GetMapping("/assessment")
-    public ResponseEntity<Object> getAllLaunchedAssessment(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchedAssessmentOfAssignee(unitId));
+    public ResponseEntity<Object> getAllLaunchedAssessment(@PathVariable Long unitId,@RequestParam Long loggedInUserId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assessmentService.getAllLaunchedAssessmentOfAssignee(unitId,loggedInUserId));
     }
 
     @ApiOperation(value = "Update Answer of assessment question In progress state by  Assignee")

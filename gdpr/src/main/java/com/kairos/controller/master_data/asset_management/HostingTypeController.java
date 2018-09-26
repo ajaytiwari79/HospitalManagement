@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
 import com.kairos.service.master_data.asset_management.HostingTypeService;
 import com.kairos.utils.ResponseHandler;

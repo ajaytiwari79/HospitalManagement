@@ -2,7 +2,7 @@ package com.kairos.response.dto.filter;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.enums.FilterType;
+import com.kairos.enums.gdpr.FilterType;
 
 import java.util.List;
 

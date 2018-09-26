@@ -95,7 +95,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long organizationId) {
-        return technicalSecurityMeasureMongoRepository.findAllOrganizationTechnicalSecurityMeasures(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return technicalSecurityMeasureMongoRepository.findAllOrganizationTechnicalSecurityMeasures(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

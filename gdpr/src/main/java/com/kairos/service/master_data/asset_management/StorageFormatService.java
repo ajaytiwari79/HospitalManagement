@@ -4,7 +4,7 @@ package com.kairos.service.master_data.asset_management;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormat;
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
@@ -84,7 +84,7 @@ public class StorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long countryId) {
-        return storageFormatMongoRepository.findAllStorageFormats(countryId,new Sort(Sort.Direction.DESC, "_id"));
+        return storageFormatMongoRepository.findAllStorageFormats(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

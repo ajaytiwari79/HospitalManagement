@@ -78,7 +78,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
     }
 
     public List<AccessorPartyResponseDTO> getAllAccessorParty(Long organizationId) {
-        return accessorPartyMongoRepository.findAllOrganizationAccessorParty(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return accessorPartyMongoRepository.findAllOrganizationAccessorParty(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
