@@ -34,7 +34,7 @@ public class AssetController {
     @ApiOperation(value = "create asset for organization with basic detail")
     @PostMapping("/asset")
     public ResponseEntity<Object> createAssetWithBasicDetail(@PathVariable Long unitId, @Valid @RequestBody AssetDTO asset) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.createAssetWithBasicDetail(unitId, asset));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.createAssetWithBasicDetail(unitId, asset,false));
     }
 
 

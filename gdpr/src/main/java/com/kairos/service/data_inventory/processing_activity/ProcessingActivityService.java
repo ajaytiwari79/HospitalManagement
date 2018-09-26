@@ -93,16 +93,16 @@ public class ProcessingActivityService extends MongoBaseService {
     private MasterProcessingActivityService masterProcessingActivityService;
 
 
-    public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
+    public ProcessingActivityDTO createProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO,boolean suggested) {
 
 
         ProcessingActivity exist = processingActivityMongoRepository.findByName(organizationId, processingActivityDTO.getName());
         if (Optional.ofNullable(exist).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Processing Activity", processingActivityDTO.getName());
         }
-        ProcessingActivity processingActivity = buildProcessingActivity(organizationId, processingActivityDTO);
+        ProcessingActivity processingActivity = buildProcessingActivity(organizationId, processingActivityDTO,suggested);
         if (!processingActivityDTO.getSubProcessingActivities().isEmpty()) {
-            processingActivity.setSubProcessingActivities(createSubProcessingActivity(organizationId, processingActivityDTO.getSubProcessingActivities()));
+            processingActivity.setSubProcessingActivities(createSubProcessingActivity(organizationId, processingActivityDTO.getSubProcessingActivities(),suggested));
         }
         processingActivityMongoRepository.save(processingActivity);
         processingActivityDTO.setId(processingActivity.getId());
@@ -140,14 +140,14 @@ public class ProcessingActivityService extends MongoBaseService {
 
     }
 
-    private List<BigInteger> createSubProcessingActivity(Long organizationId, List<ProcessingActivityDTO> subProcessingActivityDTOs) {
+    private List<BigInteger> createSubProcessingActivity(Long organizationId, List<ProcessingActivityDTO> subProcessingActivityDTOs,boolean suggested) {
 
         List<ProcessingActivity> subProcessingActivities = new ArrayList<>();
         List<BigInteger> subProcessingActivityIdList = new ArrayList<>();
 
         for (ProcessingActivityDTO processingActivityDTO : subProcessingActivityDTOs) {
 
-            ProcessingActivity processingActivity = buildProcessingActivity(organizationId, processingActivityDTO);
+            ProcessingActivity processingActivity = buildProcessingActivity(organizationId, processingActivityDTO,suggested);
             processingActivity.setSubProcess(true);
             subProcessingActivities.add(processingActivity);
         }
@@ -158,7 +158,7 @@ public class ProcessingActivityService extends MongoBaseService {
     }
 
 
-    private ProcessingActivity buildProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO) {
+    private ProcessingActivity buildProcessingActivity(Long organizationId, ProcessingActivityDTO processingActivityDTO,boolean suggested) {
         ProcessingActivity processingActivity = new ProcessingActivity(processingActivityDTO.getName(), processingActivityDTO.getDescription(),
                 processingActivityDTO.getManagingDepartment(), processingActivityDTO.getProcessOwner());
         processingActivity.setOrganizationId(organizationId);
@@ -172,7 +172,7 @@ public class ProcessingActivityService extends MongoBaseService {
         processingActivity.setDataSources(processingActivityDTO.getDataSources());
         processingActivity.setAccessorParties(processingActivityDTO.getAccessorParties());
         processingActivity.setProcessingLegalBasis(processingActivityDTO.getProcessingLegalBasis());
-        processingActivity.setSuggested(processingActivityDTO.isSuggested());
+        processingActivity.setSuggested(suggested);
         return processingActivity;
 
     }
@@ -193,7 +193,7 @@ public class ProcessingActivityService extends MongoBaseService {
         if (!existingSubProcessingActivityMap.isEmpty()) {
             updateSubProcessingActivities(organizationId, subProcessingActivitiesIdList, existingSubProcessingActivityMap);
         } else if (!newSubProcessingActivityDTOList.isEmpty()) {
-            subProcessingActivitiesIdList.addAll(createSubProcessingActivity(organizationId, newSubProcessingActivityDTOList));
+            subProcessingActivitiesIdList.addAll(createSubProcessingActivity(organizationId, newSubProcessingActivityDTOList,false));
         }
         return subProcessingActivitiesIdList;
 
@@ -540,12 +540,9 @@ public class ProcessingActivityService extends MongoBaseService {
 
     public Map<String, ProcessingActivityDTO> saveProcessingActivityAndSuggestToCountryAdmin(Long unitId, Long countryId, ProcessingActivityDTO processingActivityDTO) {
 
-        processingActivityDTO.setSuggested(true);
-        if (Optional.ofNullable(processingActivityDTO.getSubProcessingActivities()).isPresent()) {
-            processingActivityDTO.getSubProcessingActivities().forEach(subProcessingActivityDTO -> subProcessingActivityDTO.setSuggested(true));
-        }
+
         Map<String, ProcessingActivityDTO> result = new HashMap<>();
-        processingActivityDTO = createProcessingActivity(unitId, processingActivityDTO);
+        processingActivityDTO = createProcessingActivity(unitId, processingActivityDTO,true);
         ProcessingActivityDTO masterProcessingActivity = masterProcessingActivityService.saveSuggestedMasterProcessingActivityDataFromUnit(countryId, unitId, processingActivityDTO);
         result.put("new", processingActivityDTO);
         result.put("SuggestedData", masterProcessingActivity);

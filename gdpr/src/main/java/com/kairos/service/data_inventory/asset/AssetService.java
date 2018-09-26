@@ -60,7 +60,7 @@ public class AssetService extends MongoBaseService {
     private MasterAssetService masterAssetService;
 
 
-    public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
+    public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO,boolean suggested) {
         Asset previousAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
         if (Optional.ofNullable(previousAsset).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
@@ -88,7 +88,7 @@ public class AssetService extends MongoBaseService {
         asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
         asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
         asset.setAssetAssessor(assetDTO.getAssetAssessor());
-        asset.setSuggested(assetDTO.isSuggested());
+        asset.setSuggested(suggested);
         assetMongoRepository.save(asset);
         assetDTO.setId(asset.getId());
         return assetDTO;
@@ -276,9 +276,8 @@ public class AssetService extends MongoBaseService {
      */
     public Map<String, AssetDTO> saveAssetAndSuggestToCountryAdmin(Long unitId, Long countryId, AssetDTO assetDTO) {
 
-        assetDTO.setSuggested(true);
         Map<String, AssetDTO> result = new HashMap<>();
-        assetDTO = createAssetWithBasicDetail(unitId, assetDTO);
+        assetDTO = createAssetWithBasicDetail(unitId, assetDTO,true);
         AssetDTO masterAsset = masterAssetService.saveSuggestedAssetDataFromUnit(countryId, unitId, assetDTO);
         result.put("new", assetDTO);
         result.put("SuggestedData", masterAsset);
