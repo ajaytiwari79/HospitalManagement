@@ -51,7 +51,7 @@ public class UserOauth2Service implements UserDetailsService {
     }
 
     private List<GrantedAuthority> getPermission(User user){
-       List<GrantedAuthority> permissions = Collections.emptyList();
+        List<GrantedAuthority> permissions = Collections.emptyList();
         return permissions;
     }
 }
