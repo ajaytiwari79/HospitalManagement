@@ -10,6 +10,7 @@ import com.kairos.response.dto.common.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -26,24 +27,29 @@ public class ProcessingActivityResponseDTO {
     private List<AccessorPartyResponseDTO> accessorParties;
     private List<TransferMethodResponseDTO> transferMethods;
     private List<ProcessingLegalBasisResponseDTO> processingLegalBasis;
-    private List<ResponsibilityTypeResponseDTO> responsibilityType;
+    private List<ResponsibilityTypeResponseDTO>responsibilityType;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
     private Integer jointControllerContactInfo;
     private Long minDataSubjectVolume;
     private Long maxDataSubjectVolume;
     private Integer dataRetentionPeriod;
-    private boolean active;
-    private boolean suggested;
+    private Boolean active;
+    private Boolean suggested;
+    private List<ProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
 
 
-    public boolean isSuggested() { return suggested; }
+    public List<ProcessingActivityResponseDTO> getSubProcessingActivities() { return subProcessingActivities; }
 
-    public void setSuggested(boolean suggested) { this.suggested = suggested; }
+    public void setSubProcessingActivities(List<ProcessingActivityResponseDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 
-    public boolean isActive() { return active; }
+    public Boolean getActive() { return active; }
 
-    public void setActive(boolean active) { this.active = active; }
+    public void setActive(Boolean active) { this.active = active; }
+
+    public Boolean getSuggested() { return suggested; }
+
+    public void setSuggested(Boolean suggested) { this.suggested = suggested; }
 
     public List<ResponsibilityTypeResponseDTO> getResponsibilityType() { return responsibilityType; }
 

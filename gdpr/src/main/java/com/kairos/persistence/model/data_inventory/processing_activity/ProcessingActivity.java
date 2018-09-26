@@ -29,7 +29,7 @@ public class ProcessingActivity extends MongoBaseEntity {
     private List<BigInteger> transferMethods;
     private List<BigInteger> accessorParties;
     private List<BigInteger> processingLegalBasis;
-    private List<BigInteger> subProcessingActivities;
+    private List<BigInteger> subProcessingActivities=new ArrayList<>();
     private BigInteger responsibilityType;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;

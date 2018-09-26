@@ -263,20 +263,10 @@ public class ProcessingActivityService extends MongoBaseService {
     }
 
 
-    /**
-     * @param orgId
-     * @param id
-     * @return
-     * @description method return list of SubProcessing Activity
-     */
-    public List<ProcessingActivityResponseDTO> getProcessingActivityWithWithSubProcessingActivitiesById(Long orgId, BigInteger id) {
-        return processingActivityMongoRepository.getAllSubProcessingActivitiesOfProcessingActivity(orgId, id);
-
-    }
 
 
     public List<ProcessingActivityResponseDTO> getAllProcessingActivityWithMetaData(Long orgId) {
-        return processingActivityMongoRepository.getAllProcessingActivityAndMetaData(orgId);
+        return processingActivityMongoRepository.getAllProcessingActivityAndMetaDataAndSubProcessingActivities(orgId);
     }
 
 

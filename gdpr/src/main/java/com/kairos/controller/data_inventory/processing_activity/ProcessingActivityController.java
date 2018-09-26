@@ -35,9 +35,6 @@ public class ProcessingActivityController {
     @ApiOperation(value = "create Processing activity ")
     @PostMapping("/processing_activity")
     public ResponseEntity<Object> createProcessingActivity(@PathVariable Long unitId, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "ManagingOrganization id can't be Null");
-        }
         processingActivityDTO.setSuggested(false);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.createProcessingActivity(unitId, processingActivityDTO));
     }
@@ -46,43 +43,18 @@ public class ProcessingActivityController {
     @ApiOperation(value = "delete  Processing Activity by Id")
     @DeleteMapping("/processing_activity/delete/{processingActivityId}")
     public ResponseEntity<Object> deleteProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
-
-        if (unitId == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.deleteProcessingActivity(unitId, processingActivityId));
     }
 
     @ApiOperation(value = "delete  Sub Processing Activity ")
     @DeleteMapping("/processing_activity/{processingActivityId}/subProcess/{subProcessId}")
     public ResponseEntity<Object> deleteSubProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger subProcessId) {
-
-        if (unitId == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
-        } else if (processingActivityId == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Processing Activity Id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.deleteSubProcessingActivity(unitId, processingActivityId, subProcessId));
     }
-
-    @ApiOperation(value = "Get  Sub Processing Activities of Processing Activity ")
-    @GetMapping("/processing_activity/{id}")
-    public ResponseEntity<Object> getProcessingActivityWithMetaDataById(@PathVariable Long unitId, @PathVariable BigInteger id) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be Null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityWithWithSubProcessingActivitiesById(unitId, id));
-    }
-
 
     @ApiOperation(value = "Get All Processing activity With meta data ")
     @GetMapping("/processing_activity")
     public ResponseEntity<Object> getAllProcessingActivityWithMetaData(@PathVariable Long unitId) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityWithMetaData(unitId));
     }
 
@@ -108,7 +80,7 @@ public class ProcessingActivityController {
     }
 
 
-    @ApiOperation(value = "get history of asset or changes done in Asset")
+    @ApiOperation(value = "get Processing Activity And Sub Process with Basic Reponse For related tab in  Asset")
     @GetMapping("/processing_activity/related")
     public ResponseEntity<Object> getAllRelatedProcessingActivitiesAndSubProcessingActivities(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityBasicDetailsAndWithSubProcess(unitId));
