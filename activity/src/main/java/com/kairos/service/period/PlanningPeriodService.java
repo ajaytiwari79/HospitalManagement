@@ -223,7 +223,7 @@ public class PlanningPeriodService extends MongoBaseService {
                     tempFlippingDate = DateUtils.addDurationInLocalDateTime(tempFlippingDate, -phase.getDurationInDays(), DurationType.HOURS, 1);
                 }
                 // DateUtils.getDate().compareTo(tempFlippingDate) >= 0
-                if (applicablePhases.size() == index + 1 || (scopeToFlipNextPhase && DateUtils.getLocalDateFromDate(DateUtils.getDate()).isAfter(tempFlippingDate.toLocalDate()))) {
+                if (applicablePhases.size() == index + 1 || (scopeToFlipNextPhase && DateUtils.asLocalDateTime(DateUtils.getDate()).isAfter(tempFlippingDate))) {
                     if (scopeToFlipNextPhase) {
                         currentPhaseId = phase.getId();
                         nextPhaseId = previousPhaseId;
