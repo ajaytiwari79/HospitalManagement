@@ -674,8 +674,12 @@ public class StaffService {
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             logger.error("Access group not found");
             exceptionService.invalidRequestException("error.staff.accessgroup.notfound", accessGroupId);
-
         }
+
+        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+            exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
+        }
+
         List<Staff> staffList = new ArrayList<>();
         List<Integer> staffErrorList = new ArrayList<>();
         StaffUploadBySheetQueryResult staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
@@ -1192,6 +1196,9 @@ public class StaffService {
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.staff.accessgroup.notfound", accessGroupId);
 
+        }
+        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+            exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
         }
         Employment employment;
         if (employmentAlreadyExist) {
