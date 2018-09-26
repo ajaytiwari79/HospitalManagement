@@ -17,45 +17,30 @@ public class ProcessingActivityDTO {
 
 
     private BigInteger id;
-
     @NotBlank(message = "error.message.name.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String name;
-
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
-
     @NotNull(message = "Managing department can't be null")
     private ManagingOrganization managingDepartment;
-
     @NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
-
     private List<BigInteger> processingPurposes;
-
     private List<BigInteger> dataSources;
-
     private List<BigInteger> transferMethods;
-
     private List<BigInteger> accessorParties;
-
     private List<BigInteger> processingLegalBasis;
-
     private List<ProcessingActivityDTO> subProcessingActivities=new ArrayList<>();
-
     private BigInteger responsibilityType;
-
     private Integer controllerContactInfo;
-
     private Integer dpoContactInfo;
-
     private Integer jointControllerContactInfo;
-
     private Long minDataSubjectVolume;
-
     private Long maxDataSubjectVolume;
-
     private Integer dataRetentionPeriod;
+    private boolean suggestToCountryAdmin;
+
 
     public BigInteger getId() { return id; }
 
@@ -67,21 +52,53 @@ public class ProcessingActivityDTO {
 
     public String getDescription() { return description; }
 
-
     public ManagingOrganization getManagingDepartment() { return managingDepartment; }
-
 
     public Staff getProcessOwner() { return processOwner; }
 
-
     public List<BigInteger> getProcessingPurposes() { return processingPurposes; }
-
 
     public List<BigInteger> getDataSources() { return dataSources; }
 
+    public void setName(String name) { this.name = name; }
+
+    public void setDescription(String description) { this.description = description; }
+
+    public void setManagingDepartment(ManagingOrganization managingDepartment) {this.managingDepartment = managingDepartment; }
+
+    public void setProcessOwner(Staff processOwner) { this.processOwner = processOwner; }
+
+    public void setProcessingPurposes(List<BigInteger> processingPurposes) { this.processingPurposes = processingPurposes; }
+
+    public void setDataSources(List<BigInteger> dataSources) { this.dataSources = dataSources; }
+
+    public void setTransferMethods(List<BigInteger> transferMethods) { this.transferMethods = transferMethods; }
+
+    public void setAccessorParties(List<BigInteger> accessorParties) { this.accessorParties = accessorParties; }
+
+    public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
+
+    public void setSubProcessingActivities(List<ProcessingActivityDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
+
+    public void setResponsibilityType(BigInteger responsibilityType) { this.responsibilityType = responsibilityType; }
+
+    public void setControllerContactInfo(Integer controllerContactInfo) { this.controllerContactInfo = controllerContactInfo; }
+
+    public void setDpoContactInfo(Integer dpoContactInfo) { this.dpoContactInfo = dpoContactInfo; }
+
+    public void setJointControllerContactInfo(Integer jointControllerContactInfo) { this.jointControllerContactInfo = jointControllerContactInfo; }
+
+    public void setMinDataSubjectVolume(Long minDataSubjectVolume) { this.minDataSubjectVolume = minDataSubjectVolume; }
+
+    public void setMaxDataSubjectVolume(Long maxDataSubjectVolume) { this.maxDataSubjectVolume = maxDataSubjectVolume; }
+
+    public void setDataRetentionPeriod(Integer dataRetentionPeriod) { this.dataRetentionPeriod = dataRetentionPeriod; }
+
+    public boolean isSuggestToCountryAdmin() { return suggestToCountryAdmin; }
+
+    public void setSuggestToCountryAdmin(boolean suggestToCountryAdmin) { this.suggestToCountryAdmin = suggestToCountryAdmin; }
 
     public List<BigInteger> getTransferMethods() { return transferMethods; }
-
 
     public List<BigInteger> getAccessorParties() { return accessorParties; }
 

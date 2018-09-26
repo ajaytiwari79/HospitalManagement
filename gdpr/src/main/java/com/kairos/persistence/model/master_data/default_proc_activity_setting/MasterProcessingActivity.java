@@ -40,13 +40,14 @@ public class MasterProcessingActivity extends MongoBaseEntity {
     }
 
 
-    public MasterProcessingActivity(String name, String description, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
+    public MasterProcessingActivity(String name, String description, SuggestedDataStatus suggestedDataStatus,List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.name = name;
         this.description = description;
         this.organizationTypes = organizationTypes;
         this.organizationSubTypes = organizationSubTypes;
         this.organizationServices = organizationServices;
         this.organizationSubServices = organizationSubServices;
+        this.suggestedDataStatus=suggestedDataStatus;
     }
 
     public MasterProcessingActivity( String name, String description, Long countryId,SuggestedDataStatus suggestedDataStatus,LocalDate suggestedDate) {

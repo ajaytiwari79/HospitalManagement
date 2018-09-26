@@ -2,10 +2,12 @@ package com.kairos.controller.master_data.processing_activity_masterdata;
 
 import com.kairos.dto.gdpr.MasterProcessingActivityRiskDTO;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.service.master_data.processing_activity_masterdata.MasterProcessingActivityService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,8 @@ import static com.kairos.constants.ApiConstant.UNIT_URL;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_COUNTRY_URL)
@@ -41,7 +45,7 @@ public class MasterProcessingActivityController {
     @ApiOperation(value = "update MasterProcessingActivity")
     @PutMapping("/master_processing_activity/update/{id}")
     public ResponseEntity<Object> updateMasterProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody MasterProcessingActivityDTO processingActivityDto) {
-     
+
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateMasterProcessingActivityAndSubProcessingActivities(countryId, id, processingActivityDto));
     }
 
@@ -90,6 +94,27 @@ public class MasterProcessingActivityController {
     @GetMapping("/master_processing_activity/risk")
     public ResponseEntity<Object> getMasterProcessingActivityWithSubProcessingActivitiesAndLinkedRisks(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.getAllMasterProcessingActivityWithSubProcessingActivitiesAndRisks(countryId));
+    }
+
+
+    @ApiOperation(value = "Update Sugessted status of Processing Activity")
+    @PutMapping("/master_processing_activity/{processingActivityId}/status")
+    public ResponseEntity<Object> updateSuggestedStatusOfProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @RequestParam SuggestedDataStatus suggestedDataStatus) {
+        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateSuggestedStatusOfMasterProcessingActivity(countryId, processingActivityId, suggestedDataStatus));
+    }
+
+    @ApiOperation(value = "Update Sugessted status of Processing Activity")
+    @PutMapping("/master_processing_activity/{processingActivityId}/subProcess/status")
+    public ResponseEntity<Object> updateSuggestedStatusOfSubProcessingActivity(@PathVariable Long countryId, @PathVariable BigInteger processingActivityId, @RequestBody Set<BigInteger> subProcessingActivityIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
+        if (CollectionUtils.isEmpty(subProcessingActivityIds)) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Sub Processing Activity is Not Selected");
+        } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterProcessingActivityService.updateSuggestedStatusOfSubProcessingActivities(countryId, processingActivityId, subProcessingActivityIds, suggestedDataStatus));
     }
 
 }

@@ -546,7 +546,7 @@ public class ProcessingActivityService extends MongoBaseService {
 
         Map<String, ProcessingActivityDTO> result = new HashMap<>();
         processingActivityDTO = createProcessingActivity(unitId, processingActivityDTO);
-        ProcessingActivityDTO masterProcessingActivity = masterProcessingActivityService.saveSuggestedAssetDataFromUnit(countryId, unitId, processingActivityDTO);
+        ProcessingActivityDTO masterProcessingActivity = masterProcessingActivityService.saveSuggestedMasterProcessingActivityDataFromUnit(countryId, unitId, processingActivityDTO);
         result.put("new", processingActivityDTO);
         result.put("SuggestedData", masterProcessingActivity);
         return result;

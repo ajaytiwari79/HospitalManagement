@@ -6,7 +6,6 @@ import com.kairos.custom_exception.*;
 import com.kairos.dto.gdpr.OrgTypeSubTypeServicesAndSubServicesDTO;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.data_inventory.AssetDTO;
-import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.dto.gdpr.master_data.MasterAssetDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
@@ -110,7 +109,7 @@ public class MasterAssetService extends MongoBaseService {
 
 
     public Boolean deleteMasterAsset(Long countryId, BigInteger id) {
-        MasterAsset masterAsset = masterAssetMongoRepository.findByIdANdNonDeleted(countryId, id);
+        MasterAsset masterAsset = masterAssetMongoRepository.findByIdAndCountryId(countryId, id);
         if (!Optional.ofNullable(masterAsset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Master Asset", id);
         }
@@ -151,8 +150,20 @@ public class MasterAssetService extends MongoBaseService {
         masterAssetMongoRepository.save(masterAsset);
         assetDTO.setId(masterAsset.getId());
         return assetDTO;
+    }
 
+    /**
+     * @param countryId
+     * @param suggestedDataStatus
+     * @return
+     * @description update status of asset (suggest by unit)
+     */
+    public boolean updateSuggestedStatusOfMasterAsset(Long countryId, Set<BigInteger> assetIds, SuggestedDataStatus suggestedDataStatus) {
 
+        List<MasterAsset> masterAssetList = masterAssetMongoRepository.findMasterAssetByCountryIdAndIds(countryId, assetIds);
+        masterAssetList.forEach(masterAsset -> masterAsset.setSuggestedDataStatus(suggestedDataStatus));
+        masterAssetMongoRepository.saveAll(getNextSequence(masterAssetList));
+        return true;
     }
 
 

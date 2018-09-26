@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -15,7 +16,7 @@ public interface MasterProcessingActivityRepository extends MongoBaseRepository<
 
 
     @Query("{deleted:false,countryId:?0,_id:?1}")
-    MasterProcessingActivity findByIdAndCountryIdAndNonDeleted(Long countryId, BigInteger id);
+    MasterProcessingActivity findByIdAndCountryId(Long countryId, BigInteger id);
 
     MasterProcessingActivity findByid(BigInteger id);
 
@@ -23,6 +24,9 @@ public interface MasterProcessingActivityRepository extends MongoBaseRepository<
     MasterProcessingActivity findByNameAndCountryId(Long countryId, String name);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1},subProcess:true}")
-    List<MasterProcessingActivity> getAllMasterSubProcessingActivityByIds(Long countryId, List<BigInteger> subProcessingActivityIds);
+    List<MasterProcessingActivity> findAllMasterSubProcessingActivityByIds(Long countryId, Set<BigInteger> subProcessingActivityIds);
+
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1},subProcess:false}")
+    List<MasterProcessingActivity> findAllMasterProcessingActivityByIds(Long countryId, Set<BigInteger> subProcessingActivityIds);
 
 }
