@@ -2,55 +2,45 @@ package com.kairos.response.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.enums.gdpr.AssetAssessor;
 import com.kairos.response.dto.common.*;
 
 import java.math.BigInteger;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssetResponseDTO {
 
     private BigInteger id;
-
     private String name;
-
     private String description;
-
     private String hostingLocation;
-
     private ManagingOrganization managingDepartment;
-
     private Staff assetOwner;
-
     private List<StorageFormatResponseDTO> storageFormats;
-
     private List<OrganizationalSecurityMeasureResponseDTO> orgSecurityMeasures;
-
     private List<TechnicalSecurityMeasureResponseDTO> technicalSecurityMeasures;
-
     private HostingProviderResponseDTO hostingProvider;
-
     private HostingTypeResponseDTO hostingType;
-
     private DataDisposalResponseDTO dataDisposal;
-
     private AssetTypeBasicResponseDTO assetType;
-
     private List<AssetTypeBasicResponseDTO> assetSubTypes;
-
     private Integer dataRetentionPeriod;
-
     private Long minDataSubjectVolume;
-
     private Long maxDataSubjectVolume;
-
     private RiskSeverity risk;
-
     private boolean active;
+    private AssetAssessor assetAssessor;
 
+
+    public AssetAssessor getAssetAssessor() { return assetAssessor; }
+
+    public void setAssetAssessor(AssetAssessor assetAssessor) { this.assetAssessor = assetAssessor; }
 
     public BigInteger getId() { return id; }
 

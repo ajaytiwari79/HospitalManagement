@@ -87,6 +87,7 @@ public class AssetService extends MongoBaseService {
         asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
         asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
         asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
+        asset.setAssetAssessor(assetDTO.getAssetAssessor());
         assetMongoRepository.save(asset);
         assetDTO.setId(asset.getId());
         return assetDTO;

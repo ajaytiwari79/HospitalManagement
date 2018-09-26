@@ -2,6 +2,7 @@ package com.kairos.persistence.model.data_inventory.asset;
 
 
 import com.kairos.enums.RiskSeverity;
+import com.kairos.enums.gdpr.AssetAssessor;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
@@ -43,6 +44,8 @@ public class Asset extends MongoBaseEntity {
     @NotNull(message = "Status can't be empty")
     private boolean active=true;
     private boolean suggested;
+    private AssetAssessor assetAssessor;
+
 
     public Asset() {
     }
@@ -68,6 +71,9 @@ public class Asset extends MongoBaseEntity {
 
     public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
+    public AssetAssessor getAssetAssessor() { return assetAssessor; }
+
+    public void setAssetAssessor(AssetAssessor assetAssessor) { this.assetAssessor = assetAssessor; }
 
     public boolean isActive() { return active; }
 
