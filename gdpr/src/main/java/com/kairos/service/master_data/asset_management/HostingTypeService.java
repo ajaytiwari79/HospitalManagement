@@ -80,7 +80,7 @@ public class HostingTypeService extends MongoBaseService {
      * @return list of HostingType
      */
     public List<HostingTypeResponseDTO> getAllHostingType(Long countryId) {
-        return hostingTypeMongoRepository.findAllHostingTypes(countryId,new Sort(Sort.Direction.DESC, "_id"));
+        return hostingTypeMongoRepository.findAllHostingTypes(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

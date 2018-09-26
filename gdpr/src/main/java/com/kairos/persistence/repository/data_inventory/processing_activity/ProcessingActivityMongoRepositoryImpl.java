@@ -57,7 +57,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 lookup("responsibility_type", "responsibilityType", "_id", "responsibilityType"),
                 lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis"),
                 lookup("asset", "assetId", "_id", "asset"),
-                sort(Sort.Direction.DESC,"id")
+                sort(Sort.Direction.DESC,"createdAt")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
@@ -85,7 +85,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                         .addToSet("subProcessingActivities").as("subProcessingActivities"),
                 unwind("subProcessingActivities"),
                 new CustomAggregationOperation(replaceRootOperation),
-                sort(Sort.Direction.DESC, "id")
+                sort(Sort.Direction.DESC, "createdAt")
         );
 
         AggregationResults<ProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityResponseDTO.class);
@@ -115,7 +115,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false)),
                 lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
                 new CustomAggregationOperation(addNonDeletedSubProcessingActivityOperation),
-                sort(Sort.Direction.DESC, "id")
+                sort(Sort.Direction.DESC, "createdAt")
 
                 );
         AggregationResults<ProcessingActivityBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityBasicResponseDTO.class);

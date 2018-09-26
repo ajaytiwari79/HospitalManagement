@@ -90,7 +90,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
      * @return list of ProcessingLegalBasis
      */
     public List<ProcessingLegalBasisResponseDTO> getAllProcessingLegalBasis(Long organizationId) {
-        return legalBasisMongoRepository.findAllOrganizationProcessingLegalBases(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return legalBasisMongoRepository.findAllOrganizationProcessingLegalBases(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

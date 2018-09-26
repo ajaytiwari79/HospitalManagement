@@ -90,7 +90,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
      * @return list of DataSource
      */
     public List<DataSourceResponseDTO> getAllDataSource(Long organizationId) {
-        return dataSourceMongoRepository.findAllOrganizationDataSources(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return dataSourceMongoRepository.findAllOrganizationDataSources(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
