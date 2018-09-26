@@ -2,7 +2,7 @@ package com.kairos.controller.external_citizen_import;
 
 import com.kairos.service.external_citizen_import.AuthService;
 import com.kairos.service.external_citizen_import.CitizenService;
-import com.kairos.util.DateUtil;
+import com.kairos.utils.DateUtil;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

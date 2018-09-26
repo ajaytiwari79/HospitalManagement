@@ -1,5 +1,7 @@
 package com.kairos.service.organization;
 
+import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
@@ -11,6 +13,7 @@ import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.model.user.region.Municipality;
@@ -29,18 +32,19 @@ import com.kairos.persistence.repository.user.region.LevelGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.user.organization.*;
-import com.kairos.user.organization.UnitManagerDTO;
-import com.kairos.user.staff.staff.StaffCreationDTO;
-import com.kairos.util.FormatUtil;
+
+import com.kairos.dto.user.staff.staff.StaffCreationDTO;
+import com.kairos.utils.FormatUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +56,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.util.validator.company.OrganizationDetailsValidator.*;
+import static com.kairos.utils.validator.company.OrganizationDetailsValidator.*;
 
 /**
  * CreatedBy vipulpandey on 17/8/18
@@ -103,6 +107,8 @@ public class CompanyCreationService {
     private TimeSlotGraphRepository timeSlotGraphRepository;
     @Inject
     private UnitTypeGraphRepository unitTypeGraphRepository;
+    @Inject
+    private StaffGraphRepository staffGraphRepository;
 
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId, Long organizationId) {
@@ -266,7 +272,7 @@ public class CompanyCreationService {
                 user.setLastName(unitManagerDTO.getLastName());
                 userGraphRepository.save(user);
             } else {
-                if (unitManagerDTO != null && unitManagerDTO.getCprNumber() != null) {
+                if (unitManagerDTO.getCprNumber() != null) {
                     StaffCreationDTO unitManagerData = new StaffCreationDTO(unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(),
                             unitManagerDTO.getCprNumber(),
                             null, unitManagerDTO.getEmail(), null, unitManagerDTO.getEmail(), null, unitManagerDTO.getAccessGroupId());
@@ -278,27 +284,51 @@ public class CompanyCreationService {
             if (unitManagerDTO.getCprNumber() != null && unitManagerDTO.getCprNumber().length() != 10) {
                 exceptionService.actionNotPermittedException("message.cprNumber.size");
             }
+
             // user can fill any random property and we need to fetch
             User user = userGraphRepository.getUserOfOrganization(organization.getId());
             if (user != null) {
+                byte anotherUserExistBySameEmailOrCPR = userGraphRepository.validateUserEmailAndCPRExceptCurrentUser("(?)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber(), user.getId());
+                if (anotherUserExistBySameEmailOrCPR != 0) {
+                    exceptionService.duplicateDataException("message.cprNumberEmail.notNull");
+                }
                 user.setEmail(unitManagerDTO.getEmail());
+                user.setUserName(unitManagerDTO.getEmail());
                 user.setCprNumber(unitManagerDTO.getCprNumber());
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
+                setEncryptedPasswordInUser(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
                     staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId());
                 }
             } else {
-                user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail());
+                // No user is found its first time so we need to validate email and CPR number
+                //validate user email or name
+                if (unitManagerDTO.getCprNumber() != null || unitManagerDTO.getEmail() != null) {
+                    byte userBySameEmailOrCPR = userGraphRepository.findByEmailIgnoreCaseOrCprNumber("(?i)" + unitManagerDTO.getEmail(), unitManagerDTO.getCprNumber());
+                    if (userBySameEmailOrCPR != 0) {
+                        exceptionService.duplicateDataException("user already exist by email or cpr");
+                    }
+                }
+                user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
+                setEncryptedPasswordInUser(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization);
 
             }
         }
-
         return unitManagerDTO;
     }
+
+    //It checks null as well
+    private void setEncryptedPasswordInUser(UnitManagerDTO unitManagerDTO, User user) {
+        if (StringUtils.isNotEmpty(unitManagerDTO.getFirstName())) {
+            user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
+        }
+
+    }
+
 
     public StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId) {
         return userGraphRepository.getUnitManagerOfOrganization(unitId);
@@ -365,7 +395,7 @@ public class CompanyCreationService {
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
-        if (organizationBasicDTO.getUnitManager() != null) {
+        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
             setUserInfoInOrganization(null, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
         }
         //Assign Parent Organization's level to unit
@@ -381,6 +411,16 @@ public class CompanyCreationService {
 
     }
 
+    private boolean doesUnitManagerInfoAvailable(OrganizationBasicDTO organizationBasicDTO) {
+        if (organizationBasicDTO.getUnitManager() != null
+                && (organizationBasicDTO.getUnitManager().getEmail() != null || organizationBasicDTO.getUnitManager().getLastName() != null ||
+                organizationBasicDTO.getUnitManager().getFirstName() != null || organizationBasicDTO.getUnitManager().getCprNumber() != null ||
+                organizationBasicDTO.getUnitManager().getAccessGroupId() != null)) {
+            return true;
+        }
+        return false;
+    }
+
     private void setDefaultDataFromParentOrganization(Organization unit, Organization parentOrganization, OrganizationBasicDTO organizationBasicDTO) {
         unit.setOrganizationType(parentOrganization.getOrganizationType());
         unit.setAccountType(parentOrganization.getAccountType());
@@ -391,17 +431,17 @@ public class CompanyCreationService {
     }
 
     public OrganizationBasicDTO updateUnit(OrganizationBasicDTO organizationBasicDTO, Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", unitId);
         }
-        updateOrganizationDetails(organization, organizationBasicDTO, false);
+        updateOrganizationDetails(unit, organizationBasicDTO, false);
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
-        setOrganizationTypeAndSubTypeInOrganization(organization, organizationBasicDTO, null);
-        if (Optional.ofNullable(organizationBasicDTO.getUnitManager()).isPresent()) {
-            setUserInfoInOrganization(unitId, organization, organizationBasicDTO.getUnitManager(), organization.isBoardingCompleted(), false);
+        setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO, null);
+        if (doesUnitManagerInfoAvailable(organizationBasicDTO)) {
+            setUserInfoInOrganization(unitId, unit, organizationBasicDTO.getUnitManager(), unit.isBoardingCompleted(), false);
         }
-        organizationGraphRepository.save(organization);
+        organizationGraphRepository.save(unit);
         return organizationBasicDTO;
 
     }
@@ -486,12 +526,14 @@ public class CompanyCreationService {
         validateBasicDetails(organizations, exceptionService);
 
         List<Long> unitIds = organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList());
-        unitIds.add(organizationId);
 
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds);
+
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
+        unitIds.add(organizationId);
         if (staffPersonalDetailDTOS.size() != unitIds.size()) {
             exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
         }
+
         validateUserDetails(staffPersonalDetailDTOS, exceptionService);
 
         List<OrganizationContactAddress> organizationContactAddresses = organizationGraphRepository.getContactAddressOfOrganizations(unitIds);
@@ -500,6 +542,9 @@ public class CompanyCreationService {
         organization.getChildren().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
         organization.setBoardingCompleted(true);
         organizationGraphRepository.save(organization);
+
+        addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
+
 
         // if more than 2 default things needed make a  async service Please
 
@@ -519,5 +564,13 @@ public class CompanyCreationService {
 
         return true;
     }
+
+    private void addStaffsInChatServer(List<Staff> staffList) {
+        staffList.forEach(staff -> {
+            staffService.addStaffInChatServer(staff);
+        });
+        staffGraphRepository.saveAll(staffList);
+    }
+
 
 }

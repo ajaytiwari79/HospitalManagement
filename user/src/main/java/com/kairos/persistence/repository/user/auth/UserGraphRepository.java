@@ -42,8 +42,6 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     User findByAccessToken(String accessToken);
 
-    @Query("MATCH (u:User) WHERE id(u) = {0} SET org.isDeleted = true ")
-    void safeDelete(Long aLong);
 
     @Query("Match (organization:Organization{isEnable:true})-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={0} with organization\n" +
             "return id(organization) as id,organization.name as name,organization.isKairosHub as isKairosHub")
@@ -56,7 +54,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "Match (staff)-[:STAFF_HAS_ACCESS_GROUP]->(accessGroup:AccessGroup)-[r:ACCESS_GROUP_HAS_ACCESS_TO_PAGE]->(subPage) return {pageId:id(subPage),pageName:subPage.name,read:r.read,write:r.write} as result")
     List<Map<String, Object>> getPermissionForModuleInOrganization(long accessPageId, long orgId, long userId);
 
-    @Query("MATCH (u:User) WHERE u.email={0} AND Not u:Client RETURN u")
+    @Query("MATCH (u:User) WHERE u.email=~{0} AND Not u:Client RETURN u")
     User findByEmail(String email);
 
     User findByKmdExternalId(Long kmdExternalId);
@@ -64,7 +62,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("Match (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={0} with organization,employment\n" +
             "optional match (organization)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization) with organization+[unit] as coll,employment\n" +
             "unwind coll as units with distinct units,employment\n" +
-            "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]->(unitEmp:UnitEmployment)-[:APPLICABLE_IN_UNIT]->(units) with unitEmp,units\n" +
+            "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]->(unitEmp:UnitPermission)-[:APPLICABLE_IN_UNIT]->(units) with unitEmp,units\n" +
             "Match (unitEmp)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission) with accessPermission,units\n" +
             "MATCH (accessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,accessPermission,units\n" +
             "Match (accessPermission)-[modulePermission:HAS_ACCESS_PAGE_PERMISSION]->(accessPage:AccessPage) with accessPage,accessPermission,modulePermission,units\n" +
@@ -79,8 +77,8 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     Boolean checkIfUserIsCountryAdmin(Long userId, String accessGroupName);
 
     @Query("Match (u:User) WHERE id(u)={0} " +
-            "MATCH (u)<-[:"+BELONGS_TO+"]-(s:Staff)<-[:"+BELONGS_TO+"]-(e:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization)-[:"+COUNTRY+"]->(c:Country) return c")
-    Country getCountryOfUser(Long userId);
+            "MATCH (u)<-[:"+BELONGS_TO+"]-(s:Staff)<-[:"+BELONGS_TO+"]-(e:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(organization:Organization)-[:"+COUNTRY+"]->(c:Country) return id(c)")
+    Long  getCountryOfUser(Long userId);
 
     @Query("Match(user:User)-[:"+ SELECTED_LANGUAGE +"]->(userLanguage:SystemLanguage{deleted:false}) where id(user)={0} return id(userLanguage)")
     Long getUserSelectedLanguageId(Long userId);
@@ -94,16 +92,30 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "return  id(org) as organizationId ,id(user) as id, user.email as email,user.firstName as firstName,ag.name as accessGroupName,id(ag) as accessGroupId,user.lastName as lastName ,user.cprNumber as cprNumber,user.creationDate as creationDate ORDER BY user.creationDate DESC LIMIT 1" )
     StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId);
 
-    @Query("Match (org:Organization) where id(org) IN {0}" +
+    @Query("Match (org:Organization) where id(org)  = {1}" +
             "Optional Match (emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) with org,unitPermission,emp\n" +
             "Optional Match (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) with org,unitPermission,emp,r1,ag\n" +
             "Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
-            "return  id(org) as organizationId ,user.email as email,id(user) as id,ag.name as accessGroupName,id(ag) as accessGroupId, user.firstName as firstName,user.lastName as lastName ,user.cprNumber as cprNumber,user.creationDate as creationDate ORDER BY user.creationDate DESC LIMIT 1" )
-    List<StaffPersonalDetailDTO> getUnitManagerOfOrganization(List<Long> unitId);
+            "return  id(org) as organizationId ,user.email as email,id(user) as id,ag.name as accessGroupName,id(ag) as accessGroupId, user.firstName as firstName,user.lastName as lastName ,user.cprNumber as cprNumber,staff as staff,user.creationDate as creationDate " +
+            "UNION " +
+            "Match (org:Organization),(child:Organization) where id(org) = {1} and id(child) IN {0}\n" +
+            " Optional Match (org)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission) with child,emp,unitPermission\n" +
+            " MATCH (unitPermission)-[:APPLICABLE_IN_UNIT]->(child) with  unitPermission,emp,child\n" +
+            "Optional Match (unitPermission)-[r1:HAS_ACCESS_GROUP]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) with child,emp,ag\n" +
+            "Match (emp)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]-(user:User) \n" +
+            "return  id(child) as organizationId ,user.email as email,id(user) as id,ag.name as accessGroupName,id(ag) as accessGroupId, user.firstName as firstName,user.lastName as lastName,user.cprNumber as cprNumber,staff as staff,user.creationDate as creationDate " )
+
+    List<StaffPersonalDetailDTO> getUnitManagerOfOrganization(List<Long> unitId,Long parentOrganizationId);
 
     @Query("Match (org:Organization) where id(org)={0}" +
-            "Optional Match (emp:Employment)<-[:"+HAS_EMPLOYMENTS+"]-(org) with org,emp\n" +
-            "Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
-            " return user " )
+            "Optional Match (emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) with emp"+
+            " Match (emp)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
+            "return user " )
     User getUserOfOrganization(Long unitId);
+
+    @Query("MATCH (user:User) WHERE user.cprNumber={1} OR user.email=~{0}  RETURN count(user) ")
+    byte findByEmailIgnoreCaseOrCprNumber(String email, String cprNumber);
+
+    @Query("MATCH (user:User) WHERE ( user.cprNumber={1} OR user.email=~{0} ) AND id(user)<>{2} RETURN count(user) ")
+    byte validateUserEmailAndCPRExceptCurrentUser(String email, String cprNumber, Long userId);
 }

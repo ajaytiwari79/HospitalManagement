@@ -1,9 +1,10 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
-import com.kairos.dto.KairosSchedulerLogsDTO;
-import com.kairos.dto.SchedulerPanelDTO;
+import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
+import com.kairos.dto.scheduler.LocalDateTimeIdDTO;
+import com.kairos.dto.scheduler.SchedulerPanelDTO;
+import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
-import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.persistence.model.scheduler_panel.jobDetails.JobDetails;
@@ -14,9 +15,10 @@ import com.kairos.scheduler.persistence.repository.SchedulerPanelRepository;
 import com.kairos.scheduler.persistence.repository.UnitTimeZoneMappingRepository;
 import com.kairos.scheduler.service.MongoBaseService;
 
+import com.kairos.scheduler.service.UserIntegrationService;
 import com.kairos.scheduler.service.exception.ExceptionService;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_INTERVAL_STRING;
 import static com.kairos.scheduler.constants.AppConstants.SCHEDULER_PANEL_RUN_ONCE_STRING;
@@ -53,79 +55,96 @@ public class SchedulerPanelService extends MongoBaseService {
     @Inject
     private JobDetailsRepository jobDetailsRepository;
     @Inject
-    private UnitTimeZoneMappingRepository unitTimeZoneMappingRepository;
-    @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private UserIntegrationService userIntegrationService;
 
 
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerPanelService.class);
 
 
-    @PostConstruct
+
     public void initSchedulerPanels() {
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByDeletedFalse();
         logger.debug("Inside initSchedulerPanels");
-        List<Long> unitIds = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getUnitId()).
-                collect(Collectors.toList());
-        List<UnitTimeZoneMapping> unitTimeZoneMappings=unitTimeZoneMappingRepository.findAllByDeletedFalseAndUnitIdIn(unitIds);
+        if(!schedulerPanels.isEmpty()) {
+            List<Long> unitIds = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getUnitId()).
+                    collect(Collectors.toList());
+            List<UnitTimeZoneMappingDTO> unitTimeZoneMappingDTOS = userIntegrationService.getTimeZoneOfAllUnits();
 
-        Map<Long,String> unitIdTimeZoneMap = unitTimeZoneMappings.stream().collect(Collectors.toMap(unitTimeZoneMapping->{return unitTimeZoneMapping.getUnitId();},unitTimeZoneMapping->{return unitTimeZoneMapping.getTimezone();}));
+            Map<Long,String> unitIdTimeZoneMap = unitTimeZoneMappingDTOS.stream().filter(unitTimeZoneMappingDTO -> Optional.ofNullable(unitTimeZoneMappingDTO.getTimezone()).isPresent()).
+                    collect(Collectors.toMap(unitTimeZoneMapping->{return unitTimeZoneMapping.getUnitId();},unitTimeZoneMapping->{return unitTimeZoneMapping.getTimezone();}));
 
-        for(SchedulerPanel schedulerPanel:schedulerPanels) {
-            if(!(schedulerPanel.isOneTimeTrigger()&&schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
-                dynamicCronScheduler.setCronScheduling(schedulerPanel,unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
+            for(SchedulerPanel schedulerPanel:schedulerPanels) {
+                if(!(schedulerPanel.isOneTimeTrigger()&&schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
+                    logger.info("Inside initSchedulerPanels"+schedulerPanel.getUnitId()+" unitId = "+unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));
+                    dynamicCronScheduler.setCronScheduling(schedulerPanel,unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
+                }
             }
         }
+
 
     }
 
-    public SchedulerPanelDTO createSchedulerPanel(long unitId, SchedulerPanelDTO schedulerPanelDTO, BigInteger integrationConfigurationId) {
-        logger.info("integrationConfigurationId-----> "+integrationConfigurationId);
-        SchedulerPanel schedulerPanel = new SchedulerPanel();
-        ObjectMapperUtils.copyProperties(schedulerPanelDTO,schedulerPanel);
-        if(Optional.ofNullable(integrationConfigurationId).isPresent()) {
-            Optional<IntegrationSettings> integrationConfigurationOpt = integrationConfigurationRepository.findById(integrationConfigurationId);
-            IntegrationSettings integrationSettings = integrationConfigurationOpt.isPresent()?integrationConfigurationOpt.get(): null;
-            if(integrationConfigurationOpt.isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.integrationsettings.notfound",integrationConfigurationId);
+    public List<SchedulerPanelDTO> createSchedulerPanel(long unitId, List<SchedulerPanelDTO> schedulerPanelDTOs) {
+
+        //logger.info("integrationConfigurationId-----> "+integrationConfigurationId);
+
+        if(schedulerPanelDTOs.isEmpty()) {
+            exceptionService.invalidRequestException("request.invalid");
+        }
+        List<SchedulerPanel> schedulerPanels =  new ArrayList<>();
+        for(SchedulerPanelDTO schedulerPanelDTO:schedulerPanelDTOs) {
+            SchedulerPanel schedulerPanel = new SchedulerPanel();
+            ObjectMapperUtils.copyProperties(schedulerPanelDTO,schedulerPanel);
+            if(Optional.ofNullable(schedulerPanelDTO.getIntegrationConfigurationId()).isPresent()) {
+                Optional<IntegrationSettings> integrationConfigurationOpt = integrationConfigurationRepository.findById(schedulerPanelDTO.getIntegrationConfigurationId());
+                //    IntegrationSettings integrationSettings = integrationConfigurationOpt.isPresent()?integrationConfigurationOpt.get(): null;
+                if(integrationConfigurationOpt.isPresent()) {
+                    exceptionService.dataNotFoundByIdException("message.integrationsettings.notfound",schedulerPanelDTO.getIntegrationConfigurationId());
+
+                }
+                schedulerPanel.setIntegrationConfigurationId(schedulerPanelDTO.getIntegrationConfigurationId());
 
             }
-            schedulerPanel.setIntegrationConfigurationId(integrationConfigurationId);
 
-        }
+            //schedulerPanel.setProcessType(integrationConfiguration.getName());
+            String interval;
+            String cronExpression;
 
-        //schedulerPanel.setProcessType(integrationConfiguration.getName());
-        String interval;
-        String cronExpression;
+            if(!schedulerPanel.isOneTimeTrigger()) {
+                if (schedulerPanel.getRunOnce() == null) {
+                    cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getStartMinute(), schedulerPanel.getSelectedHours());
+                }
+                else {
+                    cronExpression = cronExpressionRunOnceBuilder(schedulerPanel.getDays(), schedulerPanel.getRunOnce());
+                }
+                schedulerPanel.setCronExpression(cronExpression);
+                interval = intervalStringBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getRunOnce());
+                schedulerPanel.setInterval(interval);
 
-        if(!schedulerPanel.isOneTimeTrigger()) {
-            if (schedulerPanel.getRunOnce() == null) {
-                cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getStartMinute(), schedulerPanel.getSelectedHours());
             }
             else {
-                cronExpression = cronExpressionRunOnceBuilder(schedulerPanel.getDays(), schedulerPanel.getRunOnce());
+                schedulerPanel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());
             }
-            schedulerPanel.setCronExpression(cronExpression);
-            interval = intervalStringBuilder(schedulerPanel.getDays(), schedulerPanel.getRepeat(), schedulerPanel.getRunOnce());
-            schedulerPanel.setInterval(interval);
 
+            schedulerPanel.setActive(true);
+
+            schedulerPanel.setUnitId(unitId);
+            //dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone);
+
+            schedulerPanels.add(schedulerPanel);
         }
-        else {
-            schedulerPanel.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate().withHour(9).withMinute(30));
+        save(schedulerPanels);
+        String timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
+
+        //schedulerPanels.stream().map(schedulerPanel-> dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone));
+        for(SchedulerPanel schedulerPanel:schedulerPanels) {
+            dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone);
         }
-
-        schedulerPanel.setActive(true);
-
-        String timezone = unitTimeZoneMappingRepository.findByUnitId(schedulerPanel.getUnitId()).getTimezone();
-        schedulerPanel.setUnitId(unitId);
-        save(schedulerPanel);
-
-        ObjectMapperUtils.copyProperties(schedulerPanel,schedulerPanelDTO);
-
-        dynamicCronScheduler.setCronScheduling(schedulerPanel,timezone);
-        System.out.println("log-----> "+logger.toString());
-        return schedulerPanelDTO;
+        //      System.out.println("log-----> "+logger.toString());
+        return  ObjectMapperUtils.copyPropertiesOfListByMapper(schedulerPanels,SchedulerPanelDTO.class);
     }
 
     public SchedulerPanelDTO updateSchedulerPanel(SchedulerPanelDTO schedulerPanelDTO,BigInteger schedulerPanelId)  {
@@ -164,47 +183,70 @@ public class SchedulerPanelService extends MongoBaseService {
         }
 
         save(panel);
-        String timezone = unitTimeZoneMappingRepository.findByUnitId(schedulerPanelDTO.getUnitId()).getTimezone();
+        String timezone = userIntegrationService.getTimeZoneOfUnit(schedulerPanelDTO.getUnitId());
 
         dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
         dynamicCronScheduler.startCronJob(panel,timezone);
         return ObjectMapperUtils.copyPropertiesByMapper(panel,SchedulerPanelDTO.class);
     }
 
+    public List<LocalDateTimeIdDTO> updateSchedulerPanelsOneTimeTriggerDate(List<LocalDateTimeIdDTO> localDateTimeIdDTOS, Long unitId) {
+
+        Set<BigInteger> schedulerPanelIDs = localDateTimeIdDTOS.stream().map(localDateTimeIdDTO -> localDateTimeIdDTO.getId()).collect(Collectors.toSet());
+
+        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByIdsIn(schedulerPanelIDs);
+        Map<BigInteger,SchedulerPanel>schedulerPanelsById = schedulerPanels.stream().collect(Collectors.toMap(k->k.getId(), v->v));
+        String timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
+
+        SchedulerPanel schedulerPanel;
+
+        List<SchedulerPanel> schedulerPanelsUpdated = new ArrayList<>();
+        for(LocalDateTimeIdDTO localDateTimeIdDTO: localDateTimeIdDTOS) {
+            schedulerPanel = schedulerPanelsById.get(localDateTimeIdDTO.getId());
+            schedulerPanel.setOneTimeTriggerDate(localDateTimeIdDTO.getDateTime());
+            schedulerPanelsUpdated.add(schedulerPanel);
+            dynamicCronScheduler.stopCronJob("scheduler"+localDateTimeIdDTO.getId());
+            dynamicCronScheduler.startCronJob(schedulerPanel,timezone);
+
+
+        }
+        save(schedulerPanelsUpdated);
+
+        return localDateTimeIdDTOS;
+    }
+
     public void updateSchedulerPanelByJobSubTypeAndEntityId(SchedulerPanelDTO schedulerPanelDTO) {
 
         SchedulerPanel schedulerPanelDB = schedulerPanelRepository.findByJobSubTypeAndEntityIdAndUnitId(schedulerPanelDTO.getJobSubType(),schedulerPanelDTO.getEntityId(),schedulerPanelDTO.getUnitId());
-       if(!Optional.ofNullable(schedulerPanelDB).isPresent()) {
-           createSchedulerPanel(schedulerPanelDTO.getUnitId(),schedulerPanelDTO, null);
-       }
+        if(!Optional.ofNullable(schedulerPanelDB).isPresent()) {
+            createSchedulerPanel(schedulerPanelDTO.getUnitId(),Stream.of(schedulerPanelDTO).collect(Collectors.toList()));
+        }
+        else {
 
-       else {
+            String interval;
+            String cronExpression;
 
-           String interval;
-           String cronExpression;
+            if(!schedulerPanelDTO.isOneTimeTrigger()) {
+                interval = intervalStringBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRepeat(), schedulerPanelDTO.getRunOnce());
+                schedulerPanelDB.setInterval(interval);
+                if(schedulerPanelDTO.getRunOnce() == null) {
+                    cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRepeat(), schedulerPanelDTO.getStartMinute(), schedulerPanelDTO.getSelectedHours());
+                } else
+                    cronExpression = cronExpressionRunOnceBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRunOnce());
+                schedulerPanelDB.setCronExpression(cronExpression);
+                schedulerPanelDB.setDays(schedulerPanelDTO.getDays());
+                schedulerPanelDB.setSelectedHours(schedulerPanelDTO.getSelectedHours());
 
-           if(!schedulerPanelDTO.isOneTimeTrigger()) {
-               interval = intervalStringBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRepeat(), schedulerPanelDTO.getRunOnce());
-               schedulerPanelDB.setInterval(interval);
-               if(schedulerPanelDTO.getRunOnce() == null) {
-                   cronExpression = cronExpressionSelectedHoursBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRepeat(), schedulerPanelDTO.getStartMinute(), schedulerPanelDTO.getSelectedHours());
-               } else
-                   cronExpression = cronExpressionRunOnceBuilder(schedulerPanelDTO.getDays(), schedulerPanelDTO.getRunOnce());
-               schedulerPanelDB.setCronExpression(cronExpression);
-               schedulerPanelDB.setDays(schedulerPanelDTO.getDays());
-               schedulerPanelDB.setSelectedHours(schedulerPanelDTO.getSelectedHours());
+            }
+            else {
+                schedulerPanelDB.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate());           }
 
-           }
-           else {
-               schedulerPanelDB.setOneTimeTriggerDate(schedulerPanelDTO.getOneTimeTriggerDate().withHour(9).withMinute(30));
-           }
+            save(schedulerPanelDB);
+            String timezone = userIntegrationService.getTimeZoneOfUnit(schedulerPanelDTO.getUnitId());
 
-           save(schedulerPanelDB);
-           String timezone = unitTimeZoneMappingRepository.findByUnitId(schedulerPanelDTO.getUnitId()).getTimezone();
-
-           dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanelDB.getId());
-           dynamicCronScheduler.startCronJob(schedulerPanelDB,timezone);
-       }
+            dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanelDB.getId());
+            dynamicCronScheduler.startCronJob(schedulerPanelDB,timezone);
+        }
 
     }
 
@@ -222,10 +264,10 @@ public class SchedulerPanelService extends MongoBaseService {
     }
 
     public List<SchedulerPanelDTO> getSchedulerPanelByUnitId(long unitId) {
-            //List<Map<String, Object>> controlPanels = schedulerPanelRepository.findByUnitId(unitId);
-            List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitId(unitId);
-            List<SchedulerPanelDTO> schedulerPanelDTOS =ObjectMapperUtils.copyPropertiesOfListByMapper(schedulerPanels,SchedulerPanelDTO.class);
-            return schedulerPanelDTOS;
+        //List<Map<String, Object>> controlPanels = schedulerPanelRepository.findByUnitId(unitId);
+        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByUnitId(unitId);
+        List<SchedulerPanelDTO> schedulerPanelDTOS =ObjectMapperUtils.copyPropertiesOfListByMapper(schedulerPanels,SchedulerPanelDTO.class);
+        return schedulerPanelDTOS;
 
     }
 
@@ -309,17 +351,25 @@ public class SchedulerPanelService extends MongoBaseService {
         return jobDetailsRepository.findAllBySchedulerPanelIdOrderByStartedDesc(schedulerPanelId);
     }
 
-    public Boolean deleteJob(BigInteger schedulerPanelId){
+    public Boolean deleteJob(Set<BigInteger> schedulerPanelIds){
         try {
-            Optional<SchedulerPanel> panelOptional = schedulerPanelRepository.findById(schedulerPanelId);
-            if(!panelOptional.isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
+            if(schedulerPanelIds.isEmpty()) {
+                exceptionService.invalidRequestException("request.invalid");
             }
-            SchedulerPanel panel = panelOptional.get();
-            dynamicCronScheduler.stopCronJob("scheduler"+panel.getId());
-            panel.setActive(false);
-            panel.setDeleted(true);
-            schedulerPanelRepository.save(panel);
+            List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByIdsIn(schedulerPanelIds);
+            Set<BigInteger> schedulerPanelIdsDB = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getId()).collect(Collectors.toSet());
+            for(BigInteger schedulerPanelId:schedulerPanelIds) {
+                if(!schedulerPanelIdsDB.contains(schedulerPanelId)){
+                    exceptionService.dataNotFoundByIdException("message.schedulerpanel.notfound",schedulerPanelId);
+                }
+            }
+
+            for(SchedulerPanel schedulerPanel:schedulerPanels) {
+                schedulerPanel.setDeleted(true);
+                dynamicCronScheduler.stopCronJob("scheduler"+schedulerPanel.getId());
+                schedulerPanel.setActive(false);
+            }
+            save(schedulerPanels);
             return true;
         }catch (Exception exception){
             return false;
@@ -352,4 +402,3 @@ public class SchedulerPanelService extends MongoBaseService {
 
 
 }
-

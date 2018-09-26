@@ -1,10 +1,10 @@
 package com.kairos.persistence.repository.repository_impl;
 
-import com.kairos.activity.task_type.TaskTypeResponseDTO;
+import com.kairos.dto.activity.task_type.TaskTypeResponseDTO;
 import com.kairos.persistence.model.task_demand.TaskDemand;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.repository.task_type.CustomTaskTypeRepository;
-import com.kairos.user.staff.client.ClientFilterDTO;
+import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.wrapper.OrgTaskTypeAggregateResult;
 import com.kairos.wrapper.TaskTypeAggregateResult;
 import org.slf4j.Logger;

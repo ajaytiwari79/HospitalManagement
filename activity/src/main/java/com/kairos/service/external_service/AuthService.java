@@ -1,6 +1,6 @@
 package com.kairos.service.external_service;
 import com.kairos.constants.AppConstants;
-import com.kairos.util.DateUtils;
+import com.kairos.commons.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JacksonJsonParser;

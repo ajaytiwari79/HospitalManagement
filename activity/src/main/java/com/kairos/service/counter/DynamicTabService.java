@@ -1,18 +1,16 @@
 package com.kairos.service.counter;
 
-import com.kairos.activity.counter.KPICategoryDTO;
-import com.kairos.activity.counter.KPIDashboardDTO;
-import com.kairos.activity.counter.distribution.category.KPIDashboardUpdationDTO;
-import com.kairos.activity.counter.enums.ConfLevel;
-import com.kairos.persistence.model.counter.CategoryKPIConf;
-import com.kairos.persistence.model.counter.KPICategory;
-import com.kairos.persistence.model.counter.chart.KPIDashboard;
+import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
+import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
+import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.persistence.model.counter.KPIDashboard;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.GenericIntegrationService;
-import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -34,7 +32,8 @@ public class DynamicTabService extends MongoBaseService {
 
     public List<KPIDashboardDTO> getDashboardTabOfRef(Long refId, ConfLevel level){
         if(ConfLevel.STAFF.equals(level)){
-            refId=genericIntegrationService.getStaffIdByUserId(refId);
+            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
+            refId=accessGroupPermissionCounterDTO.getStaffId();
         }
         List<KPIDashboardDTO> kpiDashboardDTOS=counterRepository.getKPIDashboard(null,level,refId);
         return kpiDashboardDTOS;
@@ -43,7 +42,8 @@ public class DynamicTabService extends MongoBaseService {
     public List<KPIDashboardDTO> addDashboardTabToRef(Long unitId, Long countryId, List<KPIDashboardDTO> kpiDashboardDTOS, ConfLevel level) {
         Long staffId;
         if(ConfLevel.STAFF.equals(level)){
-            staffId=genericIntegrationService.getStaffIdByUserId(unitId);
+            AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO =genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
+            staffId=accessGroupPermissionCounterDTO.getStaffId();
         }else{
             staffId=null;
         }
@@ -51,7 +51,7 @@ public class DynamicTabService extends MongoBaseService {
         verifyForDashboardTabAvailability(names, unitId,staffId, countryId, level);
         List<KPIDashboard> kpiDashboards = new ArrayList<>();
         kpiDashboardDTOS.stream().forEach(kpiDashboardDTO -> {
-            kpiDashboards.add(new KPIDashboard(kpiDashboardDTO.getParentModuleId(), kpiDashboardDTO.getName(), countryId, unitId,staffId, level));
+            kpiDashboards.add(new KPIDashboard(kpiDashboardDTO.getParentModuleId(),kpiDashboardDTO.getModuleId(), kpiDashboardDTO.getName(), countryId, unitId,staffId, level));
         });
         save(kpiDashboards);
         kpiDashboards.stream().forEach(kpiDashboard -> {

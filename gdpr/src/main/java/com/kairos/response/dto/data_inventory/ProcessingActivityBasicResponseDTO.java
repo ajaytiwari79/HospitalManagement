@@ -2,7 +2,7 @@ package com.kairos.response.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.gdpr.ManagingOrganization;
+import com.kairos.dto.gdpr.ManagingOrganization;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;

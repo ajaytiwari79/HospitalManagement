@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.open_shift;
 
 
-import com.kairos.activity.activity.ActivityDTO;
-import com.kairos.activity.counter.CounterDTO;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
 
 import java.util.List;
 

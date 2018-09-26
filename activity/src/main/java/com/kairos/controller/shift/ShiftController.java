@@ -1,13 +1,15 @@
 package com.kairos.controller.shift;
 
-import com.kairos.activity.shift.*;
+import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
+import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftService;
-import com.kairos.activity.shift.CopyShiftDTO;
-import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.dto.activity.shift.CopyShiftDTO;
+import com.kairos.dto.activity.shift.ShiftPublishDTO;
 import com.kairos.service.shift.ShiftSickService;
-import com.kairos.util.DateUtils;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,8 +21,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -176,9 +176,10 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
     @ApiOperation("API is used to add shift of user when user is sick")
-    @GetMapping("/staff/{staffId}/shift_on_sick")
-    public ResponseEntity<Map<String,Object>> markUserAsSick(@PathVariable Long unitId,@PathVariable Long staffId,@RequestParam ("activitySelected") BigInteger activityId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftSickService.createSicknessShiftsOfStaff(unitId,activityId,staffId));
+    @PostMapping("/staff/{staffId}/shift_on_sick")
+    public ResponseEntity<Map<String,Object>> markUserAsSick(@PathVariable Long unitId, @PathVariable Long staffId, @RequestParam ("activitySelected") BigInteger activityId,
+                                                             @RequestBody Duration duration){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftSickService.createSicknessShiftsOfStaff(unitId,activityId,staffId,duration));
     }
 
 }

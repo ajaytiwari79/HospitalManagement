@@ -4,7 +4,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.PaymentSettings;
-import com.kairos.user.organization.PaymentSettingsDTO;
+import com.kairos.dto.user.organization.PaymentSettingsDTO;
 import com.kairos.persistence.model.organization.PaymentSettingsQueryResult;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.query_results.ClientHomeAddressQueryResult;

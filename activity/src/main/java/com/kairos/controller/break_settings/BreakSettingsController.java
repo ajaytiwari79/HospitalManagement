@@ -1,8 +1,8 @@
 package com.kairos.controller.break_settings;
 
 import com.kairos.service.break_settings.BreakSettingsService;
-import com.kairos.util.response.ResponseHandler;
-import com.kairos.activity.break_settings.BreakSettingsDTO;
+import com.kairos.utils.response.ResponseHandler;
+import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;

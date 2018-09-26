@@ -2,7 +2,7 @@ package com.kairos.controller.country;
 import com.kairos.service.country.CountryHolidayCalenderService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.google_calender.GoogleCalenderService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -70,7 +70,7 @@ public class CountryHolidayCalenderController {
 
 
     @RequestMapping(value = "/holiday",method = RequestMethod.POST)
-    @ApiOperation("Update a new CountryHolidayCalenderController holiday by id")
+    @ApiOperation("save a new CountryHolidayCalenderController holiday by id")
     ResponseEntity<Map<String, Object>> addCountryCalenderToCountry(@PathVariable Long countryId ,@RequestBody Map<String,Object> countryHolidayCalender) throws Exception{
         return ResponseHandler.generateResponse(HttpStatus.OK,true,countryHolidayCalenderService.createHolidayCalenderByCountryId(countryId,countryHolidayCalender));
     }

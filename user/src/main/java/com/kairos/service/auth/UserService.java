@@ -11,7 +11,7 @@ import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
-import com.kairos.user.staff.staff.UnitWiseStaffPermissionsDTO;
+import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -21,12 +21,12 @@ import com.kairos.service.SmsService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.user.password.FirstTimePasswordUpdateDTO;
-import com.kairos.util.CPRUtil;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.OtpGenerator;
-import com.kairos.util.user_context.UserContext;
+import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
+import com.kairos.utils.CPRUtil;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.OtpGenerator;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -113,17 +113,6 @@ public class UserService {
 
 
     /**
-     * SafeDelete--> makes BaseEntity class property(isDelete) = true
-     * Calls UserGraphRepository and Safe delete user by id given in method argument
-     *
-     * @param id
-     */
-    public void safeDeleteUserById(Long id) {
-        userGraphRepository.safeDelete(id);
-    }
-
-
-    /**
      * Calls UserGraphRepository , find User by id as provided in method argument
      * and return updated User
      *
@@ -168,10 +157,11 @@ public class UserService {
      *
      * @param user
      * @return User
+     *
      */
     public Map<String, Object> authenticateUser(User user) {
 
-        User currentUser = userDetailsService.loadUserByUsername(user.getUserName(), user.getPassword());
+        User currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
         if (currentUser == null) {
             return null;
         }
@@ -183,29 +173,6 @@ public class UserService {
         //map.put("isPasswordUpdated", currentUser.isPasswordUpdated());
         map.put("otp", otp);
         return map;
-
-    }
-
-
-    public UserAuthentication authenticateUser(String username, String password) {
-
-        User currentUser = userDetailsService.loadUserByUsername(username, password);
-        if (currentUser == null) {
-            return null;
-        }
-        generateTokenToUser(currentUser);
-        return new UserAuthentication(currentUser);
-        /* *//*ContactDetail contactDetail = user.getContactDetail();
-        if(contactDetail == null && contactDetail.getMobilePhone() != null){
-            throw new InternalError("phone number is null");
-        }*//*
-        int otp = OtpGenerator.generateOtp();
-        user.setOtp(otp);
-        userGraphRepository.save(user);
-        //send otp in sms
-        String message = OTP_MESSAGE + otp;
-        smsService.sendSms("+919643042678", message);*/
-        //return true;
 
     }
 
@@ -315,7 +282,7 @@ public class UserService {
      */
     public Map<String, Object> authenticateUserFromMobileApi(User user) {
 
-        User currentUser = userDetailsService.loadUserByUsername(user.getUserName(), user.getPassword());
+        User currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
         if (currentUser == null) {
             return null;
         }
@@ -372,7 +339,7 @@ public class UserService {
     }
 
     public boolean updatePassword(FirstTimePasswordUpdateDTO firstTimePasswordUpdateDTO) {
-        User user = userGraphRepository.findByEmail(firstTimePasswordUpdateDTO.getEmail());
+        User user = userGraphRepository.findByEmail("(?i)"+firstTimePasswordUpdateDTO.getEmail());
         if (user == null) {
             logger.error("User not found belongs to this email " + firstTimePasswordUpdateDTO.getEmail());
             exceptionService.dataNotFoundByIdException("message.user.email.notFound", firstTimePasswordUpdateDTO.getEmail());

@@ -1,7 +1,7 @@
 package com.planner.controller;
 
 
-import com.kairos.planner.solverconfig.SolverConfigWTADTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigWTADTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.config.SolverConfigService;
 import io.swagger.annotations.ApiOperation;

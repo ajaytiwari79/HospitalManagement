@@ -1,6 +1,6 @@
 package com.kairos.service.fls_visitour.schedule;
 
-import com.kairos.activity.task.TaskAppointmentSuggestionDTO;
+import com.kairos.dto.activity.task.TaskAppointmentSuggestionDTO;
 import de.tourenserver.CallInfoRec;
 import de.tourenserver.FixScheduleResponse;
 

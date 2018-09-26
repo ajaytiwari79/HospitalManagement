@@ -1,14 +1,13 @@
 package com.kairos.service.master_data.asset_management;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.SuggestedDataStatus;
-import com.kairos.gdpr.metadata.OrganizationalSecurityMeasureDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
-import com.kairos.persistance.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
+import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
+import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
+import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -16,7 +15,6 @@ import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -142,27 +140,6 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
         orgSecurityMeasure.setName(securityMeasureDTO.getName());
         organizationalSecurityMeasureMongoRepository.save(orgSecurityMeasure);
         return securityMeasureDTO;
-
-    }
-
-    /**
-     * @param countryId
-     * @param
-     * @param name      OrganizationalSecurityMeasure name
-     * @return OrganizationalSecurityMeasure fetch via name
-     * @throws DataNotExists throw exception if OrganizationalSecurityMeasure not exist for given name
-     */
-    public OrganizationalSecurityMeasure getOrganizationalSecurityMeasureByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            OrganizationalSecurityMeasure exist = organizationalSecurityMeasureMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
 

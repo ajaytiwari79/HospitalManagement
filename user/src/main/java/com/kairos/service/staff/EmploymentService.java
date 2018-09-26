@@ -1,15 +1,20 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.KairosSchedulerLogsDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
+import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
 import com.kairos.enums.EmploymentStatus;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
-import com.kairos.kafka.producer.KafkaProducer;
+import com.kairos.dto.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.country.EngineerType;
@@ -31,19 +36,23 @@ import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepositor
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
+import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.IntegrationService;
-import com.kairos.service.kafka.UserToSchedulerQueueService;
+import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import com.kairos.util.DateConverter;
-import com.kairos.util.DateUtil;
-import com.kairos.util.DateUtils;
+import com.kairos.utils.DateConverter;
+import com.kairos.utils.DateUtil;
+import com.kairos.commons.utils.DateUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,6 +123,8 @@ public class EmploymentService {
     private ActivityIntegrationService activityIntegrationService;
     @Inject
     private UserToSchedulerQueueService userToSchedulerQueueService;
+    @Inject
+    private GenericRestClient genericRestClient;
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
@@ -216,106 +227,31 @@ public class EmploymentService {
                 unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
             }
             AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-//            unitPermission = new UnitPermission();
-//            unitPermission.setOrganization(unit);
-//            unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
             unitPermission.setAccessGroup(accessGroup);
             employment.getUnitPermissions().add(unitPermission);
             employmentGraphRepository.save(employment);
-//            AccessPermission accessPermission = new AccessPermission(accessGroup);
-//            accessPermissionGraphRepository.save(accessPermission);
             logger.info(unitPermission.getId() + " Currently created Unit Permission ");
-//            unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
-//            accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
-//            accessPageQueryResults = getAccessPages(accessPermission);
-//            response.put("accessPage", accessPageQueryResults);
             response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
             response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
             response.put("id", unitPermission.getId());
 
 
-            /*unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId);
-            if (Optional.ofNullable(unitPermission).isPresent()) {
-                throw new DataNotFoundByIdException("Unit permission already exist" + staffId);
-            }
-            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-            unitPermission = new UnitPermission();
-            unitPermission.setOrganization(unit);
-            unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
-            employment.getUnitPermissions().add(unitPermission);
-            employmentGraphRepository.save(employment);
-            AccessPermission accessPermission = new AccessPermission(accessGroup);
-            accessPermissionGraphRepository.save(accessPermission);
-            logger.info(unitPermission.getId() + " Currently created Unit Permission ");
-            unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
-            accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
-            accessPageQueryResults = getAccessPages(accessPermission);
-            response.put("accessPage", accessPageQueryResults);
-            response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
-            response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
-            response.put("id", unitPermission.getId());*/
-
         } else {
             // need to remove unit permission
+            if(unitPermissionGraphRepository.getAccessGroupRelationShipCountOfStaff(staffId)<=1){
+                exceptionService.actionNotPermittedException("error.permission.remove");
+            }
             unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
-
         }
-//                if (parentOrganization == null) {
-//                    unit.getEmployments().add(employment);
-//                    organizationGraphRepository.save(unit);
-//                } else {
-//                    parentOrganization.getEmployments().add(employment);
-//                    organizationGraphRepository.save(parentOrganization);
-//                }
-//                if (accessGroup.isTypeOfTaskGiver())
-//                    flsSyncStatus = syncStaffInVisitour(staff, unitId, flsCredentials);
-        //     }
-            /*else {
-                AccessPermission accessPermission;
-                if (parentOrganization == null) {
-                    accessPermission = unitPermissionGraphRepository.getAccessPermission(unit.getId(), unitId, staffId, accessGroupId);
-                } else {
-                    accessPermission = unitPermissionGraphRepository.getAccessPermission(parentOrganization.getId(), unitId, staffId, accessGroupId);
-                }
-                AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-                if (accessPermission == null) {
-                    accessPermission = new AccessPermission(accessGroup);
-                    accessPermissionGraphRepository.save(accessPermission);
-                    unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
-                    accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
-                    accessPageQueryResults = getAccessPages(accessPermission);
-                    if (accessGroup.isTypeOfTaskGiver())
-                        flsSyncStatus = syncStaffInVisitour(staff, unitId, flsCredentials);
-                } else {
-                    if (parentOrganization == null) {
-                        unitPermissionGraphRepository.updateUnitPermission(unit.getId(), unitId, staffId, accessGroupId, true);
-                    } else {
-                        unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, true);
-                    }
-                    accessPageQueryResults = Collections.emptyList();
-                    if (accessGroup.isTypeOfTaskGiver())
-                        flsSyncStatus = syncStaffInVisitour(staff, unitId, flsCredentials);
-                }
-            }
-        } else {
-            if (parentOrganization == null) {
-                unitPermissionGraphRepository.updateUnitPermission(unit.getId(), unitId, staffId, accessGroupId, false);
-            } else {
-                unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
-            }
-            flsSyncStatus = removeStaffFromFls(staff, flsCredentials);
-            accessPageQueryResults = Collections.emptyList();
 
-        }
-        if (flsSyncStatus) {
-            staff.setVisitourId(staff.getId());
-            staffGraphRepository.save(staff);
-        }*/
+        StaffAccessGroupQueryResult staffAccessGroupQueryResult=accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO= ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult,AccessGroupPermissionCounterDTO.class);
+        accessGroupPermissionCounterDTO.setStaffId(staffId);
+        List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("created",created+""));
+        genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {},accessGroupId);
 
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);
-
-
         return response;
     }
 

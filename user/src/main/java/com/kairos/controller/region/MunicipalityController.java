@@ -1,6 +1,6 @@
 package com.kairos.controller.region;
 import com.kairos.service.region.MunicipalityService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

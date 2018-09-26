@@ -1,11 +1,10 @@
 package com.kairos.controller.unit_position;
 
 
-import com.kairos.activity.cta.CollectiveTimeAgreementDTO;
-import com.kairos.activity.wta.basic_details.WTADTO;
+import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.service.unit_position.UnitPositionService;
-import com.kairos.user.staff.unit_position.UnitPositionDTO;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,10 +19,8 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -145,10 +142,11 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getAllCTAOfStaff(unitId, staffId));
     }
 
-    @ApiOperation(value = "update senioritylevel")
+    //Do not remove, required for local testing.
+    /*@ApiOperation(value = "update senioritylevel")
     @RequestMapping(value = "/seniority_level_update", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> updateSeniorityLevel() {
         unitPositionService.updateSeniorityLevelOnJobTrigger();
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null );
-    }
+    }*/
 }

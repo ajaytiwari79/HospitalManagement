@@ -1,9 +1,10 @@
 package com.kairos.service.open_shift;
 
-import com.kairos.activity.open_shift.OpenShiftResponseDTO;
-import com.kairos.activity.open_shift.OpenShiftWrapper;
-import com.kairos.activity.shift.ShiftDTO;
-import com.kairos.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
+import com.kairos.dto.activity.open_shift.OpenShiftWrapper;
+import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
+import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.enums.open_shift.OpenShiftAction;
@@ -22,10 +23,10 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.time_bank.TimeBankService;
-import com.kairos.user.access_permission.AccessGroupRole;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.time_bank.TimeBankCalculationService;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.utils.time_bank.TimeBankCalculationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -37,7 +38,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.activity.open_shift.ShiftAssignmentCriteria.*;
+import static com.kairos.dto.activity.open_shift.ShiftAssignmentCriteria.*;
 import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION;
 import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION_MESSAGE;
 
@@ -208,7 +209,7 @@ public class OpenShiftService extends MongoBaseService {
         int[] data={0,0};
         if(role.equals(AccessGroupRole.STAFF)){
             Long unitPositionId = genericIntegrationService.getUnitPositionId(unitId, staffId, openShiftActivityWrapper.getExpertiseId(), openShift.getStartDate().getTime());
-            com.kairos.activity.time_bank.UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
+            UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
             data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), unitPositionWithCtaDetailsDTO);
         }
         Date endDate = DateUtils.getDateFromLocalDate(DateUtils.asLocalDate(startDate).plusDays(6));

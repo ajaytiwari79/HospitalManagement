@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.util.DateTimeInterval;
+import com.kairos.commons.utils.DateTimeInterval;
 import org.joda.time.Interval;
 
 import java.math.BigInteger;

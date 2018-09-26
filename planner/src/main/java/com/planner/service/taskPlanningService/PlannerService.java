@@ -1,15 +1,14 @@
 package com.planner.service.taskPlanningService;
 
-import com.kairos.planner.planninginfo.PlanningSubmissionDTO;
-import com.kairos.planner.planninginfo.PlanningSubmissonResponseDTO;
-import com.kairos.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.planner.planninginfo.PlanningSubmissionDTO;
+import com.kairos.dto.planner.planninginfo.PlanningSubmissonResponseDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.planning.solution.TaskPlanningSolution;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.vrp.vrpPlanning.VRPIndictmentDTO;
-import com.kairos.vrp.vrpPlanning.VrpTaskPlanningDTO;
-import com.planner.appConfig.appConfig.AppConfig;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.planner.vrp.vrpPlanning.VRPIndictmentDTO;
+import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.planner.domain.taskPlanning.PlanningProblem;
 import com.planner.domain.vrpPlanning.VRPPlanningSolution;
 import com.planner.enums.PlanningStatus;
@@ -36,7 +35,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.util.List;
 
 
 @Service

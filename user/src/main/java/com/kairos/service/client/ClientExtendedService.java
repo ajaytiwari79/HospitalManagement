@@ -23,9 +23,9 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.user.organization.AddressDTO;
-import com.kairos.util.DateUtil;
-import com.kairos.util.FileUtil;
+import com.kairos.dto.user.organization.AddressDTO;
+import com.kairos.utils.DateUtil;
+import com.kairos.utils.FileUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -124,7 +124,7 @@ public class ClientExtendedService{
         Client nextToKinClientObject;
         ContactDetail contactDetail = null;
         if (!Optional.ofNullable(nextToKin).isPresent()) {
-            nextToKin = new User(nextToKinDTO.getCprNumber().trim(), nextToKinDTO.getFirstName(), nextToKinDTO.getLastName(),nextToKin.getEmail());
+            nextToKin = new User(nextToKinDTO.getCprNumber().trim(), nextToKinDTO.getFirstName(), nextToKinDTO.getLastName(),nextToKin.getEmail(),nextToKin.getUserName());
             nextToKin.setNickName(nextToKinDTO.getNickName());
             nextToKinClientObject = new Client();
 

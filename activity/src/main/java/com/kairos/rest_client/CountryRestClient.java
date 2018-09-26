@@ -1,9 +1,9 @@
 package com.kairos.rest_client;
 
-import com.kairos.user.country.basic_details.CountryDTO;
-import com.kairos.user.country.day_type.DayType;
-import com.kairos.user.organization.OrganizationTypeHierarchyQueryResult;
-import com.kairos.user.organization.TimeSlot;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.dto.user.organization.TimeSlot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.util.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Component
 public class CountryRestClient {

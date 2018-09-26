@@ -2,7 +2,9 @@ package com.kairos.service.unit_settings;
 
 
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.unit_settings.*;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.unit_settings.FlexibleTimeSettings;
 import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.persistence.model.unit_settings.UnitSetting;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
@@ -10,17 +12,15 @@ import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.activity.unit_settings.OpenShiftPhase;
-import com.kairos.activity.unit_settings.OpenShiftPhaseSetting;
-import com.kairos.activity.unit_settings.UnitAgeSettingDTO;
-import com.kairos.activity.unit_settings.UnitSettingDTO;
+
+import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,19 +33,21 @@ public class UnitSettingService extends MongoBaseService {
 
     @Inject
     private UnitAgeSettingMongoRepository unitAgeSettingMongoRepository;
-    @Inject private UnitSettingRepository unitSettingRepository;
-    @Inject private PhaseService phaseService;
+    @Inject
+    private UnitSettingRepository unitSettingRepository;
+    @Inject
+    private PhaseService phaseService;
 
     public UnitAgeSetting createDefaultNightWorkerSettings(Long unitId) {
-        UnitAgeSetting unitAgeSetting = new UnitAgeSetting(AppConstants.YOUNGER_AGE,AppConstants.OLDER_AGE, unitId);
+        UnitAgeSetting unitAgeSetting = new UnitAgeSetting(AppConstants.YOUNGER_AGE, AppConstants.OLDER_AGE, unitId);
         save(unitAgeSetting);
         return unitAgeSetting;
     }
 
-    public UnitAgeSettingDTO getUnitAgeSettings(Long unitId){
+    public UnitAgeSettingDTO getUnitAgeSettings(Long unitId) {
         UnitAgeSetting unitAgeSetting = unitAgeSettingMongoRepository.findByUnit(unitId);
-        if(!Optional.ofNullable(unitAgeSetting).isPresent()){
-            unitAgeSetting =  createDefaultNightWorkerSettings(unitId);
+        if (!Optional.ofNullable(unitAgeSetting).isPresent()) {
+            unitAgeSetting = createDefaultNightWorkerSettings(unitId);
         }
         return ObjectMapperUtils.copyPropertiesByMapper(unitAgeSetting, UnitAgeSettingDTO.class);
     }
@@ -62,8 +64,12 @@ public class UnitSettingService extends MongoBaseService {
         return unitSettingsDTO;
     }
 
-    public List<UnitSettingDTO> getOpenShiftPhaseSettings(Long unitId){
-       return unitSettingRepository.getOpenShiftPhaseSettings(unitId);
+    public List<UnitSettingDTO> getOpenShiftPhaseSettings(Long unitId) {
+        List<UnitSettingDTO> openShiftPhaseSettings = unitSettingRepository.getOpenShiftPhaseSettings(unitId);
+        openShiftPhaseSettings.forEach(openSettingDTO ->{
+            openSettingDTO.getOpenShiftPhaseSetting().getOpenShiftPhases().sort(Comparator.comparingInt(OpenShiftPhase::getSequence));
+        });
+        return openShiftPhaseSettings;
     }
 
     public UnitSettingDTO updateOpenShiftPhaseSettings(Long unitId, BigInteger unitSettingsId, UnitSettingDTO unitSettingsDTO) {
@@ -77,19 +83,19 @@ public class UnitSettingService extends MongoBaseService {
         return unitSettingsDTO;
     }
 
-    public boolean createDefaultOpenShiftPhaseSettings(Long unitId,List<Phase> phases){
-        if (!Optional.ofNullable(phases).isPresent()){
-            phases=ObjectMapperUtils.copyPropertiesOfListByMapper(phaseService.getPhasesByUnit(unitId),Phase.class);
+    public boolean createDefaultOpenShiftPhaseSettings(Long unitId, List<Phase> phases) {
+        if (!Optional.ofNullable(phases).isPresent()) {
+            phases = ObjectMapperUtils.copyPropertiesOfListByMapper(phaseService.getPhasesByUnit(unitId), Phase.class);
         }
-        List<UnitSettingDTO> openShiftPhaseSettings=unitSettingRepository.getOpenShiftPhaseSettings(unitId);
-        if(openShiftPhaseSettings.size()>0){
-            exceptionService.actionNotPermittedException("openShift.already.exist",unitId);
+        List<UnitSettingDTO> openShiftPhaseSettings = unitSettingRepository.getOpenShiftPhaseSettings(unitId);
+        if (openShiftPhaseSettings.size() > 0) {
+            exceptionService.actionNotPermittedException("openShift.already.exist", unitId);
         }
 
-        if(Optional.ofNullable(phases).isPresent()) {
+        if (Optional.ofNullable(phases).isPresent()) {
             List<OpenShiftPhase> openShiftPhases = new ArrayList<>();
             phases.forEach(phase -> {
-                OpenShiftPhase openShiftPhase = new OpenShiftPhase(phase.getId(), phase.getName(), false);
+                OpenShiftPhase openShiftPhase = new OpenShiftPhase(phase.getId(), phase.getName(), false,phase.getSequence());
                 openShiftPhases.add(openShiftPhase);
             });
             OpenShiftPhaseSetting openShiftPhaseSetting = new OpenShiftPhaseSetting(4, openShiftPhases);
@@ -99,5 +105,26 @@ public class UnitSettingService extends MongoBaseService {
         }
         return false;
 
+    }
+
+    public FlexibleTimeSettingDTO getFlexibleTime(Long unitId) {
+        UnitSettingDTO unitSettingDTO = unitSettingRepository.getFlexibleTimingByUnit(unitId);
+        FlexibleTimeSettingDTO flexibleTimeSettingDTO = new FlexibleTimeSettingDTO();
+        if (unitSettingDTO != null) {
+            flexibleTimeSettingDTO = unitSettingDTO.getFlexibleTimeSettings();
+        }
+        return flexibleTimeSettingDTO;
+    }
+
+    public FlexibleTimeSettingDTO updateFlexibleTime(Long unitId, FlexibleTimeSettingDTO flexibleTimeSettingDTO) {
+        UnitSetting unitSetting = unitSettingRepository.findByUnitIdAndDeletedFalse(unitId);
+        if (unitSetting == null) {
+            exceptionService.dataNotFoundException("message.unit.setting.notFound");
+        }
+        FlexibleTimeSettings flexibleTimeSettings = ObjectMapperUtils.copyPropertiesByMapper(flexibleTimeSettingDTO, FlexibleTimeSettings.class);
+        unitSetting.setUnitId(unitId);
+        unitSetting.setFlexibleTimeSettings(flexibleTimeSettings);
+        save(unitSetting);
+        return flexibleTimeSettingDTO;
     }
 }

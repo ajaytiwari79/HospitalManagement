@@ -3,10 +3,10 @@ package com.kairos.service.data_inventory.asset;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.gdpr.metadata.DataDisposalDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.DataDisposal;
-import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistance.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
+import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
+import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
+import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;

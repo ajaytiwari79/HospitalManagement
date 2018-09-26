@@ -1,6 +1,7 @@
 package com.kairos.service.planner.vrpPlanning;
 
-import com.kairos.activity.task_type.TaskTypeSettingDTO;
+import com.kairos.dto.activity.task_type.TaskTypeSettingDTO;
+import com.kairos.dto.planner.vrp.vrpPlanning.*;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.solver_config.PlannerUrl;
 import com.kairos.enums.solver_config.PlanningType;
@@ -12,8 +13,8 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.solver_config.ConstraintRepository;
 import com.kairos.persistence.repository.solver_config.SolverConfigRepository;
 import com.kairos.persistence.repository.task_type.TaskTypeSettingMongoRepository;
-import com.kairos.planner.solverconfig.ConstraintDTO;
-import com.kairos.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.ConstraintDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.rest_client.planner.PlannerRestClient;
@@ -22,12 +23,11 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.solver_config.SolverConfigService;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.task_type.TaskTypeService;
-import com.kairos.user.staff.staff.StaffDTO;
-import com.kairos.util.DateUtils;
-import com.kairos.util.ObjectMapperUtils;
-import com.kairos.util.ObjectUtils;
-import com.kairos.vrp.task.VRPTaskDTO;
-import com.kairos.vrp.vrpPlanning.*;
+import com.kairos.dto.user.staff.staff.StaffDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -192,7 +192,7 @@ public class VRPPlanningService extends MongoBaseService{
 
 
 
-    public VRPIndictmentDTO getIndictmentBySolverConfig(Long unitId,BigInteger solverConfigId){
+    public VRPIndictmentDTO getIndictmentBySolverConfig(Long unitId, BigInteger solverConfigId){
         SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
         RestTemplateResponseEnvelope<VrpTaskPlanningDTO> responseEnvelope = plannerRestClient.publish(solverConfig.getPlannerNumber(),null,unitId, IntegrationOperation.GET,PlannerUrl.GET_INDICTMENT,solverConfigId);
         VRPIndictmentDTO  vrpIndictmentDTO = ObjectMapperUtils.copyPropertiesByMapper(responseEnvelope.getData(),VRPIndictmentDTO.class);
@@ -204,7 +204,7 @@ public class VRPPlanningService extends MongoBaseService{
         if(taskDTOS.isEmpty()){
             exceptionService.dataNotFoundByIdException("message.solution.datanotFound");
         }
-        Map<String,EmployeeDTO> employeeDTOMap = vrpTaskPlanningDTO.getEmployees().stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        Map<String,EmployeeDTO> employeeDTOMap = vrpTaskPlanningDTO.getEmployees().stream().collect(Collectors.toMap(k->k.getId(), v->v));
         Map<Long,TaskDTO> taskMap = taskDTOS.stream().collect(Collectors.toMap(k->k.getInstallationNumber(), v->v));
         Map<Long,List<VRPTaskDTO>> installationNOtasks = taskService.getAllTask(unitId).stream().collect(Collectors.groupingBy(VRPTaskDTO::getInstallationNumber,toList()));
         List<TaskDTO> tasks = new ArrayList<>();

@@ -13,12 +13,12 @@ import javax.inject.Inject;
 
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class OrganizationDataElementController {
 
 
@@ -30,9 +30,6 @@ public class OrganizationDataElementController {
     @DeleteMapping("/data_category/{dataCategoryId}/data_element/{elementId}")
     public ResponseEntity<Object> deleteDataElement(@PathVariable Long unitId, @PathVariable BigInteger dataCategoryId, @PathVariable BigInteger elementId) {
 
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataElementService.deleteDataElementById(unitId, dataCategoryId, elementId));
     }
 
@@ -40,10 +37,6 @@ public class OrganizationDataElementController {
     @ApiOperation(value = "get all Data Element")
     @GetMapping("/data_element/all")
     public ResponseEntity<Object> getAllDataElementByUnitId(@PathVariable Long unitId) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataElementService.getAllDataElementByUnitId(unitId));
     }
 
@@ -51,10 +44,6 @@ public class OrganizationDataElementController {
     @ApiOperation(value = "get all Data Element")
     @GetMapping("/data_element/{id}")
     public ResponseEntity<Object> getDataElementByUnitIdAndId(@PathVariable Long unitId, @PathVariable BigInteger id) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationDataElementService.getDataElementByUnitIdAndId(unitId, id));
     }
 

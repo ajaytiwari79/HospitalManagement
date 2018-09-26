@@ -1,8 +1,11 @@
 package com.kairos.persistence.repository.activity;
 
 
-import com.kairos.activity.shift.ShiftCountDTO;
-import com.kairos.activity.shift.ShiftQueryResult;
+import com.kairos.dto.activity.shift.ShiftCountDTO;
+import com.kairos.dto.activity.shift.ShiftQueryResult;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.attendence_setting.SickSettings;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.wrapper.DateWiseShiftResponse;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 
@@ -10,13 +13,13 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by vipul on 22/9/17.
  */
 public interface CustomShiftMongoRepository {
 
-    void updatePhasesOfActivities(Long orgId, Date startDateInISO, Date endDateInISO, String phaseName, String PhaseDescription);
 
     List<ShiftQueryResult> findAllShiftsBetweenDuration(Long unitPositionId, Long staffId, Date startDate, Date endDate, Long unitId);
 
@@ -35,5 +38,8 @@ public interface CustomShiftMongoRepository {
     List<DateWiseShiftResponse> findAllByIdGroupByDate(List<BigInteger> shiftIds);
 
     void deleteShiftsAfterDate(Long staffId, LocalDateTime employmentEndDate);
+    List<Shift> findAllShiftByDynamicQuery(List<SickSettings> sickSettings, Map<BigInteger, Activity> activityMap);
+
+    Shift findShiftToBeDone(List<Long> staffIds, Date startDateMillis,Date endDateMillis);
 
 }

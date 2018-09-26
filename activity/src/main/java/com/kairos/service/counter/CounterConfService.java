@@ -1,16 +1,15 @@
 package com.kairos.service.counter;
 
-import com.kairos.activity.enums.counter.ModuleType;
-import com.kairos.activity.counter.FilterCriteria;
-import com.kairos.activity.counter.KPICategoryDTO;
-import com.kairos.activity.counter.distribution.category.KPICategoryUpdationDTO;
-import com.kairos.activity.counter.enums.ConfLevel;
-import com.kairos.activity.counter.enums.CounterType;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
+import com.kairos.dto.activity.counter.distribution.category.KPICategoryUpdationDTO;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -110,7 +109,7 @@ public class CounterConfService extends MongoBaseService {
            if(existingAssignmentDTOs.isEmpty()){
                return new ArrayList<>();
            }
-        Map<BigInteger, KPICategoryDTO> categoryDTOMapById = changedCategories.parallelStream().collect(Collectors.toMap(kPICategoryDTO -> kPICategoryDTO.getId(), kPICategoryDTO -> kPICategoryDTO));
+             Map<BigInteger, KPICategoryDTO> categoryDTOMapById = changedCategories.parallelStream().collect(Collectors.toMap(kPICategoryDTO -> kPICategoryDTO.getId(), kPICategoryDTO -> kPICategoryDTO));
              List<BigInteger> categoriesIds = changedCategories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
              List<KPICategory> kpiCategories = counterRepository.getKPICategoryByIds(categoriesIds, level, refId);
             for( KPICategory kpiCategory : kpiCategories){
@@ -137,7 +136,7 @@ public class CounterConfService extends MongoBaseService {
 
     public void addEntries(Long countryId){
         List<KPI> kpis = new ArrayList<>();
-        /// String title, BaseChart chart, CounterSize size, CounterType type, boolean treatAsCounter, BigInteger primaryCounter
+        /// String title, BaseChart chart, CounterSize size, CounterType type, boolean counter, BigInteger primaryCounter
         //verification for availability
         List<Counter> availableCounters = counterRepository.getCounterByTypes(Arrays.asList(CounterType.values()));
         if(availableCounters.size() == CounterType.values().length) exceptionService.duplicateDataException("error.counterType.duplicate", "Duplicate Available");

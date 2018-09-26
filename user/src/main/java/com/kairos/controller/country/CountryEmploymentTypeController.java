@@ -1,9 +1,9 @@
 package com.kairos.controller.country;
 
-import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
+import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.service.country.EmploymentTypeService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

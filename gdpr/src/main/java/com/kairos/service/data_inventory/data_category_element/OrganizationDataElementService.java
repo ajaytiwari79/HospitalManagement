@@ -1,10 +1,10 @@
 package com.kairos.service.data_inventory.data_category_element;
 
 
-import com.kairos.persistance.model.master_data.data_category_element.DataCategory;
-import com.kairos.persistance.model.master_data.data_category_element.DataElement;
-import com.kairos.persistance.repository.master_data.data_category_element.DataCategoryMongoRepository;
-import com.kairos.persistance.repository.master_data.data_category_element.DataElementMongoRepository;
+import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
+import com.kairos.persistence.model.master_data.data_category_element.DataElement;
+import com.kairos.persistence.repository.master_data.data_category_element.DataCategoryMongoRepository;
+import com.kairos.persistence.repository.master_data.data_category_element.DataElementMongoRepository;
 import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -34,7 +34,7 @@ public class OrganizationDataElementService extends MongoBaseService {
      * @param dataElementList  List of Data Elements
      * @return method return  list of  data Element and check of duplicate name in data Elements
      */
-    public List<DataElement> saveDataElementsAndCheckDuplicateyEntry(Long unitId, List<DataElement> dataElementList) {
+    public List<DataElement> saveDataElementsAndCheckDuplicateEntry(Long unitId, List<DataElement> dataElementList) {
 
         Set<String> dataElementNameList = new HashSet<>();
         for (DataElement dataElement : dataElementList) {

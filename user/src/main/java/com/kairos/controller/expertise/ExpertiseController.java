@@ -1,15 +1,15 @@
 package com.kairos.controller.expertise;
 
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
-import com.kairos.user.country.experties.AgeRangeDTO;
-import com.kairos.user.country.experties.CopyExpertiseDTO;
-import com.kairos.user.country.experties.ExpertiseEmploymentTypeDTO;
-import com.kairos.user.country.experties.FunctionalSeniorityLevelDTO;
+import com.kairos.dto.user.country.experties.AgeRangeDTO;
+import com.kairos.dto.user.country.experties.CopyExpertiseDTO;
+import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
+import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.expertise.FunctionalPaymentService;
 import com.kairos.service.locale.LocaleService;
 import com.kairos.service.unit_position.UnitPositionService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

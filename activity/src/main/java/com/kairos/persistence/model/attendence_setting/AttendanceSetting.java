@@ -2,10 +2,7 @@ package com.kairos.persistence.model.attendence_setting;
 
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.response.dto.web.attendance.AttendanceDuration;
-
-
-import java.time.LocalDate;
+import com.kairos.dto.activity.attendance.AttendanceDuration;
 
 
 public class AttendanceSetting extends MongoBaseEntity {

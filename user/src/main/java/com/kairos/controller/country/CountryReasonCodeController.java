@@ -1,9 +1,9 @@
 package com.kairos.controller.country;
 
 import com.kairos.enums.reason_code.ReasonCodeType;
-import com.kairos.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.service.country.ReasonCodeService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;

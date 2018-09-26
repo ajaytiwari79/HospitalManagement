@@ -1,7 +1,7 @@
 package com.kairos.controller.visitator;
 
 import com.kairos.service.visitator.VisitatorService;
-import com.kairos.util.response.ResponseHandler;
+import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.task.TaskDemandDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
