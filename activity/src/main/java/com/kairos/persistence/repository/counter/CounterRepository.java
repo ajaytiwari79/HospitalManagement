@@ -259,13 +259,13 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
 
     //accessGroupKPI distribution crud
 
-    public List<AccessGroupKPIEntry> getAccessGroupKPIByUnitIdAndKpiIds(List<BigInteger> kpiIds,Long unitId){
-        Query query = new Query(Criteria.where("kpiId").in(kpiIds).and("unitId").is(unitId));
+    public List<AccessGroupKPIEntry> getAccessGroupKPIByUnitId(AccessGroupMappingDTO entry,Long unitId,ConfLevel level){
+        Query query = new Query(Criteria.where("unitId").is(unitId).and("accessGroupId").nin(entry.getAccessGroupId()).and("level").is(level));
         return mongoTemplate.find(query, AccessGroupKPIEntry.class);
     }
 
-    public AccessGroupKPIEntry getAccessGroupKPIEntry(AccessGroupMappingDTO entry,Long unitId){
-        Query query = new Query(Criteria.where("accessGroupId").is(entry.getAccessGroupId()).and("kpiId").is(entry.getKpiId()).and("unitId").is(unitId));
+    public AccessGroupKPIEntry getAccessGroupKPIEntry(AccessGroupMappingDTO entry,Long unitId,ConfLevel level){
+        Query query = new Query(Criteria.where("accessGroupId").is(entry.getAccessGroupId()).and("kpiId").is(entry.getKpiId()).and("unitId").is(unitId).and("level").is(level));
        return mongoTemplate.findOne(query, AccessGroupKPIEntry.class);
     }
 
@@ -411,6 +411,18 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         );
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,Map.class);
         return results.getMappedResults().stream().map(s-> new BigInteger(s.get("_id").toString())).collect(Collectors.toList());
+    }
+
+    public List<AccessGroupMappingDTO> getAccessGroupAndKpiId(Set<Long> accessGroupIds , ConfLevel level, Long refId){
+        String refQueryField = getRefQueryField(level);
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("accessGroupId").in(accessGroupIds).and(refQueryField).is(refId).and("level").is(level)),
+                Aggregation.group("accessGroupId").push("kpiId").as("kpiIds"),
+                Aggregation.project().and("_id").as("accessGroupId").and("kpiIds").as("kpiIds")
+        );
+        AggregationResults<AccessGroupMappingDTO> results = mongoTemplate.aggregate(aggregation,AccessGroupKPIEntry.class,AccessGroupMappingDTO.class);
+        return results.getMappedResults();
+
     }
 
     public List<ApplicableKPI> getApplicableKPIByReferenceId(List<BigInteger> kpiIds,List<Long> refId, ConfLevel level){
