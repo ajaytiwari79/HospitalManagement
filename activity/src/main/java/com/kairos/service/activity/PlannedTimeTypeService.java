@@ -50,6 +50,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
             exceptionService.duplicateDataException("message.presenceType.name.alreadyExist", presenceTypeDTO.getName());
         }
         plannedTimeType = new PlannedTimeType(presenceTypeDTO.getName(), countryId);
+        plannedTimeType.setImageName(presenceTypeDTO.getImageName());
         save(plannedTimeType);
         presenceTypeDTO.setId(plannedTimeType.getId());
         logger.info(plannedTimeType.toString());
@@ -87,6 +88,7 @@ public class PlannedTimeTypeService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.presenceType.id.notFound");
         }
         PlannedTimeType plannedTimeType = presenceTypeOptional.get();
+        plannedTimeType.setImageName(presenceTypeDTO.getImageName());
         plannedTimeType.setName(presenceTypeDTO.getName());
         save(plannedTimeType);
         return presenceTypeDTO;

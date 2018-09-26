@@ -15,14 +15,14 @@ import java.util.List;
 public interface MasterAssetMongoRepository extends MongoBaseRepository<MasterAsset,BigInteger>,CustomMasterAssetRepository{
 
 
-    @Query("{countryId:?0,organizationId:?1,_id:?2,deleted:false}")
-    MasterAsset findByIdANdNonDeleted(Long countryId,Long organizationId,BigInteger id);
+    @Query("{countryId:?0,_id:?1,deleted:false}")
+    MasterAsset findByIdANdNonDeleted(Long countryId,BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1}")
-    List<MasterAsset> findAllMasterAssets( Long countryId,Long organizationId);
+    @Query("{deleted:false,countryId:?0}")
+    List<MasterAsset> findAllMasterAssets( Long countryId);
 
-    @Query("{countryId:?0,organizationId:?1,assetType:?2,deleted:false}")
-    List<MasterAssetBasicResponseDTO> findAllMasterAssetByAssetType(Long countryId, Long organizationId, BigInteger assetTypeId);
+    @Query("{countryId:?0,assetType:?1,deleted:false}")
+    List<MasterAssetBasicResponseDTO> findAllMasterAssetByAssetType(Long countryId, BigInteger assetTypeId);
 
     MasterAsset findByid(BigInteger id);
 

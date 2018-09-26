@@ -18,12 +18,12 @@ import javax.validation.Valid;
 
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class ProcessingActivityController {
 
 
@@ -97,12 +97,12 @@ public class ProcessingActivityController {
 
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/processing_activity/{processingActivityId}/history")
-    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger processingActivityId, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int skip) {
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger processingActivityId) {
 
         if (processingActivityId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "processing Activity id can't be Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityActivitiesHistory(processingActivityId, size, skip));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityActivitiesHistory(processingActivityId));
     }
 
 

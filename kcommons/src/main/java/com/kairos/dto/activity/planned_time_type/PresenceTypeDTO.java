@@ -19,6 +19,7 @@ public class PresenceTypeDTO {//extends UserBaseEntity {
     @NotNull(message = "error.PresenceTypeDTO.name.notnull")
     private String name;
     private BigInteger id;
+    private String imageName;
 
     public String getName() {
         return name;
@@ -35,6 +36,14 @@ public class PresenceTypeDTO {//extends UserBaseEntity {
     public PresenceTypeDTO(@NotEmpty(message = "error.PresenceTypeDTO.name.notEmpty") @NotNull(message = "error.PresenceTypeDTO.name.notnull") String name, BigInteger id) {
         this.name = name;
         this.id = id;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
 
     public PresenceTypeDTO(String name) {

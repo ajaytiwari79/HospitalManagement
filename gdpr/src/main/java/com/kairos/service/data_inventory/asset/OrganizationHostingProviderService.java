@@ -15,6 +15,7 @@ import com.kairos.service.master_data.asset_management.HostingProviderService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -90,7 +91,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
      * @return list of HostingProvider
      */
     public List<HostingProviderResponseDTO> getAllHostingProvider(Long organizationId) {
-        return hostingProviderMongoRepository.findAllOrganizationHostingProviders(organizationId);
+        return hostingProviderMongoRepository.findAllOrganizationHostingProviders(organizationId,new Sort(Sort.Direction.DESC, "_id"));
     }
 
 

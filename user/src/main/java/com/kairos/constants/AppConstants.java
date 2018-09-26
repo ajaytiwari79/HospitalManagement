@@ -1,5 +1,15 @@
 package com.kairos.constants;
 
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.calendar.CalendarScopes;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by prabjot on 22/11/16.
  */
@@ -202,5 +212,33 @@ public class AppConstants {
     public static final String USER_TO_SCHEDULER_JOB_QUEUE_TOPIC = "UserToSchedulerJobQueue";
     public static final String USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC = "UserToSchedulerLogsQueue";
 
+    //CountryService
+    /**
+     * Application name.
+     */
+    public static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
+    /**
+     * Directory to store user credentials for this application.
+     */
+    /** Directory to store user credentials for this application. */
+    public static final File DATA_STORE_DIR = new File(
+            System.getProperty("user.home"), ".credentials/calendar-java-quickstart");
 
+    /** Global instance of the {@link FileDataStoreFactory}. */
+    public static FileDataStoreFactory DATA_STORE_FACTORY;
+
+    /** Global instance of the JSON factory. */
+    public static final JsonFactory JSON_FACTORY =JacksonFactory.getDefaultInstance();
+
+
+    /** Global instance of the HTTP transport. */
+    public static HttpTransport HTTP_TRANSPORT;
+
+
+    /** Global instance of the scopes required by this quickstart.
+     *
+     * If modifying these scopes, delete your previously saved credentials
+     * at ~/.credentials/calendar-java-quickstart
+     */
+    private static final List<String> SCOPES =  Arrays.asList(CalendarScopes.CALENDAR_READONLY);
 }

@@ -35,7 +35,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     @Override
     public CTAResponseDTO getOneCtaById(BigInteger ctaId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("_id").is(ctaId).and("deleted").is(false).and("disabled").is(false)),
+                match(Criteria.where("_id").is(ctaId).and("deleted").is(false)),
                 lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation,CostTimeAgreement.class,CTAResponseDTO.class);

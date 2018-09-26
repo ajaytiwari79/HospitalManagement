@@ -1,7 +1,7 @@
 package com.kairos.controller.master_data.asset_management;
 
 
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
 import com.kairos.service.master_data.asset_management.HostingProviderService;
 import com.kairos.utils.ResponseHandler;
@@ -21,7 +21,7 @@ import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 
 
 /*
@@ -31,8 +31,8 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
+@Api(API_ORGANIZATION_COUNTRY_URL)
 public class HostingProviderController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HostingProviderController.class);
@@ -44,9 +44,6 @@ public class HostingProviderController {
     @ApiOperation("add HostingProvider")
     @PostMapping("/hosting_provider")
     public ResponseEntity<Object> createHostingProvider(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<HostingProviderDTO> hostingProviderDTOs) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.createHostingProviders(countryId, hostingProviderDTOs.getRequestBody()));
 
     }
@@ -55,9 +52,6 @@ public class HostingProviderController {
     @ApiOperation("get HostingProvider by id")
     @GetMapping("/hosting_provider/{hostingProviderId}")
     public ResponseEntity<Object> getHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getHostingProviderById(countryId, hostingProviderId));
 
     }
@@ -66,9 +60,6 @@ public class HostingProviderController {
     @ApiOperation("get all HostingProvider ")
     @GetMapping("/hosting_provider")
     public ResponseEntity<Object> getAllHostingProvider(@PathVariable Long countryId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.getAllHostingProvider(countryId));
 
     }
@@ -76,9 +67,6 @@ public class HostingProviderController {
     @ApiOperation("delete HostingProvider  by id")
     @DeleteMapping("/hosting_provider/{hostingProviderId}")
     public ResponseEntity<Object> deleteHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.deleteHostingProvider(countryId, hostingProviderId));
 
     }
@@ -86,9 +74,6 @@ public class HostingProviderController {
     @ApiOperation("update HostingProvider by id")
     @PutMapping("/hosting_provider/{hostingProviderId}")
     public ResponseEntity<Object> updateHostingProvider(@PathVariable Long countryId, @PathVariable BigInteger hostingProviderId, @Valid @RequestBody HostingProviderDTO hostingProviderDTO) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, hostingProviderService.updateHostingProvider(countryId, hostingProviderId, hostingProviderDTO));
 
     }
@@ -97,7 +82,7 @@ public class HostingProviderController {
     @PutMapping("/hosting_provider")
     public ResponseEntity<Object> updateSuggestedStatusOfHostingProviders(@PathVariable Long countryId, @RequestBody Set<BigInteger> hostingProviderIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
         if (CollectionUtils.isEmpty(hostingProviderIds)) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Id Array is Empty");
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Hosting Provider is Not Selected");
         } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }

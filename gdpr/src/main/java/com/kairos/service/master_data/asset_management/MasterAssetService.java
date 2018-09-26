@@ -33,15 +33,14 @@ public class MasterAssetService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param organizationId
      * @param masterAssetDto
      * @return return MasterAsset object
      * @throws DuplicateDataException throw exception id MasterAsset not exist for given id
      */
 
-    public MasterAssetDTO addMasterAsset(Long countryId, Long organizationId, MasterAssetDTO masterAssetDto) {
+    public MasterAssetDTO addMasterAsset(Long countryId,  MasterAssetDTO masterAssetDto) {
 
-        MasterAsset previousAsset = masterAssetMongoRepository.findByName(countryId, organizationId, masterAssetDto.getName());
+        MasterAsset previousAsset = masterAssetMongoRepository.findByName(countryId, masterAssetDto.getName());
         if (Optional.ofNullable(previousAsset).isPresent()) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         }
@@ -49,7 +48,6 @@ public class MasterAssetService extends MongoBaseService {
         MasterAsset masterAsset = new MasterAsset(masterAssetDto.getName(), masterAssetDto.getDescription(), masterAssetDto.getOrganizationTypes(), masterAssetDto.getOrganizationSubTypes()
                 , masterAssetDto.getOrganizationServices(), masterAssetDto.getOrganizationSubServices());
         masterAsset.setCountryId(countryId);
-        masterAsset.setOrganizationId(organizationId);
         masterAsset.setAssetType(masterAssetDto.getAssetTypeId());
         masterAsset.setAssetSubTypes(masterAssetDto.getAssetSubTypes());
         masterAssetMongoRepository.save(masterAsset);
@@ -60,32 +58,30 @@ public class MasterAssetService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param organizationId
      * @return list of MasterAsset
      */
 
-    public List<MasterAssetResponseDTO> getAllMasterAsset(Long countryId, Long organizationId) {
-        return masterAssetMongoRepository.getAllMasterAssetWithAssetTypeAndSubAssetType(countryId, organizationId);
+    public List<MasterAssetResponseDTO> getAllMasterAsset(Long countryId) {
+        return masterAssetMongoRepository.getAllMasterAssetWithAssetTypeAndSubAssetType(countryId);
     }
 
 
     /**
      * @param countryId
-     * @param organizationId
      * @param id             id of MasterAsset
      * @param masterAssetDto
      * @return updated object of MasterAsset
      * @throws DuplicateDataException if MasterAsset not exist already exist with same  name
      *                                {@link DataNotFoundByIdException throw exception if MasterAsset not found for given id}
      */
-    public MasterAssetDTO updateMasterAsset(Long countryId, Long organizationId, BigInteger id, MasterAssetDTO masterAssetDto) {
+    public MasterAssetDTO updateMasterAsset(Long countryId, BigInteger id, MasterAssetDTO masterAssetDto) {
 
 
-        MasterAsset masterAsset = masterAssetMongoRepository.findByName(countryId, organizationId, masterAssetDto.getName());
+        MasterAsset masterAsset = masterAssetMongoRepository.findByName(countryId, masterAssetDto.getName());
         if (Optional.ofNullable(masterAsset).isPresent() && !id.equals(masterAsset.getId())) {
             throw new DuplicateDataException("master asset for name " + masterAssetDto.getName() + " exists");
         }
-        masterAsset = masterAssetMongoRepository.findByIdANdNonDeleted(countryId, organizationId, id);
+        masterAsset = masterAssetMongoRepository.findByIdANdNonDeleted(countryId, id);
         if (!Optional.of(masterAsset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "master.asset", id);
         }
@@ -103,8 +99,8 @@ public class MasterAssetService extends MongoBaseService {
     }
 
 
-    public Boolean deleteMasterAsset(Long countryId, Long organizationId, BigInteger id) {
-        MasterAsset masterAsset = masterAssetMongoRepository.findByIdANdNonDeleted(countryId, organizationId, id);
+    public Boolean deleteMasterAsset(Long countryId, BigInteger id) {
+        MasterAsset masterAsset = masterAssetMongoRepository.findByIdANdNonDeleted(countryId, id);
         if (!Optional.ofNullable(masterAsset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Master Asset", id);
         }
@@ -114,8 +110,8 @@ public class MasterAssetService extends MongoBaseService {
     }
 
 
-    public MasterAssetResponseDTO getMasterAssetById(Long countryId, Long organizationId, BigInteger id) {
-        MasterAssetResponseDTO exists = masterAssetMongoRepository.getMasterAssetWithAssetTypeAndSubAssetTypeById(countryId, organizationId, id);
+    public MasterAssetResponseDTO getMasterAssetById(Long countryId, BigInteger id) {
+        MasterAssetResponseDTO exists = masterAssetMongoRepository.getMasterAssetWithAssetTypeAndSubAssetTypeById(countryId, id);
         if (!Optional.ofNullable(exists).isPresent()) {
             throw new DataNotFoundByIdException("master asset not Exist for id " + id);
 

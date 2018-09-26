@@ -46,7 +46,6 @@ public class ShiftWithActivityDTO {
     private int durationMinutes;
     private List<ShiftActivityDTO> activities = new ArrayList<>();
     private List<ShiftStatus> status;
-    private BigInteger plannedTypeId ;
     private String timeType;
 
     public List<ShiftStatus> getStatus() {
@@ -254,13 +253,6 @@ public class ShiftWithActivityDTO {
         return new Interval(startDate.getTime(),endDate.getTime());
     }
 
-    public BigInteger getPlannedTypeId() {
-        return plannedTypeId;
-    }
-
-    public void setPlannedTypeId(BigInteger plannedTypeId) {
-        this.plannedTypeId = plannedTypeId;
-    }
 
     public String getTimeType() {
         return timeType;

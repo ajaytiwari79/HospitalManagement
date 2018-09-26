@@ -3,6 +3,7 @@ package com.kairos.dto.user.country.agreement.cta.cta_response;
 public class PhaseResponseDTO {
     private Long id;
     private String name;
+    private int sequence;
 
     public PhaseResponseDTO() {
         //default constructor
@@ -27,5 +28,13 @@ public class PhaseResponseDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

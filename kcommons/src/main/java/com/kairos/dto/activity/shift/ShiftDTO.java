@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.commons.utils.DateUtils;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
@@ -13,7 +11,6 @@ import org.joda.time.Interval;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -44,11 +41,13 @@ public class ShiftDTO {
     @JsonFormat(pattern = "YYYY-MM-DD")
     private LocalDate shiftDate;
     private Long allowedBreakDurationInMinute;
-    private BigInteger templateId;
-    private Set<ShiftStatus> status = new HashSet<>();
+    private ShiftTemplateDTO template;
     private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger plannedTimeId;
     private Long expertiseId;
+    private LocalDate validatedByStaffDate;
+    private LocalDate validatedByPlannerDate;
+
 
     public ShiftDTO(List<ShiftActivity> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
         this.activities = activities;
@@ -76,6 +75,21 @@ public class ShiftDTO {
         this.unitPositionId = unitPositionId;
     }
 
+    public LocalDate getValidatedByStaffDate() {
+        return validatedByStaffDate;
+    }
+
+    public void setValidatedByStaffDate(LocalDate validatedByStaffDate) {
+        this.validatedByStaffDate = validatedByStaffDate;
+    }
+
+    public LocalDate getValidatedByPlannerDate() {
+        return validatedByPlannerDate;
+    }
+
+    public void setValidatedByPlannerDate(LocalDate validatedByPlannerDate) {
+        this.validatedByPlannerDate = validatedByPlannerDate;
+    }
 
     public Long getExpertiseId() {
         return expertiseId;
@@ -85,13 +99,6 @@ public class ShiftDTO {
         this.expertiseId = expertiseId;
     }
 
-    public Set<ShiftStatus> getStatus() {
-        return status;
-    }
-
-    public void setStatus(Set<ShiftStatus> status) {
-        this.status = status;
-    }
 
     public List<ShiftActivity> getActivities() {
         return activities;
@@ -311,12 +318,12 @@ public class ShiftDTO {
         this.parentOpenShiftId = parentOpenShiftId;
     }
 
-    public BigInteger getTemplateId() {
-        return templateId;
+    public ShiftTemplateDTO getTemplate() {
+        return template;
     }
 
-    public void setTemplateId(BigInteger templateId) {
-        this.templateId = templateId;
+    public void setTemplate(ShiftTemplateDTO template) {
+        this.template = template;
     }
 
 }

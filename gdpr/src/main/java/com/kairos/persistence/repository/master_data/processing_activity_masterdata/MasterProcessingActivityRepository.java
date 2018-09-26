@@ -14,18 +14,18 @@ import java.util.List;
 public interface MasterProcessingActivityRepository extends MongoBaseRepository<MasterProcessingActivity, BigInteger>, CustomMasterProcessingActivity {
 
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:?2}")
-    MasterProcessingActivity findByIdAndCountryIdAndNonDeleted(Long countryId, Long organizationId, BigInteger id);
+    @Query("{deleted:false,countryId:?0,_id:?1}")
+    MasterProcessingActivity findByIdAndCountryIdAndNonDeleted(Long countryId, BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1}")
-    List<MasterProcessingActivity> getAllMasterProcessingActivity(Long countryId, Long organizationId);
+    @Query("{deleted:false,countryId:?0}")
+    List<MasterProcessingActivity> getAllMasterProcessingActivity(Long countryId);
 
     MasterProcessingActivity findByid(BigInteger id);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1,name:?2}")
-    MasterProcessingActivity findByNameAndCountryId(Long countryId, Long organizationId, String name);
+    @Query("{deleted:false,countryId:?0,name:?1}")
+    MasterProcessingActivity findByNameAndCountryId(Long countryId, String name);
 
-    @Query("{deleted:false,countryId:?0,organizationId:?1,_id:{$in:?2},isSubProcess:true}")
-    List<MasterProcessingActivity> getAllMasterSubProcessingActivityByIds(Long countryId, Long organizationId, List<BigInteger> subProcessingActivityIds);
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1},subProcess:true}")
+    List<MasterProcessingActivity> getAllMasterSubProcessingActivityByIds(Long countryId, List<BigInteger> subProcessingActivityIds);
 
 }

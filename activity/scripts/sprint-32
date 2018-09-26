@@ -1,0 +1,4 @@
+//for kpi priority
+db.getCollection('tabKPIConf').updateMany({"level":"STAFF"},{$set:{"priority":NumberInt(14)}})
+db.getCollection('tabKPIConf').updateMany({"level":"UNIT"},{$set:{"priority":NumberInt(13)}})
+db.getCollection('tabKPIConf').updateMany({"level":"COUNTRY"},{$set:{"priority":NumberInt(12)}})

@@ -109,7 +109,7 @@ public class CounterConfService extends MongoBaseService {
            if(existingAssignmentDTOs.isEmpty()){
                return new ArrayList<>();
            }
-        Map<BigInteger, KPICategoryDTO> categoryDTOMapById = changedCategories.parallelStream().collect(Collectors.toMap(kPICategoryDTO -> kPICategoryDTO.getId(), kPICategoryDTO -> kPICategoryDTO));
+             Map<BigInteger, KPICategoryDTO> categoryDTOMapById = changedCategories.parallelStream().collect(Collectors.toMap(kPICategoryDTO -> kPICategoryDTO.getId(), kPICategoryDTO -> kPICategoryDTO));
              List<BigInteger> categoriesIds = changedCategories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
              List<KPICategory> kpiCategories = counterRepository.getKPICategoryByIds(categoriesIds, level, refId);
             for( KPICategory kpiCategory : kpiCategories){

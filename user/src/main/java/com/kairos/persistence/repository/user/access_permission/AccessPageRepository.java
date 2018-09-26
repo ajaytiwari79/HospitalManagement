@@ -350,10 +350,9 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("Match (u:User) WHERE id(u)={0} \n" +
             "Match (org:Organization{isEnable:true})-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(s:Staff)-[:BELONGS_TO]-(u) \n" +
-            "match (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization{isEnable:true}) with employment,org+[unit] as coll\n" +
+            "optional match (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization{isEnable:true}) with employment,org+[unit] as coll\n" +
             "unwind coll as units with  distinct units,employment \n" +
-            "match  (o:Organization{isEnable:true})-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
-            "WHERE o.isParentOrganization=true AND o.organizationLevel=\"CITY\" \n" +
+            "Optional match  (o:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
             "with o,employment, [o]+units as units  unwind units as org  WITH distinct org,o,employment\n" +
             "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) WITH org,unitPermission\n" +
             "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WITH org,accessGroup,unitPermission\n" +

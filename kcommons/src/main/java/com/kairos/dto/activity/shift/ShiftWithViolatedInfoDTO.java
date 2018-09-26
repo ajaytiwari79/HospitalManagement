@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.shift;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,6 +11,7 @@ import java.util.List;
 public class ShiftWithViolatedInfoDTO {
     private List<ShiftDTO> shifts;
     private ViolatedRulesDTO violatedRules;
+    private List<String> errorMessages = new ArrayList<>();
 
 
     public ShiftWithViolatedInfoDTO() {
@@ -18,6 +20,19 @@ public class ShiftWithViolatedInfoDTO {
     public ShiftWithViolatedInfoDTO(List<ShiftDTO> shifts, ViolatedRulesDTO violatedRules) {
         this.shifts = shifts;
         this.violatedRules = violatedRules;
+    }
+
+
+    public ShiftWithViolatedInfoDTO(ViolatedRulesDTO violatedRules) {
+        this.violatedRules = violatedRules;
+    }
+
+    public List<String> getErrorMessages() {
+        return errorMessages;
+    }
+
+    public void setErrorMessages(List<String> errorMessages) {
+        this.errorMessages = errorMessages;
     }
 
     public List<ShiftDTO> getShifts() {

@@ -4,7 +4,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.persistence.model.clause.Clause;
-import com.kairos.enums.FilterType;
+import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.filter.FilterGroup;
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
@@ -28,7 +28,6 @@ import static com.kairos.constants.AppConstant.ASSET_MODULE_NAME;
 import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_NAME;
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 import static com.kairos.constants.AppConstant.DELETED;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.MASTER_PROCESSING_ACTIVITY_MODULE_ID;
 
 
@@ -39,13 +38,13 @@ public class FilterMongoRepositoryImpl implements CustomFilterMongoRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Map<String, AggregationOperation> getFilterCriteria(Long countryId, Long organizationId, List<FilterType> filterTypes, FilterGroup filterGroup) {
+    public Map<String, AggregationOperation> getFilterCriteria(Long countryId,  List<FilterType> filterTypes, FilterGroup filterGroup) {
         Map<String, AggregationOperation> aggregationOperations = new HashMap<>();
         if (filterGroup.getAccessModule().get(0).getModuleId().equals(MASTER_PROCESSING_ACTIVITY_MODULE_ID)) {
-            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId).and("isSubProcess").is(false)));
+            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("isSubProcess").is(false)));
 
         } else {
-            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(ORGANIZATION_ID).is(organizationId)));
+            aggregationOperations.put("match", match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)));
         }
         filterTypes.forEach(filterType -> {
                     buildAggregationQuery(filterType,aggregationOperations);

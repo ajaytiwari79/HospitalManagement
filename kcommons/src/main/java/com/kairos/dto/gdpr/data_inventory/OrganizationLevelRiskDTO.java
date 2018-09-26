@@ -14,7 +14,7 @@ public class OrganizationLevelRiskDTO  extends BasicRiskDTO {
     @NotNull(message = "error.message.risk.due.date")
     private LocalDate dueDate;
     private Staff riskOwner;
-    private boolean isReminderActive;
+    private boolean reminderActive;
     private int daysToReminderBefore;
 
     public Staff getRiskOwner() { return riskOwner; }
@@ -25,9 +25,9 @@ public class OrganizationLevelRiskDTO  extends BasicRiskDTO {
 
     public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
 
-    public boolean isReminderActive() { return isReminderActive; }
+    public boolean isReminderActive() { return reminderActive; }
 
-    public void setReminderActive(boolean reminderActive) { isReminderActive = reminderActive; }
+    public void setReminderActive(boolean reminderActive) { this.reminderActive = reminderActive; }
 
     public int getDaysToReminderBefore() { return daysToReminderBefore; }
 

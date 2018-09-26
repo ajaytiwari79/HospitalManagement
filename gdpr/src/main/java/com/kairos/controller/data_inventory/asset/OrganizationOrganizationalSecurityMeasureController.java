@@ -17,12 +17,12 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class OrganizationOrganizationalSecurityMeasureController {
 
 
@@ -35,10 +35,6 @@ public class OrganizationOrganizationalSecurityMeasureController {
     @ApiOperation("add OrganizationalSecurityMeasure")
     @PostMapping("/organization_security")
     public ResponseEntity<Object> createOrganizationalSecurityMeasure(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<OrganizationalSecurityMeasureDTO> orgSecurityMeasures) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.createOrganizationalSecurityMeasure(unitId, orgSecurityMeasures.getRequestBody()));
 
     }
@@ -47,9 +43,6 @@ public class OrganizationOrganizationalSecurityMeasureController {
     @ApiOperation("get OrganizationalSecurityMeasure by id")
     @GetMapping("/organization_security/{orgSecurityMeasureId}")
     public ResponseEntity<Object> getOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable BigInteger orgSecurityMeasureId) {
-       if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId));
     }
 
@@ -57,9 +50,6 @@ public class OrganizationOrganizationalSecurityMeasureController {
     @ApiOperation("get all OrganizationalSecurityMeasure ")
     @GetMapping("/organization_security")
     public ResponseEntity<Object> getAllOrganizationalSecurityMeasure(@PathVariable Long unitId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.getAllOrganizationalSecurityMeasure(unitId));
     }
 
@@ -67,9 +57,6 @@ public class OrganizationOrganizationalSecurityMeasureController {
     @ApiOperation("delete OrganizationalSecurityMeasure  by id")
     @DeleteMapping("/organization_security/{orgSecurityMeasureId}")
     public ResponseEntity<Object> deleteOrganizationalSecurityMeasureById(@PathVariable Long unitId, @PathVariable BigInteger orgSecurityMeasureId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.deleteOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId));
 
     }
@@ -77,9 +64,6 @@ public class OrganizationOrganizationalSecurityMeasureController {
     @ApiOperation("update OrganizationalSecurityMeasure by id")
     @PutMapping("/organization_security/{orgSecurityMeasureId}")
     public ResponseEntity<Object> updateOrganizationalSecurityMeasure(@PathVariable Long unitId, @PathVariable BigInteger orgSecurityMeasureId, @Valid @RequestBody OrganizationalSecurityMeasureDTO orgSecurityMeasure) {
-      if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.updateOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId, orgSecurityMeasure));
 
     }
@@ -88,9 +72,6 @@ public class OrganizationOrganizationalSecurityMeasureController {
     @ApiOperation("save Organizational Security measure  And Suggest To Country admin")
     @PostMapping(COUNTRY_URL + "/organization_security/suggest")
     public ResponseEntity<Object> saveOrganizationalSecurityMeasureAndSuggestToCountryAdmin(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<OrganizationalSecurityMeasureDTO> orgSecurityMeasureDTOs) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationalSecurityMeasureService.saveAndSuggestOrganizationalSecurityMeasures(countryId, unitId, orgSecurityMeasureDTOs.getRequestBody()));
 
     }

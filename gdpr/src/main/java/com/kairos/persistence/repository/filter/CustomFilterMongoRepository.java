@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.filter;
 
-import com.kairos.enums.FilterType;
+import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.filter.FilterGroup;
 import com.kairos.response.dto.filter.FilterCategoryResult;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -13,7 +13,7 @@ import java.util.Map;
 public interface CustomFilterMongoRepository {
 
 
-    Map<String, AggregationOperation> getFilterCriteria(Long countryId,Long organizationId,List<FilterType> filterTypes,FilterGroup  filterGroup);
+    Map<String, AggregationOperation> getFilterCriteria(Long countryId,List<FilterType> filterTypes,FilterGroup  filterGroup);
 
     void buildAggregationQuery(FilterType filterType, Map<String, AggregationOperation> aggregationOperations );
 

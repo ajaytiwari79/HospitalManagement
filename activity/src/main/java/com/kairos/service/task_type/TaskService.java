@@ -728,7 +728,7 @@ public class TaskService extends MongoBaseService {
 
         }
         if (!shiftsToCreate.isEmpty()) {
-            shiftService.saveShiftsWithActivity(shiftsToCreate,staffAdditionalInfoDTO);
+            shiftService.saveShiftWithActivity(shiftsToCreate,staffAdditionalInfoDTO);
             timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shiftsToCreate);
             payOutService.savePayOuts(staffAdditionalInfoDTO, shiftsToCreate,activities);
         }

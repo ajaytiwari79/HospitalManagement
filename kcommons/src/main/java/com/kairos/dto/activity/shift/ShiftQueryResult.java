@@ -32,7 +32,7 @@ public class ShiftQueryResult {
     private static boolean overrideWeekCount;
     private Long unitId;
     private Long unitPositionId;
-    private Set<ShiftStatus> status;
+
     private Long allowedBreakDurationInMinute;
     private Long expertiseId;
     private String timeType;
@@ -189,13 +189,6 @@ public class ShiftQueryResult {
         this.unitPositionId = unitPositionId;
     }
 
-    public Set<ShiftStatus> getStatus() {
-        return status=Optional.ofNullable(status).orElse(new HashSet<>());
-    }
-
-    public void setStatus(Set<ShiftStatus> status) {
-        this.status = status;
-    }
 
     public Long getAllowedBreakDurationInMinute() {
         return allowedBreakDurationInMinute;

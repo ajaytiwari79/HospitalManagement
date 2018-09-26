@@ -1,6 +1,7 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.access_permission.*;
@@ -36,6 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
 
@@ -66,7 +69,8 @@ public class AccessGroupService {
     private ExceptionService exceptionService;
     @Inject
     private AccountTypeGraphRepository accountTypeGraphRepository;
-    @Inject private StaffService staffService;
+    @Inject
+    private StaffService staffService;
 
     public AccessGroup createAccessGroup(long organizationId, AccessGroup accessGroup) {
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroup.getName().trim());
@@ -173,6 +177,41 @@ public class AccessGroupService {
             }
             organization.setAccessGroups(accessGroups);
         }
+        organizationGraphRepository.save(organization);
+        return countryAndOrgAccessGroupIdsMap;
+    }
+
+    /**
+     * @param organization,accountTypeId
+     * @author vipul
+     * this method will create accessgroup to the organization
+     */
+    public Map<Long, Long> createDefaultAccessGroupsInOrganization(Organization organization, List<AccessGroup> accessGroupList) {
+
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap = new LinkedHashMap<>();
+
+        List<AccessGroup> newAccessGroupList = new ArrayList<>(accessGroupList.size());
+        for (AccessGroup currentAccessGroup : accessGroupList) {
+            AccessGroup accessGroup = new AccessGroup(currentAccessGroup.getName(), currentAccessGroup.getDescription(), currentAccessGroup.getRole());
+            accessGroup.setCreationDate(DateUtils.getCurrentDayStartMillis());
+            accessGroup.setLastModificationDate(accessGroup.getCreationDate());
+            countryAndOrgAccessGroupIdsMap.put(currentAccessGroup.getId(), null);
+            newAccessGroupList.add(accessGroup);
+        }
+        accessGroupRepository.saveAll(newAccessGroupList);
+        AtomicInteger counter = new AtomicInteger(0);
+        countryAndOrgAccessGroupIdsMap.forEach((k, v) -> {
+            countryAndOrgAccessGroupIdsMap.put(k, newAccessGroupList.get(counter.get()).getId());
+            // TODO PAVAN vipul remove this looped and use below when parent id is set to acccess group
+            accessGroupRepository.setAccessPagePermissionForAccessGroup(k, newAccessGroupList.get(counter.get()).getId());
+            // increment counter
+            counter.addAndGet(1);
+        });
+        // DONT remove
+        //List<Long> organizationAccessGroupIds = newAccessGroupList.stream().map(AccessGroup::getId).collect(Collectors.toList());
+        //List<Long> countryAccessGroupIds = newAccessGroupList.stream().map(AccessGroup::getId).collect(Collectors.toList());
+        //accessGroupRepository.setAccessPagePermissionForAccessGroup(countryAccessGroupIds, organizationAccessGroupIds);
+        organization.setAccessGroups(newAccessGroupList);
         organizationGraphRepository.save(organization);
         return countryAndOrgAccessGroupIdsMap;
     }
@@ -682,12 +721,12 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", accessGroupDTO.getId());
 
         }
-        AccessGroup accessGroup=new AccessGroup(accessGroupDTO.getName().trim(),accessGroupDTO.getDescription(),accessGroupDTO.getRole());
+        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole());
         accessGroupRepository.save(accessGroup);
         organization.get().getAccessGroups().add(accessGroup);
         organizationGraphRepository.save(organization.get());
-        accessPageRepository.copyAccessGroupPageRelationShips(accessGroupDTO.getId(),accessGroup.getId());
-        return new AccessGroupDTO(accessGroup.getId(),accessGroup.getName(),accessGroup.getDescription(),accessGroup.getRole());
+        accessPageRepository.copyAccessGroupPageRelationShips(accessGroupDTO.getId(), accessGroup.getId());
+        return new AccessGroupDTO(accessGroup.getId(), accessGroup.getName(), accessGroup.getDescription(), accessGroup.getRole());
 
     }
 
@@ -707,7 +746,7 @@ public class AccessGroupService {
             exceptionService.dataNotFoundByIdException("message.acessGroupId.incorrect", countryAccessGroupDTO.getId());
 
         }
-        AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole(),currentAccessGroup.get().getAccountType());
+        AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole(), currentAccessGroup.get().getAccountType());
         accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
@@ -756,12 +795,13 @@ public class AccessGroupService {
         );
         return userAccessRoleDTO;
     }
-    public List<StaffIdsQueryResult> getStaffIdsByUnitIdAndAccessGroupId(Long unitId, List<Long> accessGroupId){
-        return accessGroupRepository.getStaffIdsByUnitIdAndAccessGroupId(unitId,accessGroupId);
+
+    public List<StaffIdsQueryResult> getStaffIdsByUnitIdAndAccessGroupId(Long unitId, List<Long> accessGroupId) {
+        return accessGroupRepository.getStaffIdsByUnitIdAndAccessGroupId(unitId, accessGroupId);
     }
 
-    public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId){
-        Long staffId=staffService.getStaffIdOfLoggedInUser(unitId);
-        return accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
+    public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId) {
+        Long staffId = staffService.getStaffIdOfLoggedInUser(unitId);
+        return accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
     }
 }

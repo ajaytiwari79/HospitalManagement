@@ -2,40 +2,38 @@ package com.kairos.dto.activity.shift;
 
 import com.kairos.enums.shift.ShiftStatus;
 
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by vipul on 9/5/18.
  */
 public class ShiftPublishDTO {
-    private List<BigInteger> shiftIds;
-    private List<ShiftStatus> status;
+    private List<ShiftActivitiesIdDTO> shifts;
+    private ShiftStatus status;
 
 
     public ShiftPublishDTO() {
         //default
     }
 
-    public ShiftPublishDTO(List<BigInteger> shiftIds, List<ShiftStatus> status) {
-        this.shiftIds = shiftIds;
+    public ShiftPublishDTO(List<ShiftActivitiesIdDTO> shifts, ShiftStatus status) {
+        this.shifts = shifts;
         this.status = status;
     }
 
-    public List<BigInteger> getShiftIds() {
-        return shiftIds;
+    public List<ShiftActivitiesIdDTO> getShifts() {
+        return shifts;
     }
 
-    public void setShiftIds(List<BigInteger> shiftIds) {
-        this.shiftIds = shiftIds;
+    public void setShifts(List<ShiftActivitiesIdDTO> shifts) {
+        this.shifts = shifts;
     }
 
-    public List<ShiftStatus> getStatus() {
+    public ShiftStatus getStatus() {
         return status;
     }
 
-    public void setStatus(List<ShiftStatus> status) {
+    public void setStatus(ShiftStatus status) {
         this.status = status;
     }
 }

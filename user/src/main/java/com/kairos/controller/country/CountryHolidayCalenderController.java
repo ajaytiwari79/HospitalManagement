@@ -70,7 +70,7 @@ public class CountryHolidayCalenderController {
 
 
     @RequestMapping(value = "/holiday",method = RequestMethod.POST)
-    @ApiOperation("Update a new CountryHolidayCalenderController holiday by id")
+    @ApiOperation("save a new CountryHolidayCalenderController holiday by id")
     ResponseEntity<Map<String, Object>> addCountryCalenderToCountry(@PathVariable Long countryId ,@RequestBody Map<String,Object> countryHolidayCalender) throws Exception{
         return ResponseHandler.generateResponse(HttpStatus.OK,true,countryHolidayCalenderService.createHolidayCalenderByCountryId(countryId,countryHolidayCalender));
     }

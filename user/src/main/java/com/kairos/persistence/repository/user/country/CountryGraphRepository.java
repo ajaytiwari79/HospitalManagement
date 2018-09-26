@@ -41,10 +41,9 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     List<Map<String,Object>> getAllCountryHolidaysByYear(Long countryId, Long start, Long end);
 
 
-    @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " +
+    @Query("MATCH (c:Country)-[:"+HAS_HOLIDAY+"]-(ch:CountryHolidayCalender{isEnabled :true}) " +
             "where id(c) = {0}  " +
-            "AND ch.isEnabled = true WITH  ch as ch  " +
-            "OPTIONAL MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
+            " MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
             "return {text: ch.holidayTitle,isEnabled :ch.isEnabled  ,holidayDate: ch.holidayDate, description:ch.description,startTime:ch.startTime,id:id(ch),endTime:ch.endTime, " +
             "dayType:dt.name, allowTimeSettings:dt.allowTimeSettings, colorCode:dt.colorCode," +
             "dayTypeId:id(dt)} as result order by  ch.holidayDate asc ")

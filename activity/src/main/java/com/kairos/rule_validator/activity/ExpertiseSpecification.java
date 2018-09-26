@@ -37,7 +37,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
-            expertiseIds.addAll(shift.getActivities().stream().flatMap(a -> a.getActivity().getExpertises().stream()).collect(Collectors.toList()));
+            expertiseIds.addAll(shift.getActivities().stream().filter(a->a.getActivity()!=null).flatMap(a -> a.getActivity().getExpertises().stream()).collect(Collectors.toList()));
             if (!expertiseIds.contains(expertise.getId())) {
                 ShiftValidatorService.throwException("message.activity.expertise.match");
             }

@@ -3,7 +3,7 @@ package com.kairos.persistence.model.filter;
 
 import com.kairos.dto.gdpr.master_data.ModuleIdDTO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.enums.FilterType;
+import com.kairos.enums.gdpr.FilterType;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;

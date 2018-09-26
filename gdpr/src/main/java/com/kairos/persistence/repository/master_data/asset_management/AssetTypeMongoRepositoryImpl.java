@@ -60,7 +60,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
                         .first("hasSubAsset").as("hasSubAsset")
                         .first("name").as("name")
                         .first("subAsset").as("subAsset"),
-                sort(Sort.Direction.ASC, "name"),
+                sort(Sort.Direction.DESC, "id"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
 
@@ -110,7 +110,7 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
                         .first("hasSubAsset").as("hasSubAsset")
                         .first("name").as("name")
                         .first("subAsset").as("subAsset"),
-                sort(Sort.Direction.ASC, "name"),
+                sort(Sort.Direction.ASC, "_id"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
 

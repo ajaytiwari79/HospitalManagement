@@ -961,7 +961,7 @@ public class StaffingLevelService extends MongoBaseService {
         Iterator<DateWiseActivityDTO> iterator = dateWiseActivityDTOS.iterator();
         while (iterator.hasNext()) {
             DateWiseActivityDTO dateWiseActivityDTO = iterator.next();
-            if (dateWiseActivityDTO.getLocalDate().isBefore(startDate) || dateWiseActivityDTO.getLocalDate().isAfter(endDate)) {
+            if (dateWiseActivityDTO.getLocalDate().isBefore(startDate) || dateWiseActivityDTO.getLocalDate().isAfter(endDate) || dateWiseActivityDTO.getLocalDate().isBefore(DateUtils.getCurrentLocalDate())) {
                 iterator.remove();
                 activityValidationErrors.add(new ActivityValidationError(Arrays.asList(exceptionService.getLanguageSpecificText("date.out.of.range", dateWiseActivityDTO.getLocalDate()))));
             }
