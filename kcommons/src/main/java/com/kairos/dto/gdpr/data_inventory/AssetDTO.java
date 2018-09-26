@@ -53,10 +53,6 @@ public class AssetDTO {
 
     @NotNull(message = "Asset  Types can't be null")
     private BigInteger assetType;
-
-
-    public void setId(BigInteger id) { this.id = id; }
-
     private List<BigInteger> assetSubTypes = new ArrayList<>();
 
     private Integer dataRetentionPeriod;
@@ -66,6 +62,8 @@ public class AssetDTO {
     private Long maxDataSubjectVolume;
 
     private RiskSeverity riskLevel;
+
+    public void setId(BigInteger id) { this.id = id; }
 
     public BigInteger getId() { return id; }
 

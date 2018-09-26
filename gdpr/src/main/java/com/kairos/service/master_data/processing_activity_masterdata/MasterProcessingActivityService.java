@@ -127,12 +127,6 @@ public class MasterProcessingActivityService extends MongoBaseService {
     }
 
 
-    public List<MasterProcessingActivity> getAllMasterProcessingActivity(Long countryId) {
-        return masterProcessingActivityRepository.getAllMasterProcessingActivity(countryId);
-
-    }
-
-
     /**
      * updateExistingAndCreateNewSubProcessingActivity(countryId, organizationId, masterProcessingActivityDto.getSubProcessingActivities(), masterProcessingActivityDto)
      * is used for updating and creating new sub processing activity

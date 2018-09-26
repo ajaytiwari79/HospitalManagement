@@ -238,9 +238,9 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
                ,Criteria.where("kpiValidity").is(KPIValidity.MANDATORY.toString()),Criteria.where("kpiValidity").is(KPIValidity.OPTIONAL.toString()));
  */
 
-    public List<TabKPIConf> findTabKPIConfigurationByTabIds( String tabId,List<BigInteger> kpiIds,Long refId,ConfLevel level){
+    public List<TabKPIConf> findTabKPIConfigurationByTabIds( List<String> tabIds,List<BigInteger> kpiIds,Long refId,ConfLevel level){
         String refQueryField = getRefQueryField(level);
-        Query query=new Query(Criteria.where("tabId").is(tabId).and("kpiId").in(kpiIds).and(refQueryField).is(refId).and("level").is(level));
+        Query query=new Query(Criteria.where("tabId").in(tabIds).and("kpiId").in(kpiIds).and(refQueryField).is(refId).and("level").is(level).and("kpiValidity").nin(KPIValidity.MANDATORY,KPIValidity.OPTIONAL));
         return mongoTemplate.find(query,TabKPIConf.class);
     }
 
@@ -465,48 +465,6 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,KPIDashboard.class),KPIDashboardDTO.class);
     }
 
-    public List<DashboardKPIConf> getDashboardKPIConfs(List<BigInteger> kpiIds,List<BigInteger> dashboardIds,Long refId,ConfLevel level){
-        String refQueryField = getRefQueryField(level);
-        Query query = new Query(Criteria.where("kpiId").in(kpiIds).and("dashboardId").in(dashboardIds).and(refQueryField).is(refId).and("level").is(level));
-        return mongoTemplate.find(query, DashboardKPIConf.class);
-    }
-
-    public List<DashboardKPIDTO> getDashboardKPIForStaffByTabAndStaffId(List<String> moduleIds, List<BigInteger> kpiIds, Long staffId, Long unitId, ConfLevel level){
-        Criteria criteria;
-        if(kpiIds.isEmpty()) {
-            criteria=Criteria.where("moduleId").in(moduleIds).and("staffId").is(staffId).and("unitId").is(unitId).and("level").is(level);
-        }else{
-            criteria=Criteria.where("moduleId").in(moduleIds).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level);
-        }
-        Aggregation aggregation=Aggregation.newAggregation(
-                Aggregation.match(criteria),
-                Aggregation.lookup("counter","kpiId","_id","kpis"),
-                Aggregation.project("moduleId","position","id").and("kpis").arrayElementAt(0).as("kpis"),
-                Aggregation.project("moduleId","position","id").and("kpis.title").as("kpi.title").
-                        and("kpis._id").as("kpi._id").and("kpis.counter").as("kpi.counter")
-        );
-        AggregationResults<DashboardKPIDTO> aggregationResults=mongoTemplate.aggregate(aggregation,DashboardKPIConf.class,DashboardKPIDTO.class);
-        return aggregationResults.getMappedResults();
-    };
-
-    public void removeDashboardKPIEntry(List<Long> refIds,BigInteger kpiId,ConfLevel level){
-        String refQueryField = getRefQueryField(level);
-        Query query = new Query(Criteria.where(refQueryField).in(refIds).and("kpiId").is(kpiId).and("level").is(level));
-        mongoTemplate.remove(query, DashboardKPIConf.class);
-    }
-
-
-//    public void removeDashboardKPIEntries(List<BigInteger> dashboardIds,List<BigInteger> kpiIds){
-//        Query query=new Query(Criteria.where("dashboardId").in(dashboardIds).and("kpiId").in(kpiIds));
-//        mongoTemplate.remove(query, DashboardKPIConf.class);
-//    }
-
-    public void removeDashboardKPIConfiguration(DashboardKPIMappingDTO entry, Long refId, ConfLevel level){
-        String refQueryField = getRefQueryField(level);
-        Query query = new Query(Criteria.where("moduleId").is(entry.getModuleId()).and("kpiId").is(entry.getKpiId()).and(refQueryField).is(refId).and("level").is(level));
-        mongoTemplate.remove(query, DashboardKPIConf.class);
-    }
-
    public List<KPIAccessPageDTO> getKPIAcceccPage(Long refId,ConfLevel level){
        String refQueryField = getRefQueryField(level);
        Aggregation aggregation=Aggregation.newAggregation(
@@ -517,35 +475,5 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
        AggregationResults<KPIAccessPageDTO> results=mongoTemplate.aggregate(aggregation,KPIDashboard.class,KPIAccessPageDTO.class);
        return results.getMappedResults();
    }
-
-    public List<DashboardKPIMappingDTO> getKPIsMappingForDashboards(List<BigInteger> dashboardIds){
-        Aggregation ag = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("dashboardId").in(dashboardIds))
-                , Aggregation.group("dashboardId","moduleId").push("kpiId").as("kpiIds")
-                , Aggregation.project().and("_id").as("dashboardId").and("moduleId").as("moduleId").and("kpiIds").as("kpiId")
-        );
-        AggregationResults<DashboardKPIMappingDTO> results = mongoTemplate.aggregate(ag, DashboardKPIConf.class, DashboardKPIMappingDTO.class);
-        return results.getMappedResults();
-    }
-
-    public List<DashboardKPIConf> findDashboardKPIConfigurationByTabIds( String dashboardId,List<BigInteger> kpiIds,Long staffId,ConfLevel level){
-        Query query=new Query(Criteria.where("moduleId").is(dashboardId).and("kpiId").in(kpiIds).and("staffId").is(staffId).and("level").is(level));
-        return mongoTemplate.find(query,DashboardKPIConf.class);
-    }
-
-    public List<DashboardKPIMappingDTO> getDashboardKPIConfigurationByTabIds(List<String> dashboardIds,List<BigInteger> kpiIds, Long refId, ConfLevel level){
-        String refQueryField = getRefQueryField(level);
-        Query query=null;
-        if(kpiIds.isEmpty()) {
-            query=new Query(Criteria.where("moduleId").in(dashboardIds).and(refQueryField).is(refId).and("level").is(level));
-        }else{
-            query=new Query(Criteria.where("moduleId").in(dashboardIds).and("kpiId").in(kpiIds).and(refQueryField).is(refId).and("level").is(level));
-        }
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,DashboardKPIConf.class),DashboardKPIMappingDTO.class);
-    }
-
-//    public List<KPIAccessPageDTO> getKPIAcceccPageForCountry(Long countryId,ConfLevel level){
-//        String refQueryField = getRefQueryField(level);
-//    }
 
 }

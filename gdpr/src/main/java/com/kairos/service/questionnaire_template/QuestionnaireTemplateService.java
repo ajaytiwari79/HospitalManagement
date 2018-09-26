@@ -108,7 +108,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
             AssetType assetType = isUnitId ? assetTypeMongoRepository.findByIdAndUnitId(referenceId, templateDto.getAssetType()) : assetTypeMongoRepository.findByIdAndCountryId(referenceId, templateDto.getAssetType());
             if (!Optional.ofNullable(assetType).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", templateDto.getAssetType());
-            } else if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && !Optional.ofNullable(templateDto.getAssetSubType()).isPresent() || !assetType.getSubAssetTypes().contains(templateDto.getAssetSubType())) {
+            } else if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(templateDto.getAssetSubType()).isPresent() ||  !assetType.getSubAssetTypes().contains(templateDto.getAssetSubType()))) {
                 exceptionService.invalidRequestException("message.invalid.request", "Sub Asset Type is Not Selected");
             } else {
                 questionnaireTemplate.setAssetType(templateDto.getAssetType());
@@ -273,7 +273,6 @@ public class QuestionnaireTemplateService extends MongoBaseService {
     }
 
     /**
-     *
      * @param unitId
      * @return
      */

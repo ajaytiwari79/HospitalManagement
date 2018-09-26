@@ -8,7 +8,7 @@ import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMon
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
+import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
@@ -55,9 +55,6 @@ public class AssetService extends MongoBaseService {
 
     @Inject
     private AssessmentMongoRepository assessmentMongoRepository;
-
-    @Inject
-    private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
 
     @Inject
     private MasterAssetService masterAssetService;
@@ -283,8 +280,7 @@ public class AssetService extends MongoBaseService {
         result.put("new", assetDTO);
         result.put("SuggestedData", masterAsset);
         return result;
-
-    }
+        }
 
 
     public List<ProcessingActivityBasicResponseDTO> getAllRelatedProcessingActivityAndSubProcessingActivities(Long unitId, BigInteger assetId) {

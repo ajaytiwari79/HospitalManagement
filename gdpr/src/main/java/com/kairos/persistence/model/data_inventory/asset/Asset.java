@@ -5,6 +5,7 @@ import com.kairos.enums.RiskSeverity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -41,7 +42,6 @@ public class Asset extends MongoBaseEntity {
     private RiskSeverity riskLevel;
     @NotNull(message = "Status can't be empty")
     private boolean active=true;
-    private List<BigInteger> assessments=new ArrayList<>();
     private boolean suggested;
 
     public Asset() {
@@ -68,13 +68,11 @@ public class Asset extends MongoBaseEntity {
 
     public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
+
     public boolean isActive() { return active; }
 
     public void setActive(boolean active) { this.active = active; }
 
-    public List<BigInteger> getAssessments() { return assessments; }
-
-    public void setAssessments(List<BigInteger> assessments) { this.assessments = assessments; }
 
     public Set<BigInteger> getProcessingActivities() { return processingActivities; }
 

@@ -5,6 +5,7 @@ import com.kairos.persistence.repository.client_aggregator.CustomAggregationOper
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -66,7 +67,9 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("data_element", "dataElements", "_id", "dataElements"),
-                new CustomAggregationOperation(projectionOperation)
+                new CustomAggregationOperation(projectionOperation),
+                sort(Sort.Direction.DESC,"createdAt")
+
         );
 
         AggregationResults<DataCategoryResponseDTO> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDTO.class);
@@ -93,8 +96,10 @@ public class DataCategoryMongoRepositoryImpl implements CustomDataCategoryReposi
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(DELETED).is(false).and(ORGANIZATION_ID).is(unitId)),
                 lookup("data_element", "dataElements", "_id", "dataElements"),
-                new CustomAggregationOperation(projectionOperation)
-        );
+                new CustomAggregationOperation(projectionOperation),
+                sort(Sort.Direction.DESC,"createdAt")
+
+                );
 
         AggregationResults<DataCategoryResponseDTO> result = mongoTemplate.aggregate(aggregation, DataCategory.class, DataCategoryResponseDTO.class);
         return result.getMappedResults();
