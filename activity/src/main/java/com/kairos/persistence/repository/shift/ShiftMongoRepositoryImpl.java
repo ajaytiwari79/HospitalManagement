@@ -76,7 +76,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 new CustomAggregationOperation(shiftWithActivityProjection()),
                 new CustomAggregationOperation(shiftWithActivityGroup()),
                 new CustomAggregationOperation(anotherShiftWithActivityProjection()),
-                new CustomAggregationOperation(repa())
+                new CustomAggregationOperation(replaceRootForShift())
 
                 /*group("_id","name","startDate","endDate","disabled","bonusTimeBank","amount","probability","accumulatedTimeBankInMinutes","remarks","staffId","unitId","scheduledMinutes","durationMinutes","unitPositionId","status").addToSet("activities").as("activities"),
                 project("_id._id","_id.name","_id.startDate","_id.endDate","_id.disabled","_id.pId","_id.bonusTimeBank","_id.amount","_id.probability","_id.accumulatedTimeBankInMinutes","_id.remarks","_id.staffId","_id.unitId","_id.scheduledMinutes","_id.durationMinutes","_id.unitPositionId","_id.status").and("activities").as("_id.activities")*/
@@ -269,7 +269,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     public static Document anotherShiftWithActivityProjection(){
-        String anotherP = "{\n" +
+        String anotherShiftWithActivityProjection = "{\n" +
                 "        '$project':{\n" +
                 "            '_id._id' :1,\n" +
                 "    '_id.name' : 1,\n" +
@@ -291,14 +291,14 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "            '_id.activities':'$activities'\n" +
                 "            }\n" +
                 "    }";
-        return Document.parse(anotherP);
+        return Document.parse(anotherShiftWithActivityProjection);
     }
 
-    public static Document repa(){
-        String re="{\n" +
+    public static Document replaceRootForShift(){
+        String replaceRootForShift="{\n" +
                 "     $replaceRoot: { newRoot: '$_id' }\n" +
                 "   }";
-        return Document.parse(re);
+        return Document.parse(replaceRootForShift);
     }
 
    /* public List<ShiftTimeDTO> getShiftTimeDTO(List<FilterCriteria> filters){

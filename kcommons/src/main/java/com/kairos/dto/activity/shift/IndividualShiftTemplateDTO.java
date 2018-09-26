@@ -17,8 +17,7 @@ public class IndividualShiftTemplateDTO {
     private LocalTime startTime;
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
-    private boolean mainShift;
-    private List<ShiftActivity> activities;
+    private List<ShiftTemplateActivity> activities;
     private int durationMinutes;
 
     public IndividualShiftTemplateDTO() {
@@ -66,21 +65,14 @@ public class IndividualShiftTemplateDTO {
         this.endTime = endTime;
     }
 
-    public List<ShiftActivity> getActivities() {
+    public List<ShiftTemplateActivity> getActivities() {
         return activities;
     }
 
-    public void setActivities(List<ShiftActivity> activities) {
+    public void setActivities(List<ShiftTemplateActivity> activities) {
         this.activities = activities;
     }
 
-    public boolean isMainShift() {
-        return mainShift;
-    }
-
-    public void setMainShift(boolean mainShift) {
-        this.mainShift = mainShift;
-    }
 
 
     public int getDurationMinutes() {

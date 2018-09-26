@@ -126,6 +126,8 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
+
+        //TODO It should work on Multiple activity
         if(!isDisabled()  && isValidForPhase(infoWrapper.getPhase(),this.phaseTemplateValues) && timeTypeIds.contains(infoWrapper.getShift().getActivities().get(0).getActivity().getBalanceSettingsActivityTab().getTimeTypeId())){
             DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(),intervalUnit,intervalLength);
             List<ShiftWithActivityDTO> shifts = filterShifts(infoWrapper.getShifts(),timeTypeIds,plannedTimeIds,null);

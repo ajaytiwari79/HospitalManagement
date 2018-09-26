@@ -18,8 +18,6 @@ import java.util.Set;
 public interface ActivityMongoRepository extends MongoBaseRepository<Activity, BigInteger>,
         CustomActivityMongoRepository {
 
-    @Query("{_id:{$in:?0}, deleted:false}")
-    List<Activity> getActivityByIds(Set<BigInteger> activityIds);
 
     @Query("{'deleted' : false,'_id':?0}")
     Activity findActivityByIdAndEnabled(BigInteger id);

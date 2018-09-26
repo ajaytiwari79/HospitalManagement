@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.shift;
 
 import com.kairos.dto.activity.shift.ShiftActivity;
+import com.kairos.dto.activity.shift.ShiftTemplateActivity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -13,8 +14,7 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
     private String remarks;
     private LocalTime startTime;
     private LocalTime endTime;
-    private boolean mainShift;
-    private List<ShiftActivity> activities;
+    private List<ShiftTemplateActivity> activities;
     private int durationMinutes;
 
     public IndividualShiftTemplate() {
@@ -56,19 +56,11 @@ public class IndividualShiftTemplate extends MongoBaseEntity {
         this.endTime = endTime;
     }
 
-    public boolean isMainShift() {
-        return mainShift;
-    }
-
-    public void setMainShift(boolean mainShift) {
-        this.mainShift = mainShift;
-    }
-
-    public List<ShiftActivity> getActivities() {
+    public List<ShiftTemplateActivity> getActivities() {
         return activities;
     }
 
-    public void setActivities(List<ShiftActivity> activities) {
+    public void setActivities(List<ShiftTemplateActivity> activities) {
         this.activities = activities;
     }
 

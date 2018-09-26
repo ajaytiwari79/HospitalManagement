@@ -1034,6 +1034,7 @@ public class ShiftService extends MongoBaseService {
 
 
     private ShiftWithActivityDTO buildResponse(ShiftDTO shiftDTO, ActivityDTO activity) {
+        //TODO It should work on Multiple activity
         ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, ShiftWithActivityDTO.class);
         shiftWithActivityDTO.getActivities().get(0).setActivity(activity);
         shiftWithActivityDTO.setStatus(Arrays.asList(ShiftStatus.UNPUBLISHED));

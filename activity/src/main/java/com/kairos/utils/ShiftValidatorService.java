@@ -132,11 +132,13 @@ public class ShiftValidatorService {
             errorMessages.add(exceptionService.convertMessage("message.wta.expired-unit"));
         }
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO);
+        //TODO It should work on Multiple activity
         List<Long> dayTypeIds = shift.getActivities().get(0).getActivity().getRulesActivityTab().getDayTypes();
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills());
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
+        //TODO It should work on Multiple activity
         Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, shift.getActivities().get(0).getActivity(), staffAdditionalInfoDTO);
         Specification<ShiftWithActivityDTO> shiftTimeLessThan = new ShiftStartTimeLessThan(staffAdditionalInfoDTO.getUnitTimeZone(), shift.getActivitiesStartDate(), shift.getActivities().get(0).getActivity().getRulesActivityTab().getPlannedTimeInAdvance());
 
