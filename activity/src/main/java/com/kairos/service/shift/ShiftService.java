@@ -46,10 +46,7 @@ import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftNotificationMongoRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
-import com.kairos.persistence.repository.shift.ActivityShiftStatusSettingsRepository;
-import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
+import com.kairos.persistence.repository.shift.*;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
@@ -194,6 +191,7 @@ public class ShiftService extends MongoBaseService {
     private UnitDataService unitDataService;
     @Inject
     private StaffActivitySettingRepository staffActivitySettingRepository;
+    @Inject private ShiftStateMongoRepository shiftStateMongoRepository;
 
     @Inject
     private ShiftBreakActivityService shiftBreakActivityService;

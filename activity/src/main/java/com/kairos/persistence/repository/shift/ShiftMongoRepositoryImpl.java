@@ -179,6 +179,18 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     }
 
+    @Override
+    public Shift findShiftToBeDone(List<Long> staffIds, Date startDate,Date endDate) {
+        Query query=new Query();
+        Criteria startDateCriteria=Criteria.where("startDate").gte(startDate).lte(endDate);
+        Criteria endDateCriteria=Criteria.where("endDate").gte(startDate).lte(endDate);
+        query.addCriteria(Criteria.where("staffId").in(staffIds).and("deleted").is(false).and("attendanceDuration").exists(false)
+                .and("disabled").is(false).orOperator(startDateCriteria,endDateCriteria));
+        sort(Sort.Direction.ASC,"startDate");
+        query.limit(1);
+        return mongoTemplate.findOne(query,Shift.class);
+    }
+
     public static Document shiftWithActivityProjection(){
         String project = "{  \n" +
                 "      '$project':{  \n" +
@@ -299,15 +311,5 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return new ArrayList<>();
     }*/
 
-    @Override
-    public Shift findShiftToBeDone(List<Long> staffIds, Date startDateMillis,Date endDateMillis) {
-        Query query=new Query();
-        Criteria startDateCriteria=Criteria.where("startDate").gte(startDateMillis).lte(endDateMillis);
-        Criteria endDateCriteria=Criteria.where("endDate").gte(startDateMillis).lte(endDateMillis);
-        query.addCriteria(Criteria.where("staffId").in(staffIds).and("deleted").is(false).and("isMainShift").is(true)
-                .and("disabled").is(false).orOperator(startDateCriteria,endDateCriteria));
-        sort(Sort.Direction.ASC,"startDate");
-        query.limit(1);
-        return mongoTemplate.findOne(query,Shift.class);
-    }
+
 }

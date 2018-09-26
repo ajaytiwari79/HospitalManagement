@@ -649,6 +649,10 @@ public class DateUtils {
         return LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
+    public static Date getCurrentDayStart() {
+        return Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
     public static Long getCurrentMillis() {
         return System.currentTimeMillis();
     }
@@ -691,8 +695,8 @@ public class DateUtils {
 
     }
 
-    public static Long getCurrentDayMidNightMillis() {
-        return ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).minusSeconds(1).toInstant().toEpochMilli();
+    public static Date getCurrentDayMidNight() {
+        return Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).minusSeconds(1).toInstant());
 
 
     }

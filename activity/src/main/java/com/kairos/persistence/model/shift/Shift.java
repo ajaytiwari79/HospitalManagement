@@ -3,6 +3,7 @@ package com.kairos.persistence.model.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.kairos.dto.activity.attendance.AttendanceDuration;
 import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -60,6 +61,7 @@ public class Shift extends MongoBaseEntity {
     private LocalDate validatedByStaffDate;
     private LocalDate validatedByPlannerDate;
     private Long createdBy = UserContext.getUserDetails().getId();
+    private AttendanceDuration attendanceDuration;
 
     public Shift() {
         //Default Constructor
@@ -72,6 +74,46 @@ public class Shift extends MongoBaseEntity {
         this.unitPositionId = unitPositionId;
     }
 
+    public Shift(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
+                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.bid = bid;
+        this.pId = pId;
+        this.bonusTimeBank = bonusTimeBank;
+        this.amount = amount;
+        this.probability = probability;
+        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
+        this.remarks = remarks;
+        this.activities = activities;
+        this.staffId = staffId;
+        this.unitId = unitId;
+        this.unitPositionId = unitPositionId;
+
+    }
+    // This is used in absance shift
+    public Shift(Date startDate, Date endDate, Long staffId,List<ShiftActivity> activities,Long unitPositionId,Long unitId,BigInteger phaseId,BigInteger planningPeriodId) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.staffId = staffId;
+        this.activities = activities;
+        this.unitPositionId=unitPositionId;
+        this.unitId=unitId;
+        this.sickShift=true;
+        this.phaseId=phaseId;
+        this.planningPeriodId=planningPeriodId;
+
+    }
+
+
+    public AttendanceDuration getAttendanceDuration() {
+        return attendanceDuration;
+    }
+
+    public void setAttendanceDuration(AttendanceDuration attendanceDuration) {
+        this.attendanceDuration = attendanceDuration;
+    }
 
     public Long getCreatedBy() {
         return createdBy;
@@ -98,19 +140,7 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-    // This is used in absance shift
-    public Shift(Date startDate, Date endDate, Long staffId,List<ShiftActivity> activities,Long unitPositionId,Long unitId,BigInteger phaseId,BigInteger planningPeriodId) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.staffId = staffId;
-        this.activities = activities;
-        this.unitPositionId=unitPositionId;
-        this.unitId=unitId;
-        this.sickShift=true;
-        this.phaseId=phaseId;
-        this.planningPeriodId=planningPeriodId;
 
-    }
 
     public List<ShiftActivity> getActivities() {
         return activities;
@@ -126,24 +156,7 @@ public class Shift extends MongoBaseEntity {
         this.activities = activities;
     }
 
-    public Shift(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
-                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
-        this.id = id;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.bid = bid;
-        this.pId = pId;
-        this.bonusTimeBank = bonusTimeBank;
-        this.amount = amount;
-        this.probability = probability;
-        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
-        this.remarks = remarks;
-        this.activities = activities;
-        this.staffId = staffId;
-        this.unitId = unitId;
-        this.unitPositionId = unitPositionId;
 
-    }
 
 
     public LocalDate getValidatedByStaffDate() {
