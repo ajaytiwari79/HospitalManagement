@@ -38,6 +38,7 @@ public class ProcessingActivityController {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "ManagingOrganization id can't be Null");
         }
+        processingActivityDTO.setSuggested(false);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.createProcessingActivity(unitId, processingActivityDTO));
     }
 
@@ -198,10 +199,16 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(unitId, processingActivityId, riskId));
     }
 
+    @ApiOperation(value = "Get Previous Assessments Launched for Processing Activity")
+    @GetMapping("/processing_activity/{processingActivityId}/assesssment")
+    public ResponseEntity<Object> getAllAssessmentLaunchedForProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAssessmentListByProcessingActivityId(unitId, processingActivityId));
+    }
 
     @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")
     @PostMapping(COUNTRY_URL+"/processing_activity/suggest")
     public ResponseEntity<Object> saveProcessingActivityAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
+        processingActivityDTO.setSuggested(true);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.saveProcessingActivityAndSuggestToCountryAdmin(unitId, countryId, processingActivityDTO));
     }
 

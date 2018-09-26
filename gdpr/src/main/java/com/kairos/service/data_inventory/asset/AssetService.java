@@ -268,6 +268,17 @@ public class AssetService extends MongoBaseService {
 
 
     /**
+     * @description get all Previous Assessment Launched for Asset
+     * @param unitId
+     * @param assetId
+     * @return
+     */
+    public List<AssessmentBasicResponseDTO> getAssessmentListByAssetId(Long unitId, BigInteger assetId) {
+        return assessmentMongoRepository.findAllAssessmentLaunchedForAssetbyAssetIdAndUnitId(unitId, assetId);
+    }
+
+
+    /**
      * @param unitId    -unitid
      * @param countryId -country id
      * @param assetDTO
@@ -275,8 +286,6 @@ public class AssetService extends MongoBaseService {
      * @description create asset at unit level  and suggest asset to country admin
      */
     public Map<String, AssetDTO> saveAssetAndSuggestToCountryAdmin(Long unitId, Long countryId, AssetDTO assetDTO) {
-
-        assetDTO.setSuggested(true);
         Map<String, AssetDTO> result = new HashMap<>();
         assetDTO = createAssetWithBasicDetail(unitId, assetDTO);
         AssetDTO masterAsset = masterAssetService.saveSuggestedAssetDataFromUnit(countryId, unitId, assetDTO);

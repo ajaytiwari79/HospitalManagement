@@ -27,6 +27,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.processing_activity_masterdata.*;
 import com.kairos.service.risk_management.RiskService;
+import org.apache.commons.collections.CollectionUtils;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
@@ -540,8 +541,7 @@ public class ProcessingActivityService extends MongoBaseService {
 
     public Map<String, ProcessingActivityDTO> saveProcessingActivityAndSuggestToCountryAdmin(Long unitId, Long countryId, ProcessingActivityDTO processingActivityDTO) {
 
-        processingActivityDTO.setSuggested(true);
-        if (Optional.ofNullable(processingActivityDTO.getSubProcessingActivities()).isPresent()) {
+        if (CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
             processingActivityDTO.getSubProcessingActivities().forEach(subProcessingActivityDTO -> subProcessingActivityDTO.setSuggested(true));
         }
         Map<String, ProcessingActivityDTO> result = new HashMap<>();
