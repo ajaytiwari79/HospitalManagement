@@ -53,6 +53,7 @@ public class AssetDTO {
 
     public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
+
     public AssetAssessor getAssetAssessor() { return assetAssessor; }
 
     public void setId(BigInteger id) { this.id = id; }

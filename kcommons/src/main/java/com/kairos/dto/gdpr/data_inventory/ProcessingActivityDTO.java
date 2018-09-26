@@ -40,7 +40,7 @@ public class ProcessingActivityDTO {
     private Long maxDataSubjectVolume;
     private Integer dataRetentionPeriod;
     private boolean suggestToCountryAdmin;
-    private boolean suggested;
+    private boolean suggested=false;
 
     public boolean isSuggested() { return suggested; }
 

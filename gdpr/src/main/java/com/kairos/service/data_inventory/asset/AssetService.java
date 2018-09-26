@@ -286,6 +286,7 @@ public class AssetService extends MongoBaseService {
      * @description create asset at unit level  and suggest asset to country admin
      */
     public Map<String, AssetDTO> saveAssetAndSuggestToCountryAdmin(Long unitId, Long countryId, AssetDTO assetDTO) {
+
         Map<String, AssetDTO> result = new HashMap<>();
         assetDTO = createAssetWithBasicDetail(unitId, assetDTO);
         AssetDTO masterAsset = masterAssetService.saveSuggestedAssetDataFromUnit(countryId, unitId, assetDTO);
