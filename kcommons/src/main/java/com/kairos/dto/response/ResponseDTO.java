@@ -1,4 +1,4 @@
-package com.kairos.utils.response;
+package com.kairos.dto.response;
 
 import com.kairos.commons.utils.DateUtils;
 
