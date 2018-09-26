@@ -13,6 +13,7 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
 import com.kairos.utils.ComparisonUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -77,7 +78,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
     }
 
     public List<AccessorPartyResponseDTO> getAllAccessorParty(Long organizationId) {
-        return accessorPartyMongoRepository.findAllOrganizationAccessorParty(organizationId);
+        return accessorPartyMongoRepository.findAllOrganizationAccessorParty(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

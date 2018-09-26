@@ -30,8 +30,8 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if(pathVariables==null){
             throw new InvalidRequestException("Url or Parameter is not correct");
-        }
-        String orgIdStirng=pathVariables.get("organizationId");
+        }        String orgIdStirng=pathVariables.get("organizationId");
+
         String unitIdString=pathVariables.get("unitId");
         log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI()+"[ organizationId ,Unit Id " +orgIdStirng+" ,"+unitIdString+" ]");

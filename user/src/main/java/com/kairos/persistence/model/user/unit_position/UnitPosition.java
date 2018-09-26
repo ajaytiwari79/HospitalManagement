@@ -45,11 +45,6 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = HAS_REASON_CODE)
     private ReasonCode reasonCode;
 
-    @Relationship(type = HAS_SENIORITY_LEVEL)
-    private SeniorityLevel seniorityLevel;
-
-    @Relationship(type = HAS_FUNCTION)
-    private List<Function> functions;
 
     private Long startDateMillis;
     private Long endDateMillis;
@@ -60,8 +55,6 @@ public class UnitPosition extends UserBaseEntity {
     private boolean published;
     @Relationship(type = HAS_POSITION_LINES)
     private List<PositionLine> positionLines;
-    @Relationship(type = PARENT_UNIT_POSITION)
-    private UnitPosition parentUnitPosition;
 
     public UnitPosition() {
 
@@ -161,22 +154,6 @@ public class UnitPosition extends UserBaseEntity {
         this.reasonCode = reasonCode;
     }
 
-    public SeniorityLevel getSeniorityLevel() {
-        return seniorityLevel;
-    }
-
-    public void setSeniorityLevel(SeniorityLevel seniorityLevel) {
-        this.seniorityLevel = seniorityLevel;
-    }
-
-    public List<Function> getFunctions() {
-        return functions;
-    }
-
-    public void setFunctions(List<Function> functions) {
-        this.functions = functions;
-    }
-
     public boolean isHistory() {
         return history;
     }
@@ -191,14 +168,6 @@ public class UnitPosition extends UserBaseEntity {
 
     public void setEditable(boolean editable) {
         this.editable = editable;
-    }
-
-    public UnitPosition getParentUnitPosition() {
-        return parentUnitPosition;
-    }
-
-    public void setParentUnitPosition(UnitPosition parentUnitPosition) {
-        this.parentUnitPosition = parentUnitPosition;
     }
 
     public boolean isPublished() {
@@ -231,8 +200,6 @@ public class UnitPosition extends UserBaseEntity {
                 ", union=" + union +
                 ", unit=" + unit +
                 ", reasonCode=" + reasonCode +
-                ", seniorityLevel=" + seniorityLevel +
-                ", functions=" + functions +
                 ", startDateMillis=" + startDateMillis +
                 ", endDateMillis=" + endDateMillis +
                 ", lastWorkingDateMillis=" + lastWorkingDateMillis +
@@ -240,7 +207,6 @@ public class UnitPosition extends UserBaseEntity {
                 ", history=" + history +
                 ", editable=" + editable +
                 ", published=" + published +
-                ", parentUnitPosition=" + parentUnitPosition +
                 '}';
     }
 }

@@ -17,15 +17,12 @@ public interface MasterProcessingActivityRepository extends MongoBaseRepository<
     @Query("{deleted:false,countryId:?0,_id:?1}")
     MasterProcessingActivity findByIdAndCountryIdAndNonDeleted(Long countryId, BigInteger id);
 
-    @Query("{deleted:false,countryId:?0}")
-    List<MasterProcessingActivity> getAllMasterProcessingActivity(Long countryId);
-
     MasterProcessingActivity findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0,name:?1}")
     MasterProcessingActivity findByNameAndCountryId(Long countryId, String name);
 
-    @Query("{deleted:false,countryId:?0,_id:{$in:?1},isSubProcess:true}")
+    @Query("{deleted:false,countryId:?0,_id:{$in:?1},subProcess:true}")
     List<MasterProcessingActivity> getAllMasterSubProcessingActivityByIds(Long countryId, List<BigInteger> subProcessingActivityIds);
 
 }

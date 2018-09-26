@@ -4,6 +4,7 @@ import com.kairos.persistence.model.master_data.default_asset_setting.StorageFor
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -26,7 +27,7 @@ public interface StorageFormatMongoRepository extends MongoBaseRepository<Storag
     StorageFormat findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0}")
-    List<StorageFormatResponseDTO> findAllStorageFormats(Long countryId);
+    List<StorageFormatResponseDTO> findAllStorageFormats(Long countryId, Sort sort);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<StorageFormat> getStorageFormatListByIds(Long countryId, Set<BigInteger> storageFormatIds);
@@ -35,7 +36,7 @@ public interface StorageFormatMongoRepository extends MongoBaseRepository<Storag
     List<StorageFormatResponseDTO> findStorageFormatByIds(List<BigInteger> ids);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<StorageFormatResponseDTO> findAllOrganizationStorageFormats(Long organizationId);
+    List<StorageFormatResponseDTO> findAllOrganizationStorageFormats(Long organizationId,Sort sort);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
     StorageFormat findByOrganizationIdAndName(Long organizationId,String name);

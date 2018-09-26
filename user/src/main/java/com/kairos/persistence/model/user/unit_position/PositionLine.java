@@ -24,10 +24,10 @@ public class PositionLine extends UserBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private int totalWeeklyMinutes;
-    private int fullTimeWeeklyMinutes;
+    private int fullTimeWeeklyMinutes;  // Its coming from expertise
     private float avgDailyWorkingHours;
-    private int workingDaysInWeek;
-    private float hourlyWages;
+    private int workingDaysInWeek;       // same from expertise
+    private float hourlyWages;          // payGroupArea
 
     public PositionLine() {
         // DC
@@ -79,6 +79,10 @@ public class PositionLine extends UserBaseEntity {
 
     public float getHourlyWages() {
         return hourlyWages;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public static class PositionLineBuilder {

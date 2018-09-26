@@ -90,7 +90,7 @@ public class PlannerSyncService {
         List<UnitPositionWtaDTO> unitPositionWtaDTOS=new ArrayList<>();
         List<Long> upIds=unitPositionEmploymentTypeRelationShips.stream().map(upr->upr.getId()).collect(Collectors.toList());
         List<WTAResponseDTO> wtaResponseDTOS=workingTimeAgreementRestClient.getWTAByIds(upIds);
-        Map<Long,WTAResponseDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w->w.getUnitPositionId(), w->w));
+        Map<Long,WTAResponseDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w->w.getPositionLineId(), w->w));
         unitPositionEmploymentTypeRelationShips.forEach(upr->{
             unitPositionWtaDTOS.add(createUnitPositionDTO(upr.getUnitPosition(),upr.getEmploymentType(),unitId,wtaResponseDTOMap.get(upr.getUnitPosition().getId())));
         });

@@ -8,7 +8,7 @@ import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMon
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
-import com.kairos.persistence.repository.master_data.questionnaire_template.MasterQuestionnaireTemplateMongoRepository;
+import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
@@ -55,16 +55,13 @@ public class AssetService extends MongoBaseService {
     @Inject
     private AssessmentMongoRepository assessmentMongoRepository;
 
-    @Inject
-    private MasterQuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
-
 
     public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
         Asset previousAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
         if (Optional.ofNullable(previousAsset).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", " Asset ", assetDTO.getName());
         }
-        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(organizationId, assetDTO.getAssetType());
+        AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset  type", assetDTO.getAssetType());
         } else {
@@ -160,9 +157,9 @@ public class AssetService extends MongoBaseService {
      * @description method return audit history of asset , old Object list and latest version also.
      * return object contain  changed field with key fields and values with key Values in return list of map
      */
-    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId, int size, int skip) {
+    public List<Map<String, Object>> getAssetActivitiesHistory(BigInteger assetId) {
 
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class).limit(size).skip(skip);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(assetId, Asset.class);
         List<CdoSnapshot> changes = javers.findSnapshots(jqlQuery.build());
         changes.sort((o1, o2) -> -1 * (int) o1.getVersion() - (int) o2.getVersion());
         return javersCommonService.getHistoryMap(changes, assetId, Asset.class);
@@ -194,7 +191,7 @@ public class AssetService extends MongoBaseService {
         } else if (!asset.isActive()) {
             exceptionService.invalidRequestException("message.asset.inactive");
         }
-        AssetType assetType = assetTypeMongoRepository.findByUnitIdAndId(organizationId, assetDTO.getAssetType());
+        AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(organizationId, assetDTO.getAssetType());
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetDTO.getAssetType());
 
@@ -231,9 +228,8 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     *
      * @param unitId
-     * @param assetId - asset Id
+     * @param assetId              - asset Id
      * @param processingActivityId Processing Activity id link with Asset
      * @return
      */
@@ -250,9 +246,8 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     *
      * @param unitId
-     * @param assetId -Asset Id
+     * @param assetId                 -Asset Id
      * @param subProcessingActivityId - Sub Processing Activity Id Link with Asset
      * @return
      */
@@ -268,7 +263,9 @@ public class AssetService extends MongoBaseService {
     }
 
 
-
+    public List<AssessmentBasicResponseDTO> getAssessmentListByAssetBy(Long unitId, BigInteger assetId) {
+        return assessmentMongoRepository.findAllAssessmentLaunchedForAssetbyAssetIdAndUnitId(unitId, assetId);
+    }
 
 
     public List<ProcessingActivityBasicResponseDTO> getAllRelatedProcessingActivityAndSubProcessingActivities(Long unitId, BigInteger assetId) {

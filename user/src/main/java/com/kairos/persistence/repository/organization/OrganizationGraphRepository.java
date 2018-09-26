@@ -711,4 +711,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("Match (org:Organization) where id(org) IN {0} detach delete org")
     void removeOrganizationCompletely(List<Long> organizationIdsToDelete);
+
+    @Query("Match(org:Organization{deleted:false}) return id(org) as unitId, org.timeZone as timezone ORDER BY unitId")
+    List<UnitTimeZoneQueryResult> findTimezoneforAllorganizations();
 }

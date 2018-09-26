@@ -17,6 +17,7 @@ import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -96,7 +97,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      * @return list of ResponsibilityType
      */
     public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long organizationId) {
-        return responsibilityTypeMongoRepository.findAllOrganizationResponsibilityTypes(organizationId);
+        return responsibilityTypeMongoRepository.findAllOrganizationResponsibilityTypes(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

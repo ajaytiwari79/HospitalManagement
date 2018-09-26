@@ -4,6 +4,7 @@ import com.kairos.persistence.model.master_data.default_asset_setting.HostingTyp
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
@@ -25,7 +26,7 @@ public interface HostingTypeMongoRepository extends MongoBaseRepository<HostingT
     HostingTypeResponseDTO findHostingTypeById(BigInteger id);
 
     @Query("{deleted:false,countryId:?0}")
-    List<HostingTypeResponseDTO> findAllHostingTypes(Long countryId);
+    List<HostingTypeResponseDTO> findAllHostingTypes(Long countryId, Sort  sort);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<HostingType> getHostingTypeListByIds(Long countryId, Set<BigInteger> hostingTypeIds);
@@ -37,7 +38,7 @@ public interface HostingTypeMongoRepository extends MongoBaseRepository<HostingT
     HostingType findByOrganizationIdAndName(Long organizationId,String name);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<HostingTypeResponseDTO> findAllOrganizationHostingTypes(Long organizationId);
+    List<HostingTypeResponseDTO> findAllOrganizationHostingTypes(Long organizationId,Sort sort);
 
 }
 

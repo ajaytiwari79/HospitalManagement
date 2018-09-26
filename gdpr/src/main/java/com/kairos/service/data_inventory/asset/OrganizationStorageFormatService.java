@@ -15,6 +15,7 @@ import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -92,7 +93,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long organizationId) {
-        return storageFormatMongoRepository.findAllOrganizationStorageFormats(organizationId);
+        return storageFormatMongoRepository.findAllOrganizationStorageFormats(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
