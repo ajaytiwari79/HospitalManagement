@@ -51,13 +51,6 @@ public class AccessGroup extends UserBaseEntity {
         this.role = role;
     }
 
-    public AccessGroup(String name, String description, AccessGroupRole role, List<DayType> dayTypes) {
-        this.name = name;
-        this.description = description;
-        this.role = role;
-        this.dayTypes=dayTypes;
-    }
-
     public AccessGroup(String name, String description, AccessGroupRole role, List<DayType> dayTypes,LocalDate startDate,LocalDate endDate) {
         this.name = name;
         this.description = description;
@@ -65,14 +58,6 @@ public class AccessGroup extends UserBaseEntity {
         this.dayTypes=dayTypes;
         this.startDate=startDate;
         this.endDate=endDate;
-    }
-
-    public AccessGroup(@NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull") String name, String description, AccessGroupRole role, List<AccountType> accountType,List<DayType> dayTypes) {
-        this.name = name;
-        this.description = description;
-        this.role = role;
-        this.accountType = accountType;
-        this.dayTypes=dayTypes;
     }
 
     public AccessGroup(@NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull") String name, String description, AccessGroupRole role, List<AccountType> accountType,List<DayType> dayTypes,LocalDate startDate,LocalDate endDate) {
@@ -157,4 +142,5 @@ public class AccessGroup extends UserBaseEntity {
     public void setDayTypes(List<DayType> dayTypes) {
         this.dayTypes = dayTypes;
     }
+
 }

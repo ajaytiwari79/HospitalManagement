@@ -44,7 +44,7 @@ public class AccessGroupController {
     @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateAccessGroup(@PathVariable long unitId, @PathVariable long accessGroupId, @Valid @RequestBody AccessGroupDTO accessGroupDTO) {
-        AccessGroup updatedObject = accessGroupService.updateAccessGroup(accessGroupId, unitId, accessGroupDTO);
+        AccessGroupDTO updatedObject = accessGroupService.updateAccessGroup(accessGroupId, unitId, accessGroupDTO);
         if (updatedObject == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
         }

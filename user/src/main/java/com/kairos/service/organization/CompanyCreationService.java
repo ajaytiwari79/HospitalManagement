@@ -3,6 +3,7 @@ package com.kairos.service.organization;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
@@ -548,7 +549,7 @@ public class CompanyCreationService {
 
 
         // if more than 2 default things needed make a  async service Please
-        List<AccessGroup> accessGroups=accountTypeGraphRepository.getAccessGroupsByAccountTypeId(organization.getAccountType().getId());
+        List<AccessGroupQueryResult> accessGroups=accountTypeGraphRepository.getAccessGroupsByAccountTypeId(organization.getAccountType().getId());
         Map<Long, Long> countryAndOrgAccessGroupIdsMap=accessGroupService.createDefaultAccessGroupsInOrganization(organization,accessGroups);
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
