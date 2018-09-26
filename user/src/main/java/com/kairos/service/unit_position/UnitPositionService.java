@@ -335,7 +335,7 @@ public class UnitPositionService {
                 .setTotalWeeklyMinutes((unitPositionDTO.getTotalWeeklyHours() * 60))
                 .setHourlyWages(unitPositionDTO.getHourlyWages())
                 .setStartDate(unitPositionDTO.getStartLocalDate())
-                .createPositionLine();
+                .build();
 
         oldUnitPosition.getPositionLines().add(positionLine);
 
@@ -562,7 +562,7 @@ public class UnitPositionService {
                 .setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours())
                 .setWorkingDaysInWeek(unitPosition.getExpertise().getNumberOfWorkingDaysInWeek())
                 .setHourlyWages(unitPositionDTO.getHourlyWages())
-                .createPositionLine();
+                .build();
         unitPosition.setPositionLines(Collections.singletonList(positionLine));
         return unitPosition;
     }
@@ -716,11 +716,11 @@ public class UnitPositionService {
         Map<Long, WTAResponseDTO> wtaResponseDTOMap = ctawtaWrapper.getWta().stream().collect(Collectors.toMap(w -> w.getUnitPositionId(), w -> w));
         Map<Long, CTAResponseDTO> ctaResponseDTOMap = ctawtaWrapper.getCta().stream().collect(Collectors.toMap(c -> c.getUnitPositionId(), c -> c));
         List<PositionLinesQueryResult> positionLines=unitPositionGraphRepository.findAllPositionLines(unitPositionIds);
-        Map<Long,List<PositionLinesQueryResult>> positionLinesMap=positionLines.stream().collect(Collectors.to)
+        Map<Long,List<PositionLinesQueryResult>> positionLinesMap=positionLines.stream().collect(Collectors.groupingBy(uu->uu.getUnitPositionId()));
         unitPositionQueryResults.forEach(u -> {
             u.setWorkingTimeAgreement(wtaResponseDTOMap.get(u.getId()));
             u.setCostTimeAgreement(ctaResponseDTOMap.get(u.getId()));
-            u.getPositionLines().addAll(positionLines);
+            u.setPositionLines(positionLinesMap.get(u.getId()));
         });
 
 

@@ -32,18 +32,6 @@ public class PositionLine extends UserBaseEntity {
     public PositionLine() {
         // DC
     }
-
-    public PositionLine(SeniorityLevel seniorityLevel, List<Function> functions, LocalDate startDate, LocalDate endDate, int totalWeeklyMinutes, int fullTimeWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages) {
-        this.seniorityLevel = seniorityLevel;
-        this.functions = functions;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.hourlyWages = hourlyWages;
-    }
     private PositionLine(PositionLineBuilder positionLineBuilder){
         this.seniorityLevel = positionLineBuilder.seniorityLevel;
         this.functions = positionLineBuilder.functions;
@@ -152,8 +140,5 @@ public class PositionLine extends UserBaseEntity {
        public PositionLine build() {
            return new PositionLine(this);
        }
-         public PositionLine createPositionLine() {
-             return new PositionLine(seniorityLevel, functions, startDate, endDate, totalWeeklyMinutes, fullTimeWeeklyMinutes, avgDailyWorkingHours, workingDaysInWeek, hourlyWages);
-         }
      }
 }

@@ -217,9 +217,7 @@ public abstract class RelationshipConstants {
 
     public final static String RESOURCE_HAS_FEATURE = "RESOURCE_HAS_FEATURE";
     public final static String RESOURCE_HAS_EQUIPMENT = "RESOURCE_HAS_EQUIPMENT";
-    public final static String LOCATED_IN = "LOCATED_IN";
     public final static String ORGANIZATION_HAS_UNIONS = "ORGANIZATION_HAS_UNIONS";
-    public final static String BACKING_BY_UNION = "BACKING_BY_UNION";
 
 
     public final static String IN_UNIT = "IN_UNIT";

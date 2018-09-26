@@ -58,6 +58,7 @@ public class UnitPosition extends UserBaseEntity {
     private boolean history;
     private boolean editable;
     private boolean published;
+    @Relationship(type = HAS_POSITION_LINES)
     private List<PositionLine> positionLines;
     @Relationship(type = PARENT_UNIT_POSITION)
     private UnitPosition parentUnitPosition;
