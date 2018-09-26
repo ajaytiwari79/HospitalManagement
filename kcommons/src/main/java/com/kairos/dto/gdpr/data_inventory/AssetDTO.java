@@ -26,11 +26,11 @@ public class AssetDTO {
     private String name;
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
-    @NotBlank(message = "Hosting Location can't be Empty")
+    @NotBlank(message = "error.message.HostingLocation.notSelected")
     private String hostingLocation;
-    @NotNull(message = "Managing department can't be empty")
+    @NotNull(message = "error.message.managingDepartment.notNull")
     private ManagingOrganization managingDepartment;
-    @NotNull(message = "Asset Owner can't be Empty")
+    @NotNull(message = "error.message.assetOwner.notNull")
     private Staff assetOwner;
     private List<BigInteger> storageFormats;
     private List<BigInteger> orgSecurityMeasures;
@@ -39,7 +39,7 @@ public class AssetDTO {
     private BigInteger hostingProvider;
     private BigInteger hostingType;
     private BigInteger dataDisposal;
-    @NotNull(message = "Asset  Types can't be null")
+    @NotNull(message = "error.message.assetType.notNull")
     private BigInteger assetType;
     private List<BigInteger> assetSubTypes = new ArrayList<>();
     private Integer dataRetentionPeriod;

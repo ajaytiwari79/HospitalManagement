@@ -22,9 +22,9 @@ public class ProcessingActivityDTO {
     private String name;
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
-    @NotNull(message = "Managing department can't be null")
+    @NotNull(message = "Managaing Department cannot be Null")
     private ManagingOrganization managingDepartment;
-    @NotNull(message = "Process Owner can't be null")
+    @NotNull(message = "error.message.processOwner.notNull")
     private Staff processOwner;
     private List<BigInteger> processingPurposes;
     private List<BigInteger> dataSources;
