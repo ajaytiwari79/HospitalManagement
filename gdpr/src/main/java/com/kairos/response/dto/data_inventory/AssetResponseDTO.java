@@ -36,7 +36,12 @@ public class AssetResponseDTO {
     private RiskSeverity risk;
     private boolean active;
     private AssetAssessor assetAssessor;
+    private boolean suggested;
 
+
+    public boolean isSuggested() { return suggested; }
+
+    public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
     public AssetAssessor getAssetAssessor() { return assetAssessor; }
 

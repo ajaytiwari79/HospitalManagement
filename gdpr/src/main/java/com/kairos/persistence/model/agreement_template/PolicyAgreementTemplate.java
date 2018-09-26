@@ -44,6 +44,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     public PolicyAgreementTemplate() {
     }
 
+
     public BigInteger getTemplateType() { return templateType; }
 
     public PolicyAgreementTemplate setTemplateType(BigInteger templateType) { this.templateType = templateType; return this; }

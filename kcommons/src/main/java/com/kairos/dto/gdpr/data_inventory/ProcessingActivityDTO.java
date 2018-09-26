@@ -40,7 +40,11 @@ public class ProcessingActivityDTO {
     private Long maxDataSubjectVolume;
     private Integer dataRetentionPeriod;
     private boolean suggestToCountryAdmin;
+    private boolean suggested;
 
+    public boolean isSuggested() { return suggested; }
+
+    public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
     public BigInteger getId() { return id; }
 

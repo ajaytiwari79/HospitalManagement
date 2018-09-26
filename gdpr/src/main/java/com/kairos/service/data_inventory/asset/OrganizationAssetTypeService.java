@@ -238,10 +238,8 @@ public class OrganizationAssetTypeService extends MongoBaseService {
     public boolean deleteAssetTypeById(Long unitId, BigInteger assetTypeId) {
 
         List<AssetBasicResponseDTO> assetsLinkedWithAssetType = assetMongoRepository.findAllAssetLinkedWithAssetType(unitId, assetTypeId);
-        if (!assetsLinkedWithAssetType.isEmpty()) {
-            StringBuilder assetNames = new StringBuilder();
-            assetsLinkedWithAssetType.forEach(asset -> assetNames.append(asset.getName() + ","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Asset Type", assetNames);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithAssetType)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Asset Type", new StringBuilder(assetsLinkedWithAssetType.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
         AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
         if (!Optional.ofNullable(assetType).isPresent() && !assetType.isSubAsset()) {

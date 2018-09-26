@@ -179,7 +179,8 @@ public class CustomAggregationQuery {
                 "  'minDataSubjectVolume':1," +
                 "  'maxDataSubjectVolume':1," +
                 "  'active':1," +
-                " 'assetAssessor':1" +
+                " 'assetAssessor':1," +
+                "'suggested':1" +
 
                 "            }}";
     }

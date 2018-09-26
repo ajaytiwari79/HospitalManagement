@@ -17,44 +17,29 @@ import java.util.List;
 public class ProcessingActivityResponseDTO {
 
     private BigInteger id;
-
-    @NotBlank(message = "Name can't be empty")
     private String name;
-
-    @NotBlank(message = "Description can't be empty")
     private String description;
-
-    @NotNull(message = "Managing department can't be null")
     private ManagingOrganization managingDepartment;
-
-    @NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
-
     private List<ProcessingPurposeResponseDTO> processingPurposes;
-
     private List<DataSourceResponseDTO> dataSources;
-
     private List<AccessorPartyResponseDTO> accessorParties;
-
     private List<TransferMethodResponseDTO> transferMethods;
-
     private List<ProcessingLegalBasisResponseDTO> processingLegalBasis;
-
     private List<ResponsibilityTypeResponseDTO> responsibilityType;
-
     private Integer controllerContactInfo;
-
     private Integer dpoContactInfo;
-
     private Integer jointControllerContactInfo;
-
     private Long minDataSubjectVolume;
-
     private Long maxDataSubjectVolume;
-
     private Integer dataRetentionPeriod;
-
     private boolean active;
+    private boolean suggested;
+
+
+    public boolean isSuggested() { return suggested; }
+
+    public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
     public boolean isActive() { return active; }
 

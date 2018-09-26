@@ -3,10 +3,13 @@ package com.kairos.service.clause;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
+import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
+import com.kairos.persistence.repository.agreement_template.AgreementSectionMongoRepository;
+import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
 import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagMongoRepository;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
@@ -14,6 +17,7 @@ import com.kairos.service.clause_tag.ClauseTagService;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.template_type.TemplateTypeService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -43,6 +49,9 @@ public class ClauseService extends MongoBaseService {
 
     @Inject
     private TemplateTypeService templateTypeService;
+
+    @Inject
+    private PolicyAgreementTemplateRepository policyAgreementTemplateRepository;
 
 
     /**
@@ -122,17 +131,17 @@ public class ClauseService extends MongoBaseService {
 
     /**
      * @param countryId
-     * @param id
+     * @param clauseId
      * @return boolean true if data deleted successfully
      * @throws DataNotFoundByIdException; if clause not found for id
      */
-    public Boolean deleteClause(Long countryId, BigInteger id) {
+    public Boolean deleteClause(Long countryId, BigInteger clauseId) {
 
-        Clause clause = clauseMongoRepository.findByIdAndNonDeleted(countryId, id);
-        if (!Optional.ofNullable(clause).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.clause" + id);
+        List<PolicyAgreementTemplate> agreementTemplatesContainCurrentClause = policyAgreementTemplateRepository.findAgreementTemplatesByCurrentClauseIdAndCountryId(countryId, clauseId);
+        if (CollectionUtils.isNotEmpty(agreementTemplatesContainCurrentClause)) {
+            exceptionService.invalidRequestException("message.clause.present.inPolicyAgreementTemplate.cannotbe.delete", new StringBuilder(agreementTemplatesContainCurrentClause.stream().map(PolicyAgreementTemplate::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        delete(clause);
+        clauseMongoRepository.safeDelete(clauseId);
         return true;
     }
 

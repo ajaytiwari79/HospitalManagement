@@ -47,6 +47,11 @@ public class AssetDTO {
     private Long maxDataSubjectVolume;
     private RiskSeverity riskLevel;
     private AssetAssessor assetAssessor;
+    private boolean suggested;
+
+    public boolean isSuggested() { return suggested; }
+
+    public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
     public AssetAssessor getAssetAssessor() { return assetAssessor; }
 

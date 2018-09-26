@@ -88,6 +88,7 @@ public class AssetService extends MongoBaseService {
         asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
         asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
         asset.setAssetAssessor(assetDTO.getAssetAssessor());
+        asset.setSuggested(assetDTO.isSuggested());
         assetMongoRepository.save(asset);
         assetDTO.setId(asset.getId());
         return assetDTO;
@@ -267,21 +268,22 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     * @description create asset at unit level  and suggest asset to country admin
-     * @param unitId -unitid
+     * @param unitId    -unitid
      * @param countryId -country id
      * @param assetDTO
      * @return
+     * @description create asset at unit level  and suggest asset to country admin
      */
     public Map<String, AssetDTO> saveAssetAndSuggestToCountryAdmin(Long unitId, Long countryId, AssetDTO assetDTO) {
 
+        assetDTO.setSuggested(true);
         Map<String, AssetDTO> result = new HashMap<>();
         assetDTO = createAssetWithBasicDetail(unitId, assetDTO);
         AssetDTO masterAsset = masterAssetService.saveSuggestedAssetDataFromUnit(countryId, unitId, assetDTO);
         result.put("new", assetDTO);
         result.put("SuggestedData", masterAsset);
         return result;
-        }
+    }
 
 
     public List<ProcessingActivityBasicResponseDTO> getAllRelatedProcessingActivityAndSubProcessingActivities(Long unitId, BigInteger assetId) {

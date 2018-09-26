@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -90,7 +91,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long organizationId) {
-        return processingPurposeMongoRepository.findAllOrganizationProcessingPurposes(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return processingPurposeMongoRepository.findAllOrganizationProcessingPurposes(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -113,17 +114,11 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
 
     public Boolean deleteProcessingPurpose(Long unitId, BigInteger processingPurposeId) {
 
-        List<ProcessingActivityBasicResponseDTO>  processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
+        List<ProcessingActivityBasicResponseDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
         if (!processingActivities.isEmpty()) {
-            StringBuilder processingActivityNames=new StringBuilder();
-            processingActivities.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", processingActivities.get(0));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByOrganizationIdAndId(unitId, processingPurposeId);
-        if (!Optional.ofNullable(processingPurpose).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", processingPurposeId);
-        }
-        delete(processingPurpose);
+        processingPurposeMongoRepository.safeDelete(processingPurposeId);
         return true;
     }
 
