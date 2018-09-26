@@ -121,7 +121,7 @@ public class AssetController {
 
 
     @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")
-    @PostMapping(COUNTRY_URL + "/processing_activity/suggest")
+    @PostMapping(COUNTRY_URL + "/asset/suggest")
     public ResponseEntity<Object> saveProcessingActivityAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId, @Valid @RequestBody AssetDTO assetDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.saveAssetAndSuggestToCountryAdmin(unitId, countryId, assetDTO));
     }
