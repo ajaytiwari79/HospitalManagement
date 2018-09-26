@@ -666,8 +666,8 @@ public class DateUtils {
         return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
-    public static LocalDateTime getLocalDateTime(LocalDate localDate, int hours, int minutes) {
-        return LocalDateTime.of(localDate, LocalTime.of(hours, minutes));
+    public static LocalDateTime getLocalDateTime(LocalDate localDate, int hours, int minutes,int seconds) {
+        return LocalDateTime.of(localDate, LocalTime.of(hours, minutes,seconds));
     }
 
     public static int getWeekNumberByLocalDate(LocalDate localDate) {
