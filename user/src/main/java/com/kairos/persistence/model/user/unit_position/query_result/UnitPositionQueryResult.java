@@ -12,7 +12,10 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by vipul on 10/8/17.
@@ -50,7 +53,7 @@ public class UnitPositionQueryResult {
     private Map<String, Object> unitInfo;
     private WTAResponseDTO workingTimeAgreement;
     private BigInteger costTimeAgreementId;
-    private Object data;
+    private List<PositionLinesQueryResult> positionLines;
 
     private Boolean history;
     private Boolean editable;
@@ -318,12 +321,12 @@ public class UnitPositionQueryResult {
         this.hourlyCost = hourlyCost;
     }
 
-    public Object getData() {
-        return data;
+    public List<PositionLinesQueryResult> getPositionLines() {
+        return Optional.ofNullable(positionLines).orElse(new ArrayList<>());
     }
 
-    public void setData(Object data) {
-        this.data = data;
+    public void setPositionLines(List<PositionLinesQueryResult> positionLines) {
+        this.positionLines = positionLines;
     }
 
     public UnitPositionQueryResult() {

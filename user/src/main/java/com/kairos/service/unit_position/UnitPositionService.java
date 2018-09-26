@@ -715,11 +715,12 @@ public class UnitPositionService {
         });
         Map<Long, WTAResponseDTO> wtaResponseDTOMap = ctawtaWrapper.getWta().stream().collect(Collectors.toMap(w -> w.getUnitPositionId(), w -> w));
         Map<Long, CTAResponseDTO> ctaResponseDTOMap = ctawtaWrapper.getCta().stream().collect(Collectors.toMap(c -> c.getUnitPositionId(), c -> c));
-        Object data=unitPositionGraphRepository.findAllPositionLines(unitPositionIds);
+        List<PositionLinesQueryResult> positionLines=unitPositionGraphRepository.findAllPositionLines(unitPositionIds);
+        Map<Long,List<PositionLinesQueryResult>> positionLinesMap=positionLines.stream().collect(Collectors.to)
         unitPositionQueryResults.forEach(u -> {
             u.setWorkingTimeAgreement(wtaResponseDTOMap.get(u.getId()));
             u.setCostTimeAgreement(ctaResponseDTOMap.get(u.getId()));
-            u.setData(data);
+            u.getPositionLines().addAll(positionLines);
         });
 
 
