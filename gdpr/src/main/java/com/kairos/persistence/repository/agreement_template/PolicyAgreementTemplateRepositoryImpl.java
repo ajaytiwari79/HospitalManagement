@@ -86,7 +86,7 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
                 lookup("template_type", "templateType", "_id", "templateType"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
                 new CustomAggregationOperation(projectionForTemplateTypeElementAtIndexZeroOperation),
-                sort(Sort.Direction.DESC, "id")
+                sort(Sort.Direction.DESC, "createdAt")
         );
 
         AggregationResults<PolicyAgreementTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, PolicyAgreementTemplateResponseDTO.class);

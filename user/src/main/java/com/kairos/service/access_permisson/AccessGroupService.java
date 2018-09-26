@@ -1,6 +1,8 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.OrganizationLevel;
@@ -800,8 +802,14 @@ public class AccessGroupService {
         return accessGroupRepository.getStaffIdsByUnitIdAndAccessGroupId(unitId, accessGroupId);
     }
 
-    public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId) {
-        Long staffId = staffService.getStaffIdOfLoggedInUser(unitId);
-        return accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
+
+    public List<StaffAccessGroupDTO> getStaffAndAccessGroupsByUnitId(Long unitId, List<Long> accessGroupId){
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsBy(unitId,accessGroupId),StaffAccessGroupDTO.class);
+    }
+
+    public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId){
+        Long staffId=staffService.getStaffIdOfLoggedInUser(unitId);
+        return accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId,unitId);
+
     }
 }

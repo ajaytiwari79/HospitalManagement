@@ -93,7 +93,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long organizationId) {
-        return storageFormatMongoRepository.findAllOrganizationStorageFormats(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return storageFormatMongoRepository.findAllOrganizationStorageFormats(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

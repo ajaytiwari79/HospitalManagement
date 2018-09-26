@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.access_permission;
 
+import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -280,6 +281,13 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "with ag,org  match(ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission) with up,ag match(up)-[:"+HAS_UNIT_PERMISSIONS+"]-(emp:Employment) with ag,emp\n" +
             "match (emp)-[:"+BELONGS_TO+"]-(s:Staff) RETURN  id(ag) as accessGroupId,collect(id(s)) as staffIds ")
     List<StaffIdsQueryResult> getStaffIdsByUnitIdAndAccessGroupId(Long unitId, List<Long> accessGroupId);
+
+    @Query("MATCH (org:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(ag:AccessGroup) where id(org)={0} and id(ag) IN {1} \n" +
+            "with ag,org  match(ag)-[:"+HAS_ACCESS_GROUP+"]-(up:UnitPermission) with up,ag match(up)-[:"+HAS_UNIT_PERMISSIONS+"]-(emp:Employment) with ag,emp\n" +
+            "match (emp)-[:"+BELONGS_TO+"]-(s:Staff)\n" +
+            "MATCH (s)-[:"+BELONGS_TO+"]-(em:Employment)  MATCH (em)-[:"+HAS_UNIT_PERMISSIONS+"]-(unitP:UnitPermission)\n" +
+            "MATCH (unitP)-[:"+HAS_ACCESS_GROUP+"]-(agp:AccessGroup) RETURN id(s) as staffId, Collect(DISTINCT id(agp)) as accessGroupIds")
+    List<StaffAccessGroupQueryResult> getStaffIdsAndAccessGroupsBy(Long unitId, List<Long> accessGroupId);
 
     //for test cases
     @Query("Match(emp:Employment)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup) where id(emp)=8767 return id(ag)")

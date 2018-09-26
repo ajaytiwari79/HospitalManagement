@@ -1,43 +1,23 @@
-package com.kairos.response.dto.data_inventory;
+package com.kairos.response.dto.common;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.Staff;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import com.kairos.enums.gdpr.AssessmentStatus;
 import java.math.BigInteger;
 import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class AssessmentResponseDTO {
-
+public class AssessmentBasicResponseDTO {
 
     private BigInteger id;
-
-    @NotBlank
     private String name;
-
-    @NotNull
     private LocalDate endDate;
-
     private LocalDate completedDate;
-
     private String comment;
-
-    private BigInteger assetId;
-
-    private BigInteger processingActivityId;
-
-    private String assessmentQuestionAnswersJsonString;
-
-    @NotNull
     private Staff assignee;
-
-    @NotNull
     private Staff approver;
+    private AssessmentStatus assessmentStatus;
 
     public BigInteger getId() { return id; }
 
@@ -49,8 +29,7 @@ public class AssessmentResponseDTO {
 
     public LocalDate getEndDate() { return endDate; }
 
-    public void setEndDate(LocalDate endDate) { this.endDate = endDate;}
-
+    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
 
     public LocalDate getCompletedDate() { return completedDate; }
 
@@ -60,18 +39,6 @@ public class AssessmentResponseDTO {
 
     public void setComment(String comment) { this.comment = comment; }
 
-    public BigInteger getAssetId() { return assetId; }
-
-    public void setAssetId(BigInteger assetId) { this.assetId = assetId; }
-
-    public BigInteger getProcessingActivityId() { return processingActivityId; }
-
-    public void setProcessingActivityId(BigInteger processingActivityId) { this.processingActivityId = processingActivityId; }
-
-    public String getAssessmentQuestionAnswersJsonString() { return assessmentQuestionAnswersJsonString; }
-
-    public void setAssessmentQuestionAnswersJsonString(String assessmentQuestionAnswersJsonString) { this.assessmentQuestionAnswersJsonString = assessmentQuestionAnswersJsonString; }
-
     public Staff getAssignee() { return assignee; }
 
     public void setAssignee(Staff assignee) { this.assignee = assignee; }
@@ -79,4 +46,8 @@ public class AssessmentResponseDTO {
     public Staff getApprover() { return approver; }
 
     public void setApprover(Staff approver) { this.approver = approver; }
+
+    public AssessmentStatus getAssessmentStatus() { return assessmentStatus; }
+
+    public void setAssessmentStatus(AssessmentStatus assessmentStatus) { this.assessmentStatus = assessmentStatus; }
 }

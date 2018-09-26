@@ -51,8 +51,7 @@ public class UserOauth2Service implements UserDetailsService {
     }
 
     private List<GrantedAuthority> getPermission(User user){
-        // TODO As discussed with Arvind Das, We dont need to append tab permissions in AuthToken. 
-       List<GrantedAuthority> permissions = Collections.emptyList();//userService.getTabPermission(user.getId());
+        List<GrantedAuthority> permissions = Collections.emptyList();
         return permissions;
     }
 }

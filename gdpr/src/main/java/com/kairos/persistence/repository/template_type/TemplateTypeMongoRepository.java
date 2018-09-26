@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.template_type;
 import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -40,7 +41,7 @@ public interface TemplateTypeMongoRepository extends MongoBaseRepository<Templat
 
 
     @Query("{deleted:false,countryId:?0}")
-    List<TemplateType> getAllTemplateType(Long countryId);
+    List<TemplateType> getAllTemplateType(Long countryId, Sort sort);
 
 
 }

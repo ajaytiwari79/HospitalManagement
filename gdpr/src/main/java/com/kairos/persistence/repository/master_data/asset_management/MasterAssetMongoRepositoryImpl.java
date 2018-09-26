@@ -39,7 +39,7 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
 
 
     @Override
-    public MasterAsset findByName(Long countryId,  String name) {
+    public MasterAsset findByName(Long countryId, String name) {
         Query query = new Query();
         query.addCriteria(Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").is(name));
         query.collation(Collation.of("en").
@@ -55,8 +55,9 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
-                new CustomAggregationOperation(masterAssetProjectionOperation),
-                sort(Sort.Direction.DESC,"id")
+                sort(Sort.Direction.DESC, "createdAt"),
+                new CustomAggregationOperation(masterAssetProjectionOperation)
+
 
         );
 
@@ -99,8 +100,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
                 match(criteria),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
-                new CustomAggregationOperation(masterAssetProjectionOperation),
-                sort(Sort.Direction.DESC,"id")
+                sort(Sort.Direction.DESC, "createdAt"),
+                new CustomAggregationOperation(masterAssetProjectionOperation)
 
 
         );
@@ -135,7 +136,7 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     }
 
     @Override
-    public List<MasterAsset> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long countryId,  OrganizationMetaDataDTO organizationMetaDataDTO) {
+    public List<MasterAsset> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationMetaDataDTO organizationMetaDataDTO) {
 
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
                 .and(DELETED).is(false));

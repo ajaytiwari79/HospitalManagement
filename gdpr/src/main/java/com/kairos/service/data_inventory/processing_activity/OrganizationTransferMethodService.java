@@ -92,7 +92,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
      * @return list of TransferMethod
      */
     public List<TransferMethodResponseDTO> getAllTransferMethod(Long organizationId) {
-        return transferMethodRepository.findAllOrganizationTransferMethods(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return transferMethodRepository.findAllOrganizationTransferMethods(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

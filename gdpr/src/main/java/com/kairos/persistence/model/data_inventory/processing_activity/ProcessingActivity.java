@@ -4,6 +4,7 @@ package com.kairos.persistence.model.data_inventory.processing_activity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
+import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
@@ -17,53 +18,43 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     @NotBlank(message = "Name can't be empty")
     private String name;
-
     @NotBlank(message = "Description can't be empty")
     private String description;
-
-    @NotNull(message = "Managing department can't be null")
     private ManagingOrganization managingDepartment;
-
-    @NotNull(message = "Process Owner can't be null")
     private Staff processOwner;
-
     private List<ProcessingActivityRelatedDataSubject> dataSubjects =new ArrayList<>();
-
     private List<BigInteger> linkedAssets=new ArrayList<>();
-
     private List<BigInteger> processingPurposes;
-
     private List<BigInteger> dataSources;
-
     private List<BigInteger> transferMethods;
-
     private List<BigInteger> accessorParties;
-
     private List<BigInteger> processingLegalBasis;
-
     private List<BigInteger> subProcessingActivities;
-
     private BigInteger responsibilityType;
-
     private Integer controllerContactInfo;
-
     private Integer dpoContactInfo;
-
     private Integer jointControllerContactInfo;
-
     private Long minDataSubjectVolume;
-
     private Long maxDataSubjectVolume;
-
     private Integer dataRetentionPeriod;
-
     private boolean active=true;
-
     private boolean subProcess=false;
-
-    private List<BigInteger> assessments=new ArrayList<>();
-
     private List<BigInteger> risks=new ArrayList<>();
+
+    public ProcessingActivity() { }
+
+    public ProcessingActivity(String name, String description, ManagingOrganization managingDepartment, Staff processOwner) {
+        this.name = name;
+        this.description = description;
+        this.managingDepartment = managingDepartment;
+        this.processOwner = processOwner;
+    }
+
+    public ProcessingActivity(String name,  String description, boolean active) {
+        this.name = name;
+        this.description = description;
+        this.active = active;
+    }
 
     public List<BigInteger> getRisks() { return risks; }
 
@@ -80,10 +71,6 @@ public class ProcessingActivity extends MongoBaseEntity {
     public boolean isActive() { return active; }
 
     public void setActive(boolean active) { this.active = active; }
-
-    public List<BigInteger> getAssessments() { return assessments; }
-
-    public void setAssessments(List<BigInteger> assessments) { this.assessments = assessments; }
 
     public boolean isSubProcess() {
         return subProcess;
@@ -161,19 +148,6 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setLinkedAssets(List<BigInteger> linkedAssets) { this.linkedAssets = linkedAssets; }
 
-    public ProcessingActivity() { }
 
-    public ProcessingActivity(String name, String description, ManagingOrganization managingDepartment, Staff processOwner) {
-        this.name = name;
-        this.description = description;
-        this.managingDepartment = managingDepartment;
-        this.processOwner = processOwner;
-    }
-
-    public ProcessingActivity(String name,  String description, boolean active) {
-        this.name = name;
-        this.description = description;
-        this.active = active;
-    }
 
 }

@@ -81,7 +81,7 @@ public class HostingProviderService extends MongoBaseService {
      * @return list of HostingProvider
      */
     public List<HostingProviderResponseDTO> getAllHostingProvider(Long countryId) {
-        return hostingProviderMongoRepository.findAllHostingProviders(countryId,new Sort(Sort.Direction.DESC, "_id"));
+        return hostingProviderMongoRepository.findAllHostingProviders(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
