@@ -14,13 +14,13 @@ import java.util.List;
 @Repository
 public interface ShiftStateMongoRepository extends MongoBaseRepository<ShiftState, BigInteger> {
 
-    @Query("{deleted:false,planningPeriodId:?0,phaseId:?1,unitId:?2}")
+    @Query("{deleted:false,planningPeriodId:?0,shiftStatePhaseId:?1,unitId:?2}")
     List<ShiftState> getShiftsState(BigInteger planningPeriodId, BigInteger phaseId, Long unitId);
 
     @Query("{deleted:false,phaseId:?0,unitId:?1,shiftId:{'$in':?2}}")
     List<ShiftState> getShiftsState(BigInteger phaseId, Long unitId, List<BigInteger> shifiIds);
 
-    @Query("{deleted:false,phaseId:?0,unitPositionId:?1, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
-    List<ShiftState> getAllByUnitPositionBetweenDate(BigInteger phaseId,Long unitPositionId,Date startDate,Date endDate);
+    @Query("{deleted:false,unitPositionId:?1, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
+    List<ShiftState> getAllByUnitPositionBetweenDate(Long unitPositionId,Date startDate,Date endDate);
 
 }

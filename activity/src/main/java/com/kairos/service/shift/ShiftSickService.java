@@ -12,6 +12,7 @@ import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.period.PlanningPeriod;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
@@ -22,6 +23,7 @@ import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.service.phase.PhaseService;
 import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +61,8 @@ public class ShiftSickService extends MongoBaseService {
     @Inject
     private SickSettingsRepository sickSettingsRepository;
     @Inject private ShiftService shiftService;
+    @Inject
+    private PhaseService phaseService;
 
 
 
@@ -135,7 +139,8 @@ public class ShiftSickService extends MongoBaseService {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
         shifts.addAll(staffOriginalShiftsOfDates);
         if (!shifts.isEmpty()) {
-            shiftService.saveShiftWithActivity(shifts,staffAdditionalInfoDTO);
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shifts.get(0).getUnitId(), shifts.get(0).getActivities().get(0).getStartDate());
+            shiftService.saveShiftWithActivity(phase,shifts,staffAdditionalInfoDTO);
         }
     }
 

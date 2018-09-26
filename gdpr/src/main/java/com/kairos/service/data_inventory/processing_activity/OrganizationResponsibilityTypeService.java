@@ -97,7 +97,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      * @return list of ResponsibilityType
      */
     public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long organizationId) {
-        return responsibilityTypeMongoRepository.findAllOrganizationResponsibilityTypes(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return responsibilityTypeMongoRepository.findAllOrganizationResponsibilityTypes(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

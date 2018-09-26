@@ -3,6 +3,7 @@ package com.kairos.scheduler.service.scheduler_panel;
 import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
 import com.kairos.dto.scheduler.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.SchedulerPanelDTO;
+import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
@@ -54,8 +55,6 @@ public class SchedulerPanelService extends MongoBaseService {
     @Inject
     private JobDetailsRepository jobDetailsRepository;
     @Inject
-    private UnitTimeZoneMappingRepository unitTimeZoneMappingRepository;
-    @Inject
     private ExceptionService exceptionService;
     @Inject
     private UserIntegrationService userIntegrationService;
@@ -65,22 +64,26 @@ public class SchedulerPanelService extends MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(SchedulerPanelService.class);
 
 
-    @PostConstruct
+
     public void initSchedulerPanels() {
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByDeletedFalse();
         logger.debug("Inside initSchedulerPanels");
-        List<Long> unitIds = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getUnitId()).
-                collect(Collectors.toList());
-        List<UnitTimeZoneMapping> unitTimeZoneMappings=unitTimeZoneMappingRepository.findAllByDeletedFalseAndUnitIdIn(unitIds);
+        if(!schedulerPanels.isEmpty()) {
+            List<Long> unitIds = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getUnitId()).
+                    collect(Collectors.toList());
+            List<UnitTimeZoneMappingDTO> unitTimeZoneMappingDTOS = userIntegrationService.getTimeZoneOfAllUnits();
 
-        Map<Long,String> unitIdTimeZoneMap = unitTimeZoneMappings.stream().collect(Collectors.toMap(unitTimeZoneMapping->{return unitTimeZoneMapping.getUnitId();},unitTimeZoneMapping->{return unitTimeZoneMapping.getTimezone();}));
+            Map<Long,String> unitIdTimeZoneMap = unitTimeZoneMappingDTOS.stream().filter(unitTimeZoneMappingDTO -> Optional.ofNullable(unitTimeZoneMappingDTO.getTimezone()).isPresent()).
+                    collect(Collectors.toMap(unitTimeZoneMapping->{return unitTimeZoneMapping.getUnitId();},unitTimeZoneMapping->{return unitTimeZoneMapping.getTimezone();}));
 
-        for(SchedulerPanel schedulerPanel:schedulerPanels) {
-            if(!(schedulerPanel.isOneTimeTrigger()&&schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
-                logger.info("Inside initSchedulerPanels"+schedulerPanel.getUnitId()+" unitId = "+unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));
-               dynamicCronScheduler.setCronScheduling(schedulerPanel,unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
+            for(SchedulerPanel schedulerPanel:schedulerPanels) {
+                if(!(schedulerPanel.isOneTimeTrigger()&&schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
+                    logger.info("Inside initSchedulerPanels"+schedulerPanel.getUnitId()+" unitId = "+unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));
+                    dynamicCronScheduler.setCronScheduling(schedulerPanel,unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
+                }
             }
         }
+
 
     }
 
@@ -193,7 +196,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByIdsIn(schedulerPanelIDs);
         Map<BigInteger,SchedulerPanel>schedulerPanelsById = schedulerPanels.stream().collect(Collectors.toMap(k->k.getId(), v->v));
-        String timezone = unitTimeZoneMappingRepository.findByUnitId(unitId).getTimezone();
+        String timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
 
         SchedulerPanel schedulerPanel;
 

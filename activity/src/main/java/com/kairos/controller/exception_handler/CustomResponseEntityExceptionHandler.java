@@ -42,7 +42,7 @@ import java.util.Set;
 @ControllerAdvice
 @Order(1)
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler  {
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(CustomResponseEntityExceptionHandler.class);
 
 	public CustomResponseEntityExceptionHandler() {
 		super();

@@ -105,11 +105,6 @@ public class ShiftValidatorService {
         if (!graceInterval.contains(shiftDTO.getStartDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
         }
-        if (validatedByStaff) {
-            shiftDTO.setValidatedByStaffDate(LocalDate.now());
-        } else {
-            shiftDTO.setValidatedByPlannerDate(LocalDate.now());
-        }
     }
 
     public DateTimeInterval getGracePeriodInterval(Long unitId, Date date, boolean forStaff) {
@@ -398,7 +393,7 @@ public class ShiftValidatorService {
         if (timeTypeIds != null && !timeTypeIds.isEmpty()) {
             shifts.forEach(s -> {
                 for (ShiftActivityDTO shiftActivity : s.getActivities()) {
-                    if ((timeTypeIds == null || timeTypeIds.contains(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && (plannedTimeIds == null || plannedTimeIds.contains(s.getPlannedTypeId())) && (activitieIds == null || activitieIds.contains(shiftActivity.getActivity().getId())))) {
+                    if ((timeTypeIds == null || timeTypeIds.contains(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && (plannedTimeIds == null || plannedTimeIds.contains(shiftActivity.getPlannedTimeId())) && (activitieIds == null || activitieIds.contains(shiftActivity.getActivity().getId())))) {
                         shiftQueryResultWithActivities.add(s);
                     }
                 }

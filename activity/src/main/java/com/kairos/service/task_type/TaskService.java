@@ -15,6 +15,7 @@ import com.kairos.enums.Day;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.messaging.ReceivedTask;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.task.Task;
@@ -44,6 +45,7 @@ import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.fls_visitour.schedule.TaskConverterService;
 import com.kairos.service.pay_out.PayOutCalculationService;
 import com.kairos.service.pay_out.PayOutService;
+import com.kairos.service.phase.PhaseService;
 import com.kairos.service.planner.TasksMergingService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -181,6 +183,8 @@ public class TaskService extends MongoBaseService {
     private ExceptionService exceptionService;
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject private ShiftService shiftService;
+    @Inject
+    private PhaseService phaseService;
 
     public List<Long> getClientTaskServices(Long clientId, long orgId) {
         logger.info("Fetching tasks for ClientId: " + clientId);
@@ -728,7 +732,8 @@ public class TaskService extends MongoBaseService {
 
         }
         if (!shiftsToCreate.isEmpty()) {
-            shiftService.saveShiftWithActivity(shiftsToCreate,staffAdditionalInfoDTO);
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftsToCreate.get(0).getUnitId(), shiftsToCreate.get(0).getActivities().get(0).getStartDate());
+            shiftService.saveShiftWithActivity(phase,shiftsToCreate,staffAdditionalInfoDTO);
             timeBankService.saveTimeBanks(staffAdditionalInfoDTO, shiftsToCreate);
             payOutService.savePayOuts(staffAdditionalInfoDTO, shiftsToCreate,activities);
         }
