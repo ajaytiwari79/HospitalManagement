@@ -493,7 +493,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("Match (organization:Organization) where id(organization)={0} \n" +
             "Match (organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) \n" +
             "Match (subType)-[:" + ORG_TYPE_HAS_SKILL + "]->(skill:Skill) with skill,organization\n" +
-            "create unique (organization)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{1},lastModificationDate:{2},isEnabled:true}]->(skill)")
+            "create unique (organization)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{1},lastModificationDate:{2},isEnabled:true,customName:skill.name}]->(skill)")
     void assignDefaultSkillsToOrg(long orgId, long creationDate, long lastModificationDate);
 
     @Query("Match (n:Organization) where id(n)={0}\n" +
