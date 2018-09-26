@@ -68,19 +68,22 @@ public class SchedulerPanelService extends MongoBaseService {
     public void initSchedulerPanels() {
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByDeletedFalse();
         logger.debug("Inside initSchedulerPanels");
-        List<Long> unitIds = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getUnitId()).
-                collect(Collectors.toList());
-        List<UnitTimeZoneMappingDTO> unitTimeZoneMappingDTOS = userIntegrationService.getTimeZoneOfAllUnits();
+        if(!schedulerPanels.isEmpty()) {
+            List<Long> unitIds = schedulerPanels.stream().map(schedulerPanel -> schedulerPanel.getUnitId()).
+                    collect(Collectors.toList());
+            List<UnitTimeZoneMappingDTO> unitTimeZoneMappingDTOS = userIntegrationService.getTimeZoneOfAllUnits();
 
-        Map<Long,String> unitIdTimeZoneMap = unitTimeZoneMappingDTOS.stream().filter(unitTimeZoneMappingDTO -> Optional.ofNullable(unitTimeZoneMappingDTO.getTimezone()).isPresent()).
-                collect(Collectors.toMap(unitTimeZoneMapping->{return unitTimeZoneMapping.getUnitId();},unitTimeZoneMapping->{return unitTimeZoneMapping.getTimezone();}));
+            Map<Long,String> unitIdTimeZoneMap = unitTimeZoneMappingDTOS.stream().filter(unitTimeZoneMappingDTO -> Optional.ofNullable(unitTimeZoneMappingDTO.getTimezone()).isPresent()).
+                    collect(Collectors.toMap(unitTimeZoneMapping->{return unitTimeZoneMapping.getUnitId();},unitTimeZoneMapping->{return unitTimeZoneMapping.getTimezone();}));
 
-        for(SchedulerPanel schedulerPanel:schedulerPanels) {
-            if(!(schedulerPanel.isOneTimeTrigger()&&schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
-                logger.info("Inside initSchedulerPanels"+schedulerPanel.getUnitId()+" unitId = "+unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));
-               dynamicCronScheduler.setCronScheduling(schedulerPanel,unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
+            for(SchedulerPanel schedulerPanel:schedulerPanels) {
+                if(!(schedulerPanel.isOneTimeTrigger()&&schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
+                    logger.info("Inside initSchedulerPanels"+schedulerPanel.getUnitId()+" unitId = "+unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));
+                    dynamicCronScheduler.setCronScheduling(schedulerPanel,unitIdTimeZoneMap.get(schedulerPanel.getUnitId()));
+                }
             }
         }
+
 
     }
 
