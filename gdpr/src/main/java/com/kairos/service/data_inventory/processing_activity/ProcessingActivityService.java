@@ -14,6 +14,7 @@ import com.kairos.persistence.repository.master_data.data_category_element.DataS
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
+import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
@@ -511,6 +512,14 @@ public class ProcessingActivityService extends MongoBaseService {
     {
         return processingActivityMongoRepository.getProcessingActivityWithRisksAndSubProcessingActivities(unitId,processingActivityId);
     }
+
+
+
+    public List<AssessmentBasicResponseDTO> getAssessmentListByProcessingActivityId(Long unitId, BigInteger processingActivityId) {
+        return assessmentMongoRepository.findAllAssessmentLaunchedForProcessingActivityByActivityIdAndUnitId(unitId, processingActivityId);
+    }
+
+
 
     /**
      * @param unitId

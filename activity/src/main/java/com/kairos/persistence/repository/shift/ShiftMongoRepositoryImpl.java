@@ -199,4 +199,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         query.limit(1);
         return mongoTemplate.findOne(query,Shift.class);
     }
+
+    public void deleteShiftAfterRestorePhase(BigInteger planningPeriodId,BigInteger phaseId){
+        Query query=new Query(Criteria.where("planningPeriodId").is(planningPeriodId).and("phaseId").is(phaseId));
+        mongoTemplate.remove(query,Shift.class);
+    }
 }

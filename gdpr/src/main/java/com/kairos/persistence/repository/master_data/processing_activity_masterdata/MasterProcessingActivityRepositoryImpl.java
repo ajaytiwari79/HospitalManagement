@@ -53,7 +53,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     }
 
     @Override
-    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId,BigInteger id) {
+    public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessingActivity(Long countryId, BigInteger id) {
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(COUNTRY_ID).is(countryId).and("_id").is(id).and(DELETED).is(false).and("subProcess").is(false)),
@@ -69,9 +69,9 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("subProcess").is(false)),
-                lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
-                , new CustomAggregationOperation(projectionOperation),
-                sort(Sort.Direction.DESC,"id")
+                lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities"),
+                sort(Sort.Direction.DESC, "createdAt"),
+                new CustomAggregationOperation(projectionOperation)
         );
         AggregationResults<MasterProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDTO.class);
         return result.getMappedResults();
@@ -97,11 +97,12 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
         Aggregation aggregation = Aggregation.newAggregation(
 
                 match(criteria),
-                lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities")
-                , new CustomAggregationOperation(projectionOperation),
-                sort(Sort.Direction.DESC, "id")
+                lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities"),
+                sort(Sort.Direction.DESC, "createdAt"),
+                new CustomAggregationOperation(projectionOperation)
 
-                );
+
+        );
         AggregationResults<MasterProcessingActivityResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityResponseDTO.class);
         return result.getMappedResults();
 
@@ -132,7 +133,7 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
 
 
     @Override
-    public List<MasterProcessingActivity> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long countryId,  OrganizationMetaDataDTO organizationMetaDataDTO) {
+    public List<MasterProcessingActivity> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationMetaDataDTO organizationMetaDataDTO) {
         Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
                 .and(DELETED).is(false));
         query.addCriteria(Criteria.where("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationService().getId()));
@@ -147,21 +148,21 @@ public class MasterProcessingActivityRepositoryImpl implements CustomMasterProce
     @Override
     public List<MasterProcessingActivityRiskResponseDTO> getAllProcessingActivityWithLinkedRisksAndSubProcessingActivitiesByCountryId(Long countryId) {
 
-        String addNonDeletedRisks="{'$addFields':{'risks':{'$filter':{ 'input':'$risks', 'as':'risk','cond':{'$eq':['$$risk.deleted',false]} }} }}";
-        String groupSubProcessingActivities="{'$group':{'_id':'$_id','processingActivities':{'$addToSet':'$subProcessingActivities'},'name':{'$first':'$name'},'risks':{'$first':'$risks'}}}"
-;      Aggregation aggregation=Aggregation.newAggregation(
-              match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("subProcess").is(false)),
-              lookup("risk","risks","_id","risks"),
-              lookup("master_processing_activity","subProcessingActivityIds","_id","subProcessingActivities"),
-              unwind("subProcessingActivities",true),
-              lookup("risk","subProcessingActivities.risks","_id","subProcessingActivities.risks"),
-              new CustomAggregationOperation(Document.parse(groupSubProcessingActivities)),
-              sort(Sort.Direction.DESC,"id"),
+        String addNonDeletedRisks = "{'$addFields':{'risks':{'$filter':{ 'input':'$risks', 'as':'risk','cond':{'$eq':['$$risk.deleted',false]} }} }}";
+        String groupSubProcessingActivities = "{'$group':{'_id':'$_id','processingActivities':{'$addToSet':'$subProcessingActivities'},'name':{'$first':'$name'},'risks':{'$first':'$risks'}}}";
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("subProcess").is(false)),
+                lookup("risk", "risks", "_id", "risks"),
+                lookup("master_processing_activity", "subProcessingActivityIds", "_id", "subProcessingActivities"),
+                unwind("subProcessingActivities", true),
+                lookup("risk", "subProcessingActivities.risks", "_id", "subProcessingActivities.risks"),
+                new CustomAggregationOperation(Document.parse(groupSubProcessingActivities)),
+                sort(Sort.Direction.DESC, "id"),
                 new CustomAggregationOperation(Document.parse(addNonDeletedRisks))
-      );
-      AggregationResults<MasterProcessingActivityRiskResponseDTO> result=mongoTemplate.aggregate(aggregation,MasterProcessingActivity.class,MasterProcessingActivityRiskResponseDTO.class);
-      return result.getMappedResults();
+        );
+        AggregationResults<MasterProcessingActivityRiskResponseDTO> result = mongoTemplate.aggregate(aggregation, MasterProcessingActivity.class, MasterProcessingActivityRiskResponseDTO.class);
+        return result.getMappedResults();
     }
 
-    
+
 }

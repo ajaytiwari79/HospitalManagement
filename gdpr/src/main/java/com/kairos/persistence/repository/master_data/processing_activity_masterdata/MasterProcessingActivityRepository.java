@@ -17,9 +17,6 @@ public interface MasterProcessingActivityRepository extends MongoBaseRepository<
     @Query("{deleted:false,countryId:?0,_id:?1}")
     MasterProcessingActivity findByIdAndCountryIdAndNonDeleted(Long countryId, BigInteger id);
 
-    @Query("{deleted:false,countryId:?0}")
-    List<MasterProcessingActivity> getAllMasterProcessingActivity(Long countryId);
-
     MasterProcessingActivity findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0,name:?1}")

@@ -52,15 +52,15 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
                 lookup("risk", "risks", "_id", "risks"),
                 lookup("asset_type", "subAssetTypes", "_id", "subAssetTypes"),
                 unwind("subAssetTypes", true),
-                sort(Sort.Direction.ASC, "subAssetTypes.name"),
                 lookup("risk", "subAssetTypes.risks", "_id", "subAssetTypes.risks"),
                 group("$id")
                         .addToSet("subAssetTypes").as("subAssetTypes")
                         .first("risks").as("risks")
                         .first("hasSubAsset").as("hasSubAsset")
                         .first("name").as("name")
-                        .first("subAsset").as("subAsset"),
-                sort(Sort.Direction.DESC, "id"),
+                        .first("subAsset").as("subAsset")
+                        .first("createdAt").as("createdAt"),
+                sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
 
@@ -109,8 +109,9 @@ public class AssetTypeMongoRepositoryImpl implements CustomAssetTypeRepository {
                         .first("risks").as("risks")
                         .first("hasSubAsset").as("hasSubAsset")
                         .first("name").as("name")
-                        .first("subAsset").as("subAsset"),
-                sort(Sort.Direction.ASC, "_id"),
+                        .first("subAsset").as("subAsset")
+                        .first("createdAt").as("createdAt"),
+                sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(nonDeletedSubAssetOperation)
         );
 

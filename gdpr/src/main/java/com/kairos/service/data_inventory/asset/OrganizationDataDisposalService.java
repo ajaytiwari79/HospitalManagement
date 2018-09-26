@@ -82,7 +82,7 @@ public class OrganizationDataDisposalService extends MongoBaseService {
      * @return list of DataDisposal
      */
     public List<DataDisposalResponseDTO> getAllDataDisposal(Long organizationId) {
-        return dataDisposalMongoRepository.findAllOrganizationDataDisposals(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return dataDisposalMongoRepository.findAllOrganizationDataDisposals(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

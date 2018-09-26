@@ -88,7 +88,7 @@ public class ProcessingLegalBasisService extends MongoBaseService {
      */
 
     public List<ProcessingLegalBasisResponseDTO> getAllProcessingLegalBasis(Long countryId) {
-        return legalBasisMongoRepository.findAllProcessingLegalBases(countryId,new Sort(Sort.Direction.DESC, "_id"));
+        return legalBasisMongoRepository.findAllProcessingLegalBases(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**

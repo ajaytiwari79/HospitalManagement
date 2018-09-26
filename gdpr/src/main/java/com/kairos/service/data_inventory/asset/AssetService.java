@@ -8,7 +8,7 @@ import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMon
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
-import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
+import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
@@ -54,9 +54,6 @@ public class AssetService extends MongoBaseService {
 
     @Inject
     private AssessmentMongoRepository assessmentMongoRepository;
-
-    @Inject
-    private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
 
 
     public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
@@ -231,9 +228,8 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     *
      * @param unitId
-     * @param assetId - asset Id
+     * @param assetId              - asset Id
      * @param processingActivityId Processing Activity id link with Asset
      * @return
      */
@@ -250,9 +246,8 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     *
      * @param unitId
-     * @param assetId -Asset Id
+     * @param assetId                 -Asset Id
      * @param subProcessingActivityId - Sub Processing Activity Id Link with Asset
      * @return
      */
@@ -268,7 +263,9 @@ public class AssetService extends MongoBaseService {
     }
 
 
-
+    public List<AssessmentBasicResponseDTO> getAssessmentListByAssetBy(Long unitId, BigInteger assetId) {
+        return assessmentMongoRepository.findAllAssessmentLaunchedForAssetbyAssetIdAndUnitId(unitId, assetId);
+    }
 
 
     public List<ProcessingActivityBasicResponseDTO> getAllRelatedProcessingActivityAndSubProcessingActivities(Long unitId, BigInteger assetId) {

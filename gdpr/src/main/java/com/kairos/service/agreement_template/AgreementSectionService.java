@@ -255,7 +255,7 @@ public class AgreementSectionService extends MongoBaseService {
             List<ClauseBasicDTO> newClauseRelatedToAgreementSection = new ArrayList<>();
             Map<BigInteger, Integer> clauseIdAndOrder = new HashMap<>();
             clauseBasicDTOList.forEach(clauseBasicDTO -> {
-                if (clauseBasicDTO.getRequireUpdate() && Optional.ofNullable(clauseBasicDTO.getId()).isPresent()) {
+                if (clauseBasicDTO.isRequireUpdate() && Optional.ofNullable(clauseBasicDTO.getId()).isPresent()) {
                     alteredClauseIdList.add(clauseBasicDTO.getId());
                     exisitingClauseList.add(clauseBasicDTO);
                 } else if (Optional.ofNullable(clauseBasicDTO.getId()).isPresent()) {
@@ -463,7 +463,7 @@ public class AgreementSectionService extends MongoBaseService {
     private void checkDuplicateClauseInAgreementSection(List<ClauseBasicDTO> clauseBasicDTOS, Set<String> clauseTitles, String sectionName) {
         for (ClauseBasicDTO clauseBasicDTO : clauseBasicDTOS) {
 
-            if (clauseTitles.contains(clauseBasicDTO.getTitle())) {
+            if (clauseTitles.contains(clauseBasicDTO.getTitle().toLowerCase())) {
                 exceptionService.duplicateDataException("message.duplicate.clause.agreement.section", clauseBasicDTO.getTitle(), sectionName);
             }
             clauseTitles.add(clauseBasicDTO.getTitle().toLowerCase());
