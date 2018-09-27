@@ -37,14 +37,14 @@ public class AccessGroupController {
 
     @RequestMapping(value = UNIT_URL+"/access_group", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createAccessGroup(@PathVariable long unitId, @RequestBody AccessGroup accessGroup) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroupService.createAccessGroup(unitId, accessGroup));
+    public ResponseEntity<Map<String, Object>> createAccessGroup(@PathVariable long unitId,@Valid @RequestBody AccessGroupDTO accessGroupDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroupService.createAccessGroup(unitId, accessGroupDTO));
     }
 
     @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateAccessGroup(@PathVariable long unitId, @PathVariable long accessGroupId, @Valid @RequestBody AccessGroupDTO accessGroupDTO) {
-        AccessGroup updatedObject = accessGroupService.updateAccessGroup(accessGroupId, unitId, accessGroupDTO);
+        AccessGroupDTO updatedObject = accessGroupService.updateAccessGroup(accessGroupId, unitId, accessGroupDTO);
         if (updatedObject == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
         }
@@ -137,8 +137,7 @@ public class AccessGroupController {
     @RequestMapping(value = COUNTRY_URL+"/access_group", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createCountryAccessGroup(@PathVariable long countryId,@Valid @RequestBody CountryAccessGroupDTO accessGroupDTO) {
-        AccessGroup accessGroup = accessGroupService.createCountryAccessGroup(countryId, accessGroupDTO);
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroup);
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroupService.createCountryAccessGroup(countryId, accessGroupDTO));
     }
 
     @RequestMapping(value = COUNTRY_URL+"/access_group/{accessGroupId}", method = RequestMethod.PUT)

@@ -8,6 +8,7 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Ac
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -78,7 +80,7 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
     }
 
     public List<AccessorPartyResponseDTO> getAllAccessorParty(Long organizationId) {
-        return accessorPartyMongoRepository.findAllOrganizationAccessorParty(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return accessorPartyMongoRepository.findAllOrganizationAccessorParty(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -101,17 +103,11 @@ public class OrganizationAccessorPartyService extends MongoBaseService {
 
     public Boolean deleteAccessorParty(Long unitId, BigInteger accessorPartyId) {
 
-        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithAccessorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
+        List<ProcessingActivityBasicResponseDTO> processingActivitiesLinkedWithAccessorParty = processingActivityMongoRepository.findAllProcessingActivityLinkedWithAccessorParty(unitId, accessorPartyId);
         if (!processingActivitiesLinkedWithAccessorParty.isEmpty()) {
-            StringBuilder processingActivityNames=new StringBuilder();
-            processingActivitiesLinkedWithAccessorParty.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", processingActivityNames);
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Accessor Party", new StringBuilder(processingActivitiesLinkedWithAccessorParty.stream().map(ProcessingActivityBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        AccessorParty accessorParty = accessorPartyMongoRepository.findOrganizationIdAndIdAndNonDeleted(unitId, accessorPartyId);
-        if (!Optional.ofNullable(accessorParty).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Accessor Party", accessorPartyId);
-        }
-        delete(accessorParty);
+        accessorPartyMongoRepository.safeDelete(accessorPartyId);
         return true;
     }
 

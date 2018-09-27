@@ -32,11 +32,9 @@ public abstract class MongoBaseEntity {
         this.id = id;
     }
 
-    public Long getOrganizationId() { return organizationId;
-    }
+    public Long getOrganizationId() { return organizationId; }
 
-    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId;
-    }
+    public void setOrganizationId(Long organizationId) { this.organizationId = organizationId; }
 
     public Date getCreatedAt() {
         return createdAt;

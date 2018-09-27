@@ -1,11 +1,11 @@
 package com.kairos.persistence.repository.organization;
 
+import com.kairos.persistence.model.organization_type.OrganizationTypeSubTypeAndServicesQueryResult;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.annotation.QueryResult;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -161,6 +161,20 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("MATCH (organizationSubType:OrganizationType)<-[:" +HAS_SUB_TYPE + "]-(organizationType:OrganizationType) where id(organizationSubType)={0} return organizationType")
     OrganizationType findOrganizationTypeBySubTypeId(Long organizationSubTypeId);
 
+    /*
+    * created by bobby
+    * */
+    @Query("Match (organization:Organization{isEnable:true}) where id(organization)={0}\n" +
+            "            Match (organization)-[:"+TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) \n" +
+            "            optional match(organizationType)-[:"+HAS_SUB_TYPE+"]->(organizationSubType:OrganizationType{isEnable:true})\n" +
+            "            with DISTINCT organizationType, organizationSubType\n" +
+            "            optional match  (organizationSubType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]->( organizationSubService:OrganizationService{isEnabled:true}) with  DISTINCT organizationType, organizationSubType ,organizationSubService      \n" +
+            "optional match (organizationSubService)<-[:"+ORGANIZATION_SUB_SERVICE+"]-(organizationService:OrganizationService {isEnabled:true} )             \n" +
+            "return id(organizationType) as id, organizationType.name as name , " +
+            "CASE WHEN organizationSubType IS NOT NULL THEN  collect(distinct { id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as organizationSubTypes ,\n" +
+            "CASE WHEN organizationService IS NOT NULL THEN collect(distinct {id:id(organizationService),name:organizationService.name}) ELSE [] END as organizationServices ," +
+            "CASE WHEN organizationSubService IS NOT NULL THEN  collect(distinct { id:id(organizationSubService),name:organizationSubService.name}) ELSE [] END as organizationSubServices")
+    OrganizationTypeSubTypeAndServicesQueryResult getOrganizationTypeSubTypesServiceAndSubServices(Long unitId);
 
 
 }

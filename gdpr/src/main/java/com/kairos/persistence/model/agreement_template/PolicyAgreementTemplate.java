@@ -5,6 +5,7 @@ import com.kairos.dto.gdpr.OrganizationSubType;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,9 +23,9 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     private String name;
     @NotBlank(message = "Description cannot be empty")
     private String description;
-    private Set<AccountTypeDTO> accountTypes;
-    private List<BigInteger> agreementSections=new ArrayList<>();
     private Long countryId;
+    private List<AccountTypeVO> accountTypes;
+    private List<BigInteger> agreementSections=new ArrayList<>();
     private List<OrganizationType> organizationTypes;
     private List<OrganizationSubType> organizationSubTypes;
     private List<ServiceCategory> organizationServices;
@@ -42,6 +43,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
     }
     public PolicyAgreementTemplate() {
     }
+
 
     public BigInteger getTemplateType() { return templateType; }
 
@@ -97,12 +99,7 @@ public class PolicyAgreementTemplate extends MongoBaseEntity {
 
     public PolicyAgreementTemplate setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; return this;}
 
-    public Set<AccountTypeDTO> getAccountTypes() {
-        return accountTypes;
-    }
+    public List<AccountTypeVO> getAccountTypes() { return accountTypes; }
 
-    public PolicyAgreementTemplate setAccountTypes(Set<AccountTypeDTO> accountTypes) { this.accountTypes = accountTypes;return this; }
-
-
-
+    public PolicyAgreementTemplate setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes;return this; }
 }

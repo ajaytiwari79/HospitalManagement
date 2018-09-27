@@ -1,5 +1,6 @@
 package com.kairos.utils;
 
+import com.kairos.dto.response.ResponseDTO;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,11 @@ public class ResponseHandler {
 
         return new ResponseEntity<>(result, httpStatus);
 
+    }
+
+    public static <T> ResponseEntity<ResponseDTO<T>> generateResponseDTO(HttpStatus status, boolean isSuccess, T responsObj){
+        ResponseDTO<T> responseDTO = new ResponseDTO<T>(status.value(), isSuccess, responsObj);
+        return new ResponseEntity<>(responseDTO, status);
     }
 
     public static ResponseEntity<Object> invalidResponse(HttpStatus httpStatus, Boolean isSuccess, String message) {
