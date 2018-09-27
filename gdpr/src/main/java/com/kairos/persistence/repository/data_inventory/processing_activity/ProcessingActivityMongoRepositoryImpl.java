@@ -49,7 +49,6 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     public List<ProcessingActivityResponseDTO> getAllProcessingActivityAndMetaDataAndSubProcessingActivities(Long organizationId) {
 
 
-
         String groupOperation = "{'$group':{'_id':'$_id','subProcessingActivities':{'$addToSet':'$subProcessingActivities'}," +
                 "'processingPurposes':{'$first':'$processingPurposes'}," +
                 "'transferMethods':{'$first':'$transferMethods'}," +
@@ -74,11 +73,11 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 lookup("dataSource", "dataSources", "_id", "dataSources"),
                 lookup("responsibility_type", "responsibilityType", "_id", "responsibilityType"),
                 lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis"),
-                unwind("subProcessingActivities", true),
                 lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
+                unwind("subProcessingActivities", true),
                 lookup("processing_purpose", "subProcessingActivities.processingPurposes", "_id", "subProcessingActivities.processingPurposes"),
                 lookup("transfer_method", "subProcessingActivities.transferMethods", "_id", "subProcessingActivities.transferMethods"),
-                lookup("accessor_party", "accessorParties", "_id", "subProcessingActivities.accessorParties"),
+                lookup("accessor_party", "subProcessingActivities.accessorParties", "_id", "subProcessingActivities.accessorParties"),
                 lookup("dataSource", "subProcessingActivities.dataSources", "_id", "subProcessingActivities.dataSources"),
                 lookup("responsibility_type", "subProcessingActivities.responsibilityType", "_id", "subProcessingActivities.responsibilityType"),
                 lookup("processingLegalBasis", "subProcessingActivities.processingLegalBasis", "_id", "subProcessingActivities.processingLegalBasis"),

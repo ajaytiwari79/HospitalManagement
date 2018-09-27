@@ -36,7 +36,7 @@ public class ProcessingActivityResponseDTO {
     private Integer dataRetentionPeriod;
     private Boolean active;
     private Boolean suggested;
-    private List<ProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
+    private List<ProcessingActivityResponseDTO> subProcessingActivities;
 
 
     public List<ProcessingActivityResponseDTO> getSubProcessingActivities() { return subProcessingActivities; }

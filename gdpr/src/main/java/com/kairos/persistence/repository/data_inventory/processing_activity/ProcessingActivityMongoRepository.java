@@ -18,17 +18,14 @@ public interface ProcessingActivityMongoRepository extends MongoBaseRepository<P
 
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    ProcessingActivity findByIdAndNonDeleted(Long unitId,BigInteger id);
+    ProcessingActivity findByUnitIdAndId(Long unitId, BigInteger id);
 
     ProcessingActivity findByid(BigInteger id);
 
-    @Query("{organizationId:?0,_id:{$in:?1},deleted:false}")
-    List<ProcessingActivity> findProcessingActivityListByUnitIdAndIds(Long unitId, Set<BigInteger> processingActivityIds);
+    @Query("{organizationId:?0,_id:{$in:?1},deleted:false,subProcess:true}")
+    List<ProcessingActivity> findSubProcessingActivitiesByIds(Long unitId, Set<BigInteger> ids);
 
-    @Query("{organizationId:?0,_id:{$in:?1},deleted:false,subProcess:false}")
-    List<ProcessingActivity> findSubProcessingActivitiesByIds(Long unitId, List<BigInteger> ids);
-
-    @Query("{_id:{$in:?1},deleted:false,subProcess:false}")
+    @Query("{_id:{$in:?1},deleted:false,subProcess:true}")
     List<ProcessingActivityResponseDTO> findAllSubProcessingActivitiesByIds(List<BigInteger> ids);
 
     @Query("{organizationId:?0,assetId:?1,deleted:false,subProcess:false}")
