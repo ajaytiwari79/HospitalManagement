@@ -43,11 +43,11 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     void deleteService(long orgTypeId, long serviceId);
 
     @Query(" Match (o:OrganizationType),(os:OrganizationService) where id(o)= {0} AND id(os)={1}  " +
-            " CREATE unique (o)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]->(os) return os")
+            " CREATE unique (o)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]->(os) ")
     void selectService(long orgTypeId, long serviceId);
 
     @Query(" Match (o:OrganizationType),(os:OrganizationService) where id(o) IN {0} AND id(os)={1}  " +
-            "CREATE unique (o)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]->(os) return os")
+            "CREATE unique (o)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]->(os) ")
     void linkOrganizationTypeWithService(Set<Long> orgTypeId, long serviceId);
 
     @Query("Match (o:OrganizationType)-[rel:" + ORGANIZATION_TYPE_HAS_SERVICES + "]->(os:OrganizationService) where id(o) IN {0}  AND  id(os)={1} DELETE rel ")
