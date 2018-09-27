@@ -10,6 +10,7 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 public class PlannedTimeType extends MongoBaseEntity {
     private String name;
     private Long countryId;
+    private String imageName;
 
     public PlannedTimeType(){
 
@@ -18,6 +19,14 @@ public class PlannedTimeType extends MongoBaseEntity {
     public PlannedTimeType(String name, Long countryId){
         this.name = name;
         this.countryId = countryId;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
 
     public String getName() {

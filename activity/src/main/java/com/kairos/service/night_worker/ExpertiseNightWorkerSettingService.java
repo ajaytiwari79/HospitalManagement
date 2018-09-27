@@ -1,5 +1,6 @@
 package com.kairos.service.night_worker;
 
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -65,8 +66,8 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
 
     public Boolean updateNightWorkerStatusByUnitId(Long unitId){
         Map<Long,Long> unitPositionIdAndExpertiseMap = staffRestClient.getUnitPositionExpertiseMap(unitId, unitId);
-        List<ShiftQueryResult> shifts = shiftMongoRepository.getShiftsByUnitBeforeDate(unitId, DateUtils.getDate());
-        Map<Long, List<ShiftQueryResult>> shiftsOfStaff = new HashMap<>();
+        List<ShiftDTO> shifts = shiftMongoRepository.getShiftsByUnitBeforeDate(unitId, DateUtils.getDate());
+        Map<Long, List<ShiftDTO>> shiftsOfStaff = new HashMap<>();
 
         shifts.forEach(shiftQueryResult -> {
             shiftQueryResult.setExpertiseId(unitPositionIdAndExpertiseMap.get(shiftQueryResult.getUnitPositionId()));

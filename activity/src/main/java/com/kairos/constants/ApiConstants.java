@@ -43,6 +43,7 @@ public final class ApiConstants {
     //RestClientURL
     public static final String CTA_BASIC_INFO = COUNTRY_URL+"/cta_basic_info";
     public static final String GET_UNIT_POSITION = "/unit_position/{unitPositionId}";
+    public static final String GET_REASONCODE = PARENT_ORGANIZATION_URL+COUNTRY_URL+"/reason_codes";
 
 
 

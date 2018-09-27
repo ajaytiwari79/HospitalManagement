@@ -1,10 +1,7 @@
-package com.kairos.wrapper.activity;
+package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.open_shift.DurationField;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.PQLSettings;
-import com.kairos.persistence.model.activity.tabs.PhaseTemplateValue;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -16,7 +13,6 @@ import java.util.Optional;
  * Created by pawanmandhan on 23/8/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-
 public class RulesActivityTabDTO {
 
     private BigInteger activityId;
@@ -286,13 +282,7 @@ public class RulesActivityTabDTO {
         this.pqlSettings = pqlSettings;
     }
 
-    public RulesActivityTab buildRulesActivityTab() {
-        RulesActivityTab rulesActivityTab = new RulesActivityTab( eligibleForFinalSchedule, eligibleForDraftSchedule, eligibleForRequest,
-                eligibleAgainstTimeRules,  lockLengthPresent, eligibleToBeForced,dayTypes,this.eligibleForSchedules,eligibleForStaffingLevel,eligibleForPresence,eligibleForAbsence, breakAllowed,
-                approvalAllowed,earliestStartTime,latestStartTime, shortestTime, longestTime, eligibleForCopy,plannedTimeInAdvance,pqlSettings,maximumEndTime,cutOffdayValue,cutOffIntervalUnit,cutOffStartFrom,recurrenceDays,recurrenceTimes,allowedAutoAbsence);
 
-        return rulesActivityTab;
-    }
 
 
 }
