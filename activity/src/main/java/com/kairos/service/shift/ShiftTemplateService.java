@@ -179,8 +179,8 @@ public class ShiftTemplateService extends MongoBaseService {
                 shiftActivities.add(shiftActivity);
             });
             shiftDTO.setActivities(shiftActivities);
-            ShiftDTO shiftDTO2 = shiftService.createShift(unitId, shiftDTO1, "Organization",false).getShifts().get(0);
-            shifts.add(shiftDTO2);
+            ShiftDTO newShiftDTO = shiftService.createShift(unitId, shiftDTO1, "Organization",false).getShifts().get(0);
+            shifts.add(newShiftDTO);
         });
         return new ShiftWithViolatedInfoDTO(shifts,new ViolatedRulesDTO());
     }

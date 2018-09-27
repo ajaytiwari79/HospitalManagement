@@ -434,11 +434,11 @@ public class ActivityService extends MongoBaseService {
     public void updateCompositeActivity(List<Activity> activityMatched, Activity activity, List<CompositeActivity> compositeActivities) {
         Map<BigInteger, Activity> activityMap = activityMatched.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         for (CompositeActivity compositeActivity : compositeActivities) {
-            Activity activity1 = activityMap.get(compositeActivity.getActivityId());
-            Optional<CompositeActivity> optionalCompositeActivity1 = activity1.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
-            CompositeActivity compositeActivity1 = optionalCompositeActivity1.isPresent() ? optionalCompositeActivity1.get() : new CompositeActivity();
-            compositeActivity1.setAllowedBefore(compositeActivity.isAllowedAfter());
-            compositeActivity1.setAllowedAfter(compositeActivity.isAllowedBefore());
+            Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
+            Optional<CompositeActivity> optionalCompositeActivity = composedActivity.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
+            CompositeActivity compositeActivityOfAnotherActivity = optionalCompositeActivity.isPresent() ? optionalCompositeActivity.get() : new CompositeActivity();
+            compositeActivityOfAnotherActivity.setAllowedBefore(compositeActivity.isAllowedAfter());
+            compositeActivityOfAnotherActivity.setAllowedAfter(compositeActivity.isAllowedBefore());
         }
         save(activityMatched);
     }
