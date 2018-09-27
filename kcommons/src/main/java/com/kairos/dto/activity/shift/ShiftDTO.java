@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -44,6 +45,7 @@ public class ShiftDTO {
     private LocalDate shiftDate;
     private Long allowedBreakDurationInMinute;
     private ShiftTemplateDTO template;
+    @NotEmpty(message = "message.shift.activity.empty")
     private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger plannedTimeId;
     private Long expertiseId;
