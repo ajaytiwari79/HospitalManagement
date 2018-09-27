@@ -201,17 +201,16 @@ public class ShiftService extends MongoBaseService {
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type, boolean byTandAPhase) {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
         Activity activity = activityWrapper.getActivity();
-        List<String> errorMessages = new ArrayList<>();
         if (!Optional.ofNullable(activity).isPresent()) {
-            errorMessages.add(exceptionService.convertMessage("message.activity.id", shiftDTO.getActivities().get(0).getActivityId()));
+            exceptionService.invalidRequestException("message.activity.id", shiftDTO.getActivities().get(0).getActivityId());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
         if (staffAdditionalInfoDTO.getUnitId() == null) {
-            errorMessages.add(exceptionService.convertMessage("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId()));
+            exceptionService.invalidRequestException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
         }
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTO.getActivities().get(0).getStartDate());
         if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
-            errorMessages.add(exceptionService.convertMessage("error.cta.notFound", shiftDTO.getStartDate()));
+            exceptionService.invalidRequestException("error.cta.notFound", shiftDTO.getStartDate());
         }
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
@@ -220,12 +219,11 @@ public class ShiftService extends MongoBaseService {
         } else {
             List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByUnitPosition(shiftDTO.getUnitPositionId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
             if (!shifts.isEmpty()) {
-                errorMessages.add(exceptionService.convertMessage("message.shift.date.startandend", shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate()));
+                exceptionService.invalidRequestException("message.shift.date.startandend", shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
             }
             shiftWithViolatedInfoDTO = saveShift(activityWrapper, staffAdditionalInfoDTO, shiftDTO, byTandAPhase);
 
         }
-        shiftWithViolatedInfoDTO.getErrorMessages().addAll(errorMessages);
         return shiftWithViolatedInfoDTO;
     }
 

@@ -868,6 +868,8 @@ public class UnitPositionService {
         com.kairos.dto.activity.shift.EmploymentType employmentType = new com.kairos.dto.activity.shift.EmploymentType();
         ObjectMapperUtils.copyProperties(unitPosition.getEmploymentType(), employmentType);
         unitPositionWithCtaDetailsDTO.setEmploymentType(employmentType);
+        //Todo it should calculate dynamically
+        unitPositionWithCtaDetailsDTO.setHourlyCost(14.5f);
         return unitPositionWithCtaDetailsDTO;
     }
 
