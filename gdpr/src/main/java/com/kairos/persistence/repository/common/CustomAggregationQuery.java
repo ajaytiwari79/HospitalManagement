@@ -124,7 +124,8 @@ public class CustomAggregationQuery {
                 "             'organizationTypes':1," +
                 "             'organizationSubTypes':1," +
                 "             'organizationServices':1," +
-                "              'organizationSubServices':1," +
+                "             'organizationSubServices':1," +
+                "             'createdAt':1" +
                 "         }}";
 
 
