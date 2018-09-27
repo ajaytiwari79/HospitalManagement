@@ -69,4 +69,6 @@ public interface CustomActivityMongoRepository {
 
     List<BreakActivitiesDTO> getAllActivitiesGroupedByTimeType(Long unitId);
      List<ActivityDTO> findAllByTimeTypeIdAndUnitId(Set<BigInteger> timeTypeIds,Long unitId) ;
+
+    List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(List<BigInteger> activityIds);
 }

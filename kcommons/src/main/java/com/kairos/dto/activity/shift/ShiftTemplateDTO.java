@@ -2,11 +2,13 @@ package com.kairos.dto.activity.shift;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 
 public class ShiftTemplateDTO {
     private BigInteger id;
+    private LocalDate startDate;
     @NotBlank
     private String name;
     private List<IndividualShiftTemplateDTO> shiftList;
@@ -24,6 +26,15 @@ public class ShiftTemplateDTO {
         this.shiftList = shiftList;
         this.createdBy = createdBy;
         this.unitId = unitId;
+    }
+
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
     public BigInteger getId() {

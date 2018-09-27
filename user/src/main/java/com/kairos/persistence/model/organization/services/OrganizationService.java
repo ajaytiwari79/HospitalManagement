@@ -21,7 +21,6 @@ public class OrganizationService extends UserBaseEntity {
     @NotEmpty(message = "error.OrganizationService.name.notEmpty") @NotNull(message = "error.OrganizationService.name.notnull")
     private String name;
 
-   // @NotEmpty(message = "error.OrganizationService.description.notEmpty") @NotNull(message = "error.OrganizationService.description.notnull")
     private String description;
 
 
@@ -37,10 +36,7 @@ public class OrganizationService extends UserBaseEntity {
     private boolean hasMapped = false;
 
 
-    public OrganizationService(String name, List<OrganizationService> organizationSubServicesList) {
-        this.name = name;
-        this.organizationSubService = organizationSubServicesList;
-    }
+
 
     public OrganizationService(String name) {
         this.name = name;

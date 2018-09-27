@@ -421,21 +421,28 @@ public class ActivityService extends MongoBaseService {
         if (!activity.isPresent()) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
-        Set<BigInteger> compositeShiftIds = new HashSet<>();
-        compositeShiftIds.addAll(compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet()));
-        Integer activityMatchedCount = activityMongoRepository.countActivityByIds(compositeShiftIds);
-        if (activityMatchedCount != compositeShiftIds.size()) {
+        Set<BigInteger> compositeShiftIds = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet());
+        List<Activity> activityMatched = activityMongoRepository.findAllActivitiesByIds(compositeShiftIds);
+        if (activityMatched.size() != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
-        List<CompositeActivity> compositeActivities = new ArrayList<>();
-        compositeShiftActivityDTOs.forEach(compositeShiftActivityDTO -> {
-            compositeActivities.add(new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter()));
-        });
-
+        List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
         activity.get().setCompositeActivities(compositeActivities);
         save(activity.get());
+        updateCompositeActivity(activityMatched,activity.get(),compositeActivities);
         return compositeShiftActivityDTOs;
+    }
 
+    public void updateCompositeActivity(List<Activity> activityMatched, Activity activity, List<CompositeActivity> compositeActivities) {
+        Map<BigInteger, Activity> activityMap = activityMatched.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        for (CompositeActivity compositeActivity : compositeActivities) {
+            Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
+            Optional<CompositeActivity> optionalCompositeActivity = composedActivity.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
+            CompositeActivity compositeActivityOfAnotherActivity = optionalCompositeActivity.isPresent() ? optionalCompositeActivity.get() : new CompositeActivity();
+            compositeActivityOfAnotherActivity.setAllowedBefore(compositeActivity.isAllowedAfter());
+            compositeActivityOfAnotherActivity.setAllowedAfter(compositeActivity.isAllowedBefore());
+        }
+        save(activityMatched);
     }
 
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
@@ -481,7 +488,7 @@ public class ActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
         validateActivityTimeRules(rulesActivityDTO.getEarliestStartTime(), rulesActivityDTO.getLatestStartTime(), rulesActivityDTO.getMaximumEndTime(), rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
-        RulesActivityTab rulesActivityTab = rulesActivityDTO.buildRulesActivityTab();
+        RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
         Activity activity = activityMongoRepository.findOne(rulesActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", rulesActivityDTO.getActivityId());
@@ -1216,4 +1223,5 @@ public class ActivityService extends MongoBaseService {
             save(activityAndShiftStatusSettings.get());
         }
     }
+
 }

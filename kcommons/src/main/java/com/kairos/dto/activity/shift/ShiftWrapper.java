@@ -9,7 +9,7 @@ import java.util.List;
  * Created by vipul on 11/5/18.
  */
 public class ShiftWrapper {
-    private List<ShiftQueryResult> assignedShifts;
+    private List<ShiftDTO> assignedShifts;
     private List<OpenShiftResponseDTO> openShifts;
     private StaffAccessRoleDTO staffDetails;
 
@@ -17,22 +17,22 @@ public class ShiftWrapper {
         //default case
     }
 
-    public ShiftWrapper(List<ShiftQueryResult> assignedShifts, List<OpenShiftResponseDTO> openShifts) {
+    public ShiftWrapper(List<ShiftDTO> assignedShifts, List<OpenShiftResponseDTO> openShifts) {
         this.assignedShifts = assignedShifts;
         this.openShifts = openShifts;
     }
 
-    public ShiftWrapper(List<ShiftQueryResult> assignedShifts, List<OpenShiftResponseDTO> openShifts, StaffAccessRoleDTO staffDetails) {
+    public ShiftWrapper(List<ShiftDTO> assignedShifts, List<OpenShiftResponseDTO> openShifts, StaffAccessRoleDTO staffDetails) {
         this.assignedShifts = assignedShifts;
         this.openShifts = openShifts;
         this.staffDetails = staffDetails;
     }
 
-    public List<ShiftQueryResult> getAssignedShifts() {
+    public List<ShiftDTO> getAssignedShifts() {
         return assignedShifts;
     }
 
-    public void setAssignedShifts(List<ShiftQueryResult> assignedShifts) {
+    public void setAssignedShifts(List<ShiftDTO> assignedShifts) {
         this.assignedShifts = assignedShifts;
     }
 
