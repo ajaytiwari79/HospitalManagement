@@ -205,6 +205,12 @@ public class ShiftService extends MongoBaseService {
             exceptionService.invalidRequestException("message.activity.id", shiftDTO.getActivities().get(0).getActivityId());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
+        if (staffAdditionalInfoDTO == null) {
+            exceptionService.invalidRequestException("message.staff.notfound");
+        }
+        if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
+            exceptionService.actionNotPermittedException("message.unit.position");
+        }
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             exceptionService.invalidRequestException("message.staff.unit", shiftDTO.getStaffId(), shiftDTO.getUnitId());
         }
