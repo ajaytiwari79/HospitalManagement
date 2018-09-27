@@ -25,6 +25,13 @@ public class UnitSolverConfigController {
         return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
     }
 
+    @PostMapping (value = "/copy")
+    @ApiOperation("Copy UnitSolverConfig")
+    public ResponseEntity<Map<String, Object>> copyUnitSolverConfig(@RequestBody SolverConfigDTO solverConfigDTO) {
+        unitSolverConfigService.copyUnitSolverConfig(solverConfigDTO);
+        return ResponseHandler.generateResponse("Success", HttpStatus.CREATED);
+    }
+
     @GetMapping(value = "/{solverConfigId}")
     @ApiOperation("Get UnitSolverConfigration")
     public ResponseEntity<Map<String, Object>> getUnitSolverConfig(@PathVariable String solverConfigId) {

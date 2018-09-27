@@ -29,6 +29,17 @@ public class UnitSolverConfigService {
         }
 
     }
+
+
+    public void copyUnitSolverConfig(SolverConfigDTO solverConfigDTO) {
+        Optional<SolverConfig> solverConfigOptional = solverConfigRepository.findById(solverConfigDTO.getId() + "");
+        if (solverConfigOptional.isPresent()) {
+            SolverConfig solverConfig = ObjectMapperUtils.copyPropertiesByMapper(solverConfigDTO, SolverConfig.class)
+                    .setIdBuilder(null)//UnSet
+                    .setParentIdBuilder(solverConfigDTO.getId() + "");
+            solverConfigRepository.saveObject(solverConfig);
+        }
+    }
 /*************************************************************************/
     public SolverConfigDTO getUnitSolverConfig(String solverConfigId) {
         SolverConfigDTO solverConfigDTO = null;
@@ -96,5 +107,6 @@ public class UnitSolverConfigService {
     private List<PlanningPeriodDTO> getAllPlanningPeriods(Long unitId) {
         return activityMongoRepository.getAllPlanningPeriodByUnitId(unitId);
     }
+
 
 }
