@@ -2,10 +2,12 @@ package com.kairos.controller.master_data.asset_management;
 
 
 import com.kairos.dto.gdpr.master_data.MasterAssetDTO;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.service.master_data.asset_management.MasterAssetService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 import static com.kairos.constants.ApiConstant.UNIT_URL;
@@ -69,37 +73,17 @@ public class MasterAssetController {
 
     }
 
-/*
-
-    @ApiOperation(value = "get master asset of Unit by id")
-    @GetMapping(UNIT_URL+"/master_asset/{id}")
-    public ResponseEntity<Object> getMasterAssetOfUnitById(@PathVariable Long countryId,@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+    @ApiOperation(value = "Update Suggest Status of Master Assets")
+    @PutMapping("/master_asset/status")
+    public ResponseEntity<Object> updateStatusOfMasterAssetByIds(@PathVariable Long countryId, @PathVariable Set<BigInteger> assetIds, @RequestParam SuggestedDataStatus suggestedDataStatus) {
+        if (CollectionUtils.isEmpty(assetIds)) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Hosting Provider is Not Selected");
+        } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getMasterAssetById(countryId,unitId,id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.updateSuggestedStatusOfMasterAsset(countryId, assetIds, suggestedDataStatus));
 
     }
 
-
-
-    @ApiOperation(value = "get all master asset of Unit")
-    @GetMapping(UNIT_URL+"/master_asset/all")
-    public ResponseEntity<Object> getAllMasterAssetOfUnit(@PathVariable Long countryId, @PathVariable Long unitId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }else if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "unitId id can't be null");
-
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, masterAssetService.getAllMasterAsset(countryId, unitId));
-    }
-*/
 
 }

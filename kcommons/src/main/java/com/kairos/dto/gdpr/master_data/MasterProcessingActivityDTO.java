@@ -12,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -26,27 +27,24 @@ public class MasterProcessingActivityDTO {
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
-    @NotEmpty(message = "ManagingOrganization Type  can't be  Empty")
-    @NotNull(message = "ManagingOrganization  Type  can't be  null")
-    @Valid
-    private List<OrganizationType> organizationTypes;
 
-    @NotNull(message = "ManagingOrganization Sub Type  can't be  null")
-    @NotEmpty(message = "ManagingOrganization Sub Type  can't be Empty")
     @Valid
-    private List<OrganizationSubType> organizationSubTypes;
+    @NotEmpty(message = "error.message.organizationType.not.Selected")
+    private List<OrganizationType> organizationTypes=new ArrayList<>();
 
-    @NotNull(message = "Service Type  can't be  null")
-    @NotEmpty(message = "Service Type  can't be  Empty")
     @Valid
-    private List<ServiceCategory> organizationServices;
+    @NotEmpty(message = "error.message.organizationSubType.not.Selected")
+    private List<OrganizationSubType> organizationSubTypes=new ArrayList<>();
 
-    @NotNull(message = "Service Sub Type  can't be  null")
-    @NotEmpty(message = "Service Sub Type  can't be  Empty")
     @Valid
-    private List<SubServiceCategory> organizationSubServices;
+    @NotEmpty(message = "error.message.serviceCategory.not.Selected")
+    private List<ServiceCategory> organizationServices=new ArrayList<>();
 
-    private List<MasterProcessingActivityDTO> subProcessingActivities;
+    @Valid
+    @NotEmpty(message = "error.message.serviceSubCategory.not.Selected")
+    private List<SubServiceCategory> organizationSubServices=new ArrayList<>();
+
+    private List<MasterProcessingActivityDTO> subProcessingActivities=new ArrayList<>();
 
     public BigInteger getId() {
         return id;

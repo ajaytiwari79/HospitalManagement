@@ -29,7 +29,7 @@ public class ProcessingActivity extends MongoBaseEntity {
     private List<BigInteger> transferMethods;
     private List<BigInteger> accessorParties;
     private List<BigInteger> processingLegalBasis;
-    private List<BigInteger> subProcessingActivities;
+    private List<BigInteger> subProcessingActivities=new ArrayList<>();
     private BigInteger responsibilityType;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
@@ -40,6 +40,7 @@ public class ProcessingActivity extends MongoBaseEntity {
     private boolean active=true;
     private boolean subProcess=false;
     private List<BigInteger> risks=new ArrayList<>();
+    private boolean suggested;
 
     public ProcessingActivity() { }
 
@@ -55,6 +56,10 @@ public class ProcessingActivity extends MongoBaseEntity {
         this.description = description;
         this.active = active;
     }
+
+    public boolean isSuggested() { return suggested; }
+
+    public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
     public List<BigInteger> getRisks() { return risks; }
 
