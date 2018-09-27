@@ -1,6 +1,7 @@
 package com.kairos.service.pay_out;
 
 
+import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -19,6 +20,8 @@ import com.kairos.service.activity.TimeTypeService;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,11 +58,13 @@ public class PayOutService extends MongoBaseService {
     private ActivityMongoRepository activityMongoRepository;
     @Inject
     private OrganizationRestClient organizationRestClient;
+    @Inject private TimeBankService timeBankService;
     @Inject
     private TimeTypeService timeTypeService;
     @Inject private TimeBankRepository timeBankRepository;
     @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
+    @Inject private ExceptionService exceptionService;
 
 
     /**
@@ -151,9 +156,11 @@ public class PayOutService extends MongoBaseService {
      * @return boolean
      */
     public boolean requestPayOut(Long staffId,Long unitPositionId,int amount){
-       // DailyTimeBankEntry dailyTimeBankEntry = timeBankRepository.findLastTimeBankByUnitPositionId(unitPositionId,new Date());
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
+        if(unitPositionWithCtaDetailsDTO==null){
+            exceptionService.invalidRequestException("message.unit.position");
+        }
         PayOutTransaction requestPayOutTransaction = new PayOutTransaction(staffId,unitPositionId, PayOutTrasactionStatus.REQUESTED,amount, LocalDate.now());
-        //Todo change this functionality when CTA Merge to dev @Pradeep
         save(requestPayOutTransaction);
         return true;
 

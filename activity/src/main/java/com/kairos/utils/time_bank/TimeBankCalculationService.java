@@ -477,6 +477,7 @@ public class TimeBankCalculationService {
         timeBankDTO.setTotalScheduledMin(weeklyTimeBankIntervals.stream().mapToLong(t -> t.getTotalTimeBankDiff()).sum());
         timeBankDTO.setTotalContractedMin(contractualMin);
         timeBankDTO.setMonthlyIntervalsTimeBank(getTimeBankByIntervals(monthlyIntervals, monthlyIntervalTimeBankMap, MONTHLY, unitPositionWithCtaDetailsDTO));
+        timeBankDTO.setHourlyCost(unitPositionWithCtaDetailsDTO.getHourlyCost());
         return timeBankDTO;
     }
 

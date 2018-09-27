@@ -21,6 +21,7 @@ public class UnitPositionWithCtaDetailsDTO {
     private int minutesFromCta;
     private ZoneId unitTimeZone;
     private int fullTimeWeeklyMinutes;
+    private float hourlyCost;
 
 
     public UnitPositionWithCtaDetailsDTO(Long id) {
@@ -38,6 +39,14 @@ public class UnitPositionWithCtaDetailsDTO {
         this.unitPositionEndDate = unitPositionEndDate;
     }
 
+
+    public float getHourlyCost() {
+        return hourlyCost;
+    }
+
+    public void setHourlyCost(float hourlyCost) {
+        this.hourlyCost = hourlyCost;
+    }
 
     public int getFullTimeWeeklyMinutes() {
         return fullTimeWeeklyMinutes;
