@@ -101,7 +101,7 @@ public class ShiftWithActivityDTO {
     }
 
     public int getMinutes(){
-        return ((int)(this.endDate.getTime() - this.startDate.getTime())/60000);
+        return ((int)(this.activities.get(0).getStartDate().getTime() - this.activities.get(activities.size()-1).getEndDate().getTime())/60000);
     }
 
     public int getScheduledMinutes() {
