@@ -41,6 +41,7 @@ import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.staff.StaffService;
 
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
+import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
@@ -300,6 +301,8 @@ public class CompanyCreationService {
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
                 setEncryptedPasswordInUser(unitManagerDTO, user);
+                user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(unitManagerDTO.getCprNumber()));
+
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
                     staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId());
@@ -312,9 +315,11 @@ public class CompanyCreationService {
                     if (userBySameEmailOrCPR != 0) {
                         exceptionService.duplicateDataException("user already exist by email or cpr");
                     }
+
                 }
                 user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
                 setEncryptedPasswordInUser(unitManagerDTO, user);
+                user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(unitManagerDTO.getCprNumber()));
                 userGraphRepository.save(user);
                 staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization);
 

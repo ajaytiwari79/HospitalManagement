@@ -1165,12 +1165,10 @@ public class StaffService {
         }
         staff.setEmail(payload.getPrivateEmail());
         staff.setInactiveFrom(payload.getInactiveFrom());
-        //staff.setEmployedSince(payload.getEmployedSince());
         staff.setExternalId(payload.getExternalId());
         staff.setFirstName(payload.getFirstName());
         staff.setLastName(payload.getLastName());
         staff.setFamilyName(payload.getFamilyName());
-//        staff.setCprNumber(payload.getCprNumber());
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
         staff.setContactAddress(contactAddress);
 

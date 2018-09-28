@@ -21,6 +21,7 @@ public class CPRUtil {
     }
 
     public static Gender getGenderFromCPRNumber(String cprNumber){
+
         return Integer.valueOf(cprNumber.substring(cprNumber.length() - 1)) % 2 == 0 ? Gender.FEMALE : Gender.MALE;
     }
 
