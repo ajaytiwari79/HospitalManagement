@@ -3,7 +3,10 @@ package com.kairos.scheduler.service.scheduler_panel;
 import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
 import com.kairos.dto.scheduler.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.SchedulerPanelDTO;
+import com.kairos.dto.scheduler.SchedulerPanelDefaultDataDto;
 import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -385,6 +389,10 @@ public class SchedulerPanelService extends MongoBaseService {
         schedulerPanelDB.setDeleted(true);
         schedulerPanelDB.setActive(false);
         save(schedulerPanelDB);
+    }
+
+    public SchedulerPanelDefaultDataDto getDefaultData() {
+        return new SchedulerPanelDefaultDataDto(Arrays.asList(JobSubType.values()),Arrays.asList(JobType.values()));
     }
 //Dont remove
    /* public ControlPanelDTO getControlPanelData(BigInteger schedulerPanelId){
