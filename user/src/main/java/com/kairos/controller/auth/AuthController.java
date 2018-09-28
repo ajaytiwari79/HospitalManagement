@@ -70,6 +70,17 @@ public class AuthController {
 
     }
 
+    @RequestMapping(value = "/login_internal", method = RequestMethod.POST)
+    @ApiOperation(value = "Authenticate User")
+    ResponseEntity<Map<String, Object>> checkUserInt(@RequestBody User user) {
+
+        logger.info("user info is {}",user);
+
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,userService.checkUserInt(user));
+
+
+    }
 
 
 

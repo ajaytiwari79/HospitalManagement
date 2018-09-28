@@ -84,6 +84,8 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
 
         web.ignoring().antMatchers("/api/v1/login");
+        web.ignoring().antMatchers("/api/v1/login_internal");
+
 
     }
 

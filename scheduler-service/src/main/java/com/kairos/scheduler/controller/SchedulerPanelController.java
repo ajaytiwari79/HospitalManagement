@@ -76,6 +76,13 @@ public class SchedulerPanelController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelIds));
     }
 
+    @GetMapping("/default_data")
+    @ApiOperation("Get default data")
+    public ResponseEntity<Map<String, Object>> getDefaultData() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getDefaultData());
+    }
+
+
     /**
      * this end point will be called from
      * activity micro service

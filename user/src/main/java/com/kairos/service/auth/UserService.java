@@ -8,10 +8,7 @@ import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.access_permission.UnitModuleAccess;
 import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
-import com.kairos.persistence.model.auth.OrganizationSelectionDTO;
-import com.kairos.persistence.model.auth.TabPermission;
-import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.auth.UserOrganizationsDTO;
+import com.kairos.persistence.model.auth.*;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.organization.Organization;
@@ -183,6 +180,18 @@ public class UserService {
         //map.put("isPasswordUpdated", currentUser.isPasswordUpdated());
         map.put("otp", otp);
         return map;
+
+    }
+
+    public UserPrincipal checkUserInt(User user) {
+
+        User currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
+        if (currentUser == null ) {
+            return null;
+        }
+        //if (c)//   OPT REQUIRED{
+
+        return new UserPrincipal(currentUser,Collections.emptyList());
 
     }
 
