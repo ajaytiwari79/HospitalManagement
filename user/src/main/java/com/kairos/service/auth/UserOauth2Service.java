@@ -34,8 +34,8 @@ public class UserOauth2Service implements UserDetailsService {
     private AccessPageService accessPageService;
     @Inject
     private ExceptionService exceptionService;
-    @Inject
-    private PasswordEncoder passwordEncoder;
+    /*@Inject
+    private PasswordEncoder passwordEncoder;*/
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -43,10 +43,10 @@ public class UserOauth2Service implements UserDetailsService {
          user.setHubMember(accessPageService.isHubMember(user.getId()));
          Optional<User> loggedUser=Optional.ofNullable(user);
          String otpString=HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");
-        String password=HttpRequestHolder.getCurrentRequest().getParameter("password");
+       /* String password=HttpRequestHolder.getCurrentRequest().getParameter("password");
         if (passwordEncoder.matches(password, user.getPassword()) && user.isPasswordUpdated()){
             return new UserPrincipal(user,getPermission(user));
-        }
+        }*/
          Optional<Integer>optInt=OptionalUtility.stringToInt(otpString);
 
         if (loggedUser.filter(u->optInt.get().equals(u.getOtp())).isPresent()) {

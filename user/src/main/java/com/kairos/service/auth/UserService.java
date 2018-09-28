@@ -183,18 +183,6 @@ public class UserService {
 
     }
 
-    public UserPrincipal checkUserInt(User user) {
-
-        User currentUser = userDetailsService.loadUserByEmail(user.getUserName(), user.getPassword());
-        if (currentUser == null ) {
-            return null;
-        }
-        //if (c)//   OPT REQUIRED{
-
-        return new UserPrincipal(currentUser,Collections.emptyList());
-
-    }
-
     public User findByAccessToken(String token) {
         return userGraphRepository.findByAccessToken(token);
     }
