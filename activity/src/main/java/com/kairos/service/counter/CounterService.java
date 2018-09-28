@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
  * @dated: Jun/26/2018
  */
 
+
 public interface CounterService {
 
     default Map<FilterType, List> getApplicableFilters(List<FilterCriteria> availableFilters, Map<FilterType, List> providedFiltersMap){
