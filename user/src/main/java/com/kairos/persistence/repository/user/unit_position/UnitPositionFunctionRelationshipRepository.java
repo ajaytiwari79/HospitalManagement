@@ -34,7 +34,7 @@ public interface UnitPositionFunctionRelationshipRepository  extends Neo4jBaseRe
 
     @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND {1} in rel.appliedDates with rel,function,\n" +
             "FILTER (x IN rel.appliedDates WHERE x <> {1}) as filteredDates\n" +
-            "SET rel.appliedDates = filteredDates")
-    void removeDateFromUnitPositionFunctionRelationship(Long unitPositionId, Long localDate);
+            "SET rel.appliedDates = filteredDates return id(function)")
+    Long removeDateFromUnitPositionFunctionRelationship(Long unitPositionId, Long localDate);
 
 }

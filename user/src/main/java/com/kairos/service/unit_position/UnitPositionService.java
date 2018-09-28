@@ -1117,10 +1117,9 @@ public class UnitPositionService {
         return true;
     }
 
-    public Boolean removeFunction(Long unitPositionId, Date appliedDate) {
-        unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, appliedDate.getTime());
-        return true;
-    }
+    public Long removeFunction(Long unitPositionId, Date appliedDate) {
+       return unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, appliedDate.getTime());
+       }
 
     public List<com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, Long expertiseId, List<Long> staffId) {
         List<com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails> staffData =
