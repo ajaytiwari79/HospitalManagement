@@ -898,6 +898,7 @@ public class UnitPositionService {
         unitPositionDetails.setWorkingTimeAgreementId(unitPosition.getWorkingTimeAgreementId());
         unitPositionDetails.setUnitPositionStartDate(DateUtils.asLocalDate(new Date(unitPosition.getStartDateMillis())));
         unitPositionDetails.setCostTimeAgreementId(unitPosition.getCostTimeAgreementId());
+        unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
         if (unitPosition.getEndDateMillis() != null) {
             unitPositionDetails.setUnitPositionEndDate(DateUtils.asLocalDate(new Date(unitPosition.getEndDateMillis())));
             unitPositionDetails.setEndDateMillis(unitPosition.getEndDateMillis());
@@ -1094,7 +1095,7 @@ public class UnitPositionService {
         return mapOfUnitPositionAndExpertise;
     }
 
-    public Boolean applyFunction(Long unitPositionId, Map<String, Object> payload) throws ParseException {
+    public Boolean applyFunction(Long unitPositionId, Map<String, Object> payload,boolean restore) throws ParseException {
 
         String dateAsString = new ArrayList<>(payload.keySet()).get(0);
 

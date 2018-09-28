@@ -19,6 +19,7 @@ import com.kairos.persistence.repository.attendence_setting.SickSettingsReposito
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.rest_client.StaffRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -63,6 +64,8 @@ public class ShiftSickService extends MongoBaseService {
     @Inject private ShiftService shiftService;
     @Inject
     private PhaseService phaseService;
+    @Inject
+    private GenericIntegrationService genericIntegrationService;
 
 
 
@@ -215,13 +218,18 @@ public class ShiftSickService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.staffUnitPosition.notFound");
         }
         List<Shift> shifts = shiftMongoRepository.findAllDisabledOrSickShiftsByUnitPositionIdAndUnitId(staffUnitPositionDetails.getId(), unitId, DateUtils.getCurrentLocalDate());
+        Map<LocalDate,Long> dateAndFunctionIdMap=new HashMap<>();
         shifts.forEach(s -> {
             if (s.isSickShift()) {
                 s.setDeleted(true);// delete the sick shift.
             } else if (s.isDisabled()) {
                 s.setDisabled(false);
+                if(s.getFunctionId()!=null){
+                    dateAndFunctionIdMap.put(DateUtils.asLocalDate(s.getStartDate()),s.getFunctionId());
+                }
             }
         });
+        genericIntegrationService.restoreFunctionFromUnitPositionByDate(unitId,staffUnitPositionDetails.getId(),dateAndFunctionIdMap);
         if (!shifts.isEmpty())
             save(shifts);
     }

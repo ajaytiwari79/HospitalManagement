@@ -1,5 +1,6 @@
 package com.kairos.rest_client;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -122,8 +124,13 @@ public class GenericIntegrationService {
     }
 
     public Long removeFunctionFromUnitPositionByDate(Long unitId,Long unitPositionId,Date shiftDate){
-        BasicNameValuePair appliedDate=new BasicNameValuePair("appliedDate",shiftDate.toString());
+        BasicNameValuePair appliedDate=new BasicNameValuePair("appliedDate",DateUtils.asLocalDate(shiftDate).toString());
         Long functionId= genericRestClient.publishRequest(null,unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/applyFunction", Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {},unitPositionId);
+        return functionId;
+    }
+
+    public Long restoreFunctionFromUnitPositionByDate(Long unitId,Long unitPositionId,Map<LocalDate,Long> dateAndFunctionIdMap){
+        Long functionId= genericRestClient.publishRequest(dateAndFunctionIdMap,unitId, true, IntegrationOperation.CREATE, "/unit_position/{unitPositionId}/applyFunction", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {},unitPositionId);
         return functionId;
     }
 
