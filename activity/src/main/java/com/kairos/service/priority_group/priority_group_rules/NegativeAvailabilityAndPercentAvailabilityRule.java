@@ -38,7 +38,7 @@ public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityG
             DateTimeInterval dateTimeIntervalPerAvailability = new DateTimeInterval(flterStartDatePerAvailability.getTime(), filterEndDatePerAvailability.getTime());
 
             /* Map<Long,List<Shift>> shiftsUnitPositionMapForOpenShift = shiftUnitPositionsMap.values().stream().flatMap(shifts -> shifts.stream().
-                    filter(shift ->dateTimeInterval.overlaps(shift.getInterval()))).collect(groupingBy(Shift::getPositionLineId));*/
+                    filter(shift ->dateTimeInterval.overlaps(shift.getInterval()))).collect(groupingBy(Shift::getUnitPositionId));*/
 
             Set<Long> unitPositionIds = new HashSet<Long>();
             for (Shift shift : shifts) {
