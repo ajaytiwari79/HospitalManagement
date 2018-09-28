@@ -1172,7 +1172,7 @@ public class UnitPositionService {
     }
 
 
-    public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId) {
+    public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId,Long unitId) {
 
         LocalDateTime started = LocalDateTime.now();
         KairosSchedulerLogsDTO schedulerLogsDTO;
@@ -1238,7 +1238,7 @@ public class UnitPositionService {
         }
 
         stopped = LocalDateTime.now();
-        schedulerLogsDTO = new KairosSchedulerLogsDTO(result,log,schedulerPanelId,null,DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),JobSubType.SENIORITY_LEVEL);
+        schedulerLogsDTO = new KairosSchedulerLogsDTO(result,log,schedulerPanelId,unitId,DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),JobSubType.SENIORITY_LEVEL);
 
         kafkaProducer.pushToSchedulerLogsQueue(schedulerLogsDTO);
 
