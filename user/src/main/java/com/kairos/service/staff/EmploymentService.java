@@ -186,7 +186,10 @@ public class EmploymentService {
 
 
     public Map<String, Object> createUnitPermission(long unitId, long staffId, long accessGroupId, boolean created) {
-
+        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+            exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
+        }
         Organization unit = organizationGraphRepository.findOne(unitId);
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         if (unit == null) {
@@ -226,7 +229,6 @@ public class EmploymentService {
                 unitPermission.setOrganization(unit);
                 unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
             }
-            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
             unitPermission.setAccessGroup(accessGroup);
             employment.getUnitPermissions().add(unitPermission);
             employmentGraphRepository.save(employment);
@@ -708,8 +710,8 @@ public class EmploymentService {
 
     
     public boolean moveToReadOnlyAccessGroup(List<Long> employmentIds) {
-        Long curDateMillisStart = DateUtil.getStartOfDay(DateUtil.getCurrentDate()).getTime();
-        Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
+        Long curDateMillisStart = DateUtils.getStartOfDay(DateUtil.getCurrentDate()).getTime();
+        Long curDateMillisEnd = DateUtils.getEndOfDay(DateUtil.getCurrentDate()).getTime();
         List<UnitPermission> unitPermissions;
         UnitPermission unitPermission;
         List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(employmentIds);

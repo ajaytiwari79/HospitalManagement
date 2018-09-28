@@ -465,6 +465,7 @@ public class UnitPositionService {
         return CompletableFuture.completedFuture(true);
     }
 
+
     private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) throws InterruptedException, ExecutionException {
         CompletableFuture<Boolean> done = setDefaultData(unitPositionDTO, unitPosition);
         CompletableFuture.allOf(done).join();
@@ -473,7 +474,6 @@ public class UnitPositionService {
             exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
         }
         unitPosition.setStartDateMillis(DateUtils.getLongFromLocalDate(unitPositionDTO.getStartLocalDate()));
-
         if (Optional.ofNullable(unitPositionDTO.getEndLocalDate()).isPresent()) {
             if (unitPositionDTO.getStartLocalDate().isAfter(unitPositionDTO.getEndLocalDate())) {
                 exceptionService.actionNotPermittedException("message.startdate.notlessthan.enddate");
@@ -517,7 +517,6 @@ public class UnitPositionService {
                 .setFullTimeWeeklyMinutes(unitPosition.getExpertise().getFullTimeWeeklyMinutes())
                 .setWorkingDaysInWeek(unitPosition.getExpertise().getNumberOfWorkingDaysInWeek())
                 .setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours())
-
                 .setHourlyWages(unitPositionDTO.getHourlyWages())
                 .build();
         unitPosition.setPositionLines(Collections.singletonList(positionLine));
@@ -734,6 +733,8 @@ public class UnitPositionService {
         com.kairos.dto.activity.shift.EmploymentType employmentType = new com.kairos.dto.activity.shift.EmploymentType();
         ObjectMapperUtils.copyProperties(unitPosition.getEmploymentType(), employmentType);
         unitPositionWithCtaDetailsDTO.setEmploymentType(employmentType);
+        //Todo it should calculate dynamically
+        unitPositionWithCtaDetailsDTO.setHourlyCost(14.5f);
         return unitPositionWithCtaDetailsDTO;
     }
 
@@ -1058,7 +1059,7 @@ public class UnitPositionService {
 
                 for (UnitPosition currentUnitPosition : unitPositions) {
                     Optional<PositionLine> positionLine =currentUnitPosition.getPositionLines().stream()
-                            .filter(pl->(todaysDate.isAfter(pl.getStartDate()) && (pl.getEndDate()==null || pl.getEndDate().isBefore(todaysDate) ||pl.getEndDate().isEqual(todaysDate) )))
+                            .filter(pl->(todaysDate.isAfter(pl.getStartDate())||todaysDate.isEqual(pl.getStartDate()) && (pl.getEndDate()==null || pl.getEndDate().isBefore(todaysDate) ||pl.getEndDate().isEqual(todaysDate) )))
                             .findAny();
                     if (positionLine.isPresent()) {
                         PositionLine newPositionLine = new PositionLine.PositionLineBuilder()
@@ -1078,7 +1079,6 @@ public class UnitPositionService {
                     }
 
                 }
-                unitPositionGraphRepository.saveAll(unitPositions);
                 List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips = new ArrayList<>();
 
                 for (Map.Entry<UnitPositionIdDTO,PositionLine> currentMap:newPositionLineWithParentId.entrySet()) {
@@ -1092,16 +1092,12 @@ public class UnitPositionService {
                 }
 
                 unitPositionGraphRepository.saveAll(unitPositions);
-//                int i = 0;
-//                for (UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult : unitPositionSeniorityLevelQueryResults) {
-//                    unitPositionNewOldIds.add(new UnitPositionIdDTO(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId(), unitPositions.get(i++).getId()));
-//                }
                 unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(unitPositionEmploymentTypeRelationShips);
-                //activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
             }
 
         } catch (Exception ex) {
+
             log = ex.getMessage();
             result = Result.ERROR;
         }

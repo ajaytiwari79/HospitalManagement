@@ -72,7 +72,7 @@ public class AttendanceSettingService extends MongoBaseService {
         }
         List<Long> staffIds=staffAndOrganizationIds.stream().map(e -> e.getStaffId()).collect(Collectors.toList());
         //ShiftQueryResult shiftQueryResults = shiftService.getShiftByStaffIdAndDate(staffIds, DateUtils.getCurrentDate());
-        Shift shift=shiftMongoRepository.findShiftToBeDone(staffIds, DateUtils.getDate(DateUtils.getCurrentDayStartMillis()),DateUtils.getDate(DateUtils.getCurrentDayMidNightMillis()));
+        Shift shift=shiftMongoRepository.findShiftToBeDone(staffIds, DateUtils.getCurrentDayStart(),DateUtils.getCurrentDayMidNight());
         //If shift is not found
         if(shift==null && checkIn){
             attendanceSetting =  checkInWithoutHavingShift(unitId, reasonCodeId, staffAndOrganizationIds);
@@ -90,6 +90,9 @@ public class AttendanceSettingService extends MongoBaseService {
             if(attendanceSetting==null){
                 Set<ReasonCodeDTO> reasonCode = staffAndOrganizationIds.stream().flatMap(s -> s.getReasonCodes().stream()).collect(Collectors.toSet());
                 return new AttendanceDTO(reasonCode);
+            }else {
+                shift.setAttendanceDuration(attendanceSetting.getAttendanceDuration());
+                shiftMongoRepository.save(shift);
             }
         }
 
@@ -98,6 +101,9 @@ public class AttendanceSettingService extends MongoBaseService {
             if(attendanceSetting==null){
                 Set<ReasonCodeDTO> reasonCode = staffAndOrganizationIds.stream().flatMap(s -> s.getReasonCodes().stream()).collect(Collectors.toSet());
                 return new AttendanceDTO(reasonCode);
+            }else {
+                shift.setAttendanceDuration(attendanceSetting.getAttendanceDuration());
+                shiftMongoRepository.save(shift);
             }
         }
 

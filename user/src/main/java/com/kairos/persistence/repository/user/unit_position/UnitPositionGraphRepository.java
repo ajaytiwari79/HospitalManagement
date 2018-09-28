@@ -212,9 +212,9 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(activePositionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) where sl.to<=years_experience_in_expertise \n" +
             "match(activePositionLine)-[unitPositionEmploymentTypeRelationShip:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) \n" +
             " match(expertise)-[:"+FOR_SENIORITY_LEVEL+"]->(nextSeniorityLevel:SeniorityLevel) where nextSeniorityLevel.from <= years_experience_in_expertise and (nextSeniorityLevel.to > years_experience_in_expertise or nextSeniorityLevel.to is null) \n" +
-            "return id(unitPosition) as id,unitPositionEmploymentTypeRelationShip,employmentType,activePositionLine as positionLine,nextSeniorityLevel as seniorityLevel")
+            "return id(unitPosition) as unitPositionId,unitPositionEmploymentTypeRelationShip,employmentType,activePositionLine as positionLine,nextSeniorityLevel as seniorityLevel")
     List<UnitPositionSeniorityLevelQueryResult> findUnitPositionSeniorityLeveltoUpdate();
-
+//
 
     @Query("Match(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(unitPosition:UnitPosition{deleted:false,published:true})-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) where id(staff)={0} " +
             "and id(expertise)=expertiseId and unitPosition.startDateMillis<=timeStamp and (uniPosition.endDateMillis>=timestamp or unitPosition.endDateMillis is null)" +

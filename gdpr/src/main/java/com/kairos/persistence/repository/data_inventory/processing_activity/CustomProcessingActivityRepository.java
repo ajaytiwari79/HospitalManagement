@@ -15,11 +15,9 @@ public interface CustomProcessingActivityRepository {
 
     ProcessingActivity findByName( Long organizationId, String name);
 
-    List<ProcessingActivityResponseDTO>  getAllProcessingActivityAndMetaData( Long unitId);
+    List<ProcessingActivityResponseDTO> getAllProcessingActivityAndMetaDataAndSubProcessingActivities(Long unitId);
 
     ProcessingActivityResponseDTO  getProcessingActivityAndMetaDataById( Long unitId,BigInteger processingActivityId);
-
-    List<ProcessingActivityResponseDTO>  getAllSubProcessingActivitiesOfProcessingActivity( Long unitId, BigInteger processingActivityId);
 
     List<ProcessingActivityBasicResponseDTO>  getAllAssetRelatedProcessingActivityWithSubProcessAndMetaData(Long unitId, Set<BigInteger> processingActivityIds);
 

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -122,15 +123,9 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
         List<ProcessingActivityBasicResponseDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithResponsibilityType(unitId, responsibilityTypeId);
         if (!processingActivities.isEmpty()) {
-            StringBuilder processingActivityNames=new StringBuilder();
-            processingActivities.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Responsibility Type", processingActivityNames);
+                exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Responsibility Type", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        ResponsibilityType responsibilityType = responsibilityTypeMongoRepository.findByOrganizationIdAndId(unitId, responsibilityTypeId);
-        if (!Optional.ofNullable(responsibilityType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Responsibility Type", responsibilityTypeId);
-        }
-        delete(responsibilityType);
+        responsibilityTypeMongoRepository.safeDelete(responsibilityTypeId) ;
         return true;
     }
 

@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 
 @RestController
@@ -34,9 +35,7 @@ public class ProcessingActivityController {
     @ApiOperation(value = "create Processing activity ")
     @PostMapping("/processing_activity")
     public ResponseEntity<Object> createProcessingActivity(@PathVariable Long unitId, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "ManagingOrganization id can't be Null");
-        }
+        processingActivityDTO.setSuggested(false);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.createProcessingActivity(unitId, processingActivityDTO));
     }
 
@@ -44,43 +43,18 @@ public class ProcessingActivityController {
     @ApiOperation(value = "delete  Processing Activity by Id")
     @DeleteMapping("/processing_activity/delete/{processingActivityId}")
     public ResponseEntity<Object> deleteProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
-
-        if (unitId == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.deleteProcessingActivity(unitId, processingActivityId));
     }
 
     @ApiOperation(value = "delete  Sub Processing Activity ")
     @DeleteMapping("/processing_activity/{processingActivityId}/subProcess/{subProcessId}")
     public ResponseEntity<Object> deleteSubProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger subProcessId) {
-
-        if (unitId == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Organization Id can't be null");
-        } else if (processingActivityId == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Processing Activity Id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.deleteSubProcessingActivity(unitId, processingActivityId, subProcessId));
     }
-
-    @ApiOperation(value = "Get  Sub Processing Activities of Processing Activity ")
-    @GetMapping("/processing_activity/{id}")
-    public ResponseEntity<Object> getProcessingActivityWithMetaDataById(@PathVariable Long unitId, @PathVariable BigInteger id) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be Null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityWithWithSubProcessingActivitiesById(unitId, id));
-    }
-
 
     @ApiOperation(value = "Get All Processing activity With meta data ")
     @GetMapping("/processing_activity")
     public ResponseEntity<Object> getAllProcessingActivityWithMetaData(@PathVariable Long unitId) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityWithMetaData(unitId));
     }
 
@@ -106,7 +80,7 @@ public class ProcessingActivityController {
     }
 
 
-    @ApiOperation(value = "get history of asset or changes done in Asset")
+    @ApiOperation(value = "get Processing Activity And Sub Process with Basic Reponse For related tab in  Asset")
     @GetMapping("/processing_activity/related")
     public ResponseEntity<Object> getAllRelatedProcessingActivitiesAndSubProcessingActivities(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityBasicDetailsAndWithSubProcess(unitId));
@@ -179,9 +153,9 @@ public class ProcessingActivityController {
 
 
     @ApiOperation(value = "Create And Link Risk to processing activity And Sub Processing Activity")
-    @PostMapping("/processing_activity/{processingActivityId}/risk")
-    public ResponseEntity<Object> createAndLinkRiskWithProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody ValidateRequestBodyList<ProcessingActivityRiskDTO> processingActivityRiskDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.createRiskAndLinkWithProcessingActivities(unitId, processingActivityId, processingActivityRiskDTOs.getRequestBody()));
+    @PutMapping("/processing_activity/{processingActivityId}/risk")
+    public ResponseEntity<Object> createAndLinkRiskWithProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody ProcessingActivityRiskDTO processingActivityRiskDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.createRiskAndLinkWithProcessingActivities(unitId, processingActivityId, processingActivityRiskDTO));
     }
 
     @ApiOperation(value = "Get Risk linked processing activity And Sub Processing Activity")
@@ -195,6 +169,19 @@ public class ProcessingActivityController {
     @DeleteMapping("/processing_activity/{processingActivityId}/risk/{riskId}")
     public ResponseEntity<Object> unLinkRiskDromProcessingOrSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @PathVariable BigInteger riskId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.unLinkRiskFromProcessingOrSubProcessingActivityAndSafeDeleteRisk(unitId, processingActivityId, riskId));
+    }
+
+    @ApiOperation(value = "Get Previous Assessments Launched for Processing Activity")
+    @GetMapping("/processing_activity/{processingActivityId}/assesssment")
+    public ResponseEntity<Object> getAllAssessmentLaunchedForProcessingActivityById(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAssessmentListByProcessingActivityId(unitId, processingActivityId));
+    }
+
+    @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")
+    @PostMapping(COUNTRY_URL + "/processing_activity/suggest")
+    public ResponseEntity<Object> saveProcessingActivityAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
+        processingActivityDTO.setSuggested(true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.saveProcessingActivityAndSuggestToCountryAdmin(unitId, countryId, processingActivityDTO));
     }
 
 

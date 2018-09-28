@@ -8,7 +8,7 @@ import com.kairos.service.activity.ActivityService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.utils.response.ResponseHandler;
-import com.kairos.wrapper.activity.RulesActivityTabDTO;
+import com.kairos.dto.activity.activity.activity_tabs.RulesActivityTabDTO;
 import com.kairos.wrapper.activity.SkillActivityDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

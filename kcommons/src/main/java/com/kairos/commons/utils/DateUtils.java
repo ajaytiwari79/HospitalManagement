@@ -336,7 +336,7 @@ public class DateUtils {
     }
 
     public static Date onlyDate(Date date) {
-        return getDateByZoneDateTime(getZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
+        return getDateByZoneDateTime(asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS));
     }
 
     public static Date addMinutes(final Date date, final int amount) {
@@ -462,12 +462,12 @@ public class DateUtils {
         return dateTime.toString(formatter);
     }
 
-    public static ZonedDateTime getZoneDateTime(Date date) {
+    public static ZonedDateTime asZoneDateTime(Date date) {
         return ZonedDateTime.ofInstant(date.toInstant(),
                 ZoneId.systemDefault());
     }
 
-    public static Date getDateByZonedDateTime(ZonedDateTime dateTime) {
+    public static Date asDate(ZonedDateTime dateTime) {
         return Date.from(dateTime.toInstant());
     }
 
@@ -649,6 +649,10 @@ public class DateUtils {
         return LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
+    public static Date getCurrentDayStart() {
+        return Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
     public static Long getCurrentMillis() {
         return System.currentTimeMillis();
     }
@@ -691,8 +695,8 @@ public class DateUtils {
 
     }
 
-    public static Long getCurrentDayMidNightMillis() {
-        return ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).minusSeconds(1).toInstant().toEpochMilli();
+    public static Date getCurrentDayMidNight() {
+        return Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).minusSeconds(1).toInstant());
 
 
     }

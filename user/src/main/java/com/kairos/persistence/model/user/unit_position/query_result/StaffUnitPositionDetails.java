@@ -48,6 +48,7 @@ public class StaffUnitPositionDetails {
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
     private Long staffId;
     private Long countryId;
+    private float hourlyCost;
 
 
     public Long getStaffId() {
@@ -72,6 +73,15 @@ public class StaffUnitPositionDetails {
 
     public void setCtaRuleTemplates(List<CTARuleTemplateDTO> ctaRuleTemplates) {
         this.ctaRuleTemplates = ctaRuleTemplates;
+    }
+
+
+    public float getHourlyCost() {
+        return hourlyCost;
+    }
+
+    public void setHourlyCost(float hourlyCost) {
+        this.hourlyCost = hourlyCost;
     }
 
     public ZoneId getUnitTimeZone() {

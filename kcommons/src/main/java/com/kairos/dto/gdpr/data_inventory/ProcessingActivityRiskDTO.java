@@ -4,6 +4,7 @@ package com.kairos.dto.gdpr.data_inventory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -14,8 +15,16 @@ public class ProcessingActivityRiskDTO {
 
     @NotNull(message = "id can't be Null")
     private BigInteger id;
+
     @Valid
-    private List<OrganizationLevelRiskDTO> risks=new ArrayList<>();
+    @NotEmpty
+    private List<OrganizationLevelRiskDTO> risks;
+
+    private List<ProcessingActivityRiskDTO> subProcessingActivities=new ArrayList<>();
+
+    public List<ProcessingActivityRiskDTO> getSubProcessingActivities() { return subProcessingActivities; }
+
+    public void setSubProcessingActivities(List<ProcessingActivityRiskDTO> subProcessingActivities) { this.subProcessingActivities = subProcessingActivities; }
 
     public BigInteger getId() { return id; }
 

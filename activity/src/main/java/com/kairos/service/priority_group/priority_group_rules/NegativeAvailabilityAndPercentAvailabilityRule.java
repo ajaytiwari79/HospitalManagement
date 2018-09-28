@@ -43,11 +43,11 @@ public class NegativeAvailabilityAndPercentAvailabilityRule implements PriorityG
             Set<Long> unitPositionIds = new HashSet<Long>();
             for (Shift shift : shifts) {
                 if (priorityGroupDTO.getStaffExcludeFilter().isNegativeAvailabilityInCalender() && dateTimeInterval.overlaps(shift.getInterval())
-                        && unavailableActivitySet.contains(shift.getActivityId()) && !unitPositionIds.contains(shift.getUnitPositionId())) {
+                        && unavailableActivitySet.contains(shift.getActivities().get(0).getActivityId()) && !unitPositionIds.contains(shift.getUnitPositionId())) {
                     unitPositionIds.add(shift.getUnitPositionId());
                 }
                 if (Optional.ofNullable(priorityGroupDTO.getStaffIncludeFilter().getStaffAvailability()).isPresent() && dateTimeIntervalPerAvailability.
-                        overlaps(shift.getInterval()) && (((dateTimeIntervalPerAvailability.overlap(shift.getInterval()).getMinutes()) /
+                        overlaps(shift.getInterval()) && ((((int)dateTimeIntervalPerAvailability.overlap(shift.getInterval()).getMinutes()) /
                         (dateTimeIntervalPerAvailability.getMinutes())) * 100) < priorityGroupDTO.getStaffIncludeFilter().getStaffAvailability() &&
                         !unitPositionIds.contains(shift.getUnitPositionId())) {
                     unitPositionIds.add(shift.getUnitPositionId());

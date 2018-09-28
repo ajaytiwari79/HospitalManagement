@@ -12,7 +12,7 @@ import java.util.Map;
 public class ShiftFunctionWrapper {
 
 
-    List<ShiftQueryResult> shiftList;
+    Map<LocalDate,List<ShiftDTO>> shifts;
     Map<LocalDate,FunctionDTO> assignedFunctionsObj;
 
 
@@ -20,17 +20,17 @@ public class ShiftFunctionWrapper {
     public ShiftFunctionWrapper() {
     }
 
-    public ShiftFunctionWrapper(List<ShiftQueryResult> shiftList, Map<LocalDate, FunctionDTO> assignedFunctionsObj) {
-        this.shiftList = shiftList;
+    public ShiftFunctionWrapper(Map<LocalDate,List<ShiftDTO>> shifts, Map<LocalDate, FunctionDTO> assignedFunctionsObj) {
+        this.shifts = shifts;
         this.assignedFunctionsObj = assignedFunctionsObj;
     }
 
-    public List<ShiftQueryResult> getShiftList() {
-        return shiftList;
+    public Map<LocalDate,List<ShiftDTO>> getShifts() {
+        return shifts;
     }
 
-    public void setShiftList(List<ShiftQueryResult> shiftList) {
-        this.shiftList = shiftList;
+    public void setShifts(Map<LocalDate,List<ShiftDTO>> shifts) {
+        this.shifts = shifts;
     }
 
     public Map<LocalDate, FunctionDTO> getAssignedFunctionsObj() {

@@ -2,6 +2,7 @@ package com.kairos.service.open_shift;
 
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftWrapper;
+import com.kairos.dto.activity.shift.ShiftActivity;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
 import com.kairos.dto.activity.time_bank.UnitPositionWithCtaDetailsDTO;
@@ -261,8 +262,8 @@ public class OpenShiftService extends MongoBaseService {
                     openShift.getAssignedStaff().contains(unitPositionDetail.getStaffId()) ) {
                 return;
             }
-            ShiftDTO shiftDTO = new ShiftDTO(openShift.getActivityId(), unitId, unitPositionDetail.getStaffId(), unitPositionDetail.getId(), DateUtils.asLocalDate(openShift.getStartDate()),
-                    DateUtils.asLocalDate(openShift.getEndDate()), DateUtils.asLocalTime(openShift.getStartDate()), DateUtils.asLocalTime(openShift.getEndDate()));
+            ShiftActivity shiftActivity = new ShiftActivity("",openShift.getStartDate(),openShift.getEndDate(),openShift.getActivityId());
+            ShiftDTO shiftDTO = new ShiftDTO(Arrays.asList(shiftActivity), unitId, unitPositionDetail.getStaffId(), unitPositionDetail.getId());
             shiftDTO.setShiftDate(DateUtils.asLocalDate(openShift.getStartDate()));
             shiftDTO.setParentOpenShiftId(openShift.getId());
             shiftService.createShift(unitId, shiftDTO, "Organization", false);

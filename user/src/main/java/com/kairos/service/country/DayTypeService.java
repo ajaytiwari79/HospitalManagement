@@ -4,10 +4,12 @@ import com.kairos.enums.Day;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,7 @@ import java.util.stream.Stream;
  */
 @Service
 @Transactional
-public class DayTypeService{
+public class DayTypeService {
 
     @Inject
     private DayTypeGraphRepository dayTypeGraphRepository;
@@ -37,12 +39,14 @@ public class DayTypeService{
     private CountryHolidayCalenderGraphRepository countryHolidayCalenderGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public Map<String, Object> createDayType(DayType dayType, long countryId){
+    public Map<String, Object> createDayType(DayType dayType, long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
-        if (country!=null){
+        if (country != null) {
             dayType.setCountry(country);
             dayTypeGraphRepository.save(dayType);
             return dayType.retrieveDetails();
@@ -50,17 +54,18 @@ public class DayTypeService{
         return null;
     }
 
-    public List<DayType> getAllDayTypeByCountryId(long countryId){
-        List<DayType>  data = dayTypeGraphRepository.findByCountryId(countryId);
-        /*if (data!=null){
-         return FormatUtil.formatNeoResponse(data);
-        }*/
-        return  data;
+    public List<DayType> getAllDayTypeByCountryId(long countryId) {
+        return dayTypeGraphRepository.findByCountryId(countryId);
     }
 
-    public Map<String, Object> updateDayType(DayType dayType){
+    public List<DayType> getAllDayTypeForUnit(long unitId) {
+        Long countryId=organizationGraphRepository.getCountryId(unitId);
+        return getAllDayTypeByCountryId(countryId);
+    }
+
+    public Map<String, Object> updateDayType(DayType dayType) {
         DayType currentDayType = dayTypeGraphRepository.findOne(dayType.getId());
-        if (currentDayType!=null){
+        if (currentDayType != null) {
             currentDayType.setName(dayType.getName());
             currentDayType.setCode(dayType.getCode());
             currentDayType.setColorCode(dayType.getColorCode());
@@ -74,9 +79,9 @@ public class DayTypeService{
         return null;
     }
 
-    public boolean deleteDayType(long dayTypeId){
+    public boolean deleteDayType(long dayTypeId) {
         DayType dayType = dayTypeGraphRepository.findOne(dayTypeId);
-        if (dayType!=null){
+        if (dayType != null) {
             dayType.setEnabled(false);
             dayTypeGraphRepository.save(dayType);
             return true;
@@ -85,42 +90,42 @@ public class DayTypeService{
     }
 
     /**
-     * @auther anil maurya
      * @param
      * @return
+     * @auther anil maurya
      */
-    public List<DayType> getDayTypeByDate(Long countryId,Date date){
-        Calendar calendar= Calendar.getInstance();
+    public List<DayType> getDayTypeByDate(Long countryId, Date date) {
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
-        Date startDate=calendar.getTime();
+        Date startDate = calendar.getTime();
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
-        Date endDate=calendar.getTime();
-        CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult=countryHolidayCalenderGraphRepository.
-                findByIdAndHolidayDateBetween(countryId,startDate.getTime(),endDate.getTime());
+        Date endDate = calendar.getTime();
+        CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult = countryHolidayCalenderGraphRepository.
+                findByIdAndHolidayDateBetween(countryId, startDate.getTime(), endDate.getTime());
 
-        if(Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()){
-            List<DayType> dayTypes=new ArrayList<>();
-            dayTypes.add(countryHolidayCalendarQueryResult.getDayType()) ;
-          return  dayTypes;
-        }else{
+        if (Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()) {
+            List<DayType> dayTypes = new ArrayList<>();
+            dayTypes.add(countryHolidayCalendarQueryResult.getDayType());
+            return dayTypes;
+        } else {
             Instant instant = Instant.ofEpochMilli(date.getTime());
             LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
             LocalDate localDate = localDateTime.toLocalDate();
-            String day=localDate.getDayOfWeek().name();
-            Day dayEnum=Day.valueOf(day);
-            List<DayType> dayTypes=dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
-            return dayTypes.isEmpty()?Collections.EMPTY_LIST:dayTypes;
+            String day = localDate.getDayOfWeek().name();
+            Day dayEnum = Day.valueOf(day);
+            List<DayType> dayTypes = dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+            return dayTypes.isEmpty() ? Collections.EMPTY_LIST : dayTypes;
         }
 
     }
 
     private String getDanishNameByDay(String day) {
-        String danishName="";
+        String danishName = "";
         switch (day) {
 
             case "MONDAY":
@@ -148,12 +153,11 @@ public class DayTypeService{
                 exceptionService.unsupportedOperationException("message.dayType.notfound");
 
 
-
         }
         return danishName;
     }
 
-    public List<DayType> getDayTypes(List<Long> dayTypeIds){
+    public List<DayType> getDayTypes(List<Long> dayTypeIds) {
         return dayTypeGraphRepository.getDayTypes(dayTypeIds);
     }
 
