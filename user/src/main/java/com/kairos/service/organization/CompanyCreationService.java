@@ -383,6 +383,11 @@ public class CompanyCreationService {
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", parentOrganizationId);
         }
+
+        if (parentOrganization.getName().equalsIgnoreCase(organizationBasicDTO.getName())) {
+            exceptionService.duplicateDataException("error.Organization.name.duplicate", organizationBasicDTO.getName());
+        }
+
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(organizationBasicDTO);
         Organization unit = new OrganizationBuilder()
                 .setName(WordUtils.capitalize(organizationBasicDTO.getName()))
