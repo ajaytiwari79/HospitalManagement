@@ -16,10 +16,9 @@ public class CopyExpertiseDTO {
     private String description;
     @NotNull(message = "Start date can't be null")
 
-    @FutureLocalDate
+
     private LocalDate startDate;
 
-    @FutureLocalDate
     private LocalDate endDate;
 
     @NotNull(message = "Level can not be null")

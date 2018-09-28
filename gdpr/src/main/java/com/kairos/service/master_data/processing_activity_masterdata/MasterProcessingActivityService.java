@@ -405,7 +405,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
         if (Optional.ofNullable(previousProcessingActivity).isPresent()) {
             return null;
         }
-        OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO = restClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/organization_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrgTypeSubTypeServicesAndSubServicesDTO>>() {
+        OrgTypeSubTypeServicesAndSubServicesDTO orgTypeSubTypeServicesAndSubServicesDTO = restClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/organization_type/", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrgTypeSubTypeServicesAndSubServicesDTO>>() {
         });
         MasterProcessingActivity processingActivity = buildSuggestedProcessingActivityAndSubProcessingActivity(countryId, processingActivityDTO, orgTypeSubTypeServicesAndSubServicesDTO);
         if (Optional.ofNullable(processingActivityDTO.getSubProcessingActivities()).isPresent() && CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
@@ -416,7 +416,10 @@ public class MasterProcessingActivityService extends MongoBaseService {
                     subProcessingActivities.add(buildSuggestedProcessingActivityAndSubProcessingActivity(countryId, subProcessingActivityDTO, orgTypeSubTypeServicesAndSubServicesDTO).setSubProcess(true));
                 }
             });
-            processingActivity.setSubProcessingActivityIds(masterProcessingActivityRepository.saveAll(getNextSequence(subProcessingActivities)).stream().map(MasterProcessingActivity::getId).collect(Collectors.toList()));
+
+            if (CollectionUtils.isNotEmpty(subProcessingActivities)) {
+                processingActivity.setSubProcessingActivityIds(masterProcessingActivityRepository.saveAll(getNextSequence(subProcessingActivities)).stream().map(MasterProcessingActivity::getId).collect(Collectors.toList()));
+            }
         }
         masterProcessingActivityRepository.save(processingActivity);
         return processingActivityDTO;

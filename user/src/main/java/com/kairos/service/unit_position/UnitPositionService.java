@@ -506,11 +506,6 @@ public class UnitPositionService {
         }
         unitPosition.setStaff(staff);
 
-        // UEP can be created for past dates from time care
-        if (!createFromTimeCare && unitPositionDTO.getStartLocalDate().isBefore(LocalDate.now())) {
-            exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
-
-        }
         unitPosition.setStartDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate()));
         unitPosition.setWorkingDaysInWeek(expertise.get().getNumberOfWorkingDaysInWeek());
 
