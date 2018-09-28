@@ -4,22 +4,25 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.HostingProviderDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.HostingProvider;
-import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistance.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
+import com.kairos.persistence.model.master_data.default_asset_setting.HostingProvider;
+import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
 import com.kairos.response.dto.common.HostingProviderResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.HostingProviderService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -90,7 +93,7 @@ public class OrganizationHostingProviderService extends MongoBaseService {
      * @return list of HostingProvider
      */
     public List<HostingProviderResponseDTO> getAllHostingProvider(Long organizationId) {
-        return hostingProviderMongoRepository.findAllOrganizationHostingProviders(organizationId);
+        return hostingProviderMongoRepository.findAllOrganizationHostingProviders(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -116,16 +119,10 @@ public class OrganizationHostingProviderService extends MongoBaseService {
     public Boolean deleteHostingProvider(Long unitId, BigInteger hostingProviderId) {
 
         List<AssetBasicResponseDTO> assetsLinkedWithHostingProvider = assetMongoRepository.findAllAssetLinkedWithHostingProvider(unitId, hostingProviderId);
-        if (!assetsLinkedWithHostingProvider.isEmpty()) {
-            StringBuilder assetNames=new StringBuilder();
-            assetsLinkedWithHostingProvider.forEach(asset->assetNames.append(asset.getName()+","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Provider", assetNames);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithHostingProvider)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Hosting Provider", new StringBuilder(assetsLinkedWithHostingProvider.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        HostingProvider hostingProvider = hostingProviderMongoRepository.findByOrganizationIdAndId(unitId, hostingProviderId);
-        if (!Optional.ofNullable(hostingProvider).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Hosting Provider", hostingProviderId);
-        }
-        delete(hostingProvider);
+        hostingProviderMongoRepository.safeDelete(hostingProviderId);
         return true;
     }
 

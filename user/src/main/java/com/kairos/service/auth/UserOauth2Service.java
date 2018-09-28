@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class UserOauth2Service implements UserDetailsService {
     private ExceptionService exceptionService;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-         User user=  userGraphRepository.findByUserNameIgnoreCase(username.toLowerCase());
+         User user=  userGraphRepository.findByEmail("(?i)"+username.toLowerCase());
          user.setHubMember(accessPageService.isHubMember(user.getId()));
          Optional<User> loggedUser=Optional.ofNullable(user);
          String otpString=HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");
@@ -50,7 +51,7 @@ public class UserOauth2Service implements UserDetailsService {
     }
 
     private List<GrantedAuthority> getPermission(User user){
-       List<GrantedAuthority> permissions = userService.getTabPermission(user.getId());
+        List<GrantedAuthority> permissions = Collections.emptyList();
         return permissions;
     }
 }

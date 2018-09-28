@@ -4,22 +4,25 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.OrganizationalSecurityMeasureDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
-import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistance.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
+import com.kairos.persistence.model.master_data.default_asset_setting.OrganizationalSecurityMeasure;
+import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.response.dto.common.OrganizationalSecurityMeasureResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.OrganizationalSecurityMeasureService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -89,7 +92,7 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
      * @return list of OrganizationalSecurityMeasure
      */
     public List<OrganizationalSecurityMeasureResponseDTO> getAllOrganizationalSecurityMeasure(Long organizationId) {
-        return organizationalSecurityMeasureMongoRepository.findAllOrgOrganizationalSecurityMeasures(organizationId);
+        return organizationalSecurityMeasureMongoRepository.findAllOrgOrganizationalSecurityMeasures(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -114,16 +117,10 @@ public class OrganizationOrganizationalSecurityMeasureService extends MongoBaseS
     public Boolean deleteOrganizationalSecurityMeasure(Long unitId, BigInteger orgSecurityMeasureId) {
 
         List<AssetBasicResponseDTO> assetsLinkedWithOrganizationalSecurityMeasure = assetMongoRepository.findAllAssetLinkedWithOrganizationalSecurityMeasure(unitId, orgSecurityMeasureId);
-        if (!assetsLinkedWithOrganizationalSecurityMeasure.isEmpty()) {
-            StringBuilder assetNames=new StringBuilder();
-            assetsLinkedWithOrganizationalSecurityMeasure.forEach(asset->assetNames.append(asset.getName()+","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Organization Security Measure", assetNames);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithOrganizationalSecurityMeasure)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Organization Security Measure", new StringBuilder(assetsLinkedWithOrganizationalSecurityMeasure.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        OrganizationalSecurityMeasure organizationalSecurityMeasure = organizationalSecurityMeasureMongoRepository.findByOrganizationIdAndId(unitId, orgSecurityMeasureId);
-        if (!Optional.ofNullable(organizationalSecurityMeasure).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Security Measure", orgSecurityMeasureId);
-        }
-        delete(organizationalSecurityMeasure);
+        organizationalSecurityMeasureMongoRepository.safeDelete(orgSecurityMeasureId);
         return true;
 
     }

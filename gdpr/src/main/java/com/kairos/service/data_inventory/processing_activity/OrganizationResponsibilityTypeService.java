@@ -1,14 +1,13 @@
 package com.kairos.service.data_inventory.processing_activity;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.ResponsibilityTypeDTO;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.ResponsibilityType;
-import com.kairos.persistance.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.ResponsibilityType;
+import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
@@ -18,11 +17,13 @@ import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -97,7 +98,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      * @return list of ResponsibilityType
      */
     public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long organizationId) {
-        return responsibilityTypeMongoRepository.findAllOrganizationResponsibilityTypes(organizationId);
+        return responsibilityTypeMongoRepository.findAllOrganizationResponsibilityTypes(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -122,15 +123,9 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
         List<ProcessingActivityBasicResponseDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithResponsibilityType(unitId, responsibilityTypeId);
         if (!processingActivities.isEmpty()) {
-            StringBuilder processingActivityNames=new StringBuilder();
-            processingActivities.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Responsibility Type", processingActivityNames);
+                exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Responsibility Type", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        ResponsibilityType responsibilityType = responsibilityTypeMongoRepository.findByOrganizationIdAndId(unitId, responsibilityTypeId);
-        if (!Optional.ofNullable(responsibilityType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Responsibility Type", responsibilityTypeId);
-        }
-        delete(responsibilityType);
+        responsibilityTypeMongoRepository.safeDelete(responsibilityTypeId) ;
         return true;
     }
 
@@ -159,26 +154,6 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
         responsibilityTypeMongoRepository.save(responsibilityType);
         return responsibilityTypeDTO;
 
-
-    }
-
-    /**
-     * @param organizationId
-     * @param name           name of ResponsibilityType
-     * @return ResponsibilityType object fetch on basis of  name
-     * @throws DataNotExists throw exception if ResponsibilityType not exist for given name
-     */
-    public ResponsibilityType getResponsibilityTypeByName(Long organizationId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            ResponsibilityType exist = responsibilityTypeMongoRepository.findByOrganizationIdAndName(organizationId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
 

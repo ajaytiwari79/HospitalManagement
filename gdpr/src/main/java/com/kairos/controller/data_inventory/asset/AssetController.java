@@ -16,13 +16,14 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class AssetController {
 
 
@@ -33,10 +34,9 @@ public class AssetController {
     @ApiOperation(value = "create asset for organization with basic detail")
     @PostMapping("/asset")
     public ResponseEntity<Object> createAssetWithBasicDetail(@PathVariable Long unitId, @Valid @RequestBody AssetDTO asset) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
+        asset.setSuggested(false);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.createAssetWithBasicDetail(unitId, asset));
+
     }
 
 
@@ -54,9 +54,6 @@ public class AssetController {
     @ApiOperation(value = "updated status of processing activity")
     @PutMapping("/asset/{assetId}/status")
     public ResponseEntity<Object> updateStatusOfAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @RequestParam(value = "active", required = true) boolean active) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.updateStatusOfAsset(unitId, assetId, active));
     }
 
@@ -65,9 +62,6 @@ public class AssetController {
     @PutMapping("/asset/update/{assetId}")
     public ResponseEntity<Object> updateAssetData(@PathVariable Long unitId, @PathVariable BigInteger assetId, @Valid @RequestBody AssetDTO asset) {
 
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.updateAssetData(unitId, assetId, asset));
     }
 
@@ -76,9 +70,6 @@ public class AssetController {
     @GetMapping("/asset/{assetId}")
     public ResponseEntity<Object> getAssetWithMetaDataById(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
 
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetWithMetadataById(unitId, assetId));
     }
 
@@ -86,41 +77,26 @@ public class AssetController {
     @ApiOperation(value = "Get All Asset With meta data ")
     @GetMapping("/asset")
     public ResponseEntity<Object> getAllAssetWithMetaData(@PathVariable Long unitId) {
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllAssetWithMetadata(unitId));
     }
 
 
     @ApiOperation(value = "get history of asset or changes done in Asset")
     @GetMapping("/asset/{assetId}/history")
-    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger assetId, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "0") int skip) {
-
-        if (assetId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Asset  id can't be Null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetActivitiesHistory(assetId, size, skip));
+    public ResponseEntity<Object> getHistoryOrDataAuditOfAsset(@PathVariable BigInteger assetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetActivitiesHistory(assetId));
     }
 
 
     @ApiOperation(value = "Add processing Activity to Asset ")
     @PutMapping("/asset/{assetId}/processing_activity")
     public ResponseEntity<Object> relateProcessingActivitiesAndSubProcessingActivitiesToAsset(@PathVariable Long unitId, @PathVariable BigInteger assetId, @Valid @RequestBody AssetRelateProcessingActivityDTO relateProcessingActivityDTO) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.addProcessingActivitiesAndSubProcessingActivitiesToAsset(unitId, assetId, relateProcessingActivityDTO));
     }
 
     @ApiOperation(value = "get Processing activity and Sub processing Activity  related with asset")
     @GetMapping("/asset/{assetId}/processing_activity")
     public ResponseEntity<Object> getRelatedSubProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllRelatedProcessingActivityAndSubProcessingActivities(unitId, assetId));
     }
 
@@ -142,11 +118,22 @@ public class AssetController {
     @ApiOperation(value = "get all active asset used in processing activity related tab")
     @GetMapping("/asset/related")
     public ResponseEntity<Object> getAllActiveAsset(@PathVariable Long unitId) {
-
-        if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Organization id can't be Null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllActiveAsset(unitId));
     }
+
+    @ApiOperation(value = "Get Previous Assessments Launched for Asset")
+    @GetMapping("/asset/{assetId}/assesssment")
+    public ResponseEntity<Object> getAllAssessmentLaunchedForAssetById(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssessmentListByAssetId(unitId, assetId));
+    }
+
+
+    @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")
+    @PostMapping(COUNTRY_URL + "/asset/suggest")
+    public ResponseEntity<Object> saveProcessingActivityAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId, @Valid @RequestBody AssetDTO assetDTO) {
+        assetDTO.setSuggested(true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.saveAssetAndSuggestToCountryAdmin(unitId, countryId, assetDTO));
+    }
+
 
 }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgreementSectionResponseDTO {
 
@@ -21,6 +21,8 @@ public class AgreementSectionResponseDTO {
     private String title;
 
     private Integer orderedIndex;
+
+    private List<BigInteger> clauseIdOrderedIndex;
 
     private List<ClauseBasicResponseDTO> clauses;
 
@@ -33,6 +35,10 @@ public class AgreementSectionResponseDTO {
     public void setOrderedIndex(Integer orderedIndex) {
         this.orderedIndex = orderedIndex;
     }
+
+    public List<BigInteger> getClauseIdOrderedIndex() { return clauseIdOrderedIndex; }
+
+    public void setClauseIdOrderedIndex(List<BigInteger> clauseIdOrderedIndex) { this.clauseIdOrderedIndex = clauseIdOrderedIndex; }
 
     public BigInteger getId() {
         return id;

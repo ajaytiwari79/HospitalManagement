@@ -28,48 +28,48 @@ public class DynamicTabController {
 
     private final static Logger logger = LoggerFactory.getLogger(DynamicTabController.class);
 
-    @GetMapping(UNIT_URL + "/dashboard_tab")
-    public ResponseEntity<Map<String, Object>> getCategoriesAtUnitLevel(@PathVariable Long unitId) {
+    @GetMapping(UNIT_URL+COUNTER_CONF_URL+DASHBOARD_URL)
+    public ResponseEntity<Map<String, Object>> getDashboardTabAtUnitLevel(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dynamicTabService.getDashboardTabOfRef(unitId, ConfLevel.UNIT));
     }
 
-    @GetMapping(COUNTRY_URL + "/dashboard_tab")
-    public ResponseEntity<Map<String, Object>> getCategoriesAtCountryLevel(@PathVariable Long countryId) {
+    @GetMapping(COUNTRY_URL +COUNTER_CONF_URL+ DASHBOARD_URL)
+    public ResponseEntity<Map<String, Object>> getDashboardTabAtCountryLevel(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dynamicTabService.getDashboardTabOfRef(countryId,ConfLevel.COUNTRY));
     }
 
-    @GetMapping(UNIT_URL+STAFF_URL + "/dashboard_tab")
-    public ResponseEntity<Map<String, Object>> getCategoriesAtStaffLevel(@PathVariable Long unitId) {
+    @GetMapping(UNIT_URL+STAFF_URL +COUNTER_CONF_URL+ DASHBOARD_URL)
+    public ResponseEntity<Map<String, Object>> getDashboardTabAtStaffLevel(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,  dynamicTabService.getDashboardTabOfRef(unitId,ConfLevel.STAFF));
     }
 
-    @PostMapping(UNIT_URL + "/dashboard_tab")
-    public ResponseEntity<Map<String, Object>> addCategoriesAtUnitLevel(@PathVariable Long unitId, @RequestBody List<KPIDashboardDTO> kpiDashboardList) {
+    @PostMapping(UNIT_URL +COUNTER_CONF_URL+ DASHBOARD_URL)
+    public ResponseEntity<Map<String, Object>> addDashboardTabAtUnitLevel(@PathVariable Long unitId, @RequestBody List<KPIDashboardDTO> kpiDashboardList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dynamicTabService.addDashboardTabToRef(unitId,null,kpiDashboardList, ConfLevel.UNIT));
     }
 
-    @PostMapping(COUNTRY_URL + "/dashboard_tab")
-    public ResponseEntity<Map<String, Object>> addCategoriesAtCountryLevel(@PathVariable Long countryId, @RequestBody List<KPIDashboardDTO> kpiDashboardList) {
+    @PostMapping(COUNTRY_URL +COUNTER_CONF_URL+ DASHBOARD_URL)
+    public ResponseEntity<Map<String, Object>> addDashboardTabAtCountryLevel(@PathVariable Long countryId, @RequestBody List<KPIDashboardDTO> kpiDashboardList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dynamicTabService.addDashboardTabToRef(null,countryId,kpiDashboardList,ConfLevel.COUNTRY));
     }
 
-    @PostMapping(UNIT_URL+STAFF_URL + "/dashboard_tab")
-    public ResponseEntity<Map<String, Object>> addCategoriesAtStaffLevel(@PathVariable Long unitId, @RequestBody List<KPIDashboardDTO> kpiDashboardList) {
+    @PostMapping(UNIT_URL+STAFF_URL+COUNTER_CONF_URL+DASHBOARD_URL)
+    public ResponseEntity<Map<String, Object>> addDashboardTabAtStaffLevel(@PathVariable Long unitId, @RequestBody List<KPIDashboardDTO> kpiDashboardList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,  dynamicTabService.addDashboardTabToRef(unitId,null,kpiDashboardList,ConfLevel.STAFF));
     }
 
-    @PutMapping(UNIT_URL + "/dashboard_tab")
-    public ResponseEntity<Map<String, Object>> updateCategoriesAtUnitLevel(@PathVariable Long unitId, @RequestBody KPIDashboardUpdationDTO kpiDashboardUpdationDTOS) {
+    @PutMapping(UNIT_URL +COUNTER_CONF_URL+ DASHBOARD_URL)
+    public ResponseEntity<Map<String, Object>> updateDashboardTabAtUnitLevel(@PathVariable Long unitId, @RequestBody KPIDashboardUpdationDTO kpiDashboardUpdationDTOS) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dynamicTabService.updateDashboardTabs(unitId,kpiDashboardUpdationDTOS, ConfLevel.UNIT));
     }
 
-    @PutMapping(COUNTRY_URL + "/dashboard_tab")
-    public ResponseEntity<Map<String, Object>> updateCategoriesAtCountryLevel(@PathVariable Long countryId, @RequestBody KPIDashboardUpdationDTO kpiDashboardUpdationDTOS) {
+    @PutMapping(COUNTRY_URL +COUNTER_CONF_URL+ DASHBOARD_URL)
+    public ResponseEntity<Map<String, Object>> updateDashboardTabAtCountryLevel(@PathVariable Long countryId, @RequestBody KPIDashboardUpdationDTO kpiDashboardUpdationDTOS) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dynamicTabService.updateDashboardTabs(countryId,kpiDashboardUpdationDTOS,ConfLevel.COUNTRY));
     }
 
-    @PutMapping(UNIT_URL+STAFF_URL + "/dashboard_tab")
-    public ResponseEntity<Map<String, Object>> updateCategoriesAtStaffLevel(@PathVariable Long unitId, @RequestBody KPIDashboardUpdationDTO kpiDashboardUpdationDTOS) {
+    @PutMapping(UNIT_URL+STAFF_URL +COUNTER_CONF_URL+ DASHBOARD_URL)
+    public ResponseEntity<Map<String, Object>> updateDashboardTabAtStaffLevel(@PathVariable Long unitId, @RequestBody KPIDashboardUpdationDTO kpiDashboardUpdationDTOS) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,  dynamicTabService.updateDashboardTabs(unitId,kpiDashboardUpdationDTOS,ConfLevel.STAFF));
     }
 }

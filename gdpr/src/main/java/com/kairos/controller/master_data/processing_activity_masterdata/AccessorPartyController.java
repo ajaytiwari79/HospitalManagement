@@ -1,13 +1,14 @@
 package com.kairos.controller.master_data.processing_activity_masterdata;
 
 
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
 import com.kairos.service.master_data.processing_activity_masterdata.AccessorPartyService;
 import com.kairos.utils.ResponseHandler;
 import com.kairos.utils.ValidateRequestBodyList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 
 /*
  *
@@ -29,8 +30,8 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
+@Api(API_ORGANIZATION_COUNTRY_URL)
 public class AccessorPartyController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessorPartyController.class);
@@ -40,84 +41,48 @@ public class AccessorPartyController {
 
 
     @ApiOperation("add AccessorParty")
-    @PostMapping("/accessor_party/add")
+    @PostMapping("/accessor_party")
     public ResponseEntity<Object> createAccessorParty(@PathVariable Long countryId, @Valid @RequestBody ValidateRequestBodyList<AccessorPartyDTO> accessorParties) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.createAccessorParty(countryId, accessorParties.getRequestBody()));
 
     }
 
 
     @ApiOperation("get AccessorParty by id")
-    @GetMapping("/accessor_party/{id}")
-    public ResponseEntity<Object> getAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorParty(countryId, id));
+    @GetMapping("/accessor_party/{accessorPartyId}")
+    public ResponseEntity<Object> getAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger accessorPartyId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorParty(countryId, accessorPartyId));
     }
 
 
     @ApiOperation("get all AccessorParty ")
-    @GetMapping("/accessor_party/all")
+    @GetMapping("/accessor_party")
     public ResponseEntity<Object> getAllAccessorParty(@PathVariable Long countryId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAllAccessorParty(countryId));
     }
 
-    @ApiOperation("get AccessorParty by name")
-    @GetMapping("/accessor_party/name")
-    public ResponseEntity<Object> getAccessorPartyByName(@PathVariable Long countryId, @RequestParam String name) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorPartyByName(countryId, name));
-
-    }
-
-
     @ApiOperation("delete AccessorParty  by id")
-    @DeleteMapping("/accessor_party/delete/{id}")
-    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.deleteAccessorParty(countryId, id));
+    @DeleteMapping("/accessor_party/{accessorPartyId}")
+    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger accessorPartyId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.deleteAccessorParty(countryId, accessorPartyId));
 
     }
 
     @ApiOperation("update AccessorParty by id")
-    @PutMapping("/accessor_party/update/{id}")
-    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody AccessorPartyDTO accessorParty) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.updateAccessorParty(countryId, id, accessorParty));
+    @PutMapping("/accessor_party/{accessorPartyId}")
+    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long countryId, @PathVariable BigInteger accessorPartyId, @Valid @RequestBody AccessorPartyDTO accessorParty) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.updateAccessorParty(countryId, accessorPartyId, accessorParty));
     }
 
     @ApiOperation("update Suggested status of Accessor Party")
     @PutMapping("/accessor_party")
     public ResponseEntity<Object> updateSuggestedStatusOfAccessorParties(@PathVariable Long countryId, @RequestBody Set<BigInteger> accessorPartyIds, @RequestParam(required = true) SuggestedDataStatus suggestedDataStatus) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
+        if (CollectionUtils.isEmpty(accessorPartyIds)) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Accessor Party is Not Selected");
+        } else if (!Optional.ofNullable(suggestedDataStatus).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Suggested Status in Empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,accessorPartyService.updateSuggestedStatusOfAccessorPartyList(countryId, accessorPartyIds, suggestedDataStatus));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.updateSuggestedStatusOfAccessorPartyList(countryId, accessorPartyIds, suggestedDataStatus));
     }
 
 

@@ -16,7 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.math.BigInteger;
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 
 
 /*
@@ -26,8 +26,8 @@ import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
+@Api(API_ORGANIZATION_COUNTRY_URL)
 public class ClauseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClauseController.class);
@@ -41,79 +41,35 @@ public class ClauseController {
 
     @ApiOperation("add new clause")
     @PostMapping( "/clause/add")
-    public ResponseEntity<Object> createClause(@PathVariable Long countryId, @PathVariable Long organizationId, @Validated @RequestBody ClauseDTO clauseDto)  {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        } else if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(countryId, organizationId, clauseDto));
+    public ResponseEntity<Object> createClause(@PathVariable Long countryId, @Validated @RequestBody ClauseDTO clauseDto)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(countryId, clauseDto));
     }
 
     @ApiOperation("get clause by id")
     @GetMapping("/clause/{id}")
-    public ResponseEntity<Object> getClause(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseById(countryId, organizationId, id));
-
-
+    public ResponseEntity<Object> getClause(@PathVariable Long countryId, @PathVariable BigInteger id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseById(countryId, id));
     }
 
 
     @ApiOperation("delete clause by id")
-    @DeleteMapping("/clause/delete/{id}")
-    public ResponseEntity<Object> deleteClause(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger id) {
-
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(countryId,organizationId,id));
-
+    @DeleteMapping("/clause/delete/{clauseId}")
+    public ResponseEntity<Object> deleteClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(countryId,clauseId));
     }
 
     @ApiOperation("update clause description")
     @PutMapping("/clause/update/{clauseId}")
-    public ResponseEntity<Object> updateClause(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDTO clauseDto)  {
-
-        if (clauseId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "clauseId cannot be null or empty");
-        }
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        }
-        if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(countryId, organizationId, clauseId, clauseDto));
-
+    public ResponseEntity<Object> updateClause(@PathVariable Long countryId,@PathVariable BigInteger clauseId, @Validated @RequestBody ClauseDTO clauseDto)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(countryId,  clauseId, clauseDto));
     }
 
 
 
     @ApiOperation("get All clauses")
     @GetMapping("/clause/all")
-    public ResponseEntity<Object> getAllClauses(@PathVariable Long countryId, @PathVariable Long organizationId) {
-        if (countryId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "country id can't be null");
-        } else if (organizationId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauses(countryId, organizationId));
+    public ResponseEntity<Object> getAllClauses(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getAllClauses(countryId));
     }
 
 

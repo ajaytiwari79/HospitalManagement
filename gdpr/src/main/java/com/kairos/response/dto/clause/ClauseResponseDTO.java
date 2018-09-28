@@ -6,8 +6,8 @@ import com.kairos.dto.gdpr.OrganizationSubType;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
-import com.kairos.response.dto.master_data.AccountTypeResponseDTO;
-import com.kairos.persistance.model.clause_tag.ClauseTag;
+import com.kairos.dto.gdpr.master_data.AccountTypeVO;
+import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
 
 import javax.validation.constraints.NotBlank;
@@ -38,15 +38,11 @@ public class ClauseResponseDTO {
 
     private List<SubServiceCategory> organizationSubServices;
 
-    private List<AccountTypeResponseDTO> accountTypes;
+    private List<AccountTypeVO> accountTypes;
 
-    public List<AccountTypeResponseDTO> getAccountTypes() {
-        return accountTypes;
-    }
+    public List<AccountTypeVO> getAccountTypes() { return accountTypes; }
 
-    public void setAccountTypes(List<AccountTypeResponseDTO> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
+    public void setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes; }
 
     public List<TemplateTypeResponseDTO> getTemplateTypes() {
         return templateTypes;

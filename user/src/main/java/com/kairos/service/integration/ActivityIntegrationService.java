@@ -1,18 +1,22 @@
 package com.kairos.service.integration;
 
-import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
-import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
-import com.kairos.dto.activity.activity.TableConfiguration;
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.rest_client.RestClientForSchedulerMessages;
-import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
-import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
-import com.kairos.rest_client.priority_group.GenericRestClient;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
+import com.kairos.dto.activity.activity.TableConfiguration;
+import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
+import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
+import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
+import com.kairos.dto.user.employment.UnitPositionIdDTO;
+import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
+import com.kairos.rest_client.RestClientForSchedulerMessages;
+import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +25,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -91,6 +96,15 @@ public class ActivityIntegrationService {
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("endDate", endDate);
         genericRestClient.publish(null, unitId, true, IntegrationOperation.DELETE, "/delete_shifts/staff/"+staffId, queryParams);
+    }
+
+    public List<CTAWTAResponseDTO> copyWTACTA(List<UnitPositionIdDTO> unitPositionIdDTOS) {
+
+
+        List<CTAWTAResponseDTO> ctawtaResponseDTOS = restClientForSchedulerMessages.publishRequest(unitPositionIdDTOS,null,false,IntegrationOperation.CREATE,"copy_wta_cta", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope< List<CTAWTAResponseDTO>>>() {
+        });
+
+        return ctawtaResponseDTOS;
     }
 
 }

@@ -493,7 +493,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("Match (organization:Organization) where id(organization)={0} \n" +
             "Match (organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) \n" +
             "Match (subType)-[:" + ORG_TYPE_HAS_SKILL + "]->(skill:Skill) with skill,organization\n" +
-            "create unique (organization)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{1},lastModificationDate:{2},isEnabled:true}]->(skill)")
+            "create unique (organization)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{1},lastModificationDate:{2},isEnabled:true,customName:skill.name}]->(skill)")
     void assignDefaultSkillsToOrg(long orgId, long creationDate, long lastModificationDate);
 
     @Query("Match (n:Organization) where id(n)={0}\n" +
@@ -506,7 +506,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "Match (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with  unit,skill,skillCategory,r\n" +
             "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags with  unit,skill,skillCategory,r,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
             "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(unit) WITH skill,skillCategory,r,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
-            "return {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,skills:collect(distinct {id:id(skill),name:r.customName,visitourId:skill.visitourId,description:skill.description,customName:r.customName,isEdited:true, tags:ctags+otags})} as data")
+            "return {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,skills:collect(distinct {id:id(skill),name:skill.name,visitourId:skill.visitourId,description:skill.description,customName:r.customName,isEdited:true, tags:ctags+otags})} as data")
     List<Map<String, Object>> getSkillsOfOrganization(long unitId);
 
     Organization findByKmdExternalId(String kmdExternalId);
@@ -711,4 +711,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("Match (org:Organization) where id(org) IN {0} detach delete org")
     void removeOrganizationCompletely(List<Long> organizationIdsToDelete);
+
+    @Query("Match(org:Organization{deleted:false}) return id(org) as unitId, org.timeZone as timezone ORDER BY unitId")
+    List<UnitTimeZoneQueryResult> findTimezoneforAllorganizations();
 }

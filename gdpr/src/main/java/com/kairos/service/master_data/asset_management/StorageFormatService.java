@@ -1,21 +1,20 @@
 package com.kairos.service.master_data.asset_management;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
-import com.kairos.persistance.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
+import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormat;
+import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -85,7 +84,7 @@ public class StorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long countryId) {
-        return storageFormatMongoRepository.findAllStorageFormats(countryId);
+        return storageFormatMongoRepository.findAllStorageFormats(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -147,27 +146,6 @@ public class StorageFormatService extends MongoBaseService {
 
 
     }
-
-    /**
-     * @param countryId
-     * @param
-     * @param name      name of StorageFormat
-     * @return StorageFormat object fetch on basis of  name
-     * @throws DataNotExists throw exception if StorageFormat not exist for given name
-     */
-    public StorageFormat getStorageFormatByName(Long countryId, String name) {
-
-        if (!StringUtils.isBlank(name)) {
-            StorageFormat exist = storageFormatMongoRepository.findByNameAndCountryId(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
 
     /**
      * @description method save Storage format suggested by unit

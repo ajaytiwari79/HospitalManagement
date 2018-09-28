@@ -17,12 +17,12 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class OrganizationProcessingPurposeController {
 
 
@@ -33,9 +33,9 @@ public class OrganizationProcessingPurposeController {
 
 
     @ApiOperation("add processing purpose")
-    @PostMapping("/processing_purpose/add")
-    public ResponseEntity<Object> createProcessingPurpose( @PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ProcessingPurposeDTO> processingPurposes) {
-       if (unitId == null) {
+    @PostMapping("/processing_purpose")
+    public ResponseEntity<Object> createProcessingPurpose(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ProcessingPurposeDTO> processingPurposes) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
@@ -45,22 +45,18 @@ public class OrganizationProcessingPurposeController {
 
 
     @ApiOperation("get processing purpose by id")
-    @GetMapping("/processing_purpose/{id}")
-    public ResponseEntity<Object> getProcessingPurpose( @PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-        else
+    @GetMapping("/processing_purpose/{processingPurposeId}")
+    public ResponseEntity<Object> getProcessingPurpose(@PathVariable Long unitId, @PathVariable BigInteger processingPurposeId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.getProcessingPurpose(unitId, processingPurposeId));
     }
 
 
     @ApiOperation("get all processing purpose")
-    @GetMapping("/processing_purpose/all")
-    public ResponseEntity<Object> getAllProcessingPurpose( @PathVariable Long unitId) {
+    @GetMapping("/processing_purpose")
+    public ResponseEntity<Object> getAllProcessingPurpose(@PathVariable Long unitId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
@@ -69,32 +65,23 @@ public class OrganizationProcessingPurposeController {
 
 
     @ApiOperation("delete processing purpose by id")
-    @DeleteMapping("/processing_purpose/delete/{id}")
-    public ResponseEntity<Object> deleteProcessingPurpose( @PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-       else
+    @DeleteMapping("/processing_purpose/{processingPurposeId}")
+    public ResponseEntity<Object> deleteProcessingPurpose(@PathVariable Long unitId, @PathVariable BigInteger processingPurposeId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.deleteProcessingPurpose(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.deleteProcessingPurpose(unitId, processingPurposeId));
 
     }
 
     @ApiOperation("update processing purpose by id")
-    @PutMapping("/processing_purpose/update/{id}")
-    public ResponseEntity<Object> updateProcessingPurpose( @PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody ProcessingPurposeDTO processingPurpose) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        }
-      else
+    @PutMapping("/processing_purpose/{processingPurposeId}")
+    public ResponseEntity<Object> updateProcessingPurpose(@PathVariable Long unitId, @PathVariable BigInteger processingPurposeId, @Valid @RequestBody ProcessingPurposeDTO processingPurpose) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(unitId, id, processingPurpose));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.updateProcessingPurpose(unitId, processingPurposeId, processingPurpose));
     }
-
 
 
     @ApiOperation("save processing purpose And Suggest To Country admin")
@@ -106,5 +93,5 @@ public class OrganizationProcessingPurposeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingPurposeService.saveAndSuggestProcessingPurposes(countryId, unitId, processingPurposeDTOs.getRequestBody()));
 
     }
-    
+
 }

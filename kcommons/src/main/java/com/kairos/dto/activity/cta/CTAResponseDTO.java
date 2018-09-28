@@ -2,6 +2,7 @@ package com.kairos.dto.activity.cta;
 
 
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 
@@ -28,6 +29,7 @@ public class CTAResponseDTO {
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
     private LocalDate startDate;
     private LocalDate endDate;
+    private OrganizationDTO organization;
     // Added for version of CTA
     private List<CTAResponseDTO> versions = new ArrayList<>();
     private Map<String, Object> unitInfo;
@@ -39,7 +41,7 @@ public class CTAResponseDTO {
         //Default constructor
     }
 
-    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled,Long unitPositionId) {
+    public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled,Long unitPositionId,String description,PositionCodeDTO positionCodeDTO) {
         this.id = id;
         this.name = name;
         this.expertise = expertise;
@@ -48,8 +50,18 @@ public class CTAResponseDTO {
         this.endDate = endDate;
         this.disabled = disabled;
         this.unitPositionId = unitPositionId;
+        this.description=description;
+        this.positionCode=positionCodeDTO;
     }
 
+
+    public OrganizationDTO getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(OrganizationDTO organization) {
+        this.organization = organization;
+    }
     public ExpertiseResponseDTO getExpertise() {
         return expertise;
     }

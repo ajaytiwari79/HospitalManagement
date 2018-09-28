@@ -1,19 +1,19 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.ProcessingPurposeDTO;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.ProcessingPurpose;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.ProcessingPurpose;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
 
@@ -84,7 +84,7 @@ public class ProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long countryId) {
-        return processingPurposeMongoRepository.findAllProcessingPurposes(countryId);
+        return processingPurposeMongoRepository.findAllProcessingPurposes(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -142,29 +142,6 @@ public class ProcessingPurposeService extends MongoBaseService {
 
         }
     }
-
-
-    /**
-     * @param countryId
-     * @param
-     * @param name      name of ProcessingPurpose
-     * @return ProcessingPurpose object fetch on basis of  name
-     * @throws DataNotExists throw exception if ProcessingPurpose not exist for given name
-     */
-    public ProcessingPurpose getProcessingPurposeByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            ProcessingPurpose exist = processingPurposeMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
-
-    }
-
 
     /**
      *

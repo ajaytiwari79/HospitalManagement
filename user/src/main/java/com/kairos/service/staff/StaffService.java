@@ -56,6 +56,7 @@ import com.kairos.persistence.repository.organization.OrganizationServiceReposit
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -215,6 +216,8 @@ public class StaffService {
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private AccessPageRepository accessPageRepository;
 
 
     @Inject
@@ -671,8 +674,12 @@ public class StaffService {
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             logger.error("Access group not found");
             exceptionService.invalidRequestException("error.staff.accessgroup.notfound", accessGroupId);
-
         }
+
+        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+            exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
+        }
+
         List<Staff> staffList = new ArrayList<>();
         List<Integer> staffErrorList = new ArrayList<>();
         StaffUploadBySheetQueryResult staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
@@ -1190,6 +1197,9 @@ public class StaffService {
             exceptionService.dataNotFoundByIdException("error.staff.accessgroup.notfound", accessGroupId);
 
         }
+        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+            exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
+        }
         Employment employment;
         if (employmentAlreadyExist) {
             employment = (Optional.ofNullable(organization).isPresent()) ?
@@ -1246,13 +1256,23 @@ public class StaffService {
 
     public void setAccessGroupInUserAccount(User user, Long organizationId, Long accessGroupId) {
         UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organizationId, user.getId());
-        if (accessGroupId != null) {
+
+            unitPermission=unitPermission==null?new UnitPermission():unitPermission;
             AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
             }
-        }
-        unitPermissionGraphRepository.save(unitPermission);
+            linkAccessOfModules(accessGroup, unitPermission);
+            unitPermissionGraphRepository.save(unitPermission);
+
+    }
+
+    private void linkAccessOfModules(AccessGroup accessGroup, UnitPermission unitPermission) {
+        AccessPermission accessPermission = new AccessPermission(accessGroup);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
+        unitEmpAccessRelationship.setEnabled(true);
+        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+        accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroup.getId());
     }
 
     public void setUserAndEmployment(Organization organization, User user, Long accessGroupId, boolean parentOrganization) {
@@ -1267,13 +1287,12 @@ public class StaffService {
         // if the organization is not parent organization then adding employment in parent organization.
         if (!parentOrganization) {
             Organization
-            mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
+                    mainOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
             mainOrganization.getEmployments().add(employment);
             organizationGraphRepository.save(mainOrganization);
         } else {
             organization.getEmployments().add(employment);
         }
-
         organizationGraphRepository.save(organization);
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
@@ -1281,6 +1300,7 @@ public class StaffService {
             AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
+                linkAccessOfModules(accessGroup, unitPermission);
             }
         }
         employment.getUnitPermissions().add(unitPermission);
@@ -1671,12 +1691,14 @@ public class StaffService {
 
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId, organization, countryId);
+        //Todo it should calculate dynamically
+        unitPosition.setHourlyCost(14.5f);
         staffAdditionalInfoDTO.setUnitId(organization.getId());
         staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
         staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));
         staffAdditionalInfoDTO.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
         List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
-        Map<Long, List<LocalDate>> publicHolidayMap = publicHolidaysResult.stream().collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.mapping(o -> DateUtils.getLocalDate((Long) o.get("holidayDate")), Collectors.toList())));
+        Map<Long, List<LocalDate>> publicHolidayMap = publicHolidaysResult.stream().filter(d->d.get("dayTypeId")!=null).collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.mapping(o -> DateUtils.getLocalDate((Long) o.get("holidayDate")), Collectors.toList())));
         staffAdditionalInfoDTO.setPublicHoliday(publicHolidayMap);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         staffAdditionalInfoDTO.setDayTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, DayTypeDTO.class));
@@ -1705,7 +1727,7 @@ public class StaffService {
         UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionOfStaff(staffId, unitId, DateUtils.getCurrentDayStartMillis());
         StaffUnitPositionDetails unitPositionDetails = null;
         if (Optional.ofNullable(unitPosition).isPresent()) {
-            unitPositionDetails = new StaffUnitPositionDetails();
+            unitPositionDetails = new StaffUnitPositionDetails(unitId);
             unitPositionService.convertUnitPositionObject(unitPosition, unitPositionDetails);
         }
         return unitPositionDetails;
@@ -2103,7 +2125,7 @@ public class StaffService {
         return true;
     }
 
-    private void addStaffInChatServer(Staff staff) {
+    public void addStaffInChatServer(Staff staff) {
         Map<String, String> auth = new HashMap<>();
         auth.put("type", "m.login.dummy");
         auth.put("session", staff.getEmail());
@@ -2135,16 +2157,16 @@ public class StaffService {
 
     public StaffAccessGroupQueryResult getAccessGroupIdsOfStaff(Long unitId) {
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
-        Long staffId=getStaffIdOfLoggedInUser(unitId);
+        Long staffId = getStaffIdOfLoggedInUser(unitId);
         long loggedinUserId = UserContext.getUserDetails().getId();
-       Boolean isCountryAdmin=false;
-       staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
-       if(!Optional.ofNullable(staffAccessGroupQueryResult).isPresent()){
-           staffAccessGroupQueryResult=new StaffAccessGroupQueryResult();
-           isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
-           Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-           staffId=staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(),parentOrganization.getId());
-       }
+        Boolean isCountryAdmin = false;
+        staffAccessGroupQueryResult = accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unitId);
+        if (!Optional.ofNullable(staffAccessGroupQueryResult).isPresent()) {
+            staffAccessGroupQueryResult = new StaffAccessGroupQueryResult();
+            isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
+            Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
+            staffId = staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganization.getId());
+        }
         staffAccessGroupQueryResult.setCountryAdmin(isCountryAdmin);
         staffAccessGroupQueryResult.setStaffId(staffId);
         return staffAccessGroupQueryResult;

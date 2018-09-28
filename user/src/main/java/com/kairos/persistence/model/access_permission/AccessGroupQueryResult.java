@@ -1,6 +1,11 @@
 package com.kairos.persistence.model.access_permission;
 
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.persistence.model.country.DayType;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Created by prerna on 5/3/18.
@@ -13,8 +18,13 @@ public class AccessGroupQueryResult {
     private boolean deleted;
     private boolean typeOfTaskGiver;
     private String description;
-    private String role;
+    private AccessGroupRole role;
     private boolean enabled = true;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private List<Long> dayTypeIds;
+    private List<DayType> dayTypes;
+
 
     public long getId() {
         return id;
@@ -56,11 +66,11 @@ public class AccessGroupQueryResult {
         this.description = description;
     }
 
-    public String getRole() {
+    public AccessGroupRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(AccessGroupRole role) {
         this.role = role;
     }
 
@@ -70,5 +80,37 @@ public class AccessGroupQueryResult {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public List<Long> getDayTypeIds() {
+        return dayTypeIds;
+    }
+
+    public void setDayTypeIds(List<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
+    }
+
+    public List<DayType> getDayTypes() {
+        return dayTypes;
+    }
+
+    public void setDayTypes(List<DayType> dayTypes) {
+        this.dayTypes = dayTypes;
     }
 }

@@ -1,21 +1,20 @@
 package com.kairos.service.master_data.asset_management;
 
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.HostingTypeDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.HostingType;
-import com.kairos.persistance.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
+import com.kairos.persistence.model.master_data.default_asset_setting.HostingType;
+import com.kairos.persistence.repository.master_data.asset_management.hosting_type.HostingTypeMongoRepository;
 import com.kairos.response.dto.common.HostingTypeResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -81,7 +80,7 @@ public class HostingTypeService extends MongoBaseService {
      * @return list of HostingType
      */
     public List<HostingTypeResponseDTO> getAllHostingType(Long countryId) {
-        return hostingTypeMongoRepository.findAllHostingTypes(countryId);
+        return hostingTypeMongoRepository.findAllHostingTypes(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -143,28 +142,6 @@ public class HostingTypeService extends MongoBaseService {
         hostingTypeMongoRepository.save(hostingType);
         return hostingTypeDTO;
 
-
-    }
-
-
-    /**
-     * @param countryId
-     * @param
-     * @param name      name of HostingType
-     * @return HostingType object fetch on the basis of name
-     * @throws DataNotExists if HostingType not exist for given name
-     */
-    public HostingType getHostingTypeByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            HostingType exist = hostingTypeMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
 

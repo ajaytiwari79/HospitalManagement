@@ -124,7 +124,7 @@ public class ClientExtendedService{
         Client nextToKinClientObject;
         ContactDetail contactDetail = null;
         if (!Optional.ofNullable(nextToKin).isPresent()) {
-            nextToKin = new User(nextToKinDTO.getCprNumber().trim(), nextToKinDTO.getFirstName(), nextToKinDTO.getLastName(),nextToKin.getEmail());
+            nextToKin = new User(nextToKinDTO.getCprNumber().trim(), nextToKinDTO.getFirstName(), nextToKinDTO.getLastName(),nextToKin.getEmail(),nextToKin.getUserName());
             nextToKin.setNickName(nextToKinDTO.getNickName());
             nextToKinClientObject = new Client();
 

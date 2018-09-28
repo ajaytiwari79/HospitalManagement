@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +65,11 @@ public class UnitSettingService extends MongoBaseService {
     }
 
     public List<UnitSettingDTO> getOpenShiftPhaseSettings(Long unitId) {
-        return unitSettingRepository.getOpenShiftPhaseSettings(unitId);
+        List<UnitSettingDTO> openShiftPhaseSettings = unitSettingRepository.getOpenShiftPhaseSettings(unitId);
+        openShiftPhaseSettings.forEach(openSettingDTO ->{
+            openSettingDTO.getOpenShiftPhaseSetting().getOpenShiftPhases().sort(Comparator.comparingInt(OpenShiftPhase::getSequence));
+        });
+        return openShiftPhaseSettings;
     }
 
     public UnitSettingDTO updateOpenShiftPhaseSettings(Long unitId, BigInteger unitSettingsId, UnitSettingDTO unitSettingsDTO) {
@@ -90,7 +95,7 @@ public class UnitSettingService extends MongoBaseService {
         if (Optional.ofNullable(phases).isPresent()) {
             List<OpenShiftPhase> openShiftPhases = new ArrayList<>();
             phases.forEach(phase -> {
-                OpenShiftPhase openShiftPhase = new OpenShiftPhase(phase.getId(), phase.getName(), false);
+                OpenShiftPhase openShiftPhase = new OpenShiftPhase(phase.getId(), phase.getName(), false,phase.getSequence());
                 openShiftPhases.add(openShiftPhase);
             });
             OpenShiftPhaseSetting openShiftPhaseSetting = new OpenShiftPhaseSetting(4, openShiftPhases);

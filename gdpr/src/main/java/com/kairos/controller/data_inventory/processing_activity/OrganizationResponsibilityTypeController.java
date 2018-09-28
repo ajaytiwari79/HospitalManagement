@@ -17,12 +17,12 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class OrganizationResponsibilityTypeController {
 
 
@@ -33,7 +33,7 @@ public class OrganizationResponsibilityTypeController {
 
 
     @ApiOperation("add ResponsibilityType  ")
-    @PostMapping("/responsibility_type/add")
+    @PostMapping("/responsibility_type")
     public ResponseEntity<Object> createResponsibilityType(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<ResponsibilityTypeDTO> responsibilityTypes) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -45,19 +45,17 @@ public class OrganizationResponsibilityTypeController {
 
 
     @ApiOperation("get ResponsibilityType  by id")
-    @GetMapping("/responsibility_type/{id}")
-    public ResponseEntity<Object> getResponsibilityType(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @GetMapping("/responsibility_type/{responsibilityTypeId}")
+    public ResponseEntity<Object> getResponsibilityType(@PathVariable Long unitId, @PathVariable BigInteger responsibilityTypeId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityType(unitId, responsibilityTypeId));
     }
 
 
     @ApiOperation("get all ResponsibilityType ")
-    @GetMapping("/responsibility_type/all")
+    @GetMapping("/responsibility_type")
     public ResponseEntity<Object> getAllResponsibilityType(@PathVariable Long unitId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -66,38 +64,23 @@ public class OrganizationResponsibilityTypeController {
 
     }
 
-    @ApiOperation("get ResponsibilityType by name")
-    @GetMapping("/responsibility_type/name")
-    public ResponseEntity<Object> getResponsibilityTypeByName(@PathVariable Long unitId, @RequestParam String name) {
+    @ApiOperation("delete ResponsibilityType  by id")
+    @DeleteMapping("/responsibility_type/{responsibilityTypeId}")
+    public ResponseEntity<Object> deleteResponsibilityType(@PathVariable Long unitId, @PathVariable BigInteger responsibilityTypeId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.getResponsibilityTypeByName(unitId, name));
-
-    }
-
-
-    @ApiOperation("delete ResponsibilityType  by id")
-    @DeleteMapping("/responsibility_type/delete/{id}")
-    public ResponseEntity<Object> deleteResponsibilityType(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.deleteResponsibilityType(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.deleteResponsibilityType(unitId, responsibilityTypeId));
 
     }
 
     @ApiOperation("update ResponsibilityType  by id")
-    @PutMapping("/responsibility_type/update/{id}")
-    public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody ResponsibilityTypeDTO responsibilityType) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @PutMapping("/responsibility_type/{responsibilityTypeId}")
+    public ResponseEntity<Object> updateResponsibilityType(@PathVariable Long unitId, @PathVariable BigInteger responsibilityTypeId, @Valid @RequestBody ResponsibilityTypeDTO responsibilityType) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(unitId, id, responsibilityType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responsibilityTypeService.updateResponsibilityType(unitId, responsibilityTypeId, responsibilityType));
 
     }
 

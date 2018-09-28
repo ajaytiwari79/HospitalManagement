@@ -16,12 +16,12 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 
-import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL_UNIT_URL;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 @RestController
-@RequestMapping(API_ORGANIZATION_URL_UNIT_URL)
-@Api(API_ORGANIZATION_URL_UNIT_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class OrganizationAccessorPartyController {
 
 
@@ -32,7 +32,7 @@ public class OrganizationAccessorPartyController {
 
 
     @ApiOperation("add AccessorParty")
-    @PostMapping("/accessor_party/add")
+    @PostMapping("/accessor_party")
     public ResponseEntity<Object> createAccessorParty(@PathVariable Long unitId, @Valid @RequestBody ValidateRequestBodyList<AccessorPartyDTO> accessorParties) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -44,19 +44,17 @@ public class OrganizationAccessorPartyController {
 
 
     @ApiOperation("get AccessorParty by id")
-    @GetMapping("/accessor_party/{id}")
-    public ResponseEntity<Object> getAccessorPartyById(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @GetMapping("/accessor_party/{accessorPartyId}")
+    public ResponseEntity<Object> getAccessorPartyById(@PathVariable Long unitId, @PathVariable BigInteger accessorPartyId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorPartyById(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.getAccessorPartyById(unitId, accessorPartyId));
     }
 
 
     @ApiOperation("get all AccessorParty ")
-    @GetMapping("/accessor_party/all")
+    @GetMapping("/accessor_party")
     public ResponseEntity<Object> getAllAccessorParty(@PathVariable Long unitId) {
         if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
@@ -66,28 +64,24 @@ public class OrganizationAccessorPartyController {
     }
 
     @ApiOperation("delete AccessorParty  by id")
-    @DeleteMapping("/accessor_party/delete/{id}")
-    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long unitId, @PathVariable BigInteger id) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @DeleteMapping("/accessor_party/{accessorPartyId}")
+    public ResponseEntity<Object> deleteAccessorParty(@PathVariable Long unitId, @PathVariable BigInteger accessorPartyId) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.deleteAccessorParty(unitId, id));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.deleteAccessorParty(unitId, accessorPartyId));
 
     }
 
     @ApiOperation("update AccessorParty by id")
-    @PutMapping("/accessor_party/update/{id}")
-    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long unitId, @PathVariable BigInteger id, @Valid @RequestBody AccessorPartyDTO accessorParty) {
-        if (id == null) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
-        } else if (unitId == null) {
+    @PutMapping("/accessor_party/{accessorPartyId}")
+    public ResponseEntity<Object> updateAccessorParty(@PathVariable Long unitId, @PathVariable BigInteger accessorPartyId, @Valid @RequestBody AccessorPartyDTO accessorParty) {
+        if (unitId == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization id can't be null");
 
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.updateAccessorParty(unitId, id, accessorParty));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessorPartyService.updateAccessorParty(unitId, accessorPartyId, accessorParty));
 
     }
 

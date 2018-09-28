@@ -4,22 +4,25 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.metadata.StorageFormatDTO;
-import com.kairos.persistance.model.master_data.default_asset_setting.StorageFormat;
-import com.kairos.persistance.repository.data_inventory.asset.AssetMongoRepository;
-import com.kairos.persistance.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
+import com.kairos.persistence.model.master_data.default_asset_setting.StorageFormat;
+import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
 import com.kairos.response.dto.common.StorageFormatResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -92,7 +95,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long organizationId) {
-        return storageFormatMongoRepository.findAllOrganizationStorageFormats(organizationId);
+        return storageFormatMongoRepository.findAllOrganizationStorageFormats(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -117,16 +120,10 @@ public class OrganizationStorageFormatService extends MongoBaseService {
     public Boolean deleteStorageFormat(Long unitId, BigInteger storageFormatId) {
 
         List<AssetBasicResponseDTO> assetsLinkedWithStorageFormat = assetMongoRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
-        if (!assetsLinkedWithStorageFormat.isEmpty()) {
-            StringBuilder assetNames=new StringBuilder();
-            assetsLinkedWithStorageFormat.forEach(asset->assetNames.append(asset.getName()+","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", assetNames);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithStorageFormat)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", new StringBuilder(assetsLinkedWithStorageFormat.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        StorageFormat storageFormat = storageFormatMongoRepository.findByOrganizationIdAndId(unitId, storageFormatId);
-        if (!Optional.ofNullable(storageFormat).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Storage Format", storageFormatId);
-        }
-        delete(storageFormat);
+        storageFormatMongoRepository.safeDelete(storageFormatId);
         return true;
     }
 

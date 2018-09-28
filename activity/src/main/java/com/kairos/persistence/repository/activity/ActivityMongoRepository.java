@@ -18,8 +18,6 @@ import java.util.Set;
 public interface ActivityMongoRepository extends MongoBaseRepository<Activity, BigInteger>,
         CustomActivityMongoRepository {
 
-    @CountQuery("{_id:{$in:?0}, deleted:false}")
-    Integer countActivityByIds(Set<BigInteger> activityIds);
 
     @Query("{'deleted' : false,'_id':?0}")
     Activity findActivityByIdAndEnabled(BigInteger id);
@@ -48,6 +46,9 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Set<BigInteger> activityIds);
+
+    @Query("{_id:{$in:?0}, deleted:false}")
+    List<ActivityDTO> findAllActivitiesByIds(List<BigInteger> activityIds);
 
     List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId);
 

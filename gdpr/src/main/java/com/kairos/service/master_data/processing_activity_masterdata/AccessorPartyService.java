@@ -1,20 +1,19 @@
 package com.kairos.service.master_data.processing_activity_masterdata;
 
-import com.kairos.custom_exception.DataNotExists;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.AccessorPartyDTO;
-import com.kairos.persistance.model.master_data.default_proc_activity_setting.AccessorParty;
-import com.kairos.persistance.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
+import com.kairos.persistence.model.master_data.default_proc_activity_setting.AccessorParty;
+import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
 import com.kairos.response.dto.common.AccessorPartyResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -76,7 +75,7 @@ public class AccessorPartyService extends MongoBaseService {
 
 
     public List<AccessorPartyResponseDTO> getAllAccessorParty(Long countryId) {
-        return accessorPartyMongoRepository.findAllAccessorParty(countryId);
+        return accessorPartyMongoRepository.findAllAccessorParty(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -132,26 +131,6 @@ public class AccessorPartyService extends MongoBaseService {
         accessorPartyMongoRepository.save(accessorParty);
         return accessorPartyDTO;
 
-
-    }
-
-    /**
-     * @param countryId
-     * @param name      name of AccessorParty
-     * @return AccessorParty object fetch on basis of  name
-     * @throws DataNotExists throw exception if AccessorParty exist for given name
-     */
-    public AccessorParty getAccessorPartyByName(Long countryId, String name) {
-
-
-        if (!StringUtils.isBlank(name)) {
-            AccessorParty exist = accessorPartyMongoRepository.findByName(countryId, name);
-            if (!Optional.ofNullable(exist).isPresent()) {
-                throw new DataNotExists("data not exist for name " + name);
-            }
-            return exist;
-        } else
-            throw new InvalidRequestException("request param cannot be empty  or null");
 
     }
 
