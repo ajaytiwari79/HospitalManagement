@@ -74,6 +74,7 @@ import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.DateUtil;
 import com.kairos.wrapper.PositionWrapper;
+import javafx.geometry.Pos;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -1038,59 +1039,65 @@ public class UnitPositionService {
     public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId) {
 
         LocalDateTime started = LocalDateTime.now();
+        LocalDate todaysDate=DateUtils.getCurrentLocalDate();
         KairosSchedulerLogsDTO schedulerLogsDTO;
         LocalDateTime stopped;
         String log = null;
         Result result = Result.SUCCESS;
-
         try {
-
             List<UnitPositionSeniorityLevelQueryResult> unitPositionSeniorityLevelQueryResults = unitPositionGraphRepository.findUnitPositionSeniorityLeveltoUpdate();
             if (!unitPositionSeniorityLevelQueryResults.isEmpty()) {
-                List<Long> unitPositionIds = unitPositionSeniorityLevelQueryResults.stream().map(unitPositionQueryResult -> unitPositionQueryResult.getUnitPosition().getId()).
-                        collect(Collectors.toList());
 
-                List<UnitPositionCompleteQueryResult> unitPositionsComplete = unitPositionGraphRepository.findUnitPositionCompleteObject(unitPositionIds);
-                Map<Long, UnitPosition> unitPositionMap = new HashMap<>();
-                for (UnitPositionCompleteQueryResult unitPositionCompleteQueryResult : unitPositionsComplete) {
-                    UnitPosition unitPositionComplete = unitPositionCompleteQueryResult.getUnitPosition();
-                    unitPositionComplete.setExpertise(unitPositionCompleteQueryResult.getExpertise());
-                    //unitPositionComplete.setFunctions(unitPositionCompleteQueryResult.getFunctions());
-                    unitPositionComplete.setReasonCode(unitPositionCompleteQueryResult.getReasonCode());
-                    unitPositionComplete.setStaff(unitPositionCompleteQueryResult.getStaff());
-                    unitPositionComplete.setPositionCode(unitPositionCompleteQueryResult.getPositionCode());
-                    unitPositionComplete.setUnit(unitPositionCompleteQueryResult.getUnit());
-                    unitPositionComplete.setUnion(unitPositionCompleteQueryResult.getUnionOrg());
-                    unitPositionMap.put(unitPositionComplete.getId(), unitPositionComplete);
-                }
+                Map<Long,UnitPositionSeniorityLevelQueryResult>unitPositionSeniorityLevelQueryResultMap
+                        =unitPositionSeniorityLevelQueryResults.stream().collect(Collectors.toMap(t->t.getUnitPositionId(), java.util.function.Function.identity()));
 
-                List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips = new ArrayList<>();
-                List<UnitPosition> unitPositions = new ArrayList<>();
-                for (UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult : unitPositionSeniorityLevelQueryResults) {
-                    UnitPosition unitPosition = new UnitPosition();
-                    UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip;
-                    UnitPosition oldUnitPosition = unitPositionMap.get(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId());
-                    ObjectMapperUtils.copyProperties(oldUnitPosition, unitPosition);
-                    oldUnitPosition.setEndDateMillis(DateUtils.getOneDayBeforeMillis());
-                    oldUnitPosition.setHistory(true);
-                    oldUnitPosition.setEditable(false);
-                    unitPosition.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
-                    //unitPosition.setSeniorityLevel(unitPositionSeniorityLevelQueryResult.getSeniorityLevel());
-                    //unitPosition.setParentUnitPosition(oldUnitPosition);
-                    unitPositionEmploymentTypeRelationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition.getPositionLines().get(0), unitPositionSeniorityLevelQueryResult.getEmploymentType(),
-                            unitPositionSeniorityLevelQueryResult.getUnitPositionEmploymentTypeRelationShip().getEmploymentTypeCategory());
-                    unitPositionEmploymentTypeRelationShips.add(unitPositionEmploymentTypeRelationShip);
-                    unitPosition.setId(null);
-                    unitPositions.add(unitPosition);
+                Set<Long> unitPositionIds =unitPositionSeniorityLevelQueryResultMap.keySet();
+                        Iterable<UnitPosition> unitPositions = unitPositionGraphRepository.findAllById(unitPositionIds,2);
+
+                Map<UnitPositionIdDTO, PositionLine> newPositionLineWithParentId = new HashMap<>();
+
+                for (UnitPosition currentUnitPosition : unitPositions) {
+                    Optional<PositionLine> positionLine =currentUnitPosition.getPositionLines().stream()
+                            .filter(pl->(todaysDate.isAfter(pl.getStartDate()) && (pl.getEndDate()==null || pl.getEndDate().isBefore(todaysDate) ||pl.getEndDate().isEqual(todaysDate) )))
+                            .findAny();
+                    if (positionLine.isPresent()) {
+                        PositionLine newPositionLine = new PositionLine.PositionLineBuilder()
+                                .setAvgDailyWorkingHours(positionLine.get().getAvgDailyWorkingHours())
+                                .setTotalWeeklyMinutes(positionLine.get().getTotalWeeklyMinutes())
+                                .setHourlyWages(positionLine.get().getHourlyWages())
+                                .setStartDate(todaysDate.plusDays(1))
+                                .setFunctions(positionLine.get().getFunctions())
+                                .setFullTimeWeeklyMinutes(positionLine.get().getFullTimeWeeklyMinutes())
+                                .setWorkingDaysInWeek(positionLine.get().getWorkingDaysInWeek())
+                                .setEndDate(positionLine.get().getEndDate())
+                                .setSeniorityLevel(unitPositionSeniorityLevelQueryResultMap.get(currentUnitPosition.getId()).getSeniorityLevel())
+                                .build();
+                        positionLine.get().setEndDate(todaysDate);
+                        currentUnitPosition.getPositionLines().add(newPositionLine);
+                        newPositionLineWithParentId.put(new UnitPositionIdDTO(currentUnitPosition.getId(),null,positionLine.get().getId()), newPositionLine);
+                    }
+
                 }
-                List<UnitPositionIdDTO> unitPositionNewOldIds = new ArrayList<>();
                 unitPositionGraphRepository.saveAll(unitPositions);
-                int i = 0;
-                for (UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult : unitPositionSeniorityLevelQueryResults) {
-                    unitPositionNewOldIds.add(new UnitPositionIdDTO(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId(), unitPositions.get(i++).getId()));
+                List<UnitPositionEmploymentTypeRelationShip> unitPositionEmploymentTypeRelationShips = new ArrayList<>();
+
+                for (Map.Entry<UnitPositionIdDTO,PositionLine> currentMap:newPositionLineWithParentId.entrySet()) {
+                    UnitPositionSeniorityLevelQueryResult currentObject= unitPositionSeniorityLevelQueryResultMap.get(currentMap.getKey());
+                    if (currentObject !=null) {
+                        UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip =
+                                new UnitPositionEmploymentTypeRelationShip(currentMap.getValue(), currentObject.getEmploymentType(),
+                                        currentObject.getUnitPositionEmploymentTypeRelationShip().getEmploymentTypeCategory());
+                        unitPositionEmploymentTypeRelationShips.add(unitPositionEmploymentTypeRelationShip);
+                    }
                 }
+
+                unitPositionGraphRepository.saveAll(unitPositions);
+//                int i = 0;
+//                for (UnitPositionSeniorityLevelQueryResult unitPositionSeniorityLevelQueryResult : unitPositionSeniorityLevelQueryResults) {
+//                    unitPositionNewOldIds.add(new UnitPositionIdDTO(unitPositionSeniorityLevelQueryResult.getUnitPosition().getId(), unitPositions.get(i++).getId()));
+//                }
                 unitPositionEmploymentTypeRelationShipGraphRepository.saveAll(unitPositionEmploymentTypeRelationShips);
-                activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
+                //activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
             }
 

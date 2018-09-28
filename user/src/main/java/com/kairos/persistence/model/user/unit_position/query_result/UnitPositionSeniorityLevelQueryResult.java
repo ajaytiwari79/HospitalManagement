@@ -10,18 +10,18 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 public class UnitPositionSeniorityLevelQueryResult {
 
-    private UnitPosition unitPosition;
+    private Long unitPositionId;
     private SeniorityLevel seniorityLevel;
     private UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip;
     private EmploymentType employmentType;
     private PositionLine positionLine;
 
-    public UnitPosition getUnitPosition() {
-        return unitPosition;
+    public Long getUnitPositionId() {
+        return unitPositionId;
     }
 
-    public void setUnitPosition(UnitPosition unitPosition) {
-        this.unitPosition = unitPosition;
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
     }
 
     public SeniorityLevel getSeniorityLevel() {
