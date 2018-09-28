@@ -187,8 +187,8 @@ public class ShiftController {
 
     @ApiOperation("shifts details by date")
     @GetMapping("/shift/details_by_date")
-    public ResponseEntity<Map<String,Object>> getShiftsDetailsByDate(@PathVariable Long unitId,@RequestParam Long unitPositionId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getDetailViewInfo(unitId,unitPositionId,shiftStartDate));
+    public ResponseEntity<Map<String,Object>> getShiftsDetailsByDate(@PathVariable Long unitId,@RequestParam Long staffId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getDetailViewInfo(unitId,staffId,shiftStartDate));
     }
 
     @ApiOperation("update shift by detail view")

@@ -9,6 +9,7 @@ import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepositor
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.OrganizationRestClient;
+import com.kairos.rest_client.TimeBankRestClient;
 import com.kairos.rest_client.pay_out.PayOutRestClient;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.pay_out.PayOut;
@@ -65,6 +66,7 @@ public class PayOutService extends MongoBaseService {
     @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
     @Inject private ExceptionService exceptionService;
+    @Inject private TimeBankRestClient timeBankRestClient;
 
 
     /**
@@ -156,7 +158,7 @@ public class PayOutService extends MongoBaseService {
      * @return boolean
      */
     public boolean requestPayOut(Long staffId,Long unitPositionId,int amount){
-        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(unitPositionId);
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
         if(unitPositionWithCtaDetailsDTO==null){
             exceptionService.invalidRequestException("message.unit.position");
         }
