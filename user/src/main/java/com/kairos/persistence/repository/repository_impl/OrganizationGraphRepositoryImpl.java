@@ -131,7 +131,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         query += " Optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress) WITH engineerType, staff, user, contactAddress,expertiseList,employmentList";
 
         query += " return distinct {id:id(staff), expertiseList:expertiseList,employmentList:employmentList,city:contactAddress.city,province:contactAddress.province, " +
-                "firstName:user.firstName,user:staff.lastName,employedSince :staff.employedSince," +
+                "firstName:user.firstName,lastName:user.lastName,employedSince :staff.employedSince," +
                 "age:round ((timestamp()-user.dateOfBirth) / (365*24*60*60*1000))," +
                 "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId," +
                 "cprNumber:user.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, " +
