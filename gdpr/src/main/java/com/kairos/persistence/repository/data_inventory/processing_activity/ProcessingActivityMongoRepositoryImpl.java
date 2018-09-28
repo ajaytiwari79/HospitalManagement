@@ -73,8 +73,10 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
                 lookup("dataSource", "dataSources", "_id", "dataSources"),
                 lookup("responsibility_type", "responsibilityType", "_id", "responsibilityType"),
                 lookup("processingLegalBasis", "processingLegalBasis", "_id", "processingLegalBasis"),
+                lookup("risk", "risks", "_id", "risks"),
                 lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
                 unwind("subProcessingActivities", true),
+                lookup("risk", "subProcessingActivities.risks", "_id", "subProcessingActivities.risks"),
                 lookup("processing_purpose", "subProcessingActivities.processingPurposes", "_id", "subProcessingActivities.processingPurposes"),
                 lookup("transfer_method", "subProcessingActivities.transferMethods", "_id", "subProcessingActivities.transferMethods"),
                 lookup("accessor_party", "subProcessingActivities.accessorParties", "_id", "subProcessingActivities.accessorParties"),
@@ -179,12 +181,12 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     }
 
     @Override
-    public ProcessingActivityRiskResponseDTO getProcessingActivityWithRisksAndSubProcessingActivities(Long unitId, BigInteger processingActivityId) {
+    public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessWithRisks(Long unitId) {
 
         String groupSubProcessingActivity = "{'$group':{_id:'$_id','subProcessingActivities':{'$addToSet':'$subProcessingActivities'},'risks':{'$first':'$risks'},'name':{'$first':'$name'}}}";
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false).and("_id").is(processingActivityId)),
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false)),
                 lookup("risk", "risks", "_id", "risks"),
                 lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
                 unwind("subProcessingActivities", true),
@@ -193,7 +195,7 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
 
         );
         AggregationResults<ProcessingActivityRiskResponseDTO> result = mongoTemplate.aggregate(aggregation, ProcessingActivity.class, ProcessingActivityRiskResponseDTO.class);
-        return result.getUniqueMappedResult();
+        return result.getMappedResults();
 
     }
 }
