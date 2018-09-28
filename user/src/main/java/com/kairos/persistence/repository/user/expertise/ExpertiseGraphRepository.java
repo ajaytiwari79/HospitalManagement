@@ -187,7 +187,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
     @Query("match(organizationType:OrganizationType) where id(organizationType)={1}\n" +
             "match(organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService)\n" +
-            " match(os)<-[:SUPPORTS_SERVICES]-(expertise:Expertise) where expertise.published AND  (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp())\n" +
+            " match(os)<-[:SUPPORTS_SERVICES]-(expertise:Expertise{deleted:false}) where expertise.published AND  (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp())\n" +
             "return distinct id(expertise) as id,expertise.name as name")
     List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId);
 
