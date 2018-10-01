@@ -42,7 +42,7 @@ public class UnitPositionQueryResult {
     private WTAResponseDTO workingTimeAgreement;
 
     private List<PositionLinesQueryResult> positionLines;
-
+    private Long positionLineId;
     private Boolean history;
     private Boolean editable;
     private Boolean published;
@@ -209,11 +209,19 @@ public class UnitPositionQueryResult {
         this.positionLines = positionLines;
     }
 
+    public Long getPositionLineId() {
+        return positionLineId;
+    }
+
+    public void setPositionLineId(Long positionLineId) {
+        this.positionLineId = positionLineId;
+    }
+
     public UnitPositionQueryResult() {
         //default cons
     }
 
-    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CTAResponseDTO cta, WTAResponseDTO wta) {
+    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, Long endDateMillis,  long id,  PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CTAResponseDTO cta, WTAResponseDTO wta) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
