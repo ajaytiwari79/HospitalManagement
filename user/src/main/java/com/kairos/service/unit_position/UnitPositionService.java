@@ -73,7 +73,9 @@ import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.DateUtil;
+import com.kairos.utils.response.ResponseHandler;
 import com.kairos.wrapper.PositionWrapper;
+import io.swagger.annotations.ApiOperation;
 import javafx.geometry.Pos;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
@@ -83,9 +85,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -370,6 +376,15 @@ public class UnitPositionService {
         if (currentPositionLine == null) {
             exceptionService.dataNotFoundByIdException("message.positionid.notfound", unitPositionId);
         }
+
+        List<NameValuePair> param = Collections.singletonList(new BasicNameValuePair("unitPositionId",unitPositionId+""));
+
+        CTAWTAWrapper ctawtaWrapper=genericRestClient.publishRequest(null,unitId,true,IntegrationOperation.GET,"applicable-cta-wta",param,
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAWrapper>>() {} );
+        if (ctawtaWrapper.getCta().isEmpty() || ctawtaWrapper.getWta().isEmpty()){
+            exceptionService.dataNotFoundByIdException("message.unitPosition.ctawtamissing", ctawtaWrapper.getCta().isEmpty(),ctawtaWrapper.getWta().isEmpty(),unitPositionId);
+        }
+
         UnitPositionEmploymentTypeRelationShip positionLineEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(currentPositionLine.getId());
         EmploymentQueryResult employmentQueryResult;
         UnitPositionQueryResult unitPositionQueryResult;

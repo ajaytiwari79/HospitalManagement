@@ -188,13 +188,6 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> getDefaultWtaInfoForUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getDefaultWtaInfoForUnit(unitId));
     }
-
-    @ApiOperation(value = "get Wta By Ids")
-    @GetMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/unitposition-cta-wta")
-    public ResponseEntity<Map<String, Object>> getWTAByIds(@RequestParam List<Long> upIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByUpIds(upIds));
-    }
-
     @ApiOperation(value = "assing wta and cta to unitPosition")
     @PostMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/unitPosition/{unitPositionId}/wta/{wtaId}/cta/{ctaId}")
     public ResponseEntity<Map<String, Object>> assignWTAToUnitPosition(@PathVariable Long unitPositionId,@PathVariable BigInteger wtaId,@PathVariable BigInteger ctaId) {
@@ -238,6 +231,13 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> getwtaRuletemplates(@PathVariable BigInteger wtaId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getwtaRuletemplates(wtaId));
     }
+
+    @ApiOperation(value = "get current cta and wta applicable on unit position ")
+    @GetMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/applicable-cta-wta")
+    public ResponseEntity<Map<String, Object>> getWTACTAByOfUnitPosition(@RequestParam(value = "unitPositionId") Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByOfUnitPosition(unitPositionId));
+    }
+
 
 
    /* @ApiOperation(value = "check scheduler load balncing")

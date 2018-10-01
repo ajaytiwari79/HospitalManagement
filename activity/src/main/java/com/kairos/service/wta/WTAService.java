@@ -430,6 +430,20 @@ public class WTAService extends MongoBaseService {
         return new CTAWTAWrapper(ctaResponseDTOS,wtaResponseDTOS);
     }
 
+    public CTAWTAWrapper getWTACTAByOfUnitPosition(Long unitPositionId) {
+        WorkingTimeAgreement wta = wtaRepository.getWTABasicByUnitPositionAndDate(unitPositionId,new Date());
+        CostTimeAgreement cta = costTimeAgreementRepository.getCTABasicByUnitPositionAndDate(unitPositionId,new Date());
+        CTAWTAWrapper ctawtaWrapper=new CTAWTAWrapper();
+        if (Optional.ofNullable(wta).isPresent()){
+            WTAResponseDTO wtaResponseDTO = new WTAResponseDTO(wta.getName(),wta.getId());
+            ctawtaWrapper.setWta(Collections.singletonList(wtaResponseDTO));
+        }
+        if (Optional.ofNullable(cta).isPresent()){
+            CTAResponseDTO ctaResponseDTO = new CTAResponseDTO(cta.getName(),cta.getId());
+            ctawtaWrapper.setCta(Collections.singletonList(ctaResponseDTO));
+        }
+        return ctawtaWrapper;
+    }
 
     public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<Long> upIds) {
         List<WTAQueryResultDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(upIds);

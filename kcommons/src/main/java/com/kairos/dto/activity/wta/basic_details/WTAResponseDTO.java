@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
@@ -17,7 +18,7 @@ import java.util.Map;
  * Created by vipul on 21/8/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-//@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WTAResponseDTO {
 
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
@@ -42,7 +43,24 @@ public class WTAResponseDTO {
     private Map<String, Object> unitInfo;
     private PositionCodeDTO positionCode;
 
+    public WTAResponseDTO() {
+        //default
+    }
 
+    public WTAResponseDTO(String name, BigInteger id) {
+        this.name = name;
+        this.id = id;
+    }
+
+    public WTAResponseDTO(BigInteger id, Long startDateMillis, Long endDateMillis, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description) {
+        this.id = id;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.name = name;
+        this.description = description;
+
+
+    }
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
     }
@@ -99,19 +117,6 @@ public class WTAResponseDTO {
         this.endDate = endDate;
     }
 
-    public WTAResponseDTO() {
-        //default
-    }
-
-    public WTAResponseDTO(BigInteger id, Long startDateMillis, Long endDateMillis, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description) {
-        this.id = id;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.name = name;
-        this.description = description;
-
-
-    }
 
     public Long getStartDateMillis() {
         return startDateMillis;

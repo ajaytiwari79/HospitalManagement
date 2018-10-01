@@ -46,7 +46,7 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     WTAQueryResultDTO getWTAByUnitPosition(Long unitPositionId,Date date);
 
-    public List<WTAQueryResultDTO> getWTAByUnitPositionIds(List<Long> unitPositionIds,Date date);
-
+    List<WTAQueryResultDTO> getWTAByUnitPositionIds(List<Long> unitPositionIds,Date date);
+    WorkingTimeAgreement getWTABasicByUnitPositionAndDate(Long unitPositionId,Date date);
 
 }

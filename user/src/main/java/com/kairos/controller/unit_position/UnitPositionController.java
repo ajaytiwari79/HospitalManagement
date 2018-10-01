@@ -47,7 +47,7 @@ public class UnitPositionController {
      * */
     @ApiOperation(value = "Get all unit_position by organization and staff")
     @RequestMapping(value = "/unit_position/staff/{staffId}")
-    ResponseEntity<Map<String, Object>> getUnitPositionsOfStaff(@PathVariable Long unitId, @RequestParam("type") String type, @PathVariable Long staffId, @RequestParam("allOrganization") boolean allOrganization) {
+    ResponseEntity<Map<String, Object>> getUnitPositionsOfStaff(@PathVariable Long unitId, @RequestParam(value = "type",required = false) String type, @PathVariable Long staffId, @RequestParam("allOrganization") boolean allOrganization) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionsOfStaff(unitId, staffId, allOrganization));
     }
 

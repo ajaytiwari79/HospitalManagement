@@ -148,6 +148,12 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
         return result.getMappedResults();
     }
-
+    @Override
+    public CostTimeAgreement getCTABasicByUnitPositionAndDate(Long unitPositionId,Date date) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
+        Query query = new Query(criteria);
+        CostTimeAgreement result = mongoTemplate.findOne(query,CostTimeAgreement.class);
+        return result;
+    }
 
 }
