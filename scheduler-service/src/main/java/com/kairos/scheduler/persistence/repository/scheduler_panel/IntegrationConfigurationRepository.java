@@ -1,4 +1,4 @@
-package com.kairos.scheduler.persistence.repository;
+package com.kairos.scheduler.persistence.repository.scheduler_panel;
 
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import org.springframework.data.mongodb.repository.MongoRepository;
