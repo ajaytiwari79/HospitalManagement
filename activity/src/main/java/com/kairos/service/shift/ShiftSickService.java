@@ -165,7 +165,11 @@ public class ShiftSickService extends MongoBaseService {
     private void createSicknessShiftsOfStaff(Long staffId, Long unitId, Activity activity, StaffUnitPositionDetails staffUnitPositionDetails, List<Shift> staffOriginalShiftsOfDates, Duration duration, PlanningPeriod planningPeriod) {
         short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
         logger.info(staffOriginalShiftsOfDates.size() + "", " shifts found for days");
-        staffOriginalShiftsOfDates.forEach(s -> s.setDisabled(true));
+        List<Date> dates=new ArrayList<>();
+        staffOriginalShiftsOfDates.forEach(s -> {s.setDisabled(true);
+               dates.add(s.getStartDate());
+        }
+        );
 
         List<Shift> shifts = new ArrayList<>();
         while (shiftNeedsToAddForDays != 0 && activity.getRulesActivityTab().getRecurrenceTimes() > 0) {
