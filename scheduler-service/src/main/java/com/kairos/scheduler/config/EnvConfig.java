@@ -13,6 +13,8 @@ public class EnvConfig {
 
     @Value("${gateway.userservice.url}")
     private String userServiceUrl;
+    @Value("${user.loginapi.authToken}")
+    private String userLoginApiAuthToken;
 
     public String getUserServiceUrl() {
         return userServiceUrl;
@@ -20,5 +22,13 @@ public class EnvConfig {
 
     public void setUserServiceUrl(String userServiceUrl) {
         this.userServiceUrl = userServiceUrl;
+    }
+
+    public String getUserLoginApiAuthToken() {
+        return userLoginApiAuthToken;
+    }
+
+    public void setUserLoginApiAuthToken(String userLoginApiAuthToken) {
+        this.userLoginApiAuthToken = userLoginApiAuthToken;
     }
 }

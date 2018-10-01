@@ -76,6 +76,7 @@ public class UserRestClient {
                             url,
                             getHttpMethod(integrationOperation),
                             new HttpEntity<>(t), typeReference,pathParams);
+
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 logger.error("not valid code"+restExchange.getStatusCode());
