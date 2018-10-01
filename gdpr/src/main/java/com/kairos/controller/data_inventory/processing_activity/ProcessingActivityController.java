@@ -158,10 +158,10 @@ public class ProcessingActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.createRiskAndLinkWithProcessingActivities(unitId, processingActivityId, processingActivityRiskDTO));
     }
 
-    @ApiOperation(value = "Get Risk linked processing activity And Sub Processing Activity")
-    @GetMapping("/processing_activity/{processingActivityId}/risk")
-    public ResponseEntity<Object> getRiskRelatedTorProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityWithRiskAndSubProcessingActivities(unitId, processingActivityId));
+    @ApiOperation(value = "Get All Processing Activities with Risks")
+    @GetMapping("/processing_activity/risk")
+    public ResponseEntity<Object> getAllProcessingActivityAndSubProcessingActivitiesWithRisk(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityAndSubProcessingActivitiesWithRisk(unitId));
     }
 
 
