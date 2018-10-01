@@ -579,7 +579,7 @@ public class DateUtils {
 
 
     public static Long getLongFromLocalDate(LocalDate date) {
-        return date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return (date==null)?  null: date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public static LocalDate getDateFromEpoch(Long dateLong) {

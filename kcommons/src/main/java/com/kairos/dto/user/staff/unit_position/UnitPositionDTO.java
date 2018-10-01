@@ -21,6 +21,8 @@ public class UnitPositionDTO {
     @Range(min = 0, message = "expertise is required for position")
     private Long expertiseId;
     private Long id;
+    private Long positionLineId;
+
     private LocalDate startLocalDate;
     private LocalDate endLocalDate;
     private LocalDate lastWorkingLocalDate;
@@ -320,4 +322,11 @@ public class UnitPositionDTO {
         this.endLocalDate = endLocalDate;
     }
 
+    public Long getPositionLineId() {
+        return positionLineId;
+    }
+
+    public void setPositionLineId(Long positionLineId) {
+        this.positionLineId = positionLineId;
+    }
 }

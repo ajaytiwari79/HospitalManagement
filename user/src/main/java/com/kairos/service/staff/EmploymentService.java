@@ -710,8 +710,8 @@ public class EmploymentService {
 
     
     public boolean moveToReadOnlyAccessGroup(List<Long> employmentIds) {
-        Long curDateMillisStart = DateUtil.getStartOfDay(DateUtil.getCurrentDate()).getTime();
-        Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
+        Long curDateMillisStart = DateUtils.getStartOfDay(DateUtil.getCurrentDate()).getTime();
+        Long curDateMillisEnd = DateUtils.getEndOfDay(DateUtil.getCurrentDate()).getTime();
         List<UnitPermission> unitPermissions;
         UnitPermission unitPermission;
         List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(employmentIds);

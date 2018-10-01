@@ -3,7 +3,7 @@ package com.kairos.service.unit_employment_position;
 import com.kairos.UserServiceApplication;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.user.unit_position.UnitPositionSeniorityLevelQueryResult;
+import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionSeniorityLevelQueryResult;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.service.exception.ExceptionService;

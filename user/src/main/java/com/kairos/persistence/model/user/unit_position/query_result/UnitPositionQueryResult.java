@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.unit_position;
+package com.kairos.persistence.model.user.unit_position.query_result;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,7 +12,10 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by vipul on 10/8/17.
@@ -50,7 +53,7 @@ public class UnitPositionQueryResult {
     private Map<String, Object> unitInfo;
     private WTAResponseDTO workingTimeAgreement;
     private BigInteger costTimeAgreementId;
-
+    private List<PositionLinesQueryResult> positionLines;
 
     private Boolean history;
     private Boolean editable;
@@ -316,6 +319,14 @@ public class UnitPositionQueryResult {
 
     public void setHourlyCost(BigDecimal hourlyCost) {
         this.hourlyCost = hourlyCost;
+    }
+
+    public List<PositionLinesQueryResult> getPositionLines() {
+        return Optional.ofNullable(positionLines).orElse(new ArrayList<>());
+    }
+
+    public void setPositionLines(List<PositionLinesQueryResult> positionLines) {
+        this.positionLines = positionLines;
     }
 
     public UnitPositionQueryResult() {
