@@ -26,23 +26,11 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UnitPositionQueryResult {
     private Expertise expertise;
-    @JsonIgnore
-    private boolean deleted;
     private Long startDateMillis;
-    private int workingDaysInWeek;
     private Long endDateMillis;
-    private Long lastModificationDate;
-    private int totalWeeklyHours;
-    private float avgDailyWorkingHours;
-    private int fullTimeWeeklyMinutes;
-    private float hourlyWages;
     private Long id;
-
     private Map<String, Object> employmentType;
     private Map<String, Object> seniorityLevel;
-    private BigInteger workingTimeAgreementId;
-    private Double salary;
-    private int totalWeeklyMinutes;
     private PositionCode positionCode;
     private CTAResponseDTO costTimeAgreement;
     private Organization union;
@@ -52,13 +40,12 @@ public class UnitPositionQueryResult {
     private Long reasonCodeId;
     private Map<String, Object> unitInfo;
     private WTAResponseDTO workingTimeAgreement;
-    private BigInteger costTimeAgreementId;
+
     private List<PositionLinesQueryResult> positionLines;
 
     private Boolean history;
     private Boolean editable;
     private Boolean published;
-    private BigDecimal hourlyCost;
 
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
@@ -76,53 +63,12 @@ public class UnitPositionQueryResult {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 
-
-    public BigInteger getCostTimeAgreementId() {
-        return costTimeAgreementId;
-    }
-
-    public void setCostTimeAgreementId(BigInteger costTimeAgreementId) {
-        this.costTimeAgreementId = costTimeAgreementId;
-    }
-
-    public BigInteger getWorkingTimeAgreementId() {
-        return workingTimeAgreementId;
-    }
-
-    public void setWorkingTimeAgreementId(BigInteger workingTimeAgreementId) {
-        this.workingTimeAgreementId = workingTimeAgreementId;
-    }
-
-    public int getFullTimeWeeklyMinutes() {
-        return fullTimeWeeklyMinutes;
-    }
-
-    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-    }
-
-    public int getWorkingDaysInWeek() {
-        return workingDaysInWeek;
-    }
-
-    public void setWorkingDaysInWeek(int workingDaysInWeek) {
-        this.workingDaysInWeek = workingDaysInWeek;
-    }
-
     public Expertise getExpertise() {
         return expertise;
     }
 
     public void setExpertise(Expertise expertise) {
         this.expertise = expertise;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 
     public Long getStartDateMillis() {
@@ -142,30 +88,6 @@ public class UnitPositionQueryResult {
     }
 
 
-    public float getAvgDailyWorkingHours() {
-        return avgDailyWorkingHours;
-    }
-
-    public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-    }
-
-    public float getHourlyWages() {
-        return hourlyWages;
-    }
-
-    public void setHourlyWages(float hourlyWages) {
-        this.hourlyWages = hourlyWages;
-    }
-
-
-    public Double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Double salary) {
-        this.salary = salary;
-    }
 
     public PositionCode getPositionCode() {
         return positionCode;
@@ -179,52 +101,17 @@ public class UnitPositionQueryResult {
         return id;
     }
 
-    public Long getLastModificationDate() {
-        return lastModificationDate;
-    }
-
-    public void setLastModificationDate(Long lastModificationDate) {
-        this.lastModificationDate = lastModificationDate;
-    }
 
     public void setId(long id) {
         this.id = id;
     }
 
-    /*public WorkingTimeAgreement getWorkingTimeAgreement() {
-        return workingTimeAgreement;
-    }
-
-    public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
-        this.workingTimeAgreement = workingTimeAgreement;
-    }
-*/
     public CTAResponseDTO getCostTimeAgreement() {
         return costTimeAgreement;
     }
 
     public void setCostTimeAgreement(CTAResponseDTO costTimeAgreement) {
         this.costTimeAgreement = costTimeAgreement;
-    }
-
-    public int getTotalWeeklyMinutes() {
-        return this.totalWeeklyMinutes;
-
-    }
-
-    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
-
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-
-    }
-
-    public int getTotalWeeklyHours() {
-        this.totalWeeklyHours = this.totalWeeklyMinutes / 60;
-        return totalWeeklyHours;
-    }
-
-    public void setTotalWeeklyHours(int totalWeeklyHours) {
-        this.totalWeeklyHours = totalWeeklyHours;
     }
 
     public Organization getUnion() {
@@ -313,13 +200,6 @@ public class UnitPositionQueryResult {
     }
 
 
-    public BigDecimal getHourlyCost() {
-        return hourlyCost;
-    }
-
-    public void setHourlyCost(BigDecimal hourlyCost) {
-        this.hourlyCost = hourlyCost;
-    }
 
     public List<PositionLinesQueryResult> getPositionLines() {
         return Optional.ofNullable(positionLines).orElse(new ArrayList<>());
@@ -336,14 +216,9 @@ public class UnitPositionQueryResult {
     public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CTAResponseDTO cta, WTAResponseDTO wta) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
-        this.workingDaysInWeek = workingDaysInWeek;
         this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.hourlyWages = hourlyWages;
         this.lastWorkingDateMillis = lastWorkingDateMillis;
         this.id = id;
-        this.salary = salary;
         this.positionCode = positionCode;
         this.union = union;
         this.costTimeAgreement = cta;

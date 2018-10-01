@@ -4,6 +4,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -33,5 +34,5 @@ public interface CustomCostTimeAgreementRepository {
 
     public List<CTAResponseDTO> getCTAByUnitPositionIds(List<Long> unitPositionIds, Date date);
     CostTimeAgreement getCTABasicByUnitPositionAndDate(Long unitPositionId,Date date);
-
+    void disableOldCta(BigInteger oldctaId, LocalDate endDate);
     }

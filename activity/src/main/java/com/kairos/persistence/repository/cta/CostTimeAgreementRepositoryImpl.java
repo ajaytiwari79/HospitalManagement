@@ -1,26 +1,25 @@
 package com.kairos.persistence.repository.cta;
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
-import com.kairos.persistence.model.wta.WTAQueryResultDTO;
-import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
  * @author pradeep
@@ -156,4 +155,10 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         return result;
     }
 
+    @Override
+    public void disableOldCta(BigInteger oldctaId, LocalDate endDate){
+        Update update=Update.update("endDate",DateUtils.asDate(endDate)).set("disabled",true);
+        mongoTemplate.findAndModify(new Query(Criteria.where("id").is(oldctaId)),update,CostTimeAgreement.class);
+
+    }
 }

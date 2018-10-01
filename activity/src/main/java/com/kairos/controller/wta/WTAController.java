@@ -9,6 +9,7 @@ import com.kairos.service.wta.WTAService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -188,6 +190,13 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> getDefaultWtaInfoForUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getDefaultWtaInfoForUnit(unitId));
     }
+
+    @ApiOperation(value = "get Wta By Ids")
+    @GetMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/unitposition-cta-wta")
+    public ResponseEntity<Map<String, Object>> getWTAByIds(@RequestParam List<Long> upIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByUpIds(upIds));
+    }
+
     @ApiOperation(value = "assing wta and cta to unitPosition")
     @PostMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/unitPosition/{unitPositionId}/wta/{wtaId}/cta/{ctaId}")
     public ResponseEntity<Map<String, Object>> assignWTAToUnitPosition(@PathVariable Long unitPositionId,@PathVariable BigInteger wtaId,@PathVariable BigInteger ctaId) {
@@ -239,6 +248,16 @@ public class WTAController {
     }
 
 
+    @ApiOperation(value = "assing wta and cta to unitPosition")
+    @PostMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/unitPosition/{unitPositionId}/apply_cta_wta")
+    public ResponseEntity<Map<String, Object>> assignCTAWTAToUnitPosition(@PathVariable Long unitPositionId,
+                                                                          @RequestParam(value = "wtaId",required = false)  BigInteger wtaId,
+                                                                          @RequestParam(value = "oldwtaId",required = false)  BigInteger oldwtaId,
+                                                                          @RequestParam(value = "ctaId",required = false)   BigInteger ctaId,
+                                                                          @RequestParam(value = "oldctaId",required = false)   BigInteger oldctaId,
+                                                                            @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToUnitPosition(unitPositionId,wtaId,oldwtaId,ctaId,oldctaId,startDate));
+    }
 
    /* @ApiOperation(value = "check scheduler load balncing")
     @GetMapping(value = UNIT_URL + "/check_load_balancing_scheduler")
