@@ -289,7 +289,7 @@ public class CounterDistService extends MongoBaseService {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
         List<BigInteger> kpiIds = tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
         List<TabKPIConf> tabKPIConfs = counterRepository.findTabKPIConfigurationByTabIds(Arrays.asList(tabId), kpiIds, accessGroupPermissionCounterDTO.getStaffId(), level);
-        if (Optional.ofNullable(tabKPIConfs).isPresent()) {
+        if (!Optional.ofNullable(tabKPIConfs).isPresent()) {
             exceptionService.invalidRequestException("error.kpi.invalidData");
         }
         Map<BigInteger, TabKPIMappingDTO> tabKPIMappingDTOMap = new HashMap<>();
