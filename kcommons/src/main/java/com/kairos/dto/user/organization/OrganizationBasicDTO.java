@@ -68,7 +68,7 @@ public class OrganizationBasicDTO {
     }
 
     public void setDesiredUrl(String desiredUrl) {
-        this.desiredUrl = desiredUrl;
+        this.desiredUrl = desiredUrl!=null?desiredUrl.trim():null;
     }
 
     public Long getCompanyCategoryId() {
