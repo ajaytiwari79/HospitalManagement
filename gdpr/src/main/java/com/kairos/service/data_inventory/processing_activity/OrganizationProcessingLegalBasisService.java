@@ -91,7 +91,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
      * @return list of ProcessingLegalBasis
      */
     public List<ProcessingLegalBasisResponseDTO> getAllProcessingLegalBasis(Long organizationId) {
-        return legalBasisMongoRepository.findAllOrganizationProcessingLegalBases(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return legalBasisMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -102,7 +102,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
      */
     public ProcessingLegalBasis getProcessingLegalBasis(Long organizationId, BigInteger id) {
 
-        ProcessingLegalBasis exist = legalBasisMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        ProcessingLegalBasis exist = legalBasisMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -129,7 +129,7 @@ public class OrganizationProcessingLegalBasisService extends MongoBaseService {
      */
     public ProcessingLegalBasisDTO updateProcessingLegalBasis(Long organizationId, BigInteger id, ProcessingLegalBasisDTO legalBasisDTO) {
 
-        ProcessingLegalBasis processingLegalBasis = legalBasisMongoRepository.findByNameAndOrganizationId(organizationId, legalBasisDTO.getName());
+        ProcessingLegalBasis processingLegalBasis = legalBasisMongoRepository.findByNameAndUnitId(organizationId, legalBasisDTO.getName());
         if (Optional.ofNullable(processingLegalBasis).isPresent()) {
             if (id.equals(processingLegalBasis.getId())) {
                 return legalBasisDTO;
