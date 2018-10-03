@@ -10,8 +10,9 @@ import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
-import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
-import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
+
+import com.kairos.dto.activity.planned_time_type.PresenceTypeDTO;
+import com.kairos.dto.activity.planned_time_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelPlanningDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.config.env.EnvConfig;

@@ -1,6 +1,10 @@
-/*
 package com.kairos.service.solver_config;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.planner.solverconfig.ConstraintDTO;
+import com.kairos.dto.planner.solverconfig.DefaultContraintsDTO;
+import com.kairos.dto.planner.solverconfig.SolverConfigConstraintWrapper;
+import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.enums.solver_config.ConstraintCategory;
 import com.kairos.enums.solver_config.PlanningType;
 import com.kairos.enums.solver_config.SolverConfigStatus;
@@ -8,39 +12,35 @@ import com.kairos.persistence.model.solver_config.Constraint;
 import com.kairos.persistence.model.solver_config.ConstraintValue;
 import com.kairos.persistence.model.solver_config.SolverConfig;
 import com.kairos.persistence.repository.solver_config.ConstraintRepository;
-import com.kairos.persistence.repository.solver_config.SolverConfigRepository;
-import com.kairos.dto.planner.solverconfig.ConstraintDTO;
-import com.kairos.dto.planner.solverconfig.DefaultContraintsDTO;
-import com.kairos.dto.planner.solverconfig.SolverConfigConstraintWrapper;
-import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-*/
 /**
  * @author pradeep
- * @date - 20/6/18
- *//*
+ * @date - 20/6/18*/
+
 
 @Service
 public class SolverConfigService extends MongoBaseService {
 
-    @Inject
-    private SolverConfigRepository solverConfigRepository;
+    //@Inject
+   // private SolverConfigRepository solverConfigRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
     private ConstraintRepository constraintRepository;
 
     public SolverConfigDTO createSolverConfig(Long unitId, SolverConfigDTO solverConfigDTO) {
-        Boolean exists = solverConfigRepository.existsSolverConfigByNameAndUnitId(unitId, solverConfigDTO.getName());
+        Boolean exists =null;// solverConfigRepository.existsSolverConfigByNameAndUnitId(unitId, solverConfigDTO.getName());
         if (exists) {
             exceptionService.duplicateDataException("message.solverConfig.exists", solverConfigDTO.getName());
         }
@@ -48,7 +48,7 @@ public class SolverConfigService extends MongoBaseService {
         solverConfig.setUnitId(unitId);
         solverConfig.setStatus(SolverConfigStatus.READY);
         save(solverConfig);
-        solverConfigDTO.setStatus(SolverConfigStatus.READY);
+        //solverConfigDTO.setStatus(SolverConfigStatus.READY);
         solverConfigDTO.setId(solverConfig.getId());
         return solverConfigDTO;
     }
@@ -57,30 +57,29 @@ public class SolverConfigService extends MongoBaseService {
         //solverConfigDTO.setName("Copy of "+solverConfigDTO.getName());
         SolverConfig solverConfig = ObjectMapperUtils.copyPropertiesByMapper(solverConfigDTO, SolverConfig.class);
         solverConfig.setUnitId(unitId);
-        solverConfig.setPlannerNumber(solverConfigDTO.getPlannerNumber());
-        solverConfig.setTerminationTime(solverConfigDTO.getTerminationTime());
-        solverConfig.setNumberOfThread(solverConfigDTO.getNumberOfThread());
+        //solverConfig.setPlannerNumber(solverConfigDTO.getPlannerNumber());
+        //solverConfig.setTerminationTime(solverConfigDTO.getTerminationTime());
+        //solverConfig.setNumberOfThread(solverConfigDTO.getNumberOfThread());
         solverConfig.setStatus(SolverConfigStatus.IN_PROGRESS);
         solverConfig.setLastSubmittedDate(new Date());
         save(solverConfig);
-        solverConfigDTO.setStatus(SolverConfigStatus.IN_PROGRESS);
+        //solverConfigDTO.setStatus(SolverConfigStatus.IN_PROGRESS);
         solverConfigDTO.setId(solverConfig.getId());
         return solverConfigDTO;
     }
 
 
     public SolverConfigDTO updateSolverConfig(Long unitId,BigInteger solverConfigId, SolverConfigDTO solverConfigDTO) {
-        */
-/*Boolean exists = solverConfigRepository.existsSolverConfigByNameAndUnitIdAndSolverConfigId(unitId,solverConfigDTO.getName(),solverConfigDTO.getId());
+Boolean exists =null;// solverConfigRepository.existsSolverConfigByNameAndUnitIdAndSolverConfigId(unitId,solverConfigDTO.getName(),solverConfigDTO.getId());
         if(exists){
             exceptionService.duplicateDataException("message.solverConfig.exists",solverConfigDTO.getName());
-        }*//*
-
-        if (solverConfigDTO.isDefault()) {
-            exceptionService.invalidRequestException("message.solverConfig.default.update");
         }
-        SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
-        List<ConstraintValue> constraintValues = ObjectMapperUtils.copyPropertiesOfListByMapper(solverConfigDTO.getConstraints(), ConstraintValue.class);
+
+       /* if (solverConfigDTO.isDefault()) {
+            exceptionService.invalidRequestException("message.solverConfig.default.update");
+        }*/
+        SolverConfig solverConfig =null;// solverConfigRepository.findOne(solverConfigId);
+        List<ConstraintValue> constraintValues = null;//ObjectMapperUtils.copyPropertiesOfListByMapper(solverConfigDTO.getConstraints(), ConstraintValue.class);
         solverConfig.setConstraints(constraintValues);
         save(solverConfig);
         return solverConfigDTO;
@@ -88,7 +87,7 @@ public class SolverConfigService extends MongoBaseService {
 
 
     public boolean deleteSolverConfig(Long unitId,BigInteger solverConfigId) {
-        SolverConfig solverConfig = solverConfigRepository.findOne(solverConfigId);
+        SolverConfig solverConfig =null;// solverConfigRepository.findOne(solverConfigId);
         if (solverConfig.isDefault()) {
             exceptionService.invalidRequestException("message.solverConfig.default.update");
         }
@@ -101,18 +100,18 @@ public class SolverConfigService extends MongoBaseService {
     public SolverConfigConstraintWrapper getAllVRPSolverConfig(Long unitId) {
         List<ConstraintDTO> constraints = constraintRepository.getAllVRPPlanningConstraints(unitId, PlanningType.VRPPLANNING);
         Map<BigInteger,ConstraintDTO> constraintDTOMap = constraints.stream().collect(Collectors.toMap(k->k.getId(),v->v));
-        List<SolverConfigDTO> solverConfigs = solverConfigRepository.getAllByUnitId(unitId);
+        List<SolverConfigDTO> solverConfigs =null;// solverConfigRepository.getAllByUnitId(unitId);
         solverConfigs.forEach(s->{
-            s.getConstraints().forEach(c->{
+            /*s.getConstraints().forEach(c->{
                 ConstraintDTO constraintDTO = constraintDTOMap.get(c.getId());
                 c.setCategory(constraintDTO.getCategory());
                 c.setName(constraintDTO.getName());
                 c.setDescription(constraintDTO.getDescription());
-            });
+            });*/
         });
 
-        List<SolverConfigDTO> solverConfigDTOS = solverConfigs.stream().filter(solverConfigDTO -> solverConfigDTO.getLastSubmittedDate()!=null).sorted((s1,s2)-> s1.getLastSubmittedDate().compareTo(s2.getLastSubmittedDate())).collect(Collectors.toList());
-        solverConfigDTOS.addAll(solverConfigs.stream().filter(solverConfigDTO -> solverConfigDTO.getLastSubmittedDate()==null).collect(Collectors.toList()));
+        List<SolverConfigDTO> solverConfigDTOS =null;// solverConfigs.stream().filter(solverConfigDTO -> solverConfigDTO.getLastSubmittedDate()!=null).sorted((s1,s2)-> s1.getLastSubmittedDate().compareTo(s2.getLastSubmittedDate())).collect(Collectors.toList());
+        solverConfigDTOS.addAll(null);//solverConfigs.stream().filter(solverConfigDTO -> solverConfigDTO.getLastSubmittedDate()==null).collect(Collectors.toList()));
         List<DefaultContraintsDTO> defaultContraints = constraints.stream().collect(Collectors.groupingBy(ConstraintDTO::getCategory,Collectors.toList())).entrySet().stream().map(c->new DefaultContraintsDTO(c.getKey().toValue(),c.getValue())).collect(Collectors.toList());
         defaultContraints.forEach(d->{
             d.getConstraints().sort((c1,c2)->c1.isDisabled().compareTo(c2.isDisabled()));
@@ -172,4 +171,3 @@ public class SolverConfigService extends MongoBaseService {
 
 
 }
-*/
