@@ -6,21 +6,38 @@ import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.data.RepresentationDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.TimeTypes;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepositoryImpl;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.service.activity.TimeTypeService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class RestingHoursCalculationService implements CounterService{
     @Inject
     TimeTypeService timeTypeService;
-
+    @Inject
+    private ShiftMongoRepository shiftMongoRepository;
     @Inject
     ActivityMongoRepositoryImpl activityMongoRepository;
+    @Inject private CounterDataService counterDataService;
+
+    public Map<Long,Long> calculateRestingHours(List<Long> staffIds, Date startDate, Date endDate){
+        Map<Long,Long> staffRestingHours=new HashMap<>();
+        staffIds.stream().forEach(staffId -> {
+            List<Shift> shifts= shiftMongoRepository.findAllShiftsByStaffIdsAndDate(Arrays.asList(staffId),startDate,endDate);
+            Long restingHours =counterDataService.getTotalRestingHours(shifts,startDate.getTime(),endDate.getTime(),0,false);
+            staffRestingHours.put(staffId,restingHours);
+
+        });
+        return staffRestingHours;
+    }
+
 
     private List<BigInteger> getFilterredActivities(List<FilterCriteria> filters){
         ActivityFilterCriteria activityCriteria = ActivityFilterCriteria.getInstance();

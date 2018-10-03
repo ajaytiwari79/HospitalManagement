@@ -5,6 +5,7 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
@@ -328,29 +329,36 @@ public class CounterDataService {
         Map<Long, Integer> shiftDayCollisionMap = new HashMap<>();
         long baseInitTs = initTs;
         long durationMillis = endTs - initTs;
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(initTs,endTs);
+        long totalrestingMinutes = dateTimeInterval.getMilliSeconds();
         for (Shift shift : shifts) {
-            if (initTs >= shift.getStartDate().getTime() && initTs >= shift.getEndDate().getTime()) {
+            DateTimeInterval shiftInterval= new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
+            if(dateTimeInterval.overlaps(shiftInterval)){
+                totalrestingMinutes-=dateTimeInterval.overlap(shiftInterval).getMilliSeconds();
+            }
+
+            /*if (initTs >= shift.getStartDate().getTime() && initTs >= shift.getEndDate().getTime()) {
                 durationMillis -= 0;
-                setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
+                //setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
             } else if (initTs >= shift.getStartDate().getTime() && initTs < shift.getEndDate().getTime()) {
                 durationMillis -= (shift.getEndDate().getTime() - initTs);
                 initTs = shift.getEndDate().getTime();
-                setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
+                //setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
             } else if (initTs < shift.getStartDate().getTime() && endTs > shift.getEndDate().getTime()) {
                 durationMillis -= (shift.getEndDate().getTime() - shift.getStartDate().getTime());
                 initTs = shift.getEndDate().getTime();
-                setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
-                setShiftDayCollisionMap(shift.getStartDate().getTime(), baseInitTs, shiftDayCollisionMap);
+                //setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
+                //setShiftDayCollisionMap(shift.getStartDate().getTime(), baseInitTs, shiftDayCollisionMap);
             } else if (initTs < shift.getStartDate().getTime() && endTs < shift.getEndDate().getTime()) {
                 durationMillis -= (endTs - shift.getStartDate().getTime());
                 initTs = endTs;
-                setShiftDayCollisionMap(shift.getStartDate().getTime(), baseInitTs, shiftDayCollisionMap);
-            }
+                //setShiftDayCollisionMap(shift.getStartDate().getTime(), baseInitTs, shiftDayCollisionMap);
+            }*/
         }
-        if (dayOffAllowed) {
-            durationMillis -= (shiftDayCollisionMap.entrySet().size() * (24 * 3600 * 1000));
-        }
-        return durationMillis;
+//        if (dayOffAllowed) {
+//            durationMillis -= (shiftDayCollisionMap.entrySet().size() * (24 * 3600 * 1000));
+//        }
+        return totalrestingMinutes;
     }
 
     //public List<ShiftDTO> getShifts
