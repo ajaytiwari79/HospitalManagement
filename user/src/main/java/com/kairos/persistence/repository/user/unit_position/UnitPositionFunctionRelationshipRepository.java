@@ -29,18 +29,11 @@ public interface UnitPositionFunctionRelationshipRepository  extends Neo4jBaseRe
             "ON MATCH set rel.appliedDates = rel.appliedDates+{2} ")
     void createUnitPositionFunctionRelationship(Long unitPositionId, Long functionId, List<String> localDate);
 
-    /*@Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND id(function)={1}\n" +
-            "set rel.date= rel.date + {2}")
-    void addDateToUnitPositionFunctionRelationship(Long unitPositionId, Long functionId, Long localDate);*/
 
     @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND {1} in rel.appliedDates with rel,function,\n" +
             "FILTER (x IN rel.appliedDates WHERE x <> {1}) as filteredDates\n" +
             "SET rel.appliedDates = filteredDates return id(function)")
     Long removeDateFromUnitPositionFunctionRelationship(Long unitPositionId, String localDate);
-
-    @Query("MATCH (unitPosition:UnitPosition)-[rel:APPLIED_FUNCTION ]->(function:Function) where id(unitPosition) = {0} AND any(x IN rel.appliedDates WHERE x IN {1}) return rel")
-    Map<LocalDate,Long> removeDatesFromUnitPositionFunctionRelationship(Long unitPositionId, List<String> localDate);
-
 
     @Query("MATCH (unitPosition:UnitPosition{deleted:false}) ,(function:Function{deleted:false})  where id(unitPosition) = {0} AND id(function) IN {1} " +
             "MATCH(unitPosition)-[rel:APPLIED_FUNCTION]->(function) return id(rel) as id, function as function,unitPosition as unitPosition,rel.appliedDates as appliedDates ")
