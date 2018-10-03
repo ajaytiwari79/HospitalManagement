@@ -78,6 +78,7 @@ import com.kairos.wrapper.shift.ShiftWithActivityDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.omg.CORBA.NameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -197,6 +198,7 @@ public class ShiftService extends MongoBaseService {
 
     @Inject
     private ShiftBreakActivityService shiftBreakActivityService;
+
 
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type, boolean byTandAPhase) {
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
@@ -555,8 +557,8 @@ public class ShiftService extends MongoBaseService {
             for (AppliedFunctionDTO appliedFunctionDTO : appliedFunctionDTOs) {
                 if (appliedFunctionDTO.getAppliedDates() != null && !appliedFunctionDTO.getAppliedDates().isEmpty()) {
                     FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
-                    for (Long date : appliedFunctionDTO.getAppliedDates()) {
-                        functionDTOMap.put(Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate(), functionDTO);
+                    for (LocalDate date : appliedFunctionDTO.getAppliedDates()) {
+                        functionDTOMap.put(date, functionDTO);
                     }
                 }
             }
@@ -572,7 +574,11 @@ public class ShiftService extends MongoBaseService {
         }
         shiftValidatorService.validateStatusOfShiftOnDelete(shift);
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
+
+
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId());
+
+
 
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate());
         validateStaffingLevel(phase, shift, activityWrapper.getActivity(), false, staffAdditionalInfoDTO);
@@ -583,12 +589,20 @@ public class ShiftService extends MongoBaseService {
             exceptionService.actionNotPermittedException(messages.get(0));
         }
         shift.setDeleted(true);
+
         List<BigInteger> activityIds = shift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
+        Long functionId=null;
+        if(CollectionUtils.isNotEmpty(staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions()) && !activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
+                && !activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)){
+            functionId= genericIntegrationService.removeFunctionFromUnitPositionByDate(shift.getUnitId(),shift.getUnitPositionId(),shift.getStartDate());
+
+        }
+        shift.setFunctionId(functionId);
         saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
         payOutService.savePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
 

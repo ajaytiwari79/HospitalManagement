@@ -1,7 +1,7 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
 import com.kairos.dto.scheduler.IntegrationSettingsDTO;
-import com.kairos.dto.scheduler.KairosSchedulerExecutorDTO;
+import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.scheduler.kafka.producer.KafkaProducer;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
