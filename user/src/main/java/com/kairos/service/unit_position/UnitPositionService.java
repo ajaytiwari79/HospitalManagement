@@ -1269,10 +1269,10 @@ public class UnitPositionService {
         List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationshipQueryResults=unitPositionFunctionRelationshipRepository.findAllByFunctionIdAndUnitPositionId(unitPositionId,payload.keySet());
         List<UnitPositionFunctionRelationship> unitPositionFunctionRelationships=new ArrayList<>();
 
-        for(UnitPositionFunctionRelationshipQueryResult unitPositionFunctionRelationshipQueryResult:unitPositionFunctionRelationshipQueryResults){
-            if(payload.get(unitPositionFunctionRelationshipQueryResult.getFunction().getId())!=null){
-                unitPositionFunctionRelationshipQueryResult.getAppliedDates().addAll(payload.get(unitPositionFunctionRelationshipQueryResult.getFunction().getId()));
-                unitPositionFunctionRelationships.add(new UnitPositionFunctionRelationship(unitPositionFunctionRelationshipQueryResult.getId(),unitPositionFunctionRelationshipQueryResult.getUnitPosition(),unitPositionFunctionRelationshipQueryResult.getFunction(),unitPositionFunctionRelationshipQueryResult.getAppliedDates()));
+        for(UnitPositionFunctionRelationshipQueryResult current:unitPositionFunctionRelationshipQueryResults){
+            if(payload.get(current.getFunction().getId())!=null){
+                current.getAppliedDates().addAll(payload.get(current.getFunction().getId()));
+                unitPositionFunctionRelationships.add(new UnitPositionFunctionRelationship(current.getId(),current.getUnitPosition(),current.getFunction(),current.getAppliedDates()));
                 }
         }
         unitPositionFunctionRelationshipRepository.saveAll(unitPositionFunctionRelationships);
