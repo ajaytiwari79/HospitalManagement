@@ -62,6 +62,7 @@ public class Shift extends MongoBaseEntity {
     private LocalDate validatedByPlannerDate;
     private Long createdBy = UserContext.getUserDetails().getId();
     private AttendanceDuration attendanceDuration;
+    private Long functionId;
 
     public Shift() {
         //Default Constructor
@@ -104,6 +105,22 @@ public class Shift extends MongoBaseEntity {
         this.phaseId=phaseId;
         this.planningPeriodId=planningPeriodId;
 
+    }
+
+    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.remarks = remarks;
+        this.activities = activities;
+        this.staffId = staffId;
+        this.unitId = unitId;
+        this.externalId = externalId;
+        this.unitPositionId = unitPositionId;
+        this.parentOpenShiftId = parentOpenShiftId;
+        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+        this.copiedFromShiftId = copiedFromShiftId;
+        this.scheduledMinutes = scheduledMinutes;
+        this.durationMinutes = durationMinutes;
     }
 
 
@@ -269,26 +286,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-
-    @Override
-    public String toString() {
-        return "Shift{" +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", disabled=" + disabled +
-                ", bid=" + bid +
-                ", pId=" + pId +
-                ", bonusTimeBank=" + bonusTimeBank +
-                ", amount=" + amount +
-                ", probability=" + probability +
-                ", accumulatedTimeBankInMinutes=" + accumulatedTimeBankInMinutes +
-                ", remarks='" + remarks + '\'' +
-                ", staffId=" + staffId +
-                ", weekCount=" + weekCount +
-                ", unitId=" + unitId +
-                '}';
-    }
-
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
@@ -311,41 +308,6 @@ public class Shift extends MongoBaseEntity {
     }
 
 
-
-    public ShiftQueryResult getShiftQueryResult() {
-        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id,
-                this.startDate,
-                this.endDate,
-                this.bid,
-                this.pId,
-                this.bonusTimeBank,
-                this.amount,
-                this.probability,
-                this.accumulatedTimeBankInMinutes,
-                this.remarks,
-                this.activities, this.staffId, this.unitId, this.unitPositionId);
-        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
-        return shiftQueryResult;
-    }
-
-    public ShiftDTO getShiftDTO() {
-        ShiftDTO shiftDTO = new ShiftDTO(this.id,
-                this.startDate,
-                this.endDate,
-                this.bid,
-                this.pId,
-                this.bonusTimeBank,
-                this.amount,
-                this.probability,
-                this.accumulatedTimeBankInMinutes,
-                this.remarks,
-                this.activities, this.staffId, this.unitId, this.unitPositionId);
-        shiftDTO.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
-        return shiftDTO;
-    }
-
-
-
     public String getExternalId() {
         return externalId;
     }
@@ -354,7 +316,6 @@ public class Shift extends MongoBaseEntity {
         this.externalId = externalId;
 
     }
-
 
     public Long getUnitPositionId() {
         return unitPositionId;
@@ -415,24 +376,67 @@ public class Shift extends MongoBaseEntity {
         this.planningPeriodId = planningPeriodId;
     }
 
-    public Shift( Date startDate, Date endDate, String remarks, List<ShiftActivity> activities, Long staffId,Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long unitPositionId,  BigInteger parentOpenShiftId, Long allowedBreakDurationInMinute, BigInteger copiedFromShiftId) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.remarks = remarks;
-        this.activities = activities;
-        this.staffId = staffId;
-        this.unitId = unitId;
-        this.externalId = externalId;
-        this.unitPositionId = unitPositionId;
-        this.parentOpenShiftId = parentOpenShiftId;
-        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
-        this.copiedFromShiftId = copiedFromShiftId;
-        this.scheduledMinutes = scheduledMinutes;
-        this.durationMinutes = durationMinutes;
+    public Long getFunctionId() {
+        return functionId;
+    }
+
+    public void setFunctionId(Long functionId) {
+        this.functionId = functionId;
     }
 
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.startDate.getTime(), this.endDate.getTime());
+    }
+
+    public ShiftQueryResult getShiftQueryResult() {
+        ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id,
+                this.startDate,
+                this.endDate,
+                this.bid,
+                this.pId,
+                this.bonusTimeBank,
+                this.amount,
+                this.probability,
+                this.accumulatedTimeBankInMinutes,
+                this.remarks,
+                this.activities, this.staffId, this.unitId, this.unitPositionId);
+        shiftQueryResult.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
+        return shiftQueryResult;
+    }
+
+    public ShiftDTO getShiftDTO() {
+        ShiftDTO shiftDTO = new ShiftDTO(this.id,
+                this.startDate,
+                this.endDate,
+                this.bid,
+                this.pId,
+                this.bonusTimeBank,
+                this.amount,
+                this.probability,
+                this.accumulatedTimeBankInMinutes,
+                this.remarks,
+                this.activities, this.staffId, this.unitId, this.unitPositionId);
+        shiftDTO.setAllowedBreakDurationInMinute(this.allowedBreakDurationInMinute);
+        return shiftDTO;
+    }
+
+    @Override
+    public String toString() {
+        return "Shift{" +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", disabled=" + disabled +
+                ", bid=" + bid +
+                ", pId=" + pId +
+                ", bonusTimeBank=" + bonusTimeBank +
+                ", amount=" + amount +
+                ", probability=" + probability +
+                ", accumulatedTimeBankInMinutes=" + accumulatedTimeBankInMinutes +
+                ", remarks='" + remarks + '\'' +
+                ", staffId=" + staffId +
+                ", weekCount=" + weekCount +
+                ", unitId=" + unitId +
+                '}';
     }
 
 }

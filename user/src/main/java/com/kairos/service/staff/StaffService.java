@@ -413,8 +413,8 @@ public class StaffService {
     public Map<String, Object> retrievePersonalInfo(Staff staff) {
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
-        map.put("firstName", staff.getFirstName());
-        map.put("lastName", staff.getLastName());
+        map.put("firstName", user.getFirstName());
+        map.put("lastName", user.getLastName());
         map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic());
         map.put("familyName", staff.getFamilyName());
         map.put("currentStatus", staff.getCurrentStatus());

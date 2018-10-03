@@ -498,11 +498,10 @@ public class ProcessingActivityService extends MongoBaseService {
 
     /**
      * @param unitId
-     * @param processingActivityId
      * @return
      */
-    public ProcessingActivityRiskResponseDTO getProcessingActivityWithRiskAndSubProcessingActivities(Long unitId, BigInteger processingActivityId) {
-        return processingActivityMongoRepository.getProcessingActivityWithRisksAndSubProcessingActivities(unitId, processingActivityId);
+    public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessingActivitiesWithRisk(Long unitId) {
+        return processingActivityMongoRepository.getAllProcessingActivityAndSubProcessWithRisks(unitId);
     }
 
 

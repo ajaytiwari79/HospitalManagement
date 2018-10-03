@@ -1,8 +1,7 @@
 package com.kairos.scheduler.service;
 
-import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.unit_settings.UnitTimeZoneMapping;
-import com.kairos.scheduler.persistence.repository.UnitTimeZoneMappingRepository;
+import com.kairos.scheduler.persistence.repository.scheduler_panel.UnitTimeZoneMappingRepository;
 import com.kairos.scheduler.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
