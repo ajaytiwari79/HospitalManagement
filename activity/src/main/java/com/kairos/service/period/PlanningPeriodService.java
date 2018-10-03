@@ -370,7 +370,7 @@ public class PlanningPeriodService extends MongoBaseService {
         for (PeriodPhaseFlippingDate phaseFlippingDate : phaseFlippingDateList) {
             switch (phasesMap.get(phaseFlippingDate.getPhaseId())) {
                 case 4: {
-                    if (!isPastDate(LocalDateTime.of(phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime()))) {
+                    if (phaseFlippingDate.getFlippingDate()!=null && phaseFlippingDate.getFlippingTime()!=null && !isPastDate(LocalDateTime.of(phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime()))) {
                         phaseFlippingDate.setFlippingDate(planningPeriodDTO.getConstructionToDraftDate().getDate());
                         phaseFlippingDate.setFlippingTime(LocalTime.of(planningPeriodDTO.getConstructionToDraftDate().getHours(), planningPeriodDTO.getConstructionToDraftDate().getMinutes()));
                         updateSchedularFlippingDateById(phaseFlippingDate.getSchedulerPanelId(), unitId, phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime());
@@ -378,7 +378,7 @@ public class PlanningPeriodService extends MongoBaseService {
                     break;
                 }
                 case 3: {
-                    if (!isPastDate(LocalDateTime.of(phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime()))) {
+                    if (phaseFlippingDate.getFlippingDate()!=null && phaseFlippingDate.getFlippingTime()!=null && !isPastDate(LocalDateTime.of(phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime()))) {
                         phaseFlippingDate.setFlippingDate(planningPeriodDTO.getPuzzleToConstructionDate().getDate());
                         phaseFlippingDate.setFlippingTime(LocalTime.of(planningPeriodDTO.getPuzzleToConstructionDate().getHours(), planningPeriodDTO.getPuzzleToConstructionDate().getMinutes()));
                         updateSchedularFlippingDateById(phaseFlippingDate.getSchedulerPanelId(), unitId, phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime());
@@ -386,7 +386,7 @@ public class PlanningPeriodService extends MongoBaseService {
                     break;
                 }
                 case 2: {
-                    if (!isPastDate(LocalDateTime.of(phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime()))) {
+                    if (phaseFlippingDate.getFlippingDate()!=null && phaseFlippingDate.getFlippingTime()!=null && !isPastDate(LocalDateTime.of(phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime()))) {
                         phaseFlippingDate.setFlippingDate(planningPeriodDTO.getRequestToPuzzleDate().getDate());
                         phaseFlippingDate.setFlippingTime(LocalTime.of(planningPeriodDTO.getRequestToPuzzleDate().getHours(), planningPeriodDTO.getRequestToPuzzleDate().getMinutes()));
                         updateSchedularFlippingDateById(phaseFlippingDate.getSchedulerPanelId(), unitId, phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime());
