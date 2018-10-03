@@ -330,7 +330,7 @@ public class ShiftService extends MongoBaseService {
             shift.getSortedActvities();
         }
         shiftMongoRepository.saveObject(shift);
-        updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
+        //updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
     }
 
     public void saveShiftWithActivity(Phase phase, List<Shift> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -360,7 +360,7 @@ public class ShiftService extends MongoBaseService {
             shift.setDurationMinutes(durationMinutes);
             shift.setStartDate(shift.getActivities().get(0).getStartDate());
             shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
-            updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
+            //updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
         }
         shiftMongoRepository.saveObjects(shifts);
     }
@@ -557,8 +557,8 @@ public class ShiftService extends MongoBaseService {
             for (AppliedFunctionDTO appliedFunctionDTO : appliedFunctionDTOs) {
                 if (appliedFunctionDTO.getAppliedDates() != null && !appliedFunctionDTO.getAppliedDates().isEmpty()) {
                     FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
-                    for (Long date : appliedFunctionDTO.getAppliedDates()) {
-                        functionDTOMap.put(Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate(), functionDTO);
+                    for (LocalDate date : appliedFunctionDTO.getAppliedDates()) {
+                        functionDTOMap.put(date, functionDTO);
                     }
                 }
             }

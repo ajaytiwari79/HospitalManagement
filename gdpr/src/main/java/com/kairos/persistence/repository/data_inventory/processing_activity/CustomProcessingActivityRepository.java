@@ -27,6 +27,6 @@ public interface CustomProcessingActivityRepository {
 
     List<AssetBasicResponseDTO> getAllAssetLinkedWithProcessingActivityById(Long unitId,BigInteger processingActivityId);
 
-    ProcessingActivityRiskResponseDTO getProcessingActivityWithRisksAndSubProcessingActivities(Long unitId,BigInteger processingActivityId);
+    List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessWithRisks(Long unitId);
 
 }

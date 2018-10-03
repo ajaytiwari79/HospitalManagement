@@ -5,7 +5,6 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.data_inventory.AssetTypeOrganizationLevelDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
-import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
@@ -20,7 +19,6 @@ import com.kairos.service.risk_management.RiskService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -253,24 +251,22 @@ public class OrganizationAssetTypeService extends MongoBaseService {
 
     public boolean deleteAssetSubTypeById(Long unitId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
 
-        List<AssetBasicResponseDTO> assetsLinkedWithAssetSubType = assetMongoRepository.findAllAssetLinkedWithAssetSubType(unitId, subAssetTypeId);
-        if (!assetsLinkedWithAssetSubType.isEmpty()) {
-            StringBuilder assetNames = new StringBuilder();
-            assetsLinkedWithAssetSubType.forEach(asset -> assetNames.append(asset.getName() + ","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", assetNames);
-        }
         AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetType);
-        } else {
-            assetType.getSubAssetTypes().remove(subAssetTypeId);
-            assetTypeMongoRepository.save(assetType);
-            AssetType subAssetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, subAssetTypeId);
-            if (!Optional.ofNullable(subAssetType).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub AssetType", subAssetType);
-            }
-            delete(subAssetType);
         }
+        List<AssetBasicResponseDTO> assetsLinkedWithAssetSubType = assetMongoRepository.findAllAssetLinkedWithAssetSubType(unitId, subAssetTypeId);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithAssetSubType)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Sub Asset Type", new StringBuffer());
+        }
+        assetType.getSubAssetTypes().remove(subAssetTypeId);
+        AssetType subAssetType = assetTypeMongoRepository.findSubAssetTypeByIdAndUnitId(unitId, subAssetTypeId);
+        if (!Optional.ofNullable(subAssetType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub AssetType", subAssetType);
+        }
+        delete(subAssetType);
+        assetTypeMongoRepository.save(assetType);
+
         return true;
 
     }

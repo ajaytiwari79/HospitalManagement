@@ -31,7 +31,7 @@ public interface QuestionnaireTemplateMongoRepository extends MongoBaseRepositor
     @Query("{deleted:false,organizationId:?0,assetType:?1,assetSubType:{$in:?2}}")
     QuestionnaireTemplate findQuestionnaireTemplateByAssetTypeAndSubAssetType(Long unitId, BigInteger assetTypeId, List<BigInteger> subAssetTypeIds);
 
-    @Query("{deleted:false,organizationId:?0,assetType:?1}")
+    @Query("{deleted:false,organizationId:?0,assetType:?1,assetSubType:{$exists:false}}")
     QuestionnaireTemplate findQuestionnaireTemplateByAssetTypeAndUnitId(Long unitId, BigInteger assetTypeId);
 
 

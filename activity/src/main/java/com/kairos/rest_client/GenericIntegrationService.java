@@ -129,8 +129,13 @@ public class GenericIntegrationService {
         return functionId;
     }
 
-    public Long restoreFunctionFromUnitPositionByDate(Long unitId,Long unitPositionId,Map<LocalDate,Long> dateAndFunctionIdMap){
-        Long functionId= genericRestClient.publishRequest(dateAndFunctionIdMap,unitId, true, IntegrationOperation.CREATE, "/unit_position/{unitPositionId}/applyFunction", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {},unitPositionId);
+    public Boolean restoreFunctionFromUnitPositionByDate(Long unitId,Long unitPositionId,Map<Long,Set<LocalDate>> dateAndFunctionIdMap){
+        return genericRestClient.publishRequest(dateAndFunctionIdMap,unitId, true, IntegrationOperation.CREATE, "/unit_position/{unitPositionId}/restore_functions",null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},unitPositionId);
+
+    }
+
+    public Map<LocalDate,Long> removeFunctionFromUnitPositionByDates(Long unitId,Long unitPositionId,List<LocalDate> dates){
+        Map<LocalDate,Long> functionId= genericRestClient.publishRequest(dates,unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/remove_functions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,Long>>>() {},unitPositionId);
         return functionId;
     }
 
