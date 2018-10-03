@@ -19,6 +19,7 @@ import static java.time.temporal.TemporalAdjusters.previousOrSame;
 /**
  * Created by oodles on 1/2/17.
  */
+@Deprecated
 public class DateUtil {
     public static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";

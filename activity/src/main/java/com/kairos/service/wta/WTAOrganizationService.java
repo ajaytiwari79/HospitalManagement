@@ -105,8 +105,8 @@ public class WTAOrganizationService extends MongoBaseService {
         newWta.setCountryParentWTA(null);
         //ruleTemplateCategoryMongoRepository.detachPreviousRuleTemplates(oldWta.getId());
         save(newWta);
-        if (Optional.ofNullable(oldWta.getParentWTA()).isPresent()) {
-            WorkingTimeAgreement workingTimeAgreement = workingTimeAgreementMongoRepository.findOne(oldWta.getParentWTA());
+        if (Optional.ofNullable(oldWta.getParentId()).isPresent()) {
+            WorkingTimeAgreement workingTimeAgreement = workingTimeAgreementMongoRepository.findOne(oldWta.getParentId());
             workingTimeAgreement.setDeleted(true);
             save(workingTimeAgreement);
         }
@@ -118,7 +118,7 @@ public class WTAOrganizationService extends MongoBaseService {
             oldWta.setEndDate(new Date(updateDTO.getEndDateMillis()));
         }
         oldWta.setExpertise(oldWta.getExpertise());
-        oldWta.setParentWTA(newWta.getId());
+        oldWta.setParentId(newWta.getId());
         oldWta.setDisabled(false);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
@@ -134,7 +134,7 @@ public class WTAOrganizationService extends MongoBaseService {
         save(oldWta);
         //Preparing Response for frontend
         //workingTimeAgreementMongoRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDate());
-        oldWta.setParentWTA(newWta.getParentWTA());
+        oldWta.setParentId(newWta.getParentId());
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta, WTAResponseDTO.class);
         wtaResponseDTO.setStartDateMillis(oldWta.getStartDate().getTime());
         if (oldWta.getEndDate() != null) {

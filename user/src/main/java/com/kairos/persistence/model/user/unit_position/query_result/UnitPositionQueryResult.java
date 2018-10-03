@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.user.unit_position.query_result;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -10,8 +8,7 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,27 +19,22 @@ import java.util.Optional;
  */
 
 @QueryResult
-@JsonInclude(JsonInclude.Include.NON_NULL)
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UnitPositionQueryResult {
     private Expertise expertise;
-    private Long startDateMillis;
-    private Long endDateMillis;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Long id;
-    private Map<String, Object> employmentType;
-    private Map<String, Object> seniorityLevel;
     private PositionCode positionCode;
-    private CTAResponseDTO costTimeAgreement;
     private Organization union;
-    private Long lastWorkingDateMillis;
+    private LocalDate lastWorkingDate;
     private Long parentUnitId;
     private Long unitId;
-    private Long reasonCodeId;
-    private Map<String, Object> unitInfo;
-    private WTAResponseDTO workingTimeAgreement;
 
+    private Map<String, Object> reasonCode;
+    private Map<String, Object> unitInfo;
     private List<PositionLinesQueryResult> positionLines;
-    private Long positionLineId;
     private Boolean history;
     private Boolean editable;
     private Boolean published;
@@ -55,14 +47,6 @@ public class UnitPositionQueryResult {
         this.unitInfo = unitInfo;
     }
 
-    public WTAResponseDTO getWorkingTimeAgreement() {
-        return workingTimeAgreement;
-    }
-
-    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
-        this.workingTimeAgreement = workingTimeAgreement;
-    }
-
     public Expertise getExpertise() {
         return expertise;
     }
@@ -71,23 +55,21 @@ public class UnitPositionQueryResult {
         this.expertise = expertise;
     }
 
-    public Long getStartDateMillis() {
-        return startDateMillis;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    public Long getEndDateMillis() {
-        return endDateMillis;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
-
-
 
     public PositionCode getPositionCode() {
         return positionCode;
@@ -106,14 +88,6 @@ public class UnitPositionQueryResult {
         this.id = id;
     }
 
-    public CTAResponseDTO getCostTimeAgreement() {
-        return costTimeAgreement;
-    }
-
-    public void setCostTimeAgreement(CTAResponseDTO costTimeAgreement) {
-        this.costTimeAgreement = costTimeAgreement;
-    }
-
     public Organization getUnion() {
         return union;
     }
@@ -122,12 +96,12 @@ public class UnitPositionQueryResult {
         this.union = union;
     }
 
-    public Long getLastWorkingDateMillis() {
-        return lastWorkingDateMillis;
+    public LocalDate getLastWorkingDate() {
+        return lastWorkingDate;
     }
 
-    public void setLastWorkingDateMillis(Long lastWorkingDateMillis) {
-        this.lastWorkingDateMillis = lastWorkingDateMillis;
+    public void setLastWorkingDate(LocalDate lastWorkingDate) {
+        this.lastWorkingDate = lastWorkingDate;
     }
 
     public Long getParentUnitId() {
@@ -144,31 +118,6 @@ public class UnitPositionQueryResult {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
-    }
-
-    public Long getReasonCodeId() {
-        return reasonCodeId;
-    }
-
-    public void setReasonCodeId(Long reasonCodeId) {
-        this.reasonCodeId = reasonCodeId;
-    }
-
-
-    public Map<String, Object> getEmploymentType() {
-        return employmentType;
-    }
-
-    public void setEmploymentType(Map<String, Object> employmentType) {
-        this.employmentType = employmentType;
-    }
-
-    public Map<String, Object> getSeniorityLevel() {
-        return seniorityLevel;
-    }
-
-    public void setSeniorityLevel(Map<String, Object> seniorityLevel) {
-        this.seniorityLevel = seniorityLevel;
     }
 
     public Boolean getHistory() {
@@ -209,28 +158,26 @@ public class UnitPositionQueryResult {
         this.positionLines = positionLines;
     }
 
-    public Long getPositionLineId() {
-        return positionLineId;
+    public Map<String, Object> getReasonCode() {
+        return reasonCode;
     }
 
-    public void setPositionLineId(Long positionLineId) {
-        this.positionLineId = positionLineId;
+    public void setReasonCode(Map<String, Object> reasonCode) {
+        this.reasonCode = reasonCode;
     }
 
     public UnitPositionQueryResult() {
         //default cons
     }
 
-    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, Long endDateMillis,  long id,  PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CTAResponseDTO cta, WTAResponseDTO wta) {
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate, CTAResponseDTO cta, WTAResponseDTO wta) {
         this.expertise = expertise;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.lastWorkingDateMillis = lastWorkingDateMillis;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.lastWorkingDate = lastWorkingDate;
         this.id = id;
         this.positionCode = positionCode;
         this.union = union;
-        this.costTimeAgreement = cta;
-        this.workingTimeAgreement = wta;
     }
 
 }

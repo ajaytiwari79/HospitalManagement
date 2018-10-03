@@ -179,11 +179,11 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     @Override
     public List<WTAQueryResultDTO> getAllWTAByUpIds(List<Long> upIds, Date date) {
         //.orOperator(Criteria.where("startDate").gte(date).and("endDate").lte(date),Criteria.where("endDate").exists(false).and("startDate").gte(date)
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(upIds).and("disabled").is(false);
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(upIds);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 //lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
-                project("name", "description", "unitPositionId")
+                project("name", "description", "unitPositionId","startDate","endDate")
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
