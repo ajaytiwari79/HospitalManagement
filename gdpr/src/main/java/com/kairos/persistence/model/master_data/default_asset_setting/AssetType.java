@@ -33,6 +33,8 @@ public class AssetType extends MongoBaseEntity {
         this.suggestedDataStatus=suggestedDataStatus;
     }
 
+
+
     public AssetType(String name) {
         this.name = name;
     }

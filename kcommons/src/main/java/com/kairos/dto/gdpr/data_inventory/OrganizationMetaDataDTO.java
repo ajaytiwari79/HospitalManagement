@@ -6,15 +6,21 @@ import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
 
+import javax.validation.constraints.NotNull;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationMetaDataDTO {
 
+    @NotNull
     private OrganizationType organizationType;
 
+    @NotNull
     private OrganizationSubType organizationSubType;
 
+    @NotNull
     private ServiceCategory organizationService;
 
+    @NotNull
     private SubServiceCategory organizationSubService;
 
     public OrganizationType getOrganizationType() {

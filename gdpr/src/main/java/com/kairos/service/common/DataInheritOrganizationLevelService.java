@@ -1,11 +1,17 @@
 package com.kairos.service.common;
 
 
+import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.persistence.model.data_inventory.asset.Asset;
+import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
+import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
+import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.hosting_provider.HostingProviderMongoRepository;
@@ -21,17 +27,25 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
+import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.common.*;
+import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
+import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
+import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
+import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
 import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.master_data.data_category_element.DataSubjectMappingService;
+import com.kairos.service.risk_management.RiskService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 @Service
 public class DataInheritOrganizationLevelService extends MongoBaseService {
@@ -75,9 +89,27 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
     private DataSubjectMappingService dataSubjectMappingService;
     @Inject
     private DataCategoryMongoRepository dataCategoryMongoRepository;
+    @Inject
+    private RiskMongoRepository riskMongoRepository;
+    @Inject
+    private AssetTypeMongoRepository assetTypeMongoRepository;
 
 
-    public Boolean inheritMasterAssetAndProcessingActivityMetaData(Long countryId, Long unitId) throws Exception {
+    private Map<String, BigInteger> globalAssetTypeAndSubAssetTypeMap = new HashMap<>();
+
+
+    public Boolean copyDataFromCountryToUnitIdOnOnBoarding(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
+
+
+        //  inheritMetaDataOfAssetAndProcessingActivityMetaDataAndProcessingActivity(countryId, unitId, organizationMetaDataDTO);
+        List<MasterAssetResponseDTO> masterAssetDTOS = masterAssetMongoRepository.getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO);
+        copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssetDTOS);
+        return true;
+
+    }
+
+
+    public void inheritMetaDataOfAssetAndProcessingActivityMetaDataAndProcessingActivity(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
 
         List<Callable<Boolean>> callables = new ArrayList<>();
         Callable<Boolean> dataDispoaslTask = () -> {
@@ -146,6 +178,16 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             saveTransferMethods(unitId, transferMethodDTOS);
             return true;
         };
+        Callable<Boolean> processingActivityTask = () -> {
+            List<MasterProcessingActivityResponseDTO> masterProcessingActivityDTOS = masterProcessingActivityRepository.getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO);
+            copyProcessingActivityAndSubProcessingActivitiesFromCountryToUnit(unitId, masterProcessingActivityDTOS);
+            return true;
+        };
+        Callable<Boolean> assetTypeInheritTask = () -> {
+            List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
+            saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
+            return true;
+        };
 
         callables.add(hostingProviderTask);
         callables.add(dataDispoaslTask);
@@ -159,35 +201,132 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
         callables.add(processingPurposeTask);
         callables.add(responsibilityTypeTask);
         callables.add(transferMethodTask);
+        callables.add(processingActivityTask);
+        callables.add(assetTypeInheritTask);
         asynchronousService.executeAsynchronously(callables);
-
-        return true;
-
     }
 
 
-    private void copyDataSubjectDataCategoryAndDataElementsFromCountryToUnit(Long countryId, Long unitId) {
-
-        List<DataSubjectMappingResponseDTO> dataSubjectDTOS = dataSubjectMappingService.getAllDataSubjectWithDataCategory(countryId);
-        List<DataCategoryResponseDTO> dataCategoryDTOS = new ArrayList<>();
-
-        dataSubjectDTOS.forEach(dataSubjectDTO -> {
-
-            DataSubjectMapping dataSubject = new DataSubjectMapping(dataSubjectDTO.getName());
-            dataSubject.setOrganizationId(unitId);
-
-            if (CollectionUtils.isNotEmpty(dataSubjectDTO.getDataCategories())) {
-
-
+    private void copyMasterAssetAndAssetTypeFromCountryToUnit(Long unitId, List<MasterAssetResponseDTO> masterAssetDTOS) {
+        if (CollectionUtils.isNotEmpty(masterAssetDTOS)) {
+            List<Asset> assets = new ArrayList<>();
+            for (MasterAssetResponseDTO masterAssetDTO : masterAssetDTOS) {
+                Asset asset = new Asset(masterAssetDTO.getName(), masterAssetDTO.getDescription(), false);
+                asset.setOrganizationId(unitId);
+                if (Optional.ofNullable(masterAssetDTO.getAssetType()).isPresent()) {
+                    AssetTypeBasicResponseDTO assetTypeBasicDTO = masterAssetDTO.getAssetType();
+                    asset.setAssetType(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
+                    if (CollectionUtils.isNotEmpty(masterAssetDTO.assetSubTypes)) {
+                        List<BigInteger> subAssetTypeIds = new ArrayList<>();
+                        masterAssetDTO.assetSubTypes.forEach(subAssetType -> subAssetTypeIds.add(globalAssetTypeAndSubAssetTypeMap.get(subAssetType.getName().toLowerCase().trim())));
+                    }
+                }
+                assets.add(asset);
             }
-        });
+            assetMongoRepository.saveAll(getNextSequence(assets));
+        }
 
 
     }
 
+    private void copyProcessingActivityAndSubProcessingActivitiesFromCountryToUnit(Long unitId, List<MasterProcessingActivityResponseDTO> masterProcessingActivityDTOS) {
 
-    private void saveDataCategoryAndDataElement(Long countryId, Long unitId) {
+        if (CollectionUtils.isNotEmpty(masterProcessingActivityDTOS)) {
+            List<ProcessingActivity> processingActivities = new ArrayList<>();
+            Map<ProcessingActivity, List<ProcessingActivity>> processingActivitySubProcessingActivityListMap = new HashMap<>();
+            for (MasterProcessingActivityResponseDTO masterProcessingActivityDTO : masterProcessingActivityDTOS) {
+                ProcessingActivity processingActivity = new ProcessingActivity(masterProcessingActivityDTO.getName(), masterProcessingActivityDTO.getDescription(), false);
+                processingActivity.setOrganizationId(unitId);
+                List<ProcessingActivity> subProcessingActivities = new ArrayList<>();
+                if (CollectionUtils.isNotEmpty(masterProcessingActivityDTO.getSubProcessingActivities())) {
+                    for (MasterProcessingActivityResponseDTO subProcessingActivityDTO : masterProcessingActivityDTO.getSubProcessingActivities()) {
+                        ProcessingActivity subProcessingActivity = new ProcessingActivity(subProcessingActivityDTO.getName(), subProcessingActivityDTO.getDescription(), false);
+                        subProcessingActivity.setOrganizationId(unitId);
+                        subProcessingActivities.add(subProcessingActivity);
+                    }
+                    processingActivities.addAll(subProcessingActivities);
+                    processingActivitySubProcessingActivityListMap.put(processingActivity, subProcessingActivities);
+                }
+            }
 
+            processingActivities.clear();
+            if (processingActivities.isEmpty()) {
+                processingActivityMongoRepository.saveAll(getNextSequence(processingActivities));
+            }
+            processingActivities = new ArrayList<>(processingActivitySubProcessingActivityListMap.keySet());
+            processingActivitySubProcessingActivityListMap.forEach((processingActivity, subProcessingActivities) -> {
+                if (CollectionUtils.isNotEmpty(subProcessingActivities)) {
+                    processingActivity.setSubProcessingActivities(subProcessingActivities.stream().map(ProcessingActivity::getId).collect(Collectors.toList()));
+                }
+            });
+            processingActivityMongoRepository.saveAll(getNextSequence(processingActivities));
+        }
+    }
+
+
+    private void saveAssetTypeAndAssetSubType(Long unitId, List<AssetTypeRiskResponseDTO> assetTypeDTOS) {
+
+        if (CollectionUtils.isNotEmpty(assetTypeDTOS)) {
+
+
+            List<Risk> risks = new ArrayList<>();
+            Map<AssetType, List<Risk>> assetTypeRiskMap = new HashMap<>();
+            Map<AssetType, List<AssetType>> assetTypeAndSubAssetTypeMap = new HashMap<>();
+            for (AssetTypeRiskResponseDTO assetTypeDTO : assetTypeDTOS) {
+                AssetType assetType = new AssetType(assetTypeDTO.getName());
+                assetType.setOrganizationId(unitId);
+                assetTypeRiskMap.put(assetType, buildRisks(unitId, assetTypeDTO.getRisks()));
+                if (CollectionUtils.isNotEmpty(assetTypeDTO.getSubAssetTypes())) {
+
+                    List<AssetType> subAssetTypes = new ArrayList<>();
+                    for (AssetTypeRiskResponseDTO subAssetTypeDTO : assetTypeDTO.getSubAssetTypes()) {
+                        AssetType subAssetType = new AssetType(subAssetTypeDTO.getName());
+                        subAssetType.setOrganizationId(unitId);
+                        assetTypeRiskMap.put(subAssetType, buildRisks(unitId, subAssetTypeDTO.getRisks()));
+                        subAssetTypes.add(subAssetType);
+                    }
+                    assetTypeAndSubAssetTypeMap.put(assetType, subAssetTypes);
+                }
+            }
+            assetTypeRiskMap.forEach((assetType, riskList) -> risks.addAll(riskList));
+            if (CollectionUtils.isNotEmpty(risks)) {
+                riskMongoRepository.saveAll(getNextSequence(risks));
+            }
+            List<AssetType> assetSubTypes = new ArrayList<>();
+            assetTypeAndSubAssetTypeMap.forEach((assetType, subAssetTypes) -> {
+                assetType.setRisks(assetTypeRiskMap.get(assetType).stream().map(Risk::getId).collect(Collectors.toList()));
+                if (CollectionUtils.isNotEmpty(subAssetTypes)) {
+                    assetSubTypes.addAll(subAssetTypes);
+                    subAssetTypes.stream().forEach(subAssetType -> subAssetType.setRisks(assetTypeRiskMap.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toList())));
+                }
+            });
+            if (CollectionUtils.isNotEmpty(assetSubTypes)) {
+                assetTypeMongoRepository.saveAll(getNextSequence(assetSubTypes));
+                assetSubTypes.forEach(subAssetType -> globalAssetTypeAndSubAssetTypeMap.put(subAssetType.getName().toLowerCase(), subAssetType.getId()));
+            }
+            List<AssetType> assetTypes = new ArrayList<>(assetTypeAndSubAssetTypeMap.keySet());
+            assetTypes.forEach(assetType -> {
+                globalAssetTypeAndSubAssetTypeMap.put(assetType.getName().toLowerCase(), assetType.getId());
+                if (CollectionUtils.isNotEmpty(assetTypeAndSubAssetTypeMap.get(assetType))) {
+                    assetType.setSubAssetTypes(assetTypeAndSubAssetTypeMap.get(assetType).stream().map(AssetType::getId).collect(Collectors.toList()));
+                }
+            });
+            assetTypeMongoRepository.saveAll(getNextSequence(assetTypes));
+        }
+    }
+
+
+    private List<Risk> buildRisks(Long unitId, List<RiskResponseDTO> riskDTOS) {
+
+        List<Risk> risks = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(riskDTOS)) {
+            riskDTOS.forEach(riskDTO -> {
+                Risk risk = new Risk(riskDTO.getName(), riskDTO.getDescription(), riskDTO.getRiskRecommendation(), riskDTO.getRiskLevel());
+                risk.setOrganizationId(unitId);
+                risks.add(risk);
+            });
+        }
+        return risks;
 
     }
 

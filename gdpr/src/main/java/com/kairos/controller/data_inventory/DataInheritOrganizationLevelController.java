@@ -33,7 +33,7 @@ public class DataInheritOrganizationLevelController {
     @ApiOperation(value = "inherit Data from Parent organization on the basis of Org Type, sub Type,Category and Sub Category")
     @PostMapping(UNIT_URL + "/inherit")
     public ResponseEntity<Object> inheritMasterDataFromCountry(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataInheritOrganizationLevelService.inheritMasterAssetAndProcessingActivityMetaData(countryId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataInheritOrganizationLevelService.copyDataFromCountryToUnitIdOnOnBoarding(countryId, unitId,organizationMetaDataDTO));
 
     }
 
