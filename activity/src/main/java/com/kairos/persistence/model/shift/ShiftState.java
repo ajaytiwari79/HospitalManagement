@@ -9,6 +9,7 @@ public class ShiftState extends Shift {
 
     private BigInteger shiftId;
     private BigInteger shiftStatePhaseId;
+
     public BigInteger getShiftId() {
         return shiftId;
     }
@@ -24,4 +25,6 @@ public class ShiftState extends Shift {
     public void setShiftStatePhaseId(BigInteger shiftStatePhaseId) {
         this.shiftStatePhaseId = shiftStatePhaseId;
     }
+
+
 }

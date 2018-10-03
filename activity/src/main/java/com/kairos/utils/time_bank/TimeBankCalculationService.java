@@ -189,7 +189,6 @@ public class TimeBankCalculationService {
      * @param shifts
      * @return DailyTimeBankEntry
      */
-    //TODO complete review by Sachin and need Test cases
     public DailyTimeBankEntry calculateDailyTimebank(Interval interval, StaffUnitPositionDetails ctaDto, List<ShiftWithActivityDTO> shifts) {
         DailyTimeBankEntry dailyTimeBank = new DailyTimeBankEntry(ctaDto.getId(), ctaDto.getStaffId(), ctaDto.getWorkingDaysInWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
         int totalDailyTimebank = 0;
@@ -198,7 +197,7 @@ public class TimeBankCalculationService {
         Map<BigInteger, Integer> ctaTimeBankMinMap = new HashMap<>();
         for (ShiftWithActivityDTO shift : shifts) {
             for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
-                Interval shiftInterval = new Interval(new DateTime(shiftActivity.getStartDate().getTime()), new DateTime(shiftActivity.getEndDate().getTime()));
+                Interval shiftInterval = new Interval(shiftActivity.getStartDate().getTime(),shiftActivity.getEndDate().getTime());
                 if (interval.overlaps(shiftInterval)) {
                     shiftInterval = interval.overlap(shiftInterval);
                     for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {

@@ -109,7 +109,7 @@ public class ShiftValidatorService {
 
     public DateTimeInterval getGracePeriodInterval(Long unitId, Date date, boolean forStaff) {
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
-        ZonedDateTime startDate = DateUtils.asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime startDate = DateUtils.asZoneDateTime(date).plusDays(1).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = startDate;
         if (forStaff) {
             startDate = startDate.minusDays(timeAttendanceGracePeriod.getStaffGracePeriodDays());

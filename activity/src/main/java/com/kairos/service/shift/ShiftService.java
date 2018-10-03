@@ -306,7 +306,11 @@ public class ShiftService extends MongoBaseService {
         int scheduledMinutes = 0;
         int durationMinutes = 0;
         Map<BigInteger, ShiftTimeDetails> shiftTimeDetailsMap = new HashMap<>();
-
+        List<ShiftActivity> breakActvities = shiftBreakActivityService.addBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition());
+        if (!breakActvities.isEmpty()) {
+            shift.getActivities().addAll(breakActvities);
+            shift.getSortedActvities();
+        }
         for (ShiftActivity shiftActivity : shift.getSortedActvities()) {
             shiftTimeDetailsMap.put(shiftActivity.getActivityId(), prepareShiftTimeDetails(shiftActivity, shiftTimeDetailsMap));
             if (shiftActivity.getId() == null) {
@@ -332,11 +336,6 @@ public class ShiftService extends MongoBaseService {
         shift.setScheduledMinutes(scheduledMinutes);
         shift.setDurationMinutes(durationMinutes);
         shift.setPhaseId(phase.getId());
-        List<ShiftActivity> breakActvities = shiftBreakActivityService.addBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition());
-        if (!breakActvities.isEmpty()) {
-            shift.getActivities().addAll(breakActvities);
-            shift.getSortedActvities();
-        }
         shiftMongoRepository.saveObject(shift);
         updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
     }
@@ -489,7 +488,7 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public ShiftWithViolatedInfoDTO updateShift(Long unitId, ShiftDTO shiftDTO, String type) {
+    public ShiftWithViolatedInfoDTO updateShift( ShiftDTO shiftDTO, String type) {
 
         Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
         if (!Optional.ofNullable(shift).isPresent()) {
@@ -1106,7 +1105,7 @@ public class ShiftService extends MongoBaseService {
         });
         List<ShiftState> shiftStates = shiftStateMongoRepository.getAllByStaffBetweenDate(staffId, shiftStartDate, endDate);
         List<ShiftDTO> shiftStateDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftStates, ShiftDTO.class);
-        Map<BigInteger, ShiftDTO> shiftDTOMap = plannedShifts.stream().collect(Collectors.toMap(ShiftDTO::getShiftId, v -> v));
+        Map<BigInteger, ShiftDTO> shiftDTOMap = shiftStateDTOs.stream().filter(s->s.getShiftId()!=null).collect(Collectors.toMap(ShiftDTO::getShiftId, v -> v));
         DateTimeInterval graceInterval = shiftValidatorService.getGracePeriodInterval(unitId, DateUtils.getDate(), true);
         List<ShiftDTO> updateRealTime = new ArrayList<>();
         realTimeShift.forEach(s -> {
@@ -1129,12 +1128,20 @@ public class ShiftService extends MongoBaseService {
     }
 
 
-    public ShiftWithViolatedInfoDTO updateShift(Long unitId, ShiftDTO shiftDTO, Boolean
-            validatedByStaff, String type) {
-        if (validatedByStaff != null) {
-            shiftValidatorService.validateGracePeriod(shiftDTO, validatedByStaff, unitId);
+    public ShiftWithViolatedInfoDTO updateShift(Long unitId, ShiftDTO shiftDTO,
+             String type) {
+        DateTimeInterval graceInterval = shiftValidatorService.getGracePeriodInterval(unitId, DateUtils.getDate(), true);
+        if (!graceInterval.contains(shiftDTO.getStartDate())) {
+            exceptionService.invalidRequestException("message.shift.cannot.update");
         }
-        return createShift(unitId, shiftDTO, type, true);
+        shiftStateMongoRepository.deleteShiftStateByShiftId(shiftDTO.getShiftId());
+        if(shiftDTO.getShiftId()==null){
+            shiftDTO.setShiftId(shiftDTO.getId());
+        }
+        shiftDTO.setId(null);
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = createShift(unitId, shiftDTO, type, true);
+        shiftWithViolatedInfoDTO.getShifts().get(0).setEditable(true);
+        return shiftWithViolatedInfoDTO;
     }
 
     public ShiftDTO validateShift(BigInteger shiftId, Boolean validatedByStaff, Long unitId) {
@@ -1147,6 +1154,7 @@ public class ShiftService extends MongoBaseService {
             shiftState.setValidatedByPlannerDate(LocalDate.now());
         }
         shiftState.setId(null);
+        shiftState.setShiftId(null);
         save(shiftState);
         return ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
     }

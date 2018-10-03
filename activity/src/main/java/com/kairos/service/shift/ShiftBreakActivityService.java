@@ -38,7 +38,7 @@ public class ShiftBreakActivityService {
 
 
     public List<ShiftActivity> addBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffUnitPositionDetails unitPositionDetails) {
-        Long shiftDurationInMinute = new DateTimeInterval(shift.getEndDate(), shift.getStartDate()).getMinutes();
+        Long shiftDurationInMinute = new DateTimeInterval(shift.getStartDate(), shift.getEndDate()).getMinutes();
         List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(shift.getUnitId(), shiftDurationInMinute);
         List<ShiftActivity> breakActivities = new ArrayList<>();
         if (!breakSettings.isEmpty()) {
@@ -80,7 +80,7 @@ public class ShiftBreakActivityService {
 
     private Object[] createBreakActivity(BreakSettings breakSettings, Long shiftDurationInMinute, Map<BigInteger, Activity> breakActivitiesMap, Boolean paid, ZonedDateTime shiftStart, ZonedDateTime shiftEnd, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap){
         ShiftActivity shiftActivity = null;
-        if (breakSettings.getShiftDurationInMinute() > shiftDurationInMinute) {
+        if (breakSettings.getShiftDurationInMinute() < shiftDurationInMinute) {
             Activity breakActivity = breakActivitiesMap.get(paid ? breakSettings.getPaidActivityId() : breakSettings.getUnpaidActivityId());
             ZonedDateTime breakStart = shiftStart.plusMinutes(breakSettings.getShiftDurationInMinute());
             ZonedDateTime breakEnd = breakStart.plusMinutes(breakSettings.getShiftDurationInMinute());
@@ -98,7 +98,7 @@ public class ShiftBreakActivityService {
 
     private void updateShiftActivityAndScheduledAndDurationMinutes(Shift shift, ZonedDateTime breakDateTime, boolean paid, Map<BigInteger, ActivityWrapper> activityWrapperMap,boolean updateStart){
         ShiftActivity overLappedActivityOfShift = getOverLappedActivityOfShift(shift, breakDateTime);
-        if (activityWrapperMap.get(overLappedActivityOfShift.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
+        if (overLappedActivityOfShift!=null && activityWrapperMap.get(overLappedActivityOfShift.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
             if(!paid){
                 long minutes = ChronoUnit.MINUTES.between(DateUtils.asZoneDateTime(overLappedActivityOfShift.getStartDate()),breakDateTime);
                 overLappedActivityOfShift.setDurationMinutes(overLappedActivityOfShift.getDurationMinutes()- (int)minutes);
