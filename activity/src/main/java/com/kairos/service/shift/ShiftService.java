@@ -533,35 +533,40 @@ public class ShiftService extends MongoBaseService {
         return shiftWithViolatedInfoDTO;
     }
 
-    public ShiftFunctionWrapper getShiftByStaffId(Long id, Long staffId, Date startDate, Date endDate, Long week, Long unitPositionId, String type) {
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, type, unitPositionId);
-        if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent() || staffAdditionalInfoDTO.getUnitId() == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.belongs", staffId, type);
+    public ShiftFunctionWrapper getShiftByStaffId(Long unitId, Long staffId, Date startDate, Date endDate, Long week, Long unitPositionId, String type) {
+
+        Map<LocalDate, FunctionDTO> functionDTOMap = new HashMap();
+        if(Optional.ofNullable(unitPositionId).isPresent()){
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, type, unitPositionId);
+            if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent() || staffAdditionalInfoDTO.getUnitId() == null) {
+                exceptionService.dataNotFoundByIdException("message.staff.belongs", staffId, type);
+            }
+            List<AppliedFunctionDTO> appliedFunctionDTOs = null;
+            if (Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
+                appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
+            }
+
+            if (appliedFunctionDTOs != null && !appliedFunctionDTOs.isEmpty()) {
+                for (AppliedFunctionDTO appliedFunctionDTO : appliedFunctionDTOs) {
+                    if (appliedFunctionDTO.getAppliedDates() != null && !appliedFunctionDTO.getAppliedDates().isEmpty()) {
+                        FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
+                        for (LocalDate date : appliedFunctionDTO.getAppliedDates()) {
+                            functionDTOMap.put(date, functionDTO);
+                        }
+                    }
+                }
+            }
         }
+        //When UnitPositionID is not present then we are retreiving shifts for all staffs(NOT only for UnitPosition).
         if (startDate == null) {
             startDate = DateUtils.getDate();
             if (endDate == null) {
                 endDate = DateUtils.getDate();
             }
         }
-        List<ShiftDTO> shifts = (Optional.ofNullable(unitPositionId).isPresent()) ? shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDate, endDate, staffAdditionalInfoDTO.getUnitId()) :
-                shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, startDate, endDate, staffAdditionalInfoDTO.getUnitId());
-        List<AppliedFunctionDTO> appliedFunctionDTOs = null;
-        if (Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
-            appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
-        }
+        List<ShiftDTO> shifts = (Optional.ofNullable(unitPositionId).isPresent()) ? shiftMongoRepository.findAllShiftsBetweenDuration(unitPositionId, staffId, startDate, endDate, unitId) :
+                shiftMongoRepository.findAllShiftsBetweenDurationOfUnitAndStaffId(staffId, startDate, endDate, unitId);
 
-        Map<LocalDate, FunctionDTO> functionDTOMap = new HashMap();
-        if (appliedFunctionDTOs != null && !appliedFunctionDTOs.isEmpty()) {
-            for (AppliedFunctionDTO appliedFunctionDTO : appliedFunctionDTOs) {
-                if (appliedFunctionDTO.getAppliedDates() != null && !appliedFunctionDTO.getAppliedDates().isEmpty()) {
-                    FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
-                    for (LocalDate date : appliedFunctionDTO.getAppliedDates()) {
-                        functionDTOMap.put(date, functionDTO);
-                    }
-                }
-            }
-        }
         Map<LocalDate, List<ShiftDTO>> shiftsMap = shifts.stream().collect(Collectors.groupingBy(k -> DateUtils.asLocalDate(k.getStartDate()), Collectors.toList()));
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
     }
