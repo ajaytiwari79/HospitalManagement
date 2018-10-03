@@ -18,11 +18,7 @@ public class AsynchronousService {
     @Qualifier("executorService")
     private ExecutorService executorService;
 
-    public <T> List<Future<Object>> executeAsynchronously(Collection<? extends Callable<Object>> tasks) throws InterruptedException {
-        return executorService.invokeAll(tasks);
-    }
-
-    public <T> List<Future<T>> executeAsynchronously(List<Callable<T>> tasks) throws InterruptedException {
+    public <T> List<Future<T>> executeAsynchronously(Collection<? extends Callable<T>> tasks) throws InterruptedException {
         return executorService.invokeAll(tasks);
     }
 
@@ -35,8 +31,7 @@ public class AsynchronousService {
         return executorService.submit(task);
     }
 
-    public void executeInBackGround(Runnable task) {
-        executorService.execute(task);
-    }
+
+
 
 }

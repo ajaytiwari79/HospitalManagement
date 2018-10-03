@@ -1,7 +1,7 @@
 package com.kairos.service.common;
 
 
-import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
+import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
@@ -13,6 +13,7 @@ import com.kairos.persistence.repository.master_data.asset_management.hosting_ty
 import com.kairos.persistence.repository.master_data.asset_management.org_security_measure.OrganizationalSecurityMeasureMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
+import com.kairos.persistence.repository.master_data.data_category_element.DataCategoryMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
@@ -21,17 +22,16 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
 import com.kairos.response.dto.common.*;
+import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import com.kairos.service.AsynchronousService;
+import com.kairos.service.master_data.data_category_element.DataSubjectMappingService;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 @Service
 public class DataInheritOrganizationLevelService extends MongoBaseService {
@@ -71,40 +71,143 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
     private ResponsibilityTypeMongoRepository responsibilityTypeMongoRepository;
     @Inject
     private TransferMethodMongoRepository transferMethodMongoRepository;
+    @Inject
+    private DataSubjectMappingService dataSubjectMappingService;
+    @Inject
+    private DataCategoryMongoRepository dataCategoryMongoRepository;
 
 
-    public Boolean inheritDataFromParentOrganization(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaData) throws Exception {
+    public Boolean inheritMasterAssetAndProcessingActivityMetaData(Long countryId, Long unitId) throws Exception {
 
-        List<CompletableFuture> abc = new ArrayList<>();
+        List<Callable<Boolean>> callables = new ArrayList<>();
+        Callable<Boolean> dataDispoaslTask = () -> {
+            List<DataDisposalResponseDTO> dataDisposalResponseDTOS = dataDisposalMongoRepository.findAllByCountryId(countryId);
+            saveDataDisposal(unitId, dataDisposalResponseDTOS);
+            return true;
+        };
+        Callable<Boolean> hostingProviderTask = () -> {
+            List<HostingProviderResponseDTO> hostingProviderDTOS = hostingProviderMongoRepository.findAllByCountryId(countryId);
+            saveHostingProvider(unitId, hostingProviderDTOS);
+            return true;
+        };
+        Callable<Boolean> hostingTypeTask = () -> {
+            List<HostingTypeResponseDTO> hostingTypeDTOS = hostingTypeMongoRepository.findAllByCountryId(countryId);
+            saveHostingType(unitId, hostingTypeDTOS);
+            return true;
+
+        };
+        Callable<Boolean> storageFormatTask = () -> {
+            List<StorageFormatResponseDTO> storageFormatDTOS = storageFormatMongoRepository.findAllByCountryId(countryId);
+            saveStorageFormat(unitId, storageFormatDTOS);
+            return true;
+
+        };
+        Callable<Boolean> technicalSecurityMeasureTask = () -> {
+
+            List<TechnicalSecurityMeasureResponseDTO> techSecurityMeasureDTOS = technicalSecurityMeasureMongoRepository.findAllByCountryId(countryId);
+            saveTechnicalSecurityMeasure(unitId, techSecurityMeasureDTOS);
+            return true;
+
+        };
+        Callable<Boolean> orgSecurityMeasureTask = () -> {
+            List<OrganizationalSecurityMeasureResponseDTO> orgSecurityMeasureDTOS = organizationalSecurityMeasureMongoRepository.findAllByCountryId(countryId);
+            saveOrgSecurityMeasure(unitId, orgSecurityMeasureDTOS);
+            return true;
+        };
+
+        Callable<Boolean> accessorPartyTask = () -> {
+            List<AccessorPartyResponseDTO> accessorPartyDTOS = accessorPartyMongoRepository.findAllByCountryId(countryId);
+            saveAccessorParties(unitId, accessorPartyDTOS);
+            return true;
+        };
+
+        Callable<Boolean> dataSourceTask = () -> {
+            List<DataSourceResponseDTO> dataSourceDTOS = dataSourceMongoRepository.findAllByCountryId(countryId);
+            saveDataSources(unitId, dataSourceDTOS);
+            return true;
+        };
+        Callable<Boolean> legalBasisTask = () -> {
+            List<ProcessingLegalBasisResponseDTO> legalBasisDTOS = processingLegalBasisMongoRepository.findAllByCountryId(countryId);
+            saveProcessingLegalBasis(unitId, legalBasisDTOS);
+            return true;
+        };
+        Callable<Boolean> processingPurposeTask = () -> {
+            List<ProcessingPurposeResponseDTO> processingPurposeDTOS = processingPurposeMongoRepository.findAllByCountryId(countryId);
+            saveProcessingPurposes(unitId, processingPurposeDTOS);
+            return true;
+        };
+        Callable<Boolean> responsibilityTypeTask = () -> {
+            List<ResponsibilityTypeResponseDTO> responsibilityTypeDTOS = responsibilityTypeMongoRepository.findAllByCountryId(countryId);
+            saveResponsibilityTypes(unitId, responsibilityTypeDTOS);
+            return true;
+        };
+        Callable<Boolean> transferMethodTask = () -> {
+            List<TransferMethodResponseDTO> transferMethodDTOS = transferMethodMongoRepository.findAllByCountryId(countryId);
+            saveTransferMethods(unitId, transferMethodDTOS);
+            return true;
+        };
+
+        callables.add(hostingProviderTask);
+        callables.add(dataDispoaslTask);
+        callables.add(hostingTypeTask);
+        callables.add(technicalSecurityMeasureTask);
+        callables.add(storageFormatTask);
+        callables.add(orgSecurityMeasureTask);
+        callables.add(accessorPartyTask);
+        callables.add(dataSourceTask);
+        callables.add(legalBasisTask);
+        callables.add(processingPurposeTask);
+        callables.add(responsibilityTypeTask);
+        callables.add(transferMethodTask);
+        asynchronousService.executeAsynchronously(callables);
+
         return true;
 
     }
 
-    public CompletableFuture<Boolean> inheritAssetAndAssetMetaDataFromCountry(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
+
+    private void copyDataSubjectDataCategoryAndDataElementsFromCountryToUnit(Long countryId, Long unitId) {
+
+        List<DataSubjectMappingResponseDTO> dataSubjectDTOS = dataSubjectMappingService.getAllDataSubjectWithDataCategory(countryId);
+        List<DataCategoryResponseDTO> dataCategoryDTOS = new ArrayList<>();
+
+        dataSubjectDTOS.forEach(dataSubjectDTO -> {
+
+            DataSubjectMapping dataSubject = new DataSubjectMapping(dataSubjectDTO.getName());
+            dataSubject.setOrganizationId(unitId);
+
+            if (CollectionUtils.isNotEmpty(dataSubjectDTO.getDataCategories())) {
 
 
-        Callable<List<DataDisposalResponseDTO>> inheritDataDisposalTask = () -> {
-            return dataDisposalMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<DataDisposalResponseDTO>> futureDataDisposal = asynchronousService.executeAsynchronously(inheritDataDisposalTask);
-        if (futureDataDisposal.get() != null && CollectionUtils.isNotEmpty(futureDataDisposal.get())) {
+            }
+        });
+
+
+    }
+
+
+    private void saveDataCategoryAndDataElement(Long countryId, Long unitId) {
+
+
+    }
+
+
+    private void saveDataDisposal(Long unitId, List<DataDisposalResponseDTO> dataDisposalDTOS) {
+        if (CollectionUtils.isNotEmpty(dataDisposalDTOS)) {
             List<DataDisposal> dataDisposalsList = new ArrayList<>();
-            for (DataDisposalResponseDTO dataDisposalDTO : futureDataDisposal.get()) {
+            for (DataDisposalResponseDTO dataDisposalDTO : dataDisposalDTOS) {
                 DataDisposal dataDisposal = new DataDisposal(dataDisposalDTO.getName());
                 dataDisposal.setOrganizationId(unitId);
                 dataDisposalsList.add(dataDisposal);
             }
             dataDisposalMongoRepository.saveAll(getNextSequence(dataDisposalsList));
         }
+    }
 
-
-        Callable<List<HostingProviderResponseDTO>> inheritHostingProviderTask = () -> {
-            return hostingProviderMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<HostingProviderResponseDTO>> futureHostingProviderTask = asynchronousService.executeAsynchronously(inheritHostingProviderTask);
-        if (futureHostingProviderTask.get() != null && CollectionUtils.isNotEmpty(futureHostingProviderTask.get())) {
+    private void saveHostingProvider(Long unitId, List<HostingProviderResponseDTO> hostingProviderDTOS) {
+        if (CollectionUtils.isNotEmpty(hostingProviderDTOS)) {
             List<HostingProvider> hostingProviderList = new ArrayList<>();
-            for (HostingProviderResponseDTO hostingProviderDTO : futureHostingProviderTask.get()) {
+            for (HostingProviderResponseDTO hostingProviderDTO : hostingProviderDTOS) {
                 HostingProvider hostingProvider = new HostingProvider(hostingProviderDTO.getName());
                 hostingProvider.setOrganizationId(unitId);
                 hostingProviderList.add(hostingProvider);
@@ -113,13 +216,12 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
 
         }
 
-        Callable<List<HostingTypeResponseDTO>> inheritHostingTypeTask = () -> {
-            return hostingTypeMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<HostingTypeResponseDTO>> futureHostingTypeTask = asynchronousService.executeAsynchronously(inheritHostingTypeTask);
-        if (futureHostingTypeTask.get() != null && CollectionUtils.isNotEmpty(futureHostingTypeTask.get())) {
+    }
+
+    private void saveHostingType(Long unitId, List<HostingTypeResponseDTO> hostingTypeDTOS) {
+        if (CollectionUtils.isNotEmpty(hostingTypeDTOS)) {
             List<HostingType> hostingTypeList = new ArrayList<>();
-            for (HostingTypeResponseDTO hostingTypeDTO : futureHostingTypeTask.get()) {
+            for (HostingTypeResponseDTO hostingTypeDTO : hostingTypeDTOS) {
                 HostingType hostingType = new HostingType(hostingTypeDTO.getName());
                 hostingType.setOrganizationId(unitId);
                 hostingTypeList.add(hostingType);
@@ -127,14 +229,38 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             hostingTypeMongoRepository.saveAll(getNextSequence(hostingTypeList));
 
         }
+    }
 
-        Callable<List<OrganizationalSecurityMeasureResponseDTO>> inheritOrgSecurityMeasureTask = () -> {
-            return organizationalSecurityMeasureMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<OrganizationalSecurityMeasureResponseDTO>> futureOrgSecurityMeasureTask = asynchronousService.executeAsynchronously(inheritOrgSecurityMeasureTask);
-        if (futureOrgSecurityMeasureTask.get() != null && CollectionUtils.isNotEmpty(futureOrgSecurityMeasureTask.get())) {
+
+    private void saveStorageFormat(Long unitId, List<StorageFormatResponseDTO> storageFormatDTOS) {
+        if (CollectionUtils.isNotEmpty(storageFormatDTOS)) {
+            List<StorageFormat> storageFormatList = new ArrayList<>();
+            for (StorageFormatResponseDTO storageFormatDTO : storageFormatDTOS) {
+                StorageFormat storageFormat = new StorageFormat(storageFormatDTO.getName());
+                storageFormat.setOrganizationId(unitId);
+                storageFormatList.add(storageFormat);
+            }
+            storageFormatMongoRepository.saveAll(getNextSequence(storageFormatList));
+        }
+    }
+
+    private void saveTechnicalSecurityMeasure(Long unitId, List<TechnicalSecurityMeasureResponseDTO> techSecurityMeasureDTOS) {
+
+        if (CollectionUtils.isNotEmpty(techSecurityMeasureDTOS)) {
+            List<TechnicalSecurityMeasure> technicalSecurityMeasures = new ArrayList<>();
+            for (TechnicalSecurityMeasureResponseDTO technicalSecurityMeasureDTO : techSecurityMeasureDTOS) {
+                TechnicalSecurityMeasure technicalSecurityMeasure = new TechnicalSecurityMeasure(technicalSecurityMeasureDTO.getName());
+                technicalSecurityMeasure.setOrganizationId(unitId);
+                technicalSecurityMeasures.add(technicalSecurityMeasure);
+            }
+            technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(technicalSecurityMeasures));
+        }
+    }
+
+    private void saveOrgSecurityMeasure(Long unitId, List<OrganizationalSecurityMeasureResponseDTO> orgSecurityMeasureDTOS) {
+        if (CollectionUtils.isNotEmpty(orgSecurityMeasureDTOS)) {
             List<OrganizationalSecurityMeasure> organizationalSecurityMeasureList = new ArrayList<>();
-            for (OrganizationalSecurityMeasureResponseDTO orgSecurityMeasureDTO : futureOrgSecurityMeasureTask.get()) {
+            for (OrganizationalSecurityMeasureResponseDTO orgSecurityMeasureDTO : orgSecurityMeasureDTOS) {
                 OrganizationalSecurityMeasure organizationalSecurityMeasure = new OrganizationalSecurityMeasure(orgSecurityMeasureDTO.getName());
                 organizationalSecurityMeasure.setOrganizationId(unitId);
                 organizationalSecurityMeasureList.add(organizationalSecurityMeasure);
@@ -143,50 +269,12 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
         }
 
 
-        Callable<List<StorageFormatResponseDTO>> inheritStorageFormatTask = () -> {
-            return storageFormatMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<StorageFormatResponseDTO>> futureStorageFormatTask = asynchronousService.executeAsynchronously(inheritStorageFormatTask);
-        if (futureStorageFormatTask.get() != null && CollectionUtils.isNotEmpty(futureStorageFormatTask.get())) {
-            List<StorageFormat> storageFormatList = new ArrayList<>();
-            for (StorageFormatResponseDTO storageFormatDTO : futureStorageFormatTask.get()) {
-                StorageFormat storageFormat = new StorageFormat(storageFormatDTO.getName());
-                storageFormat.setOrganizationId(unitId);
-                storageFormatList.add(storageFormat);
-            }
-            storageFormatMongoRepository.saveAll(getNextSequence(storageFormatList));
-        }
-
-        Callable<List<TechnicalSecurityMeasureResponseDTO>> inheritTechnicalSecurityMeasureTask = () -> {
-            return technicalSecurityMeasureMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<TechnicalSecurityMeasureResponseDTO>> futureTechSecurityMeasureTask = asynchronousService.executeAsynchronously(inheritTechnicalSecurityMeasureTask);
-        if (futureTechSecurityMeasureTask.get() != null && CollectionUtils.isNotEmpty(futureTechSecurityMeasureTask.get())) {
-            List<TechnicalSecurityMeasure> technicalSecurityMeasures = new ArrayList<>();
-            for (TechnicalSecurityMeasureResponseDTO technicalSecurityMeasureDTO : futureTechSecurityMeasureTask.get()) {
-                TechnicalSecurityMeasure technicalSecurityMeasure = new TechnicalSecurityMeasure(technicalSecurityMeasureDTO.getName());
-                technicalSecurityMeasure.setOrganizationId(unitId);
-                technicalSecurityMeasures.add(technicalSecurityMeasure);
-            }
-            technicalSecurityMeasureMongoRepository.saveAll(getNextSequence(technicalSecurityMeasures));
-        }
-
-
-        return CompletableFuture.completedFuture(true);
-
     }
 
-
-    public CompletableFuture<Boolean> inheritProcessingActivityMetaDataFromCountry(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
-
-
-        Callable<List<AccessorPartyResponseDTO>> inheritAccessorPartyTask = () -> {
-            return accessorPartyMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<AccessorPartyResponseDTO>> futureAccessorParties = asynchronousService.executeAsynchronously(inheritAccessorPartyTask);
-        if (futureAccessorParties.get() != null && CollectionUtils.isNotEmpty(futureAccessorParties.get())) {
+    private void saveAccessorParties(Long unitId, List<AccessorPartyResponseDTO> accessorPartyDTOS) {
+        if (CollectionUtils.isNotEmpty(accessorPartyDTOS)) {
             List<AccessorParty> accessorParties = new ArrayList<>();
-            for (AccessorPartyResponseDTO accessorPartyDTO : futureAccessorParties.get()) {
+            for (AccessorPartyResponseDTO accessorPartyDTO : accessorPartyDTOS) {
                 AccessorParty accessorParty = new AccessorParty(accessorPartyDTO.getName());
                 accessorParty.setOrganizationId(unitId);
                 accessorParties.add(accessorParty);
@@ -194,14 +282,12 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             accessorPartyMongoRepository.saveAll(getNextSequence(accessorParties));
         }
 
+    }
 
-        Callable<List<DataSourceResponseDTO>> inheritDataSourceTask = () -> {
-            return dataSourceMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<DataSourceResponseDTO>> futureHostingProviderTask = asynchronousService.executeAsynchronously(inheritDataSourceTask);
-        if (futureHostingProviderTask.get() != null && CollectionUtils.isNotEmpty(futureHostingProviderTask.get())) {
+    private void saveDataSources(Long unitId, List<DataSourceResponseDTO> dataSourceDTOS) {
+        if (CollectionUtils.isNotEmpty(dataSourceDTOS)) {
             List<DataSource> dataSourceList = new ArrayList<>();
-            for (DataSourceResponseDTO dataSourceDTO : futureHostingProviderTask.get()) {
+            for (DataSourceResponseDTO dataSourceDTO : dataSourceDTOS) {
                 DataSource dataSource = new DataSource(dataSourceDTO.getName());
                 dataSource.setOrganizationId(unitId);
                 dataSourceList.add(dataSource);
@@ -209,14 +295,12 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             dataSourceMongoRepository.saveAll(getNextSequence(dataSourceList));
 
         }
+    }
 
-        Callable<List<ProcessingLegalBasisResponseDTO>> inheritLegalBasis = () -> {
-            return processingLegalBasisMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<ProcessingLegalBasisResponseDTO>> futureLegalBasisTask = asynchronousService.executeAsynchronously(inheritLegalBasis);
-        if (futureLegalBasisTask.get() != null && CollectionUtils.isNotEmpty(futureLegalBasisTask.get())) {
+    private void saveProcessingLegalBasis(Long unitId, List<ProcessingLegalBasisResponseDTO> legalBasisDTOS) {
+        if (CollectionUtils.isNotEmpty(legalBasisDTOS)) {
             List<ProcessingLegalBasis> processingLegalBasisList = new ArrayList<>();
-            for (ProcessingLegalBasisResponseDTO legalBasisDTO : futureLegalBasisTask.get()) {
+            for (ProcessingLegalBasisResponseDTO legalBasisDTO : legalBasisDTOS) {
                 ProcessingLegalBasis processingLegalBasis = new ProcessingLegalBasis(legalBasisDTO.getName());
                 processingLegalBasis.setOrganizationId(unitId);
                 processingLegalBasisList.add(processingLegalBasis);
@@ -224,53 +308,42 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             processingLegalBasisMongoRepository.saveAll(getNextSequence(processingLegalBasisList));
 
         }
+    }
 
-        Callable<List<ProcessingPurposeResponseDTO>> inheritOrgSecurityMeasureTask = () -> {
-            return processingPurposeMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<ProcessingPurposeResponseDTO>> futureOrgSecurityMeasureTask = asynchronousService.executeAsynchronously(inheritOrgSecurityMeasureTask);
-        if (futureOrgSecurityMeasureTask.get() != null && CollectionUtils.isNotEmpty(futureOrgSecurityMeasureTask.get())) {
+    private void saveProcessingPurposes(Long unitId, List<ProcessingPurposeResponseDTO> processingPurposeDTOS) {
+        if (CollectionUtils.isNotEmpty(processingPurposeDTOS)) {
             List<ProcessingPurpose> processingPurposes = new ArrayList<>();
-            for (ProcessingPurposeResponseDTO processingPurposeDTO : futureOrgSecurityMeasureTask.get()) {
+            for (ProcessingPurposeResponseDTO processingPurposeDTO : processingPurposeDTOS) {
                 ProcessingPurpose processingPurpose = new ProcessingPurpose(processingPurposeDTO.getName());
                 processingPurpose.setOrganizationId(unitId);
                 processingPurposes.add(processingPurpose);
             }
             processingPurposeMongoRepository.saveAll(getNextSequence(processingPurposes));
         }
+    }
 
-
-        Callable<List<ResponsibilityTypeResponseDTO>> inheritResponsibilityTypeTask = () -> {
-            return responsibilityTypeMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<ResponsibilityTypeResponseDTO>> futureResponsibilityTypeTask = asynchronousService.executeAsynchronously(inheritResponsibilityTypeTask);
-        if (futureResponsibilityTypeTask.get() != null && CollectionUtils.isNotEmpty(futureResponsibilityTypeTask.get())) {
+    private void saveResponsibilityTypes(Long unitId, List<ResponsibilityTypeResponseDTO> responsibilityTypeDTOS) {
+        if (CollectionUtils.isNotEmpty(responsibilityTypeDTOS)) {
             List<ResponsibilityType> responsibilityTypes = new ArrayList<>();
-            for (ResponsibilityTypeResponseDTO responsibilityTypeDTO : futureResponsibilityTypeTask.get()) {
+            for (ResponsibilityTypeResponseDTO responsibilityTypeDTO : responsibilityTypeDTOS) {
                 ResponsibilityType responsibilityType = new ResponsibilityType(responsibilityTypeDTO.getName());
                 responsibilityType.setOrganizationId(unitId);
                 responsibilityTypes.add(responsibilityType);
             }
             responsibilityTypeMongoRepository.saveAll(getNextSequence(responsibilityTypes));
         }
+    }
 
-        Callable<List<TransferMethodResponseDTO>> inheritTransferMethods = () -> {
-            return transferMethodMongoRepository.findAllByCountryId(countryId);
-        };
-        Future<List<TransferMethodResponseDTO>> futureTransferMethodTask = asynchronousService.executeAsynchronously(inheritTransferMethods);
-        if (futureTransferMethodTask.get() != null && CollectionUtils.isNotEmpty(futureTransferMethodTask.get())) {
+    private void saveTransferMethods(Long unitId, List<TransferMethodResponseDTO> transferMethodDTOS) {
+        if (CollectionUtils.isNotEmpty(transferMethodDTOS)) {
             List<TransferMethod> transferMethods = new ArrayList<>();
-            for (TransferMethodResponseDTO transferMethodResponseDTO : futureTransferMethodTask.get()) {
+            for (TransferMethodResponseDTO transferMethodResponseDTO : transferMethodDTOS) {
                 TransferMethod transferMethod = new TransferMethod(transferMethodResponseDTO.getName());
                 transferMethod.setOrganizationId(unitId);
                 transferMethods.add(transferMethod);
             }
             transferMethodMongoRepository.saveAll(getNextSequence(transferMethods));
         }
-
-
-        return CompletableFuture.completedFuture(true);
-
     }
 
 

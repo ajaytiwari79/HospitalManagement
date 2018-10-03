@@ -1,4 +1,4 @@
-package com.kairos.config;
+package com.kairos.config.async;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

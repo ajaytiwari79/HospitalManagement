@@ -79,7 +79,7 @@ public class DataSubjectMappingService extends MongoBaseService {
      * @param countryId
      * @return list of DataSubject With Data category List
      */
-    public List<DataSubjectMappingResponseDTO> getAllDataSubjectAndMappingWithData(Long countryId) {
+    public List<DataSubjectMappingResponseDTO> getAllDataSubjectWithDataCategory(Long countryId) {
         return dataSubjectMappingRepository.getAllDataSubjectWithDataCategoryAndDataElementByCountryId(countryId);
     }
 
