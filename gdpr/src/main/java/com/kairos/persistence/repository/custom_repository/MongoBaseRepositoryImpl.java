@@ -64,8 +64,9 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
     @Override
     public T findOne(ID id) {
         Assert.notNull(id, "The given id must not be null!");
-       return mongoOperations.findOne(new Query(Criteria.where("deleted").is(false)),entityInformation.getJavaType());
+       return mongoOperations.findOne(new Query(Criteria.where("deleted").is(false).and("_id").is(id)),entityInformation.getJavaType());
     }
+
 
     @Override
     public boolean safeDelete(ID id) {

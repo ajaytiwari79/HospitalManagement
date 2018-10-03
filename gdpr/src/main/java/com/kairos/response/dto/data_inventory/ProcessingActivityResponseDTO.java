@@ -28,6 +28,7 @@ public class ProcessingActivityResponseDTO {
     private List<TransferMethodResponseDTO> transferMethods;
     private List<ProcessingLegalBasisResponseDTO> processingLegalBasis;
     private List<ResponsibilityTypeResponseDTO>responsibilityType;
+    private List<RiskResponseDTO> risks;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
     private Integer jointControllerContactInfo;
@@ -36,8 +37,12 @@ public class ProcessingActivityResponseDTO {
     private Integer dataRetentionPeriod;
     private Boolean active;
     private Boolean suggested;
-    private List<ProcessingActivityResponseDTO> subProcessingActivities;
+    private List<ProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
 
+
+    public List<RiskResponseDTO> getRisks() { return risks; }
+
+    public void setRisks(List<RiskResponseDTO> risks) { this.risks = risks; }
 
     public List<ProcessingActivityResponseDTO> getSubProcessingActivities() { return subProcessingActivities; }
 
