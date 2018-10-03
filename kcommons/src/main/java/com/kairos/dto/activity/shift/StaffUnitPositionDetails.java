@@ -49,6 +49,7 @@ public class StaffUnitPositionDetails {
     private Date endDate;
     private Long unitId;
     private float hourlyCost;
+    private Long functionId;
 
     public StaffUnitPositionDetails() {
 
@@ -306,5 +307,13 @@ public class StaffUnitPositionDetails {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public Long getFunctionId() {
+        return functionId;
+    }
+
+    public void setFunctionId(Long functionId) {
+        this.functionId = functionId;
     }
 }

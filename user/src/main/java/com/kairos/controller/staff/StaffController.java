@@ -39,6 +39,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.QueryParam;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -578,9 +579,9 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment/{unitPositionId}", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @PathVariable long unitId, @PathVariable long staffId,
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @RequestParam("shiftDate") LocalDate shiftDate, @PathVariable long unitId, @PathVariable long staffId,
                                                                       @PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(staffId, unitPositionId, unitId, type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(shiftDate,staffId, unitPositionId, unitId, type));
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)

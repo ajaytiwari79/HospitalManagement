@@ -1,7 +1,7 @@
 package com.kairos.scheduler.controller;
 
-import com.kairos.dto.scheduler.LocalDateTimeIdDTO;
-import com.kairos.dto.scheduler.SchedulerPanelDTO;
+import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
 import com.kairos.scheduler.utils.ResponseHandler;
 import io.swagger.annotations.Api;
