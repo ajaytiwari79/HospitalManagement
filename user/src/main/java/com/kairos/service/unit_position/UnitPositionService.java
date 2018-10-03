@@ -1126,7 +1126,7 @@ public class UnitPositionService {
         Set<String> localDatesAsString=ObjectMapperUtils.copyPropertiesOfSetByMapper(appliedDates,String.class);
         List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationshipQueryResults=unitPositionFunctionRelationshipRepository.findAllByAppliedDatesIn(unitPositionId,localDatesAsString);
         for(UnitPositionFunctionRelationshipQueryResult unitPositionFunctionRelationshipQueryResult :unitPositionFunctionRelationshipQueryResults){
-           Set<LocalDate> dateToRemove= getInterSectedDates(unitPositionFunctionRelationshipQueryResult.getAppliedDates(),appliedDates);
+           Set<LocalDate> dateToRemove= getIntersectedDates(unitPositionFunctionRelationshipQueryResult.getAppliedDates(),appliedDates);
             unitPositionFunctionRelationshipQueryResult.getAppliedDates().removeAll(dateToRemove);
             unitPositionFunctionRelationships.add(new UnitPositionFunctionRelationship(unitPositionFunctionRelationshipQueryResult.getId(),unitPositionFunctionRelationshipQueryResult.getUnitPosition(), unitPositionFunctionRelationshipQueryResult.getFunction(), unitPositionFunctionRelationshipQueryResult.getAppliedDates()));
             for(LocalDate localDate:dateToRemove){
@@ -1286,7 +1286,7 @@ public class UnitPositionService {
      * @return matchedDates
      * @Desc This method will return the Matched or common dates from two sets
      */
-    private Set<LocalDate> getInterSectedDates(Set<LocalDate> first, Set<LocalDate> second){
+    private Set<LocalDate> getIntersectedDates(Set<LocalDate> first, Set<LocalDate> second){
         Set<LocalDate> matchedDates=new HashSet<>();
         if(CollectionUtils.isEmpty(first) || CollectionUtils.isEmpty(second)){
             return matchedDates;
