@@ -6,7 +6,6 @@ import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.shift.StaffUnitPositionDetails;
-import com.kairos.dto.scheduler.SchedulerPanelDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
@@ -138,8 +137,5 @@ public class GenericIntegrationService {
          return genericRestClient.publishRequest(dates,unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/remove_functions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,Long>>>() {},unitPositionId);
          }
 
-  /*  public SchedulerPanelDTO checkSchedulerLoadBalanceWorking() {
 
-        return schedulerServiceRestClient.publishRequest(null,2567L,true,IntegrationOperation.GET,"/scheduler_panel/12",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<SchedulerPanelDTO>>() {});
-    }*/
  }
