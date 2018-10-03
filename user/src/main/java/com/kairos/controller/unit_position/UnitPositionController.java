@@ -110,7 +110,7 @@ public class UnitPositionController {
 
     @ApiOperation(value = "apply function to unit position")
     @PostMapping(value = "/unit_position/{unitPositionId}/restore_functions")
-    public ResponseEntity<Map<String, Object>> applyFunctions(@PathVariable Long unitPositionId, @RequestBody Map<Long,Set<LocalDate>> payload)  {
+    public ResponseEntity<Map<String, Object>> restoreFunctions(@PathVariable Long unitPositionId, @RequestBody Map<Long,Set<LocalDate>> payload)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.restoreFunctions(unitPositionId, payload));
     }
 
