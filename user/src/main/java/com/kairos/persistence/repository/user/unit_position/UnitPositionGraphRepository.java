@@ -8,6 +8,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -20,25 +21,27 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPosition, Long> {
 
-    @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0}\n" +
-            "match (unitPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
+    @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0}" +
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:PositionLine) WHERE  WHERE  (date(positionLine.startDate).month<=date().month AND date(positionLine.startDate).day<=date().day AND date(positionLine.startDate).year<=date().year) \n" +
+            "AND (NOT exists(positionLine.endDate) OR (date(positionLine.endDate).month<=date().month AND date(positionLine.endDate).day<=date().day AND date(positionLine.endDate).year<=date().year) )" +
+            "match (positionLine)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
             "match (unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)\n" +
             "optional match (unitPosition)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
             "return e as expertise," +
-            "unitPosition.totalWeeklyHours as totalWeeklyHours," +
+            "positionLine.totalWeeklyHours as totalWeeklyHours," +
             "unitPosition.startDate as startDate," +
             "unitPosition.endDate as endDate," +
-            "unitPosition.salary as salary," +
-            "unitPosition.workingDaysInWeek as workingDaysInWeek," +
+            "positionLine.salary as salary," +
+            "positionLine.workingDaysInWeek as workingDaysInWeek," +
             "et as employmentType," +
-            "unitPosition.hourlyWages as hourlyWages," +
+            "positionLine.hourlyWages as hourlyWages," +
             "id(unitPosition)   as id,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published," +
-            "unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
+            "positionLine.avgDailyWorkingHours as avgDailyWorkingHours," +
             "unitPosition.lastWorkingDate as lastWorkingDate," +
-            "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
-            "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes, " +
+            "positionLine.totalWeeklyMinutes as totalWeeklyMinutes," +
+            "positionLine.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes, " +
             "Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) as appliedFunctions")
-    StaffUnitPositionDetails getUnitPositionById(long unitEmploymentId);
+    StaffUnitPositionDetails getUnitPositionById(Long unitEmploymentId);
 
 
 
@@ -123,7 +126,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     void updateUnitPositionEndDateFromEmployment(Long staffId, Long startDate);
 
     @Query("Match(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} and ( up.startDate > {1} or up.startDate is null)  return up")
-    List<UnitPosition> getUnitPositionsFromEmploymentEndDate(Long staffId, Long startDate);
+    List<UnitPosition> getUnitPositionsFromEmploymentEndDate(Long staffId, LocalDate startDate);
 
     @Query("Match(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} Match(staff)<-[:" + BELONGS_TO + "]-(emp:Employment) return min(up.startDate) as earliestUnitPositionstartDate, emp.startDate as employmentstartDate")
     EmploymentUnitPositionQueryResult getEarliestUnitPositionStartDateAndEmploymentByStaffId(Long staffId);
@@ -131,8 +134,8 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     @Query("Match(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition) where id(up)={0} return id(staff) as staffId")
     Long getStaffIdFromUnitPosition(Long unitPositionId);
 
-    @Query("Match(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} return max(up.startDateMillis) as maxStartDateMillis")
-    Long getMaxUnitPositionStartDate(Long staffId);
+    @Query("Match(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={0} return max(up.startDate) as maxStartDate")
+    LocalDate getMaxUnitPositionStartDate(Long staffId);
 
     @Query("match(staff:Staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) where id(staff)={0} " +
             "match(org)-[:" + HAS_SUB_ORGANIZATION + "*]->(subOrg:Organization) \n" +
@@ -162,7 +165,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(unitPosition)-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={0} AND id(staff)={1} and id(expertise)={2} \n" +
             "AND unitPosition.startDate<={3} AND  (unitPosition.startDate IS NULL or unitPosition.startDate>={3})  \n" +
             "return id(unitPosition)")
-    Long getUnitPositionIdByStaffAndExpertise(Long unitId, Long staffId, Long expertiseId, Long currentMillis);
+    Long getUnitPositionIdByStaffAndExpertise(Long unitId, Long staffId, Long expertiseId, LocalDate requestedDate);
 
     @Query("MATCH (unit:Organization) WHERE id(unit)={0} \n" +
             "MATCH (unit)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition{deleted:false,published:true})-[:" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) \n" +

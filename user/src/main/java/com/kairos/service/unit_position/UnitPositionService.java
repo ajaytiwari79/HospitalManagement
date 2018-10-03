@@ -959,12 +959,12 @@ public class UnitPositionService {
 
         Organization unit = organizationGraphRepository.findOne(unitId);
         Long endDateMillis = DateUtil.getIsoDateInLong(employmentEndDate);
-        Long unitPositionStartDateMillisMax = unitPositionGraphRepository.getMaxUnitPositionStartDate(staffId);
-        if (Optional.ofNullable(unitPositionStartDateMillisMax).isPresent() && endDateMillis < unitPositionStartDateMillisMax) {
-            exceptionService.actionNotPermittedException("message.employmentdata.greaterthan.unitpositiondate", unitPositionStartDateMillisMax);
+        LocalDate unitPositionStartDateMax = unitPositionGraphRepository.getMaxUnitPositionStartDate(staffId);
+        if (Optional.ofNullable(unitPositionStartDateMax).isPresent() && DateUtils.getDateFromEpoch(endDateMillis).isBefore(unitPositionStartDateMax)) {
+            exceptionService.actionNotPermittedException("message.employmentdata.greaterthan.unitpositiondate", unitPositionStartDateMax);
 
         }
-        List<UnitPosition> unitPositions = unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId, endDateMillis);
+        List<UnitPosition> unitPositions = unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId, DateUtils.getDateFromEpoch(endDateMillis));
         ReasonCode reasonCode = reasonCodeGraphRepository.findById(reasonCodeId, 0).get();
         if (!Optional.of(reasonCode).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.reasonCode.id.notFound", reasonCodeId);
@@ -980,7 +980,7 @@ public class UnitPositionService {
 
         Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
         if (employment.getMainEmploymentEndDate() != null) {
-            Long mainEmploymentEndDate = DateUtil.getDateFromEpoch(employment.getMainEmploymentEndDate());
+            Long mainEmploymentEndDate = DateUtils.getLongFromLocalDate(employment.getMainEmploymentEndDate());
             if (endDateMillis > mainEmploymentEndDate) {
                 exceptionService.invalidRequestException("message.employmentdata.lessthan.mainEmploymentEndDate");
             }
@@ -1004,7 +1004,7 @@ public class UnitPositionService {
     }
 
     public Long getUnitPositionIdByStaffAndExpertise(Long unitId, Long staffId, Long dateInMillis, Long expertiseId) {
-        return unitPositionGraphRepository.getUnitPositionIdByStaffAndExpertise(unitId, staffId, expertiseId, dateInMillis);
+        return unitPositionGraphRepository.getUnitPositionIdByStaffAndExpertise(unitId, staffId, expertiseId, DateUtils.getLocalDate(dateInMillis));
     }
 
     public Map<Long, Long> getUnitPositionExpertiseMap(Long unitId) {

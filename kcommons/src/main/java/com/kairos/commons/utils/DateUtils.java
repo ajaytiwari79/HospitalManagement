@@ -695,9 +695,7 @@ public class DateUtils {
 
     }
 
-    public static Date getCurrentDayMidNight() {
-        return Date.from(ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS).minusSeconds(1).toInstant());
 
 
-    }
+
 }

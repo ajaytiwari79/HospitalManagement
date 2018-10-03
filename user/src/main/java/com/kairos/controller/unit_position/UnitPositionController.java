@@ -144,11 +144,11 @@ public class UnitPositionController {
     }
 
     //Do not remove, required for local testing.
-   /* @ApiOperation(value = "update senioritylevel")
+   @ApiOperation(value = "update senioritylevel")
     @RequestMapping(value = "/seniority_level_update", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> updateSeniorityLevel() {
         unitPositionService.updateSeniorityLevelOnJobTrigger(new BigInteger("4"));
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
-    */
+
 }
