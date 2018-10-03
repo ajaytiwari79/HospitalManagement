@@ -1,13 +1,14 @@
 package com.kairos.service.common;
 
 
-import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
-import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
+import com.kairos.persistence.model.questionnaire_template.Question;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
@@ -27,17 +28,20 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodMongoRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
+import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
 import com.kairos.response.dto.common.*;
-import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
-import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
+import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.master_data.data_category_element.DataSubjectMappingService;
-import com.kairos.service.risk_management.RiskService;
+import com.kairos.service.questionnaire_template.QuestionnaireTemplateService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -93,7 +97,15 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
     private RiskMongoRepository riskMongoRepository;
     @Inject
     private AssetTypeMongoRepository assetTypeMongoRepository;
+    @Inject
+    private QuestionnaireTemplateService questionnaireTemplateService;
+    @Inject
+    private QuestionMongoRepository questionMongoRepository;
+    @Inject
+    private QuestionnaireSectionRepository questionnaireSectionRepository;
 
+    @Inject
+    private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
 
     private Map<String, BigInteger> globalAssetTypeAndSubAssetTypeMap = new HashMap<>();
 
@@ -101,15 +113,16 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
     public Boolean copyDataFromCountryToUnitIdOnOnBoarding(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
 
 
-        //  inheritMetaDataOfAssetAndProcessingActivityMetaDataAndProcessingActivity(countryId, unitId, organizationMetaDataDTO);
-        List<MasterAssetResponseDTO> masterAssetDTOS = masterAssetMongoRepository.getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO);
-        copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssetDTOS);
+        List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
+        saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
+        inheritMetaDataOfAssetAndProcessingActivity(countryId, unitId, organizationMetaDataDTO);
+
         return true;
 
     }
 
 
-    public void inheritMetaDataOfAssetAndProcessingActivityMetaDataAndProcessingActivity(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
+    public void inheritMetaDataOfAssetAndProcessingActivity(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
 
         List<Callable<Boolean>> callables = new ArrayList<>();
         Callable<Boolean> dataDispoaslTask = () -> {
@@ -183,11 +196,17 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             copyProcessingActivityAndSubProcessingActivitiesFromCountryToUnit(unitId, masterProcessingActivityDTOS);
             return true;
         };
-        Callable<Boolean> assetTypeInheritTask = () -> {
-            List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
-            saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
+        Callable<Boolean> questionniareTemplateTask = () -> {
+            List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS = questionnaireTemplateService.getAllMasterQuestionnaireTemplateWithSection(countryId);
+            copyQuestionnaireTemplateFromCountry(unitId, questionnaireTemplateDTOS);
             return true;
         };
+        Callable<Boolean> assetTask = () -> {
+            List<MasterAssetResponseDTO> masterAssetDTOS = masterAssetMongoRepository.getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(countryId, organizationMetaDataDTO);
+            copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssetDTOS);
+            return true;
+        };
+
 
         callables.add(hostingProviderTask);
         callables.add(dataDispoaslTask);
@@ -202,7 +221,8 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
         callables.add(responsibilityTypeTask);
         callables.add(transferMethodTask);
         callables.add(processingActivityTask);
-        callables.add(assetTypeInheritTask);
+        callables.add(questionniareTemplateTask);
+        callables.add(assetTask);
         asynchronousService.executeAsynchronously(callables);
     }
 
@@ -264,69 +284,87 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
     }
 
 
-    private void saveAssetTypeAndAssetSubType(Long unitId, List<AssetTypeRiskResponseDTO> assetTypeDTOS) {
-
-        if (CollectionUtils.isNotEmpty(assetTypeDTOS)) {
+    private void copyQuestionnaireTemplateFromCountry(Long unitId, List<QuestionnaireTemplateResponseDTO> questionnaireTemplateDTOS) {
 
 
-            List<Risk> risks = new ArrayList<>();
-            Map<AssetType, List<Risk>> assetTypeRiskMap = new HashMap<>();
-            Map<AssetType, List<AssetType>> assetTypeAndSubAssetTypeMap = new HashMap<>();
-            for (AssetTypeRiskResponseDTO assetTypeDTO : assetTypeDTOS) {
-                AssetType assetType = new AssetType(assetTypeDTO.getName());
-                assetType.setOrganizationId(unitId);
-                assetTypeRiskMap.put(assetType, buildRisks(unitId, assetTypeDTO.getRisks()));
-                if (CollectionUtils.isNotEmpty(assetTypeDTO.getSubAssetTypes())) {
+        Map<QuestionnaireTemplate, List<QuestionnaireSection>> questionnaireTemplateAndSectionListMap = new HashMap<>();
+        Map<QuestionnaireSection, List<Question>> questionnaireSectionAndQuestionListMap = new HashMap<>();
 
-                    List<AssetType> subAssetTypes = new ArrayList<>();
-                    for (AssetTypeRiskResponseDTO subAssetTypeDTO : assetTypeDTO.getSubAssetTypes()) {
-                        AssetType subAssetType = new AssetType(subAssetTypeDTO.getName());
-                        subAssetType.setOrganizationId(unitId);
-                        assetTypeRiskMap.put(subAssetType, buildRisks(unitId, subAssetTypeDTO.getRisks()));
-                        subAssetTypes.add(subAssetType);
+
+        for (QuestionnaireTemplateResponseDTO questionnaireTemplateDTO : questionnaireTemplateDTOS) {
+
+            QuestionnaireTemplate questionnaireTemplate = buildQuestionnaireTemplate(unitId, questionnaireTemplateDTO);
+            List<QuestionnaireSection> questionnaireSections = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(questionnaireTemplateDTO.getSections())) {
+                for (QuestionnaireSectionResponseDTO questionnaireSectionDTO : questionnaireTemplateDTO.getSections()) {
+                    QuestionnaireSection questionnaireSection = new QuestionnaireSection(questionnaireSectionDTO.getTitle());
+                    questionnaireSection.setOrganizationId(unitId);
+                    questionnaireSections.add(questionnaireSection);
+                    if (CollectionUtils.isNotEmpty(questionnaireSectionDTO.getQuestions())) {
+                        List<Question> questions = new ArrayList<>();
+                        for (QuestionBasicResponseDTO questionBasicDTO : questionnaireSectionDTO.getQuestions()) {
+                            Question question = new Question(questionBasicDTO.getQuestion(), questionBasicDTO.getDescription(), questionBasicDTO.isRequired(), questionBasicDTO.getQuestionType(), questionBasicDTO.isNotSureAllowed());
+                            question.setOrganizationId(unitId);
+                            questions.add(question);
+                        }
+                        questionnaireSectionAndQuestionListMap.put(questionnaireSection, questions);
                     }
-                    assetTypeAndSubAssetTypeMap.put(assetType, subAssetTypes);
                 }
+                questionnaireTemplateAndSectionListMap.put(questionnaireTemplate, questionnaireSections);
             }
-            assetTypeRiskMap.forEach((assetType, riskList) -> risks.addAll(riskList));
-            if (CollectionUtils.isNotEmpty(risks)) {
-                riskMongoRepository.saveAll(getNextSequence(risks));
-            }
-            List<AssetType> assetSubTypes = new ArrayList<>();
-            assetTypeAndSubAssetTypeMap.forEach((assetType, subAssetTypes) -> {
-                assetType.setRisks(assetTypeRiskMap.get(assetType).stream().map(Risk::getId).collect(Collectors.toList()));
-                if (CollectionUtils.isNotEmpty(subAssetTypes)) {
-                    assetSubTypes.addAll(subAssetTypes);
-                    subAssetTypes.stream().forEach(subAssetType -> subAssetType.setRisks(assetTypeRiskMap.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toList())));
-                }
-            });
-            if (CollectionUtils.isNotEmpty(assetSubTypes)) {
-                assetTypeMongoRepository.saveAll(getNextSequence(assetSubTypes));
-                assetSubTypes.forEach(subAssetType -> globalAssetTypeAndSubAssetTypeMap.put(subAssetType.getName().toLowerCase(), subAssetType.getId()));
-            }
-            List<AssetType> assetTypes = new ArrayList<>(assetTypeAndSubAssetTypeMap.keySet());
-            assetTypes.forEach(assetType -> {
-                globalAssetTypeAndSubAssetTypeMap.put(assetType.getName().toLowerCase(), assetType.getId());
-                if (CollectionUtils.isNotEmpty(assetTypeAndSubAssetTypeMap.get(assetType))) {
-                    assetType.setSubAssetTypes(assetTypeAndSubAssetTypeMap.get(assetType).stream().map(AssetType::getId).collect(Collectors.toList()));
-                }
-            });
-            assetTypeMongoRepository.saveAll(getNextSequence(assetTypes));
+        }
+
+        saveQuestionAndAddToQuestionnaireSection(questionnaireSectionAndQuestionListMap);
+        saveQuestionnaireSectionAndAddToQuestionnaireTemplate(questionnaireTemplateAndSectionListMap);
+        List<QuestionnaireTemplate> questionnaireTemplates = new ArrayList<>(questionnaireTemplateAndSectionListMap.keySet());
+        questionnaireTemplateMongoRepository.saveAll(getNextSequence(questionnaireTemplates));
+    }
+
+
+    private void saveQuestionAndAddToQuestionnaireSection(Map<QuestionnaireSection, List<Question>> questionnaireSectionListMap) {
+
+        if (CollectionUtils.isNotEmpty(questionnaireSectionListMap.keySet())) {
+            List<Question> questionList = new ArrayList<>();
+            questionnaireSectionListMap.forEach((questionnaireSection, questions) -> questionList.addAll(questions));
+            questionMongoRepository.saveAll(getNextSequence(questionList));
+            questionnaireSectionListMap.forEach((questionnaireSection, questions) -> questionnaireSection.setQuestions(questions.stream().map(Question::getId).collect(Collectors.toList())));
         }
     }
 
 
-    private List<Risk> buildRisks(Long unitId, List<RiskResponseDTO> riskDTOS) {
-
-        List<Risk> risks = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(riskDTOS)) {
-            riskDTOS.forEach(riskDTO -> {
-                Risk risk = new Risk(riskDTO.getName(), riskDTO.getDescription(), riskDTO.getRiskRecommendation(), riskDTO.getRiskLevel());
-                risk.setOrganizationId(unitId);
-                risks.add(risk);
-            });
+    private void saveQuestionnaireSectionAndAddToQuestionnaireTemplate(Map<QuestionnaireTemplate, List<QuestionnaireSection>> questionnaireTemplateAndSectionListMap) {
+        if (CollectionUtils.isNotEmpty(questionnaireTemplateAndSectionListMap.keySet())) {
+            List<QuestionnaireSection> questionnaireSectionList = new ArrayList<>();
+            questionnaireTemplateAndSectionListMap.forEach((questionnaireTemplate, questionnaireSections) -> questionnaireSectionList.addAll(questionnaireSections));
+            questionnaireSectionRepository.saveAll(getNextSequence(questionnaireSectionList));
+            questionnaireTemplateAndSectionListMap.forEach((questionnaireTemplate, questionnaireSections) -> questionnaireTemplate.setSections(questionnaireSections.stream().map(QuestionnaireSection::getId).collect(Collectors.toList())));
         }
-        return risks;
+    }
+
+
+    private QuestionnaireTemplate buildQuestionnaireTemplate(Long unitId, QuestionnaireTemplateResponseDTO questionnaireTemplateDTO) {
+
+        QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription());
+        questionnaireTemplate.setOrganizationId(unitId);
+        switch (questionnaireTemplateDTO.getTemplateType()) {
+            case ASSET_TYPE:
+                if (questionnaireTemplateDTO.getDefaultAssetTemplate()) {
+                    questionnaireTemplate.setDefaultAssetTemplate(true);
+                } else {
+                    questionnaireTemplate.setAssetType(globalAssetTypeAndSubAssetTypeMap.get(questionnaireTemplateDTO.getAssetType().getName().trim().toLowerCase()));
+                    if (Optional.ofNullable(questionnaireTemplateDTO.getAssetSubType()).isPresent()) {
+                        questionnaireTemplate.setAssetSubType(globalAssetTypeAndSubAssetTypeMap.get(questionnaireTemplateDTO.getAssetSubType().getName().toLowerCase().trim()));
+                    }
+                }
+                break;
+
+            default:
+                questionnaireTemplate.setTemplateType(questionnaireTemplateDTO.getTemplateType());
+                break;
+        }
+
+
+        return questionnaireTemplate;
 
     }
 
@@ -483,6 +521,71 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             }
             transferMethodMongoRepository.saveAll(getNextSequence(transferMethods));
         }
+    }
+
+
+    private void saveAssetTypeAndAssetSubType(Long unitId, List<AssetTypeRiskResponseDTO> assetTypeDTOS) {
+
+        if (CollectionUtils.isNotEmpty(assetTypeDTOS)) {
+
+
+            List<Risk> risks = new ArrayList<>();
+            Map<AssetType, List<Risk>> assetTypeRiskMap = new HashMap<>();
+            Map<AssetType, List<AssetType>> assetTypeAndSubAssetTypeMap = new HashMap<>();
+            for (AssetTypeRiskResponseDTO assetTypeDTO : assetTypeDTOS) {
+                AssetType assetType = new AssetType(assetTypeDTO.getName());
+                assetType.setOrganizationId(unitId);
+                assetTypeRiskMap.put(assetType, buildRisks(unitId, assetTypeDTO.getRisks()));
+                if (CollectionUtils.isNotEmpty(assetTypeDTO.getSubAssetTypes())) {
+
+                    List<AssetType> subAssetTypes = new ArrayList<>();
+                    for (AssetTypeRiskResponseDTO subAssetTypeDTO : assetTypeDTO.getSubAssetTypes()) {
+                        AssetType subAssetType = new AssetType(subAssetTypeDTO.getName());
+                        subAssetType.setOrganizationId(unitId);
+                        assetTypeRiskMap.put(subAssetType, buildRisks(unitId, subAssetTypeDTO.getRisks()));
+                        subAssetTypes.add(subAssetType);
+                    }
+                    assetTypeAndSubAssetTypeMap.put(assetType, subAssetTypes);
+                }
+            }
+            assetTypeRiskMap.forEach((assetType, riskList) -> risks.addAll(riskList));
+            if (CollectionUtils.isNotEmpty(risks)) {
+                riskMongoRepository.saveAll(getNextSequence(risks));
+            }
+            List<AssetType> assetSubTypes = new ArrayList<>();
+            assetTypeAndSubAssetTypeMap.forEach((assetType, subAssetTypes) -> {
+                assetType.setRisks(assetTypeRiskMap.get(assetType).stream().map(Risk::getId).collect(Collectors.toList()));
+                if (CollectionUtils.isNotEmpty(subAssetTypes)) {
+                    assetSubTypes.addAll(subAssetTypes);
+                    subAssetTypes.forEach(subAssetType -> subAssetType.setRisks(assetTypeRiskMap.get(subAssetType).stream().map(Risk::getId).collect(Collectors.toList())));
+                }
+            });
+            if (CollectionUtils.isNotEmpty(assetSubTypes)) {
+                assetTypeMongoRepository.saveAll(getNextSequence(assetSubTypes));
+                assetSubTypes.forEach(subAssetType -> globalAssetTypeAndSubAssetTypeMap.put(subAssetType.getName().toLowerCase(), subAssetType.getId()));
+            }
+            List<AssetType> assetTypes = new ArrayList<>(assetTypeAndSubAssetTypeMap.keySet());
+            assetTypes.forEach(assetType -> {
+                globalAssetTypeAndSubAssetTypeMap.put(assetType.getName().toLowerCase(), assetType.getId());
+                assetType.setSubAssetTypes(assetTypeAndSubAssetTypeMap.get(assetType).stream().map(AssetType::getId).collect(Collectors.toList()));
+            });
+            assetTypeMongoRepository.saveAll(getNextSequence(assetTypes));
+        }
+    }
+
+
+    private List<Risk> buildRisks(Long unitId, List<RiskResponseDTO> riskDTOS) {
+
+        List<Risk> risks = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(riskDTOS)) {
+            riskDTOS.forEach(riskDTO -> {
+                Risk risk = new Risk(riskDTO.getName(), riskDTO.getDescription(), riskDTO.getRiskRecommendation(), riskDTO.getRiskLevel());
+                risk.setOrganizationId(unitId);
+                risks.add(risk);
+            });
+        }
+        return risks;
+
     }
 
 

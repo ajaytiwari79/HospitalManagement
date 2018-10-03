@@ -56,16 +56,6 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String questionnaireTemplateAddNonDeletedAssetType() {
-        return "{  '$addFields':" +
-                "{'assetType':" +
-                "{$filter : { " +
-                "'input': '$assetType'," +
-                "as: 'assetType', " +
-                "cond: {$eq: ['$$assetType.deleted'," + false + "]}" +
-                "}}}} ";
-    }
-
 
     public static String questionnaireTemplateGroupOperation() {
         return "{'$group':{" +
@@ -81,6 +71,7 @@ public class CustomAggregationQuery {
         return " {" +
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "'assetSubType':{$arrayElemAt:['$assetSubType',0]}," +
                 "         'name':1," +
                 "        'sections':1," +
                 "      'description':1," +
