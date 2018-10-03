@@ -547,9 +547,9 @@ public class ShiftService extends MongoBaseService {
                 appliedFunctionDTOs = staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions();
             }
 
-            if (appliedFunctionDTOs != null && !appliedFunctionDTOs.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(appliedFunctionDTOs)) {
                 for (AppliedFunctionDTO appliedFunctionDTO : appliedFunctionDTOs) {
-                    if (appliedFunctionDTO.getAppliedDates() != null && !appliedFunctionDTO.getAppliedDates().isEmpty()) {
+                    if (CollectionUtils.isNotEmpty(appliedFunctionDTO.getAppliedDates())) {
                         FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
                         for (LocalDate date : appliedFunctionDTO.getAppliedDates()) {
                             functionDTOMap.put(date, functionDTO);
