@@ -139,7 +139,7 @@ public class ShiftSickService extends MongoBaseService {
 
     }
 
-    private void addPreviousShiftAndSaveShift(List<Shift> staffOriginalShiftsOfDates, List<Shift> shifts,List<LocalDate> dates) {
+    private void addPreviousShiftAndSaveShift(List<Shift> staffOriginalShiftsOfDates, List<Shift> shifts,Set<LocalDate> dates) {
         Map<LocalDate,Long> dateLongMap=new HashMap<>();
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shifts.get(0).getStaffId(), ORGANIZATION, shifts.get(0).getUnitPositionId());
         if(staffAdditionalInfoDTO.getUnitPosition().getAppliedFunctions()!=null){
@@ -174,7 +174,7 @@ public class ShiftSickService extends MongoBaseService {
     private void createSicknessShiftsOfStaff(Long staffId, Long unitId, Activity activity, StaffUnitPositionDetails staffUnitPositionDetails, List<Shift> staffOriginalShiftsOfDates, Duration duration, PlanningPeriod planningPeriod) {
         short shiftNeedsToAddForDays = activity.getRulesActivityTab().getRecurrenceDays();
         logger.info(staffOriginalShiftsOfDates.size() + "", " shifts found for days");
-        List<LocalDate> dates=new ArrayList<>();
+        Set<LocalDate> dates=new HashSet<>();
         staffOriginalShiftsOfDates.forEach(s -> {s.setDisabled(true);
                dates.add(DateUtils.asLocalDate(s.getStartDate()));
         }

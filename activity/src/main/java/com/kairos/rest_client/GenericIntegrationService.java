@@ -134,10 +134,9 @@ public class GenericIntegrationService {
 
     }
 
-    public Map<LocalDate,Long> removeFunctionFromUnitPositionByDates(Long unitId,Long unitPositionId,List<LocalDate> dates){
-        Map<LocalDate,Long> functionId= genericRestClient.publishRequest(dates,unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/remove_functions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,Long>>>() {},unitPositionId);
-        return functionId;
-    }
+    public Map<LocalDate,Long> removeFunctionFromUnitPositionByDates(Long unitId,Long unitPositionId,Set<LocalDate> dates){
+         return genericRestClient.publishRequest(dates,unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/remove_functions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,Long>>>() {},unitPositionId);
+         }
 
   /*  public SchedulerPanelDTO checkSchedulerLoadBalanceWorking() {
 

@@ -130,7 +130,7 @@ public class UnitPositionController {
      */
     @ApiOperation(value = "remove function to unit position")
     @DeleteMapping(value = "/unit_position/{unitPositionId}/remove_functions")
-    public ResponseEntity<Map<String, Object>> removeFunctions(@PathVariable Long unitPositionId, @RequestBody List<LocalDate> appliedDates)  {
+    public ResponseEntity<Map<String, Object>> removeFunctions(@PathVariable Long unitPositionId, @RequestBody Set<LocalDate> appliedDates)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removeFunctions(unitPositionId, appliedDates));
     }
 

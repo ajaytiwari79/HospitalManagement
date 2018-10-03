@@ -1121,22 +1121,22 @@ public class UnitPositionService {
      * @return
      * @Desc this method will remove applied functions for multiple dates
      */
-    public Map<LocalDate,Long> removeFunctions(Long unitPositionId, List<LocalDate> appliedDates) {
-        Map<LocalDate,Long> localDateLongMap=new HashMap<>();
+    public Map<LocalDate,Long> removeFunctions(Long unitPositionId, Set<LocalDate> appliedDates) {
+        Map<LocalDate,Long> localDateAndFunctionIdMap=new HashMap<>();
         List<UnitPositionFunctionRelationship> unitPositionFunctionRelationships=new ArrayList<>();
-        List<String> stringDates=ObjectMapperUtils.copyPropertiesOfListByMapper(appliedDates,String.class);
-        List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationshipQueryResults=unitPositionFunctionRelationshipRepository.findAllByAppliedDatesIn(unitPositionId,stringDates);
+        Set<String> localDatesAsString=ObjectMapperUtils.copyPropertiesOfSetByMapper(appliedDates,String.class);
+        List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationshipQueryResults=unitPositionFunctionRelationshipRepository.findAllByAppliedDatesIn(unitPositionId,localDatesAsString);
         for(UnitPositionFunctionRelationshipQueryResult unitPositionFunctionRelationshipQueryResult :unitPositionFunctionRelationshipQueryResults){
            Set<LocalDate> dateToRemove=getInterSectedDate(unitPositionFunctionRelationshipQueryResult.getAppliedDates(),appliedDates);
             unitPositionFunctionRelationshipQueryResult.getAppliedDates().removeAll(dateToRemove);
             unitPositionFunctionRelationships.add(new UnitPositionFunctionRelationship(unitPositionFunctionRelationshipQueryResult.getId(),unitPositionFunctionRelationshipQueryResult.getUnitPosition(), unitPositionFunctionRelationshipQueryResult.getFunction(), unitPositionFunctionRelationshipQueryResult.getAppliedDates()));
             for(LocalDate localDate:dateToRemove){
-                localDateLongMap.put(localDate, unitPositionFunctionRelationshipQueryResult.getFunction().getId());
+                localDateAndFunctionIdMap.put(localDate, unitPositionFunctionRelationshipQueryResult.getFunction().getId());
             }
 
         }
         unitPositionFunctionRelationshipRepository.saveAll(unitPositionFunctionRelationships);
-       return localDateLongMap;
+       return localDateAndFunctionIdMap;
     }
 
 
@@ -1267,7 +1267,6 @@ public class UnitPositionService {
     }
 
     public Boolean restoreFunctions(Long unitPositionId, Map<Long,Set<LocalDate>> payload) {
-        //Map<Long,LocalDate> reversMap=MapUtils.invertMap(payload);
         List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationshipQueryResults=unitPositionFunctionRelationshipRepository.findAllByFunctionIdAndUnitPositionId(unitPositionId,payload.keySet());
         List<UnitPositionFunctionRelationship> unitPositionFunctionRelationships=new ArrayList<>();
 
@@ -1281,7 +1280,7 @@ public class UnitPositionService {
         return true;
     }
 
-    private Set<LocalDate> getInterSectedDate(Set<LocalDate> first,List<LocalDate> second){
+    private Set<LocalDate> getInterSectedDate(Set<LocalDate> first,Set<LocalDate> second){
         Set<LocalDate> matchedDates=new HashSet<>();
         if(CollectionUtils.isEmpty(first) || CollectionUtils.isEmpty(second)){
             return matchedDates;

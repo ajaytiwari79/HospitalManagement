@@ -330,7 +330,7 @@ public class ShiftService extends MongoBaseService {
             shift.getSortedActvities();
         }
         shiftMongoRepository.saveObject(shift);
-        //updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
+        updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
     }
 
     public void saveShiftWithActivity(Phase phase, List<Shift> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -360,7 +360,7 @@ public class ShiftService extends MongoBaseService {
             shift.setDurationMinutes(durationMinutes);
             shift.setStartDate(shift.getActivities().get(0).getStartDate());
             shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
-            //updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
+            updateTimeBankAndPublishNotification(activityWrapperMap, shift, staffAdditionalInfoDTO);
         }
         shiftMongoRepository.saveObjects(shifts);
     }
