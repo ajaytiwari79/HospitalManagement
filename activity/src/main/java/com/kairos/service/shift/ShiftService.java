@@ -334,6 +334,7 @@ public class ShiftService extends MongoBaseService {
         shift.setDurationMinutes(durationMinutes);
         List<ShiftActivity> breakActvities = shiftBreakActivityService.addBreakInShifts(activityWrapperMap, shift, staffAdditionalInfoDTO.getUnitPosition());
         if (!breakActvities.isEmpty()) {
+            shift.getActivities().remove(0);
             shift.getActivities().addAll(breakActvities);
         }
         shift.setPhaseId(phase.getId());
