@@ -21,6 +21,17 @@ public class JobDetails extends MongoBaseEntity {
     private String processName;
     private String name;
     private String log;
+    private Long unitId;
+
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
 
     public LocalDateTime getStarted() {
         return started;

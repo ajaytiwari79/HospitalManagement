@@ -247,7 +247,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     UnitPositionQueryResult findByUnitPositionId(Long unitPositionId);
 
     @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) IN {0} " +
-            " MATCH(unitPosition)-[:" + HAS_POSITION_LINES + "]-(positionLine:PositionLine) " +
+            "MATCH(unitPosition)-[:" + HAS_POSITION_LINES + "]-(positionLine:PositionLine) " +
             "MATCH(positionLine)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]-(payGrade:PayGrade) " +
             "MATCH(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) " +
             "OPTIONAL MATCH (positionLine)-[:" + HAS_FUNCTION + "]-(function:Function) with unitPosition,positionLine,payGrade,seniorityLevel,employmentType,employmentRel,collect(function) as functionData "+
@@ -263,5 +263,20 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "positionLine.hourlyWages as hourlyWages,positionLine.avgDailyWorkingHours as avgDailyWorkingHours ORDER BY positionLine.startDate"
     )
     List<PositionLinesQueryResult> findAllPositionLines(List<Long> unitPositionIds);
+
+
+    @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) IN {0} " +
+            "MATCH(unitPosition)-[:" + HAS_POSITION_LINES + "]-(positionLine:PositionLine) " +
+            "MATCH(positionLine)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]-(payGrade:PayGrade)" +
+            "MATCH(unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{published:true}) " +
+            "OPTIONAL MATCH(unitPosition)-[:" + IN_UNIT + "]-(org:Organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality)-[:" + HAS_MUNICIPALITY + "]-(pga:PayGroupArea)<-[pgaRel:" + HAS_PAY_GROUP_AREA + "]-(payGrade) " +
+            "with  unitPosition,positionLine,payGrade,seniorityLevel,employmentType,employmentRel, functionData ,CASE when pgaRel.payGroupAreaAmount IS NULL THEN '0' ELSE toString((toInteger(pgaRel.payGroupAreaAmount)/(52*37))) END as hourlyCost" +
+            "OPTIONAL MATCH (positionLine)-[:" + HAS_FUNCTION + "]-(function:Function)" +
+            "OPTIONAL MATCH(functionalPayment:FunctionalPayment)<-[:"+APPLICABLE_FOR_EXPERTISE+"]-(expertise) "+
+            "OPTIONAL MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix) " +
+            "OPTIONAL MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[:"+FOR_SENIORITY_LEVEL+"]->(seniorityLevel) " +
+            "OPTIONAL MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function) with hourlyWages+rel.amount as hourlyWages" +
+            "return {id:id(positionLine), hourlyWages : hourlyWages} as hourlyWagesMap")
+    Map<Long,Float> findFunctionalHourlyWages(List<Long> unitPositionIds);
 
 }

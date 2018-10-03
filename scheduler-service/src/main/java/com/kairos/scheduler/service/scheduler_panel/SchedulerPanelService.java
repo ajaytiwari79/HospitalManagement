@@ -11,11 +11,9 @@ import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.persistence.model.scheduler_panel.jobDetails.JobDetails;
-import com.kairos.scheduler.persistence.model.unit_settings.UnitTimeZoneMapping;
-import com.kairos.scheduler.persistence.repository.IntegrationConfigurationRepository;
-import com.kairos.scheduler.persistence.repository.JobDetailsRepository;
-import com.kairos.scheduler.persistence.repository.SchedulerPanelRepository;
-import com.kairos.scheduler.persistence.repository.UnitTimeZoneMappingRepository;
+import com.kairos.scheduler.persistence.repository.scheduler_panel.IntegrationConfigurationRepository;
+import com.kairos.scheduler.persistence.repository.job_details.JobDetailsRepository;
+import com.kairos.scheduler.persistence.repository.scheduler_panel.SchedulerPanelRepository;
 import com.kairos.scheduler.service.MongoBaseService;
 
 import com.kairos.scheduler.service.UserIntegrationService;
@@ -28,9 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -351,6 +347,9 @@ public class SchedulerPanelService extends MongoBaseService {
 
     }
 
+    public List<JobDetails> getAllJobDetailsByUnitId(Long unitId,int offset){
+        return jobDetailsRepository.findAllSchedulerPanelsByUnitIdAndOffset(unitId,offset);
+    }
     public List<JobDetails> getJobDetails(BigInteger schedulerPanelId){
         return jobDetailsRepository.findAllBySchedulerPanelIdOrderByStartedDesc(schedulerPanelId);
     }

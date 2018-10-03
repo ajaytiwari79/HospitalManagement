@@ -16,10 +16,13 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import java.util.concurrent.ExecutionException;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -107,10 +110,30 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.applyFunction(unitPositionId, payload));
     }
 
+    @ApiOperation(value = "apply function to unit position")
+    @PostMapping(value = "/unit_position/{unitPositionId}/restore_functions")
+    public ResponseEntity<Map<String, Object>> restoreFunctions(@PathVariable Long unitPositionId, @RequestBody Map<Long,Set<LocalDate>> payload)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.restoreFunctions(unitPositionId, payload));
+    }
+
     @ApiOperation(value = "remove function to unit position")
     @DeleteMapping(value = "/unit_position/{unitPositionId}/applyFunction")
     public ResponseEntity<Map<String, Object>> removeFunction(@PathVariable Long unitPositionId, @RequestParam(value = "appliedDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date appliedDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removeFunction(unitPositionId, appliedDate));
+    }
+
+    /**
+     *
+     * @param unitPositionId
+     * @param appliedDates
+     * @return
+     * @throws ParseException
+     * @Desc this endpoint will remove applied functions for multiple dates
+     */
+    @ApiOperation(value = "remove function to unit position")
+    @DeleteMapping(value = "/unit_position/{unitPositionId}/remove_functions")
+    public ResponseEntity<Map<String, Object>> removeFunctions(@PathVariable Long unitPositionId, @RequestBody Set<LocalDate> appliedDates)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removeFunctions(unitPositionId, appliedDates));
     }
 
     @ApiOperation(value = "get unit_position's Id By Staff and expertise")

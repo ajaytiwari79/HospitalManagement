@@ -17,7 +17,7 @@ public class CPRUtil {
     }
 
     public static Date fetchDateOfBirthFromCPR(String cprNumber) {
-        return DateUtils.getDateByLocalDate(getDateOfBirthFromCPR(cprNumber));
+         return cprNumber!=null?DateUtils.getDateByLocalDate(getDateOfBirthFromCPR(cprNumber)):null;
     }
 
     public static Gender getGenderFromCPRNumber(String cprNumber) {
