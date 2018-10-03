@@ -6,7 +6,7 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.planner.domain.solverconfig.SolverConfig;
-import com.planner.repository.config.SolverConfigRepository;
+import com.planner.repository.solver_config.SolverConfigRepository;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import org.springframework.stereotype.Service;
 

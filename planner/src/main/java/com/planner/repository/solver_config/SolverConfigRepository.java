@@ -1,4 +1,4 @@
-package com.planner.repository.config;
+package com.planner.repository.solver_config;
 
 import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.common.MongoBaseRepository;

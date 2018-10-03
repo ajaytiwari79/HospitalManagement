@@ -12,7 +12,7 @@ import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.planner.domain.taskPlanning.PlanningProblem;
 import com.planner.domain.vrpPlanning.VRPPlanningSolution;
 import com.planner.enums.PlanningStatus;
-import com.planner.repository.config.SolverConfigRepository;
+import com.planner.repository.solver_config.SolverConfigRepository;
 import com.planner.repository.taskPlanningRepository.PlanningRepository;
 import com.planner.repository.vrpPlanning.IndictmentMongoRepository;
 import com.planner.repository.vrpPlanning.VRPPlanningMongoRepository;

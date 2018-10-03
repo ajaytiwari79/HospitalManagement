@@ -7,10 +7,10 @@ import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.planner.domain.query_results.organization_service.OrganizationServiceQueryResult;
 import com.planner.domain.solverconfig.SolverConfig;
-import com.planner.repository.config.SolverConfigRepository;
 import com.planner.repository.shift_planning.ActivityMongoRepository;
 import com.planner.repository.shift_planning.UserNeo4jRepo;
-import com.planner.service.shift_planning.ActivityMongoService;
+import com.planner.repository.solver_config.SolverConfigRepository;
+import com.planner.service.commons.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -26,6 +26,9 @@ public class CountrySolverConfigService {
     private ActivityMongoRepository activityMongoRepository;
     @Inject
     private UserNeo4jRepo userNeo4jRepo;
+    @Inject
+    private ExceptionService exceptionService;
+
 
     /**
      * @param solverConfigDTO
@@ -39,6 +42,10 @@ public class CountrySolverConfigService {
                 //Now copy same solverConfig at {unit/s} associated with {organizationSubServiceId}
                 copyUnitSolverConfigByOrganizationSubService(solverConfigDTO.getOrganizationSubServiceId(), solverConfig);
             }
+        }
+        else
+        {
+            exceptionService.fieldAlreadyExistsException("message.name.alreadyExists");
         }
     }
 
