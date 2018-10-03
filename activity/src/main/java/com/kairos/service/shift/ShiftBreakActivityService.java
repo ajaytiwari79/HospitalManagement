@@ -242,6 +242,7 @@ public class ShiftBreakActivityService {
     private ShiftActivity getShiftObject(String name, BigInteger activityId, Date startDate, Date endDate) {
         ShiftActivity childShift = new ShiftActivity( name, startDate, endDate, activityId);
         childShift.setStatus(Collections.singleton(ShiftStatus.UNPUBLISHED));
+        childShift.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
         return childShift;
 
     }
