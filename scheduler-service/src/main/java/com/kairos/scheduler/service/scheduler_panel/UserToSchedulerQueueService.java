@@ -1,7 +1,7 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
-import com.kairos.dto.scheduler.KairosScheduleJobDTO;
-import com.kairos.dto.scheduler.SchedulerPanelDTO;
+import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import org.springframework.stereotype.Service;

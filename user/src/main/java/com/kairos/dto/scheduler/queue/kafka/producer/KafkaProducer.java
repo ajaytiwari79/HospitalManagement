@@ -1,8 +1,8 @@
-package com.kairos.dto.scheduler.kafka.producer;
+package com.kairos.dto.scheduler.queue.kafka.producer;
 
 
-import com.kairos.dto.scheduler.KairosScheduleJobDTO;
-import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
+import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
+import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 

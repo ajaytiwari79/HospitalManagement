@@ -153,15 +153,15 @@ public class ProcessingActivityController {
 
 
     @ApiOperation(value = "Create And Link Risk to processing activity And Sub Processing Activity")
-    @PostMapping("/processing_activity/{processingActivityId}/risk")
-    public ResponseEntity<Object> createAndLinkRiskWithProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody ValidateRequestBodyList<ProcessingActivityRiskDTO> processingActivityRiskDTOs) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.createRiskAndLinkWithProcessingActivities(unitId, processingActivityId, processingActivityRiskDTOs.getRequestBody()));
+    @PutMapping("/processing_activity/{processingActivityId}/risk")
+    public ResponseEntity<Object> createAndLinkRiskWithProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId, @Valid @RequestBody ProcessingActivityRiskDTO processingActivityRiskDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.createRiskAndLinkWithProcessingActivities(unitId, processingActivityId, processingActivityRiskDTO));
     }
 
-    @ApiOperation(value = "Get Risk linked processing activity And Sub Processing Activity")
-    @GetMapping("/processing_activity/{processingActivityId}/risk")
-    public ResponseEntity<Object> getRiskRelatedTorProcessingActivityAndSubProcessingActivity(@PathVariable Long unitId, @PathVariable BigInteger processingActivityId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getProcessingActivityWithRiskAndSubProcessingActivities(unitId, processingActivityId));
+    @ApiOperation(value = "Get All Processing Activities with Risks")
+    @GetMapping("/processing_activity/risk")
+    public ResponseEntity<Object> getAllProcessingActivityAndSubProcessingActivitiesWithRisk(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.getAllProcessingActivityAndSubProcessingActivitiesWithRisk(unitId));
     }
 
 
@@ -178,12 +178,11 @@ public class ProcessingActivityController {
     }
 
     @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")
-    @PostMapping(COUNTRY_URL+"/processing_activity/suggest")
+    @PostMapping(COUNTRY_URL + "/processing_activity/suggest")
     public ResponseEntity<Object> saveProcessingActivityAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId, @Valid @RequestBody ProcessingActivityDTO processingActivityDTO) {
         processingActivityDTO.setSuggested(true);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, processingActivityService.saveProcessingActivityAndSuggestToCountryAdmin(unitId, countryId, processingActivityDTO));
     }
-
 
 
 }

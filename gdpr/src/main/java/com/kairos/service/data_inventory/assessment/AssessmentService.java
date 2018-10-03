@@ -26,6 +26,7 @@ import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireS
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -61,7 +62,7 @@ public class AssessmentService extends MongoBaseService {
      * @param assetId       asset id for which assessment is related
      * @param assessmentDTO Assessment Dto contain detail about who assign assessment and to whom assessment is assigned
      * @return
-     *///todo add assessment message
+     */
     public AssessmentDTO saveAssessmentForAsset(Long unitId, BigInteger assetId, AssessmentDTO assessmentDTO) {
 
         Assessment previousAssessment = assessmentMongoRepository.findPreviousLaunchedAssessmentOfAssetByUnitId(unitId, assetId);
@@ -90,7 +91,6 @@ public class AssessmentService extends MongoBaseService {
         if (Optional.ofNullable(previousAssessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.processing.activity", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
-        // ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, processingActivityId);
         Assessment assessment = buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.PROCESSING_ACTIVITY, null);
         assessmentMongoRepository.save(assessment);
         assessmentDTO.setId(assessment.getId());
@@ -102,7 +102,7 @@ public class AssessmentService extends MongoBaseService {
      * @param unitId
      * @param assessmentDTO
      * @return
-     */
+     *///todo remove find by name
     private Assessment buildAssessmentWithBasicDetail(Long unitId, AssessmentDTO assessmentDTO, QuestionnaireTemplateType templateType, Object entity) {
 
         Assessment previousAssessment = assessmentMongoRepository.findAssessmentByNameAndUnitId(unitId, assessmentDTO.getName());
@@ -113,11 +113,11 @@ public class AssessmentService extends MongoBaseService {
         switch (templateType) {
             case ASSET_TYPE:
                 Asset asset = (Asset) entity;
-                if (Optional.ofNullable(asset.getAssetType()).isPresent()) {
+
+                if (CollectionUtils.isNotEmpty(asset.getAssetSubTypes())) {
                     questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetType(unitId, asset.getAssetType(), asset.getAssetSubTypes());
-                    if (!Optional.ofNullable(questionnaireTemplateType).isPresent()) {
-                        questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndUnitId(unitId, asset.getAssetType());
-                    }
+                } else {
+                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndUnitId(unitId, asset.getAssetType());
                 }
                 if (!Optional.ofNullable(questionnaireTemplateType).isPresent()) {
                     questionnaireTemplateType = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);
@@ -274,7 +274,7 @@ public class AssessmentService extends MongoBaseService {
                         assetMongoRepository.save(asset);
 
                     } else if (Optional.ofNullable(assessment.getProcessingActivityId()).isPresent()) {
-                        ProcessingActivity processingActivity = processingActivityMongoRepository.findByIdAndNonDeleted(unitId, assessment.getAssetId());
+                        ProcessingActivity processingActivity = processingActivityMongoRepository.findByUnitIdAndId(unitId, assessment.getAssetId());
                         List<ProcessingActivityAssessmentAnswerVO> assessmentAnswersForProcessingActivity = assessment.getProcessingActivityAssessmentAnswers();
 
                         assessmentAnswersForProcessingActivity.forEach(processingActivityAssessmentAnswer

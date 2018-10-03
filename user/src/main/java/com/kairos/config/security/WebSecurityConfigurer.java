@@ -22,7 +22,7 @@ import static com.kairos.constants.AppConstants.*;
 
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity()
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 

@@ -2,7 +2,7 @@ package com.kairos.scheduler.service.scheduler_panel;
 
 import com.kairos.dto.scheduler.IntegrationSettingsDTO;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
-import com.kairos.scheduler.persistence.repository.IntegrationConfigurationRepository;
+import com.kairos.scheduler.persistence.repository.scheduler_panel.IntegrationConfigurationRepository;
 import com.kairos.scheduler.service.MongoBaseService;
 import com.kairos.scheduler.service.exception.ExceptionService;
 import com.kairos.commons.utils.ObjectMapperUtils;

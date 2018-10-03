@@ -1,4 +1,4 @@
-package com.kairos.scheduler.persistence.repository;
+package com.kairos.scheduler.persistence.repository.scheduler_panel;
 
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;

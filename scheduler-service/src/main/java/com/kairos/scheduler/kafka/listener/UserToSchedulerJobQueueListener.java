@@ -1,7 +1,7 @@
 package com.kairos.scheduler.kafka.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.dto.scheduler.KairosScheduleJobDTO;
+import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
 import com.kairos.scheduler.service.scheduler_panel.UserToSchedulerQueueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

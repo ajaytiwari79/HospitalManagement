@@ -1,4 +1,4 @@
-package com.kairos.dto.scheduler;
+package com.kairos.dto.scheduler.scheduler_panel;
 
 
 import java.time.LocalDateTime;

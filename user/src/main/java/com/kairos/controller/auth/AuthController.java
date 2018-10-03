@@ -70,10 +70,6 @@ public class AuthController {
 
     }
 
-
-
-
-
     @RequestMapping(value = "/login/mobile", method = RequestMethod.POST)
     @ApiOperation(value = "Authenticate User")
     ResponseEntity<Map<String, Object>> checkUserMobileUser(@RequestBody User user) {
