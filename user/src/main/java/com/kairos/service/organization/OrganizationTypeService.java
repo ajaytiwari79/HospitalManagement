@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.persistence.model.organization_type.OrganizationTypeSubTypeAndServicesQueryResult;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization_type.OrgTypeSkillQueryResult;
@@ -194,6 +195,11 @@ public class OrganizationTypeService{
             list.add(ObjectMapperUtils.copyPropertiesByMapper(o.get("organizationType"), OrganizationTypeAndSubTypeDto.class));
         });
         return list;
+    }
+
+    public OrganizationTypeSubTypeAndServicesQueryResult getOrgTypesServicesAndSubServicesListByUnitId(Long unitId)
+    {
+      return organizationTypeGraphRepository.getOrganizationTypeSubTypesServiceAndSubServices(unitId);
     }
 
 

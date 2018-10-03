@@ -82,7 +82,7 @@ public class OrganizationalSecurityMeasureService extends MongoBaseService {
      * @return list of OrganizationalSecurityMeasure
      */
     public List<OrganizationalSecurityMeasureResponseDTO> getAllOrganizationalSecurityMeasure(Long countryId) {
-        return organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures(countryId,new Sort(Sort.Direction.DESC, "_id"));
+        return organizationalSecurityMeasureMongoRepository.findAllOrganizationalSecurityMeasures(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

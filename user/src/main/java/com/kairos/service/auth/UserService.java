@@ -1,30 +1,33 @@
 package com.kairos.service.auth;
 
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
+import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.access_permission.UnitModuleAccess;
 import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.auth.*;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.country.DayType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
-import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
-import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.SmsService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.utils.CPRUtil;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.utils.OtpGenerator;
 import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
@@ -78,6 +81,10 @@ public class UserService {
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
     @Inject
     private UnitTypeGraphRepository unitTypeGraphRepository;
+    @Inject
+    private DayTypeGraphRepository dayTypeGraphRepository;
+    @Inject
+    private DayTypeService dayTypeService;
 
     /**
      * Calls UserGraphRepository,
@@ -406,8 +413,10 @@ public class UserService {
             permissionData.setHubPermissions(unitPermissionMap);
 
         } else {
-
-            List<UserPermissionQueryResult> unitWisePermissions = accessPageRepository.fetchStaffPermission(currentUserId);
+            Long countryId = organizationGraphRepository.getCountryId(organizationId);
+            List<DayType> dayTypes=dayTypeService.getDayTypeByDate(countryId,DateUtils.getDate());
+            Set<Long> dayTypeIds=dayTypes.stream().map(DayType::getId).collect(Collectors.toSet());
+            List<UserPermissionQueryResult> unitWisePermissions = accessPageRepository.fetchStaffPermission(currentUserId,dayTypeIds);
             HashMap<Long, Object> unitPermission = new HashMap<>();
 
             List<Long> unitIds = unitWisePermissions.stream()

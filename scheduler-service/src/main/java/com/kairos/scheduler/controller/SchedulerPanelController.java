@@ -64,17 +64,29 @@ public class SchedulerPanelController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelsOneTimeTriggerDate(localDateTimeIdDTOs,unitId));
     }
 
-    @GetMapping("/jobDetails/{schedulerPanelId}")
+    @GetMapping("/job_details/{schedulerPanelId}")
     @ApiOperation("Get job details ")
     public ResponseEntity<Map<String, Object>> getJobDetails(@PathVariable BigInteger schedulerPanelId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getJobDetails(schedulerPanelId));
     }
 
+    @GetMapping("/job_details")
+    @ApiOperation("Get job details by unitId and offset")
+    public ResponseEntity<Map<String, Object>> getAllJobDetails(@PathVariable Long unitId,@RequestParam("offset") int offset) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getAllJobDetailsByUnitId(unitId,offset));
+    }
     @DeleteMapping("")
     @ApiOperation("Delete Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> deleteJob(@RequestBody Set<BigInteger> schedulerPanelIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJob(schedulerPanelIds));
     }
+
+    @GetMapping("/default_data")
+    @ApiOperation("Get default data")
+    public ResponseEntity<Map<String, Object>> getDefaultData() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.getDefaultData());
+    }
+
 
     /**
      * this end point will be called from

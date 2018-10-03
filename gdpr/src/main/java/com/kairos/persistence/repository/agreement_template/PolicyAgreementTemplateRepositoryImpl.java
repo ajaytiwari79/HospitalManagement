@@ -86,10 +86,25 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
                 lookup("template_type", "templateType", "_id", "templateType"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
                 new CustomAggregationOperation(projectionForTemplateTypeElementAtIndexZeroOperation),
-                sort(Sort.Direction.DESC, "id")
+                sort(Sort.Direction.DESC, "createdAt")
         );
 
         AggregationResults<PolicyAgreementTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, PolicyAgreementTemplateResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+
+    @Override
+    public List<PolicyAgreementTemplate> findAgreementTemplatesByCurrentClauseIdAndCountryId(Long countryId, BigInteger clauseId) {
+        String projectionOperation="{'$project':{ '_id':1,'name':1 }}";
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
+                lookup("agreement_section", "agreementSections", "_id", "agreementSections"),
+                match(Criteria.where("agreementSections.clauseIdOrderedIndex").is(clauseId).and("agreementSections.deleted").is(false)),
+                new CustomAggregationOperation(Document.parse(projectionOperation))
+        );
+
+        AggregationResults<PolicyAgreementTemplate> result = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, PolicyAgreementTemplate.class);
         return result.getMappedResults();
 
     }

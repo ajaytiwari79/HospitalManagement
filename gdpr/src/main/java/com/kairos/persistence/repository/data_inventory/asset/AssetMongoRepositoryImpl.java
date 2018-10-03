@@ -74,8 +74,9 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
                 lookup("hosting_provider", "hostingProvider", "_id", "hostingProvider"),
                 lookup("hosting_type", "hostingType", "_id", "hostingType"),
                 lookup("data_disposal", "dataDisposal", "_id", "dataDisposal"),
-                new CustomAggregationOperation(projectionOperation),
-                sort(Sort.Direction.DESC, "id")
+                sort(Sort.Direction.DESC, "createdAt"),
+                new CustomAggregationOperation(projectionOperation)
+
 
 
                 );

@@ -2,6 +2,7 @@ package com.kairos.controller.data_inventory.asset;
 
 
 import com.kairos.dto.gdpr.data_inventory.AssetTypeOrganizationLevelDTO;
+import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
 import com.kairos.service.data_inventory.asset.OrganizationAssetTypeService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
@@ -90,6 +92,15 @@ public class OrganizationAssetTypeController {
     @PutMapping("/asset_type/{assetTypeId}")
     public ResponseEntity<Object> updateAssetType(@PathVariable Long unitId, @PathVariable BigInteger assetTypeId, @Valid @RequestBody AssetTypeOrganizationLevelDTO assetTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.updateAssetTypeAndSubAssetsAndAddRisks(unitId, assetTypeId, assetTypeDTO));
+
+    }
+
+
+    @ApiOperation("save and suggest AssetType to country admin ")
+    @PostMapping(COUNTRY_URL+"/asset_type/suggest")
+    public ResponseEntity<Object> saveAssetTypeAndSubAssetTypeAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId,@Valid @RequestBody AssetTypeBasicDTO assetTypeDTO) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationAssetTypeService.saveAndSuggestAssetTypeAndSubAssetTypeToCountryAdmin(unitId,countryId,assetTypeDTO));
 
     }
 

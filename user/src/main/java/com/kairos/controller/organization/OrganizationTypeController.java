@@ -15,9 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.PARENT_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 
 /**
@@ -61,7 +59,7 @@ public class OrganizationTypeController {
     @ApiOperation("get organization sub services by organization type")
     public ResponseEntity<Map<String, Object>> getOrganizationTypeHierarchy(@PathVariable long countryId,
                                                                             @RequestBody Set<Long> orgTypeIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrganizationTypeHierarchy(countryId,orgTypeIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrganizationTypeHierarchy(countryId, orgTypeIds));
     }
 
     @ApiOperation(value = "Get All organization and sub-organization based on CountryId")
@@ -72,28 +70,36 @@ public class OrganizationTypeController {
 
     @RequestMapping(value = "/organization_type/{organizationTypeId}/organizations", method = RequestMethod.GET)
     @ApiOperation("Get organizations by organization type id")
-    public ResponseEntity<Map<String,Object>> getOrganizationByOrganizationTypeId(@PathVariable long organizationTypeId){
+    public ResponseEntity<Map<String, Object>> getOrganizationByOrganizationTypeId(@PathVariable long organizationTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrganizationByOrganizationTypeId(organizationTypeId));
     }
 
     @RequestMapping(value = "/organization_service/{organizationServiceId}/assign/organizationTypes", method = RequestMethod.POST)
     @ApiOperation("Linking of organization types with services")
-    public ResponseEntity<Map<String,Object>> linkOrganizationTypeWithService(@RequestBody Set<Long> orgTypeId, @PathVariable long organizationServiceId){
-        organizationTypeService.linkOrganizationTypeWithService(orgTypeId,organizationServiceId);
+    public ResponseEntity<Map<String, Object>> linkOrganizationTypeWithService(@RequestBody Set<Long> orgTypeId, @PathVariable long organizationServiceId) {
+        organizationTypeService.linkOrganizationTypeWithService(orgTypeId, organizationServiceId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
     @RequestMapping(value = "/organization_service/{organizationServiceId}/detach/organizationTypes", method = RequestMethod.DELETE)
     @ApiOperation("detach organization types with services")
-    public ResponseEntity<Map<String,Object>> deleteLinkingOfOrganizationTypeAndService(@RequestBody  Set<Long> orgTypeId, @PathVariable long organizationServiceId){
-        organizationTypeService.deleteLinkingOfOrganizationTypeAndService(orgTypeId,organizationServiceId);
+    public ResponseEntity<Map<String, Object>> deleteLinkingOfOrganizationTypeAndService(@RequestBody Set<Long> orgTypeId, @PathVariable long organizationServiceId) {
+        organizationTypeService.deleteLinkingOfOrganizationTypeAndService(orgTypeId, organizationServiceId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
     @ApiOperation(value = "get organization and services")
-    @RequestMapping(value = COUNTRY_URL+"/organization_type/all", method = RequestMethod.GET)
+    @RequestMapping(value = COUNTRY_URL + "/organization_type/all", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getOrgTypeAndOrgServiceshierarchy(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllOrganizationTypeAndServiceAndSubServices(countryId) );
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllOrganizationTypeAndServiceAndSubServices(countryId));
     }
+
+
+    @ApiOperation(value = "get organization Type ,Sub Type , Org services and Sub Services")
+    @GetMapping(value = UNIT_URL + "/organization_type")
+    ResponseEntity<Map<String, Object>> getOrgTypeSubTypesOrganizationServiceAndSubServicesByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrgTypesServicesAndSubServicesListByUnitId(unitId));
+    }
+
 
 }

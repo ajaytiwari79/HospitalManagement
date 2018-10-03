@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
@@ -16,13 +17,13 @@ public interface MasterAssetMongoRepository extends MongoBaseRepository<MasterAs
 
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
-    MasterAsset findByIdANdNonDeleted(Long countryId,BigInteger id);
+    MasterAsset findByIdAndCountryId(Long countryId, BigInteger id);
 
     @Query("{deleted:false,countryId:?0}")
     List<MasterAsset> findAllMasterAssets( Long countryId);
 
-    @Query("{countryId:?0,assetType:?1,deleted:false}")
-    List<MasterAssetBasicResponseDTO> findAllMasterAssetByAssetType(Long countryId, BigInteger assetTypeId);
+    @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
+    List<MasterAsset> findMasterAssetByCountryIdAndIds(Long countryId, Set<BigInteger> assetIds);
 
     MasterAsset findByid(BigInteger id);
 

@@ -60,7 +60,7 @@ public class LastWorkInUnitAndActivityRule implements PriorityGroupRuleFilter{
                                 break;
                             }
                         }
-                    if(Optional.ofNullable(activityDateTimeInterval).isPresent()&&shift.getActivityId().equals(activityId)&&(activityDateTimeInterval.overlaps(shift.getInterval()))) {
+                    if(Optional.ofNullable(activityDateTimeInterval).isPresent()&&shift.getActivities().get(0).getActivityId().equals(activityId)&&(activityDateTimeInterval.overlaps(shift.getInterval()))) {
                             shiftCountActivity++;
                         if(shiftCountUnit>0){
                             break;

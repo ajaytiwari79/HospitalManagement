@@ -13,6 +13,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,29 +31,25 @@ public class MasterAssetDTO {
     private String description;
 
     @Valid
-    @NotNull(message = "ManagingOrganization  Type  can't be  null")
-    @NotEmpty(message = "ManagingOrganization Type  can't be  Empty")
-    private List<OrganizationType> organizationTypes;
+    @NotEmpty(message = "error.message.organizationType.not.Selected")
+    private List<OrganizationType> organizationTypes=new ArrayList<>();
 
     @Valid
-    @NotNull(message = "ManagingOrganization Sub Type  can't be  null")
-    @NotEmpty(message = "ManagingOrganization Sub Type  can't be  Empty")
-    private List<OrganizationSubType> organizationSubTypes;
+    @NotEmpty(message = "error.message.organizationSubType.not.Selected")
+    private List<OrganizationSubType> organizationSubTypes=new ArrayList<>();
 
     @Valid
-    @NotNull(message = "Service  Type  can't be  null")
-    @NotEmpty(message = "Service  Type  can't be  Empty")
-    private List<ServiceCategory> organizationServices;
+    @NotEmpty(message = "error.message.serviceCategory.not.Selected")
+    private List<ServiceCategory> organizationServices=new ArrayList<>();
 
-    @NotNull(message = "Service Sub Type  can't be  null")
-    @NotEmpty(message = "Service Sub Type  can't be  Empty")
     @Valid
-    private List<SubServiceCategory> organizationSubServices;
+    @NotEmpty(message = "error.message.serviceSubCategory.not.Selected")
+    private List<SubServiceCategory> organizationSubServices=new ArrayList<>();
 
-    @NotNull(message = "Asset Type Can't be empty")
+    @NotNull(message = "error.message.assetType.notNull")
     private BigInteger assetTypeId;
 
-    private List<BigInteger> assetSubTypes;
+    private List<BigInteger> assetSubTypes=new ArrayList<>();
 
     public List<BigInteger> getAssetSubTypes() { return assetSubTypes; }
 

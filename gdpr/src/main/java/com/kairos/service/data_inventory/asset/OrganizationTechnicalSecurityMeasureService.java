@@ -13,6 +13,7 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.TechnicalSecurityMeasureService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -95,7 +97,7 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long organizationId) {
-        return technicalSecurityMeasureMongoRepository.findAllOrganizationTechnicalSecurityMeasures(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return technicalSecurityMeasureMongoRepository.findAllOrganizationTechnicalSecurityMeasures(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 
@@ -121,16 +123,11 @@ public class OrganizationTechnicalSecurityMeasureService extends MongoBaseServic
     public Boolean deleteTechnicalSecurityMeasure(Long unitId, BigInteger techSecurityMeasureId) {
 
         List<AssetBasicResponseDTO> assetsLinkedWithTechnicalSecurityMeasure = assetMongoRepository.findAllAssetLinkedWithTechnicalSecurityMeasure(unitId, techSecurityMeasureId);
-        if (!assetsLinkedWithTechnicalSecurityMeasure.isEmpty()) {
-            StringBuilder assetNames=new StringBuilder();
-            assetsLinkedWithTechnicalSecurityMeasure.forEach(asset->assetNames.append(asset.getName()+","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Technical Security Measure", assetNames);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithTechnicalSecurityMeasure)) {
+
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Technical Security Measure", new StringBuilder(assetsLinkedWithTechnicalSecurityMeasure.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        TechnicalSecurityMeasure technicalSecurityMeasure = technicalSecurityMeasureMongoRepository.findByOrganizationIdAndId(unitId, techSecurityMeasureId);
-        if (!Optional.ofNullable(technicalSecurityMeasure).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Security Measure", techSecurityMeasureId);
-        }
-        delete(technicalSecurityMeasure);
+        technicalSecurityMeasureMongoRepository.safeDelete(techSecurityMeasureId);
         return true;
     }
 

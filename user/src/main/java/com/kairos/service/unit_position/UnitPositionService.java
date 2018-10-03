@@ -506,11 +506,6 @@ public class UnitPositionService {
         }
         unitPosition.setStaff(staff);
 
-        // UEP can be created for past dates from time care
-        if (!createFromTimeCare && unitPositionDTO.getStartLocalDate().isBefore(LocalDate.now())) {
-            exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
-
-        }
         unitPosition.setStartDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate()));
         unitPosition.setWorkingDaysInWeek(expertise.get().getNumberOfWorkingDaysInWeek());
 
@@ -868,6 +863,8 @@ public class UnitPositionService {
         com.kairos.dto.activity.shift.EmploymentType employmentType = new com.kairos.dto.activity.shift.EmploymentType();
         ObjectMapperUtils.copyProperties(unitPosition.getEmploymentType(), employmentType);
         unitPositionWithCtaDetailsDTO.setEmploymentType(employmentType);
+        //Todo it should calculate dynamically
+        unitPositionWithCtaDetailsDTO.setHourlyCost(14.5f);
         return unitPositionWithCtaDetailsDTO;
     }
 
@@ -1172,7 +1169,7 @@ public class UnitPositionService {
     }
 
 
-    public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId) {
+    public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId,Long unitId) {
 
         LocalDateTime started = LocalDateTime.now();
         KairosSchedulerLogsDTO schedulerLogsDTO;
@@ -1238,7 +1235,7 @@ public class UnitPositionService {
         }
 
         stopped = LocalDateTime.now();
-        schedulerLogsDTO = new KairosSchedulerLogsDTO(result,log,schedulerPanelId,null,DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),JobSubType.SENIORITY_LEVEL);
+        schedulerLogsDTO = new KairosSchedulerLogsDTO(result,log,schedulerPanelId,unitId,DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),JobSubType.SENIORITY_LEVEL);
 
         kafkaProducer.pushToSchedulerLogsQueue(schedulerLogsDTO);
 

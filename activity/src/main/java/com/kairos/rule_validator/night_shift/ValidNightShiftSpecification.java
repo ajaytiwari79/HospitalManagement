@@ -2,6 +2,7 @@ package com.kairos.rule_validator.night_shift;
 
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
 import com.kairos.enums.DurationType;
 import com.kairos.rule_validator.activity.AbstractActivitySpecification;
@@ -17,7 +18,7 @@ import java.util.*;
 
 public class ValidNightShiftSpecification extends AbstractActivitySpecification<ShiftAndExpertiseNightWorkerSettingDTO> {
 
-    private Map<Long, List<ShiftQueryResult>> expertiseWiseShifts = new HashMap<>();
+    private Map<Long, List<ShiftDTO>> expertiseWiseShifts = new HashMap<>();
 
     private Long addHoursAndMinutes(Long millis, int minutes, int hours){
         return millis + (hours * Timer.ONE_HOUR) + (minutes * Timer.ONE_MINUTE);
@@ -47,17 +48,17 @@ public class ValidNightShiftSpecification extends AbstractActivitySpecification<
         return zonedDateTime.isAfter(ZonedDateTime.now(ZoneId.systemDefault()));
     }
 
-    private Long getNightWorkingMillis(TimeSlot timeSlot, ShiftQueryResult shiftQueryResult, ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettings){
+    private Long getNightWorkingMillis(TimeSlot timeSlot, ShiftDTO shiftDTO, ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettings){
         boolean isNightShift = false;
         Long nightWorkingMillis =0L;
-        if( ! checkNightShiftIsForValidDuration(DateUtils.getDate(shiftQueryResult.getStartDate()), expertiseNightWorkerSettings.getIntervalUnitToCheckNightWorker(),
+        if( ! checkNightShiftIsForValidDuration(shiftDTO.getStartDate(), expertiseNightWorkerSettings.getIntervalUnitToCheckNightWorker(),
                 expertiseNightWorkerSettings.getIntervalValueToCheckNightWorker())){
             return 0L;
         }
 
-        DateTimeInterval shiftDateTimeInterval = new DateTimeInterval(shiftQueryResult.getStartDate(), shiftQueryResult.getEndDate());
-        LocalDate startLocalDate = DateUtils.getLocalDate(shiftQueryResult.getStartDate());
-        LocalDate endLocalDate = DateUtils.getLocalDate(shiftQueryResult.getEndDate());
+        DateTimeInterval shiftDateTimeInterval = new DateTimeInterval(shiftDTO.getStartDate(), shiftDTO.getEndDate());
+        LocalDate startLocalDate = DateUtils.asLocalDate(shiftDTO.getStartDate());
+        LocalDate endLocalDate = DateUtils.asLocalDate(shiftDTO.getEndDate());
 
         DateTimeInterval dateTimeInterval = new DateTimeInterval(
                 addHoursAndMinutes(DateUtils.convertLocalDateToDate(startLocalDate).getTime(), timeSlot.getStartHour(), timeSlot.getStartMinute()),
@@ -74,7 +75,7 @@ public class ValidNightShiftSpecification extends AbstractActivitySpecification<
     }
 
 
-    private boolean checkNightWorkerStatusByExpertise(int totalShifts, Long totalNightWorkingMillis, List<ShiftQueryResult> applicableShifts,
+    private boolean checkNightWorkerStatusByExpertise(int totalShifts, Long totalNightWorkingMillis, List<ShiftDTO> applicableShifts,
                                                       ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettings){
 
         switch (expertiseNightWorkerSettings.getMinShiftsUnitToCheckNightWorker()){
@@ -88,9 +89,9 @@ public class ValidNightShiftSpecification extends AbstractActivitySpecification<
         return true;
     }
 
-    private boolean checkNightWorkerStatusByExpertiseId(List<ShiftQueryResult> shifts, ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettings){
+    private boolean checkNightWorkerStatusByExpertiseId(List<ShiftDTO> shifts, ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettings){
         Long totalNightWorkingMillis = 0L;
-        List<ShiftQueryResult> applicalNightShifts = new ArrayList<>();
+        List<ShiftDTO> applicalNightShifts = new ArrayList<>();
         List<Long> listOfNightWorkingMillis = new ArrayList<>();
 
         shifts.forEach(shiftQueryResult -> {

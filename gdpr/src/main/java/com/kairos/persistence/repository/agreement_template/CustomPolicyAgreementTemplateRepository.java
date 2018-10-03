@@ -17,5 +17,7 @@ public interface CustomPolicyAgreementTemplateRepository {
 
     List<AgreementSectionResponseDTO> getAgreementTemplateWithSectionsAndSubSections(Long countryId, BigInteger agreementTemplateId);
 
+    List<PolicyAgreementTemplate> findAgreementTemplatesByCurrentClauseIdAndCountryId(Long countryId,BigInteger clauseId);
+
 
 }

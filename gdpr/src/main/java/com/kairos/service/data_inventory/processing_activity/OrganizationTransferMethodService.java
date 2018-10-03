@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -92,7 +93,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
      * @return list of TransferMethod
      */
     public List<TransferMethodResponseDTO> getAllTransferMethod(Long organizationId) {
-        return transferMethodRepository.findAllOrganizationTransferMethods(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return transferMethodRepository.findAllOrganizationTransferMethods(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -114,17 +115,11 @@ public class OrganizationTransferMethodService extends MongoBaseService {
 
     public Boolean deleteTransferMethod(Long unitId, BigInteger transferMethodId) {
 
-        List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithTransferMethod = processingActivityMongoRepository.findAllProcessingActivityLinkedWithTransferMethod(unitId, transferMethodId);
+        List<ProcessingActivityBasicResponseDTO> processingActivitiesLinkedWithTransferMethod = processingActivityMongoRepository.findAllProcessingActivityLinkedWithTransferMethod(unitId, transferMethodId);
         if (!processingActivitiesLinkedWithTransferMethod.isEmpty()) {
-            StringBuilder processingActivityNames=new StringBuilder();
-            processingActivitiesLinkedWithTransferMethod.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Transfer Method", processingActivityNames);
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Transfer Method", new StringBuilder(processingActivitiesLinkedWithTransferMethod.stream().map(ProcessingActivityBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        TransferMethod transferMethod = transferMethodRepository.findByOrganizationIdAndId(unitId, transferMethodId);
-        if (!Optional.ofNullable(transferMethod).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Transfer Method", transferMethodId);
-        }
-        delete(transferMethod);
+        transferMethodRepository.safeDelete(transferMethodId);
         return true;
     }
 

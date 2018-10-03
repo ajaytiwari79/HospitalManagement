@@ -13,18 +13,19 @@ import java.util.List;
 public class ProcessingActivityBasicResponseDTO {
 
     private BigInteger id;
-
     @NotBlank(message = "Name can't be empty")
     private String name;
-
     @NotBlank(message = "Description can't be empty")
     private String description;
-
     private ManagingOrganization managingDepartment;
-
     private boolean selected=false;
-
     List<ProcessingActivityBasicResponseDTO> subProcessingActivities=new ArrayList<>();
+    private boolean suggested;
+
+
+    public boolean isSuggested() { return suggested; }
+
+    public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
     public ManagingOrganization getManagingDepartment() { return managingDepartment; }
 

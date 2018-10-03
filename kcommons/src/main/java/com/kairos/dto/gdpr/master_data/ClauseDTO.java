@@ -22,10 +22,10 @@ import java.util.Set;
 public class ClauseDTO {
 
 
+    private BigInteger id;
     @NotBlank(message = "error.message.title.notNull.orEmpty")
     @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String title;
-
     @Valid
     @NotEmpty(message = "Tags  can't be empty")
     private List<ClauseTagDTO> tags = new ArrayList<>();
@@ -34,35 +34,35 @@ public class ClauseDTO {
     private String description;
 
     @Valid
-    @NotNull(message = "ManagingOrganization  Type  can't be  null")
-    @NotEmpty(message = "ManagingOrganization  Type  can't be  empty")
-    private List<OrganizationType> organizationTypes;
+    @NotEmpty(message = "error.message.organizationType.not.Selected")
+    private List<OrganizationType> organizationTypes=new ArrayList<>();
 
     @Valid
-    @NotNull(message = "ManagingOrganization Sub Type  can't be  null")
-    @NotEmpty(message = "ManagingOrganization Sub Type  can't be  empty")
-    private List<OrganizationSubType> organizationSubTypes;
+    @NotEmpty(message = "error.message.organizationSubType.not.Selected")
+    private List<OrganizationSubType> organizationSubTypes=new ArrayList<>();
 
     @Valid
-    @NotNull(message = "Service Type  can't be  null")
-    @NotEmpty(message = "Service  Type  can't be  empty")
-    private List<ServiceCategory> organizationServices;
+    @NotEmpty(message = "error.message.serviceCategory.not.Selected")
+    private List<ServiceCategory> organizationServices=new ArrayList<>();
 
     @Valid
-    @NotNull(message = "Service Sub Type  can't be  null")
-    @NotEmpty(message = "Service Sub Type  can't be  empty")
-    private List<SubServiceCategory> organizationSubServices;
+    @NotEmpty(message = "error.message.serviceSubCategory.not.Selected")
+    private List<SubServiceCategory> organizationSubServices=new ArrayList<>();
 
-    @NotNull(message = "Account Type cannot be null")
-    @NotEmpty
-    private Set<AccountTypeDTO> accountTypes;
+    @Valid
+    @NotEmpty(message = "error.message.accountType.not.Selected")
+    private List<AccountTypeVO> accountTypes=new ArrayList<>();
 
 
-    @NotNull(message = "Template Type cannot be null")
-    @NotEmpty(message = "Template Type Can't be empty")
+    @NotNull(message = "error.message.templateType.notNull")
+    @NotEmpty(message = "error.message.templateType.notNull")
     private List<BigInteger> templateTypes;
 
     private List<Long> organizationList;
+
+    public BigInteger getId() { return id; }
+
+    public void setId(BigInteger id) { this.id = id; }
 
     public List<Long> getOrganizationList() {
         return organizationList;
@@ -80,12 +80,10 @@ public class ClauseDTO {
         this.templateTypes = templateTypes;
     }
 
-    public String getTitle() {
-        return title.trim();
-    }
+    public String getTitle() { return title.trim(); }
 
     public String getDescription() {
-        return description;
+        return description.trim();
     }
 
     public void setTitle(String title) {
@@ -108,39 +106,25 @@ public class ClauseDTO {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes; }
 
     public List<OrganizationSubType> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
-
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
     public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
 
     public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
-    }
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
-    public Set<AccountTypeDTO> getAccountTypes() {
-        return accountTypes;
-    }
-
-    public void setAccountTypes(Set<AccountTypeDTO> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
+    public List<AccountTypeVO> getAccountTypes() { return accountTypes; }
+    public void setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes; }
 }

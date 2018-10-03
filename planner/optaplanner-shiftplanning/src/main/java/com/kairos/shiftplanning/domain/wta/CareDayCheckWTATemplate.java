@@ -16,7 +16,6 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CareDayCheckWTATemplate implements ConstraintHandler {
-
     private long daysLimit;
     private long intervalLength;
     private String intervalUnit;

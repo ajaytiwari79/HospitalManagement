@@ -23,4 +23,6 @@ public interface StaffActivitySettingRepository extends MongoBaseRepository<Staf
 
     Set<StaffActivitySetting> findByStaffIdInAndActivityIdInAndDeletedFalse(Set<Long> staffIds, Set<BigInteger> activityIds);
 
+    List<StaffActivitySetting> findByStaffIdAndActivityIdInAndDeletedFalse(Long staffId,List<BigInteger> activityId);
+
 }

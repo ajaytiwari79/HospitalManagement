@@ -1,7 +1,6 @@
 package com.kairos.service.period;
 
 
-import com.kairos.dto.activity.cta.UnitPositionDTO;
 import com.kairos.dto.activity.period.FlippingDateDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.period.PeriodPhaseDTO;
@@ -37,13 +36,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -227,7 +224,7 @@ public class PlanningPeriodService extends MongoBaseService {
                     tempFlippingDate = DateUtils.addDurationInLocalDateTime(tempFlippingDate, -phase.getDurationInDays(), DurationType.HOURS, 1);
                 }
                 // DateUtils.getDate().compareTo(tempFlippingDate) >= 0
-                if (applicablePhases.size() == index + 1 || (scopeToFlipNextPhase && DateUtils.getLocalDateFromDate(DateUtils.getDate()).isAfter(tempFlippingDate.toLocalDate()))) {
+                if (applicablePhases.size() == index + 1 || (scopeToFlipNextPhase && DateUtils.asLocalDateTime(DateUtils.getDate()).isAfter(tempFlippingDate))) {
                     if (scopeToFlipNextPhase) {
                         currentPhaseId = phase.getId();
                         nextPhaseId = previousPhaseId;
@@ -482,18 +479,17 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         Phase initialNextPhase = phaseMongoRepository.findOne(planningPeriod.getNextPhaseId());
         List<PhaseDTO> toBeNextPhase = phaseMongoRepository.getNextApplicablePhasesOfUnitBySequence(unitId, initialNextPhase.getSequence());
-        List<Shift> shifts = shiftMongoRepository.findAllShiftsPlanningPeriodAndPhaseId(periodId, planningPeriod.getCurrentPhaseId(), unitId);
+        List<Shift> shifts=shiftMongoRepository.findAllShiftsByPlanningPeriod(periodId,unitId);
         planningPeriod.setCurrentPhaseId(initialNextPhase.getId());
         planningPeriod.setNextPhaseId(Optional.ofNullable(toBeNextPhase).isPresent() && toBeNextPhase.size() > 0 ? toBeNextPhase.get(0).getId() : null);
-        PeriodPhaseFlippingDate periodPhaseFlippingDate = planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDates -> periodPhaseFlippingDates.getPhaseId().equals(planningPeriod.getCurrentPhaseId())).findFirst().get();
+        PeriodPhaseFlippingDate periodPhaseFlippingDate=planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDates -> periodPhaseFlippingDates.getPhaseId().equals(planningPeriod.getCurrentPhaseId())).findFirst().get();
+        List<BigInteger> schedulerPanelIds=planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDates -> periodPhaseFlippingDates.getPhaseId().equals(initialNextPhase.getId())).map(periodPhaseFlippingDates -> periodPhaseFlippingDate.getSchedulerPanelId()).collect(Collectors.toList());
         periodPhaseFlippingDate.setSchedulerPanelId(null);
         periodPhaseFlippingDate.setFlippingDate(DateUtils.getCurrentLocalDate());
         periodPhaseFlippingDate.setFlippingTime(DateUtils.getCurrentLocalTime());
         flipShiftAndCreateShiftState(shifts, planningPeriod.getCurrentPhaseId());
         save(planningPeriod);
-        List<BigInteger> schedulerPanelIds = planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDates -> periodPhaseFlippingDates.getPhaseId().equals(initialNextPhase.getId())).map(periodPhaseFlippingDates -> periodPhaseFlippingDate.getSchedulerPanelId()).collect(Collectors.toList());
-        schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        }, null, null);
+        schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE,  "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},null,null);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
@@ -508,7 +504,7 @@ public class PlanningPeriodService extends MongoBaseService {
         BigInteger nextPhaseId = null;
         for (PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()) {
             if (phaseFlippingDate.getSchedulerPanelId().equals(schedulerPanelId)) {
-                shifts = shiftMongoRepository.findAllShiftsPlanningPeriodAndPhaseId(planningPeriod.getId(), planningPeriod.getCurrentPhaseId(), unitId);
+                shifts=shiftMongoRepository.findAllShiftsByPlanningPeriod(planningPeriod.getId(),unitId);
                 planningPeriod.setCurrentPhaseId(phaseFlippingDate.getPhaseId());
                 updateCurrentAndNextPhases = true;
                 break;
@@ -530,16 +526,15 @@ public class PlanningPeriodService extends MongoBaseService {
         if (shifts.isEmpty()) {
             return;
         }
-        List<ShiftState> shiftStates = new ArrayList<>();
-        shifts.stream().forEach(shift -> {
-            shift.setPhaseId(currentPhaseId);
-            ShiftState shiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
+        List<ShiftState> shiftStates=new ArrayList<>();
+        shifts.stream().forEach(shift ->{
+            ShiftState shiftState = ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftState.class);
             shiftState.setShiftId(shift.getId());
+            shiftState.setShiftStatePhaseId(currentPhaseId);
             shiftState.setId(null);
             shiftStates.add(shiftState);
-        });
-        save(shiftStates);
-        save(shifts);
+        } );
+            save(shiftStates);
     }
 
     /**
@@ -550,8 +545,9 @@ public class PlanningPeriodService extends MongoBaseService {
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
             exceptionService.dataNotFoundException("message.periodsetting.notFound");
         }
-        List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(planningPeriodId, planningPeriod.getCurrentPhaseId(), unitId);
+        List<ShiftState> shiftStates=shiftStateMongoRepository.getShiftsState(planningPeriodId,planningPeriod.getCurrentPhaseId(),unitId);
         restoreShifts(shiftStates);
+        shiftMongoRepository.deleteShiftAfterRestorePhase(planningPeriod.getId(),planningPeriod.getCurrentPhaseId());
         return true;
     }
 
@@ -565,9 +561,9 @@ public class PlanningPeriodService extends MongoBaseService {
         if (shiftStates.isEmpty()) {
             return;
         }
-        List<Shift> shifts = new ArrayList<>();
-        shiftStates.stream().forEach(shiftState -> {
-            Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftState, Shift.class);
+        List<Shift> shifts=new ArrayList<>();
+        shiftStates.forEach(shiftState -> {
+            Shift shift=ObjectMapperUtils.copyPropertiesByMapper(shiftState,Shift.class);
             shift.setId(shiftState.getShiftId());
             shifts.add(shift);
         });

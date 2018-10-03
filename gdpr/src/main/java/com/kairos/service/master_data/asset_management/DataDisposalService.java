@@ -56,7 +56,7 @@ public class DataDisposalService extends MongoBaseService {
         List<DataDisposal> newDataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
-                DataDisposal newDataDisposal = new DataDisposal(name,countryId,SuggestedDataStatus.APPROVED);
+                DataDisposal newDataDisposal = new DataDisposal(name, countryId, SuggestedDataStatus.APPROVED);
                 newDataDisposals.add(newDataDisposal);
             }
 
@@ -73,7 +73,7 @@ public class DataDisposalService extends MongoBaseService {
      * @return list of DataDisposal
      */
     public List<DataDisposalResponseDTO> getAllDataDisposal(Long countryId) {
-        return dataDisposalMongoRepository.findAllDataDisposals(countryId,new Sort(Sort.Direction.DESC, "_id"));
+        return dataDisposalMongoRepository.findAllDataDisposals(countryId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

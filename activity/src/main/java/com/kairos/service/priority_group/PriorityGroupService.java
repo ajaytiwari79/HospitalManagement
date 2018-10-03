@@ -228,7 +228,9 @@ public class PriorityGroupService extends MongoBaseService {
             int fibonacciCounter = 0;//Using it to put fibonacci order in email for testing.
             for(StaffUnitPositionQueryResult staffUnitPositionQueryResult:entry.getValue()) {
 
-                mailService.sendPlainMail(staffUnitPositionQueryResult.getStaffEmail(), String.format(AppConstants.OPENSHIFT_EMAIL_BODY,fibonacciCounter++),AppConstants.OPENSHIFT_SUBJECT);
+                mailService.sendPlainMail(staffUnitPositionQueryResult.getStaffEmail(), String.format(AppConstants.OPENSHIFT_EMAIL_BODY,fibonacciCounter++,
+                        staffUnitPositionQueryResult.getAccumulatedTimeBank(),staffUnitPositionQueryResult.getDeltaWeeklytimeBank(),
+                        staffUnitPositionQueryResult.getPlannedHoursWeek()),AppConstants.OPENSHIFT_SUBJECT);
                 openShiftNotification = new OpenShiftNotification(entry.getKey(),staffUnitPositionQueryResult.getStaffId());
                 openShiftNotifications.add(openShiftNotification);
             }

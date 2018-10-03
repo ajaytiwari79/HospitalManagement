@@ -186,7 +186,10 @@ public class EmploymentService {
 
 
     public Map<String, Object> createUnitPermission(long unitId, long staffId, long accessGroupId, boolean created) {
-
+        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+            exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
+        }
         Organization unit = organizationGraphRepository.findOne(unitId);
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         if (unit == null) {
@@ -226,7 +229,6 @@ public class EmploymentService {
                 unitPermission.setOrganization(unit);
                 unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
             }
-            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
             unitPermission.setAccessGroup(accessGroup);
             employment.getUnitPermissions().add(unitPermission);
             employmentGraphRepository.save(employment);
