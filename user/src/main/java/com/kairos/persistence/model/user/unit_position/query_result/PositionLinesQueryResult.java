@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.user.unit_position.query_result;
 
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
@@ -24,9 +26,26 @@ public class PositionLinesQueryResult {
     private Float hourlyWages;
     private Map<String, Object> employmentType;
     private Map<String, Object> seniorityLevel;
+    private WTAResponseDTO workingTimeAgreement;
+    private CTAResponseDTO costTimeAgreement;
 
     public PositionLinesQueryResult() {
         //DC
+    }
+
+    public PositionLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, Float hourlyWages, Map<String, Object> employmentType, Map<String, Object> seniorityLevel) {
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+        this.salary = salary;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.hourlyWages = hourlyWages;
+        this.employmentType = employmentType;
+        this.seniorityLevel = seniorityLevel;
     }
 
     public Long getId() {
@@ -131,5 +150,21 @@ public class PositionLinesQueryResult {
 
     public void setUnitPositionId(Long unitPositionId) {
         this.unitPositionId = unitPositionId;
+    }
+
+    public WTAResponseDTO getWorkingTimeAgreement() {
+        return workingTimeAgreement;
+    }
+
+    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
+        this.workingTimeAgreement = workingTimeAgreement;
+    }
+
+    public CTAResponseDTO getCostTimeAgreement() {
+        return costTimeAgreement;
+    }
+
+    public void setCostTimeAgreement(CTAResponseDTO costTimeAgreement) {
+        this.costTimeAgreement = costTimeAgreement;
     }
 }

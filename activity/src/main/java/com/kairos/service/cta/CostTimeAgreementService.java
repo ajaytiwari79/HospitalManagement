@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -522,11 +523,12 @@ public class CostTimeAgreementService extends MongoBaseService {
     }
 
 
-    public CTAResponseDTO assignCTATOUnitPosition(Long unitPositionId, BigInteger ctaId) {
+    public CTAResponseDTO assignCTATOUnitPosition(Long unitPositionId, BigInteger ctaId, LocalDate startLocalDate) {
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getOneCtaById(ctaId);
         CostTimeAgreement costTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(ctaResponseDTO, CostTimeAgreement.class);
         costTimeAgreement.setId(null);
         costTimeAgreement.setParentId(ctaId);
+        costTimeAgreement.setStartDate(startLocalDate);
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaResponseDTO.getRuleTemplates(), CTARuleTemplate.class);
         ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
         if (!ctaRuleTemplates.isEmpty()) {

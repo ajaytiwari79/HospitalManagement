@@ -41,9 +41,10 @@ public class CTAResponseDTO {
     public CTAResponseDTO() {
         //Default constructor
     }
-    public CTAResponseDTO(String name, BigInteger id) {
+    public CTAResponseDTO(String name, BigInteger id,BigInteger parentCTAId) {
         this.name = name;
         this.id = id;
+        this.parentCTAId=parentCTAId;
     }
     public CTAResponseDTO(@NotNull BigInteger id, String name, ExpertiseResponseDTO expertise, List<CTARuleTemplateDTO> ruleTemplates, LocalDate startDate, LocalDate endDate, Boolean disabled,Long unitPositionId,String description,PositionCodeDTO positionCodeDTO) {
         this.id = id;

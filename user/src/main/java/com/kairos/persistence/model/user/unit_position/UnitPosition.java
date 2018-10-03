@@ -13,6 +13,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,9 +47,9 @@ public class UnitPosition extends UserBaseEntity {
     private ReasonCode reasonCode;
 
 
-    private Long startDateMillis;
-    private Long endDateMillis;
-    private Long lastWorkingDateMillis;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalDate lastWorkingDate;
     private Long timeCareExternalId;
     private boolean history;
     private boolean editable;
@@ -60,10 +61,10 @@ public class UnitPosition extends UserBaseEntity {
 
     }
 
-    public UnitPosition(PositionCode positionCode, Organization unit, Long startDateMillis, Long timeCareExternalId,boolean published) {
+    public UnitPosition(PositionCode positionCode, Organization unit, LocalDate startDate, Long timeCareExternalId,boolean published) {
         this.positionCode = positionCode;
         this.unit = unit;
-        this.startDateMillis = startDateMillis;
+        this.startDate = startDate;
         this.timeCareExternalId = timeCareExternalId;
         this.editable=true;
         this.history=false;
@@ -86,24 +87,6 @@ public class UnitPosition extends UserBaseEntity {
         this.expertise = expertise;
     }
 
-
-    public Long getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public Long getEndDateMillis() {
-        return endDateMillis;
-    }
-
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
-    }
-
-
     public Staff getStaff() {
         return staff;
     }
@@ -122,12 +105,28 @@ public class UnitPosition extends UserBaseEntity {
         this.union = union;
     }
 
-    public Long getLastWorkingDateMillis() {
-        return lastWorkingDateMillis;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setLastWorkingDateMillis(Long lastWorkingDateMillis) {
-        this.lastWorkingDateMillis = lastWorkingDateMillis;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDate getLastWorkingDate() {
+        return lastWorkingDate;
+    }
+
+    public void setLastWorkingDate(LocalDate lastWorkingDate) {
+        this.lastWorkingDate = lastWorkingDate;
     }
 
     public Organization getUnit() {
@@ -186,9 +185,9 @@ public class UnitPosition extends UserBaseEntity {
         this.positionLines = positionLines;
     }
 
-    public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary) {
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
+    public UnitPosition(LocalDate startDate, LocalDate endDate, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary) {
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     @Override
@@ -200,9 +199,6 @@ public class UnitPosition extends UserBaseEntity {
                 ", union=" + union +
                 ", unit=" + unit +
                 ", reasonCode=" + reasonCode +
-                ", startDateMillis=" + startDateMillis +
-                ", endDateMillis=" + endDateMillis +
-                ", lastWorkingDateMillis=" + lastWorkingDateMillis +
                 ", timeCareExternalId=" + timeCareExternalId +
                 ", history=" + history +
                 ", editable=" + editable +

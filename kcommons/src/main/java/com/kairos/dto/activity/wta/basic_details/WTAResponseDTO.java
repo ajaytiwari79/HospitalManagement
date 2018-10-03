@@ -47,9 +47,10 @@ public class WTAResponseDTO {
         //default
     }
 
-    public WTAResponseDTO(String name, BigInteger id) {
+    public WTAResponseDTO(String name, BigInteger id,BigInteger parentWTA) {
         this.name = name;
         this.id = id;
+        this.parentWTA=parentWTA;
     }
 
     public WTAResponseDTO(BigInteger id, Long startDateMillis, Long endDateMillis, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description) {

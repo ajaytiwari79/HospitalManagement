@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.user.unit_position.query_result;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -10,8 +8,7 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,43 +19,25 @@ import java.util.Optional;
  */
 
 @QueryResult
-@JsonInclude(JsonInclude.Include.NON_NULL)
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UnitPositionQueryResult {
     private Expertise expertise;
-    @JsonIgnore
-    private boolean deleted;
-    private Long startDateMillis;
-    private int workingDaysInWeek;
-    private Long endDateMillis;
-    private Long lastModificationDate;
-    private int totalWeeklyHours;
-    private float avgDailyWorkingHours;
-    private int fullTimeWeeklyMinutes;
-    private float hourlyWages;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Long id;
-
-    private Map<String, Object> employmentType;
-    private Map<String, Object> seniorityLevel;
-    private BigInteger workingTimeAgreementId;
-    private Double salary;
-    private int totalWeeklyMinutes;
     private PositionCode positionCode;
-    private CTAResponseDTO costTimeAgreement;
     private Organization union;
-    private Long lastWorkingDateMillis;
+    private LocalDate lastWorkingDate;
     private Long parentUnitId;
     private Long unitId;
-    private Long reasonCodeId;
-    private Map<String, Object> unitInfo;
-    private WTAResponseDTO workingTimeAgreement;
-    private BigInteger costTimeAgreementId;
-    private List<PositionLinesQueryResult> positionLines;
 
+    private Map<String, Object> reasonCode;
+    private Map<String, Object> unitInfo;
+    private List<PositionLinesQueryResult> positionLines;
     private Boolean history;
     private Boolean editable;
     private Boolean published;
-    private BigDecimal hourlyCost;
 
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
@@ -66,47 +45,6 @@ public class UnitPositionQueryResult {
 
     public void setUnitInfo(Map<String, Object> unitInfo) {
         this.unitInfo = unitInfo;
-    }
-
-    public WTAResponseDTO getWorkingTimeAgreement() {
-        return workingTimeAgreement;
-    }
-
-    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
-        this.workingTimeAgreement = workingTimeAgreement;
-    }
-
-
-    public BigInteger getCostTimeAgreementId() {
-        return costTimeAgreementId;
-    }
-
-    public void setCostTimeAgreementId(BigInteger costTimeAgreementId) {
-        this.costTimeAgreementId = costTimeAgreementId;
-    }
-
-    public BigInteger getWorkingTimeAgreementId() {
-        return workingTimeAgreementId;
-    }
-
-    public void setWorkingTimeAgreementId(BigInteger workingTimeAgreementId) {
-        this.workingTimeAgreementId = workingTimeAgreementId;
-    }
-
-    public int getFullTimeWeeklyMinutes() {
-        return fullTimeWeeklyMinutes;
-    }
-
-    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-    }
-
-    public int getWorkingDaysInWeek() {
-        return workingDaysInWeek;
-    }
-
-    public void setWorkingDaysInWeek(int workingDaysInWeek) {
-        this.workingDaysInWeek = workingDaysInWeek;
     }
 
     public Expertise getExpertise() {
@@ -117,54 +55,20 @@ public class UnitPositionQueryResult {
         this.expertise = expertise;
     }
 
-    public boolean isDeleted() {
-        return deleted;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    public Long getStartDateMillis() {
-        return startDateMillis;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public Long getEndDateMillis() {
-        return endDateMillis;
-    }
-
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
-    }
-
-
-    public float getAvgDailyWorkingHours() {
-        return avgDailyWorkingHours;
-    }
-
-    public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-    }
-
-    public float getHourlyWages() {
-        return hourlyWages;
-    }
-
-    public void setHourlyWages(float hourlyWages) {
-        this.hourlyWages = hourlyWages;
-    }
-
-
-    public Double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Double salary) {
-        this.salary = salary;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public PositionCode getPositionCode() {
@@ -179,52 +83,9 @@ public class UnitPositionQueryResult {
         return id;
     }
 
-    public Long getLastModificationDate() {
-        return lastModificationDate;
-    }
-
-    public void setLastModificationDate(Long lastModificationDate) {
-        this.lastModificationDate = lastModificationDate;
-    }
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    /*public WorkingTimeAgreement getWorkingTimeAgreement() {
-        return workingTimeAgreement;
-    }
-
-    public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
-        this.workingTimeAgreement = workingTimeAgreement;
-    }
-*/
-    public CTAResponseDTO getCostTimeAgreement() {
-        return costTimeAgreement;
-    }
-
-    public void setCostTimeAgreement(CTAResponseDTO costTimeAgreement) {
-        this.costTimeAgreement = costTimeAgreement;
-    }
-
-    public int getTotalWeeklyMinutes() {
-        return this.totalWeeklyMinutes;
-
-    }
-
-    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
-
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-
-    }
-
-    public int getTotalWeeklyHours() {
-        this.totalWeeklyHours = this.totalWeeklyMinutes / 60;
-        return totalWeeklyHours;
-    }
-
-    public void setTotalWeeklyHours(int totalWeeklyHours) {
-        this.totalWeeklyHours = totalWeeklyHours;
     }
 
     public Organization getUnion() {
@@ -235,12 +96,12 @@ public class UnitPositionQueryResult {
         this.union = union;
     }
 
-    public Long getLastWorkingDateMillis() {
-        return lastWorkingDateMillis;
+    public LocalDate getLastWorkingDate() {
+        return lastWorkingDate;
     }
 
-    public void setLastWorkingDateMillis(Long lastWorkingDateMillis) {
-        this.lastWorkingDateMillis = lastWorkingDateMillis;
+    public void setLastWorkingDate(LocalDate lastWorkingDate) {
+        this.lastWorkingDate = lastWorkingDate;
     }
 
     public Long getParentUnitId() {
@@ -257,31 +118,6 @@ public class UnitPositionQueryResult {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
-    }
-
-    public Long getReasonCodeId() {
-        return reasonCodeId;
-    }
-
-    public void setReasonCodeId(Long reasonCodeId) {
-        this.reasonCodeId = reasonCodeId;
-    }
-
-
-    public Map<String, Object> getEmploymentType() {
-        return employmentType;
-    }
-
-    public void setEmploymentType(Map<String, Object> employmentType) {
-        this.employmentType = employmentType;
-    }
-
-    public Map<String, Object> getSeniorityLevel() {
-        return seniorityLevel;
-    }
-
-    public void setSeniorityLevel(Map<String, Object> seniorityLevel) {
-        this.seniorityLevel = seniorityLevel;
     }
 
     public Boolean getHistory() {
@@ -313,13 +149,6 @@ public class UnitPositionQueryResult {
     }
 
 
-    public BigDecimal getHourlyCost() {
-        return hourlyCost;
-    }
-
-    public void setHourlyCost(BigDecimal hourlyCost) {
-        this.hourlyCost = hourlyCost;
-    }
 
     public List<PositionLinesQueryResult> getPositionLines() {
         return Optional.ofNullable(positionLines).orElse(new ArrayList<>());
@@ -329,25 +158,26 @@ public class UnitPositionQueryResult {
         this.positionLines = positionLines;
     }
 
+    public Map<String, Object> getReasonCode() {
+        return reasonCode;
+    }
+
+    public void setReasonCode(Map<String, Object> reasonCode) {
+        this.reasonCode = reasonCode;
+    }
+
     public UnitPositionQueryResult() {
         //default cons
     }
 
-    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CTAResponseDTO cta, WTAResponseDTO wta) {
+    public UnitPositionQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, PositionCode positionCode, Organization union, LocalDate lastWorkingDate, CTAResponseDTO cta, WTAResponseDTO wta) {
         this.expertise = expertise;
-        this.startDateMillis = startDateMillis;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.hourlyWages = hourlyWages;
-        this.lastWorkingDateMillis = lastWorkingDateMillis;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.lastWorkingDate = lastWorkingDate;
         this.id = id;
-        this.salary = salary;
         this.positionCode = positionCode;
         this.union = union;
-        this.costTimeAgreement = cta;
-        this.workingTimeAgreement = wta;
     }
 
 }

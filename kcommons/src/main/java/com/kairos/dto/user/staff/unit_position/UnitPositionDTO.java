@@ -23,9 +23,9 @@ public class UnitPositionDTO {
     private Long id;
     private Long positionLineId;
 
-    private LocalDate startLocalDate;
-    private LocalDate endLocalDate;
-    private LocalDate lastWorkingLocalDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalDate lastWorkingDate;
 
     @Range(min = 0, max = 60, message = "Incorrect Weekly minute")
     private int totalWeeklyMinutes;
@@ -49,14 +49,6 @@ public class UnitPositionDTO {
     // private Long expiryDate;
 
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     private Long unionId;
     private Long parentUnitId;
 
@@ -72,16 +64,26 @@ public class UnitPositionDTO {
     private Set<Long> functionIds = new HashSet<>();
     private Long timeCareExternalId;
     private boolean published;
+    private Long accessGroupId;
 
-    public Long getAccessGroupIdOnEmploymentEnd() {
-        return accessGroupIdOnEmploymentEnd;
+
+
+    public Long getId() {
+        return id;
     }
 
-    public void setAccessGroupIdOnEmploymentEnd(Long accessGroupIdOnEmploymentEnd) {
-        this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public Long getAccessGroupId() {
+        return accessGroupId;
     }
 
-    private Long accessGroupIdOnEmploymentEnd;
+    public void setAccessGroupId(Long accessGroupId) {
+        this.accessGroupId = accessGroupId;
+    }
+
+
     public UnitPositionDTO() {
         //default cons
     }
@@ -110,7 +112,7 @@ public class UnitPositionDTO {
     }
 
 
-    public UnitPositionDTO(Long positionCodeId, Long expertiseId, LocalDate startLocalDate, LocalDate endLocalDate, int totalWeeklyHours, Long employmentTypeId,
+    public UnitPositionDTO(Long positionCodeId, Long expertiseId, LocalDate startDate, LocalDate endDate, int totalWeeklyHours, Long employmentTypeId,
                            Long staffId, BigInteger wtaId, BigInteger ctaId, Long unitId, Long timeCareExternalId) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
@@ -118,8 +120,8 @@ public class UnitPositionDTO {
         this.staffId = staffId;
         this.wtaId = wtaId;
         this.ctaId = ctaId;
-        this.startLocalDate = startLocalDate;
-        this.endLocalDate = endLocalDate;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.totalWeeklyHours = totalWeeklyHours;
         this.timeCareExternalId = timeCareExternalId;
         this.unitId = unitId;
@@ -241,12 +243,12 @@ public class UnitPositionDTO {
         this.unionId = unionId;
     }
 
-    public LocalDate getLastWorkingLocalDate() {
-        return lastWorkingLocalDate;
+    public LocalDate getLastWorkingDate() {
+        return lastWorkingDate;
     }
 
-    public void setLastWorkingLocalDate(LocalDate lastWorkingLocalDate) {
-        this.lastWorkingLocalDate = lastWorkingLocalDate;
+    public void setLastWorkingDate(LocalDate lastWorkingDate) {
+        this.lastWorkingDate = lastWorkingDate;
     }
 
     public Long getUnitId() {
@@ -306,20 +308,20 @@ public class UnitPositionDTO {
         this.functionIds = functionIds;
     }
 
-    public LocalDate getStartLocalDate() {
-        return startLocalDate;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setStartLocalDate(LocalDate startLocalDate) {
-        this.startLocalDate = startLocalDate;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    public LocalDate getEndLocalDate() {
-        return endLocalDate;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public void setEndLocalDate(LocalDate endLocalDate) {
-        this.endLocalDate = endLocalDate;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public Long getPositionLineId() {
