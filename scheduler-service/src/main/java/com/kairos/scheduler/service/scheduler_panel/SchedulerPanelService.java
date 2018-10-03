@@ -1,9 +1,10 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
-import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
-import com.kairos.dto.scheduler.LocalDateTimeIdDTO;
-import com.kairos.dto.scheduler.SchedulerPanelDTO;
-import com.kairos.dto.scheduler.SchedulerPanelDefaultDataDto;
+import com.kairos.dto.scheduler.JobDetailsDTO;
+import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
+import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDefaultDataDto;
 import com.kairos.dto.user.organization.UnitTimeZoneMappingDTO;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
@@ -347,7 +348,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
     }
 
-    public List<JobDetails> getAllJobDetailsByUnitId(Long unitId,int offset){
+    public List<JobDetailsDTO> getAllJobDetailsByUnitId(Long unitId, int offset){
         return jobDetailsRepository.findAllSchedulerPanelsByUnitIdAndOffset(unitId,offset);
     }
     public List<JobDetails> getJobDetails(BigInteger schedulerPanelId){

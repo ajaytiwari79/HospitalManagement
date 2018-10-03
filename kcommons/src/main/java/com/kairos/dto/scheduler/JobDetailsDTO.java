@@ -2,49 +2,21 @@ package com.kairos.dto.scheduler;
 
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
+
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 
-public class KairosSchedulerLogsDTO {
-
-
-    private Result result;
-    private String log;
+public class JobDetailsDTO {
     private BigInteger schedulerPanelId;
+    private LocalDateTime started;
+    private LocalDateTime stopped;
+    private Result result;
+    private String processName;
+    private String name;
+    private String log;
     private Long unitId;
-
-
-
-    private Long startedDate;
-    private Long stoppedDate;
     private JobSubType jobSubType;
 
-    public KairosSchedulerLogsDTO() {
-
-    }
-    public KairosSchedulerLogsDTO(Result result, String log, BigInteger schedulerPanelId, Long unitId, Long startedDate, Long stoppedDate, JobSubType jobSubType) {
-        this.result = result;
-        this.log = log;
-        this.schedulerPanelId = schedulerPanelId;
-        this.unitId = unitId;
-        this.startedDate = startedDate;
-        this.stoppedDate = stoppedDate;
-        this.jobSubType = jobSubType;
-    }
-    public Long getStartedDate() {
-        return startedDate;
-    }
-
-    public void setStartedDate(Long startedDate) {
-        this.startedDate = startedDate;
-    }
-
-    public Long getStoppedDate() {
-        return stoppedDate;
-    }
-
-    public void setStoppedDate(Long stoppedDate) {
-        this.stoppedDate = stoppedDate;
-    }
     public BigInteger getSchedulerPanelId() {
         return schedulerPanelId;
     }
@@ -52,6 +24,7 @@ public class KairosSchedulerLogsDTO {
     public void setSchedulerPanelId(BigInteger schedulerPanelId) {
         this.schedulerPanelId = schedulerPanelId;
     }
+
 
     public JobSubType getJobSubType() {
         return jobSubType;
@@ -61,6 +34,21 @@ public class KairosSchedulerLogsDTO {
         this.jobSubType = jobSubType;
     }
 
+    public LocalDateTime getStarted() {
+        return started;
+    }
+
+    public void setStarted(LocalDateTime started) {
+        this.started = started;
+    }
+
+    public LocalDateTime getStopped() {
+        return stopped;
+    }
+
+    public void setStopped(LocalDateTime stopped) {
+        this.stopped = stopped;
+    }
 
     public Result getResult() {
         return result;
@@ -70,6 +58,22 @@ public class KairosSchedulerLogsDTO {
         this.result = result;
     }
 
+    public String getProcessName() {
+        return processName;
+    }
+
+    public void setProcessName(String processName) {
+        this.processName = processName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getLog() {
         return log;
     }
@@ -77,7 +81,6 @@ public class KairosSchedulerLogsDTO {
     public void setLog(String log) {
         this.log = log;
     }
-
 
     public Long getUnitId() {
         return unitId;

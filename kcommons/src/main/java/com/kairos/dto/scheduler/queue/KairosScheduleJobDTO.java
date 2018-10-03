@@ -1,18 +1,21 @@
-package com.kairos.dto.scheduler;
+package com.kairos.dto.scheduler.queue;
 
+/*
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
+*/
+
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 
 import java.math.BigInteger;
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
-public class SchedulerPanelDTO {
-
-    private BigInteger id;
+public class KairosScheduleJobDTO {
     private String name;
     private String processType;
     private boolean active;
@@ -20,70 +23,45 @@ public class SchedulerPanelDTO {
     private String interval; // to show the content selected e.g. Monday,Tuesday,Wednesday,Thursday,Friday. Every 60 minute
     private Date lastRunTime;
     private Date nextRunTime;
+    private boolean isAlarmed;
     private Integer startMinute;
     private Integer repeat;
     private List<DayOfWeek> days;
     private LocalTime runOnce;
-    private List<String> selectedHours;
+    private List<LocalTime> selectedHours;
     private Date startDate;
     private Date endDate;
+    private Integer weeks;
     private Long unitId;
     private String filterId;
-    private BigInteger integrationConfigurationId;
     private JobType jobType;
     private JobSubType jobSubType;
-    private boolean oneTimeTrigger;
-    private LocalDateTime oneTimeTriggerDate;
     private BigInteger entityId;
+    private IntegrationOperation integrationOperation;
+    private boolean oneTimeTrigger;
+    private Long oneTimeTriggerDateMillis;
 
-
-    public SchedulerPanelDTO() {
+    public KairosScheduleJobDTO() {
 
     }
+    public KairosScheduleJobDTO(Long unitId, JobType jobType, JobSubType jobSubType, BigInteger entityId,IntegrationOperation operation,
+                                Long oneTimeTriggerDateMillis, boolean oneTimeTrigger) {
 
-    public SchedulerPanelDTO(String name, boolean active, Integer startMinute, Integer repeat, List<DayOfWeek> days, LocalTime runOnce, List<String> selectedHours, Long unitId, BigInteger integrationConfigurationId, JobType jobType, JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
-        this.name = name;
-        this.active = active;
-        this.startMinute = startMinute;
-        this.repeat = repeat;
-        this.days = days;
-        this.runOnce = runOnce;
-        this.selectedHours = selectedHours;
         this.unitId = unitId;
-        this.integrationConfigurationId = integrationConfigurationId;
         this.jobType = jobType;
         this.jobSubType = jobSubType;
+        this.entityId = entityId;
+        this.integrationOperation = operation;
+        this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
         this.oneTimeTrigger = oneTimeTrigger;
-        this.oneTimeTriggerDate = oneTimeTriggerDate;
-        this.entityId = entityId;
     }
 
-    public SchedulerPanelDTO(JobType jobType,JobSubType jobSubType, boolean oneTimeTrigger, LocalDateTime oneTimeTriggerDate, BigInteger entityId) {
-       this.jobType=jobType;
-        this.jobSubType = jobSubType;
-        this.oneTimeTrigger = oneTimeTrigger;
-        this.oneTimeTriggerDate = oneTimeTriggerDate;
-        this.entityId = entityId;
+    public Long getOneTimeTriggerDateMillis() {
+        return oneTimeTriggerDateMillis;
     }
 
-    public SchedulerPanelDTO(BigInteger id, LocalDateTime oneTimeTriggerDate) {
-        this.id = id;
-        this.oneTimeTriggerDate = oneTimeTriggerDate;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-    public BigInteger getEntityId() {
-        return entityId;
-    }
-
-    public void setEntityId(BigInteger entityId) {
-        this.entityId = entityId;
+    public void setOneTimeTriggerDateMillis(Long oneTimeTriggerDateMillis) {
+        this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
     }
 
     public boolean isOneTimeTrigger() {
@@ -94,12 +72,20 @@ public class SchedulerPanelDTO {
         this.oneTimeTrigger = oneTimeTrigger;
     }
 
-    public LocalDateTime getOneTimeTriggerDate() {
-        return oneTimeTriggerDate;
+    public BigInteger getEntityId() {
+        return entityId;
     }
 
-    public void setOneTimeTriggerDate(LocalDateTime oneTimeTriggerDate) {
-        this.oneTimeTriggerDate = oneTimeTriggerDate;
+    public void setEntityId(BigInteger entityId) {
+        this.entityId = entityId;
+    }
+
+    public List<DayOfWeek> getDays() {
+        return days;
+    }
+
+    public void setDays(List<DayOfWeek> days) {
+        this.days = days;
     }
 
     public JobType getJobType() {
@@ -118,35 +104,13 @@ public class SchedulerPanelDTO {
         this.jobSubType = jobSubType;
     }
 
-
-    public BigInteger getIntegrationConfigurationId() {
-        return integrationConfigurationId;
+    public List<LocalTime> getSelectedHours() {
+        return selectedHours;
     }
 
-    public void setIntegrationConfigurationId(BigInteger integrationConfigurationId) {
-        this.integrationConfigurationId = integrationConfigurationId;
+    public void setSelectedHours(List<LocalTime> selectedHours) {
+        this.selectedHours = selectedHours;
     }
-
-
-
-    /* public String getRunOnce() {
-        return runOnce;
-    }
-
-    public void setRunOnce(String runOnce) {
-        this.runOnce = runOnce;
-    }*/
-
-   /* public List<String> getDays() {
-        return days;
-    }
-
-    public void setDays(List<String> days) {
-        this.days = days;
-    }
-*/
-
-
     public String getName() {
         return name;
     }
@@ -163,16 +127,6 @@ public class SchedulerPanelDTO {
         this.processType = processType;
     }
 
-    public String getInterval() {
-        return interval;
-    }
-
-    public void setInterval(String interval) {
-        this.interval = interval;
-    }
-
-
-
     public boolean isActive() {
         return active;
     }
@@ -187,6 +141,14 @@ public class SchedulerPanelDTO {
 
     public void setCronExpression(String cronExpression) {
         this.cronExpression = cronExpression;
+    }
+
+    public String getInterval() {
+        return interval;
+    }
+
+    public void setInterval(String interval) {
+        this.interval = interval;
     }
 
     public Date getLastRunTime() {
@@ -205,6 +167,40 @@ public class SchedulerPanelDTO {
         this.nextRunTime = nextRunTime;
     }
 
+    public boolean isAlarmed() {
+        return isAlarmed;
+    }
+
+    public void setAlarmed(boolean alarmed) {
+        isAlarmed = alarmed;
+    }
+
+    public Integer getStartMinute() {
+        return startMinute;
+    }
+
+    public void setStartMinute(Integer startMinute) {
+        this.startMinute = startMinute;
+    }
+
+  /*  public String getRepeat() {
+        return repeat;
+    }
+
+    public void setRepeat(String repeat) {
+        this.repeat = repeat;
+    }*/
+
+
+    /*public String getRunOnce() {
+        return runOnce;
+    }
+
+    public void setRunOnce(String runOnce) {
+        this.runOnce = runOnce;
+    }*/
+
+
 
     public Date getStartDate() {
         return startDate;
@@ -222,14 +218,12 @@ public class SchedulerPanelDTO {
         this.endDate = endDate;
     }
 
-
-
-    public Integer getStartMinute() {
-        return startMinute;
+    public Integer getWeeks() {
+        return weeks;
     }
 
-    public void setStartMinute(Integer startMinute) {
-        this.startMinute = startMinute;
+    public void setWeeks(Integer weeks) {
+        this.weeks = weeks;
     }
 
     public Long getUnitId() {
@@ -248,12 +242,12 @@ public class SchedulerPanelDTO {
         this.filterId = filterId;
     }
 
-    public List<DayOfWeek> getDays() {
-        return days;
+    public IntegrationOperation getIntegrationOperation() {
+        return integrationOperation;
     }
 
-    public void setDays(List<DayOfWeek> days) {
-        this.days = days;
+    public void setIntegrationOperation(IntegrationOperation integrationOperation) {
+        this.integrationOperation = integrationOperation;
     }
 
     public Integer getRepeat() {
@@ -263,8 +257,6 @@ public class SchedulerPanelDTO {
     public void setRepeat(Integer repeat) {
         this.repeat = repeat;
     }
-
-
     public LocalTime getRunOnce() {
         return runOnce;
     }
@@ -273,11 +265,4 @@ public class SchedulerPanelDTO {
         this.runOnce = runOnce;
     }
 
-    public List<String> getSelectedHours() {
-        return selectedHours;
-    }
-
-    public void setSelectedHours(List<String> selectedHours) {
-        this.selectedHours = selectedHours;
-    }
 }
