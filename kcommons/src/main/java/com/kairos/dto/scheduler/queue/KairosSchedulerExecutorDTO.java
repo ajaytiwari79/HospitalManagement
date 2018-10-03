@@ -1,5 +1,6 @@
-package com.kairos.dto.scheduler;
+package com.kairos.dto.scheduler.queue;
 
+import com.kairos.dto.scheduler.IntegrationSettingsDTO;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 

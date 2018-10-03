@@ -7,11 +7,13 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import com.kairos.dto.activity.cta.CTAWTAWrapper;
+import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
-import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
-import com.kairos.dto.scheduler.kafka.producer.KafkaProducer;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
+import com.kairos.dto.scheduler.queue.kafka.producer.KafkaProducer;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
@@ -19,6 +21,7 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.auth.User;
+
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.Function;
@@ -70,6 +73,7 @@ import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.DateUtil;
 import com.kairos.wrapper.PositionWrapper;
+import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -91,6 +95,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -170,7 +175,7 @@ public class UnitPositionService {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Organization parentOrganization;
 
-        PositionCode positionCode;
+        PositionCode positionCode = null;
         if (!organization.isParentOrganization()) {
             parentOrganization = organizationService.getParentOfOrganization(organization.getId());
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(parentOrganization.getId(), unitPositionDTO.getPositionCodeId());
@@ -894,7 +899,6 @@ public class UnitPositionService {
         unitPositionDetails.setWorkingTimeAgreementId(unitPosition.getWorkingTimeAgreementId());
         unitPositionDetails.setUnitPositionStartDate(DateUtils.asLocalDate(new Date(unitPosition.getStartDateMillis())));
         unitPositionDetails.setCostTimeAgreementId(unitPosition.getCostTimeAgreementId());
-        unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
         if (unitPosition.getEndDateMillis() != null) {
             unitPositionDetails.setUnitPositionEndDate(DateUtils.asLocalDate(new Date(unitPosition.getEndDateMillis())));
             unitPositionDetails.setEndDateMillis(unitPosition.getEndDateMillis());
