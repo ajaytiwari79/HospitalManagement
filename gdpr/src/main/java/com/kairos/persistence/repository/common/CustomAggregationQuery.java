@@ -100,7 +100,9 @@ public class CustomAggregationQuery {
                 "}}," +
                 "'countryId':1" +
                 ", 'name':1" +
-                ",'deleted':1 }}";
+                ",'deleted':1 ," +
+                "'createdAt':1" +
+                "}}";
     }
 
 
@@ -125,7 +127,8 @@ public class CustomAggregationQuery {
                 "             'organizationTypes':1," +
                 "             'organizationSubTypes':1," +
                 "             'organizationServices':1," +
-                "              'organizationSubServices':1," +
+                "             'organizationSubServices':1," +
+                "             'createdAt':1" +
                 "         }}";
 
 
@@ -154,7 +157,7 @@ public class CustomAggregationQuery {
                 "       'organizationSubTypes':1," +
                 "       'organizationTypes':1," +
                 "       'organizationServices':1," +
-                "       'organizationSubServices':1," +
+                "       'organizationSubServices':1" +
 
                 "            }}";
     }
@@ -180,6 +183,8 @@ public class CustomAggregationQuery {
                 "  'minDataSubjectVolume':1," +
                 "  'maxDataSubjectVolume':1," +
                 "  'active':1," +
+                " 'assetAssessor':1," +
+                "'suggested':1" +
 
                 "            }}";
     }

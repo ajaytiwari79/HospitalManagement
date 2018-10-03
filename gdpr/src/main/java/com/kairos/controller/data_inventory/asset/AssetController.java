@@ -17,6 +17,7 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 
@@ -33,7 +34,9 @@ public class AssetController {
     @ApiOperation(value = "create asset for organization with basic detail")
     @PostMapping("/asset")
     public ResponseEntity<Object> createAssetWithBasicDetail(@PathVariable Long unitId, @Valid @RequestBody AssetDTO asset) {
+        asset.setSuggested(false);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.createAssetWithBasicDetail(unitId, asset));
+
     }
 
 
@@ -117,5 +120,20 @@ public class AssetController {
     public ResponseEntity<Object> getAllActiveAsset(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAllActiveAsset(unitId));
     }
+
+    @ApiOperation(value = "Get Previous Assessments Launched for Asset")
+    @GetMapping("/asset/{assetId}/assesssment")
+    public ResponseEntity<Object> getAllAssessmentLaunchedForAssetById(@PathVariable Long unitId, @PathVariable BigInteger assetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssessmentListByAssetId(unitId, assetId));
+    }
+
+
+    @ApiOperation(value = "Save Processing Activity And Suggest To country Admin")
+    @PostMapping(COUNTRY_URL + "/asset/suggest")
+    public ResponseEntity<Object> saveProcessingActivityAndSuggestToCountryAdmin(@PathVariable Long unitId, @PathVariable Long countryId, @Valid @RequestBody AssetDTO assetDTO) {
+        assetDTO.setSuggested(true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.saveAssetAndSuggestToCountryAdmin(unitId, countryId, assetDTO));
+    }
+
 
 }

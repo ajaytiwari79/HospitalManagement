@@ -8,10 +8,11 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Repository
 @JaversSpringDataAuditable
-public interface QuestionnaireTemplateMongoRepository extends MongoBaseRepository<QuestionnaireTemplate,BigInteger>,CustomQuestionnaireTemplateRepository {
+public interface QuestionnaireTemplateMongoRepository extends MongoBaseRepository<QuestionnaireTemplate, BigInteger>, CustomQuestionnaireTemplateRepository {
 
     @Query("{deleted:false,countryId:?0,_id:?1}")
     QuestionnaireTemplate findByCountryIdAndId(Long countryId, BigInteger questionnaireTemplateId);
@@ -26,5 +27,12 @@ public interface QuestionnaireTemplateMongoRepository extends MongoBaseRepositor
 
     @Query("{deleted:false,organizationId:?0,defaultAssetTemplate:true}")
     QuestionnaireTemplate findDefaultAssetQuestionnaireTemplateByUnitId(Long unitId);
+
+    @Query("{deleted:false,organizationId:?0,assetType:?1,assetSubType:{$in:?2}}")
+    QuestionnaireTemplate findQuestionnaireTemplateByAssetTypeAndSubAssetType(Long unitId, BigInteger assetTypeId, List<BigInteger> subAssetTypeIds);
+
+    @Query("{deleted:false,organizationId:?0,assetType:?1,assetSubType:{$exists:false}}")
+    QuestionnaireTemplate findQuestionnaireTemplateByAssetTypeAndUnitId(Long unitId, BigInteger assetTypeId);
+
 
 }

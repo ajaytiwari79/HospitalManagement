@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author pradeep
@@ -60,7 +61,7 @@ public class WTAQueryResultDTO {
     private List<TagDTO> tags = new ArrayList<>();
 
     public List<WTABaseRuleTemplate> getRuleTemplates() {
-        return ruleTemplates;
+        return Optional.ofNullable(ruleTemplates).orElse(new ArrayList<>());
     }
 
     public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {

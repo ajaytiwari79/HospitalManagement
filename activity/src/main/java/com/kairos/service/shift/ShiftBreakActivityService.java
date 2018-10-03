@@ -40,28 +40,28 @@ public class ShiftBreakActivityService {
     public List<ShiftActivity> addBreakInShifts(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffUnitPositionDetails unitPositionDetails) {
         Long shiftDurationInMinute = new DateTimeInterval(shift.getEndDate(), shift.getStartDate()).getMinutes();
         List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndUnitIdAndShiftDurationInMinuteLessThanEqualOrderByCreatedAtAsc(shift.getUnitId(), shiftDurationInMinute);
-        List<ShiftActivity> breaksActivites = new ArrayList<>();
+        List<ShiftActivity> breakActivities = new ArrayList<>();
         if (!breakSettings.isEmpty()) {
             Map<BigInteger, Activity> breakActivitiesMap = getBreakActivities(breakSettings);
             boolean paid = Optional.ofNullable(unitPositionDetails.getExpertise().getBreakPaymentSetting()).isPresent() &&
                     BreakPaymentSetting.PAID.equals(unitPositionDetails.getExpertise().getBreakPaymentSetting());
-            breaksActivites = getBreaks(activityWrapperMap, shift, breakSettings, breakActivitiesMap, paid);
+            breakActivities = getBreaks(activityWrapperMap, shift, breakSettings, breakActivitiesMap, paid);
         }
-        return breaksActivites;
+        return breakActivities;
     }
 
     private List<ShiftActivity> getBreaks(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, List<BreakSettings> breakSettings, Map<BigInteger, Activity> breakActivitiesMap, Boolean paid) {
-        List<ShiftActivity> breakActvities = new ArrayList<>();
+        List<ShiftActivity> breakActivities = new ArrayList<>();
         BreakSettings lastBreakSetting = breakSettings.get(breakSettings.size()-1);
         ZonedDateTime shiftStart = DateUtils.asZoneDateTime(shift.getStartDate());
         ZonedDateTime shiftEnd = DateUtils.asZoneDateTime(shift.getEndDate());
-        Long shiftDurationInMinute = 0l;
+        Long shiftDurationInMinute = 0L;
         for (BreakSettings breakSetting : breakSettings) {
             shiftDurationInMinute = new DateTimeInterval(shiftStart, shiftEnd).getMinutes();
             Object[] objects = createBreakActivity(breakSetting,shiftDurationInMinute,breakActivitiesMap,paid,shiftStart,shiftEnd,shift,activityWrapperMap);
             ShiftActivity shiftActivity = (ShiftActivity)objects[0];
             if(shiftActivity!=null) {
-                breakActvities.add(shiftActivity);
+                breakActivities.add(shiftActivity);
             }
             shiftStart = (ZonedDateTime) objects[1];
         }
@@ -70,12 +70,12 @@ public class ShiftBreakActivityService {
             Object[] objects = createBreakActivity(lastBreakSetting,shiftDurationInMinute,breakActivitiesMap,paid,shiftStart,shiftEnd,shift,activityWrapperMap);
             ShiftActivity shiftActivity = (ShiftActivity)objects[0];
             if(shiftActivity!=null) {
-                breakActvities.add(shiftActivity);
+                breakActivities.add(shiftActivity);
             }
             shiftStart = (ZonedDateTime) objects[1];
 
         }
-        return breakActvities;
+        return breakActivities;
     }
 
     private Object[] createBreakActivity(BreakSettings breakSettings, Long shiftDurationInMinute, Map<BigInteger, Activity> breakActivitiesMap, Boolean paid, ZonedDateTime shiftStart, ZonedDateTime shiftEnd, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap){
@@ -97,37 +97,37 @@ public class ShiftBreakActivityService {
     }
 
     private void updateShiftActivityAndScheduledAndDurationMinutes(Shift shift, ZonedDateTime breakDateTime, boolean paid, Map<BigInteger, ActivityWrapper> activityWrapperMap,boolean updateStart){
-        ShiftActivity overLappedActivitiyOfShift = getOverLappedActivitiyOfShift(shift, breakDateTime);
-        if (activityWrapperMap.get(overLappedActivitiyOfShift.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
+        ShiftActivity overLappedActivityOfShift = getOverLappedActivityOfShift(shift, breakDateTime);
+        if (activityWrapperMap.get(overLappedActivityOfShift.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()) {
             if(!paid){
-                long minutes = ChronoUnit.MINUTES.between(DateUtils.asZoneDateTime(overLappedActivitiyOfShift.getStartDate()),breakDateTime);
-                overLappedActivitiyOfShift.setDurationMinutes(overLappedActivitiyOfShift.getDurationMinutes()- (int)minutes);
+                long minutes = ChronoUnit.MINUTES.between(DateUtils.asZoneDateTime(overLappedActivityOfShift.getStartDate()),breakDateTime);
+                overLappedActivityOfShift.setDurationMinutes(overLappedActivityOfShift.getDurationMinutes()- (int)minutes);
             }
             if(updateStart){
-                overLappedActivitiyOfShift.setStartDate(DateUtils.asDate(breakDateTime));
+                overLappedActivityOfShift.setStartDate(DateUtils.asDate(breakDateTime));
             }else {
-                overLappedActivitiyOfShift.setEndDate(DateUtils.asDate(breakDateTime));
+                overLappedActivityOfShift.setEndDate(DateUtils.asDate(breakDateTime));
             }
         }
     }
 
-    private ShiftActivity getOverLappedActivitiyOfShift(Shift shift, ZonedDateTime breakDateTime) {
-        ShiftActivity overLappedActivitiyOfShift = null;
+    private ShiftActivity getOverLappedActivityOfShift(Shift shift, ZonedDateTime breakDateTime) {
+        ShiftActivity overLappedActivityOfShift = null;
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             DateTimeInterval shiftInterval = new DateTimeInterval(shiftActivity.getStartDate().getTime(), shiftActivity.getEndDate().getTime());
             if (shiftInterval.contains(breakDateTime)) {
-                overLappedActivitiyOfShift = shiftActivity;
+                overLappedActivityOfShift = shiftActivity;
                 break;
             }
         }
-        return overLappedActivitiyOfShift;
+        return overLappedActivityOfShift;
     }
 
 
     public Map<BigInteger, Activity> getBreakActivities(List<BreakSettings> breakSettings) {
         Set<BigInteger> breakActivityIds = breakSettings.stream().flatMap(a -> Stream.of(a.getPaidActivityId(), a.getUnpaidActivityId())).collect(Collectors.toSet());
         List<Activity> breakActivities = activityRepository.findAllActivitiesByIds(breakActivityIds);
-        return breakActivities.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        return breakActivities.stream().collect(Collectors.toMap(key -> key.getId(), value -> value));
     }
 
 }

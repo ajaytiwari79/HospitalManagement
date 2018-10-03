@@ -165,7 +165,8 @@ public class AppConstants {
     public static final String NO_CONFLICTS = "NO CONFLICTS";
     public static final String BREAK = "BREAK";
     public static final String SHIFT = "SHIFT";
-    public static final String OPENSHIFT_EMAIL_BODY = "Hi, You have been picked for openshift. fibonacii order- %s";
+    public static final String OPENSHIFT_EMAIL_BODY = "Hi, You have been picked for openshift. fibonacii order- %s, Accumulated timebank- %s, Delta Weeklytimebank- %s," +
+            " PlannedHoursweek- %s";
     public static final String OPENSHIFT_SUBJECT = "Open Shift";
     public static final String SHIFT_NOTIFICATION="SHIFT_NOTIFICATION";
     public static final String SHIFT_NOTIFICATION_MESSAGE="SHIFT_NOTIFICATION_MESSAGE";

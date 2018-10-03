@@ -5,10 +5,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTAWTAWrapper;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
-import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
-import com.kairos.dto.activity.wta.basic_details.WTADTO;
-import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
-import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
@@ -293,6 +290,12 @@ public class WTAService extends MongoBaseService {
         return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResult, WTAResponseDTO.class);
     }
 
+
+
+    public List<WTABaseRuleTemplateDTO> getwtaRuletemplates(BigInteger wtaId) {
+        WTAQueryResultDTO wtaQueryResult = wtaRepository.getOne(wtaId);
+        return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResult, WTAResponseDTO.class).getRuleTemplates();
+    }
     public boolean removeWta(BigInteger wtaId) {
         WorkingTimeAgreement wta = wtaRepository.findOne(wtaId);
         if (!Optional.ofNullable(wta).isPresent()) {

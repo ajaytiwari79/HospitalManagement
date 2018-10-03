@@ -22,9 +22,9 @@ public class PayLevelDTO {
     private PaymentUnit paymentUnit;
     @NotNull(message = "Start date can't be null")
     @DateLong
-    @FutureDate
+
     private Date startDate;
-    @FutureDate
+
     @DateLong
     private Date endDate;
 

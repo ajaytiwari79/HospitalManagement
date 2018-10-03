@@ -287,7 +287,7 @@ public class ExpertiseService {
     }
 
 
-    public List<ExpertiseQueryResult> getAllExpertise(long countryId, String selectedDate) {
+    public List<ExpertiseQueryResult> getAllExpertise(long countryId) {
         return expertiseGraphRepository.getAllExpertiseByCountryId(countryId);
     }
 
@@ -637,9 +637,9 @@ public class ExpertiseService {
     }
 
 
-    public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId, Date selectedDate) {
+    public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
         //Long selectedDateInLong = (selectedDate != null) ? DateUtil.getIsoDateInLong(selectedDate) : DateUtil.getCurrentDateMillis();
-        return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId, selectedDate.getTime());
+        return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId);
     }
 
     public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId, List<AgeRangeDTO> ageRangeDTO, String wtaType) {

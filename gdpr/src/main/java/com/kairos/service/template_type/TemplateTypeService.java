@@ -9,6 +9,7 @@ import com.kairos.persistence.repository.template_type.TemplateTypeMongoReposito
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -150,6 +151,6 @@ public class TemplateTypeService extends MongoBaseService {
      * @author vikash patwal
      */
     public List<TemplateType> getAllTemplateType(Long countryId) {
-        return templateTypeRepository.getAllTemplateType(countryId);
+        return templateTypeRepository.getAllTemplateType(countryId,new Sort(Sort.Direction.DESC,"createdAt"));
     }
 }

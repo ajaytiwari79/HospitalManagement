@@ -4,13 +4,16 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.attendance.AttendanceDuration;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -42,11 +45,15 @@ public class ShiftDTO {
     private LocalDate shiftDate;
     private Long allowedBreakDurationInMinute;
     private ShiftTemplateDTO template;
+    @NotEmpty(message = "message.shift.activity.empty")
     private List<ShiftActivity> activities = new ArrayList<>();
     private BigInteger plannedTimeId;
     private Long expertiseId;
     private LocalDate validatedByStaffDate;
     private LocalDate validatedByPlannerDate;
+    private AttendanceDuration attendanceDuration;
+    private LocalDateTime clockIn;
+    private LocalDateTime clockOut;
 
 
     public ShiftDTO(List<ShiftActivity> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
@@ -73,6 +80,31 @@ public class ShiftDTO {
         this.staffId = staffId;
         this.unitId = unitId;
         this.unitPositionId = unitPositionId;
+    }
+
+
+    public LocalDateTime getClockIn() {
+        return clockIn;
+    }
+
+    public void setClockIn(LocalDateTime clockIn) {
+        this.clockIn = clockIn;
+    }
+
+    public LocalDateTime getClockOut() {
+        return clockOut;
+    }
+
+    public void setClockOut(LocalDateTime clockOut) {
+        this.clockOut = clockOut;
+    }
+
+    public AttendanceDuration getAttendanceDuration() {
+        return attendanceDuration;
+    }
+
+    public void setAttendanceDuration(AttendanceDuration attendanceDuration) {
+        this.attendanceDuration = attendanceDuration;
     }
 
     public LocalDate getValidatedByStaffDate() {

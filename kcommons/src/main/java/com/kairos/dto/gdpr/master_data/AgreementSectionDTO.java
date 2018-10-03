@@ -18,7 +18,6 @@ public class AgreementSectionDTO {
     private BigInteger id;
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
-    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
     private String title;
 
     @NotNull(message = "Section order is Not defined")

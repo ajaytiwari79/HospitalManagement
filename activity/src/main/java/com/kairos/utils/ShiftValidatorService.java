@@ -105,11 +105,6 @@ public class ShiftValidatorService {
         if (!graceInterval.contains(shiftDTO.getStartDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
         }
-        if (validatedByStaff) {
-            shiftDTO.setValidatedByStaffDate(LocalDate.now());
-        } else {
-            shiftDTO.setValidatedByPlannerDate(LocalDate.now());
-        }
     }
 
     public DateTimeInterval getGracePeriodInterval(Long unitId, Date date, boolean forStaff) {
@@ -126,22 +121,20 @@ public class ShiftValidatorService {
 
 
     public ShiftWithViolatedInfoDTO validateShiftWithActivity(Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        List<String> errorMessages = new ArrayList<>();
-        if (!Optional.ofNullable(staffAdditionalInfoDTO.getUnitPosition()).isPresent()) {
-            errorMessages.add(exceptionService.convertMessage("message.unit.position"));
-        }
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
-            errorMessages.add(exceptionService.convertMessage("message.wta.notFound"));
+            exceptionService.actionNotPermittedException("message.wta.notFound");
         }
         if (wtaQueryResultDTO.getEndDate() != null && new DateTime(wtaQueryResultDTO.getEndDate()).isBefore(shift.getActivitiesEndDate().getTime())) {
-            errorMessages.add(exceptionService.convertMessage("message.wta.expired-unit"));
+            exceptionService.actionNotPermittedException("message.wta.expired-unit");
         }
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO);
+        //TODO It should work on Multiple activity
         List<Long> dayTypeIds = shift.getActivities().get(0).getActivity().getRulesActivityTab().getDayTypes();
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills());
         Specification<ShiftWithActivityDTO> activityEmploymentTypeSpecification = new EmploymentTypeSpecification(staffAdditionalInfoDTO.getUnitPosition().getEmploymentType());
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getUnitPosition().getExpertise());
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
+        //TODO It should work on Multiple activity
         Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, shift.getActivities().get(0).getActivity(), staffAdditionalInfoDTO);
         Specification<ShiftWithActivityDTO> shiftTimeLessThan = new ShiftStartTimeLessThan(staffAdditionalInfoDTO.getUnitTimeZone(), shift.getActivitiesStartDate(), shift.getActivities().get(0).getActivity().getRulesActivityTab().getPlannedTimeInAdvance());
 
@@ -158,7 +151,6 @@ public class ShiftValidatorService {
         }
         activitySpecification.validateRules(shift);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
-        shiftWithViolatedInfoDTO.getErrorMessages().addAll(errorMessages);
         return shiftWithViolatedInfoDTO;
     }
 
@@ -167,7 +159,7 @@ public class ShiftValidatorService {
         logger.info("Current phase is " + phase.getName() + " for date " + new DateTime(shift.getActivities().get(0).getStartDate()));
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()));
         if (planningPeriod == null) {
-            exceptionService.convertMessage("message.shift.planning.period.exit", shift.getActivities().get(0).getStartDate());
+            exceptionService.actionNotPermittedException("message.shift.planning.period.exit", shift.getActivities().get(0).getStartDate());
         }
         List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getUnitPosition().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()), staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff());
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates());
@@ -398,7 +390,7 @@ public class ShiftValidatorService {
         if (timeTypeIds != null && !timeTypeIds.isEmpty()) {
             shifts.forEach(s -> {
                 for (ShiftActivityDTO shiftActivity : s.getActivities()) {
-                    if ((timeTypeIds == null || timeTypeIds.contains(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && (plannedTimeIds == null || plannedTimeIds.contains(s.getPlannedTypeId())) && (activitieIds == null || activitieIds.contains(shiftActivity.getActivity().getId())))) {
+                    if ((timeTypeIds == null || timeTypeIds.contains(shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()) && (plannedTimeIds == null || plannedTimeIds.contains(shiftActivity.getPlannedTimeId())) && (activitieIds == null || activitieIds.contains(shiftActivity.getActivity().getId())))) {
                         shiftQueryResultWithActivities.add(s);
                     }
                 }

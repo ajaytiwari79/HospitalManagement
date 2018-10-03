@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -90,7 +91,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
      * @return list of DataSource
      */
     public List<DataSourceResponseDTO> getAllDataSource(Long organizationId) {
-        return dataSourceMongoRepository.findAllOrganizationDataSources(organizationId,new Sort(Sort.Direction.DESC, "_id"));
+        return dataSourceMongoRepository.findAllOrganizationDataSources(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -113,15 +114,9 @@ public class OrganizationDataSourceService extends MongoBaseService {
 
         List<ProcessingActivityBasicResponseDTO>  processingActivitiesLinkedWithDataSource = processingActivityMongoRepository.findAllProcessingActivityLinkedWithDataSource(unitId, dataSourceId);
         if (!processingActivitiesLinkedWithDataSource.isEmpty()) {
-            StringBuilder processingActivityNames=new StringBuilder();
-            processingActivitiesLinkedWithDataSource.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource", processingActivityNames);
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "DataSource",new StringBuilder(processingActivitiesLinkedWithDataSource.stream().map(ProcessingActivityBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        DataSource dataSource = dataSourceMongoRepository.findByOrganizationIdAndId(unitId, dataSourceId);
-        if (!Optional.ofNullable(dataSource).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "DataSource", dataSourceId);
-        }
-        delete(dataSource);
+       dataSourceMongoRepository.safeDelete(dataSourceId);
         return true;
     }
 

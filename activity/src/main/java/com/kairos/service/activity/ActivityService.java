@@ -65,6 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -89,6 +90,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static javafx.scene.input.KeyCode.V;
 import static org.springframework.http.MediaType.APPLICATION_XML;
 
 
@@ -420,7 +422,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
         Set<BigInteger> compositeShiftIds = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet());
-        List<Activity> activityMatched = activityMongoRepository.getActivityByIds(compositeShiftIds);
+        List<Activity> activityMatched = activityMongoRepository.findAllActivitiesByIds(compositeShiftIds);
         if (activityMatched.size() != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
@@ -434,11 +436,11 @@ public class ActivityService extends MongoBaseService {
     public void updateCompositeActivity(List<Activity> activityMatched, Activity activity, List<CompositeActivity> compositeActivities) {
         Map<BigInteger, Activity> activityMap = activityMatched.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         for (CompositeActivity compositeActivity : compositeActivities) {
-            Activity activity1 = activityMap.get(compositeActivity.getActivityId());
-            Optional<CompositeActivity> optionalCompositeActivity1 = activity1.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
-            CompositeActivity compositeActivity1 = optionalCompositeActivity1.isPresent() ? optionalCompositeActivity1.get() : new CompositeActivity();
-            compositeActivity1.setAllowedBefore(compositeActivity.isAllowedAfter());
-            compositeActivity1.setAllowedAfter(compositeActivity.isAllowedBefore());
+            Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
+            Optional<CompositeActivity> optionalCompositeActivity = composedActivity.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
+            CompositeActivity compositeActivityOfAnotherActivity = optionalCompositeActivity.isPresent() ? optionalCompositeActivity.get() : new CompositeActivity();
+            compositeActivityOfAnotherActivity.setAllowedBefore(compositeActivity.isAllowedAfter());
+            compositeActivityOfAnotherActivity.setAllowedAfter(compositeActivity.isAllowedBefore());
         }
         save(activityMatched);
     }
@@ -902,7 +904,7 @@ public class ActivityService extends MongoBaseService {
     private List<Activity> createActivatesForCountryFromTimeCare(List<TimeCareActivity> timeCareActivities, Long unitId, Long countryId,
                                                                  List<String> externalIdsOfAllActivities, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
 
-        OrganizationDTO organizationDTO = organizationRestClient.getOrganization(unitId);
+        OrganizationDTO organizationDTO = genericRestClient.publishRequest(null,unitId, true, IntegrationOperation.GET, "", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {});
         if (organizationDTO == null) {
             exceptionService.dataNotFoundByIdException("message.organization.id");
         }
@@ -911,7 +913,7 @@ public class ActivityService extends MongoBaseService {
             activityCategory = new ActivityCategory("NONE", "", countryId, null);
             save(activityCategory);
         }
-        List<Long> orgTypes = organizationDTO.getOrganizationTypes().stream().map(organizationTypeDTO -> organizationTypeDTO.getId()).collect(Collectors.toList());
+        Long orgType = organizationDTO.getOrganizationType().getId();
         List<Long> orgSubTypes = organizationDTO.getOrganizationSubTypes().stream().map(organizationTypeDTO -> organizationTypeDTO.getId()).collect(Collectors.toList());
 
         Set<String> skillsOfAllTimeCareActivity = timeCareActivities.stream().flatMap(timeCareActivity -> timeCareActivity.getArrayOfSkill().stream().
@@ -930,7 +932,7 @@ public class ActivityService extends MongoBaseService {
             activity.setParentActivity(true);
             activity.setState(ActivityStateEnum.LIVE);
             activity.setName(timeCareActivity.getName());
-            activity.setOrganizationTypes(orgTypes);
+            activity.setOrganizationTypes(Arrays.asList(orgType));
             activity.setOrganizationSubTypes(orgSubTypes);
             activity.setExternalId(timeCareActivity.getId());
             //general tab
@@ -1120,6 +1122,7 @@ public class ActivityService extends MongoBaseService {
         activityCopied.setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
+        activityCopied.setState(ActivityStateEnum.PUBLISHED);
         activityCopied.getGeneralActivityTab().setEndDate(activityDTO.getEndDate());
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());

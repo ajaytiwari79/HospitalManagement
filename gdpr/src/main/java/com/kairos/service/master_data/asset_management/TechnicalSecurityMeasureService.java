@@ -82,7 +82,7 @@ public class TechnicalSecurityMeasureService extends MongoBaseService {
      * @return list of TechnicalSecurityMeasure
      */
     public List<TechnicalSecurityMeasureResponseDTO> getAllTechnicalSecurityMeasure(Long countryId) {
-        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(countryId,new Sort(Sort.Direction.DESC, "_id"));
+        return technicalSecurityMeasureMongoRepository.findAllTechnicalSecurityMeasures(countryId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

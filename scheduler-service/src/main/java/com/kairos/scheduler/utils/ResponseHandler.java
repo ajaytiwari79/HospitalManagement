@@ -1,6 +1,7 @@
 package com.kairos.scheduler.utils;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.response.ResponseDTO;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,11 @@ public final class ResponseHandler {
         map.put("time_stamp", DateUtils.getCurrentDate());
         return new ResponseEntity<Map<String, Object>>(map, status);
 
+    }
+
+    public static <T> ResponseEntity<ResponseDTO<T>> generateResponseDTO(HttpStatus status, boolean isSuccess, T responsObj){
+        ResponseDTO<T> responseDTO = new ResponseDTO<T>(status.value(), isSuccess, responsObj);
+        return new ResponseEntity<>(responseDTO, status);
     }
 
     public static ResponseEntity<String> generateResponse(JSONObject jsonObject) {

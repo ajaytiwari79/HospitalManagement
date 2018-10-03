@@ -43,16 +43,24 @@ public class PolicyAgreementTemplateController {
 
     @ApiOperation("get All agreement sections and Subjection of Agreement template ")
     @GetMapping(value = "/agreement_template/{agreementTemplateId}/section")
-    public ResponseEntity<Object> getAllAgreementSectionWithSubSectionsAndClausesOfAgreementTemplate(@PathVariable Long countryId,@PathVariable BigInteger agreementTemplateId) {
+    public ResponseEntity<Object> getAllAgreementSectionWithSubSectionsAndClausesOfAgreementTemplate(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(countryId, agreementTemplateId));
     }
 
 
     @ApiOperation("delete Policy agreement Template By Id")
-    @DeleteMapping("/agreement_template/delete/{id}")
-    public ResponseEntity<Object> deletePolicyAgreementTemplateById(@PathVariable Long countryId,  @PathVariable BigInteger id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.deletePolicyAgreementTemplate(countryId,  id));
+    @DeleteMapping("/agreement_template/delete/{agreementTemplateId}")
+    public ResponseEntity<Object> deletePolicyAgreementTemplateById(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.deletePolicyAgreementTemplate(countryId, agreementTemplateId));
+
+    }
+
+
+    @ApiOperation("update Policy agreement Template Basic details")
+    @PutMapping("/agreement_template/{agreementTemplateId}")
+    public ResponseEntity<Object> deletePolicyAgreementTemplateById(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId, @Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplateBasicDetails(countryId, agreementTemplateId, agreementTemplateDto));
 
     }
 

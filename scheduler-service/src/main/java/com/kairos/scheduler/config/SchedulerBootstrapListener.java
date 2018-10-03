@@ -28,14 +28,7 @@ public class SchedulerBootstrapListener implements ApplicationListener<Applicati
     private static final Logger logger =LoggerFactory.getLogger(SchedulerBootstrapListener.class);
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        logger.info("Scheduler MS is started");
-        List<DayOfWeek> days= Stream.of(DayOfWeek.MONDAY,DayOfWeek.TUESDAY,DayOfWeek.WEDNESDAY,DayOfWeek.THURSDAY,DayOfWeek.FRIDAY,DayOfWeek.SATURDAY,DayOfWeek.SUNDAY).
-                collect(Collectors.toList());
-        List<String> selectedHours = Stream.of("23:00-23:59").collect(Collectors.toList());
 
-        SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(JOB_TO_CHECK_SICK_USER,true,0,8,days,null,
-                selectedHours,null,null,JobType.FUNCTIONAL,JobSubType.UPDATE_USER_ABSENCE,false,null,null);
-        //schedulerPanelService.createSchedulerPanel(null,schedulerPanelDTO,null);
-
+        schedulerPanelService.initSchedulerPanels();
     }
 }
