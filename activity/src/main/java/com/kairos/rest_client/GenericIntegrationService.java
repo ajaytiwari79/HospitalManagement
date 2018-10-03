@@ -1,5 +1,6 @@
 package com.kairos.rest_client;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
@@ -10,22 +11,22 @@ import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.dto.user.organization.UnitAndParentOrganizationAndCountryDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 @Transactional
@@ -121,6 +122,21 @@ public class GenericIntegrationService {
     public AccessGroupPermissionCounterDTO getAccessGroupIdsAndCountryAdmin(Long unitId){
             return ObjectMapperUtils.copyPropertiesByMapper(genericRestClient.publish(null,unitId,true,IntegrationOperation.GET,"/staff/user/accessgroup",null),AccessGroupPermissionCounterDTO.class);
     }
+
+    public Long removeFunctionFromUnitPositionByDate(Long unitId,Long unitPositionId,Date shiftDate){
+        BasicNameValuePair appliedDate=new BasicNameValuePair("appliedDate",DateUtils.asLocalDate(shiftDate).toString());
+        Long functionId= genericRestClient.publishRequest(null,unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/applyFunction", Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {},unitPositionId);
+        return functionId;
+    }
+
+    public Boolean restoreFunctionFromUnitPositionByDate(Long unitId,Long unitPositionId,Map<Long,Set<LocalDate>> dateAndFunctionIdMap){
+        return genericRestClient.publishRequest(dateAndFunctionIdMap,unitId, true, IntegrationOperation.CREATE, "/unit_position/{unitPositionId}/restore_functions",null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},unitPositionId);
+
+    }
+
+    public Map<LocalDate,Long> removeFunctionFromUnitPositionByDates(Long unitId,Long unitPositionId,Set<LocalDate> dates){
+         return genericRestClient.publishRequest(dates,unitId, true, IntegrationOperation.DELETE, "/unit_position/{unitPositionId}/remove_functions", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<LocalDate,Long>>>() {},unitPositionId);
+         }
 
   /*  public SchedulerPanelDTO checkSchedulerLoadBalanceWorking() {
 
