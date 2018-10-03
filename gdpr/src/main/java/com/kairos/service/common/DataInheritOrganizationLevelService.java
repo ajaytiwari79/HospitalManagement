@@ -4,6 +4,9 @@ package com.kairos.service.common;
 import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
+import com.kairos.persistence.model.master_data.data_category_element.DataElement;
+import com.kairos.persistence.model.master_data.data_category_element.DataSubjectMapping;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
 import com.kairos.persistence.model.questionnaire_template.Question;
@@ -21,6 +24,8 @@ import com.kairos.persistence.repository.master_data.asset_management.org_securi
 import com.kairos.persistence.repository.master_data.asset_management.storage_format.StorageFormatMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureMongoRepository;
 import com.kairos.persistence.repository.master_data.data_category_element.DataCategoryMongoRepository;
+import com.kairos.persistence.repository.master_data.data_category_element.DataElementMongoRepository;
+import com.kairos.persistence.repository.master_data.data_category_element.DataSubjectMappingRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.accessor_party.AccessorPartyMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.data_source.DataSourceMongoRepository;
@@ -36,6 +41,9 @@ import com.kairos.response.dto.common.*;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataCategoryResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataElementBasicResponseDTO;
+import com.kairos.response.dto.master_data.data_mapping.DataSubjectMappingResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireTemplateResponseDTO;
@@ -103,11 +111,15 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
     private QuestionMongoRepository questionMongoRepository;
     @Inject
     private QuestionnaireSectionRepository questionnaireSectionRepository;
-
     @Inject
     private QuestionnaireTemplateMongoRepository questionnaireTemplateMongoRepository;
+    @Inject
+    private DataElementMongoRepository dataElementMongoRepository;
+    @Inject
+    private DataSubjectMappingRepository dataSubjectMappingRepository;
 
     private Map<String, BigInteger> globalAssetTypeAndSubAssetTypeMap = new HashMap<>();
+    private Map<String, BigInteger> globalCategoryNameAndIdMap = new HashMap<>();
 
 
     public Boolean copyDataFromCountryToUnitIdOnOnBoarding(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
@@ -115,6 +127,8 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
 
         List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
         saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
+        List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
+        copyDataCategoryAndDataElements(unitId, dataCategoryDTOS);
         inheritMetaDataOfAssetAndProcessingActivity(countryId, unitId, organizationMetaDataDTO);
 
         return true;
@@ -206,7 +220,12 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssetDTOS);
             return true;
         };
+        Callable<Boolean> dataSubjectTask = () -> {
 
+            List<DataSubjectMappingResponseDTO> dataSubjectMappingDTOS = dataSubjectMappingService.getAllDataSubjectAndMappingWithDataOfUnitOnLeftHierarchySelection(countryId);
+            copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectMappingDTOS);
+            return true;
+        };
 
         callables.add(hostingProviderTask);
         callables.add(dataDispoaslTask);
@@ -223,6 +242,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
         callables.add(processingActivityTask);
         callables.add(questionniareTemplateTask);
         callables.add(assetTask);
+        callables.add(dataSubjectTask);
         asynchronousService.executeAsynchronously(callables);
     }
 
@@ -281,6 +301,55 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             });
             processingActivityMongoRepository.saveAll(getNextSequence(processingActivities));
         }
+    }
+
+
+    private void copyDataCategoryAndDataElements(Long unitId, List<DataCategoryResponseDTO> dataCategoryDTOS) {
+        if (CollectionUtils.isNotEmpty(dataCategoryDTOS)) {
+
+            Map<DataCategory, List<DataElement>> dataCategoryAndDataElementListMap = new HashMap<>();
+            for (DataCategoryResponseDTO dataCategoryDTO : dataCategoryDTOS) {
+                DataCategory dataCategory = new DataCategory(dataCategoryDTO.getName());
+                dataCategory.setOrganizationId(unitId);
+                List<DataElement> dataElementList = new ArrayList<>();
+                if (CollectionUtils.isNotEmpty(dataCategoryDTO.getDataElements())) {
+                    for (DataElementBasicResponseDTO dataElementBasicResponseDTO : dataCategoryDTO.getDataElements()) {
+                        DataElement dataElement = new DataElement(dataElementBasicResponseDTO.getName());
+                        dataElement.setOrganizationId(unitId);
+                        dataElementList.add(dataElement);
+                    }
+                }
+                dataCategoryAndDataElementListMap.put(dataCategory, dataElementList);
+            }
+
+            List<DataElement> dataElements = new ArrayList<>();
+            dataCategoryAndDataElementListMap.forEach((dataCategory, dataElementList) -> dataElements.addAll(dataElementList));
+            if (CollectionUtils.isNotEmpty(dataElements)) {
+                dataElementMongoRepository.saveAll(getNextSequence(dataElements));
+            }
+            List<DataCategory> dataCategories = new ArrayList<>(dataCategoryAndDataElementListMap.keySet());
+            dataCategoryMongoRepository.saveAll(getNextSequence(dataCategories));
+            dataCategories.parallelStream().forEach(dataCategory -> globalCategoryNameAndIdMap.put(dataCategory.getName().trim().toLowerCase(), dataCategory.getId()));
+        }
+    }
+
+
+    private void copyDataSubjectAndDataCategoryFromCountry(Long unitId, List<DataSubjectMappingResponseDTO> dataSubjectMappingResponseDTOS) {
+        if (CollectionUtils.isNotEmpty(dataSubjectMappingResponseDTOS)) {
+            List<DataSubjectMapping> dataSubjects = new ArrayList<>();
+            for (DataSubjectMappingResponseDTO dataSubjectDTO : dataSubjectMappingResponseDTOS) {
+                DataSubjectMapping dataSubjectMapping = new DataSubjectMapping(dataSubjectDTO.getName());
+                dataSubjectMapping.setOrganizationId(unitId);
+                if (CollectionUtils.isNotEmpty(dataSubjectDTO.getDataCategories())) {
+                    Set<BigInteger> dataCategoryIds = new HashSet<>();
+                    dataSubjectDTO.getDataCategories().parallelStream().forEach(dataCategoryDTO -> dataCategoryIds.add(globalAssetTypeAndSubAssetTypeMap.get(dataCategoryDTO.getName().toLowerCase().trim())));
+                    dataSubjectMapping.setDataCategories(dataCategoryIds);
+                }
+                dataSubjects.add(dataSubjectMapping);
+            }
+            dataSubjectMappingRepository.saveAll(getNextSequence(dataSubjects));
+        }
+
     }
 
 
