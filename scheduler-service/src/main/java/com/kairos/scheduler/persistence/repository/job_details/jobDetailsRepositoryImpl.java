@@ -23,12 +23,6 @@ public class jobDetailsRepositoryImpl implements CustomJobDetailsRepository {
     private MongoTemplate mongoTemplate;
 
     public List<JobDetailsDTO> findAllSchedulerPanelsByUnitIdAndOffset(Long unitId, int offset) {
-
-        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false));
-        query.with(new Sort(Sort.Direction.DESC, "started"));
-
-        query.skip(offset*50);
-        query.limit(50);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 lookup("schedulerPanel","schedulerPanelId","_id","schedulerPanel"),
