@@ -71,7 +71,6 @@ import com.kairos.service.staff.StaffService;
 import com.kairos.utils.DateUtil;
 import com.kairos.wrapper.PositionWrapper;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.joda.time.Interval;
@@ -1127,7 +1126,7 @@ public class UnitPositionService {
         Set<String> localDatesAsString=ObjectMapperUtils.copyPropertiesOfSetByMapper(appliedDates,String.class);
         List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationshipQueryResults=unitPositionFunctionRelationshipRepository.findAllByAppliedDatesIn(unitPositionId,localDatesAsString);
         for(UnitPositionFunctionRelationshipQueryResult unitPositionFunctionRelationshipQueryResult :unitPositionFunctionRelationshipQueryResults){
-           Set<LocalDate> dateToRemove=getInterSectedDate(unitPositionFunctionRelationshipQueryResult.getAppliedDates(),appliedDates);
+           Set<LocalDate> dateToRemove= getInterSectedDates(unitPositionFunctionRelationshipQueryResult.getAppliedDates(),appliedDates);
             unitPositionFunctionRelationshipQueryResult.getAppliedDates().removeAll(dateToRemove);
             unitPositionFunctionRelationships.add(new UnitPositionFunctionRelationship(unitPositionFunctionRelationshipQueryResult.getId(),unitPositionFunctionRelationshipQueryResult.getUnitPosition(), unitPositionFunctionRelationshipQueryResult.getFunction(), unitPositionFunctionRelationshipQueryResult.getAppliedDates()));
             for(LocalDate localDate:dateToRemove){
@@ -1280,7 +1279,14 @@ public class UnitPositionService {
         return true;
     }
 
-    private Set<LocalDate> getInterSectedDate(Set<LocalDate> first,Set<LocalDate> second){
+    /**
+     *
+     * @param first
+     * @param second
+     * @return matchedDates
+     * @Desc This method will return the Matched or common dates from two sets
+     */
+    private Set<LocalDate> getInterSectedDates(Set<LocalDate> first, Set<LocalDate> second){
         Set<LocalDate> matchedDates=new HashSet<>();
         if(CollectionUtils.isEmpty(first) || CollectionUtils.isEmpty(second)){
             return matchedDates;
