@@ -74,7 +74,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     @Override
     public List<CTAResponseDTO> getCTAByUpIds(List<Long> unitPositionIds) {
         Query query = new Query(Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds));
-        query.fields().include("name").include("description").include("unitPositionId").include("startDate").include("endDate");
+        query.fields().include("name").include("description").include("unitPositionId").include("startDate").include("endDate").include("parentId");
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
 

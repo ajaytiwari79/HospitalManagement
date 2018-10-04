@@ -79,31 +79,6 @@ public class UnitPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.updateUnitPositionWTA(unitId, unitPositionId, wtaId, wtadto));
     }
 
-   /* @ApiOperation(value = "get unit_position's WTA")
-    @GetMapping(value = "/unit_position/{unitPositionId}/wta")
-    public ResponseEntity<Map<String, Object>> getUnitPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionWTA(unitId, unitPositionId));
-    }*/
-
-    /*@ApiOperation(value = "Update Unit Position's CTA")
-    @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta/{ctaId}")
-    public ResponseEntity<Map<String, Object>> updateCostTimeAgreementForUnitPosition(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable BigInteger ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO ctaDTO) throws ExecutionException, InterruptedException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.updateCostTimeAgreementForUnitPosition(unitId, unitPositionId, ctaId, ctaDTO));
-    }
-
-    @ApiOperation(value = "get unit_position's CTA")
-    @GetMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta")
-    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitId, unitPositionId));
-    }*/
-
-    @ApiOperation(value = "get unit_position's CTA")
-    @GetMapping(value = "/getCTAbyUnitPosition/{unitPositionId}")
-    public ResponseEntity<Map<String, Object>> getUnitPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionCTA(unitPositionId, unitId));
-    }
-
-
     @ApiOperation(value = "apply function to unit position")
     @PostMapping(value = "/unit_position/{unitPositionId}/applyFunction")
     public ResponseEntity<Map<String, Object>> applyFunction(@PathVariable Long unitPositionId, @RequestBody Map<String, Object> payload) throws ParseException {
@@ -170,7 +145,7 @@ public class UnitPositionController {
    @ApiOperation(value = "update senioritylevel")
     @RequestMapping(value = "/seniority_level_update", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> updateSeniorityLevel() {
-        unitPositionService.updateSeniorityLevelOnJobTrigger(new BigInteger("4"));
+        unitPositionService.updateSeniorityLevelOnJobTrigger(new BigInteger("4"),999L);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 

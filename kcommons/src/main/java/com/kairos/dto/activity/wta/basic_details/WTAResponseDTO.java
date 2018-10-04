@@ -23,7 +23,7 @@ public class WTAResponseDTO {
 
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
 
-    private BigInteger parentWTA;
+    private BigInteger parentId;
 
     private Long startDateMillis;
     private Long endDateMillis;
@@ -47,10 +47,10 @@ public class WTAResponseDTO {
         //default
     }
 
-    public WTAResponseDTO(String name, BigInteger id,BigInteger parentWTA) {
+    public WTAResponseDTO(String name, BigInteger id,BigInteger parentId) {
         this.name = name;
         this.id = id;
-        this.parentWTA=parentWTA;
+        this.parentId = parentId;
     }
 
     public WTAResponseDTO(BigInteger id, Long startDateMillis, Long endDateMillis, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description) {
@@ -207,12 +207,12 @@ public class WTAResponseDTO {
         this.tags = tags;
     }
 
-    public BigInteger getParentWTA() {
-        return parentWTA;
+    public BigInteger getParentId() {
+        return parentId;
     }
 
-    public void setParentWTA(BigInteger parentWTA) {
-        this.parentWTA = parentWTA;
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
     public WTAResponseDTO(BigInteger id, Long startDateMillis, Long endDateMillis, String name, String description, ExpertiseResponseDTO expertise, OrganizationTypeDTO organizationType, OrganizationTypeDTO organizationSubType, List<TagDTO> tags) {
