@@ -24,9 +24,11 @@ public interface HostingTypeMongoRepository extends MongoBaseRepository<HostingT
 
     @Query("{deleted:false,_id:?0}")
     HostingTypeResponseDTO findHostingTypeById(BigInteger id);
+    @Query("{deleted:false,countryId:?0}")
+    List<HostingTypeResponseDTO> findAllByCountryId(Long countryId);
 
     @Query("{deleted:false,countryId:?0}")
-    List<HostingTypeResponseDTO> findAllHostingTypes(Long countryId, Sort  sort);
+    List<HostingTypeResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort  sort);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<HostingType> getHostingTypeListByIds(Long countryId, Set<BigInteger> hostingTypeIds);
@@ -38,7 +40,7 @@ public interface HostingTypeMongoRepository extends MongoBaseRepository<HostingT
     HostingType findByOrganizationIdAndName(Long organizationId,String name);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<HostingTypeResponseDTO> findAllOrganizationHostingTypes(Long organizationId,Sort sort);
+    List<HostingTypeResponseDTO> findAllByUnitIdSortByCreatedDate(Long organizationId, Sort sort);
 
 }
 

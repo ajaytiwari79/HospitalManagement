@@ -91,7 +91,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long organizationId) {
-        return processingPurposeMongoRepository.findAllOrganizationProcessingPurposes(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return processingPurposeMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -102,7 +102,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      */
     public ProcessingPurpose getProcessingPurpose(Long organizationId, BigInteger id) {
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -131,7 +131,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      */
     public ProcessingPurposeDTO updateProcessingPurpose(Long organizationId, BigInteger id, ProcessingPurposeDTO processingPurposeDTO) {
 
-        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByOrganizationIdAndName(organizationId, processingPurposeDTO.getName());
+        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByUnitIdAndName(organizationId, processingPurposeDTO.getName());
         if (Optional.ofNullable(processingPurpose).isPresent()) {
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;

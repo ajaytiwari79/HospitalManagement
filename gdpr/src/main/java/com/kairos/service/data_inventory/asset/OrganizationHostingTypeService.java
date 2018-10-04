@@ -94,7 +94,7 @@ public class OrganizationHostingTypeService extends MongoBaseService {
      * @return list of HostingType
      */
     public List<HostingTypeResponseDTO> getAllHostingType(Long organizationId) {
-        return hostingTypeMongoRepository.findAllOrganizationHostingTypes(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return hostingTypeMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

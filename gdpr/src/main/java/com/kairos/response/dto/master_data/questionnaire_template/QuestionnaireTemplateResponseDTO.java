@@ -13,14 +13,14 @@ public class QuestionnaireTemplateResponseDTO {
 
 
     private BigInteger id;
-
     private String name;
     private String description;
     private QuestionnaireTemplateType templateType;
-
+    private boolean defaultAssetTemplate;
     private AssetType assetType;
-
+    private AssetType assetSubType;
     private List<QuestionnaireSectionResponseDTO> sections;
+
 
     public BigInteger getId() {
         return id;
@@ -29,6 +29,14 @@ public class QuestionnaireTemplateResponseDTO {
     public void setId(BigInteger id) {
         this.id = id;
     }
+
+    public AssetType getAssetSubType() { return assetSubType; }
+
+    public void setAssetSubType(AssetType assetSubType) { this.assetSubType = assetSubType; }
+
+    public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
+
+    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.defaultAssetTemplate = defaultAssetTemplate; }
 
     public String getName() {
         return name;

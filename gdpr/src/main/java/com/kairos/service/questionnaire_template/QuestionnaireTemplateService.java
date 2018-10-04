@@ -83,12 +83,12 @@ public class QuestionnaireTemplateService extends MongoBaseService {
                 questionnaireTemplate.setTemplateType(templateDto.getTemplateType());
                 break;
             case ASSET_TYPE:
+                questionnaireTemplate.setTemplateType(templateDto.getTemplateType());
                 if (templateDto.isDefaultAssetTemplate()) {
                     QuestionnaireTemplate previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(referenceId) : questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByCountryId(referenceId);
                     if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                         exceptionService.invalidRequestException("message.invalid.request", "Default Questionnaire Template is Already Present");
                     }
-                    questionnaireTemplate.setTemplateType(templateDto.getTemplateType());
                     questionnaireTemplate.setDefaultAssetTemplate(true);
                 } else {
                     addAssetTypeToQuestionnaireTemplate(referenceId, isUnitId, questionnaireTemplate, templateDto);
@@ -108,7 +108,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
             AssetType assetType = isUnitId ? assetTypeMongoRepository.findByIdAndUnitId(referenceId, templateDto.getAssetType()) : assetTypeMongoRepository.findByIdAndCountryId(referenceId, templateDto.getAssetType());
             if (!Optional.ofNullable(assetType).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", templateDto.getAssetType());
-            } else if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(templateDto.getAssetSubType()).isPresent() ||  !assetType.getSubAssetTypes().contains(templateDto.getAssetSubType()))) {
+            } else if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(templateDto.getAssetSubType()).isPresent() || !assetType.getSubAssetTypes().contains(templateDto.getAssetSubType()))) {
                 exceptionService.invalidRequestException("message.invalid.request", "Sub Asset Type is Not Selected");
             } else {
                 questionnaireTemplate.setAssetType(templateDto.getAssetType());

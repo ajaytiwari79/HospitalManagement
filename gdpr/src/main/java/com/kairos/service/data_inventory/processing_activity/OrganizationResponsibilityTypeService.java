@@ -98,7 +98,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      * @return list of ResponsibilityType
      */
     public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long organizationId) {
-        return responsibilityTypeMongoRepository.findAllOrganizationResponsibilityTypes(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return responsibilityTypeMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -109,7 +109,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      */
     public ResponsibilityType getResponsibilityType(Long organizationId, BigInteger id) {
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        ResponsibilityType exist = responsibilityTypeMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -139,7 +139,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
     public ResponsibilityTypeDTO updateResponsibilityType(Long organizationId, BigInteger id, ResponsibilityTypeDTO responsibilityTypeDTO) {
 
 
-        ResponsibilityType responsibilityType = responsibilityTypeMongoRepository.findByOrganizationIdAndName(organizationId, responsibilityTypeDTO.getName());
+        ResponsibilityType responsibilityType = responsibilityTypeMongoRepository.findByUnitIdAndName(organizationId, responsibilityTypeDTO.getName());
         if (Optional.ofNullable(responsibilityType).isPresent()) {
             if (id.equals(responsibilityType.getId())) {
                 return responsibilityTypeDTO;

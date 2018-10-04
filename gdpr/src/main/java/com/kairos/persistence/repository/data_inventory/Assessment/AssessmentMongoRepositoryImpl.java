@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import javax.inject.Inject;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

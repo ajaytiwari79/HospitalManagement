@@ -91,7 +91,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
      * @return list of DataSource
      */
     public List<DataSourceResponseDTO> getAllDataSource(Long organizationId) {
-        return dataSourceMongoRepository.findAllOrganizationDataSources(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return dataSourceMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -102,7 +102,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
      */
     public DataSource getDataSource(Long organizationId, BigInteger id) {
 
-        DataSource exist = dataSourceMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        DataSource exist = dataSourceMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         }
@@ -129,7 +129,7 @@ public class OrganizationDataSourceService extends MongoBaseService {
      */
     public DataSourceDTO updateDataSource(Long organizationId, BigInteger id, DataSourceDTO dataSourceDTO) {
 
-        DataSource dataSource = dataSourceMongoRepository.findByNameAndOrganizationId(organizationId, dataSourceDTO.getName());
+        DataSource dataSource = dataSourceMongoRepository.findByNameAndUnitId(organizationId, dataSourceDTO.getName());
         if (Optional.ofNullable(dataSource).isPresent()) {
             if (id.equals(dataSource.getId())) {
                 return dataSourceDTO;

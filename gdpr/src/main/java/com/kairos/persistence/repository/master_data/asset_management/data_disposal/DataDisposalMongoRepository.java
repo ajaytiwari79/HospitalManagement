@@ -33,16 +33,19 @@ public interface DataDisposalMongoRepository extends MongoBaseRepository<DataDis
     List<DataDisposal> getDataDisposalListByIds(Long countryId,Set<BigInteger> dataDisposalIds);
 
     @Query("{deleted:false,countryId:?0}")
-    List<DataDisposalResponseDTO> findAllDataDisposals(Long countryId, Sort sort);
+    List<DataDisposalResponseDTO> findAllByCountryId(Long countryId);
+
+    @Query("{deleted:false,countryId:?0}")
+    List<DataDisposalResponseDTO> findAllByCountryIdAndSortByCreatedDate(Long countryId, Sort sort);
 
     @Query("{deleted:false,organizationId:?0}")
-    List<DataDisposalResponseDTO> findAllOrganizationDataDisposals(Long organizationId,Sort sort);
+    List<DataDisposalResponseDTO> findAllByUnitIdAndSortByCreatedDate(Long unitId, Sort sort);
 
     @Query("{deleted:false,organizationId:?0,_id:?1}")
-    DataDisposal findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    DataDisposal findByUnitIdAndId(Long unitId, BigInteger id);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    DataDisposal findByOrganizationIdAndName(Long organizationId,String name);
+    DataDisposal findByUnitIdAndName(Long unitId, String name);
 
 
 

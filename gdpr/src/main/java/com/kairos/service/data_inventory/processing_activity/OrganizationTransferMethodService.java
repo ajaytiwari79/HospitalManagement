@@ -93,7 +93,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
      * @return list of TransferMethod
      */
     public List<TransferMethodResponseDTO> getAllTransferMethod(Long organizationId) {
-        return transferMethodRepository.findAllOrganizationTransferMethods(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return transferMethodRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -104,7 +104,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
      */
     public TransferMethod getTransferMethod(Long organizationId, BigInteger id) {
 
-        TransferMethod exist = transferMethodRepository.findByOrganizationIdAndId(organizationId, id);
+        TransferMethod exist = transferMethodRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -132,7 +132,7 @@ public class OrganizationTransferMethodService extends MongoBaseService {
      */
     public TransferMethodDTO updateTransferMethod(Long organizationId, BigInteger id, TransferMethodDTO transferMethodDTO) {
 
-        TransferMethod transferMethod = transferMethodRepository.findByOrganizationIdAndName(organizationId, transferMethodDTO.getName());
+        TransferMethod transferMethod = transferMethodRepository.findByUnitIdAndName(organizationId, transferMethodDTO.getName());
         if (Optional.ofNullable(transferMethod).isPresent()) {
             if (id.equals(transferMethod.getId())) {
                 return transferMethodDTO;
