@@ -72,7 +72,7 @@ public class AttendanceSettingService extends MongoBaseService {
         }
         List<Long> staffIds=staffAndOrganizationIds.stream().map(e -> e.getStaffId()).collect(Collectors.toList());
         //ShiftQueryResult shiftQueryResults = shiftService.getShiftByStaffIdAndDate(staffIds, DateUtils.getCurrentDate());
-        Shift shift=shiftMongoRepository.findShiftToBeDone(staffIds, DateUtils.getCurrentDayStart(),DateUtils.getCurrentDayMidNight());
+        Shift shift=shiftMongoRepository.findShiftToBeDone(staffIds, DateUtils.getCurrentDayStart(),DateUtils.getDate());
         //If shift is not found
         if(shift==null && checkIn){
             attendanceSetting =  checkInWithoutHavingShift(unitId, reasonCodeId, staffAndOrganizationIds);

@@ -15,6 +15,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -28,28 +29,49 @@ public class StaffUnitPositionDetails {
     private Expertise expertise;
     @JsonIgnore
     private boolean deleted;
-    private Long startDateMillis;
-    private int workingDaysInWeek;
-    private Long endDateMillis;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Long lastModificationDate;
-    private int totalWeeklyHours;
-    private float avgDailyWorkingHours;
-    private float hourlyWages;
     private long id;
-    private EmploymentType employmentType;
-    private float salary;
-    private int totalWeeklyMinutes;
-    private int fullTimeWeeklyMinutes;
     private PositionCode positionCode;
-    private BigInteger workingTimeAgreementId;
-    private BigInteger costTimeAgreementId;
     private WTAResponseDTO workingTimeAgreement;
     private CTAResponseDTO costTimeAgreement;
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
     private Long staffId;
     private Long countryId;
-    private float hourlyCost;
+    // TODO MOVING THIS INSIDE SO THAT WE CAN REMOVE THE UPPER LEVEL WRAPPER
+    private List<DayOfWeek> activityDayTypes;
+    private ZoneId unitTimeZone;
+    private Staff staff;
+    private List<AppliedFunctionDTO> appliedFunctions;
+    private List<PositionLinesQueryResult> positionLines;
 
+    public StaffUnitPositionDetails() {
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public Staff getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Staff staff) {
+        this.staff = staff;
+    }
 
     public Long getStaffId() {
         return staffId;
@@ -75,65 +97,6 @@ public class StaffUnitPositionDetails {
         this.ctaRuleTemplates = ctaRuleTemplates;
     }
 
-
-    public float getHourlyCost() {
-        return hourlyCost;
-    }
-
-    public void setHourlyCost(float hourlyCost) {
-        this.hourlyCost = hourlyCost;
-    }
-
-    public ZoneId getUnitTimeZone() {
-        return unitTimeZone;
-    }
-
-    public void setUnitTimeZone(ZoneId unitTimeZone) {
-        this.unitTimeZone = unitTimeZone;
-    }
-
-    // TODO MOVING THIS INSIDE SO THAT WE CAN REMOVE THE UPPER LEVEL WRAPPER
-    private List<DayOfWeek> activityDayTypes;
-    private ZoneId unitTimeZone;
-    private Staff staff;
-    private List<AppliedFunctionDTO> appliedFunctions;
-
-    public StaffUnitPositionDetails() {
-    }
-
-
-    public BigInteger getCostTimeAgreementId() {
-        return costTimeAgreementId;
-    }
-
-    public void setCostTimeAgreementId(BigInteger costTimeAgreementId) {
-        this.costTimeAgreementId = costTimeAgreementId;
-    }
-
-    public Staff getStaff() {
-        return staff;
-    }
-
-    public void setStaff(Staff staff) {
-        this.staff = staff;
-    }
-
-    public BigInteger getWorkingTimeAgreementId() {
-        return workingTimeAgreementId;
-    }
-
-    public void setWorkingTimeAgreementId(BigInteger workingTimeAgreementId) {
-        this.workingTimeAgreementId = workingTimeAgreementId;
-    }
-
-    public int getFullTimeWeeklyMinutes() {
-        return fullTimeWeeklyMinutes;
-    }
-
-    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-    }
-
     public Expertise getExpertise() {
         return expertise;
     }
@@ -150,60 +113,12 @@ public class StaffUnitPositionDetails {
         this.deleted = deleted;
     }
 
-    public Long getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public int getWorkingDaysInWeek() {
-        return workingDaysInWeek;
-    }
-
-    public void setWorkingDaysInWeek(int workingDaysInWeek) {
-        this.workingDaysInWeek = workingDaysInWeek;
-    }
-
-    public Long getEndDateMillis() {
-        return endDateMillis;
-    }
-
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
-    }
-
     public Long getLastModificationDate() {
         return lastModificationDate;
     }
 
     public void setLastModificationDate(Long lastModificationDate) {
         this.lastModificationDate = lastModificationDate;
-    }
-
-    public int getTotalWeeklyHours() {
-        return totalWeeklyHours;
-    }
-
-    public void setTotalWeeklyHours(int totalWeeklyHours) {
-        this.totalWeeklyHours = totalWeeklyHours;
-    }
-
-    public float getAvgDailyWorkingHours() {
-        return avgDailyWorkingHours;
-    }
-
-    public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-    }
-
-    public float getHourlyWages() {
-        return hourlyWages;
-    }
-
-    public void setHourlyWages(float hourlyWages) {
-        this.hourlyWages = hourlyWages;
     }
 
     public long getId() {
@@ -214,28 +129,12 @@ public class StaffUnitPositionDetails {
         this.id = id;
     }
 
-    public EmploymentType getEmploymentType() {
-        return employmentType;
+    public ZoneId getUnitTimeZone() {
+        return unitTimeZone;
     }
 
-    public void setEmploymentType(EmploymentType employmentType) {
-        this.employmentType = employmentType;
-    }
-
-    public float getSalary() {
-        return salary;
-    }
-
-    public void setSalary(float salary) {
-        this.salary = salary;
-    }
-
-    public int getTotalWeeklyMinutes() {
-        return totalWeeklyMinutes;
-    }
-
-    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
+    public void setUnitTimeZone(ZoneId unitTimeZone) {
+        this.unitTimeZone = unitTimeZone;
     }
 
     public PositionCode getPositionCode() {
@@ -278,5 +177,13 @@ public class StaffUnitPositionDetails {
 
     public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {
         this.appliedFunctions = appliedFunctions;
+    }
+
+    public List<PositionLinesQueryResult> getPositionLines() {
+        return positionLines;
+    }
+
+    public void setPositionLines(List<PositionLinesQueryResult> positionLines) {
+        this.positionLines = positionLines;
     }
 }

@@ -1731,7 +1731,7 @@ public class StaffService {
     }
 
     public StaffUnitPositionDetails getUnitPositionOfStaff(long staffId, long unitId) {
-        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionOfStaff(staffId, unitId, DateUtils.getCurrentDayStartMillis());
+        UnitPositionQueryResult unitPosition = unitPositionGraphRepository.getUnitPositionOfStaff(staffId, unitId);
         StaffUnitPositionDetails unitPositionDetails = null;
         if (Optional.ofNullable(unitPosition).isPresent()) {
             unitPositionDetails = new StaffUnitPositionDetails(unitId);

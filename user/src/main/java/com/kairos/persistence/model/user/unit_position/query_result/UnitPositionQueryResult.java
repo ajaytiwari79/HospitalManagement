@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.unit_position.query_result;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
@@ -19,7 +20,6 @@ import java.util.Optional;
  */
 
 @QueryResult
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UnitPositionQueryResult {
     private Expertise expertise;
@@ -38,7 +38,7 @@ public class UnitPositionQueryResult {
     private Boolean history;
     private Boolean editable;
     private Boolean published;
-
+    private List<AppliedFunctionDTO> appliedFunctions;
     public Map<String, Object> getUnitInfo() {
         return unitInfo;
     }
@@ -164,6 +164,14 @@ public class UnitPositionQueryResult {
 
     public void setReasonCode(Map<String, Object> reasonCode) {
         this.reasonCode = reasonCode;
+    }
+
+    public List<AppliedFunctionDTO> getAppliedFunctions() {
+        return appliedFunctions;
+    }
+
+    public void setAppliedFunctions(List<AppliedFunctionDTO> appliedFunctions) {
+        this.appliedFunctions = appliedFunctions;
     }
 
     public UnitPositionQueryResult() {
