@@ -19,7 +19,6 @@ import java.math.BigInteger;
 import java.util.Optional;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstant.COUNTRY_URL;
 
 
 @RestController

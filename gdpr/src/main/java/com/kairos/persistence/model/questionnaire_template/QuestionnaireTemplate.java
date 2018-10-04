@@ -6,7 +6,6 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

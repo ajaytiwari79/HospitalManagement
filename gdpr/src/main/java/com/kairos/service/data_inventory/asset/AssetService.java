@@ -268,18 +268,18 @@ public class AssetService extends MongoBaseService {
 
 
     /**
-     * @description get all Previous Assessment Launched for Asset
      * @param unitId
      * @param assetId
      * @return
+     * @description get all Previous Assessment Launched for Asset
      */
     public List<AssessmentBasicResponseDTO> getAssessmentListByAssetId(Long unitId, BigInteger assetId) {
-        return assessmentMongoRepository.findAllAssessmentLaunchedForAssetbyAssetIdAndUnitId(unitId, assetId);
+        return assessmentMongoRepository.findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(unitId, assetId);
     }
 
 
     /**
-     * @param unitId    -unitid
+     * @param unitId    -unit Id
      * @param countryId -country id
      * @param assetDTO
      * @return
@@ -319,9 +319,8 @@ public class AssetService extends MongoBaseService {
                         subProcessingActivity.setSelected(true);
                         defaultSelected = false;
                     } else if (defaultSelected) {
-                        ProcessingActivityBasicResponseDTO defaultSubProcessingActivity = subProcessingActivity;
-                        defaultSubProcessingActivity.setSelected(true);
-                        defaultSubProcessingActivityList.add(defaultSubProcessingActivity);
+                        subProcessingActivity.setSelected(true);
+                        defaultSubProcessingActivityList.add(subProcessingActivity);
                     }
                 }
 

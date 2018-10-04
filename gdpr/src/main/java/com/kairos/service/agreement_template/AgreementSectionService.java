@@ -315,9 +315,7 @@ public class AgreementSectionService extends MongoBaseService {
             } else {
                 if (Optional.ofNullable(subSectionList).isPresent() && CollectionUtils.isNotEmpty(subSectionList)) {
                     subSections.addAll(subSectionList);
-                    subSectionList.forEach(agreementSubSection -> {
-                        addClauseIdInIndexedOrderToSectionAndSubSection(agreementSubSection, clauseOrderCoresspondingToAgreementSectionAndSubSection, clauseListCoresspondingToAgreementSection);
-                    });
+                    subSectionList.forEach(agreementSubSection -> addClauseIdInIndexedOrderToSectionAndSubSection(agreementSubSection, clauseOrderCoresspondingToAgreementSectionAndSubSection, clauseListCoresspondingToAgreementSection));
                 }
             }
 

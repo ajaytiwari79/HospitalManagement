@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.common;
 
 
-import org.bson.Document;
-
 public class CustomAggregationQuery {
 
 

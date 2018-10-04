@@ -10,7 +10,6 @@ import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetMongoRepository;
 import com.kairos.persistence.repository.risk_management.RiskMongoRepository;
-import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;

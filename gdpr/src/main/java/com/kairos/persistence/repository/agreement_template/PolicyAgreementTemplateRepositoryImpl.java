@@ -21,7 +21,6 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.constants.AppConstant.DELETED;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 
 

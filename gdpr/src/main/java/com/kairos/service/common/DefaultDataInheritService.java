@@ -60,7 +60,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 @Service
-public class DataInheritOrganizationLevelService extends MongoBaseService {
+public class DefaultDataInheritService extends MongoBaseService {
 
 
     @Inject
@@ -122,20 +122,13 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
     private Map<String, BigInteger> globalAssetTypeAndSubAssetTypeMap = new HashMap<>();
     private Map<String, BigInteger> globalCategoryNameAndIdMap = new HashMap<>();
 
-    public Boolean copyDataFromCountryToUnitIdOnUnitCreation(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
 
+    public boolean copyMasterDataFromCountry(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
 
         List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
         saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
         List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
         copyDataCategoryAndDataElements(unitId, dataCategoryDTOS);
-        copyMasterDataFromCountry(countryId, unitId, organizationMetaDataDTO);
-        return true;
-
-    }
-
-
-    public void copyMasterDataFromCountry(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
 
         List<Callable<Boolean>> callables = new ArrayList<>();
         Callable<Boolean> dataDispoaslTask = () -> {
@@ -242,6 +235,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
         callables.add(assetTask);
         callables.add(dataSubjectTask);
         asynchronousService.executeAsynchronously(callables);
+        return true;
     }
 
 
@@ -634,9 +628,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
                 assetSubTypes.forEach(subAssetType -> globalAssetTypeAndSubAssetTypeMap.put(subAssetType.getName().toLowerCase(), subAssetType.getId()));
             }
             List<AssetType> assetTypes = new ArrayList<>(assetTypeAndSubAssetTypeMap.keySet());
-            assetTypes.forEach(assetType -> {
-                assetType.setSubAssetTypes(assetTypeAndSubAssetTypeMap.get(assetType).stream().map(AssetType::getId).collect(Collectors.toList()));
-            });
+            assetTypes.forEach(assetType -> assetType.setSubAssetTypes(assetTypeAndSubAssetTypeMap.get(assetType).stream().map(AssetType::getId).collect(Collectors.toList())));
             assetTypeMongoRepository.saveAll(getNextSequence(assetTypes)).forEach(assetType -> globalAssetTypeAndSubAssetTypeMap.put(assetType.getName().toLowerCase(), assetType.getId()));
         }
     }
