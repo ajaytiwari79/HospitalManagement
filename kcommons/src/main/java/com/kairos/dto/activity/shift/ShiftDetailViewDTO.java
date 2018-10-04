@@ -23,7 +23,6 @@ public class ShiftDetailViewDTO {
         this.realTimeShifts = realTimeShifts;
         this.staffValidated = staffValidated;
         this.plannerValidated = plannerValidated;
-
     }
 
     public ShiftDetailViewDTO() {
