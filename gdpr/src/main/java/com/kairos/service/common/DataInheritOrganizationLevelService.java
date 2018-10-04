@@ -221,8 +221,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             return true;
         };
         Callable<Boolean> dataSubjectTask = () -> {
-
-            List<DataSubjectMappingResponseDTO> dataSubjectMappingDTOS = dataSubjectMappingService.getAllDataSubjectAndMappingWithDataOfUnitOnLeftHierarchySelection(countryId);
+            List<DataSubjectMappingResponseDTO> dataSubjectMappingDTOS = dataSubjectMappingService.getAllDataSubjectWithDataCategoryByCountryId(countryId);
             copyDataSubjectAndDataCategoryFromCountry(unitId, dataSubjectMappingDTOS);
             return true;
         };
@@ -328,8 +327,10 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
                 dataElementMongoRepository.saveAll(getNextSequence(dataElements));
             }
             List<DataCategory> dataCategories = new ArrayList<>(dataCategoryAndDataElementListMap.keySet());
+            dataCategories.forEach(dataCategory -> dataCategory.setDataElements(dataCategoryAndDataElementListMap.get(dataCategory).stream().map(DataElement::getId).collect(Collectors.toList())));
             dataCategoryMongoRepository.saveAll(getNextSequence(dataCategories));
             dataCategories.parallelStream().forEach(dataCategory -> globalCategoryNameAndIdMap.put(dataCategory.getName().trim().toLowerCase(), dataCategory.getId()));
+
         }
     }
 
@@ -342,7 +343,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
                 dataSubjectMapping.setOrganizationId(unitId);
                 if (CollectionUtils.isNotEmpty(dataSubjectDTO.getDataCategories())) {
                     Set<BigInteger> dataCategoryIds = new HashSet<>();
-                    dataSubjectDTO.getDataCategories().parallelStream().forEach(dataCategoryDTO -> dataCategoryIds.add(globalAssetTypeAndSubAssetTypeMap.get(dataCategoryDTO.getName().toLowerCase().trim())));
+                    dataSubjectDTO.getDataCategories().parallelStream().forEach(dataCategoryDTO -> dataCategoryIds.add(globalCategoryNameAndIdMap.get(dataCategoryDTO.getName().toLowerCase().trim())));
                     dataSubjectMapping.setDataCategories(dataCategoryIds);
                 }
                 dataSubjects.add(dataSubjectMapping);
