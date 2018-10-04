@@ -10,8 +10,8 @@ import com.kairos.dto.activity.cta.CTAWTAWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
-import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
-import com.kairos.dto.scheduler.kafka.producer.KafkaProducer;
+import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
+import com.kairos.dto.scheduler.queue.kafka.producer.KafkaProducer;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
 import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
 import com.kairos.dto.user.staff.unit_position.PositionLineChangeResultDTO;
@@ -73,9 +73,6 @@ import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.DateUtil;
 import com.kairos.wrapper.PositionWrapper;
-import io.swagger.annotations.ApiOperation;
-import javafx.geometry.Pos;
-import com.kairos.wrapper.PositionWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -100,7 +97,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 import static com.kairos.constants.ApiConstants.*;
 
 /**
@@ -182,7 +178,6 @@ public class UnitPositionService {
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws InterruptedException, ExecutionException {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Organization parentOrganization;
-
 
         PositionCode positionCode;
         if (!organization.isParentOrganization()) {
@@ -786,6 +781,7 @@ public class UnitPositionService {
         PositionLinesQueryResult currentPositionLine = ObjectMapperUtils.copyPropertiesByMapper(unitPosition.getPositionLines().get(0), PositionLinesQueryResult.class);
         unitPositionDetails.setEmploymentType(ObjectMapperUtils.copyPropertiesByMapper(currentPositionLine.getEmploymentType(), com.kairos.dto.activity.shift.EmploymentType.class));
         unitPositionDetails.setId(unitPosition.getId());
+
         unitPositionDetails.setStartDate(unitPosition.getStartDate());
         unitPositionDetails.setAppliedFunctions(unitPosition.getAppliedFunctions());
         unitPositionDetails.setEndDate(unitPosition.getEndDate());
@@ -795,8 +791,8 @@ public class UnitPositionService {
         unitPositionDetails.setWorkingDaysInWeek(currentPositionLine.getWorkingDaysInWeek());
         unitPositionDetails.setAvgDailyWorkingHours(currentPositionLine.getAvgDailyWorkingHours());
         unitPositionDetails.setHourlyWages(currentPositionLine.getHourlyWages());
-
     }
+
 
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionDetails(Long unitPositionId, Organization organization, Long countryId) {
 

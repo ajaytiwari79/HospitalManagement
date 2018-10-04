@@ -50,6 +50,7 @@ import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
+import com.kairos.persistence.model.user.unit_position.UnitPositionFunctionRelationship;
 import com.kairos.persistence.model.user.unit_position.query_result.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -66,6 +67,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionFunctionRelationshipRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.rest_client.ChatRestClient;
@@ -218,6 +220,8 @@ public class StaffService {
     private ActivityIntegrationService activityIntegrationService;
     @Inject
     private AccessPageRepository accessPageRepository;
+    @Inject
+    private UnitPositionFunctionRelationshipRepository unitPositionFunctionRelationshipRepository;
 
 
     @Inject
@@ -1678,7 +1682,7 @@ public class StaffService {
 
     }
 
-    public StaffAdditionalInfoDTO getStaffEmploymentData(long staffId, Long unitPositionId, long id, String type) {
+    public StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate,long staffId, Long unitPositionId, long id, String type) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Long unitId = organization.getId();
         List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
@@ -1686,11 +1690,16 @@ public class StaffService {
         //List<TimeSlotSetDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotSets,TimeSlotSetDTO.class);
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
+        Long functionId=null;
+        if(shiftDate!=null){
+            functionId=unitPositionFunctionRelationshipRepository.getApplicableFunction(unitPositionId,shiftDate.toString());
+        }
 
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId, organization, countryId);
         //Todo it should calculate dynamically
         unitPosition.setHourlyCost(14.5f);
+        unitPosition.setFunctionId(functionId);
         staffAdditionalInfoDTO.setUnitId(organization.getId());
         staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
         staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));

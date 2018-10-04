@@ -43,6 +43,7 @@ public class StaffUnitPositionDetails {
     private BigInteger includedPlannedTime;
     private Long unitId;
     private Float hourlyCost;
+    private Long functionId;
 
     public StaffUnitPositionDetails() {
 
@@ -247,5 +248,13 @@ public class StaffUnitPositionDetails {
 
     public void setHourlyCost(Float hourlyCost) {
         this.hourlyCost = hourlyCost;
+    }
+
+    public Long getFunctionId() {
+        return functionId;
+    }
+
+    public void setFunctionId(Long functionId) {
+        this.functionId = functionId;
     }
 }
