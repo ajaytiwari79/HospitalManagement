@@ -227,7 +227,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted, ag.role as role, ag.enabled as enabled,ag.startDate as startDate, ag.endDate as endDate, collect(id(dayType)) as dayTypeIds")
     List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategory(Long countryId, String orgCategory);
 
-    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false,enabled:true})-[:"+DAY_TYPES+"]-(dayType:DayType{isEnabled:true}) WHERE id(c)={0} AND r.organizationCategory={1} AND (ag.endDate IS NULL OR ag.endDate <= date()) " +
+    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false,enabled:true})-[:"+DAY_TYPES+"]-(dayType:DayType{isEnabled:true}) WHERE id(c)={0} AND r.organizationCategory={1} AND (ag.endDate IS NULL OR date(ag.endDate) >= date()) " +
             "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted, ag.role as role, ag.enabled as enabled,ag.startDate as startDate, ag.endDate as endDate, collect(dayType) as dayTypes")
     List<AccessGroupQueryResult> getCountryAccessGroupByCategory(Long countryId, String organizationCategory);
 
