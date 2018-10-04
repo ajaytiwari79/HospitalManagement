@@ -253,13 +253,11 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             for (MasterAssetResponseDTO masterAssetDTO : masterAssetDTOS) {
                 Asset asset = new Asset(masterAssetDTO.getName(), masterAssetDTO.getDescription(), false);
                 asset.setOrganizationId(unitId);
-                if (Optional.ofNullable(masterAssetDTO.getAssetType()).isPresent()) {
-                    AssetTypeBasicResponseDTO assetTypeBasicDTO = masterAssetDTO.getAssetType();
-                    asset.setAssetType(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
-                    if (CollectionUtils.isNotEmpty(masterAssetDTO.assetSubTypes)) {
-                        List<BigInteger> subAssetTypeIds = new ArrayList<>();
-                        masterAssetDTO.assetSubTypes.forEach(subAssetType -> subAssetTypeIds.add(globalAssetTypeAndSubAssetTypeMap.get(subAssetType.getName().toLowerCase().trim())));
-                    }
+                AssetTypeBasicResponseDTO assetTypeBasicDTO = masterAssetDTO.getAssetType();
+                asset.setAssetType(globalAssetTypeAndSubAssetTypeMap.get(assetTypeBasicDTO.getName().trim().toLowerCase()));
+                if (CollectionUtils.isNotEmpty(masterAssetDTO.assetSubTypes)) {
+                    List<BigInteger> subAssetTypeIds = new ArrayList<>();
+                    masterAssetDTO.assetSubTypes.forEach(subAssetType -> subAssetTypeIds.add(globalAssetTypeAndSubAssetTypeMap.get(subAssetType.getName().toLowerCase().trim())));
                 }
                 assets.add(asset);
             }
@@ -276,12 +274,14 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             Map<ProcessingActivity, List<ProcessingActivity>> processingActivitySubProcessingActivityListMap = new HashMap<>();
             for (MasterProcessingActivityResponseDTO masterProcessingActivityDTO : masterProcessingActivityDTOS) {
                 ProcessingActivity processingActivity = new ProcessingActivity(masterProcessingActivityDTO.getName(), masterProcessingActivityDTO.getDescription(), false);
+                processingActivity.setSubProcess(false);
                 processingActivity.setOrganizationId(unitId);
                 List<ProcessingActivity> subProcessingActivities = new ArrayList<>();
                 if (CollectionUtils.isNotEmpty(masterProcessingActivityDTO.getSubProcessingActivities())) {
                     for (MasterProcessingActivityResponseDTO subProcessingActivityDTO : masterProcessingActivityDTO.getSubProcessingActivities()) {
                         ProcessingActivity subProcessingActivity = new ProcessingActivity(subProcessingActivityDTO.getName(), subProcessingActivityDTO.getDescription(), false);
                         subProcessingActivity.setOrganizationId(unitId);
+                        processingActivity.setSubProcess(true);
                         subProcessingActivities.add(subProcessingActivity);
                     }
                     processingActivities.addAll(subProcessingActivities);
@@ -417,7 +417,7 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
         questionnaireTemplate.setOrganizationId(unitId);
         switch (questionnaireTemplateDTO.getTemplateType()) {
             case ASSET_TYPE:
-                if (questionnaireTemplateDTO.getDefaultAssetTemplate()) {
+                if (questionnaireTemplateDTO.isDefaultAssetTemplate()) {
                     questionnaireTemplate.setDefaultAssetTemplate(true);
                 } else {
                     questionnaireTemplate.setAssetType(globalAssetTypeAndSubAssetTypeMap.get(questionnaireTemplateDTO.getAssetType().getName().trim().toLowerCase()));
@@ -605,17 +605,17 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
                 AssetType assetType = new AssetType(assetTypeDTO.getName());
                 assetType.setOrganizationId(unitId);
                 assetTypeRiskMap.put(assetType, buildRisks(unitId, assetTypeDTO.getRisks()));
+                List<AssetType> subAssetTypes = new ArrayList<>();
                 if (CollectionUtils.isNotEmpty(assetTypeDTO.getSubAssetTypes())) {
-
-                    List<AssetType> subAssetTypes = new ArrayList<>();
                     for (AssetTypeRiskResponseDTO subAssetTypeDTO : assetTypeDTO.getSubAssetTypes()) {
                         AssetType subAssetType = new AssetType(subAssetTypeDTO.getName());
                         subAssetType.setOrganizationId(unitId);
+                        subAssetType.setSubAsset(true);
                         assetTypeRiskMap.put(subAssetType, buildRisks(unitId, subAssetTypeDTO.getRisks()));
                         subAssetTypes.add(subAssetType);
                     }
-                    assetTypeAndSubAssetTypeMap.put(assetType, subAssetTypes);
                 }
+                assetTypeAndSubAssetTypeMap.put(assetType, subAssetTypes);
             }
             assetTypeRiskMap.forEach((assetType, riskList) -> risks.addAll(riskList));
             if (CollectionUtils.isNotEmpty(risks)) {
@@ -635,10 +635,9 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
             }
             List<AssetType> assetTypes = new ArrayList<>(assetTypeAndSubAssetTypeMap.keySet());
             assetTypes.forEach(assetType -> {
-                globalAssetTypeAndSubAssetTypeMap.put(assetType.getName().toLowerCase(), assetType.getId());
                 assetType.setSubAssetTypes(assetTypeAndSubAssetTypeMap.get(assetType).stream().map(AssetType::getId).collect(Collectors.toList()));
             });
-            assetTypeMongoRepository.saveAll(getNextSequence(assetTypes));
+            assetTypeMongoRepository.saveAll(getNextSequence(assetTypes)).forEach(assetType -> globalAssetTypeAndSubAssetTypeMap.put(assetType.getName().toLowerCase(), assetType.getId()));
         }
     }
 

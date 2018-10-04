@@ -16,7 +16,7 @@ public class QuestionnaireTemplateResponseDTO {
     private String name;
     private String description;
     private QuestionnaireTemplateType templateType;
-    private Boolean defaultAssetTemplate;
+    private boolean defaultAssetTemplate;
     private AssetType assetType;
     private AssetType assetSubType;
     private List<QuestionnaireSectionResponseDTO> sections;
@@ -34,9 +34,9 @@ public class QuestionnaireTemplateResponseDTO {
 
     public void setAssetSubType(AssetType assetSubType) { this.assetSubType = assetSubType; }
 
-    public Boolean getDefaultAssetTemplate() { return defaultAssetTemplate; }
+    public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
 
-    public void setDefaultAssetTemplate(Boolean defaultAssetTemplate) { this.defaultAssetTemplate = defaultAssetTemplate; }
+    public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.defaultAssetTemplate = defaultAssetTemplate; }
 
     public String getName() {
         return name;

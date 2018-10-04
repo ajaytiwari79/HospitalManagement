@@ -64,6 +64,7 @@ public class CustomAggregationQuery {
                 "'description':{$first:'$description'}," +
                 "'assetType':{$first:'$assetType'}," +
                 "'templateType':{$first:'$templateType'}," +
+                "'defaultAssetTemplate':{'$first':'$defaultAssetTemplate'}" +
                 "}}";
     }
 
@@ -76,7 +77,7 @@ public class CustomAggregationQuery {
                 "        'sections':1," +
                 "      'description':1," +
                 "     'templateType':1," +
-                "      'countryId':1," +
+                "'defaultAssetTemplate':1" +
                 "            }}";
     }
 
