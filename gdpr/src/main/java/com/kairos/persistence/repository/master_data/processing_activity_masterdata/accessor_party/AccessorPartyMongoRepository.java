@@ -36,17 +36,20 @@ public interface AccessorPartyMongoRepository extends MongoBaseRepository<Access
     List<AccessorParty> getAccessorPartyListByIds(Long countryId, Set<BigInteger> accessorPartyIds);
 
     @Query("{deleted:false,countryId:?0},")
-    List<AccessorPartyResponseDTO> findAllAccessorParty(Long countryId, Sort sort);
+    List<AccessorPartyResponseDTO> findAllByCountryId(Long countryId);
+
+    @Query("{deleted:false,countryId:?0},")
+    List<AccessorPartyResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort sort);
 
     @Query("{_id:{$in:?0},deleted:false}")
     List<AccessorPartyResponseDTO> findAccessorPartyByIds(List<BigInteger> accessorPartyIds);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    AccessorParty findOrganizationIdAndIdAndNonDeleted(Long organizationId, BigInteger id);
+    AccessorParty findOrganizationIdAndIdAndNonDeleted(Long unitId, BigInteger id);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    AccessorParty findByNameAndOrganizationId(Long organizationId,String name);
+    AccessorParty findByNameAndUnitId(Long unitId, String name);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<AccessorPartyResponseDTO> findAllOrganizationAccessorParty(Long organizationId,Sort sort);
+    List<AccessorPartyResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
 }

@@ -42,9 +42,7 @@ public class HostingType extends MongoBaseEntity {
         return name.trim();
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setName(String name) { this.name = name; }
 
 
     public HostingType(@NotBlank(message = "Name can't be empty") String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {

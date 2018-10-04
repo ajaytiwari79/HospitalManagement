@@ -28,21 +28,24 @@ public interface HostingProviderMongoRepository extends MongoBaseRepository<Host
     HostingProvider findByid(BigInteger id);
 
     @Query("{countryId:?0,deleted:false}")
-    List<HostingProviderResponseDTO> findAllHostingProviders(Long countryId, Sort sort);
+    List<HostingProviderResponseDTO> findAllByCountryId(Long countryId);
+
+    @Query("{countryId:?0,deleted:false}")
+    List<HostingProviderResponseDTO> findAllByCountryIdAndSortByCreatedDate(Long countryId, Sort sort);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<HostingProvider> getHostingProviderListByIds(Long countryId, Set<BigInteger> hostingProviderIds);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    HostingProvider findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    HostingProvider findByUnitIdAndId(Long unitId, BigInteger id);
 
 
     @Query("{deleted:false,organizationId:?0,name:?1}")
-    HostingProvider findByOrganizationIdAndName(Long organizationId,String name);
+    HostingProvider findByUnitIdAndName(Long unitId, String name);
 
 
     @Query("{organizationId:?0,deleted:false}")
-    List<HostingProviderResponseDTO> findAllOrganizationHostingProviders(Long organizationId,Sort sort);
+    List<HostingProviderResponseDTO> findAllUnitIdAndSortByCreatedDate(Long unitId, Sort sort);
 
 
 

@@ -384,7 +384,7 @@ public class MasterProcessingActivityService extends MongoBaseService {
             if (!Optional.ofNullable(masterProcessingActivity.getProcessingActivities().get(0).getId()).isPresent()) {
                 masterProcessingActivity.setProcessingActivities(new ArrayList<>());
             }
-            masterProcessingActivity.getProcessingActivities().add(0, new MasterProcessingActivityRiskResponseDTO(masterProcessingActivity.getId(), masterProcessingActivity.getName(), true, masterProcessingActivity.getRisks()));
+            masterProcessingActivity.getProcessingActivities().add(0, new MasterProcessingActivityRiskResponseDTO(masterProcessingActivity.getId(), masterProcessingActivity.getName(), true, masterProcessingActivity.getRisks(),masterProcessingActivity.getSuggestedDate(),masterProcessingActivity.getSuggestedDataStatus()));
             masterProcessingActivity.setMainParent(true);
             masterProcessingActivity.setRisks(new ArrayList<>());
         });

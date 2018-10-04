@@ -95,7 +95,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long organizationId) {
-        return storageFormatMongoRepository.findAllOrganizationStorageFormats(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
+        return storageFormatMongoRepository.findAllUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -107,7 +107,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      */
     public StorageFormat getStorageFormat(Long organizationId, BigInteger id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        StorageFormat exist = storageFormatMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -138,7 +138,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      */
     public StorageFormatDTO updateStorageFormat(Long organizationId, BigInteger id, StorageFormatDTO storageFormatDTO) {
 
-        StorageFormat storageFormat = storageFormatMongoRepository.findByOrganizationIdAndName(organizationId, storageFormatDTO.getName());
+        StorageFormat storageFormat = storageFormatMongoRepository.findByUnitIdAndName(organizationId, storageFormatDTO.getName());
         if (Optional.ofNullable(storageFormat).isPresent()) {
             if (id.equals(storageFormat.getId())) {
                 return storageFormatDTO;
