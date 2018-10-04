@@ -204,4 +204,10 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.validateShift(shiftId,validatedByStaff,unitId));
     }
 
+    @ApiOperation("shifts details by date")
+    @GetMapping("/shift/compact_view_details_by_date")
+    public ResponseEntity<Map<String,Object>> getShiftsDetailsForComapactViewByDate(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getCompactViewDetails(unitId,shiftStartDate));
+    }
+
 }

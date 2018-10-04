@@ -130,8 +130,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 
 
 
-	@Override
-	public <T extends MongoBaseEntity> List<T> saveAll(List<T> entities){
+	public <T extends MongoBaseEntity> List<T> saveEntities(List<T> entities){
 		Assert.notNull(entities, "Entity must not be null!");
 		Assert.notEmpty(entities, "Entity must not be Empty!");
 
