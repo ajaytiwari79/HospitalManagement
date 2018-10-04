@@ -341,7 +341,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("MATCH (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={0} with emp \n" +
             "MATCH (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org:Organization{isEnable:true}) WHERE id(org)={1}  with unitPermission,org \n" +
-            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) WHERE (accessGroup.endDate IS NULL OR accessGroup.endDate <= date()) with accessGroup,org,unitPermission \n" +
+            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date()) with accessGroup,org,unitPermission \n" +
             "Match (module:AccessPage)<-[modulePermission:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with module,modulePermission,unitPermission,accessGroup\n" +
             "optional match (unitPermission)-[moduleCustomRel:HAS_CUSTOMIZED_PERMISSION]->(module) WHERE moduleCustomRel.accessGroupId=id(accessGroup) \n" +
             "with module,modulePermission,unitPermission,moduleCustomRel,accessGroup\n" +
@@ -355,7 +355,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Optional match  (o:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
             "with o,employment, [o]+units as units  unwind units as org  WITH distinct org,o,employment\n" +
             "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) WITH org,unitPermission \n" +
-            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{deleted:false,enabled:true})-[:"+DAY_TYPES+"]->(dayType:DayType) WHERE  id(dayType) IN {1} AND (accessGroup.endDate IS NULL OR accessGroup.endDate <= date())  WITH org,accessGroup,unitPermission\n" +
+            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{deleted:false,enabled:true})-[:"+DAY_TYPES+"]->(dayType:DayType) WHERE  id(dayType) IN {1} AND (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
             "Match (accessPage:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) \n" +
             "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
             "WITH org,collect( distinct {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,module:accessPage.isModule}) as permissions\n" +
