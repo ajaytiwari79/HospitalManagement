@@ -257,18 +257,18 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     List<PositionLinesQueryResult> findAllPositionLines(List<Long> unitPositionIds);
 
 
-    @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) IN {0} " +
-            "MATCH(unitPosition)-[:" + HAS_POSITION_LINES + "]-(positionLine:PositionLine) " +
-            "MATCH(positionLine)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]-(payGrade:PayGrade)" +
-            "MATCH(unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{published:true}) " +
-            "OPTIONAL MATCH(unitPosition)-[:" + IN_UNIT + "]-(org:Organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality)-[:" + HAS_MUNICIPALITY + "]-(pga:PayGroupArea)<-[pgaRel:" + HAS_PAY_GROUP_AREA + "]-(payGrade) " +
-            "with  unitPosition,positionLine,payGrade,seniorityLevel, CASE when pgaRel.payGroupAreaAmount IS NULL THEN '0' ELSE toString((toInteger(pgaRel.payGroupAreaAmount)/(52*37))) END as hourlyCost" +
-            "OPTIONAL MATCH (positionLine)-[:" + HAS_FUNCTION + "]-(function:Function)" +
-            "OPTIONAL MATCH(functionalPayment:FunctionalPayment)<-[:"+APPLICABLE_FOR_EXPERTISE+"]-(expertise) "+
-            "OPTIONAL MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix) " +
-            "OPTIONAL MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[:"+FOR_SENIORITY_LEVEL+"]->(seniorityLevel) " +
-            "OPTIONAL MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function) with hourlyCost+rel.amount as hourlyCost" +
-            "return {id:id(positionLine), hourlyCost : hourlyCost} as hourlyWagesMap")
-    Map<Long,Float> findFunctionalHourlyWages(List<Long> unitPositionIds);
+    @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) IN {0}\n" +
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:PositionLine) \n" +
+            "MATCH(positionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]-(payGrade:PayGrade) \n" +
+            "MATCH(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{published:true}) \n" +
+            "OPTIONAL MATCH(unitPosition)-[:IN_UNIT]-(org:Organization)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress)-[:MUNICIPALITY]->(municipality:Municipality)-[:HAS_MUNICIPALITY]-(pga:PayGroupArea)<-[pgaRel:HAS_PAY_GROUP_AREA]-(payGrade) \n" +
+            "with  unitPosition,positionLine,payGrade,seniorityLevel, CASE when pgaRel.payGroupAreaAmount IS NULL THEN '0' ELSE toString((toInteger(pgaRel.payGroupAreaAmount)/(52*37))) END as hourlyCost \n" +
+            " OPTIONAL MATCH (positionLine)-[:HAS_FUNCTION]-(function:Function) \n" +
+            " OPTIONAL MATCH(functionalPayment:FunctionalPayment)<-[:APPLICABLE_FOR_EXPERTISE]-(expertise) \n" +
+            " OPTIONAL MATCH(functionalPayment)-[:FUNCTIONAL_PAYMENT_MATRIX]->(fpm:FunctionalPaymentMatrix) \n" +
+            " OPTIONAL MATCH(fpm)-[:SENIORITY_LEVEL_FUNCTIONS]->(slf:SeniorityLevelFunction)-[:FOR_SENIORITY_LEVEL]->(seniorityLevel) \n" +
+            " OPTIONAL MATCH(slf)-[rel:HAS_FUNCTIONAL_AMOUNT]-(function) with positionLine, hourlyCost+rel.amount as hourlyCost \n" +
+            " return {id:id(positionLine), hourlyCost : case hourlyCost when null then 0.0 else hourlyCost end} as hourlyWagesMap")
+    List<Map<Long,Float>> findFunctionalHourlyWages(List<Long> unitPositionIds);
 
 }
