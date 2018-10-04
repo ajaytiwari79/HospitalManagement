@@ -118,25 +118,24 @@ public class DataInheritOrganizationLevelService extends MongoBaseService {
     @Inject
     private DataSubjectMappingRepository dataSubjectMappingRepository;
 
+
     private Map<String, BigInteger> globalAssetTypeAndSubAssetTypeMap = new HashMap<>();
     private Map<String, BigInteger> globalCategoryNameAndIdMap = new HashMap<>();
 
-
-    public Boolean copyDataFromCountryToUnitIdOnOnBoarding(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
+    public Boolean copyDataFromCountryToUnitIdOnUnitCreation(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
 
 
         List<AssetTypeRiskResponseDTO> assetTypeDTOS = assetTypeMongoRepository.getAllAssetTypeWithSubAssetTypeAndRiskByCountryId(countryId);
         saveAssetTypeAndAssetSubType(unitId, assetTypeDTOS);
         List<DataCategoryResponseDTO> dataCategoryDTOS = dataCategoryMongoRepository.getAllDataCategoryWithDataElement(countryId);
         copyDataCategoryAndDataElements(unitId, dataCategoryDTOS);
-        inheritMetaDataOfAssetAndProcessingActivity(countryId, unitId, organizationMetaDataDTO);
-
+        copyMasterDataFromCountry(countryId, unitId, organizationMetaDataDTO);
         return true;
 
     }
 
 
-    public void inheritMetaDataOfAssetAndProcessingActivity(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
+    public void copyMasterDataFromCountry(Long countryId, Long unitId, OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
 
         List<Callable<Boolean>> callables = new ArrayList<>();
         Callable<Boolean> dataDispoaslTask = () -> {
