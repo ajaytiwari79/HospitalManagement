@@ -22,8 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPosition, Long> {
 
     @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0}" +
-            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:PositionLine) WHERE  (date(positionLine.startDate).month<=date().month AND date(positionLine.startDate).day<=date().day AND date(positionLine.startDate).year<=date().year) \n" +
-            "AND (NOT exists(positionLine.endDate) OR (date(positionLine.endDate).month<=date().month AND date(positionLine.endDate).day<=date().day AND date(positionLine.endDate).year<=date().year) )" +
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:PositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
             "match (positionLine)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
             "match (unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)\n" +
             "match(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
@@ -226,8 +225,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("match(staff:Staff),(unit:Organization) where id(staff)={0} and id(unit)={1} \n" +
             "match(unit)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition{deleted:false,published:true})<-[:" + BELONGS_TO_STAFF + "]-(staff)" +
-            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:PositionLine) WHERE  (date(positionLine.startDate).month<=date().month AND date(positionLine.startDate).day<=date().day AND date(positionLine.startDate).year<=date().year) " +
-            "AND (NOT exists(positionLine.endDate) OR (date(positionLine.endDate).month<=date().month AND date(positionLine.endDate).day<=date().day AND date(positionLine.endDate).year<=date().year)) \n" +
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:PositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date()) \n" +
             "match(unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
             "match(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
             "with expertise,unitPosition,positionLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
