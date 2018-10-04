@@ -47,6 +47,8 @@ public class ShiftDTO {
     private ShiftTemplateDTO template;
     @NotEmpty(message = "message.shift.activity.empty")
     private List<ShiftActivity> activities = new ArrayList<>();
+    private int scheduledMinutes;
+    private int durationMinutes;
     private BigInteger plannedTimeId;
     private Long expertiseId;
     private LocalDate validatedByStaffDate;
@@ -54,6 +56,8 @@ public class ShiftDTO {
     private AttendanceDuration attendanceDuration;
     private LocalDateTime clockIn;
     private LocalDateTime clockOut;
+    private BigInteger shiftId;
+    private boolean editable;
 
 
     public ShiftDTO(List<ShiftActivity> activities,Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
@@ -82,6 +86,38 @@ public class ShiftDTO {
         this.unitPositionId = unitPositionId;
     }
 
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    public BigInteger getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(BigInteger shiftId) {
+        this.shiftId = shiftId;
+    }
+
+    public int getScheduledMinutes() {
+        return scheduledMinutes;
+    }
+
+    public void setScheduledMinutes(int scheduledMinutes) {
+        this.scheduledMinutes = scheduledMinutes;
+    }
+
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public void setDurationMinutes(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
+    }
 
     public LocalDateTime getClockIn() {
         return clockIn;
