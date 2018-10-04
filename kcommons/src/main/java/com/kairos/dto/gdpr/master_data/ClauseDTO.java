@@ -80,12 +80,10 @@ public class ClauseDTO {
         this.templateTypes = templateTypes;
     }
 
-    public String getTitle() {
-        return title.trim();
-    }
+    public String getTitle() { return title.trim(); }
 
     public String getDescription() {
-        return description;
+        return description.trim();
     }
 
     public void setTitle(String title) {

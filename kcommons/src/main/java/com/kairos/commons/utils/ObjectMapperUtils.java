@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 
@@ -54,6 +55,16 @@ public class ObjectMapperUtils {
         try {
             return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
                     List.class, className));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static <T extends Object,E extends Object> Set<E> copyPropertiesOfSetByMapper(Set<T> objects, Class className) {
+        try {
+            return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
+                    Set.class, className));
         } catch (IOException e) {
             e.printStackTrace();
         }

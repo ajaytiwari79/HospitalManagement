@@ -17,10 +17,13 @@ public class CPRUtil {
     }
 
     public static Date fetchDateOfBirthFromCPR(String cprNumber) {
-        return DateUtils.getDateByLocalDate(getDateOfBirthFromCPR(cprNumber));
+         return cprNumber!=null?DateUtils.getDateByLocalDate(getDateOfBirthFromCPR(cprNumber)):null;
     }
 
     public static Gender getGenderFromCPRNumber(String cprNumber){
+        if (cprNumber == null) {
+            return null;
+        }
         return Integer.valueOf(cprNumber.substring(cprNumber.length() - 1)) % 2 == 0 ? Gender.FEMALE : Gender.MALE;
     }
 

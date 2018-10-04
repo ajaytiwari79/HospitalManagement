@@ -1,7 +1,7 @@
 package com.kairos.service.scheduler_service;
 
-import com.kairos.dto.scheduler.KairosSchedulerExecutorDTO;
-import com.kairos.dto.scheduler.kafka.JobQueueExecutor;
+import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
+import com.kairos.dto.scheduler.queue.kafka.JobQueueExecutor;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.dashboard.SickService;
 import org.slf4j.Logger;

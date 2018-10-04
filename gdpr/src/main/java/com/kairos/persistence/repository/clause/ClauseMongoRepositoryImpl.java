@@ -40,7 +40,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public Clause findByTitle(Long countryId,  String title) {
+    public Clause findByTitle(Long countryId, String title) {
 
         Query query = new Query();
         query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("title").is(title));
@@ -51,7 +51,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
 
 
     @Override
-    public List<Clause> findClausesByTitle(Long countryId,  List<String> clauseTitles) {
+    public List<Clause> findClausesByTitle(Long countryId, List<String> clauseTitles) {
         Query query = new Query();
         query.addCriteria(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("title").in(clauseTitles));
         query.collation(Collation.of("en").
@@ -67,11 +67,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                 lookup("template_type", "templateTypes", "_id", "templateTypes"),
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
                 sort(Sort.Direction.DESC, "createdAt")
-
-
-                );
-
-
+        );
         AggregationResults<ClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseResponseDTO.class);
         return result.getMappedResults();
     }
@@ -109,7 +105,7 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
                 new CustomAggregationOperation(addNonDeletedTemplateTypeOperation),
                 sort(Sort.Direction.DESC, "createdAt")
 
-                );
+        );
 
         AggregationResults<ClauseResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseResponseDTO.class);
         return result.getMappedResults();

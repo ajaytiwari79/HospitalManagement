@@ -1,16 +1,22 @@
 package com.kairos.service.unit_position;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import com.kairos.dto.activity.cta.CTAWTAWrapper;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
-import com.kairos.dto.scheduler.kafka.producer.KafkaProducer;
+import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
+import com.kairos.dto.scheduler.queue.kafka.producer.KafkaProducer;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
+import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
+import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
@@ -65,14 +71,9 @@ import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.dto.user.organization.position_code.PositionCodeDTO;
-import com.kairos.dto.user.staff.unit_position.UnitPositionDTO;
 import com.kairos.utils.DateUtil;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.wrapper.PositionWrapper;
 import com.kairos.dto.activity.cta.CTATableSettingWrapper;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -506,11 +507,6 @@ public class UnitPositionService {
         }
         unitPosition.setStaff(staff);
 
-        // UEP can be created for past dates from time care
-        if (!createFromTimeCare && unitPositionDTO.getStartLocalDate().isBefore(LocalDate.now())) {
-            exceptionService.actionNotPermittedException("message.startdate.notlessthan.currentdate");
-
-        }
         unitPosition.setStartDateMillis(DateUtil.getDateFromEpoch(unitPositionDTO.getStartLocalDate()));
         unitPosition.setWorkingDaysInWeek(expertise.get().getNumberOfWorkingDaysInWeek());
 
@@ -1106,21 +1102,46 @@ public class UnitPositionService {
         Map<String, Object> functionMap = (Map<String, Object>) payload.get(dateAsString);
         Long functionId = new Long((Integer) functionMap.get("id"));
 
-        Date date = DateUtils.convertToOnlyDate(dateAsString, ONLY_DATE);
-        Boolean unitPositionFunctionRelationship = unitPositionFunctionRelationshipRepository.getUnitPositionFunctionRelationshipByUnitPositionAndFunction(unitPositionId, functionId, date.getTime());
+        Boolean unitPositionFunctionRelationship = unitPositionFunctionRelationshipRepository.getUnitPositionFunctionRelationshipByUnitPositionAndFunction(unitPositionId, functionId, dateAsString);
 
         if (unitPositionFunctionRelationship == null) {
-            unitPositionFunctionRelationshipRepository.createUnitPositionFunctionRelationship(unitPositionId, functionId, Collections.singletonList(date.getTime()));
+            unitPositionFunctionRelationshipRepository.createUnitPositionFunctionRelationship(unitPositionId, functionId, Collections.singletonList(dateAsString));
         } else if (unitPositionFunctionRelationship) {
             exceptionService.actionNotPermittedException("message.unitposition.function.alreadyApplied", dateAsString);
         }
         return true;
     }
 
-    public Boolean removeFunction(Long unitPositionId, Date appliedDate) {
-        unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, appliedDate.getTime());
-        return true;
+    public Long removeFunction(Long unitPositionId, Date appliedDate) {
+       return unitPositionFunctionRelationshipRepository.removeDateFromUnitPositionFunctionRelationship(unitPositionId, DateUtils.asLocalDate(appliedDate).toString());
+       }
+
+
+    /**
+     *
+     * @param unitPositionId
+     * @param appliedDates
+     * @return
+     * @Desc this method will remove applied functions for multiple dates
+     */
+    public Map<LocalDate,Long> removeFunctions(Long unitPositionId, Set<LocalDate> appliedDates) {
+        Map<LocalDate,Long> localDateAndFunctionIdMap=new HashMap<>();
+        List<UnitPositionFunctionRelationship> unitPositionFunctionRelationships=new ArrayList<>();
+        Set<String> localDatesAsString=ObjectMapperUtils.copyPropertiesOfSetByMapper(appliedDates,String.class);
+        List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationshipQueryResults=unitPositionFunctionRelationshipRepository.findAllByAppliedDatesIn(unitPositionId,localDatesAsString);
+        for(UnitPositionFunctionRelationshipQueryResult unitPositionFunctionRelationshipQueryResult :unitPositionFunctionRelationshipQueryResults){
+           Set<LocalDate> dateToRemove= getIntersectedDates(unitPositionFunctionRelationshipQueryResult.getAppliedDates(),appliedDates);
+            unitPositionFunctionRelationshipQueryResult.getAppliedDates().removeAll(dateToRemove);
+            unitPositionFunctionRelationships.add(new UnitPositionFunctionRelationship(unitPositionFunctionRelationshipQueryResult.getId(),unitPositionFunctionRelationshipQueryResult.getUnitPosition(), unitPositionFunctionRelationshipQueryResult.getFunction(), unitPositionFunctionRelationshipQueryResult.getAppliedDates()));
+            for(LocalDate localDate:dateToRemove){
+                localDateAndFunctionIdMap.put(localDate, unitPositionFunctionRelationshipQueryResult.getFunction().getId());
+            }
+
+        }
+        unitPositionFunctionRelationshipRepository.saveAll(unitPositionFunctionRelationships);
+       return localDateAndFunctionIdMap;
     }
+
 
     public List<com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails> getStaffsUnitPosition(Long unitId, Long expertiseId, List<Long> staffId) {
         List<com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails> staffData =
@@ -1174,7 +1195,7 @@ public class UnitPositionService {
     }
 
 
-    public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId) {
+    public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId,Long unitId) {
 
         LocalDateTime started = LocalDateTime.now();
         KairosSchedulerLogsDTO schedulerLogsDTO;
@@ -1240,11 +1261,46 @@ public class UnitPositionService {
         }
 
         stopped = LocalDateTime.now();
-        schedulerLogsDTO = new KairosSchedulerLogsDTO(result,log,schedulerPanelId,null,DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),JobSubType.SENIORITY_LEVEL);
+        schedulerLogsDTO = new KairosSchedulerLogsDTO(result,log,schedulerPanelId,unitId,DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),JobSubType.SENIORITY_LEVEL);
 
         kafkaProducer.pushToSchedulerLogsQueue(schedulerLogsDTO);
 
       // List<CTAWTAResponseDTO> ctaWTAs =  activityIntegrationService.copyWTACTA(unitPositionNewOldIds);
 
+    }
+
+    public Boolean restoreFunctions(Long unitPositionId, Map<Long,Set<LocalDate>> payload) {
+        List<UnitPositionFunctionRelationshipQueryResult> unitPositionFunctionRelationshipQueryResults=unitPositionFunctionRelationshipRepository.findAllByFunctionIdAndUnitPositionId(unitPositionId,payload.keySet());
+        List<UnitPositionFunctionRelationship> unitPositionFunctionRelationships=new ArrayList<>();
+
+        for(UnitPositionFunctionRelationshipQueryResult current:unitPositionFunctionRelationshipQueryResults){
+            if(payload.get(current.getFunction().getId())!=null){
+                current.getAppliedDates().addAll(payload.get(current.getFunction().getId()));
+                unitPositionFunctionRelationships.add(new UnitPositionFunctionRelationship(current.getId(),current.getUnitPosition(),current.getFunction(),current.getAppliedDates()));
+                }
+        }
+        unitPositionFunctionRelationshipRepository.saveAll(unitPositionFunctionRelationships);
+        return true;
+    }
+
+    /**
+     * @Auther Pavan
+     * @param first
+     * @param second
+     * @return matchedDates
+     * @Desc This method will return the Matched or common dates from two sets
+     */
+    private Set<LocalDate> getIntersectedDates(Set<LocalDate> first, Set<LocalDate> second){
+        Set<LocalDate> matchedDates=new HashSet<>();
+        if(CollectionUtils.isEmpty(first) || CollectionUtils.isEmpty(second)){
+            return matchedDates;
+        }
+        for(LocalDate currentLocalDate:second){
+            if(first.contains(currentLocalDate)){
+                matchedDates.add(currentLocalDate);
+            }
+
+        }
+        return matchedDates;
     }
 }

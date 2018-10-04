@@ -121,7 +121,10 @@ public class CounterDistService extends MongoBaseService {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
         if (accessGroupPermissionCounterDTO.getCountryAdmin()) {
             kpidtos = counterRepository.getCounterListForReferenceId(refId, ConfLevel.UNIT);
-        } else {
+        } else  {
+            if(accessGroupPermissionCounterDTO.getAccessGroupIds()==null){
+                exceptionService.dataNotFoundException("message.staff.invalid.unit");
+            }
             kpidtos = counterRepository.getAccessGroupKPIDto(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, refId, accessGroupPermissionCounterDTO.getStaffId());
         }
         kpiIds = kpidtos.stream().map(kpidto -> kpidto.getId()).collect(Collectors.toSet());
@@ -289,7 +292,7 @@ public class CounterDistService extends MongoBaseService {
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = genericIntegrationService.getAccessGroupIdsAndCountryAdmin(unitId);
         List<BigInteger> kpiIds = tabKPIMappingDTOS.stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList());
         List<TabKPIConf> tabKPIConfs = counterRepository.findTabKPIConfigurationByTabIds(Arrays.asList(tabId), kpiIds, accessGroupPermissionCounterDTO.getStaffId(), level);
-        if (Optional.ofNullable(tabKPIConfs).isPresent()) {
+        if (!Optional.ofNullable(tabKPIConfs).isPresent()) {
             exceptionService.invalidRequestException("error.kpi.invalidData");
         }
         Map<BigInteger, TabKPIMappingDTO> tabKPIMappingDTOMap = new HashMap<>();

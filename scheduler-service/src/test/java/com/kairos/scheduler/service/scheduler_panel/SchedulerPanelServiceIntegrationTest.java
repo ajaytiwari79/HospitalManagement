@@ -1,7 +1,7 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.dto.scheduler.SchedulerPanelDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.scheduler.config.OrderTest;

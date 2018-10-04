@@ -11,9 +11,7 @@ import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.APPLIED_FUNCTION;
 
@@ -31,14 +29,14 @@ public class UnitPositionFunctionRelationship extends UserBaseEntity {
     @EndNode
     private Function function;
 
-    @Convert(LocalDateListConverter.class)
-    private List<LocalDate> appliedDates;
+    private Set<LocalDate> appliedDates;
 
 
     public UnitPositionFunctionRelationship() {
     }
 
-    public UnitPositionFunctionRelationship(UnitPosition unitPosition, Function function, List<LocalDate> appliedDates) {
+    public UnitPositionFunctionRelationship(Long id,UnitPosition unitPosition, Function function, Set<LocalDate> appliedDates) {
+        this.id=id;
         this.unitPosition = unitPosition;
         this.function = function;
         this.appliedDates = appliedDates;
@@ -60,11 +58,11 @@ public class UnitPositionFunctionRelationship extends UserBaseEntity {
         this.function = function;
     }
 
-    public List<LocalDate> getDate() {
-        return appliedDates = Optional.ofNullable(appliedDates).orElse(new ArrayList<>());
+    public Set<LocalDate> getDate() {
+        return appliedDates = Optional.ofNullable(appliedDates).orElse(new HashSet<>());
     }
 
-    public void setDate(List<LocalDate> appliedDates) {
+    public void setDate(Set<LocalDate> appliedDates) {
         this.appliedDates = appliedDates;
     }
 
