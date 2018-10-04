@@ -20,6 +20,7 @@ public class ShiftActivity {
     private String activityName;
     private long bid;
     private long pId;
+    private Long reasonCodeId;
     private String remarks;
     private BigInteger id;
     private String timeType;
@@ -43,6 +44,14 @@ public class ShiftActivity {
         this.activityName = activityName;
     }
 
+
+    public Long getReasonCodeId() {
+        return reasonCodeId;
+    }
+
+    public void setReasonCodeId(Long reasonCodeId) {
+        this.reasonCodeId = reasonCodeId;
+    }
 
     public BigInteger getPlannedTimeId() {
         return plannedTimeId;

@@ -110,17 +110,17 @@ public class ShiftValidatorService {
     public DateTimeInterval getGracePeriodInterval(Long unitId, Date date, boolean forStaff) {
         TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         ZonedDateTime startDate = DateUtils.asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS);
-        ZonedDateTime endDate;
+        ZonedDateTime endDate = DateUtils.asZoneDateTime(date).plusDays(1).truncatedTo(ChronoUnit.DAYS);
         if (forStaff) {
-            endDate = startDate.plusDays(timeAttendanceGracePeriod.getStaffGracePeriodDays());
+            startDate = startDate.minusDays(timeAttendanceGracePeriod.getStaffGracePeriodDays());
         } else {
-            endDate = startDate.plusDays(timeAttendanceGracePeriod.getManagementGracePeriodDays());
+            startDate = startDate.minusDays(timeAttendanceGracePeriod.getManagementGracePeriodDays());
         }
         return new DateTimeInterval(startDate, endDate);
     }
 
 
-    public ShiftWithViolatedInfoDTO validateShiftWithActivity(Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public ShiftWithViolatedInfoDTO validateShiftWithActivity(Phase phase, WTAQueryResultDTO wtaQueryResultDTO, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO,boolean byTandAPhase) {
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
             exceptionService.actionNotPermittedException("message.wta.notFound");
         }
@@ -136,14 +136,17 @@ public class ShiftValidatorService {
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
         //TODO It should work on Multiple activity
         Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, shift.getActivities().get(0).getActivity(), staffAdditionalInfoDTO);
-        Specification<ShiftWithActivityDTO> shiftTimeLessThan = new ShiftStartTimeLessThan(staffAdditionalInfoDTO.getUnitTimeZone(), shift.getActivitiesStartDate(), shift.getActivities().get(0).getActivity().getRulesActivityTab().getPlannedTimeInAdvance());
 
         Specification<ShiftWithActivityDTO> activitySpecification = activityEmploymentTypeSpecification
                 .and(activityExpertiseSpecification)
                 .and(activitySkillSpec)
                 .and(wtaRulesSpecification)
-                .and(staffEmploymentSpecification)
-                .and(shiftTimeLessThan);
+                .and(staffEmploymentSpecification);
+        ;
+        if(!byTandAPhase){
+            Specification<ShiftWithActivityDTO> shiftTimeLessThan = new ShiftStartTimeLessThan(staffAdditionalInfoDTO.getUnitTimeZone(), shift.getActivitiesStartDate(), shift.getActivities().get(0).getActivity().getRulesActivityTab().getPlannedTimeInAdvance());
+            activitySpecification.and(shiftTimeLessThan);
+        }
         if (dayTypeIds != null) {
             Set<DayOfWeek> validDays = getValidDays(staffAdditionalInfoDTO.getDayTypes(), dayTypeIds);
             Specification<ShiftWithActivityDTO> activityDayTypeSpec = new DayTypeSpecification(validDays, shift.getActivitiesStartDate());
