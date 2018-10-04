@@ -12,7 +12,7 @@ import java.util.Map;
  * CreatedBy vipulpandey on 26/9/18
  **/
 @QueryResult
-public class PositionLinesQueryResult {
+public class UnitPositionLinesQueryResult {
     private Long id;
     private Long unitPositionId;
     private LocalDate startDate;
@@ -29,11 +29,11 @@ public class PositionLinesQueryResult {
     private WTAResponseDTO workingTimeAgreement;
     private CTAResponseDTO costTimeAgreement;
 
-    public PositionLinesQueryResult() {
+    public UnitPositionLinesQueryResult() {
         //DC
     }
 
-    public PositionLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, Float hourlyWages, Map<String, Object> employmentType, Map<String, Object> seniorityLevel) {
+    public UnitPositionLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, Float hourlyWages, Map<String, Object> employmentType, Map<String, Object> seniorityLevel) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;

@@ -22,7 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPosition, Long> {
 
     @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0}" +
-            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:PositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date())" +
             "match (unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "match(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
             "with expertise,unitPosition,positionLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
@@ -98,7 +98,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "RETURN id(subOrg) as unitId,id(org) as parentUnitId")
     UnitPositionQueryResult getUnitIdAndParentUnitIdByUnitPositionId(Long unitPositionId);
 
-    @Query("match(positionLine:PositionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)  where id(positionLine)={0} return positionLine,employmentRel,employmentType")
+    @Query("match(positionLine:UnitPositionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)  where id(positionLine)={0} return positionLine,employmentRel,employmentType")
     UnitPositionEmploymentTypeRelationShip findEmploymentTypeByUnitPositionId(Long unitPositionId);
 
     // TODO its INCORRECT
@@ -184,7 +184,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
      * match(staff : Staff)-[expertise_from_date:STAFF_HAS_EXPERTISE]->(expertise:Expertise{deleted:false}) where expertise_from_date.expertiseStartDate is not null
      * and datetime({epochmillis:expertise_from_date.expertiseStartDate}).month=datetime().month and
      * datetime({epochmillis:expertise_from_date.expertiseStartDate}).day=datetime().day and datetime({epochmillis:expertise_from_date.expertiseStartDate}).year<>datetime().year
-     * Match(activePositionLine:PositionLine)<-[:HAS_POSITION_LINES]-(unitPosition:UnitPosition{deleted:false,published:true})-[:HAS_EXPERTISE_IN]->(expertise) where activePositionLine.endDate is null OR activePositionLine.endDate >= date()
+     * Match(activePositionLine:UnitPositionLine)<-[:HAS_POSITION_LINES]-(unitPosition:UnitPosition{deleted:false,published:true})-[:HAS_EXPERTISE_IN]->(expertise) where activePositionLine.endDate is null OR activePositionLine.endDate >= date()
      * with staff,expertise,unitPosition,activePositionLine, datetime().year-datetime({epochmillis:expertise_from_date.expertiseStartDate}).year as years_experience_in_expertise
      *
      * match(staff)-[:BELONGS_TO_STAFF]->(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise) with staff,unitPosition,expertise,years_experience_in_expertise,activePositionLine
@@ -199,7 +199,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     @Query( "match(staff:Staff)-[expertise_from_date:"+STAFF_HAS_EXPERTISE+"]->(expertise:Expertise{deleted:false}) where expertise_from_date.expertiseStartDate is not null\n" +
             "and datetime({epochmillis:expertise_from_date.expertiseStartDate}).month=datetime().month and\n" +
             "datetime({epochmillis:expertise_from_date.expertiseStartDate}).day=datetime().day and datetime({epochmillis:expertise_from_date.expertiseStartDate}).year<>datetime().year \n" +
-            "Match(activePositionLine:PositionLine)<-[:"+HAS_POSITION_LINES+"]-(unitPosition:UnitPosition{deleted:false,published:true})-[:"+HAS_EXPERTISE_IN+"]->(expertise) where activePositionLine.endDate is null OR activePositionLine.endDate >= date()\n" +
+            "Match(activePositionLine:UnitPositionLine)<-[:"+HAS_POSITION_LINES+"]-(unitPosition:UnitPosition{deleted:false,published:true})-[:"+HAS_EXPERTISE_IN+"]->(expertise) where activePositionLine.endDate is null OR activePositionLine.endDate >= date()\n" +
             "with staff,expertise,unitPosition,activePositionLine, datetime().year-datetime({epochmillis:expertise_from_date.expertiseStartDate}).year as years_experience_in_expertise \n" +
             "match(staff)-[:"+BELONGS_TO_STAFF+"]->(unitPosition)-[:"+HAS_EXPERTISE_IN+"]->(expertise) with staff,unitPosition,expertise,years_experience_in_expertise,activePositionLine\n" +
             "match(activePositionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(sl:SeniorityLevel) where sl.to<=years_experience_in_expertise \n" +
@@ -224,7 +224,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("match(staff:Staff),(unit:Organization) where id(staff)={0} and id(unit)={1} \n" +
             "match(unit)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition{deleted:false,published:true})<-[:" + BELONGS_TO_STAFF + "]-(staff)" +
-            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:PositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date()) \n" +
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) WHERE  date(positionLine.startDate) <= date() AND (NOT exists(positionLine.endDate) OR date(positionLine.endDate) >= date()) \n" +
             "match(unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
             "match(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
             "with expertise,unitPosition,positionLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
@@ -237,7 +237,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     UnitPositionQueryResult findByUnitPositionId(Long unitPositionId);
 
     @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) IN {0} " +
-            "MATCH(unitPosition)-[:" + HAS_POSITION_LINES + "]-(positionLine:PositionLine) " +
+            "MATCH(unitPosition)-[:" + HAS_POSITION_LINES + "]-(positionLine:UnitPositionLine) " +
             "MATCH(positionLine)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]-(payGrade:PayGrade) " +
             "MATCH(positionLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) " +
             "OPTIONAL MATCH (positionLine)-[:" + HAS_FUNCTION + "]-(function:Function) with unitPosition,positionLine,payGrade,seniorityLevel,employmentType,employmentRel,collect(function) as functionData "+
@@ -253,11 +253,11 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             " positionLine.startDate as startDate, positionLine.endDate as endDate, \n" +
             "positionLine.hourlyWages as hourlyWages,positionLine.avgDailyWorkingHours as avgDailyWorkingHours ORDER BY positionLine.startDate"
     )
-    List<PositionLinesQueryResult> findAllPositionLines(List<Long> unitPositionIds);
+    List<UnitPositionLinesQueryResult> findAllPositionLines(List<Long> unitPositionIds);
 
 
     @Query(" MATCH (unitPosition:UnitPosition) where id(unitPosition) IN {0}\n" +
-            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:PositionLine) \n" +
+            "MATCH(unitPosition)-[:"+HAS_POSITION_LINES+"]-(positionLine:UnitPositionLine) \n" +
             "MATCH(positionLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]-(payGrade:PayGrade) \n" +
             "MATCH(unitPosition)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{published:true}) \n" +
             "OPTIONAL MATCH(unitPosition)-[:IN_UNIT]-(org:Organization)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress)-[:MUNICIPALITY]->(municipality:Municipality)-[:HAS_MUNICIPALITY]-(pga:PayGroupArea)<-[pgaRel:HAS_PAY_GROUP_AREA]-(payGrade) \n" +

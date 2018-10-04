@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_S
  * CreatedBy vipulpandey on 24/9/18
  **/
 @NodeEntity
-public class PositionLine extends UserBaseEntity {
+public class UnitPositionLine extends UserBaseEntity {
     @Relationship(type = HAS_SENIORITY_LEVEL)
     private SeniorityLevel seniorityLevel;
     @Relationship(type = HAS_FUNCTION)
@@ -29,19 +29,19 @@ public class PositionLine extends UserBaseEntity {
     private int workingDaysInWeek;       // same from expertise
     private float hourlyWages;          // payGroupArea
 
-    public PositionLine() {
+    public UnitPositionLine() {
         // DC
     }
-    private PositionLine(PositionLineBuilder positionLineBuilder){
-        this.seniorityLevel = positionLineBuilder.seniorityLevel;
-        this.functions = positionLineBuilder.functions;
-        this.startDate = positionLineBuilder.startDate;
-        this.endDate = positionLineBuilder.endDate;
-        this.totalWeeklyMinutes = positionLineBuilder.totalWeeklyMinutes;
-        this.fullTimeWeeklyMinutes = positionLineBuilder.fullTimeWeeklyMinutes;
-        this.avgDailyWorkingHours = positionLineBuilder.avgDailyWorkingHours;
-        this.workingDaysInWeek = positionLineBuilder.workingDaysInWeek;
-        this.hourlyWages = positionLineBuilder.hourlyWages;
+    private UnitPositionLine(UnitPositionLineBuilder unitPositionLineBuilder){
+        this.seniorityLevel = unitPositionLineBuilder.seniorityLevel;
+        this.functions = unitPositionLineBuilder.functions;
+        this.startDate = unitPositionLineBuilder.startDate;
+        this.endDate = unitPositionLineBuilder.endDate;
+        this.totalWeeklyMinutes = unitPositionLineBuilder.totalWeeklyMinutes;
+        this.fullTimeWeeklyMinutes = unitPositionLineBuilder.fullTimeWeeklyMinutes;
+        this.avgDailyWorkingHours = unitPositionLineBuilder.avgDailyWorkingHours;
+        this.workingDaysInWeek = unitPositionLineBuilder.workingDaysInWeek;
+        this.hourlyWages = unitPositionLineBuilder.hourlyWages;
 
     }
 
@@ -85,7 +85,7 @@ public class PositionLine extends UserBaseEntity {
         this.endDate = endDate;
     }
 
-    public static class PositionLineBuilder {
+    public static class UnitPositionLineBuilder {
          private SeniorityLevel seniorityLevel;
          private List<Function> functions;
          private LocalDate startDate;
@@ -96,53 +96,53 @@ public class PositionLine extends UserBaseEntity {
          private int workingDaysInWeek;
          private float hourlyWages;
 
-         public PositionLineBuilder setSeniorityLevel(SeniorityLevel seniorityLevel) {
+         public UnitPositionLineBuilder setSeniorityLevel(SeniorityLevel seniorityLevel) {
              this.seniorityLevel = seniorityLevel;
              return this;
          }
 
-         public PositionLineBuilder setFunctions(List<Function> functions) {
+         public UnitPositionLineBuilder setFunctions(List<Function> functions) {
              this.functions = functions;
              return this;
          }
 
-         public PositionLineBuilder setStartDate(LocalDate startDate) {
+         public UnitPositionLineBuilder setStartDate(LocalDate startDate) {
              this.startDate = startDate;
              return this;
          }
 
-         public PositionLineBuilder setEndDate(LocalDate endDate) {
+         public UnitPositionLineBuilder setEndDate(LocalDate endDate) {
              this.endDate = endDate;
              return this;
          }
 
-         public PositionLineBuilder setTotalWeeklyMinutes(int totalWeeklyMinutes) {
+         public UnitPositionLineBuilder setTotalWeeklyMinutes(int totalWeeklyMinutes) {
              this.totalWeeklyMinutes = totalWeeklyMinutes;
              return this;
          }
 
-         public PositionLineBuilder setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+         public UnitPositionLineBuilder setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
              this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
              return this;
          }
 
-         public PositionLineBuilder setAvgDailyWorkingHours(float avgDailyWorkingHours) {
+         public UnitPositionLineBuilder setAvgDailyWorkingHours(float avgDailyWorkingHours) {
              this.avgDailyWorkingHours = avgDailyWorkingHours;
              return this;
          }
 
-         public PositionLineBuilder setWorkingDaysInWeek(int workingDaysInWeek) {
+         public UnitPositionLineBuilder setWorkingDaysInWeek(int workingDaysInWeek) {
              this.workingDaysInWeek = workingDaysInWeek;
              return this;
          }
 
-         public PositionLineBuilder setHourlyWages(float hourlyWages) {
+         public UnitPositionLineBuilder setHourlyWages(float hourlyWages) {
              this.hourlyWages = hourlyWages;
              return this;
          }
 
-       public PositionLine build() {
-           return new PositionLine(this);
+       public UnitPositionLine build() {
+           return new UnitPositionLine(this);
        }
      }
 }

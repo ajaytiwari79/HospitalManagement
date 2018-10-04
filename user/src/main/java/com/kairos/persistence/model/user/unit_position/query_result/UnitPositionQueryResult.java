@@ -34,7 +34,7 @@ public class UnitPositionQueryResult {
 
     private Map<String, Object> reasonCode;
     private Map<String, Object> unitInfo;
-    private List<PositionLinesQueryResult> positionLines;
+    private List<UnitPositionLinesQueryResult> positionLines;
     private Boolean history;
     private Boolean editable;
     private Boolean published;
@@ -150,11 +150,11 @@ public class UnitPositionQueryResult {
 
 
 
-    public List<PositionLinesQueryResult> getPositionLines() {
+    public List<UnitPositionLinesQueryResult> getPositionLines() {
         return Optional.ofNullable(positionLines).orElse(new ArrayList<>());
     }
 
-    public void setPositionLines(List<PositionLinesQueryResult> positionLines) {
+    public void setPositionLines(List<UnitPositionLinesQueryResult> positionLines) {
         this.positionLines = positionLines;
     }
 

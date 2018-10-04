@@ -6,14 +6,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -44,7 +42,7 @@ public class StaffUnitPositionDetails {
     private ZoneId unitTimeZone;
     private Staff staff;
     private List<AppliedFunctionDTO> appliedFunctions;
-    private List<PositionLinesQueryResult> positionLines;
+    private List<UnitPositionLinesQueryResult> positionLines;
 
     public StaffUnitPositionDetails() {
     }
@@ -179,11 +177,11 @@ public class StaffUnitPositionDetails {
         this.appliedFunctions = appliedFunctions;
     }
 
-    public List<PositionLinesQueryResult> getPositionLines() {
+    public List<UnitPositionLinesQueryResult> getPositionLines() {
         return positionLines;
     }
 
-    public void setPositionLines(List<PositionLinesQueryResult> positionLines) {
+    public void setPositionLines(List<UnitPositionLinesQueryResult> positionLines) {
         this.positionLines = positionLines;
     }
 }

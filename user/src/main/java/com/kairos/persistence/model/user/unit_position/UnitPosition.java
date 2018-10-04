@@ -3,16 +3,13 @@ package com.kairos.persistence.model.user.unit_position;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +52,7 @@ public class UnitPosition extends UserBaseEntity {
     private boolean editable;
     private boolean published;
     @Relationship(type = HAS_POSITION_LINES)
-    private List<PositionLine> positionLines;
+    private List<UnitPositionLine> unitPositionLines;
 
     public UnitPosition() {
 
@@ -177,12 +174,12 @@ public class UnitPosition extends UserBaseEntity {
         this.published = published;
     }
 
-    public List<PositionLine> getPositionLines() {
-        return Optional.ofNullable(positionLines).orElse(new ArrayList<>());
+    public List<UnitPositionLine> getUnitPositionLines() {
+        return Optional.ofNullable(unitPositionLines).orElse(new ArrayList<>());
     }
 
-    public void setPositionLines(List<PositionLine> positionLines) {
-        this.positionLines = positionLines;
+    public void setUnitPositionLines(List<UnitPositionLine> unitPositionLines) {
+        this.unitPositionLines = unitPositionLines;
     }
 
     public UnitPosition(LocalDate startDate, LocalDate endDate, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary) {
