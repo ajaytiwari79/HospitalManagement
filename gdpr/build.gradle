@@ -1,14 +1,14 @@
 buildscript {
     ext {
         springBootVersion = '2.0.5.RELEASE'
+        jacksonVersion = '2.9.2'
         projectVersion = "0.0.1"
         version = "0.0.1"
     }
     repositories {
         mavenCentral()
         jcenter()
-        maven { url "https://repo.spring.io/snapshot" }
-        maven { url "https://repo.spring.io/milestone" }
+        maven{url "https://plugins.gradle.org/m2/"}
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -29,13 +29,13 @@ mainClassName = 'com.kairos.KairosGdprApplication'
 repositories {
     mavenCentral()
     jcenter()
-    maven { url "https://repo.spring.io/snapshot" }
-    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://plugins.gradle.org/m2/" }
+    maven{url "https://repo.spring.io/plugins-release"}
 
 }
 
 ext {
-    springCloudVersion = 'Finchley.M8'
+    springCloudVersion = 'Finchley.SR1'
 }
 dependencies {
 
