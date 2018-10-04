@@ -4,8 +4,13 @@ db.getCollection('tabKPIConf').updateMany({"level":"UNIT"},{$set:{"priority":Num
 db.getCollection('tabKPIConf').updateMany({"level":"COUNTRY"},{$set:{"priority":NumberInt(12)}})
 
 
+//
+
+db.counter.updateMany({},{ $rename: { "treatAsCounter": "counter" } })
+
 //Because of Shift Domain refactoring we have to Remove these collections
 db.shifts.drop();
 db.dailyTimeBankEntries.drop();
 db.shiftViolatedRules.drop();
 db.payOut.drop();
+
