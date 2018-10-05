@@ -285,7 +285,7 @@ public class PhaseService extends MongoBaseService {
      */
     public Phase getCurrentPhaseByUnitIdAndDate(Long unitId, Date date){
         Phase tentativePhase = phaseMongoRepository.findByUnitIdAndName(unitId,TENTATIVE);
-        LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(LocalDate.now(),tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
+        LocalDateTime untilTentativeDate = DateUtils.getDateForUpcomingDay(LocalDate.now(),tentativePhase.getUntilNextDay()==null?DayOfWeek.MONDAY:tentativePhase.getUntilNextDay()).atStartOfDay().minusSeconds(1);
         LocalDateTime requestedDate=DateUtils.asLocalDateTime(date);
         Phase phase;
         if(requestedDate.isAfter(untilTentativeDate)){
