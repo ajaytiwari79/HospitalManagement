@@ -332,29 +332,15 @@ public class PhaseService extends MongoBaseService {
         return localDatePhaseStatusMap;
     }
 
-//    /**
-//     *
-//     * @param requestedDate
-//     * @param previousMonday
-//     * @param phaseMap
-//     * @param currentDate
-//     * @param upcomingMondayDate
-//     * @return
-//     */
-//    private Phase getActualPhaseApplicableForDate(LocalDate requestedDate, LocalDate previousMonday, Map<String,Phase> phaseMap, LocalDate currentDate, LocalDate upcomingMondayDate){
-//        Phase phase=null;
-//        if (requestedDate.isBefore(previousMonday)) {
-//            phase= phaseMap.get(PAYROLL);
-//        } else if (requestedDate.isBefore(currentDate) && requestedDate.isAfter(previousMonday.minusDays(1))) {
-//            phase= phaseMap.get(TIME_AND_ATTENDANCE);
-//        } else if ((currentDate).isEqual(requestedDate)) {
-//            phase= phaseMap.get(REALTIME);
-//        } else if ((requestedDate).isBefore(upcomingMondayDate.plusDays(1)) && requestedDate.isAfter(currentDate)) {
-//            phase=phaseMap.get(TENTATIVE);
-//        }
-//        return phase;
-//    }
 
+    /**
+     *
+     * @param requestedDateTime
+     * @param previousMondayLocalDateTime
+     * @param phaseMap
+     * @param untilTentativeDate
+     * @return phase
+     */
     private Phase getActualPhaseApplicableForDate(LocalDateTime requestedDateTime, LocalDateTime previousMondayLocalDateTime, Map<String,Phase> phaseMap, LocalDateTime untilTentativeDate){
         Phase phase=null;
         int minutesToCalculate=phaseMap.get(REALTIME).getRealtimeDuration();
