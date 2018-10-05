@@ -19,6 +19,7 @@ import com.kairos.persistence.repository.data_inventory.asset.AssetMongoReposito
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateMongoRepository;
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
+import com.kairos.response.dto.common.AssessmentResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
@@ -92,6 +93,7 @@ public class AssessmentService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.assessment.cannotbe.launched.processing.activity", previousAssessment.getName(), previousAssessment.getAssessmentStatus());
         }
         Assessment assessment = buildAssessmentWithBasicDetail(unitId, assessmentDTO, QuestionnaireTemplateType.PROCESSING_ACTIVITY, null);
+        assessment.setProcessingActivityId(processingActivityId);
         assessmentMongoRepository.save(assessment);
         assessmentDTO.setId(assessment.getId());
         return assessmentDTO;
@@ -303,6 +305,10 @@ public class AssessmentService extends MongoBaseService {
         return assessmentMongoRepository.getAllLaunchedAssessmentAssignToRespondent(unitId, loggedInUserId);
     }
 
+
+    public List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId) {
+        return assessmentMongoRepository.getAllAssessmentByUnitId(unitId);
+    }
 
     /**
      * @param unitId

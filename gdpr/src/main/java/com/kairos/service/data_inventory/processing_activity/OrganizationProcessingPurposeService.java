@@ -9,6 +9,7 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Pr
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -114,9 +115,9 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
 
     public Boolean deleteProcessingPurpose(Long unitId, BigInteger processingPurposeId) {
 
-        List<ProcessingActivityBasicResponseDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
+        List<ProcessingActivityBasicDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
         if (!processingActivities.isEmpty()) {
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
         processingPurposeMongoRepository.safeDelete(processingPurposeId);
         return true;
