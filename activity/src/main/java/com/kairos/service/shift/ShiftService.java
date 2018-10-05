@@ -497,7 +497,7 @@ public class ShiftService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.shift.id", shiftDTO.getId());
         }
         shiftValidatorService.validateStatusOfShiftOnUpdate(shift, shiftDTO);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftDTO.getStartDate()),shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftDTO.getActivities().get(0).getStartDate()),shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId());
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(), shiftDTO.getActivities().get(0).getStartDate());
         if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("error.cta.notFound", shiftDTO.getStartDate());
