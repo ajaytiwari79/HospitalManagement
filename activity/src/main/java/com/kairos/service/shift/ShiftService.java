@@ -884,7 +884,7 @@ public class ShiftService extends MongoBaseService {
         List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>(shifts.size());
         if (!shifts.isEmpty() && objects[1] != null) {
             Set<BigInteger> activityIds = (Set<BigInteger>) objects[1];
-            Set<LocalDate> dates = shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
+            Set<LocalDateTime> dates = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getStartDate())).collect(Collectors.toSet());
             Map<LocalDate, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, dates);
             List<BigInteger> phaseIds = phaseListByDate.values().stream().map(p -> p.getId()).collect(Collectors.toList());
             List<ActivityShiftStatusSettings> activityShiftStatusSettings = activityAndShiftStatusSettingsRepository.findByPhaseIdsAndActivityIdsAndShiftStatus(phaseIds, activityIds, shiftPublishDTO.getStatus());
