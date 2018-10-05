@@ -57,7 +57,7 @@ public class QuestionnaireTemplateController {
     }
 
     @ApiOperation(value = "update basic detail of Questionnaire template ")
-    @PutMapping(COUNTRY_URL+"/questionnaire_template/update/{id}")
+    @PutMapping(COUNTRY_URL+"/questionnaire_template/{id}")
     public ResponseEntity<Object> updateMasterQuestionnaireTemplate(@PathVariable Long countryId, @PathVariable BigInteger id, @Valid @RequestBody QuestionnaireTemplateDTO templateDto) {
          return ResponseHandler.generateResponse(HttpStatus.OK, true, masterQuestionnaireTemplateService.updateMasterQuestionnaireTemplate(countryId, id, templateDto));
 
