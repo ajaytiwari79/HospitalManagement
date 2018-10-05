@@ -165,7 +165,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
      */
     public QuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionById(Long countryId, BigInteger questionnaireTemplateId) {
         QuestionnaireTemplateResponseDTO templateResponseDto = questionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsByCountryId(countryId, questionnaireTemplateId);
-        if (templateResponseDto.getSections().get(0).getId() == null) {
+        if (!Optional.ofNullable(templateResponseDto.getSections().get(0).getId()).isPresent()) {
             templateResponseDto.setSections(new ArrayList<>());
         }
         return templateResponseDto;
@@ -182,7 +182,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
     public List<QuestionnaireTemplateResponseDTO> getAllMasterQuestionnaireTemplateWithSection(Long countryId) {
         List<QuestionnaireTemplateResponseDTO> templateResponseDTOs = questionnaireTemplateMongoRepository.getAllMasterQuestionnaireTemplateWithSectionsAndQuestionsByCountryId(countryId);
         templateResponseDTOs.forEach(template -> {
-            if (template.getSections().get(0).getId() == null) {
+            if (!Optional.ofNullable(template.getSections().get(0).getId()).isPresent()) {
                 template.setSections(new ArrayList<>());
             }
         });
@@ -266,7 +266,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
      */
     public QuestionnaireTemplateResponseDTO getQuestionnaireTemplateWithSectionByUnitIdAndId(Long unitId, BigInteger questionnaireTemplateId) {
         QuestionnaireTemplateResponseDTO templateResponseDto = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, questionnaireTemplateId);
-        if (templateResponseDto.getSections().get(0).getId() == null) {
+        if (!Optional.ofNullable(templateResponseDto.getSections().get(0).getId()).isPresent()) {
             templateResponseDto.setSections(new ArrayList<>());
         }
         return templateResponseDto;
@@ -279,7 +279,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
     public List<QuestionnaireTemplateResponseDTO> getAllQuestionnaireTemplateWithSectionByUnitId(Long unitId) {
         List<QuestionnaireTemplateResponseDTO> templateResponseDTOs = questionnaireTemplateMongoRepository.getAllQuestionnaireTemplateWithSectionsAndQuestionsByUnitId(unitId);
         templateResponseDTOs.forEach(template -> {
-            if (template.getSections().get(0).getId() == null) {
+            if (!Optional.ofNullable(template.getSections().get(0).getId()).isPresent()) {
                 template.setSections(new ArrayList<>());
             }
         });

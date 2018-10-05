@@ -2,7 +2,10 @@ package com.kairos.persistence.repository.data_inventory.Assessment;
 
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
+import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
+import com.kairos.response.dto.common.AssessmentResponseDTO;
+import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -49,6 +52,22 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
         return result.getMappedResults();
     }
 
+    @Override
+    public List<AssessmentResponseDTO> getAllAssessmentByUnitId(Long unitId) {
+
+        String projectionOpertaion = "{ '$project':{'asset':{$arrayElemAt:['$asset',0]},'processingActivity':{'$arrayElemAt':['$processingActivity',0]}," +
+                "'_id':1,'name':1,'endDate':1,'completedDate':1,'comment':1,'assignee':1,'approver':1,'assessmentStatus':1}}";
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false)),
+                lookup("asset", "assetId", "_id", "asset"),
+                lookup("processing_activity", "processingActivityId", "_id", "processingActivity"),
+                new CustomAggregationOperation(Document.parse(projectionOpertaion))
+
+        );
+        AggregationResults<AssessmentResponseDTO> result = mongoTemplate.aggregate(aggregation, Assessment.class, AssessmentResponseDTO.class);
+        return result.getMappedResults();
+    }
 
     @Override
     public Assessment findPreviousLaunchedAssessmentOfAssetByUnitId(Long unitId, BigInteger assetId) {

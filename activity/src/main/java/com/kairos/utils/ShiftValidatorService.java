@@ -94,21 +94,22 @@ public class ShiftValidatorService {
 
     public void validateGracePeriod(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId) {
         DateTimeInterval graceInterval;
+        TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
         if (validatedByStaff) {
-            graceInterval = getGracePeriodInterval(unitId, shiftDTO.getStartDate(), validatedByStaff);
+            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, shiftDTO.getStartDate(), validatedByStaff);
         } else {
             if (shiftDTO.getValidatedByStaffDate() == null) {
                 exceptionService.invalidRequestException("message.shift.cannot.validated");
             }
-            graceInterval = getGracePeriodInterval(unitId, DateUtils.asDate(shiftDTO.getValidatedByStaffDate()), validatedByStaff);
+            graceInterval = getGracePeriodInterval(timeAttendanceGracePeriod, DateUtils.asDate(shiftDTO.getValidatedByStaffDate()), validatedByStaff);
         }
         if (!graceInterval.contains(shiftDTO.getStartDate())) {
             exceptionService.invalidRequestException("message.shift.cannot.update");
         }
     }
 
-    public DateTimeInterval getGracePeriodInterval(Long unitId, Date date, boolean forStaff) {
-        TimeAttendanceGracePeriod timeAttendanceGracePeriod = timeAttendanceGracePeriodRepository.findByUnitId(unitId);
+    public DateTimeInterval getGracePeriodInterval(TimeAttendanceGracePeriod timeAttendanceGracePeriod, Date date, boolean forStaff) {
+
         ZonedDateTime startDate = DateUtils.asZoneDateTime(date).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.asZoneDateTime(date).plusDays(1).truncatedTo(ChronoUnit.DAYS);
         if (forStaff) {

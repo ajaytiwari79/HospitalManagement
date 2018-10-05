@@ -102,8 +102,10 @@ public class AttendanceSettingService extends MongoBaseService {
                 Set<ReasonCodeDTO> reasonCode = staffAndOrganizationIds.stream().flatMap(s -> s.getReasonCodes().stream()).collect(Collectors.toSet());
                 return new AttendanceDTO(reasonCode);
             }else {
-                shift.setAttendanceDuration(attendanceSetting.getAttendanceDuration());
-                shiftMongoRepository.save(shift);
+                if(shift!=null){
+                    shift.setAttendanceDuration(attendanceSetting.getAttendanceDuration());
+                    shiftMongoRepository.save(shift);
+                }
             }
         }
 
