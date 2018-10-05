@@ -640,19 +640,21 @@ public class ShiftService extends MongoBaseService {
     }
 
     private void validateStaffingLevel(Phase phase, Shift shift, Activity activity, boolean checkOverStaffing, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        Date shitfStartDate = shift.getActivities().get(0).getStartDate();
+        Date shiftEndDate = shift.getActivities().get(shift.getActivities().size()-1).getEndDate();
         if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
             PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
             if (!Optional.ofNullable(phaseSettings).isPresent()) {
                 exceptionService.dataNotFoundException("message.phaseSettings.absent");
             }
             if (!phaseSettings.isManagementEligibleForOverStaffing() || !phaseSettings.isManagementEligibleForUnderStaffing() || !phaseSettings.isStaffEligibleForOverStaffing() || !phaseSettings.isStaffEligibleForUnderStaffing()) {
-                Date startDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS));
-                Date endDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shift.getEndDate()).truncatedTo(ChronoUnit.DAYS));
+                Date startDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shitfStartDate).truncatedTo(ChronoUnit.DAYS));
+                Date endDate1 = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftEndDate).truncatedTo(ChronoUnit.DAYS));
                 List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(shift.getUnitId(), startDate1, endDate1);
                 if (!Optional.ofNullable(staffingLevels).isPresent() || staffingLevels.isEmpty()) {
                     exceptionService.actionNotPermittedException("message.staffingLevel.absent");
                 }
-                List<Shift> shifts = shiftMongoRepository.findShiftBetweenDuration(shift.getStartDate(), shift.getEndDate(), shift.getUnitId());
+                List<Shift> shifts = shiftMongoRepository.findShiftBetweenDuration(shitfStartDate, shiftEndDate, shift.getUnitId());
                 for (StaffingLevel staffingLevel : staffingLevels) {
                     List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
                             activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
