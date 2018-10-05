@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.data_inventory.processing_activity;
 
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
@@ -29,25 +30,25 @@ public interface ProcessingActivityMongoRepository extends MongoBaseRepository<P
     List<ProcessingActivityResponseDTO> findAllSubProcessingActivitiesByIds(List<BigInteger> ids);
 
     @Query("{organizationId:?0,assetId:?1,deleted:false,subProcess:false}")
-    List<ProcessingActivityBasicResponseDTO> findAllProcessingActivityLinkWithAssetById(Long unitId, BigInteger assetId);
+    List<ProcessingActivityBasicDTO> findAllProcessingActivityLinkWithAssetById(Long unitId, BigInteger assetId);
 
     @Query("{organizationId:?0,deleted:false,active:true,responsibilityType:?1},{name:1,_id:0}")
-    List<ProcessingActivityBasicResponseDTO> findAllProcessingActivityLinkedWithResponsibilityType(Long unitId,BigInteger responsibilityTypeId);
+    List<ProcessingActivityBasicDTO> findAllProcessingActivityLinkedWithResponsibilityType(Long unitId, BigInteger responsibilityTypeId);
 
     @Query("{organizationId:?0,deleted:false,active:true,accessorParties:?1},{name:1,_id:0}")
-    List<ProcessingActivityBasicResponseDTO> findAllProcessingActivityLinkedWithAccessorParty(Long unitId,BigInteger accessorPartyId);
+    List<ProcessingActivityBasicDTO> findAllProcessingActivityLinkedWithAccessorParty(Long unitId,BigInteger accessorPartyId);
 
     @Query("{organizationId:?0,deleted:false,active:true,transferMethods:?1},{name:1,_id:0}")
-    List<ProcessingActivityBasicResponseDTO> findAllProcessingActivityLinkedWithTransferMethod(Long unitId,BigInteger transferMethodId);
+    List<ProcessingActivityBasicDTO> findAllProcessingActivityLinkedWithTransferMethod(Long unitId,BigInteger transferMethodId);
 
     @Query("{organizationId:?0,deleted:false,active:true,dataSources:?1},{name:1,_id:0}")
-    List<ProcessingActivityBasicResponseDTO> findAllProcessingActivityLinkedWithDataSource(Long unitId,BigInteger dataSourceId);
+    List<ProcessingActivityBasicDTO> findAllProcessingActivityLinkedWithDataSource(Long unitId,BigInteger dataSourceId);
 
     @Query("{organizationId:?0,deleted:false,active:true,processingPurposes:?1},{name:1,_id:0}")
-    List<ProcessingActivityBasicResponseDTO> findAllProcessingActivityLinkedWithProcessingPurpose(Long unitId,BigInteger processingPurposeId);
+    List<ProcessingActivityBasicDTO> findAllProcessingActivityLinkedWithProcessingPurpose(Long unitId,BigInteger processingPurposeId);
 
     @Query("{organizationId:?0,deleted:false,active:true,processingLegalBasis:?1},{name:1,_id:0}")
-    List<ProcessingActivityBasicResponseDTO> findAllProcessingActivityLinkedWithProcessingLegalBasis(Long unitId,BigInteger processingLegalBasisId);
+    List<ProcessingActivityBasicDTO> findAllProcessingActivityLinkedWithProcessingLegalBasis(Long unitId,BigInteger processingLegalBasisId);
 
 
 }
