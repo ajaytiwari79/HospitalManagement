@@ -13,5 +13,4 @@ db.shifts.drop();
 db.dailyTimeBankEntries.drop();
 db.shiftViolatedRules.drop();
 db.payOut.drop();
-]
 db.workingTimeAgreement.updateMany({},{"$rename":{"parentWTA":"parentId"}})
