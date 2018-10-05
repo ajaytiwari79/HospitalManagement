@@ -40,6 +40,25 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) as appliedFunctions")
     StaffUnitPositionDetails getUnitPositionById(long unitEmploymentId);
 
+    @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition) IN {0}\n" +
+            "match (unitPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
+            "match (unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)\n" +
+            "optional match (unitPosition)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
+            "return e as expertise," +
+            "unitPosition.totalWeeklyHours as totalWeeklyHours," +
+            "unitPosition.startDateMillis as startDateMillis," +
+            "unitPosition.endDateMillis as endDateMillis," +
+            "unitPosition.salary as salary," +
+            "unitPosition.workingDaysInWeek as workingDaysInWeek," +
+            "et as employmentType," +
+            "unitPosition.hourlyWages as hourlyWages," +
+            "id(unitPosition)   as id,unitPosition.history as history,unitPosition.editable as editable,unitPosition.published as published," +
+            "unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
+            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis," +
+            "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
+            "unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes, " +
+            "Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) as appliedFunctions")
+    List<StaffUnitPositionDetails> getUnitPositionsByIds(List<Long> unitEmploymentId);
 
 
     /*@Query("Match (org:Organization) where id(org)={0} WITH org\n" +

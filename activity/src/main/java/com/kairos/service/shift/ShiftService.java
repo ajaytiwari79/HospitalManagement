@@ -27,6 +27,7 @@ import com.kairos.persistence.model.activity.tabs.CompositeActivity;
 import com.kairos.persistence.model.attendence_setting.AttendanceSetting;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.open_shift.OpenShift;
+import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.ActivityShiftStatusSettings;
@@ -100,6 +101,7 @@ import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
 import static com.kairos.constants.ApiConstants.GET_REASONCODE;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.ShiftValidatorService.getValidDays;
+import static java.util.stream.Collectors.groupingBy;
 
 
 /**
@@ -571,6 +573,30 @@ public class ShiftService extends MongoBaseService {
         return new ShiftFunctionWrapper(shiftsMap, functionDTOMap);
     }
 
+    public void deleteAllShift(List<BigInteger> shiftIds,Long unitId){
+        List<Shift> shifts = shiftMongoRepository.findAllShiftByIds(shiftIds);
+        if (!Optional.ofNullable(shifts).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.shift.ids");
+        }
+        List<Long> staffids=shifts.stream().map(shift -> shift.getStaffId()).collect(Collectors.toList());
+        List<Long> unitPositionids=shifts.stream().map(shift -> shift.getUnitPositionId()).collect(Collectors.toList());
+//        List<BigInteger> activityIds=shifts.stream().map(shift-> shift.getActivities().get(0).getActivityId()).collect(Collectors.toList());
+//        List<ActivityWrapper> activityWrappers = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = genericRestClient.publishRequest(null,unitId,true,IntegrationOperation.GET,"/staff/verifyUnitEmployment",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>(){},staffids,unitPositionids);
+        Set<BigInteger> activityIds = shifts.stream().flatMap(s->s.getActivities().stream().map(activity -> activity.getActivityId())).collect(Collectors.toSet());
+        List<BigInteger> activityIdsList=new ArrayList<>(activityIds);
+        List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+        List<Long> unitPositionIds=staffAdditionalInfoDTOS.stream().map(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getUnitPosition().getId()).collect(Collectors.toList());
+        Date startDate=shifts.stream().map(shift -> shift.getStartDate()).min(Date::compareTo).get();
+        Date endDate=shifts.stream().map(shift -> shift.getEndDate()).max(Date::compareTo).get();
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByUnitPositionIdsAndDate(unitPositionIds, startDate,endDate);
+        Map<Long,List<CTAResponseDTO>> unitPositionAndCTAResponseMap=ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getUnitPositionId));
+
+
+    }
+
+
     public void deleteShift(BigInteger shiftId) {
         Shift shift = shiftMongoRepository.findOne(shiftId);
         if (!Optional.ofNullable(shift).isPresent()) {
@@ -597,6 +623,7 @@ public class ShiftService extends MongoBaseService {
         List<BigInteger> activityIds = shift.getActivities().stream().map(s -> s.getActivityId()).collect(Collectors.toList());
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByUnitPositionId(staffAdditionalInfoDTO.getUnitPosition().getId(), shift.getStartDate());
         staffAdditionalInfoDTO.getUnitPosition().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         setDayTypeTOCTARuleTemplate(staffAdditionalInfoDTO);
@@ -607,7 +634,7 @@ public class ShiftService extends MongoBaseService {
 
         }
         shift.setFunctionId(functionId);
-        saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
+       saveShiftWithActivity(phase, activityIds, activityWrapperMap, shift, staffAdditionalInfoDTO);
         payOutService.savePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
 
     }

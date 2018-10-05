@@ -905,6 +905,25 @@ public class UnitPositionService {
         }
     }
 
+    public List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> getUnitPositionsDetails(List<Long> unitPositionId, Organization organization, Long countryId) {
+        List<StaffUnitPositionDetails> unitPosition = unitPositionGraphRepository.getUnitPositionsByIds(unitPositionId);
+        List<com.kairos.dto.activity.shift.StaffUnitPositionDetails> unitPositionDetailsList=ObjectMapperUtils.copyPropertiesOfListByMapper(unitPosition,StaffUnitPositionDetails.class);
+        unitPositionDetailsList.forEach(unitPositionDetails -> {
+            unitPositionDetails.setCountryId(countryId);
+            unitPositionDetails.setUnitTimeZone(organization.getTimeZone());
+        });
+        // convertUnitPositionObject(unitPosition, unitPositionDetails);
+//  com.kairos.dto.activity.shift.StaffUnitPositionDetails unitPositionDetails = new com.kairos.dto.activity.shift.StaffUnitPositionDetails();
+//        ExpertisePlannedTimeQueryResult expertisePlannedTimeQueryResult = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(unitPositionDetails.getExpertise().getId(), unitPositionDetails.getEmploymentType().getId());
+//        if (Optional.ofNullable(expertisePlannedTimeQueryResult).isPresent()) {
+//            unitPositionDetails.setExcludedPlannedTime(expertisePlannedTimeQueryResult.getExcludedPlannedTime());
+//            unitPositionDetails.setIncludedPlannedTime(expertisePlannedTimeQueryResult.getIncludedPlannedTime());
+//
+//        }
+                return unitPositionDetailsList;
+    }
+
+
     public com.kairos.dto.activity.shift.StaffUnitPositionDetails getUnitPositionDetails(Long unitPositionId, Organization organization, Long countryId) {
 
         StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);

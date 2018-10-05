@@ -33,5 +33,7 @@ public interface CustomCostTimeAgreementRepository {
 
     public List<CTAResponseDTO> getCTAByUnitPositionIds(List<Long> unitPositionIds, Date date);
 
+    public List<CTAResponseDTO> getCTAByUnitPositionIdsAndDate(List<Long> unitPositionIds, Date startDate,Date endDate);
 
-    }
+
+}
