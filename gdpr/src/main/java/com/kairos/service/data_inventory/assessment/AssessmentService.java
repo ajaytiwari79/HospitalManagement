@@ -115,11 +115,10 @@ public class AssessmentService extends MongoBaseService {
         switch (templateType) {
             case ASSET_TYPE:
                 Asset asset = (Asset) entity;
-
                 if (CollectionUtils.isNotEmpty(asset.getAssetSubTypes())) {
-                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetType(unitId, asset.getAssetType(), asset.getAssetSubTypes());
+                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(unitId, asset.getAssetType(), asset.getAssetSubTypes());
                 } else {
-                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndUnitId(unitId, asset.getAssetType());
+                    questionnaireTemplateType = questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndByUnitId(unitId, asset.getAssetType());
                 }
                 if (!Optional.ofNullable(questionnaireTemplateType).isPresent()) {
                     questionnaireTemplateType = questionnaireTemplateMongoRepository.findDefaultAssetQuestionnaireTemplateByUnitId(unitId);
@@ -153,7 +152,7 @@ public class AssessmentService extends MongoBaseService {
         if (!Optional.ofNullable(assessment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Assessment", assessmentId);
         }
-        QuestionnaireTemplateResponseDTO assessmentQuestionnaireTemplate = questionnaireTemplateMongoRepository.getMasterQuestionnaireTemplateWithSectionsByUnitIdAndId(unitId, assessment.getQuestionnaireTemplateId());
+        QuestionnaireTemplateResponseDTO assessmentQuestionnaireTemplate = questionnaireTemplateMongoRepository.getQuestionnaireTemplateWithSectionsByUnitId(unitId, assessment.getQuestionnaireTemplateId());
         List<QuestionnaireSectionResponseDTO> assessmentQuestionnaireSections = assessmentQuestionnaireTemplate.getSections();
         if (Optional.ofNullable(assessment.getAssetId()).isPresent()) {
             getAssetAssessmentQuestionAndValuesById(unitId, assessment.getAssessmentStatus(), assessment, assessmentQuestionnaireSections);

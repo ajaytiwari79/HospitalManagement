@@ -18,8 +18,6 @@ public interface CustomQuestionnaireTemplateRepository {
 
     QuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsByCountryId(Long countryId, BigInteger templateId);
 
-    QuestionnaireTemplateResponseDTO getMasterQuestionnaireTemplateWithSectionsByUnitIdAndId(Long unitId, BigInteger templateId);
-
     QuestionnaireTemplate getQuestionnaireTemplateByTemplateTypeByUnitId(Long unitId, QuestionnaireTemplateType templateType);
 
     QuestionnaireTemplateResponseDTO getQuestionnaireTemplateWithSectionsByUnitId(Long unitId, BigInteger templateId);

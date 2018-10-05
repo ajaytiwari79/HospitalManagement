@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MasterProcessingActivityRiskResponseDTO {
 
 
