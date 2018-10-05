@@ -1,1 +1,2 @@
+// questionnaire template script gdpr
 db.getCollection('questionnaire_template').updateMany({'deleted':false,'defaultAssetTemplate':{ $exists: false}},{$set:{"defaultAssetTemplate":false}})
