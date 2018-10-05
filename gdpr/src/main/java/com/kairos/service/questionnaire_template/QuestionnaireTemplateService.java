@@ -76,12 +76,6 @@ public class QuestionnaireTemplateService extends MongoBaseService {
     private void addTemplateTypeToQuestionnaireTemplate(Long referenceId, boolean isUnitId, QuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateDTO templateDto) {
 
         switch (templateDto.getTemplateType()) {
-            case VENDOR:
-                questionnaireTemplate.setTemplateType(templateDto.getTemplateType());
-                break;
-            case GENERAL:
-                questionnaireTemplate.setTemplateType(templateDto.getTemplateType());
-                break;
             case ASSET_TYPE:
                 questionnaireTemplate.setTemplateType(templateDto.getTemplateType());
                 if (templateDto.isDefaultAssetTemplate()) {
@@ -95,7 +89,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
                 }
 
                 break;
-            case PROCESSING_ACTIVITY:
+            default:
                 questionnaireTemplate.setTemplateType(templateDto.getTemplateType());
                 break;
         }
@@ -104,13 +98,22 @@ public class QuestionnaireTemplateService extends MongoBaseService {
     private void addAssetTypeToQuestionnaireTemplate(Long referenceId, boolean isUnitId, QuestionnaireTemplate questionnaireTemplate, QuestionnaireTemplateDTO templateDto) {
         if (!Optional.ofNullable(templateDto.getAssetType()).isPresent()) {
             exceptionService.invalidRequestException("message.invalid.request", "asset type is not selected");
+        }
+        AssetType assetType = isUnitId ? assetTypeMongoRepository.findByIdAndUnitId(referenceId, templateDto.getAssetType()) : assetTypeMongoRepository.findByIdAndCountryId(referenceId, templateDto.getAssetType());
+        if (CollectionUtils.isEmpty(assetType.getSubAssetTypes())) {
+            QuestionnaireTemplate previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndByUnitId(referenceId, templateDto.getAssetType()) : questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndByCountryId(referenceId, templateDto.getAssetType());
+            if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
+                exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType", previousTemplate.getName(), assetType.getName());
+            }
+            questionnaireTemplate.setAssetType(templateDto.getAssetType());
         } else {
-            AssetType assetType = isUnitId ? assetTypeMongoRepository.findByIdAndUnitId(referenceId, templateDto.getAssetType()) : assetTypeMongoRepository.findByIdAndCountryId(referenceId, templateDto.getAssetType());
-            if (!Optional.ofNullable(assetType).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", templateDto.getAssetType());
-            } else if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(templateDto.getAssetSubType()).isPresent() || !assetType.getSubAssetTypes().contains(templateDto.getAssetSubType()))) {
+            if (CollectionUtils.isNotEmpty(assetType.getSubAssetTypes()) && (!Optional.ofNullable(templateDto.getAssetSubType()).isPresent() || !assetType.getSubAssetTypes().contains(templateDto.getAssetSubType()))) {
                 exceptionService.invalidRequestException("message.invalid.request", "Sub Asset Type is Not Selected");
             } else {
+                QuestionnaireTemplate previousTemplate = isUnitId ? questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetTypeByUnitId(referenceId, templateDto.getAssetType(), Collections.singletonList(templateDto.getAssetSubType())) : questionnaireTemplateMongoRepository.findQuestionnaireTemplateByAssetTypeAndSubAssetTypeByCountryId(referenceId, templateDto.getAssetType(), Collections.singletonList(templateDto.getAssetSubType()));
+                if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
+                    exceptionService.duplicateDataException("message.duplicate.questionnaireTemplate.assetType.subType", previousTemplate.getName(), assetType.getName());
+                }
                 questionnaireTemplate.setAssetType(templateDto.getAssetType());
                 questionnaireTemplate.setAssetSubType(templateDto.getAssetSubType());
             }
