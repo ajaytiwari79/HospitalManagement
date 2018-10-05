@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 
 import java.math.BigInteger;
@@ -24,7 +25,7 @@ public class AssessmentResponseDTO {
     private Staff approver;
     private AssessmentStatus assessmentStatus;
     private AssetBasicResponseDTO asset;
-    private ProcessingActivityBasicResponseDTO processingActivity;
+    private ProcessingActivityBasicDTO processingActivity;
 
     public BigInteger getId() { return id; }
 
@@ -63,7 +64,7 @@ public class AssessmentResponseDTO {
 
     public void setAsset(AssetBasicResponseDTO asset) { this.asset = asset; }
 
-    public ProcessingActivityBasicResponseDTO getProcessingActivity() { return processingActivity; }
+    public ProcessingActivityBasicDTO getProcessingActivity() { return processingActivity; }
 
-    public void setProcessingActivity(ProcessingActivityBasicResponseDTO processingActivity) { this.processingActivity = processingActivity; }
+    public void setProcessingActivity(ProcessingActivityBasicDTO processingActivity) { this.processingActivity = processingActivity; }
 }
