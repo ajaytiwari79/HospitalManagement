@@ -2,21 +2,18 @@ package com.kairos.response.dto.data_inventory;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.response.dto.common.RiskResponseDTO;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProcessingActivityRiskResponseDTO {
 
     private BigInteger id;
     private String name;
     private Boolean mainParent;
-    private List<RiskResponseDTO> risks=new ArrayList<>();
+    private List<RiskResponseDTO> risks;
     private List<ProcessingActivityRiskResponseDTO> processingActivities;
 
     public ProcessingActivityRiskResponseDTO(BigInteger id, String name, Boolean mainParent, List<RiskResponseDTO> risks) {
