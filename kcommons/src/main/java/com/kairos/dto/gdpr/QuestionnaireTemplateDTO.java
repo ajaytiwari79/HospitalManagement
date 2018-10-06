@@ -2,6 +2,7 @@ package com.kairos.dto.gdpr;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 
 import javax.validation.constraints.NotBlank;
@@ -25,6 +26,7 @@ public class QuestionnaireTemplateDTO {
     private BigInteger assetType;
     private BigInteger assetSubType;
     private boolean defaultAssetTemplate;
+    private QuestionnaireTemplateStatus templateStatus;
     private List sections=new ArrayList<>();
 
     public BigInteger getAssetSubType() { return assetSubType; }
@@ -34,6 +36,10 @@ public class QuestionnaireTemplateDTO {
     public boolean isDefaultAssetTemplate() { return defaultAssetTemplate; }
 
     public void setDefaultAssetTemplate(boolean defaultAssetTemplate) { this.defaultAssetTemplate = defaultAssetTemplate; }
+
+    public QuestionnaireTemplateStatus getTemplateStatus() { return templateStatus; }
+
+    public void setTemplateStatus(QuestionnaireTemplateStatus templateStatus) { this.templateStatus = templateStatus; }
 
     public String getName() {
         return name.trim();
