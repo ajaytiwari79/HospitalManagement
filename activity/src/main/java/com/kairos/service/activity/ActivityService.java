@@ -196,7 +196,7 @@ public class ActivityService extends MongoBaseService {
         List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
 
         RulesActivityTab rulesActivityTab = new RulesActivityTab(false, false, false,
-                false, false, false, false, false, false, null, phaseTemplateValues);
+                false, false, false, null, phaseTemplateValues);
         activity.setRulesActivityTab(rulesActivityTab);
 
         TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab(ENTERED_TIMES, 0l, true, LocalTime.of(7, 0), 1d);
@@ -954,7 +954,6 @@ public class ActivityService extends MongoBaseService {
             RulesActivityTab rulesActivityTab = Optional.ofNullable(activity.getRulesActivityTab()).isPresent() ? activity.getRulesActivityTab() :
                     new RulesActivityTab();
 
-            rulesActivityTab.setEligibleAgainstTimeRules(timeCareActivity.getUseTimeRules());
             rulesActivityTab.setEligibleForStaffingLevel(timeCareActivity.getIsStaffing());
             List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
             rulesActivityTab.setEligibleForSchedules(phaseTemplateValues);
