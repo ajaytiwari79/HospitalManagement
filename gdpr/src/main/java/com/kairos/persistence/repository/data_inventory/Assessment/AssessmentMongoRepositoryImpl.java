@@ -81,4 +81,11 @@ public class AssessmentMongoRepositoryImpl implements CustomAssessmentRepository
         Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("processingActivityId").is(processingActivityId).and("assessmentStatus").in(assessmentStatusList));
         return mongoTemplate.findOne(query, Assessment.class);
     }
+
+
+    @Override
+    public List<Assessment> getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(Long unitId, BigInteger templateId) {
+        Query query = new Query(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("questionnaireTemplateId").is(templateId).and("assessmentStatus").in(AssessmentStatus.IN_PROGRESS));
+        return mongoTemplate.find(query, Assessment.class);
+    }
 }

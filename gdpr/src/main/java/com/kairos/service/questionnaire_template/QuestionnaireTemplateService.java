@@ -7,8 +7,10 @@ import com.kairos.enums.gdpr.AssetAttributeName;
 import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import com.kairos.dto.gdpr.QuestionnaireTemplateDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
+import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
+import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -50,6 +53,9 @@ public class QuestionnaireTemplateService extends MongoBaseService {
 
     @Inject
     private QuestionMongoRepository questionMongoRepository;
+
+    @Inject
+    private AssessmentMongoRepository assessmentMongoRepository;
 
 
     /**
@@ -239,6 +245,12 @@ public class QuestionnaireTemplateService extends MongoBaseService {
      * @description method update exisiting questionnaire template at organization level( check if template with same name exist, then throw exception )
      */
     public QuestionnaireTemplateDTO updateQuestionnaireTemplate(Long unitId, BigInteger questionnaireTemplateId, QuestionnaireTemplateDTO questionnaireTemplateDTO) {
+
+
+        List<Assessment> inprogressAssessmentsLinkedWithQuestionnaireTemplate = assessmentMongoRepository.getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(unitId, questionnaireTemplateId);
+        if (CollectionUtils.isNotEmpty(inprogressAssessmentsLinkedWithQuestionnaireTemplate)) {
+            exceptionService.invalidRequestException("message.questionnaire.cannotbe.edit", new StringBuilder(inprogressAssessmentsLinkedWithQuestionnaireTemplate.stream().map(Assessment::getName).map(String::toString).collect(Collectors.joining(","))));
+        }
         QuestionnaireTemplate masterQuestionnaireTemplate = questionnaireTemplateMongoRepository.findByNameAndUnitId(unitId, questionnaireTemplateDTO.getName());
         if (Optional.ofNullable(masterQuestionnaireTemplate).isPresent() && !questionnaireTemplateId.equals(masterQuestionnaireTemplate.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Questionnaire Template", questionnaireTemplateDTO.getName());
