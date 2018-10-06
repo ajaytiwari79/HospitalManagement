@@ -82,6 +82,10 @@ public class DateUtils {
     }
 
 
+    public static LocalDateTime getLocalDateTime(){
+        return LocalDateTime.now();
+    }
+
     public static Date getSingleCompleteDate(Date date, Date time) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         String dateString = dateFormat.format(date);

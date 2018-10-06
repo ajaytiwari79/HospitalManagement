@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /*
@@ -37,6 +38,7 @@ public class ShiftWithActivityDTO {
     private long accumulatedTimeBankInMinutes;
     private String remarks;
     private Long unitPositionId;
+    private BigInteger planningPeriodId;
     private Long staffId;
     private Phase phase;
     private Integer weekCount;
@@ -47,6 +49,9 @@ public class ShiftWithActivityDTO {
     private List<ShiftActivityDTO> activities = new ArrayList<>();
     private List<ShiftStatus> status;
     private String timeType;
+    private List<BigInteger> activitiesTimeTypeIds = new ArrayList<>();
+    private List<BigInteger> activityIds = new ArrayList<>();
+    private List<BigInteger> activitiesPlannedTimeIds = new ArrayList<>();
 
     public List<ShiftStatus> getStatus() {
         return status;
@@ -86,6 +91,37 @@ public class ShiftWithActivityDTO {
         this.startDate = startDate;
         this.endDate = endDate;
         this.activities = activities;
+    }
+
+
+    public List<BigInteger> getActivitiesTimeTypeIds(){
+        if(activitiesTimeTypeIds.isEmpty()) {
+            activitiesTimeTypeIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).collect(Collectors.toList());
+        }
+        return activitiesTimeTypeIds;
+    }
+
+    public List<BigInteger> getActivitiesPlannedTimeIds(){
+        if(activitiesPlannedTimeIds.isEmpty()) {
+            activitiesPlannedTimeIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getPlannedTimeId()).collect(Collectors.toList());
+        }
+        return activitiesPlannedTimeIds;
+    }
+
+
+    public List<BigInteger> getActivitIds(){
+        if(activityIds.isEmpty()) {
+            activityIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toList());
+        }
+        return activityIds;
+    }
+
+    public BigInteger getPlanningPeriodId() {
+        return planningPeriodId;
+    }
+
+    public void setPlanningPeriodId(BigInteger planningPeriodId) {
+        this.planningPeriodId = planningPeriodId;
     }
 
     public List<ShiftActivityDTO> getActivities() {

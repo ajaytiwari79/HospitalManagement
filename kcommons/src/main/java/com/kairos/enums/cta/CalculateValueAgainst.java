@@ -1,4 +1,6 @@
-package com.kairos.dto.activity.cta;
+package com.kairos.enums.cta;
+
+import com.kairos.dto.activity.cta.FixedValue;
 
 public class CalculateValueAgainst{
     private CalculateValueType calculateValue;

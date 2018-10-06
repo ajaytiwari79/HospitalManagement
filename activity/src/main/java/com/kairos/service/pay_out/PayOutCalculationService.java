@@ -32,7 +32,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.dto.activity.cta.AccountType.PAID_OUT;
+import static com.kairos.enums.cta.AccountType.PAID_OUT;
 import static com.kairos.constants.AppConstants.*;
 
 
