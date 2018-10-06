@@ -4,6 +4,8 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
@@ -30,7 +32,7 @@ import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.ActivityShiftStatusSettings;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
@@ -181,8 +183,6 @@ public class ShiftService extends MongoBaseService {
 
     @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
-    @Inject
-    private ActivityShiftStatusSettingsRepository activityAndShiftStatusSettingsRepository;
     @Inject
     private GenericRestClient genericRestClient;
     @Inject
@@ -592,7 +592,7 @@ public class ShiftService extends MongoBaseService {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shift.getStaffId(), ORGANIZATION, shift.getUnitPositionId());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate());
         validateStaffingLevel(phase, shift, activityWrapper.getActivity(), false, staffAdditionalInfoDTO);
-        Specification<BigInteger> shiftAllowedToDelete = new ShiftAllowedToDelete(activityWrapper.getActivity().getRulesActivityTab().getEligibleForSchedules(), staffAdditionalInfoDTO.getUserAccessRoleDTO());
+        Specification<BigInteger> shiftAllowedToDelete = new ShiftAllowedToDelete(activityWrapper.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues(), staffAdditionalInfoDTO.getUserAccessRoleDTO());
         Specification<BigInteger> activitySpecification = shiftAllowedToDelete;
         List<String> messages = activitySpecification.isSatisfiedString(phase.getId());
         if (!messages.isEmpty()) {
@@ -882,21 +882,22 @@ public class ShiftService extends MongoBaseService {
         Map<BigInteger, BigInteger> activityIdsMap = ((Set<BigInteger>) objects[1]).stream().collect(Collectors.toMap(k -> k, v -> v));
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc((List<BigInteger>) objects[0]);
         List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>(shifts.size());
+        Set<BigInteger>  allActivities=shiftPublishDTO.getShifts().stream().flatMap(s->s.getActivityIds().stream().map(a->a)).collect(Collectors.toSet());
+        List<Activity> activities=activityRepository.findAllPhaseSettingsByActivityIds(allActivities);
+        Map<BigInteger,PhaseSettingsActivityTab> activityPhaseSettingMap=activities.stream().collect(Collectors.toMap(Activity::getId,Activity::getPhaseSettingsActivityTab));
         if (!shifts.isEmpty() && objects[1] != null) {
-            Set<BigInteger> activityIds = (Set<BigInteger>) objects[1];
             Set<LocalDateTime> dates = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getStartDate())).collect(Collectors.toSet());
             Map<LocalDate, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, dates);
-            List<BigInteger> phaseIds = phaseListByDate.values().stream().map(p -> p.getId()).collect(Collectors.toList());
-            List<ActivityShiftStatusSettings> activityShiftStatusSettings = activityAndShiftStatusSettingsRepository.findByPhaseIdsAndActivityIdsAndShiftStatus(phaseIds, activityIds, shiftPublishDTO.getStatus());
-            StaffAccessGroupDTO staffAccessGroupDTO = genericRestClient.publishRequest(null, null, true, IntegrationOperation.GET, "/staff/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAccessGroupDTO>>() {
-            });
-            Map<StringBuffer, ActivityShiftStatusSettings> activityShiftStatusSettingsMap = activityShiftStatusSettings.stream().collect(Collectors.toMap(k -> new StringBuffer(k.getActivityId().toString()).append(k.getPhaseId()), v -> v));
+            StaffAccessGroupDTO staffAccessGroupDTO = genericRestClient.publishRequest(null, null, true, IntegrationOperation.GET, "/staff/access_groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAccessGroupDTO>>() {});
             for (Shift shift : shifts) {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
                     if (activityIdsMap.containsKey(shiftActivity.getId())) {
                         Phase phase = phaseListByDate.get(DateUtils.asLocalDate(shift.getStartDate()));
-                        ActivityShiftStatusSettings activityShiftStatusSettings1 = activityShiftStatusSettingsMap.get(new StringBuffer(shiftActivity.getActivityId().toString()).append(phase.getId()));
-                        boolean validAccessGroup = validateAccessGroup(activityShiftStatusSettings1, staffAccessGroupDTO);
+
+                        PhaseSettingsActivityTab phaseSettingsActivityTab = activityPhaseSettingMap.get(shiftActivity.getActivityId());
+                        PhaseTemplateValue phaseTemplateValue=phaseSettingsActivityTab.getPhaseTemplateValues().stream().filter(p->p.getPhaseId().equals(phase.getId())).findFirst().get();
+                        ActivityShiftStatusSettings activityShiftStatusSettings=phaseTemplateValue.getActivityShiftStatusSettings().stream().filter(a->a.getShiftStatus().equals(shiftPublishDTO.getStatus())).findAny().get();
+                        boolean validAccessGroup = validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
                         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
                         if (validAccessGroup) {
                             shiftActivity.getStatus().add(shiftPublishDTO.getStatus());

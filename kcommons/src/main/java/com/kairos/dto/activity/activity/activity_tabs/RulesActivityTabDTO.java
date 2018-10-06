@@ -23,7 +23,6 @@ public class RulesActivityTabDTO {
     private boolean lockLengthPresent;
     private boolean eligibleToBeForced;
     private List<Long> dayTypes;
-    private List<PhaseTemplateValue> eligibleForSchedules;
     private boolean eligibleForStaffingLevel;
     private boolean eligibleForPresence;
     private boolean eligibleForAbsence;
@@ -168,14 +167,6 @@ public class RulesActivityTabDTO {
 
     public void setDayTypes(List<Long> dayTypes) {
         this.dayTypes = dayTypes;
-    }
-
-    public List<PhaseTemplateValue> getEligibleForSchedules() {
-        return eligibleForSchedules;
-    }
-
-    public void setEligibleForSchedules(List<PhaseTemplateValue> eligibleForSchedules) {
-        this.eligibleForSchedules = eligibleForSchedules;
     }
 
     public boolean isBreakAllowed() {
