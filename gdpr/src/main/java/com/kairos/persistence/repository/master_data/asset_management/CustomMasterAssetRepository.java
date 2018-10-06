@@ -25,7 +25,7 @@ public interface CustomMasterAssetRepository {
 
     MasterAssetResponseDTO getMasterAssetWithAssetTypeAndSubAssetTypeById(Long  countryId, BigInteger id);
 
-    List<MasterAsset> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId, OrganizationMetaDataDTO organizationMetaDataDTO);
+    List<MasterAssetResponseDTO> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId, OrganizationMetaDataDTO organizationMetaDataDTO);
 
 
 }

@@ -40,7 +40,10 @@ public class DateUtils {
         return LocalDate.now();
 
     }
+    public static LocalTime getCurrentLocalTime() {
+        return LocalTime.now();
 
+    }
     public static LocalDate getLocalDateFromDate(Date date) {
 
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -667,8 +670,8 @@ public class DateUtils {
         return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
-    public static LocalDateTime getLocalDateTime(LocalDate localDate, int hours, int minutes) {
-        return LocalDateTime.of(localDate, LocalTime.of(hours, minutes));
+    public static LocalDateTime getLocalDateTime(LocalDate localDate, int hours, int minutes,int seconds) {
+        return LocalDateTime.of(localDate, LocalTime.of(hours, minutes,seconds));
     }
 
     public static int getWeekNumberByLocalDate(LocalDate localDate) {

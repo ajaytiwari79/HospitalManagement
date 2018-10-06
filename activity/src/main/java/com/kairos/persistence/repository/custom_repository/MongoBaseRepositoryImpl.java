@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
 
-public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
+public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Serializable> extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
 	private final MongoOperations mongoOperations;
 	private final MongoEntityInformation<T, ID> entityInformation;
 	MongoDatabase mongoDatabase;
@@ -96,8 +96,8 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
 		return new BigInteger(mongoSequence.getSequenceNumber()+"");
 	}
 
-	public <T extends MongoBaseEntity> T saveObject(T entity){
-
+	@Override
+	public <S extends T> S save(S entity) {
 		Assert.notNull(entity, "Entity must not be null!");
 		/**
 		 *  Get class name for sequence class
@@ -128,7 +128,9 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
 		return entity;
 	}
 
-	public <T extends MongoBaseEntity> List<T> saveObjects(List<T> entities){
+
+
+	public <T extends MongoBaseEntity> List<T> saveEntities(List<T> entities){
 		Assert.notNull(entities, "Entity must not be null!");
 		Assert.notEmpty(entities, "Entity must not be Empty!");
 

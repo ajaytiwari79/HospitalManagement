@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.master_data.asset_management;
 
 import com.kairos.persistence.model.master_data.default_asset_setting.MasterAsset;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import com.kairos.response.dto.master_data.MasterAssetBasicResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

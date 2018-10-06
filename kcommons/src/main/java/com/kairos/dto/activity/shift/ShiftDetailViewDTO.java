@@ -16,31 +16,19 @@ public class ShiftDetailViewDTO {
     private List<ShiftDTO> realTimeShifts;
     private List<ShiftDTO> staffValidated;
     private List<ShiftDTO> plannerValidated;
-    private List<ReasonCodeDTO> reasonCodes;
-    private LocalTime clockInTime;
-    private LocalTime clockOutTime;
 
 
-    public ShiftDetailViewDTO(List<ShiftDTO> plannedShifts, List<ShiftDTO> realTimeShifts, List<ShiftDTO> staffValidated, List<ShiftDTO> plannerValidated, List<ReasonCodeDTO> reasonCodes, LocalTime clockInTime, LocalTime clockOutTime) {
+    public ShiftDetailViewDTO(List<ShiftDTO> plannedShifts, List<ShiftDTO> realTimeShifts, List<ShiftDTO> staffValidated, List<ShiftDTO> plannerValidated) {
         this.plannedShifts = plannedShifts;
         this.realTimeShifts = realTimeShifts;
         this.staffValidated = staffValidated;
         this.plannerValidated = plannerValidated;
-        this.reasonCodes = reasonCodes;
-        this.clockInTime = clockInTime;
-        this.clockOutTime = clockOutTime;
     }
 
     public ShiftDetailViewDTO() {
     }
 
-    public List<ReasonCodeDTO> getReasonCodes() {
-        return reasonCodes;
-    }
 
-    public void setReasonCodes(List<ReasonCodeDTO> reasonCodes) {
-        this.reasonCodes = reasonCodes;
-    }
 
     public List<ShiftDTO> getPlannedShifts() {
         return plannedShifts;
@@ -74,19 +62,4 @@ public class ShiftDetailViewDTO {
         this.plannerValidated = plannerValidated;
     }
 
-    public LocalTime getClockInTime() {
-        return clockInTime;
-    }
-
-    public void setClockInTime(LocalTime clockInTime) {
-        this.clockInTime = clockInTime;
-    }
-
-    public LocalTime getClockOutTime() {
-        return clockOutTime;
-    }
-
-    public void setClockOutTime(LocalTime clockOutTime) {
-        this.clockOutTime = clockOutTime;
-    }
 }

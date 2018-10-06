@@ -69,6 +69,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by vipul on 5/12/17.
@@ -218,7 +219,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
-        activityCopied.setCompositeActivities(null);
+       // activityCopied.setCompositeActivities(null);
         return activityCopied;
     }
 
@@ -378,8 +379,35 @@ public class OrganizationActivityService extends MongoBaseService {
                 activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
             }
             save(activityCopiedList);
+            updateCompositeActivitiesIds(activityCopiedList);
         }
         return true;
+    }
+
+    /**
+     * This method is used to update all composite activities Ids
+     * which is initially set as country level composite activities,
+     * after update all composite activities will be updated
+     * as per Organizational level composite activities Ids.
+     * CalledBy {#createDefaultDataForOrganization}
+     * @author mohit
+     * @date 5-10-2018
+     * @param activities{after copied into database}
+     */
+    private void updateCompositeActivitiesIds(List<Activity> activities){
+       Map<BigInteger,BigInteger> activityIdMap = activities.stream().collect(Collectors.toMap(k->k.getParentId(),v->v.getId()));
+        for (Activity activity : activities) {
+            Iterator<CompositeActivity> compositeActivityIterator = activity.getCompositeActivities().iterator();
+            while (compositeActivityIterator.hasNext()){
+                CompositeActivity compositeActivity = compositeActivityIterator.next();
+                if(activityIdMap.containsKey(compositeActivity.getActivityId())) {
+                    compositeActivity.setActivityId(activityIdMap.get(compositeActivity.getActivityId()));
+                }else {
+                    compositeActivityIterator.remove();
+                }
+            }
+        }
+        save(activities);
     }
 
 

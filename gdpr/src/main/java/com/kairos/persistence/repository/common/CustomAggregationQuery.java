@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.common;
 
 
-import org.bson.Document;
-
 public class CustomAggregationQuery {
 
 
@@ -56,16 +54,6 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String questionnaireTemplateAddNonDeletedAssetType() {
-        return "{  '$addFields':" +
-                "{'assetType':" +
-                "{$filter : { " +
-                "'input': '$assetType'," +
-                "as: 'assetType', " +
-                "cond: {$eq: ['$$assetType.deleted'," + false + "]}" +
-                "}}}} ";
-    }
-
 
     public static String questionnaireTemplateGroupOperation() {
         return "{'$group':{" +
@@ -74,6 +62,7 @@ public class CustomAggregationQuery {
                 "'description':{$first:'$description'}," +
                 "'assetType':{$first:'$assetType'}," +
                 "'templateType':{$first:'$templateType'}," +
+                "'defaultAssetTemplate':{'$first':'$defaultAssetTemplate'}" +
                 "}}";
     }
 
@@ -81,11 +70,13 @@ public class CustomAggregationQuery {
         return " {" +
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "'assetSubType':{$arrayElemAt:['$assetSubType',0]}," +
                 "         'name':1," +
                 "        'sections':1," +
                 "      'description':1," +
                 "     'templateType':1," +
-                "      'countryId':1," +
+                "'defaultAssetTemplate':1," +
+                "'templateStatus':1" +
                 "            }}";
     }
 

@@ -83,7 +83,7 @@ public class ShiftController {
     @PutMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long organizationId, @PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftDTO shiftDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift(unitId, shiftDTO, type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift( shiftDTO, type));
     }
 
     @ApiOperation("delete a Shift of a staff")
@@ -187,21 +187,27 @@ public class ShiftController {
 
     @ApiOperation("shifts details by date")
     @GetMapping("/shift/details_by_date")
-    public ResponseEntity<Map<String,Object>> getShiftsDetailsByDate(@PathVariable Long unitId,@RequestParam Long unitPositionId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getDetailViewInfo(unitId,unitPositionId,shiftStartDate));
+    public ResponseEntity<Map<String,Object>> getShiftsDetailsByDate(@PathVariable Long unitId,@RequestParam Long staffId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getDetailViewInfo(unitId,staffId,shiftStartDate));
     }
 
     @ApiOperation("update shift by detail view")
     @PutMapping("/shift/update_shift_by_details_view")
-    public ResponseEntity<Map<String,Object>> updateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody ShiftDTO shiftDTO,@RequestParam(required = false) Boolean validatedByStaff){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateShift(unitId,shiftDTO,validatedByStaff,type));
+    public ResponseEntity<Map<String,Object>> updateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody ShiftDTO shiftDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.updateShift(unitId,shiftDTO,type));
     }
 
 
     @ApiOperation("validate shift by detail view")
     @PostMapping("/shift/validate_shift_by_details_view")
-    public ResponseEntity<Map<String,Object>> validateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestBody BigInteger shiftId,@RequestParam(required = false) Boolean validatedByStaff){
+    public ResponseEntity<Map<String,Object>> validateShiftByDetailsView(@PathVariable Long unitId,@RequestParam String type,@RequestParam BigInteger shiftId,@RequestParam Boolean validatedByStaff){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.validateShift(shiftId,validatedByStaff,unitId));
+    }
+
+    @ApiOperation("shifts details by date")
+    @GetMapping("/shift/compact_view_details_by_date")
+    public ResponseEntity<Map<String,Object>> getShiftsDetailsForComapactViewByDate(@PathVariable Long unitId,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date shiftStartDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,shiftService.getCompactViewDetails(unitId,shiftStartDate));
     }
 
 }

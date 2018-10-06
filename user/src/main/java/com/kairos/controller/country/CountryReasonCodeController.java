@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by pavan on 23/3/18.
@@ -58,4 +59,14 @@ public class CountryReasonCodeController {
     public ResponseEntity<Map<String, Object>> deleteReasonCode(@PathVariable long countryId, @PathVariable long reasonCodeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.deleteReasonCode(countryId,reasonCodeId));
     }
+
+    @ApiOperation(value = "Get ReasonCodes by UnitId")
+    @RequestMapping(value = UNIT_URL + "/reason_codes", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getReasonCodesByUnitId(@RequestParam("reasonCodeType") ReasonCodeType reasonCodeType ,@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.getReasonCodesByUnitId(unitId,reasonCodeType));
+
+    }
+
+
 }

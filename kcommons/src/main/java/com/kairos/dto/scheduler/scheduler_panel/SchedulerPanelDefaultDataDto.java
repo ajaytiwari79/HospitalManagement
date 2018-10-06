@@ -1,4 +1,4 @@
-package com.kairos.dto.scheduler;
+package com.kairos.dto.scheduler.scheduler_panel;
 
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;

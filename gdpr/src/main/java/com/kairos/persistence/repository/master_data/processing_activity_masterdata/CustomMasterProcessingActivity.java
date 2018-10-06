@@ -25,7 +25,7 @@ public interface CustomMasterProcessingActivity {
 
    Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType);
 
-   List<MasterProcessingActivity> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId,  OrganizationMetaDataDTO organizationMetaDataDTO);
+   List<MasterProcessingActivityResponseDTO> getMasterProcessingActivityByOrgTypeSubTypeCategoryAndSubCategory(Long  countryId,  OrganizationMetaDataDTO organizationMetaDataDTO);
 
    List<MasterProcessingActivityRiskResponseDTO> getAllProcessingActivityWithLinkedRisksAndSubProcessingActivitiesByCountryId(Long countryId);
 

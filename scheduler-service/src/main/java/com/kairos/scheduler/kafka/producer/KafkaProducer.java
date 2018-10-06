@@ -1,7 +1,7 @@
 package com.kairos.scheduler.kafka.producer;
 
 
-import com.kairos.dto.scheduler.KairosSchedulerExecutorDTO;
+import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;

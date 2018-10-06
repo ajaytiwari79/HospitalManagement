@@ -102,6 +102,29 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
     @Override
+    public List<CTAResponseDTO> getCTAByUnitPositionIdBetweenDate(Long unitPositionId,Date startDate,Date endDate) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lt(endDate).gte(startDate));
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates")
+        );
+        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation,CostTimeAgreement.class,CTAResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public List<CTAResponseDTO> getCTAByUnitPositionIds(List<Long> unitPositionIds, Date date) {
+                Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
+                Aggregation aggregation = Aggregation.newAggregation(
+                                match(criteria),
+                                lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
+                                project("name", "description", "disabled", "expertise", "organizationType", "organizationSubType", "countryId", "organization", "parentId", "parentCountryCTAId", "startDate", "endDate", "ruleTemplates","unitPositionId")
+                                );
+                AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
+                return result.getMappedResults();
+            }
+
+    @Override
     public List<CTAResponseDTO> getVersionsCTA(List<Long> upIds){
         String query = "{\n" +
                 "      $graphLookup: {\n" +
@@ -137,17 +160,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     }
 
 
-    @Override
-    public List<CTAResponseDTO> getCTAByUnitPositionIds(List<Long> unitPositionIds, Date date) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("unitPositionId").in(unitPositionIds).orOperator(Criteria.where("startDate").lte(date).and("endDate").gte(date),Criteria.where("endDate").exists(false).and("startDate").lte(date));
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria),
-                lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
-                project("name", "description", "disabled", "expertise", "organizationType", "organizationSubType", "countryId", "organization", "parentId", "parentCountryCTAId", "startDate", "endDate", "ruleTemplates","unitPositionId")
-        );
-        AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
-        return result.getMappedResults();
-    }
+
 
 
 }

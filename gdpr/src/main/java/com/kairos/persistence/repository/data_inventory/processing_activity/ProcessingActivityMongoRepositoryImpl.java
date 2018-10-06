@@ -181,16 +181,16 @@ public class ProcessingActivityMongoRepositoryImpl implements CustomProcessingAc
     }
 
     @Override
-    public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessWithRisks(Long unitId) {
+    public List<ProcessingActivityRiskResponseDTO> getAllProcessingActivityAndSubProcessWithRisksByUnitId(Long unitId) {
 
-        String groupSubProcessingActivity = "{'$group':{_id:'$_id','subProcessingActivities':{'$addToSet':'$subProcessingActivities'},'risks':{'$first':'$risks'},'name':{'$first':'$name'}}}";
+        String groupSubProcessingActivity = "{'$group':{_id:'$_id','processingActivities':{'$addToSet':'$processingActivities'},'risks':{'$first':'$risks'},'name':{'$first':'$name'}}}";
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and("subProcess").is(false)),
                 lookup("risk", "risks", "_id", "risks"),
-                lookup("processing_activity", "subProcessingActivities", "_id", "subProcessingActivities"),
-                unwind("subProcessingActivities", true),
-                lookup("risk", "subProcessingActivities.risks", "_id", "subProcessingActivities.risks"),
+                lookup("processing_activity", "subProcessingActivities", "_id", "processingActivities"),
+                unwind("processingActivities", true),
+                lookup("risk", "processingActivities.risks", "_id", "processingActivities.risks"),
                 new CustomAggregationOperation(Document.parse(groupSubProcessingActivity))
 
         );

@@ -50,6 +50,11 @@ public class ReasonCodeService {
         return reasonCodeGraphRepository.findReasonCodesByCountry(countryId,reasonCodeType);
     }
 
+    public List<ReasonCodeResponseDTO> getReasonCodesByUnitId(long unitId, ReasonCodeType reasonCodeType){
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
+        return reasonCodeGraphRepository.findReasonCodesByCountry(countryId,reasonCodeType);
+    }
+
     public ReasonCodeResponseDTO updateReasonCode(long countryId,ReasonCodeDTO reasonCodeDTO){
         boolean isNameAlreadyExists=reasonCodeGraphRepository.findByNameExcludingCurrent(countryId,reasonCodeDTO.getId(),"(?i)"+reasonCodeDTO.getName().trim(),reasonCodeDTO.getReasonCodeType());
         if(isNameAlreadyExists){

@@ -2,7 +2,7 @@ package com.kairos.controller.data_inventory;
 
 
 import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
-import com.kairos.service.common.DataInheritOrganizationLevelService;
+import com.kairos.service.common.DefaultDataInheritService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -16,26 +16,24 @@ import static com.kairos.constants.ApiConstant.*;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_COUNTRY_URL)
-public class DataInheritOrganizationLevelController {
+public class DefaultDataInheritController {
 
 
     @Inject
-    private DataInheritOrganizationLevelService dataInheritOrganizationLevelService;
+    private DefaultDataInheritService defaultDataInheritService;
 
 
     /**
-     *
      * @param countryId
-     * @param organizationId - id of parent organization from which unit inherit data
-     * @param unitId - id of the organization which inherit data from from
+     * @param unitId                  - id of the organization which inherit data from from
      * @param organizationMetaDataDTO - contain meta data about child organization, on the basis of meta data (org type ,sub type ,service category and sub service) unit
-     *                             inherit data from parent
+     *                                inherit data from parent
      * @return
      */
     @ApiOperation(value = "inherit Data from Parent organization on the basis of Org Type, sub Type,Category and Sub Category")
     @PostMapping(UNIT_URL + "/inherit")
-    public ResponseEntity<Object> inheritDataFromParentOrganization(@PathVariable Long countryId, @PathVariable Long organizationId, @PathVariable Long unitId, @Valid @RequestBody OrganizationMetaDataDTO organizationMetaDataDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataInheritOrganizationLevelService.inheritDataFromParentOrganization(countryId, organizationId, unitId, organizationMetaDataDTO));
+    public ResponseEntity<Object> inheritMasterDataFromCountry(@PathVariable Long countryId, @PathVariable Long unitId, @Valid @RequestBody OrganizationMetaDataDTO organizationMetaDataDTO) throws Exception {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, defaultDataInheritService.copyMasterDataFromCountry(countryId, unitId,organizationMetaDataDTO));
 
     }
 

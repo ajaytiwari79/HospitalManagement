@@ -48,7 +48,6 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableTransactionManagement(proxyTargetClass=true)
 @EnableResourceServer
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-
 @EnableNeo4jRepositories(basePackages = {"com.kairos.persistence.repository"},repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
 @EnableCircuitBreaker
 @EnableKafka
