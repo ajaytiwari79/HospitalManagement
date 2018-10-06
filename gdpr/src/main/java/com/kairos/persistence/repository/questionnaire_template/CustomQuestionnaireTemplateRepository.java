@@ -24,4 +24,5 @@ public interface CustomQuestionnaireTemplateRepository {
 
     List<QuestionnaireTemplateResponseDTO> getAllQuestionnaireTemplateWithSectionsAndQuestionsByUnitId(Long unitId);
 
+
 }

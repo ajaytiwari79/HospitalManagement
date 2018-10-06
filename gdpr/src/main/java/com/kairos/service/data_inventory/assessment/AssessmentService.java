@@ -2,10 +2,7 @@ package com.kairos.service.data_inventory.assessment;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.enums.gdpr.AssessmentStatus;
-import com.kairos.enums.gdpr.AssetAttributeName;
-import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
-import com.kairos.enums.gdpr.QuestionnaireTemplateType;
+import com.kairos.enums.gdpr.*;
 import com.kairos.dto.gdpr.data_inventory.AssessmentDTO;
 import com.kairos.persistence.model.data_inventory.assessment.AssetAssessmentAnswerVO;
 import com.kairos.persistence.model.data_inventory.assessment.ProcessingActivityAssessmentAnswerVO;
@@ -131,6 +128,8 @@ public class AssessmentService extends MongoBaseService {
         }
         if (!Optional.ofNullable(questionnaireTemplateType).isPresent()) {
             exceptionService.invalidRequestException("message.questionnaire.template.Not.Found.For.Template.Type", templateType);
+        } else if (questionnaireTemplateType.getTemplateStatus().equals(QuestionnaireTemplateStatus.DRAFT)) {
+            exceptionService.invalidRequestException("message.assessment.cannotbe.launched.questionnaireTemplate.notPublished");
         }
         Assessment assessment = new Assessment(assessmentDTO.getName(), assessmentDTO.getEndDate(), assessmentDTO.getAssignee(), assessmentDTO.getApprover());
         assessment.setOrganizationId(unitId);

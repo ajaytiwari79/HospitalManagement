@@ -6,9 +6,13 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.enums.gdpr.AssetAttributeName;
 import com.kairos.enums.gdpr.ProcessingActivityAttributeName;
 import com.kairos.dto.gdpr.QuestionnaireTemplateDTO;
+import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
+import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
+import com.kairos.persistence.model.questionnaire_template.Question;
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
+import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionMongoRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
@@ -24,6 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -50,6 +55,9 @@ public class QuestionnaireTemplateService extends MongoBaseService {
 
     @Inject
     private QuestionMongoRepository questionMongoRepository;
+
+    @Inject
+    private AssessmentMongoRepository assessmentMongoRepository;
 
 
     /**
@@ -223,7 +231,7 @@ public class QuestionnaireTemplateService extends MongoBaseService {
         if (Optional.ofNullable(previousTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.duplicate", "Questionnaire Template", questionnaireTemplateDTO.getName());
         }
-        QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription());
+        QuestionnaireTemplate questionnaireTemplate = new QuestionnaireTemplate(questionnaireTemplateDTO.getName(), questionnaireTemplateDTO.getDescription(), questionnaireTemplateDTO.getTemplateStatus());
         questionnaireTemplate.setOrganizationId(unitId);
         addTemplateTypeToQuestionnaireTemplate(unitId, true, questionnaireTemplate, questionnaireTemplateDTO);
         questionnaireTemplateMongoRepository.save(questionnaireTemplate);
@@ -239,18 +247,26 @@ public class QuestionnaireTemplateService extends MongoBaseService {
      * @description method update exisiting questionnaire template at organization level( check if template with same name exist, then throw exception )
      */
     public QuestionnaireTemplateDTO updateQuestionnaireTemplate(Long unitId, BigInteger questionnaireTemplateId, QuestionnaireTemplateDTO questionnaireTemplateDTO) {
-        QuestionnaireTemplate masterQuestionnaireTemplate = questionnaireTemplateMongoRepository.findByNameAndUnitId(unitId, questionnaireTemplateDTO.getName());
-        if (Optional.ofNullable(masterQuestionnaireTemplate).isPresent() && !questionnaireTemplateId.equals(masterQuestionnaireTemplate.getId())) {
+
+        QuestionnaireTemplate questionnaireTemplate = questionnaireTemplateMongoRepository.findByNameAndUnitId(unitId, questionnaireTemplateDTO.getName());
+        if (Optional.ofNullable(questionnaireTemplate).isPresent() && !questionnaireTemplateId.equals(questionnaireTemplate.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Questionnaire Template", questionnaireTemplateDTO.getName());
         }
-        masterQuestionnaireTemplate = questionnaireTemplateMongoRepository.findOne(questionnaireTemplateId);
-        if (!Optional.ofNullable(masterQuestionnaireTemplate).isPresent()) {
+        if (questionnaireTemplate.getTemplateStatus().equals(QuestionnaireTemplateStatus.PUBLISHED)) {
+            List<Assessment> inProgressAssessmentsLinkedWithQuestionnaireTemplate = assessmentMongoRepository.getAssessmentLinkedWithQuestionnaireTemplateByTemplateIdAndUnitId(unitId, questionnaireTemplateId);
+            if (CollectionUtils.isNotEmpty(inProgressAssessmentsLinkedWithQuestionnaireTemplate)) {
+                exceptionService.invalidRequestException("message.questionnaire.cannotbe.edit", new StringBuilder(inProgressAssessmentsLinkedWithQuestionnaireTemplate.stream().map(Assessment::getName).map(String::toString).collect(Collectors.joining(","))));
+            }
+        }
+        questionnaireTemplate = questionnaireTemplateMongoRepository.findOne(questionnaireTemplateId);
+        if (!Optional.ofNullable(questionnaireTemplate).isPresent()) {
             exceptionService.duplicateDataException("message.dataNotFound", "questionnaire template", questionnaireTemplateId);
         }
-        masterQuestionnaireTemplate.setName(questionnaireTemplateDTO.getName());
-        masterQuestionnaireTemplate.setDescription(questionnaireTemplateDTO.getDescription());
-        addTemplateTypeToQuestionnaireTemplate(unitId, true, masterQuestionnaireTemplate, questionnaireTemplateDTO);
-        questionnaireTemplateMongoRepository.save(masterQuestionnaireTemplate);
+        questionnaireTemplate.setName(questionnaireTemplateDTO.getName());
+        questionnaireTemplate.setTemplateStatus(questionnaireTemplateDTO.getTemplateStatus());
+        questionnaireTemplate.setDescription(questionnaireTemplateDTO.getDescription());
+        addTemplateTypeToQuestionnaireTemplate(unitId, true, questionnaireTemplate, questionnaireTemplateDTO);
+        questionnaireTemplateMongoRepository.save(questionnaireTemplate);
         return questionnaireTemplateDTO;
     }
 
