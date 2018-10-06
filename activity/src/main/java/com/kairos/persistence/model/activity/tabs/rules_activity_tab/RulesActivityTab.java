@@ -51,14 +51,7 @@ public class RulesActivityTab implements Serializable{
         //Default Constructor
     }
 
-    public RulesActivityTab(boolean eligibleForFinalSchedule, boolean eligibleForDraftSchedule, boolean eligibleForRequest, boolean eligibleForStaffingLevel, boolean lockLengthPresent, boolean eligibleToBeForced, List<Long> dayTypes, List<PhaseTemplateValue> eligibleForSchedules) {
-        this.eligibleForFinalSchedule = eligibleForFinalSchedule;
-        this.eligibleForDraftSchedule = eligibleForDraftSchedule;
-        this.eligibleForRequest = eligibleForRequest;
-        this.lockLengthPresent = lockLengthPresent;
-        this.eligibleToBeForced = eligibleToBeForced;
-        this.eligibleForStaffingLevel=eligibleForStaffingLevel;
-        this.dayTypes=dayTypes;
+    public RulesActivityTab(List<PhaseTemplateValue> eligibleForSchedules) {
         this.eligibleForSchedules = eligibleForSchedules;
     }
 
