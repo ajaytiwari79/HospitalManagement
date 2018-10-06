@@ -1140,6 +1140,7 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setId(null);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = createShift(unitId, shiftDTO, type, true);
         shiftWithViolatedInfoDTO.getShifts().get(0).setEditable(true);
+        shiftWithViolatedInfoDTO.getShifts().get(0).setDurationMinutes((int)shiftWithViolatedInfoDTO.getShifts().get(0).getInterval().getMinutes());
         return shiftWithViolatedInfoDTO;
     }
 
@@ -1161,6 +1162,7 @@ public class ShiftService extends MongoBaseService {
         if(validatedByStaff){
             shiftDTO1.setEditable(true);
         }
+        shiftDTO1.setDurationMinutes((int)shiftDTO1.getInterval().getMinutes());
         return shiftDTO1;
     }
 
