@@ -184,7 +184,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Query query=new Query();
         Criteria startDateCriteria=Criteria.where("startDate").gte(startDate).lte(endDate);
         Criteria endDateCriteria=Criteria.where("endDate").gte(startDate).lte(endDate);
-        query.addCriteria(Criteria.where("staffId").in(staffIds).and("deleted").is(false).and("attendanceDuration").exists(false)
+        query.addCriteria(Criteria.where("staffId").in(staffIds).and("deleted").is(false)
                 .and("disabled").is(false).orOperator(startDateCriteria,endDateCriteria));
         sort(Sort.Direction.ASC,"startDate");
         query.limit(1);
