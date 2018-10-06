@@ -3,10 +3,12 @@ package com.kairos.persistence.repository.clause;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.persistence.model.clause.Clause;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.repository.client_aggregator.CustomAggregationOperation;
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
+import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.clause.ClauseResponseDTO;
 import org.bson.Document;
 import org.springframework.data.domain.Sort;
@@ -111,6 +113,19 @@ public class ClauseMongoRepositoryImpl implements CustomClauseRepository {
         return result.getMappedResults();
     }
 
+
+    @Override
+    public List<ClauseBasicResponseDTO> getClausesByAgreementTemplateMetadata(Long countryId, OrganizationMetaDataDTO organizationMetaDataDTO) {
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())
+                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
+                        .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds())),
+                sort(Sort.Direction.DESC, "createdAt")
+        );
+        AggregationResults<ClauseBasicResponseDTO> result = mongoTemplate.aggregate(aggregation, Clause.class, ClauseBasicResponseDTO.class);
+        return result.getMappedResults();
+    }
 
     @Override
     public Criteria buildMatchCriteria(FilterSelection filterSelection, FilterType filterType) {

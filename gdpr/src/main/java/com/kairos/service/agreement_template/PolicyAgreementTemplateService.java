@@ -1,9 +1,11 @@
 package com.kairos.service.agreement_template;
 
 
-import com.kairos.dto.gdpr.PolicyAgreementTemplateDTO;
+import com.kairos.dto.gdpr.*;
+import com.kairos.dto.gdpr.data_inventory.OrganizationMetaDataDTO;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
 import com.kairos.persistence.repository.agreement_template.PolicyAgreementTemplateRepository;
+import com.kairos.persistence.repository.clause.ClauseMongoRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
 import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
@@ -37,6 +39,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
     @Inject
     private TemplateTypeService templateTypeService;
+
+    @Inject
+    private ClauseMongoRepository clauseMongoRepository;
 
 
     /**
@@ -83,7 +88,6 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
     /**
-     *
      * @param countryId
      * @param agreementTemplateId
      * @param policyAgreementTemplateDto
@@ -117,9 +121,18 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
      * @return
      * @description method return list of Agreement sections with sub sections of policy agreement template
      */
-    public List<AgreementSectionResponseDTO> getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(Long countryId, BigInteger agreementTemplateId) {
+    public Map<String, Object> getAllAgreementSectionsAndSubSectionsOfAgreementTemplateByTemplateId(Long countryId, BigInteger agreementTemplateId) {
 
-
+        PolicyAgreementTemplate template = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, agreementTemplateId);
+        if (!Optional.ofNullable(template).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Agreement Template", agreementTemplateId);
+        }
+        Map<String, Object> agreementTemplateResponse = new HashMap<>();
+        OrganizationMetaDataDTO organizationMetaDataDTO = new OrganizationMetaDataDTO(template.getOrganizationTypes().stream().map(OrganizationType::getId).collect(Collectors.toList()),
+                template.getOrganizationSubTypes().stream().map(OrganizationSubType::getId).collect(Collectors.toList()),
+                template.getOrganizationServices().stream().map(ServiceCategory::getId).collect(Collectors.toList()),
+                template.getOrganizationSubServices().stream().map(SubServiceCategory::getId).collect(Collectors.toList()));
+        List<ClauseBasicResponseDTO> clauseListForTemplate = clauseMongoRepository.getClausesByAgreementTemplateMetadata(countryId, organizationMetaDataDTO);
         List<AgreementSectionResponseDTO> agreementSectionResponseDTOS = policyAgreementTemplateRepository.getAgreementTemplateWithSectionsAndSubSections(countryId, agreementTemplateId);
         agreementSectionResponseDTOS.forEach(agreementSectionResponseDTO ->
                 {
@@ -135,7 +148,9 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     }
                 }
         );
-        return agreementSectionResponseDTOS;
+        agreementTemplateResponse.put("sections", agreementSectionResponseDTOS);
+        agreementTemplateResponse.put("clauseListForTemplate", clauseListForTemplate);
+        return agreementTemplateResponse;
     }
 
     private void sortClauseOfAgreementSectionAndSubSectionInResponseDTO(Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS, AgreementSectionResponseDTO agreementSectionResponseDTO) {

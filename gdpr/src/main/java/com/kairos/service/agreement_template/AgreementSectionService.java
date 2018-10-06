@@ -48,7 +48,7 @@ public class AgreementSectionService extends MongoBaseService {
     private ClauseService clauseService;
 
 
-    public List<AgreementSectionResponseDTO> createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, BigInteger templateId, List<AgreementSectionDTO> agreementSectionDTOs) {
+    public Map<String, Object> createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long countryId, BigInteger templateId, List<AgreementSectionDTO> agreementSectionDTOs) {
 
         PolicyAgreementTemplate policyAgreementTemplate = policyAgreementTemplateRepository.findByIdAndCountryId(countryId, templateId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {

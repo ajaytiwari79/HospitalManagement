@@ -140,8 +140,8 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
 
         Aggregation aggregation = Aggregation.newAggregation(
 
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getTypeId())
-                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationTypeId())
+                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
                         .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds())),
                 lookup("asset_type", "assetType", "_id", "assetType"),
                 lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
