@@ -9,6 +9,7 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Pr
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.processing_purpose.ProcessingPurposeMongoRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -16,11 +17,13 @@ import com.kairos.service.master_data.processing_activity_masterdata.ProcessingP
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -89,7 +92,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      * @return list of ProcessingPurpose
      */
     public List<ProcessingPurposeResponseDTO> getAllProcessingPurpose(Long organizationId) {
-        return processingPurposeMongoRepository.findAllOrganizationProcessingPurposes(organizationId);
+        return processingPurposeMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -100,7 +103,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      */
     public ProcessingPurpose getProcessingPurpose(Long organizationId, BigInteger id) {
 
-        ProcessingPurpose exist = processingPurposeMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        ProcessingPurpose exist = processingPurposeMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -112,17 +115,11 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
 
     public Boolean deleteProcessingPurpose(Long unitId, BigInteger processingPurposeId) {
 
-        List<ProcessingActivityBasicResponseDTO>  processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
+        List<ProcessingActivityBasicDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithProcessingPurpose(unitId, processingPurposeId);
         if (!processingActivities.isEmpty()) {
-            StringBuilder processingActivityNames=new StringBuilder();
-            processingActivities.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", processingActivities.get(0));
+            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Processing Purpose", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByOrganizationIdAndId(unitId, processingPurposeId);
-        if (!Optional.ofNullable(processingPurpose).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Processing Purpose", processingPurposeId);
-        }
-        delete(processingPurpose);
+        processingPurposeMongoRepository.safeDelete(processingPurposeId);
         return true;
     }
 
@@ -135,7 +132,7 @@ public class OrganizationProcessingPurposeService extends MongoBaseService {
      */
     public ProcessingPurposeDTO updateProcessingPurpose(Long organizationId, BigInteger id, ProcessingPurposeDTO processingPurposeDTO) {
 
-        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByOrganizationIdAndName(organizationId, processingPurposeDTO.getName());
+        ProcessingPurpose processingPurpose = processingPurposeMongoRepository.findByUnitIdAndName(organizationId, processingPurposeDTO.getName());
         if (Optional.ofNullable(processingPurpose).isPresent()) {
             if (id.equals(processingPurpose.getId())) {
                 return processingPurposeDTO;

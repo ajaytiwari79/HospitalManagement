@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.Day;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class Phase extends MongoBaseEntity {
     private LocalTime flippingDefaultTime;
     private int gracePeriodByStaff;
     private int gracePeriodByManagement;
-    private String untilNextDay;
+    private DayOfWeek untilNextDay;
     private int realtimeDuration;
     private String shortName;
     public Phase() {
@@ -181,11 +183,11 @@ public class Phase extends MongoBaseEntity {
         this.gracePeriodByManagement = gracePeriodByManagement;
     }
 
-    public String getUntilNextDay() {
+    public DayOfWeek getUntilNextDay() {
         return untilNextDay;
     }
 
-    public void setUntilNextDay(String untilNextDay) {
+    public void setUntilNextDay(DayOfWeek untilNextDay) {
         this.untilNextDay = untilNextDay;
     }
 

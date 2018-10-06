@@ -6,6 +6,7 @@ import com.kairos.dto.activity.counter.distribution.category.KPICategoryUpdation
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.persistence.model.counter.Counter;
 import com.kairos.service.counter.CounterConfService;
+import com.kairos.dto.response.ResponseDTO;
 import com.kairos.utils.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +33,9 @@ public class CounterConfController {
     private CounterConfService counterConfService;
 
     @PostMapping(value = COUNTRY_URL+COUNTER_CONF_URL+"/counter")
-    public ResponseEntity<Map<String, Object>> addCounterEntries(@PathVariable Long countryId){
+    public ResponseEntity<ResponseDTO<Object>> addCounterEntries(@PathVariable Long countryId){
         counterConfService.addEntries(countryId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, null);
     }
 
     /*

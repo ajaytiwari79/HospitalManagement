@@ -4,6 +4,7 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Pr
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.ProcessingPurposeResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +26,11 @@ public interface ProcessingPurposeMongoRepository extends MongoBaseRepository<Pr
     ProcessingPurpose findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0}")
-    List<ProcessingPurposeResponseDTO> findAllProcessingPurposes(Long countryId);
+    List<ProcessingPurposeResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort sort);
+
+
+    @Query("{deleted:false,countryId:?0}")
+    List<ProcessingPurposeResponseDTO> findAllByCountryId(Long countryId);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<ProcessingPurpose> getProcessingPurposeListByIds(Long countryId, Set<BigInteger> processingPurposeIds);
@@ -34,14 +39,14 @@ public interface ProcessingPurposeMongoRepository extends MongoBaseRepository<Pr
     List<ProcessingPurposeResponseDTO> findProcessingPurposeByIds(List<BigInteger> processingPurposeIds);
 
     @Query("{organizationId:?0,deleted:false}")
-    List<ProcessingPurposeResponseDTO> findAllOrganizationProcessingPurposes( Long organizationId);
+    List<ProcessingPurposeResponseDTO> findAllByUnitIdSortByCreatedDate(Long unitId, Sort sort);
 
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    ProcessingPurpose findByOrganizationIdAndName(Long organizationId,String name);
+    ProcessingPurpose findByUnitIdAndName(Long unitId, String name);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    ProcessingPurpose findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    ProcessingPurpose findByUnitIdAndId(Long unitId, BigInteger id);
 
 
 

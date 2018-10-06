@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.common;
 
+
 public class CustomAggregationQuery {
 
 
@@ -53,16 +54,6 @@ public class CustomAggregationQuery {
     }
 
 
-    public static String questionnaireTemplateAddNonDeletedAssetType() {
-        return "{  '$addFields':" +
-                "{'assetType':" +
-                "{$filter : { " +
-                "'input': '$assetType'," +
-                "as: 'assetType', " +
-                "cond: {$eq: ['$$assetType.deleted'," + false + "]}" +
-                "}}}} ";
-    }
-
 
     public static String questionnaireTemplateGroupOperation() {
         return "{'$group':{" +
@@ -71,6 +62,7 @@ public class CustomAggregationQuery {
                 "'description':{$first:'$description'}," +
                 "'assetType':{$first:'$assetType'}," +
                 "'templateType':{$first:'$templateType'}," +
+                "'defaultAssetTemplate':{'$first':'$defaultAssetTemplate'}" +
                 "}}";
     }
 
@@ -78,11 +70,12 @@ public class CustomAggregationQuery {
         return " {" +
                 "'$project':{" +
                 "'assetType':{$arrayElemAt:['$assetType',0]}," +
+                "'assetSubType':{$arrayElemAt:['$assetSubType',0]}," +
                 "         'name':1," +
                 "        'sections':1," +
                 "      'description':1," +
                 "     'templateType':1," +
-                "      'countryId':1," +
+                "'defaultAssetTemplate':1" +
                 "            }}";
     }
 
@@ -97,7 +90,9 @@ public class CustomAggregationQuery {
                 "}}," +
                 "'countryId':1" +
                 ", 'name':1" +
-                ",'deleted':1 }}";
+                ",'deleted':1 ," +
+                "'createdAt':1" +
+                "}}";
     }
 
 
@@ -122,7 +117,8 @@ public class CustomAggregationQuery {
                 "             'organizationTypes':1," +
                 "             'organizationSubTypes':1," +
                 "             'organizationServices':1," +
-                "              'organizationSubServices':1," +
+                "             'organizationSubServices':1," +
+                "             'createdAt':1" +
                 "         }}";
 
 
@@ -151,7 +147,7 @@ public class CustomAggregationQuery {
                 "       'organizationSubTypes':1," +
                 "       'organizationTypes':1," +
                 "       'organizationServices':1," +
-                "       'organizationSubServices':1," +
+                "       'organizationSubServices':1" +
 
                 "            }}";
     }
@@ -177,6 +173,8 @@ public class CustomAggregationQuery {
                 "  'minDataSubjectVolume':1," +
                 "  'maxDataSubjectVolume':1," +
                 "  'active':1," +
+                " 'assetAssessor':1," +
+                "'suggested':1" +
 
                 "            }}";
     }
@@ -227,6 +225,8 @@ public class CustomAggregationQuery {
     public static String metaDataReplaceRoot() {
         return "{ '$replaceRoot' : { 'newRoot' : '$data' } }";
     }
+
+
 
 
 }

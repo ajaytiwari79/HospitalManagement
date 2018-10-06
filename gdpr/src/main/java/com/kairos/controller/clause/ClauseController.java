@@ -53,9 +53,9 @@ public class ClauseController {
 
 
     @ApiOperation("delete clause by id")
-    @DeleteMapping("/clause/delete/{id}")
-    public ResponseEntity<Object> deleteClause(@PathVariable Long countryId, @PathVariable BigInteger id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(countryId,id));
+    @DeleteMapping("/clause/delete/{clauseId}")
+    public ResponseEntity<Object> deleteClause(@PathVariable Long countryId, @PathVariable BigInteger clauseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(countryId,clauseId));
     }
 
     @ApiOperation("update clause description")

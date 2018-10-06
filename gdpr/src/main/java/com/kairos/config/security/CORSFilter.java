@@ -16,27 +16,24 @@ import java.io.IOException;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CORSFilter implements Filter {
     @Override
-    public void init(FilterConfig filterConfig) {
-    }
-    private static final String ALLOWED_HEADERS = "X-Requested-With,access-control-allow-origin,Authorization,authorization,Origin,Content-Type,Version";
-    private static final String ALLOWED_METHODS = "GET,PUT,POST,DELETE,OPTIONS";
-    private static final String ALLOWED_ORIGIN = "*";
-    private static final String MAX_AGE = "3600";
-    public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain chain) throws IOException, ServletException {
-            HttpServletResponse resp=(HttpServletResponse)response;
-            resp.addHeader("Access-Control-Allow-Origin",ALLOWED_ORIGIN);
-            resp.addHeader("Access-Control-Allow-Credentials","true");
-            resp.addHeader("Access-Control-Allow-Methods",ALLOWED_METHODS);
-            resp.addHeader("Access-Control-Allow-Headers",ALLOWED_HEADERS);
-            resp.addHeader("Access-Control-Max-Age", MAX_AGE);
-            if(((HttpServletRequest)request).getMethod().equals("OPTIONS")){
-                return;
-            }
-            chain.doFilter(request, response);
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        final HttpServletResponse response = (HttpServletResponse) res;
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Allow-Headers", "X-Requested-With,access-control-allow-origin,Authorization,authorization,Origin,Content-Type,Version");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) req).getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            chain.doFilter(req, res);
+        }
     }
 
     @Override
     public void destroy() {
+    }
+
+    @Override
+    public void init(FilterConfig config) throws ServletException {
     }
 }

@@ -83,6 +83,35 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
 
 
     /**
+     *
+     * @param countryId
+     * @param agreementTemplateId
+     * @param policyAgreementTemplateDto
+     * @return
+     */
+    public PolicyAgreementTemplateDTO updatePolicyAgreementTemplateBasicDetails(Long countryId, BigInteger agreementTemplateId, PolicyAgreementTemplateDTO policyAgreementTemplateDto) {
+
+        PolicyAgreementTemplate template = policyAgreementTemplateRepository.findByName(countryId, policyAgreementTemplateDto.getName());
+        if (Optional.ofNullable(template).isPresent() && !agreementTemplateId.equals(template.getId())) {
+            exceptionService.duplicateDataException("message.duplicate", "Policy Agreement Template ", policyAgreementTemplateDto.getName());
+        }
+        template = policyAgreementTemplateRepository.findOne(agreementTemplateId);
+        template.setName(policyAgreementTemplateDto.getName())
+                .setDescription(policyAgreementTemplateDto.getDescription())
+                .setAccountTypes(policyAgreementTemplateDto.getAccountTypes())
+                .setOrganizationTypes(policyAgreementTemplateDto.getOrganizationTypes())
+                .setOrganizationSubTypes(policyAgreementTemplateDto.getOrganizationSubTypes())
+                .setOrganizationServices(policyAgreementTemplateDto.getOrganizationServices())
+                .setOrganizationSubServices(policyAgreementTemplateDto.getOrganizationSubServices())
+                .setTemplateType(policyAgreementTemplateDto.getTemplateTypeId());
+        policyAgreementTemplateRepository.save(template);
+        policyAgreementTemplateDto.setId(template.getId());
+        return policyAgreementTemplateDto;
+
+    }
+
+
+    /**
      * @param countryId
      * @param agreementTemplateId
      * @return
@@ -97,7 +126,7 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
                     Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS = agreementSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));
                     sortClauseOfAgreementSectionAndSubSectionInResponseDTO(clauseBasicResponseDTOS, agreementSectionResponseDTO);
                     if (!Optional.ofNullable(agreementSectionResponseDTO.getSubSections().get(0).getId()).isPresent()) {
-                        agreementSectionResponseDTO.getSubSections().clear();;
+                        agreementSectionResponseDTO.getSubSections().clear();
                     } else {
                         agreementSectionResponseDTO.getSubSections().forEach(agreementSubSectionResponseDTO -> {
                             Map<BigInteger, ClauseBasicResponseDTO> subSectionClauseBasicResponseDTOS = agreementSubSectionResponseDTO.getClauses().stream().collect(Collectors.toMap(ClauseBasicResponseDTO::getId, clauseBasicDTO -> clauseBasicDTO));
@@ -112,8 +141,8 @@ public class PolicyAgreementTemplateService extends MongoBaseService {
     private void sortClauseOfAgreementSectionAndSubSectionInResponseDTO(Map<BigInteger, ClauseBasicResponseDTO> clauseBasicResponseDTOS, AgreementSectionResponseDTO agreementSectionResponseDTO) {
         agreementSectionResponseDTO.getClauses().clear();
         List<ClauseBasicResponseDTO> clauses = new ArrayList<>();
-        List<BigInteger> clauseIdOrderIndex=agreementSectionResponseDTO.getClauseIdOrderedIndex();
-        for (int i = 0; i <clauseIdOrderIndex.size(); i++) {
+        List<BigInteger> clauseIdOrderIndex = agreementSectionResponseDTO.getClauseIdOrderedIndex();
+        for (int i = 0; i < clauseIdOrderIndex.size(); i++) {
             clauses.add(clauseBasicResponseDTOS.get(clauseIdOrderIndex.get(i)));
         }
         agreementSectionResponseDTO.setClauses(clauses);

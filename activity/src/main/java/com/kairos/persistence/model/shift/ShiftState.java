@@ -8,6 +8,7 @@ import java.math.BigInteger;
 public class ShiftState extends Shift {
 
     private BigInteger shiftId;
+    private BigInteger shiftStatePhaseId;
 
     public BigInteger getShiftId() {
         return shiftId;
@@ -16,4 +17,14 @@ public class ShiftState extends Shift {
     public void setShiftId(BigInteger shiftId) {
         this.shiftId = shiftId;
     }
+
+    public BigInteger getShiftStatePhaseId() {
+        return shiftStatePhaseId;
+    }
+
+    public void setShiftStatePhaseId(BigInteger shiftStatePhaseId) {
+        this.shiftStatePhaseId = shiftStatePhaseId;
+    }
+
+
 }

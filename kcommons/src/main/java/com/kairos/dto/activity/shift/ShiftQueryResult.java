@@ -16,8 +16,6 @@ import java.util.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftQueryResult {
     private BigInteger id;
-    private String name;
-
     private Date startDate;
 
     private Date endDate;
@@ -29,41 +27,23 @@ public class ShiftQueryResult {
     private long probability;
     private long accumulatedTimeBankInMinutes;
     private String remarks;
-    private BigInteger activityId;
     private Long staffId;
     private Integer weekCount;
     private static boolean overrideWeekCount;
     private Long unitId;
-    private List<ShiftQueryResult> subShifts = new ArrayList<>();
     private Long unitPositionId;
-    private int scheduledMinutes;
-    private int durationMinutes;
-    private Set<ShiftStatus> status;
+
     private Long allowedBreakDurationInMinute;
     private Long expertiseId;
     private String timeType;
     private BigInteger plannedTimeId; // This is calculated by Phase and unit settings.
+
+    private List<ShiftActivity> activities;
     public ShiftQueryResult() {
         //DC
     }
 
 
-
-    public int getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
-    public int getScheduledMinutes() {
-        return scheduledMinutes;
-    }
-
-    public void setScheduledMinutes(int scheduledMinutes) {
-        this.scheduledMinutes = scheduledMinutes;
-    }
 
     public BigInteger getId() {
         return id;
@@ -71,14 +51,6 @@ public class ShiftQueryResult {
 
     public void setId(BigInteger id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public long getBid() {
@@ -137,13 +109,6 @@ public class ShiftQueryResult {
         this.remarks = remarks;
     }
 
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
 
     public Long getStaffId() {
         return staffId;
@@ -191,7 +156,7 @@ public class ShiftQueryResult {
 
 
     public Long getStartDate() {
-        return startDate.getTime();
+        return this.activities.get(0).getStartDate().getTime();
     }
 
     public void setStartDate(Date startDate) {
@@ -199,7 +164,7 @@ public class ShiftQueryResult {
     }
 
     public Long getEndDate() {
-        return endDate.getTime();
+        return this.activities.get(0).getEndDate().getTime();
     }
 
     public void setEndDate(Date endDate) {
@@ -215,13 +180,6 @@ public class ShiftQueryResult {
     }
 
 
-    public List<ShiftQueryResult> getSubShifts() {
-        return subShifts;
-    }
-
-    public void setSubShifts(List<ShiftQueryResult> subShifts) {
-        this.subShifts = subShifts;
-    }
 
     public Long getUnitPositionId() {
         return unitPositionId;
@@ -231,13 +189,6 @@ public class ShiftQueryResult {
         this.unitPositionId = unitPositionId;
     }
 
-    public Set<ShiftStatus> getStatus() {
-        return status=Optional.ofNullable(status).orElse(new HashSet<>());
-    }
-
-    public void setStatus(Set<ShiftStatus> status) {
-        this.status = status;
-    }
 
     public Long getAllowedBreakDurationInMinute() {
         return allowedBreakDurationInMinute;
@@ -247,9 +198,8 @@ public class ShiftQueryResult {
         this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
     }
 
-    public ShiftQueryResult(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitId, Long unitPositionId) {
+    public ShiftQueryResult(BigInteger id,  Date startDate, Date endDate, long bid, long pId, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivity> activities, Long staffId, Long unitId, Long unitPositionId) {
         this.id = id;
-        this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.bid = bid;
@@ -259,18 +209,18 @@ public class ShiftQueryResult {
         this.probability = probability;
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
         this.remarks = remarks;
-        this.activityId = activityId;
+        this.activities = activities;
         this.staffId = staffId;
         this.unitId = unitId;
         this.unitPositionId = unitPositionId;
     }
 
 
-    public List<ShiftQueryResult> sortShifts() {
-        if (Optional.ofNullable(subShifts).isPresent()) {
-            subShifts.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
+    public List<ShiftActivity> sortShifts() {
+        if (Optional.ofNullable(activities).isPresent()) {
+            activities.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
         }
-        return subShifts;
+        return activities;
     }
 
     public Long getExpertiseId() {

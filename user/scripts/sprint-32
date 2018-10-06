@@ -1,0 +1,5 @@
+// To Assign all Day Types to Previous AccessGroup
+
+MATCH(dayType:DayType{isEnabled:true}),(accessGroup:AccessGroup{deleted:false})
+CREATE UNIQUE(accessGroup)-[r:DAY_TYPES]->(dayType)
+return count(r)

@@ -42,8 +42,4 @@ public class SchedulerConfig implements SchedulingConfigurer,AsyncConfigurer {
         return executor;
     }
 
-    @Override
-    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return new MyAsyncUncaughtExceptionHandler();
-    }
 }

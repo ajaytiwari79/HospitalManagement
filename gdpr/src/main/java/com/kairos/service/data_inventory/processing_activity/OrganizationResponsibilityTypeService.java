@@ -9,6 +9,7 @@ import com.kairos.persistence.model.master_data.default_proc_activity_setting.Re
 import com.kairos.persistence.repository.data_inventory.processing_activity.ProcessingActivityMongoRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeMongoRepository;
 import com.kairos.response.dto.common.ResponsibilityTypeResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -17,11 +18,13 @@ import com.kairos.utils.ComparisonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -96,7 +99,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      * @return list of ResponsibilityType
      */
     public List<ResponsibilityTypeResponseDTO> getAllResponsibilityType(Long organizationId) {
-        return responsibilityTypeMongoRepository.findAllOrganizationResponsibilityTypes(organizationId);
+        return responsibilityTypeMongoRepository.findAllByUnitIdSortByCreatedDate(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -107,7 +110,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
      */
     public ResponsibilityType getResponsibilityType(Long organizationId, BigInteger id) {
 
-        ResponsibilityType exist = responsibilityTypeMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        ResponsibilityType exist = responsibilityTypeMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id ");
         } else {
@@ -119,17 +122,11 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
 
     public Boolean deleteResponsibilityType(Long unitId, BigInteger responsibilityTypeId) {
 
-        List<ProcessingActivityBasicResponseDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithResponsibilityType(unitId, responsibilityTypeId);
+        List<ProcessingActivityBasicDTO> processingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkedWithResponsibilityType(unitId, responsibilityTypeId);
         if (!processingActivities.isEmpty()) {
-            StringBuilder processingActivityNames=new StringBuilder();
-            processingActivities.forEach(processingActivity->processingActivityNames.append(processingActivity.getName()+","));
-            exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Responsibility Type", processingActivityNames);
+                exceptionService.metaDataLinkedWithProcessingActivityException("message.metaData.linked.with.ProcessingActivity", "Responsibility Type", new StringBuilder(processingActivities.stream().map(ProcessingActivityBasicDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        ResponsibilityType responsibilityType = responsibilityTypeMongoRepository.findByOrganizationIdAndId(unitId, responsibilityTypeId);
-        if (!Optional.ofNullable(responsibilityType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Responsibility Type", responsibilityTypeId);
-        }
-        delete(responsibilityType);
+        responsibilityTypeMongoRepository.safeDelete(responsibilityTypeId) ;
         return true;
     }
 
@@ -143,7 +140,7 @@ public class OrganizationResponsibilityTypeService extends MongoBaseService {
     public ResponsibilityTypeDTO updateResponsibilityType(Long organizationId, BigInteger id, ResponsibilityTypeDTO responsibilityTypeDTO) {
 
 
-        ResponsibilityType responsibilityType = responsibilityTypeMongoRepository.findByOrganizationIdAndName(organizationId, responsibilityTypeDTO.getName());
+        ResponsibilityType responsibilityType = responsibilityTypeMongoRepository.findByUnitIdAndName(organizationId, responsibilityTypeDTO.getName());
         if (Optional.ofNullable(responsibilityType).isPresent()) {
             if (id.equals(responsibilityType.getId())) {
                 return responsibilityTypeDTO;

@@ -28,10 +28,10 @@ public class PayGroupAreaDTO {
 
     @NotNull(message = "Start date can't be null")
     //@DateLong
-    @FutureDate
+
     private Date startDateMillis;
 
-    @FutureDate
+
     //@DateLong
     private Date endDateMillis;
 

@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.night_worker;
 
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftQueryResult;
 
 import java.util.List;
@@ -7,23 +8,23 @@ import java.util.Map;
 
 public class ShiftAndExpertiseNightWorkerSettingDTO {
 
-    private List<ShiftQueryResult> shifts;
+    private List<ShiftDTO> shifts;
     private Map<Long, ExpertiseNightWorkerSettingDTO> nightWorkerSettings;
 
     public ShiftAndExpertiseNightWorkerSettingDTO(){
         // default constructor
     }
 
-    public ShiftAndExpertiseNightWorkerSettingDTO(List<ShiftQueryResult> shifts, Map<Long, ExpertiseNightWorkerSettingDTO> nightWorkerSettings){
+    public ShiftAndExpertiseNightWorkerSettingDTO(List<ShiftDTO> shifts, Map<Long, ExpertiseNightWorkerSettingDTO> nightWorkerSettings){
         this.shifts = shifts;
         this.nightWorkerSettings = nightWorkerSettings;
     }
 
-    public List<ShiftQueryResult> getShifts() {
+    public List<ShiftDTO> getShifts() {
         return shifts;
     }
 
-    public void setShifts(List<ShiftQueryResult> shifts) {
+    public void setShifts(List<ShiftDTO> shifts) {
         this.shifts = shifts;
     }
 

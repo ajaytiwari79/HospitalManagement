@@ -24,11 +24,14 @@ import java.util.Optional;
 @Transactional
 public class FunctionService {
 
-    @Inject CountryGraphRepository countryGraphRepository;
+    @Inject
+    private CountryGraphRepository countryGraphRepository;
 
-    @Inject FunctionGraphRepository functionGraphRepository;
+    @Inject
+    private FunctionGraphRepository functionGraphRepository;
 
-    @Inject OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
 
     @Inject
     private ExceptionService exceptionService;

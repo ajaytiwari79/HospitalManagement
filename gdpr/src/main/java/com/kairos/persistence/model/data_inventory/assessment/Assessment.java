@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.data_inventory.assessment;
 
 
-import com.kairos.enums.AssessmentStatus;
+import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,33 +17,28 @@ public class Assessment extends MongoBaseEntity {
 
     @NotBlank
     private String name;
-
     @NotNull
     private LocalDate endDate;
-
     private LocalDate completedDate;
-
     private String comment;
-
     private BigInteger assetId;
-
     private BigInteger processingActivityId;
-
-    private String relatedAssetOrProcessingActivityName;
-
     private List<AssetAssessmentAnswerVO> assetAssessmentAnswers;
-
     private List<ProcessingActivityAssessmentAnswerVO> processingActivityAssessmentAnswers;
-
     @NotNull
     private Staff assignee;
-
     @NotNull
     private Staff approver;
-
     private AssessmentStatus  assessmentStatus=AssessmentStatus.NEW;
-
     private BigInteger questionnaireTemplateId;
+
+
+    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull Staff assignee, @NotNull Staff approver) {
+        this.name = name;
+        this.endDate = endDate;
+        this.assignee = assignee;
+        this.approver = approver;
+    }
 
     public String getName() { return name; }
 
@@ -85,22 +80,7 @@ public class Assessment extends MongoBaseEntity {
 
     public void setProcessingActivityId(BigInteger processingActivityId) { this.processingActivityId = processingActivityId; }
 
-    public Assessment(@NotBlank String name, @NotNull LocalDate endDate, @NotNull Staff assignee, @NotNull Staff approver) {
-        this.name = name;
-        this.endDate = endDate;
-        this.assignee = assignee;
-        this.approver = approver;
-    }
-
-    public String getRelatedAssetOrProcessingActivityName() {
-        return relatedAssetOrProcessingActivityName;
-    }
-
-    public void setRelatedAssetOrProcessingActivityName(String relatedAssetOrProcessingActivityName) {
-        this.relatedAssetOrProcessingActivityName = relatedAssetOrProcessingActivityName;
-    }
-
-    public List<AssetAssessmentAnswerVO> getAssetAssessmentAnswers() { return assetAssessmentAnswers;}
+     public List<AssetAssessmentAnswerVO> getAssetAssessmentAnswers() { return assetAssessmentAnswers;}
 
     public void setAssetAssessmentAnswers(List<AssetAssessmentAnswerVO> assetAssessmentAnswers) { this.assetAssessmentAnswers = assetAssessmentAnswers; }
 

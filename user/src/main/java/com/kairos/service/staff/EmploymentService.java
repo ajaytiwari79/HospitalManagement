@@ -5,13 +5,13 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
-import com.kairos.dto.scheduler.KairosSchedulerLogsDTO;
+import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.enums.EmploymentStatus;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
-import com.kairos.dto.scheduler.kafka.producer.KafkaProducer;
+import com.kairos.dto.scheduler.queue.kafka.producer.KafkaProducer;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
@@ -186,7 +186,10 @@ public class EmploymentService {
 
 
     public Map<String, Object> createUnitPermission(long unitId, long staffId, long accessGroupId, boolean created) {
-
+        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+            exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
+        }
         Organization unit = organizationGraphRepository.findOne(unitId);
         //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         if (unit == null) {
@@ -226,7 +229,6 @@ public class EmploymentService {
                 unitPermission.setOrganization(unit);
                 unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
             }
-            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
             unitPermission.setAccessGroup(accessGroup);
             employment.getUnitPermissions().add(unitPermission);
             employmentGraphRepository.save(employment);

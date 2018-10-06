@@ -5,6 +5,7 @@ import com.kairos.persistence.model.master_data.default_asset_setting.DataDispos
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.common.DataDisposalResponseDTO;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -32,16 +33,19 @@ public interface DataDisposalMongoRepository extends MongoBaseRepository<DataDis
     List<DataDisposal> getDataDisposalListByIds(Long countryId,Set<BigInteger> dataDisposalIds);
 
     @Query("{deleted:false,countryId:?0}")
-    List<DataDisposalResponseDTO> findAllDataDisposals(Long countryId);
+    List<DataDisposalResponseDTO> findAllByCountryId(Long countryId);
+
+    @Query("{deleted:false,countryId:?0}")
+    List<DataDisposalResponseDTO> findAllByCountryIdAndSortByCreatedDate(Long countryId, Sort sort);
 
     @Query("{deleted:false,organizationId:?0}")
-    List<DataDisposalResponseDTO> findAllOrganizationDataDisposals(Long organizationId);
+    List<DataDisposalResponseDTO> findAllByUnitIdAndSortByCreatedDate(Long unitId, Sort sort);
 
     @Query("{deleted:false,organizationId:?0,_id:?1}")
-    DataDisposal findByOrganizationIdAndId(Long organizationId,BigInteger id);
+    DataDisposal findByUnitIdAndId(Long unitId, BigInteger id);
 
     @Query("{organizationId:?0,name:?1,deleted:false}")
-    DataDisposal findByOrganizationIdAndName(Long organizationId,String name);
+    DataDisposal findByUnitIdAndName(Long unitId, String name);
 
 
 

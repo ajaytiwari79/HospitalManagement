@@ -28,10 +28,10 @@ public class CountryExpertiseDTO {
     private String description;
 
     @NotNull(message = "Start date can't be null")
-    @FutureDate
+
     private Date startDateMillis;
 
-    @FutureDate
+
     private Date endDateMillis;
 
     @NotNull(message = "Level can not be null")

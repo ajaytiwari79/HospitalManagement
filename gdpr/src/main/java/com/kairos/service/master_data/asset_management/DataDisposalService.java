@@ -3,7 +3,7 @@ package com.kairos.service.master_data.asset_management;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.enums.SuggestedDataStatus;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.dto.gdpr.metadata.DataDisposalDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.DataDisposal;
 import com.kairos.persistence.repository.master_data.asset_management.data_disposal.DataDisposalMongoRepository;
@@ -13,6 +13,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.ComparisonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -55,7 +56,7 @@ public class DataDisposalService extends MongoBaseService {
         List<DataDisposal> newDataDisposals = new ArrayList<>();
         if (!dataDisposalsNames.isEmpty()) {
             for (String name : dataDisposalsNames) {
-                DataDisposal newDataDisposal = new DataDisposal(name,countryId,SuggestedDataStatus.APPROVED);
+                DataDisposal newDataDisposal = new DataDisposal(name, countryId, SuggestedDataStatus.APPROVED);
                 newDataDisposals.add(newDataDisposal);
             }
 
@@ -72,7 +73,7 @@ public class DataDisposalService extends MongoBaseService {
      * @return list of DataDisposal
      */
     public List<DataDisposalResponseDTO> getAllDataDisposal(Long countryId) {
-        return dataDisposalMongoRepository.findAllDataDisposals(countryId);
+        return dataDisposalMongoRepository.findAllByCountryIdAndSortByCreatedDate(countryId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
 

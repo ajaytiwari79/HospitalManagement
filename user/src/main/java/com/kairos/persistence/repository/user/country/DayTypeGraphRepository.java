@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by oodles on 9/1/17.
@@ -24,4 +25,7 @@ public interface DayTypeGraphRepository extends Neo4jBaseRepository<DayType,Long
 
     @Query("Match (n:DayType) where id(n) in {0} return n")
     List<DayType> getDayTypes(List<Long> dayTypeIds);
+
+    @Query("Match (dayType:DayType{isEnabled:true}) where id(dayType) in {0} return dayType")
+    List<DayType> getDayTypes(Set<Long> dayTypeIds);
 }

@@ -5,6 +5,7 @@ import com.kairos.persistence.repository.client_aggregator.CustomAggregationOper
 import com.kairos.persistence.repository.common.CustomAggregationQuery;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -73,9 +74,12 @@ public class AssetMongoRepositoryImpl implements CustomAssetRepository {
                 lookup("hosting_provider", "hostingProvider", "_id", "hostingProvider"),
                 lookup("hosting_type", "hostingType", "_id", "hostingType"),
                 lookup("data_disposal", "dataDisposal", "_id", "dataDisposal"),
+                sort(Sort.Direction.DESC, "createdAt"),
                 new CustomAggregationOperation(projectionOperation)
 
-        );
+
+
+                );
         AggregationResults<AssetResponseDTO> results = mongoTemplate.aggregate(aggregation, Asset.class, AssetResponseDTO.class);
         return results.getMappedResults();
     }

@@ -3,32 +3,46 @@ package com.kairos.response.dto.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.response.dto.common.RiskResponseDTO;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MasterProcessingActivityRiskResponseDTO {
 
 
     private BigInteger id;
     private String name;
-    private boolean mainParent;
+    private Boolean mainParent;
     private List<RiskResponseDTO> risks=new ArrayList<>();
+    private LocalDate suggestedDate;
+    private SuggestedDataStatus suggestedDataStatus;
+
     private List<MasterProcessingActivityRiskResponseDTO>  processingActivities=new ArrayList<>();
 
     public MasterProcessingActivityRiskResponseDTO() {
     }
 
-    public MasterProcessingActivityRiskResponseDTO(BigInteger id, String name, boolean mainParent, List<RiskResponseDTO> risks) {
+    public MasterProcessingActivityRiskResponseDTO(BigInteger id, String name, boolean mainParent, List<RiskResponseDTO> risks,LocalDate suggestedDate,SuggestedDataStatus suggestedDataStatus) {
         this.id = id;
         this.name = name;
         this.mainParent = mainParent;
         this.risks=risks;
+       this.suggestedDate= suggestedDate;
+       this.suggestedDataStatus=suggestedDataStatus;
     }
+
+    public LocalDate getSuggestedDate() { return suggestedDate; }
+
+    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
+
+    public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
+
+    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
     public List<MasterProcessingActivityRiskResponseDTO> getProcessingActivities() { return processingActivities; }
 
@@ -36,9 +50,9 @@ public class MasterProcessingActivityRiskResponseDTO {
 
     public BigInteger getId() { return id; }
 
-    public boolean isMainParent() { return mainParent; }
+    public Boolean getMainParent() { return mainParent; }
 
-    public void setMainParent(boolean mainParent) { this.mainParent = mainParent; }
+    public void setMainParent(Boolean mainParent) { this.mainParent = mainParent; }
 
     public void setId(BigInteger id) { this.id = id; }
 

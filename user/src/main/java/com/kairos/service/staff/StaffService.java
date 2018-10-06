@@ -413,8 +413,8 @@ public class StaffService {
     public Map<String, Object> retrievePersonalInfo(Staff staff) {
         User user = userGraphRepository.getUserByStaffId(staff.getId());
         Map<String, Object> map = new HashMap<>();
-        map.put("firstName", staff.getFirstName());
-        map.put("lastName", staff.getLastName());
+        map.put("firstName", user.getFirstName());
+        map.put("lastName", user.getLastName());
         map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic());
         map.put("familyName", staff.getFamilyName());
         map.put("currentStatus", staff.getCurrentStatus());
@@ -674,8 +674,12 @@ public class StaffService {
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             logger.error("Access group not found");
             exceptionService.invalidRequestException("error.staff.accessgroup.notfound", accessGroupId);
-
         }
+
+        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+            exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
+        }
+
         List<Staff> staffList = new ArrayList<>();
         List<Integer> staffErrorList = new ArrayList<>();
         StaffUploadBySheetQueryResult staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
@@ -1193,6 +1197,9 @@ public class StaffService {
             exceptionService.dataNotFoundByIdException("error.staff.accessgroup.notfound", accessGroupId);
 
         }
+        if(accessGroup.getEndDate()!=null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())){
+            exceptionService.actionNotPermittedException("error.access.expired",accessGroup.getName());
+        }
         Employment employment;
         if (employmentAlreadyExist) {
             employment = (Optional.ofNullable(organization).isPresent()) ?
@@ -1684,6 +1691,8 @@ public class StaffService {
 
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         StaffUnitPositionDetails unitPosition = unitPositionService.getUnitPositionDetails(unitPositionId, organization, countryId);
+        //Todo it should calculate dynamically
+        unitPosition.setHourlyCost(14.5f);
         staffAdditionalInfoDTO.setUnitId(organization.getId());
         staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
         staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));

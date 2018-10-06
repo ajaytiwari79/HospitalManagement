@@ -48,4 +48,5 @@ public class UserPermissionQueryResult {
     public void setAccessibleTabs(List<Long> accessibleTabs) {
         this.accessibleTabs = accessibleTabs;
     }
+
 }

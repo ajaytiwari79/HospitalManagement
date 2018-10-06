@@ -5,10 +5,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTAWTAWrapper;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
-import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
-import com.kairos.dto.activity.wta.basic_details.WTADTO;
-import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
-import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.user.employment.UnitPositionIdDTO;
@@ -118,13 +115,13 @@ public class WTAService extends MongoBaseService {
         wta = new WorkingTimeAgreement();
         // Link tags to WTA
         Date startDate = (wtaDTO.getStartDateMillis() == 0) ? DateUtils.getCurrentDate() : new Date(wtaDTO.getStartDateMillis());
-        startDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(startDate).truncatedTo(ChronoUnit.DAYS));
+        startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(startDate).truncatedTo(ChronoUnit.DAYS));
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {
             if (startDate.getTime() > wtaDTO.getEndDateMillis()) {
                 exceptionService.invalidRequestException("message.wta.start-end-date");
             }
             Date endDate = new Date(wtaDTO.getEndDateMillis());
-            endDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(endDate).truncatedTo(ChronoUnit.DAYS));
+            endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(endDate).truncatedTo(ChronoUnit.DAYS));
             wta.setEndDate(endDate);
         }
         WTABasicDetailsDTO wtaBasicDetailsDTO = wtaDetailRestClient.getWtaRelatedInfo(wtaDTO.getExpertiseId(), wtaDTO.getOrganizationSubType(), countryId, 0l, wtaDTO.getOrganizationType());
@@ -293,6 +290,12 @@ public class WTAService extends MongoBaseService {
         return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResult, WTAResponseDTO.class);
     }
 
+
+
+    public List<WTABaseRuleTemplateDTO> getwtaRuletemplates(BigInteger wtaId) {
+        WTAQueryResultDTO wtaQueryResult = wtaRepository.getOne(wtaId);
+        return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResult, WTAResponseDTO.class).getRuleTemplates();
+    }
     public boolean removeWta(BigInteger wtaId) {
         WorkingTimeAgreement wta = wtaRepository.findOne(wtaId);
         if (!Optional.ofNullable(wta).isPresent()) {
@@ -473,9 +476,9 @@ public class WTAService extends MongoBaseService {
             workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
         }
         workingTimeAgreement.setUnitPositionId(unitPositionId);
-        Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(wtaQueryResultDTO.getStartDate()).truncatedTo(ChronoUnit.DAYS));
+        Date startDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(wtaQueryResultDTO.getStartDate()).truncatedTo(ChronoUnit.DAYS));
         if(wtaQueryResultDTO.getEndDate()!=null){
-            Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.getZoneDateTime(wtaQueryResultDTO.getEndDate()).truncatedTo(ChronoUnit.DAYS));
+            Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(wtaQueryResultDTO.getEndDate()).truncatedTo(ChronoUnit.DAYS));
             workingTimeAgreement.setEndDate(endDate);
         }
         workingTimeAgreement.setStartDate(startDate);
