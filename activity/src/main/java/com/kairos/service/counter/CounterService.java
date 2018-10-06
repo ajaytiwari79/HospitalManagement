@@ -1,11 +1,12 @@
 package com.kairos.service.counter;
 
 
-import com.kairos.dto.activity.counter.data.BasicRequirementDTO;
+import com.kairos.dto.activity.counter.chart.BaseChart;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
-import com.kairos.dto.activity.counter.data.RepresentationDTO;
+import com.kairos.dto.activity.counter.data.RawRepresentationData;
 import com.kairos.enums.FilterType;
+import com.kairos.persistence.model.counter.KPI;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,5 +38,7 @@ public interface CounterService {
     }
 
     //map -> { data: [ {} ] }
-    RepresentationDTO getCalculatedCounter(FilterCriteriaDTO filterCriteria, BasicRequirementDTO representationRequirement);
+    RawRepresentationData getCalculatedCounter(FilterCriteriaDTO filterCriteria, KPI kpi);
+
+    RawRepresentationData getCalculatedKPI(FilterCriteriaDTO filterCriteriaDTO, KPI kpi);
 }

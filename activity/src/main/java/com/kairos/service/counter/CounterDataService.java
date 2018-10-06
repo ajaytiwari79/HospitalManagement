@@ -5,7 +5,6 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
-import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
@@ -14,10 +13,10 @@ import com.kairos.dto.planner.vrp.vrpPlanning.EmployeeDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.TaskDTO;
 import com.kairos.dto.planner.vrp.vrpPlanning.VrpTaskPlanningDTO;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.counter.chart.BaseChart;
-import com.kairos.persistence.model.counter.chart.PieChart;
-import com.kairos.persistence.model.counter.chart.PieDataUnit;
-import com.kairos.persistence.model.counter.chart.SingleNumberChart;
+import com.kairos.dto.activity.counter.chart.BaseChart;
+import com.kairos.dto.activity.counter.chart.PieChart;
+import com.kairos.dto.activity.counter.chart.DataUnit;
+import com.kairos.dto.activity.counter.chart.SingleNumberChart;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.rest_client.GenericIntegrationService;
 import com.kairos.service.exception.ExceptionService;
@@ -91,8 +90,8 @@ public class CounterDataService {
 
     private KPI prepareTaskUnplannedKPI(long tasksUnplanned, long totalTasks){
         BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "Task", new ArrayList());
-        ((PieChart) baseChart).getDataList().add(new PieDataUnit("Planned", decimalSpecification(totalTasks-tasksUnplanned)));
-        ((PieChart) baseChart).getDataList().add(new PieDataUnit("UnPlanned", decimalSpecification(tasksUnplanned)));
+        ((PieChart) baseChart).getDataList().add(new DataUnit("Planned", decimalSpecification(totalTasks-tasksUnplanned)));
+        ((PieChart) baseChart).getDataList().add(new DataUnit("UnPlanned", decimalSpecification(tasksUnplanned)));
         KPI kpi = new KPI(CounterType.TASK_UNPLANNED.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED, false,null);
         kpi.setId(new BigInteger("1"));
         return kpi;
@@ -107,8 +106,8 @@ public class CounterDataService {
 
     private KPI prepareTaskUnplannedHours(double unplannedMinutes, double plannedMinutes){
         BaseChart baseChart = new PieChart(RepresentationUnit.DECIMAL, "Hours", new ArrayList());
-        ((PieChart) baseChart).getDataList().add(new PieDataUnit("Planned Task", decimalSpecification(plannedMinutes/60.0)));
-        ((PieChart) baseChart).getDataList().add(new PieDataUnit("UnPlanned Task", decimalSpecification(unplannedMinutes/60.0)));
+        ((PieChart) baseChart).getDataList().add(new DataUnit("Planned Task", decimalSpecification(plannedMinutes/60.0)));
+        ((PieChart) baseChart).getDataList().add(new DataUnit("UnPlanned Task", decimalSpecification(unplannedMinutes/60.0)));
         KPI kpi = new KPI(CounterType.TASK_UNPLANNED_HOURS.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASK_UNPLANNED_HOURS, false,null);
         kpi.setId(new BigInteger("2"));
         return kpi;
@@ -132,7 +131,7 @@ public class CounterDataService {
     private KPI prepareTasksPerStaffKPI(Map<String, Long> staffTaskData){
         BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "Tasks", new ArrayList());
         staffTaskData.forEach((staffName, taskCount) -> {
-            ((PieChart) baseChart).getDataList().add(new PieDataUnit(staffName, decimalSpecification(taskCount)));
+            ((PieChart) baseChart).getDataList().add(new DataUnit(staffName, decimalSpecification(taskCount)));
         });
         KPI kpi = new KPI(CounterType.TASKS_PER_STAFF.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TASKS_PER_STAFF, false, null);
         kpi.setId(new BigInteger("3"));
@@ -280,7 +279,7 @@ public class CounterDataService {
     private KPI prepareTotalKMDrivenByStaff(Map<String, Double> staffAndKMDetails){
         BaseChart baseChart = new PieChart(RepresentationUnit.NUMBER, "KMs", new ArrayList());
         staffAndKMDetails.forEach((staffName, kmDriven) -> {
-            ((PieChart) baseChart).getDataList().add(new PieDataUnit(staffName, decimalSpecification(kmDriven)));
+            ((PieChart) baseChart).getDataList().add(new DataUnit(staffName, decimalSpecification(kmDriven)));
         });
         KPI kpi = new KPI(CounterType.TOTAL_KM_DRIVEN_PER_STAFF.getName(), baseChart, CounterSize.SIZE_1X1, CounterType.TOTAL_KM_DRIVEN_PER_STAFF, false,null);
         kpi.setId(new BigInteger("10"));
@@ -314,52 +313,6 @@ public class CounterDataService {
 
     }
 
-    private void setShiftDayCollisionMap(long shiftCornerTs, long initTs, Map<Long, Integer> shiftDayCollisionMap) {
-        if ((shiftCornerTs) > initTs) {
-            long key = (shiftCornerTs - initTs) / (24 * 3600 * 1000);
-            if (shiftDayCollisionMap.get(key) == null) {
-                shiftDayCollisionMap.put(key, 0);
-            }
-            shiftDayCollisionMap.put(key, shiftDayCollisionMap.get(key) + 1);
-        }
-    }
-
-    public long getTotalRestingHours(List<Shift> shifts, long initTs, long endTs, long restingHoursMillis, boolean dayOffAllowed) {
-        //all shifts should be sorted on startDate
-        Map<Long, Integer> shiftDayCollisionMap = new HashMap<>();
-        long baseInitTs = initTs;
-        long durationMillis = endTs - initTs;
-        DateTimeInterval dateTimeInterval = new DateTimeInterval(initTs,endTs);
-        long totalrestingMinutes = dateTimeInterval.getMilliSeconds();
-        for (Shift shift : shifts) {
-            DateTimeInterval shiftInterval= new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
-            if(dateTimeInterval.overlaps(shiftInterval)){
-                totalrestingMinutes-=dateTimeInterval.overlap(shiftInterval).getMilliSeconds();
-            }
-
-            /*if (initTs >= shift.getStartDate().getTime() && initTs >= shift.getEndDate().getTime()) {
-                durationMillis -= 0;
-                //setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
-            } else if (initTs >= shift.getStartDate().getTime() && initTs < shift.getEndDate().getTime()) {
-                durationMillis -= (shift.getEndDate().getTime() - initTs);
-                initTs = shift.getEndDate().getTime();
-                //setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
-            } else if (initTs < shift.getStartDate().getTime() && endTs > shift.getEndDate().getTime()) {
-                durationMillis -= (shift.getEndDate().getTime() - shift.getStartDate().getTime());
-                initTs = shift.getEndDate().getTime();
-                //setShiftDayCollisionMap(shift.getEndDate().getTime() + restingHoursMillis, baseInitTs, shiftDayCollisionMap);
-                //setShiftDayCollisionMap(shift.getStartDate().getTime(), baseInitTs, shiftDayCollisionMap);
-            } else if (initTs < shift.getStartDate().getTime() && endTs < shift.getEndDate().getTime()) {
-                durationMillis -= (endTs - shift.getStartDate().getTime());
-                initTs = endTs;
-                //setShiftDayCollisionMap(shift.getStartDate().getTime(), baseInitTs, shiftDayCollisionMap);
-            }*/
-        }
-//        if (dayOffAllowed) {
-//            durationMillis -= (shiftDayCollisionMap.entrySet().size() * (24 * 3600 * 1000));
-//        }
-        return totalrestingMinutes;
-    }
 
     //public List<ShiftDTO> getShifts
 

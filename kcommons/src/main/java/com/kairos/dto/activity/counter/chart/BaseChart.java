@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.counter.chart;
+package com.kairos.dto.activity.counter.chart;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com

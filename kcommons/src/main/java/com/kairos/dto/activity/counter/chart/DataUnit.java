@@ -1,6 +1,6 @@
-package com.kairos.persistence.model.counter.chart;
+package com.kairos.dto.activity.counter.chart;
 
-public class PieDataUnit {
+public class DataUnit {
     private String label;
     private double value;
 
@@ -9,7 +9,7 @@ public class PieDataUnit {
      * @dated: Jun/29/2018
      */
 
-    public PieDataUnit(String label, double value) {
+    public DataUnit(String label, double value) {
         this.label = label;
         this.value = value;
     }

@@ -29,7 +29,6 @@ public class CounterServiceMapping {
         logger.info("Enum mapping: "+this.counters);
     }
 
-
     public CounterService getService(CounterType counterType){
         return (CounterService) this.counters.get(counterType);
     }
