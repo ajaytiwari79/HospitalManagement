@@ -1,8 +1,8 @@
 package com.kairos.service.scheduler;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.scheduler.KairosScheduleJobDTO;
-import com.kairos.dto.scheduler.kafka.producer.KafkaProducer;
+import com.kairos.dto.scheduler.queue.KairosScheduleJobDTO;
+import com.kairos.dto.scheduler.queue.kafka.producer.KafkaProducer;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;

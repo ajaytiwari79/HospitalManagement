@@ -1,11 +1,13 @@
 package com.kairos.persistence.model.master_data.default_asset_setting;
 
+import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,22 +18,34 @@ public class AssetType extends MongoBaseEntity {
     @NotBlank(message = "Name can't be empty or null")
     @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$")
     private String name;
-
     private Long countryId;
-
-    private boolean subAsset=false ;
-
-    private boolean hasSubAsset=false;
-
-    private String suggestedDataStatus;
-
+    private boolean subAsset;
+    private boolean hasSubAsset;
+    private SuggestedDataStatus suggestedDataStatus;
+    private LocalDate suggestedDate;
     private List<BigInteger> risks;
-
     private List<BigInteger> subAssetTypes=new ArrayList<>();
 
-    public String getSuggestedDataStatus() { return suggestedDataStatus; }
 
-    public void setSuggestedDataStatus(String suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
+    public AssetType(String name, Long countryId, SuggestedDataStatus suggestedDataStatus) {
+        this.name = name;
+        this.countryId = countryId;
+        this.suggestedDataStatus=suggestedDataStatus;
+    }
+
+
+
+    public AssetType(String name) {
+        this.name = name;
+    }
+
+    public LocalDate getSuggestedDate() { return suggestedDate; }
+
+    public void setSuggestedDate(LocalDate suggestedDate) { this.suggestedDate = suggestedDate; }
+
+    public SuggestedDataStatus getSuggestedDataStatus() { return suggestedDataStatus; }
+
+    public void setSuggestedDataStatus(SuggestedDataStatus suggestedDataStatus) { this.suggestedDataStatus = suggestedDataStatus; }
 
     public boolean isHasSubAsset() { return hasSubAsset; }
 
@@ -65,14 +79,6 @@ public class AssetType extends MongoBaseEntity {
 
     public void setRisks(List<BigInteger> risks) { this.risks = risks; }
 
-    public AssetType(@NotBlank(message = "Name can't be empty or null") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name, Long countryId) {
-        this.name = name;
-        this.countryId = countryId;
-    }
-
-    public AssetType(@NotBlank(message = "Name can't be empty or null") @Pattern(message = "Numbers and Special characters are not allowed for Name", regexp = "^[a-zA-Z\\s]+$") String name) {
-        this.name = name;
-    }
 
     public AssetType() {
     }

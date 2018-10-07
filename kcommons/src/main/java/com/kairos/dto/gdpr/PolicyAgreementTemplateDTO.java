@@ -3,13 +3,16 @@ package com.kairos.dto.gdpr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -27,28 +30,30 @@ public class PolicyAgreementTemplateDTO {
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
 
-    @NotNull(message = "ManagingOrganization Type cannot be null")
-    @NotEmpty(message = "ManagingOrganization Type cannot be empty")
-    private List<OrganizationType>  organizationTypes;
-
-    @NotNull(message = "ManagingOrganization Sub Type cannot be null")
-    @NotEmpty(message = "ManagingOrganization Sub Type cannot be empty")
-    private List<OrganizationSubType>  organizationSubTypes;
-
-    @NotNull(message = "Service Type cannot be null")
-    @NotEmpty(message = "Service Type cannot be empty")
-    private List<ServiceCategory>  organizationServices;
-
-    @NotNull(message = "Service Sub Type cannot be null")
-    @NotEmpty(message = "Service Sub Type cannot be empty")
-    private List<SubServiceCategory>  organizationSubServices;
-
-    @NotNull(message = "Account Type cannot be null")
-    @NotEmpty(message = "Account Type cannot be empty")
-    private Set<AccountTypeDTO> accountTypes;
+    @Valid
+    @NotEmpty(message = "error.message.organizationType.not.Selected")
+    private List<OrganizationType> organizationTypes = new ArrayList<>();
 
 
-    @NotNull
+    @Valid
+    @NotEmpty(message = "error.message.organizationSubType.not.Selected")
+    private List<OrganizationSubType> organizationSubTypes = new ArrayList<>();
+
+    @Valid
+    @NotEmpty(message = "error.message.serviceCategory.not.Selected")
+    private List<ServiceCategory> organizationServices = new ArrayList<>();
+
+    @Valid
+    @NotEmpty(message = "error.message.serviceSubCategory.not.Selected")
+    private List<SubServiceCategory> organizationSubServices = new ArrayList<>();
+
+
+    @Valid
+    @NotEmpty(message = "error.message.accountType.not.Selected")
+    private List<AccountTypeVO> accountTypes=new ArrayList<>();
+
+
+    @NotNull(message = "error.message.templateType.notNull")
     private BigInteger templateTypeId;
 
     public BigInteger getTemplateTypeId() {
@@ -87,39 +92,27 @@ public class PolicyAgreementTemplateDTO {
         return organizationTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
+    public void setOrganizationTypes(List<OrganizationType> organizationTypes) { this.organizationTypes = organizationTypes; }
 
     public List<OrganizationSubType> getOrganizationSubTypes() {
         return organizationSubTypes;
     }
 
-    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
+    public void setOrganizationSubTypes(List<OrganizationSubType> organizationSubTypes) { this.organizationSubTypes = organizationSubTypes; }
 
     public List<ServiceCategory> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<ServiceCategory> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
+    public void setOrganizationServices(List<ServiceCategory> organizationServices) { this.organizationServices = organizationServices; }
 
     public List<SubServiceCategory> getOrganizationSubServices() {
         return organizationSubServices;
     }
 
-    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) {
-        this.organizationSubServices = organizationSubServices;
-    }
+    public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
-    public Set<AccountTypeDTO> getAccountTypes() {
-        return accountTypes;
-    }
+    public List<AccountTypeVO> getAccountTypes() { return accountTypes; }
 
-    public void setAccountTypes(Set<AccountTypeDTO> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
+    public void setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes; }
 }

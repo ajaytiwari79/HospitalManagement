@@ -15,20 +15,22 @@ import java.util.Set;
 
 @Repository
 @JaversSpringDataAuditable
-public interface OrganizationalSecurityMeasureMongoRepository extends MongoBaseRepository<OrganizationalSecurityMeasure,BigInteger>,CustomOrganizationalSecurityRepository{
+public interface OrganizationalSecurityMeasureMongoRepository extends MongoBaseRepository<OrganizationalSecurityMeasure, BigInteger>, CustomOrganizationalSecurityRepository {
 
 
     @Query("{countryId:?0,_id:?1,deleted:false}")
-    OrganizationalSecurityMeasure findByIdAndNonDeleted(Long countryId,BigInteger id);
+    OrganizationalSecurityMeasure findByIdAndNonDeleted(Long countryId, BigInteger id);
 
     @Query("{countryId:?0,name:?1,deleted:false}")
-    OrganizationalSecurityMeasure findByName(Long countryId,String name);
+    OrganizationalSecurityMeasure findByName(Long countryId, String name);
 
     OrganizationalSecurityMeasure findByid(BigInteger id);
 
     @Query("{deleted:false,countryId:?0}")
-    List<OrganizationalSecurityMeasureResponseDTO> findAllOrganizationalSecurityMeasures(Long countryId, Sort sort);
+    List<OrganizationalSecurityMeasureResponseDTO> findAllByCountryIdSortByCreatedDate(Long countryId, Sort sort);
 
+    @Query("{deleted:false,countryId:?0}")
+    List<OrganizationalSecurityMeasureResponseDTO> findAllByCountryId(Long countryId);
 
     @Query("{deleted:false,countryId:?0,_id:{$in:?1}}")
     List<OrganizationalSecurityMeasure> getOrganizationalSecurityMeasureListByIds(Long countryId, Set<BigInteger> orgSecurityMeasureIds);
@@ -37,13 +39,13 @@ public interface OrganizationalSecurityMeasureMongoRepository extends MongoBaseR
     List<OrganizationalSecurityMeasureResponseDTO> findOrganizationalSecurityMeasuresListByIds(List<BigInteger> ids);
 
     @Query("{deleted:false,organizationId:?0}")
-    List<OrganizationalSecurityMeasureResponseDTO> findAllOrgOrganizationalSecurityMeasures( Long organizationId,Sort sort);
+    List<OrganizationalSecurityMeasureResponseDTO> findAllByUnitIdSortByCreatedDate(Long organizationId, Sort sort);
 
     @Query("{organizationId:?0,_id:?1,deleted:false}")
-    OrganizationalSecurityMeasure findByOrganizationIdAndId( Long organizationId,BigInteger id);
+    OrganizationalSecurityMeasure findByUnitIdAndId(Long unitId, BigInteger id);
 
 
     @Query("{countryId:?0,organizationId:?1,name:?2,deleted:false}")
-    OrganizationalSecurityMeasure findByOrganizationIdAndName(Long organizationId,String name);
+    OrganizationalSecurityMeasure findByUnitIdAndName(Long unitId, String name);
 
 }

@@ -6,9 +6,9 @@ import com.kairos.dto.gdpr.OrganizationSubType;
 import com.kairos.dto.gdpr.OrganizationType;
 import com.kairos.dto.gdpr.ServiceCategory;
 import com.kairos.dto.gdpr.SubServiceCategory;
+import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.dto.user.country.system_setting.AccountTypeDTO;
 import org.javers.core.metamodel.annotation.*;
 import org.springframework.data.annotation.Transient;
 
@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -39,7 +38,7 @@ public class Clause extends MongoBaseEntity {
 
     private List<SubServiceCategory> organizationSubServices;
 
-    private Set<AccountTypeDTO> accountTypes;
+    private List<AccountTypeVO> accountTypes;
 
     private Long countryId;
 
@@ -142,13 +141,9 @@ public class Clause extends MongoBaseEntity {
 
     public void setOrganizationSubServices(List<SubServiceCategory> organizationSubServices) { this.organizationSubServices = organizationSubServices; }
 
-    public Set<AccountTypeDTO> getAccountTypes() {
-        return accountTypes;
-    }
+    public List<AccountTypeVO> getAccountTypes() { return accountTypes; }
 
-    public void setAccountTypes(Set<AccountTypeDTO> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
+    public void setAccountTypes(List<AccountTypeVO> accountTypes) { this.accountTypes = accountTypes; }
 
     public Integer getOrderedIndex() { return orderedIndex; }
 

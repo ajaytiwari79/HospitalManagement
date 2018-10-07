@@ -65,6 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -89,6 +90,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static javafx.scene.input.KeyCode.V;
 import static org.springframework.http.MediaType.APPLICATION_XML;
 
 
@@ -193,8 +195,7 @@ public class ActivityService extends MongoBaseService {
         List<PhaseDTO> phases = phaseService.getPhasesByCountryId(countryId);
         List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
 
-        RulesActivityTab rulesActivityTab = new RulesActivityTab(false, false, false,
-                false, false, false, false, false, false, null, phaseTemplateValues);
+        RulesActivityTab rulesActivityTab = new RulesActivityTab( phaseTemplateValues);
         activity.setRulesActivityTab(rulesActivityTab);
 
         TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab(ENTERED_TIMES, 0l, true, LocalTime.of(7, 0), 1d);
@@ -419,21 +420,28 @@ public class ActivityService extends MongoBaseService {
         if (!activity.isPresent()) {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound", "activity", activityId);
         }
-        Set<BigInteger> compositeShiftIds = new HashSet<>();
-        compositeShiftIds.addAll(compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet()));
-        Integer activityMatchedCount = activityMongoRepository.countActivityByIds(compositeShiftIds);
-        if (activityMatchedCount != compositeShiftIds.size()) {
+        Set<BigInteger> compositeShiftIds = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet());
+        List<Activity> activityMatched = activityMongoRepository.findAllActivitiesByIds(compositeShiftIds);
+        if (activityMatched.size() != compositeShiftIds.size()) {
             exceptionService.illegalArgumentException("message.mismatched-ids", compositeShiftIds);
         }
-        List<CompositeActivity> compositeActivities = new ArrayList<>();
-        compositeShiftActivityDTOs.forEach(compositeShiftActivityDTO -> {
-            compositeActivities.add(new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter()));
-        });
-
+        List<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toList());
         activity.get().setCompositeActivities(compositeActivities);
         save(activity.get());
+        updateCompositeActivity(activityMatched,activity.get(),compositeActivities);
         return compositeShiftActivityDTOs;
+    }
 
+    public void updateCompositeActivity(List<Activity> activityMatched, Activity activity, List<CompositeActivity> compositeActivities) {
+        Map<BigInteger, Activity> activityMap = activityMatched.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        for (CompositeActivity compositeActivity : compositeActivities) {
+            Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
+            Optional<CompositeActivity> optionalCompositeActivity = composedActivity.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
+            CompositeActivity compositeActivityOfAnotherActivity = optionalCompositeActivity.isPresent() ? optionalCompositeActivity.get() : new CompositeActivity();
+            compositeActivityOfAnotherActivity.setAllowedBefore(compositeActivity.isAllowedAfter());
+            compositeActivityOfAnotherActivity.setAllowedAfter(compositeActivity.isAllowedBefore());
+        }
+        save(activityMatched);
     }
 
     public ActivityTabsWrapper getTimeCalculationTabOfActivity(BigInteger activityId, Long countryId) {
@@ -479,7 +487,7 @@ public class ActivityService extends MongoBaseService {
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
         validateActivityTimeRules(rulesActivityDTO.getEarliestStartTime(), rulesActivityDTO.getLatestStartTime(), rulesActivityDTO.getMaximumEndTime(), rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
-        RulesActivityTab rulesActivityTab = rulesActivityDTO.buildRulesActivityTab();
+        RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
         Activity activity = activityMongoRepository.findOne(rulesActivityDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.activity.id", rulesActivityDTO.getActivityId());
@@ -895,7 +903,7 @@ public class ActivityService extends MongoBaseService {
     private List<Activity> createActivatesForCountryFromTimeCare(List<TimeCareActivity> timeCareActivities, Long unitId, Long countryId,
                                                                  List<String> externalIdsOfAllActivities, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
 
-        OrganizationDTO organizationDTO = organizationRestClient.getOrganization(unitId);
+        OrganizationDTO organizationDTO = genericRestClient.publishRequest(null,unitId, true, IntegrationOperation.GET, "", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {});
         if (organizationDTO == null) {
             exceptionService.dataNotFoundByIdException("message.organization.id");
         }
@@ -904,7 +912,7 @@ public class ActivityService extends MongoBaseService {
             activityCategory = new ActivityCategory("NONE", "", countryId, null);
             save(activityCategory);
         }
-        List<Long> orgTypes = organizationDTO.getOrganizationTypes().stream().map(organizationTypeDTO -> organizationTypeDTO.getId()).collect(Collectors.toList());
+        Long orgType = organizationDTO.getOrganizationType().getId();
         List<Long> orgSubTypes = organizationDTO.getOrganizationSubTypes().stream().map(organizationTypeDTO -> organizationTypeDTO.getId()).collect(Collectors.toList());
 
         Set<String> skillsOfAllTimeCareActivity = timeCareActivities.stream().flatMap(timeCareActivity -> timeCareActivity.getArrayOfSkill().stream().
@@ -923,7 +931,7 @@ public class ActivityService extends MongoBaseService {
             activity.setParentActivity(true);
             activity.setState(ActivityStateEnum.LIVE);
             activity.setName(timeCareActivity.getName());
-            activity.setOrganizationTypes(orgTypes);
+            activity.setOrganizationTypes(Arrays.asList(orgType));
             activity.setOrganizationSubTypes(orgSubTypes);
             activity.setExternalId(timeCareActivity.getId());
             //general tab
@@ -945,7 +953,6 @@ public class ActivityService extends MongoBaseService {
             RulesActivityTab rulesActivityTab = Optional.ofNullable(activity.getRulesActivityTab()).isPresent() ? activity.getRulesActivityTab() :
                     new RulesActivityTab();
 
-            rulesActivityTab.setEligibleAgainstTimeRules(timeCareActivity.getUseTimeRules());
             rulesActivityTab.setEligibleForStaffingLevel(timeCareActivity.getIsStaffing());
             List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
             rulesActivityTab.setEligibleForSchedules(phaseTemplateValues);
@@ -1214,4 +1221,5 @@ public class ActivityService extends MongoBaseService {
             save(activityAndShiftStatusSettings.get());
         }
     }
+
 }

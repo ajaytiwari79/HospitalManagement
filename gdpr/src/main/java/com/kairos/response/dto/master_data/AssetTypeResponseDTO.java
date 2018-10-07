@@ -16,7 +16,6 @@ public class AssetTypeResponseDTO {
     private List<AssetTypeResponseDTO> subAssetTypes=new ArrayList<>();
     private Boolean hasSubAsset;
 
-
     public BigInteger getId() {
         return id;
     }

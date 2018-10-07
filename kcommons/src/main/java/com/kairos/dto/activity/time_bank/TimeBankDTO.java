@@ -50,6 +50,7 @@ public class TimeBankDTO {
 
     private List<TimeBankIntervalDTO> weeklyIntervalsTimeBank;
     private List<TimeBankIntervalDTO> monthlyIntervalsTimeBank;
+    private float hourlyCost;
 
     public TimeBankDTO(Long unitPositionId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
      {
@@ -59,6 +60,14 @@ public class TimeBankDTO {
         this.totalWeeklyMin = totalWeeklyMins;
     }
 
+
+    public float getHourlyCost() {
+        return hourlyCost;
+    }
+
+    public void setHourlyCost(float hourlyCost) {
+        this.hourlyCost = hourlyCost;
+    }
 
     public long getTotalDeltaBalanceConrection() {
         return totalDeltaBalanceConrection;

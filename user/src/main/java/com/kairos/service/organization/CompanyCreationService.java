@@ -2,7 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
-import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.access_permission.AccessGroupQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
@@ -40,6 +40,7 @@ import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.staff.StaffService;
 
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
+import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
@@ -298,7 +299,7 @@ public class CompanyCreationService {
                 user.setCprNumber(unitManagerDTO.getCprNumber());
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
-                setEncryptedPasswordInUser(unitManagerDTO, user);
+                setEncryptedPasswordAndAge(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 if (unitManagerDTO.getAccessGroupId() != null) {
                     staffService.setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId());
@@ -313,7 +314,7 @@ public class CompanyCreationService {
                     }
                 }
                 user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getEmail());
-                setEncryptedPasswordInUser(unitManagerDTO, user);
+                setEncryptedPasswordAndAge(unitManagerDTO, user);
                 userGraphRepository.save(user);
                 staffService.setUserAndEmployment(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization);
 
@@ -323,11 +324,12 @@ public class CompanyCreationService {
     }
 
     //It checks null as well
-    private void setEncryptedPasswordInUser(UnitManagerDTO unitManagerDTO, User user) {
+    private void setEncryptedPasswordAndAge(UnitManagerDTO unitManagerDTO, User user) {
         if (StringUtils.isNotEmpty(unitManagerDTO.getFirstName())) {
             user.setPassword(new BCryptPasswordEncoder().encode(unitManagerDTO.getFirstName().trim() + "@kairos"));
         }
-
+        user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(unitManagerDTO.getCprNumber()));
+        user.setGender(CPRUtil.getGenderFromCPRNumber(unitManagerDTO.getCprNumber()));
     }
 
 
@@ -381,6 +383,11 @@ public class CompanyCreationService {
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.id.notFound", parentOrganizationId);
         }
+
+        if (parentOrganization.getName().equalsIgnoreCase(organizationBasicDTO.getName())) {
+            exceptionService.duplicateDataException("error.Organization.name.duplicate", organizationBasicDTO.getName());
+        }
+
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(organizationBasicDTO);
         Organization unit = new OrganizationBuilder()
                 .setName(WordUtils.capitalize(organizationBasicDTO.getName()))
@@ -548,8 +555,8 @@ public class CompanyCreationService {
 
 
         // if more than 2 default things needed make a  async service Please
-        List<AccessGroup> accessGroups=accountTypeGraphRepository.getAccessGroupsByAccountTypeId(organization.getAccountType().getId());
-        Map<Long, Long> countryAndOrgAccessGroupIdsMap=accessGroupService.createDefaultAccessGroupsInOrganization(organization,accessGroups);
+        List<AccessGroupQueryResult> accessGroups=accountTypeGraphRepository.getAccessGroupsByAccountTypeId(organization.getAccountType().getId());
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap=accessGroupService.createDefaultAccessGroupsInOrganization(organization,accessGroups,true);
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
 
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());

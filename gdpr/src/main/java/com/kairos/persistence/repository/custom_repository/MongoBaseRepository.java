@@ -13,4 +13,6 @@ public interface MongoBaseRepository<T extends MongoBaseEntity, ID extends Seria
 
      boolean safeDelete(ID id);
 
+
+
 }

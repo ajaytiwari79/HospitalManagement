@@ -58,7 +58,7 @@ public class PolicyAgreementTemplateController {
 
 
     @ApiOperation("update Policy agreement Template Basic details")
-    @DeleteMapping("/agreement_template/{agreementTemplateId}")
+    @PutMapping("/agreement_template/{agreementTemplateId}")
     public ResponseEntity<Object> deletePolicyAgreementTemplateById(@PathVariable Long countryId, @PathVariable BigInteger agreementTemplateId, @Validated @RequestBody PolicyAgreementTemplateDTO agreementTemplateDto) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updatePolicyAgreementTemplateBasicDetails(countryId, agreementTemplateId, agreementTemplateDto));
 

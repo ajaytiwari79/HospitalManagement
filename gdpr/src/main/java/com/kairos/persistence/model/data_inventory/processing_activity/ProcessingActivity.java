@@ -4,11 +4,9 @@ package com.kairos.persistence.model.data_inventory.processing_activity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
-import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +20,14 @@ public class ProcessingActivity extends MongoBaseEntity {
     private String description;
     private ManagingOrganization managingDepartment;
     private Staff processOwner;
-    private List<ProcessingActivityRelatedDataSubject> dataSubjects =new ArrayList<>();
-    private List<BigInteger> linkedAssets=new ArrayList<>();
+    private List<ProcessingActivityRelatedDataSubject> dataSubjects = new ArrayList<>();
+    private List<BigInteger> linkedAssets = new ArrayList<>();
     private List<BigInteger> processingPurposes;
     private List<BigInteger> dataSources;
     private List<BigInteger> transferMethods;
     private List<BigInteger> accessorParties;
     private List<BigInteger> processingLegalBasis;
-    private List<BigInteger> subProcessingActivities;
+    private List<BigInteger> subProcessingActivities = new ArrayList<>();
     private BigInteger responsibilityType;
     private Integer controllerContactInfo;
     private Integer dpoContactInfo;
@@ -37,11 +35,13 @@ public class ProcessingActivity extends MongoBaseEntity {
     private Long minDataSubjectVolume;
     private Long maxDataSubjectVolume;
     private Integer dataRetentionPeriod;
-    private boolean active=true;
-    private boolean subProcess=false;
-    private List<BigInteger> risks=new ArrayList<>();
+    private boolean active = true;
+    private boolean subProcess;
+    private List<BigInteger> risks = new ArrayList<>();
+    private boolean suggested;
 
-    public ProcessingActivity() { }
+    public ProcessingActivity() {
+    }
 
     public ProcessingActivity(String name, String description, ManagingOrganization managingDepartment, Staff processOwner) {
         this.name = name;
@@ -50,18 +50,21 @@ public class ProcessingActivity extends MongoBaseEntity {
         this.processOwner = processOwner;
     }
 
-    public ProcessingActivity(String name,  String description, boolean active) {
+    public ProcessingActivity(String name, String description, boolean active) {
         this.name = name;
         this.description = description;
         this.active = active;
     }
+
+    public boolean isSuggested() { return suggested; }
+
+    public void setSuggested(boolean suggested) { this.suggested = suggested; }
 
     public List<BigInteger> getRisks() { return risks; }
 
     public void setRisks(List<BigInteger> risks) { this.risks = risks; }
 
     public List<ProcessingActivityRelatedDataSubject> getDataSubjects() { return dataSubjects; }
-
     public void setDataSubjects(List<ProcessingActivityRelatedDataSubject> dataSubjects) { this.dataSubjects = dataSubjects; }
 
     public List<BigInteger> getSubProcessingActivities() { return subProcessingActivities; }
@@ -130,7 +133,6 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setAccessorParties(List<BigInteger> accessorParties) { this.accessorParties = accessorParties; }
 
-
     public List<BigInteger> getTransferMethods() { return transferMethods; }
 
     public void setTransferMethods(List<BigInteger> transferMethods) { this.transferMethods = transferMethods; }
@@ -139,7 +141,6 @@ public class ProcessingActivity extends MongoBaseEntity {
 
     public void setResponsibilityType(BigInteger responsibilityType) { this.responsibilityType = responsibilityType; }
 
-
     public List<BigInteger> getProcessingLegalBasis() { return processingLegalBasis; }
 
     public void setProcessingLegalBasis(List<BigInteger> processingLegalBasis) { this.processingLegalBasis = processingLegalBasis; }
@@ -147,7 +148,6 @@ public class ProcessingActivity extends MongoBaseEntity {
     public List<BigInteger> getLinkedAssets() { return linkedAssets; }
 
     public void setLinkedAssets(List<BigInteger> linkedAssets) { this.linkedAssets = linkedAssets; }
-
 
 
 }

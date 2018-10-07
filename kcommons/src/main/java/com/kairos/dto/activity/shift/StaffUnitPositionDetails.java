@@ -48,10 +48,17 @@ public class StaffUnitPositionDetails {
     private Date startDate;
     private Date endDate;
     private Long unitId;
+    private float hourlyCost;
 
     public StaffUnitPositionDetails() {
 
     }
+
+    public StaffUnitPositionDetails(int workingDaysInWeek, int totalWeeklyMinutes) {
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+    }
+
 
     public StaffUnitPositionDetails(Long unitId) {
         this.unitId = unitId;
@@ -130,9 +137,14 @@ public class StaffUnitPositionDetails {
         this.workingTimeAgreementId = workingTimeAgreementId;
     }
 
-    public StaffUnitPositionDetails(int workingDaysInWeek, int totalWeeklyMinutes) {
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
+
+
+    public float getHourlyCost() {
+        return hourlyCost;
+    }
+
+    public void setHourlyCost(float hourlyCost) {
+        this.hourlyCost = hourlyCost;
     }
 
 

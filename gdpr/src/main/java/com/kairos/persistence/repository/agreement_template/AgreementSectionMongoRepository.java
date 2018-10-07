@@ -20,9 +20,9 @@ public interface AgreementSectionMongoRepository extends MongoBaseRepository<Agr
 
     AgreementSection findByid(BigInteger id);
 
-
     @Query("{countryId:?0,_id:{$in:?1},deleted:false}")
     List<AgreementSection> findAgreementSectionByIds(Long countryId,List<BigInteger> ids);
+
 
 
 }

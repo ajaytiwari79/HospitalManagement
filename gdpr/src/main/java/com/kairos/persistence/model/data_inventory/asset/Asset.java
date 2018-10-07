@@ -2,33 +2,28 @@ package com.kairos.persistence.model.data_inventory.asset;
 
 
 import com.kairos.enums.RiskSeverity;
+import com.kairos.enums.gdpr.AssetAssessor;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
-import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @Document(collection = "asset")
 public class Asset extends MongoBaseEntity {
 
-
     @NotBlank(message = "Name can 't be empty")
     private String name;
     @NotBlank(message = "description can't be empty")
     private String description;
     private Long countryId;
-    @NotBlank(message = "Hosting Location can't be empty")
     private String hostingLocation;
-    @NotNull(message = "Managing department can't be empty")
     private ManagingOrganization managingDepartment;
-    @NotNull(message = "Asset Owner can't be Empty")
     private Staff assetOwner;
     private List<BigInteger> storageFormats;
     private List<BigInteger> orgSecurityMeasures;
@@ -36,9 +31,8 @@ public class Asset extends MongoBaseEntity {
     private BigInteger hostingProvider;
     private BigInteger hostingType;
     private BigInteger dataDisposal;
-    @NotNull(message = "Asset Type can't be empty")
     private BigInteger assetType;
-    private List<BigInteger> assetSubTypes=new ArrayList<>();
+    private List<BigInteger> assetSubTypes;
     private Set<BigInteger> processingActivities;
     private Set<BigInteger> subProcessingActivities;
     private Integer dataRetentionPeriod;
@@ -47,6 +41,37 @@ public class Asset extends MongoBaseEntity {
     private RiskSeverity riskLevel;
     @NotNull(message = "Status can't be empty")
     private boolean active=true;
+    private boolean suggested;
+    private AssetAssessor assetAssessor;
+
+
+    public Asset() {
+    }
+
+    public Asset(String name, String description, String hostingLocation, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner) {
+        this.name = name;
+        this.description = description;
+        this.hostingLocation=hostingLocation;
+        this.assetType = assetType;
+        this.assetSubTypes=assetSubTypes;
+        this.assetOwner=assetOwner;
+        this.managingDepartment=managingDepartment;
+    }
+
+
+    public Asset(String name, String description, boolean active) {
+        this.name = name;
+        this.description = description;
+        this.active = active;
+    }
+
+    public boolean isSuggested() { return suggested; }
+
+    public void setSuggested(boolean suggested) { this.suggested = suggested; }
+
+    public AssetAssessor getAssetAssessor() { return assetAssessor; }
+
+    public void setAssetAssessor(AssetAssessor assetAssessor) { this.assetAssessor = assetAssessor; }
 
     public boolean isActive() { return active; }
 
@@ -130,9 +155,6 @@ public class Asset extends MongoBaseEntity {
 
     public void setAssetOwner(Staff assetOwner) { this.assetOwner = assetOwner; }
 
-    public Asset() {
-    }
-
     public List<BigInteger> getAssetSubTypes() { return assetSubTypes; }
 
     public void setAssetSubTypes(List<BigInteger> assetSubTypes) { this.assetSubTypes = assetSubTypes; }
@@ -141,22 +163,7 @@ public class Asset extends MongoBaseEntity {
 
     public void setDataDisposal(BigInteger dataDisposal) { this.dataDisposal = dataDisposal; }
 
-    public Asset(String name, String description, String hostingLocation, BigInteger assetType, List<BigInteger> assetSubTypes, ManagingOrganization managingDepartment, Staff assetOwner) {
-        this.name = name;
-        this.description = description;
-        this.hostingLocation=hostingLocation;
-        this.assetType = assetType;
-        this.assetSubTypes=assetSubTypes;
-        this.assetOwner=assetOwner;
-        this.managingDepartment=managingDepartment;
-    }
 
-
-    public Asset(String name, String description, boolean active) {
-        this.name = name;
-        this.description = description;
-        this.active = active;
-    }
 }
 
 

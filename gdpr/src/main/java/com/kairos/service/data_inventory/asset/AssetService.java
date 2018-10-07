@@ -11,11 +11,13 @@ import com.kairos.persistence.repository.master_data.asset_management.AssetTypeM
 import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.AssetResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.service.master_data.asset_management.MasterAssetService;
 import org.javers.core.Javers;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
@@ -55,6 +57,9 @@ public class AssetService extends MongoBaseService {
     @Inject
     private AssessmentMongoRepository assessmentMongoRepository;
 
+    @Inject
+    private MasterAssetService masterAssetService;
+
 
     public AssetDTO createAssetWithBasicDetail(Long organizationId, AssetDTO assetDTO) {
         Asset previousAsset = assetMongoRepository.findByName(organizationId, assetDTO.getName());
@@ -83,7 +88,9 @@ public class AssetService extends MongoBaseService {
         asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
         asset.setMaxDataSubjectVolume(assetDTO.getMaxDataSubjectVolume());
         asset.setMinDataSubjectVolume(assetDTO.getMinDataSubjectVolume());
-        asset = assetMongoRepository.save(asset);
+        asset.setAssetAssessor(assetDTO.getAssetAssessor());
+        asset.setSuggested(assetDTO.isSuggested());
+        assetMongoRepository.save(asset);
         assetDTO.setId(asset.getId());
         return assetDTO;
     }
@@ -94,7 +101,7 @@ public class AssetService extends MongoBaseService {
         if (!Optional.ofNullable(asset).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", " Asset " + assetId);
         }
-        List<ProcessingActivityBasicResponseDTO> linkedProcessingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkWithAssetById(organizationId, assetId);
+        List<ProcessingActivityBasicDTO> linkedProcessingActivities = processingActivityMongoRepository.findAllProcessingActivityLinkWithAssetById(organizationId, assetId);
         Map<String, Object> result = new HashMap<>();
         if (!linkedProcessingActivities.isEmpty()) {
             result.put(IS_SUCCESS, false);
@@ -185,10 +192,8 @@ public class AssetService extends MongoBaseService {
         if (Optional.ofNullable(asset).isPresent() && !assetId.equals(asset.getId())) {
             exceptionService.duplicateDataException("message.duplicate", "Asset", assetDTO.getName());
         }
-        asset = assetMongoRepository.findByIdAndNonDeleted(organizationId, assetId);
-        if (!Optional.ofNullable(asset).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset", assetId);
-        } else if (!asset.isActive()) {
+        asset = assetMongoRepository.findOne(assetId);
+        if (!asset.isActive()) {
             exceptionService.invalidRequestException("message.asset.inactive");
         }
         AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(organizationId, assetDTO.getAssetType());
@@ -263,8 +268,32 @@ public class AssetService extends MongoBaseService {
     }
 
 
-    public List<AssessmentBasicResponseDTO> getAssessmentListByAssetBy(Long unitId, BigInteger assetId) {
-        return assessmentMongoRepository.findAllAssessmentLaunchedForAssetbyAssetIdAndUnitId(unitId, assetId);
+    /**
+     * @param unitId
+     * @param assetId
+     * @return
+     * @description get all Previous Assessment Launched for Asset
+     */
+    public List<AssessmentBasicResponseDTO> getAssessmentListByAssetId(Long unitId, BigInteger assetId) {
+        return assessmentMongoRepository.findAllAssessmentLaunchedForAssetByAssetIdAndUnitId(unitId, assetId);
+    }
+
+
+    /**
+     * @param unitId    -unit Id
+     * @param countryId -country id
+     * @param assetDTO
+     * @return
+     * @description create asset at unit level  and suggest asset to country admin
+     */
+    public Map<String, AssetDTO> saveAssetAndSuggestToCountryAdmin(Long unitId, Long countryId, AssetDTO assetDTO) {
+
+        Map<String, AssetDTO> result = new HashMap<>();
+        assetDTO = createAssetWithBasicDetail(unitId, assetDTO);
+        AssetDTO masterAsset = masterAssetService.saveSuggestedAssetDataFromUnit(countryId, unitId, assetDTO);
+        result.put("new", assetDTO);
+        result.put("SuggestedData", masterAsset);
+        return result;
     }
 
 
@@ -291,9 +320,8 @@ public class AssetService extends MongoBaseService {
                         subProcessingActivity.setSelected(true);
                         defaultSelected = false;
                     } else if (defaultSelected) {
-                        ProcessingActivityBasicResponseDTO defaultSubProcessingActivity = subProcessingActivity;
-                        defaultSubProcessingActivity.setSelected(true);
-                        defaultSubProcessingActivityList.add(defaultSubProcessingActivity);
+                        subProcessingActivity.setSelected(true);
+                        defaultSubProcessingActivityList.add(subProcessingActivity);
                     }
                 }
 

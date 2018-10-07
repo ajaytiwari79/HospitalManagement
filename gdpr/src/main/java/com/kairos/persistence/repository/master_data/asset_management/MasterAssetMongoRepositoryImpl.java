@@ -136,15 +136,19 @@ public class MasterAssetMongoRepositoryImpl implements CustomMasterAssetReposito
     }
 
     @Override
-    public List<MasterAsset> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationMetaDataDTO organizationMetaDataDTO) {
+    public List<MasterAssetResponseDTO> getMasterAssetByOrgTypeSubTypeCategoryAndSubCategory(Long countryId, OrganizationMetaDataDTO organizationMetaDataDTO) {
 
-        Query query = new Query(Criteria.where(COUNTRY_ID).is(countryId)
-                .and(DELETED).is(false));
-        query.addCriteria(Criteria.where("organizationTypes._id").in(organizationMetaDataDTO.getOrganizationService().getId()));
-        query.addCriteria(Criteria.where("organizationSubTypes._id").in(organizationMetaDataDTO.getOrganizationSubType().getId()));
-        query.addCriteria(Criteria.where("organizationServices._id").in(organizationMetaDataDTO.getOrganizationService().getId()));
-        query.addCriteria(Criteria.where("organizationSubServices._id").in(organizationMetaDataDTO.getOrganizationSubService().getId()));
-        return mongoTemplate.find(query, MasterAsset.class);
+        Aggregation aggregation = Aggregation.newAggregation(
+
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and("organizationTypes._id").in(organizationMetaDataDTO.getTypeId())
+                        .and("organizationSubTypes._id").in(organizationMetaDataDTO.getSubTypeIds()).and(("organizationServices._id")).in(organizationMetaDataDTO.getServiceCategoryIds())
+                        .and("organizationSubServices._id").in(organizationMetaDataDTO.getSubServiceCategoryIds())),
+                lookup("asset_type", "assetType", "_id", "assetType"),
+                lookup("asset_type", "assetSubTypes", "_id", "assetSubTypes"),
+                new CustomAggregationOperation(masterAssetProjectionOperation)
+
+        );
+        return mongoTemplate.aggregate(aggregation, MasterAsset.class, MasterAssetResponseDTO.class).getMappedResults();
 
     }
 }

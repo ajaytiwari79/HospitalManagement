@@ -4,6 +4,7 @@ package com.kairos.service.data_inventory.asset;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.dto.gdpr.data_inventory.AssetTypeOrganizationLevelDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationLevelRiskDTO;
+import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.repository.data_inventory.asset.AssetMongoRepository;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeMongoRepository;
@@ -13,14 +14,16 @@ import com.kairos.response.dto.master_data.AssetTypeResponseDTO;
 import com.kairos.response.dto.master_data.AssetTypeRiskResponseDTO;
 import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.service.risk_management.RiskService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,6 +49,9 @@ public class OrganizationAssetTypeService extends MongoBaseService {
 
     @Inject
     private RiskMongoRepository riskMongoRepository;
+
+    @Inject
+    private AssetTypeService assetTypeService;
 
 
     /**
@@ -96,7 +102,6 @@ public class OrganizationAssetTypeService extends MongoBaseService {
 
 
     public List<AssetType> buildSubAssetTypeListAndRiskAndLinkedToAssetType(Long unitId, List<AssetTypeOrganizationLevelDTO> subAssetTypesDto, Map<AssetType, List<OrganizationLevelRiskDTO>> riskRelatedToSubAssetTypes) {
-
         checkForDuplicacyInNameOfAssetType(subAssetTypesDto);
         List<AssetType> subAssetTypes = new ArrayList<>();
         for (AssetTypeOrganizationLevelDTO subAssetTypeDto : subAssetTypesDto) {
@@ -231,10 +236,8 @@ public class OrganizationAssetTypeService extends MongoBaseService {
     public boolean deleteAssetTypeById(Long unitId, BigInteger assetTypeId) {
 
         List<AssetBasicResponseDTO> assetsLinkedWithAssetType = assetMongoRepository.findAllAssetLinkedWithAssetType(unitId, assetTypeId);
-        if (!assetsLinkedWithAssetType.isEmpty()) {
-            StringBuilder assetNames = new StringBuilder();
-            assetsLinkedWithAssetType.forEach(asset -> assetNames.append(asset.getName() + ","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Asset Type", assetNames);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithAssetType)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Asset Type", new StringBuilder(assetsLinkedWithAssetType.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
         AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
         if (!Optional.ofNullable(assetType).isPresent() && !assetType.isSubAsset()) {
@@ -248,24 +251,22 @@ public class OrganizationAssetTypeService extends MongoBaseService {
 
     public boolean deleteAssetSubTypeById(Long unitId, BigInteger assetTypeId, BigInteger subAssetTypeId) {
 
-        List<AssetBasicResponseDTO> assetsLinkedWithAssetSubType = assetMongoRepository.findAllAssetLinkedWithAssetSubType(unitId, subAssetTypeId);
-        if (!assetsLinkedWithAssetSubType.isEmpty()) {
-            StringBuilder assetNames = new StringBuilder();
-            assetsLinkedWithAssetSubType.forEach(asset -> assetNames.append(asset.getName() + ","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Data Disposal", assetNames);
-        }
         AssetType assetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, assetTypeId);
         if (!Optional.ofNullable(assetType).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "Asset Type", assetType);
-        } else {
-            assetType.getSubAssetTypes().remove(subAssetTypeId);
-            assetTypeMongoRepository.save(assetType);
-            AssetType subAssetType = assetTypeMongoRepository.findByIdAndUnitId(unitId, subAssetTypeId);
-            if (!Optional.ofNullable(subAssetType).isPresent()) {
-                exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub AssetType", subAssetType);
-            }
-            delete(subAssetType);
         }
+        List<AssetBasicResponseDTO> assetsLinkedWithAssetSubType = assetMongoRepository.findAllAssetLinkedWithAssetSubType(unitId, subAssetTypeId);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithAssetSubType)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Sub Asset Type", new StringBuffer());
+        }
+        assetType.getSubAssetTypes().remove(subAssetTypeId);
+        AssetType subAssetType = assetTypeMongoRepository.findSubAssetTypeByIdAndUnitId(unitId, subAssetTypeId);
+        if (!Optional.ofNullable(subAssetType).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Sub AssetType", subAssetType);
+        }
+        delete(subAssetType);
+        assetTypeMongoRepository.save(assetType);
+
         return true;
 
     }
@@ -289,6 +290,54 @@ public class OrganizationAssetTypeService extends MongoBaseService {
         assetTypeMongoRepository.save(assetType);
         return true;
     }
+
+
+    /**
+     * @param countryId
+     * @param unitId
+     * @param assetTypeBasicDTO
+     * @return
+     */
+    public Map<String, AssetTypeBasicDTO> saveAndSuggestAssetTypeAndSubAssetTypeToCountryAdmin(Long unitId, Long countryId, AssetTypeBasicDTO assetTypeBasicDTO) {
+
+        Map<String, AssetTypeBasicDTO> result = createAssetTypeAndSubAssetTypeWithBasicDetail(unitId, assetTypeBasicDTO);
+        AssetTypeBasicDTO acceptedByCountryAdmin = assetTypeService.saveSuggestedAssetTypeAndSubAssetTypeFromUnit(countryId, assetTypeBasicDTO);
+        result.put("SuggestedData", acceptedByCountryAdmin);
+        return result;
+    }
+
+
+    /**
+     * @param unitId
+     * @param assetTypeBasicDTO
+     * @return
+     * @description create sub Asset tYpe and Asset type with basic detail on Save and Suggest of data from unit to country admin
+     */
+    private Map<String, AssetTypeBasicDTO> createAssetTypeAndSubAssetTypeWithBasicDetail(Long unitId, AssetTypeBasicDTO assetTypeBasicDTO) {
+
+        AssetType assetType = new AssetType(assetTypeBasicDTO.getName());
+        assetType.setOrganizationId(unitId);
+        List<AssetType> subAssetTypes = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(assetTypeBasicDTO.getSubAssetTypes())) {
+            for (AssetTypeBasicDTO subAssetTypeDTO : assetTypeBasicDTO.getSubAssetTypes()) {
+                AssetType subAssetType = new AssetType(subAssetTypeDTO.getName());
+                subAssetType.setOrganizationId(unitId);
+                subAssetType.setSuggestedDate(LocalDate.now());
+                assetType.setHasSubAsset(true);
+                subAssetType.setSubAsset(true);
+                subAssetTypes.add(subAssetType);
+            }
+        }
+        if (!subAssetTypes.isEmpty()) {
+            assetTypeMongoRepository.saveAll(getNextSequence(subAssetTypes));
+            assetType.setSubAssetTypes(subAssetTypes.stream().map(AssetType::getId).collect(Collectors.toList()));
+        }
+        assetTypeMongoRepository.save(assetType);
+        assetTypeBasicDTO.setId(assetType.getId());
+        return (Map<String, AssetTypeBasicDTO>) new HashMap<>().put("new", assetTypeBasicDTO);
+
+    }
+
 
     /**
      * @param assetTypeDTOs check for duplicates in name of Asset types

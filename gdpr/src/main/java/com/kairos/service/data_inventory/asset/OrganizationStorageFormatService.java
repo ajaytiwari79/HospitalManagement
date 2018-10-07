@@ -13,6 +13,7 @@ import com.kairos.service.common.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.StorageFormatService;
 import com.kairos.utils.ComparisonUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstant.EXISTING_DATA_LIST;
 import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
@@ -93,7 +95,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      * @return list of StorageFormat
      */
     public List<StorageFormatResponseDTO> getAllStorageFormat(Long organizationId) {
-        return storageFormatMongoRepository.findAllOrganizationStorageFormats(organizationId,new Sort(Sort.Direction.DESC, "createdAt"));
+        return storageFormatMongoRepository.findAllUnitIdSortByCreatedDate(organizationId, new Sort(Sort.Direction.DESC, "createdAt"));
     }
 
     /**
@@ -105,7 +107,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      */
     public StorageFormat getStorageFormat(Long organizationId, BigInteger id) {
 
-        StorageFormat exist = storageFormatMongoRepository.findByOrganizationIdAndId(organizationId, id);
+        StorageFormat exist = storageFormatMongoRepository.findByUnitIdAndId(organizationId, id);
         if (!Optional.ofNullable(exist).isPresent()) {
             throw new DataNotFoundByIdException("data not exist for id " + id);
         } else {
@@ -118,16 +120,10 @@ public class OrganizationStorageFormatService extends MongoBaseService {
     public Boolean deleteStorageFormat(Long unitId, BigInteger storageFormatId) {
 
         List<AssetBasicResponseDTO> assetsLinkedWithStorageFormat = assetMongoRepository.findAllAssetLinkedWithStorageFormat(unitId, storageFormatId);
-        if (!assetsLinkedWithStorageFormat.isEmpty()) {
-            StringBuilder assetNames=new StringBuilder();
-            assetsLinkedWithStorageFormat.forEach(asset->assetNames.append(asset.getName()+","));
-            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", assetNames);
+        if (CollectionUtils.isNotEmpty(assetsLinkedWithStorageFormat)) {
+            exceptionService.metaDataLinkedWithAssetException("message.metaData.linked.with.asset", "Storage Format", new StringBuilder(assetsLinkedWithStorageFormat.stream().map(AssetBasicResponseDTO::getName).map(String::toString).collect(Collectors.joining(","))));
         }
-        StorageFormat storageFormat = storageFormatMongoRepository.findByOrganizationIdAndId(unitId, storageFormatId);
-        if (!Optional.ofNullable(storageFormat).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Storage Format", storageFormatId);
-        }
-        delete(storageFormat);
+        storageFormatMongoRepository.safeDelete(storageFormatId);
         return true;
     }
 
@@ -142,7 +138,7 @@ public class OrganizationStorageFormatService extends MongoBaseService {
      */
     public StorageFormatDTO updateStorageFormat(Long organizationId, BigInteger id, StorageFormatDTO storageFormatDTO) {
 
-        StorageFormat storageFormat = storageFormatMongoRepository.findByOrganizationIdAndName(organizationId, storageFormatDTO.getName());
+        StorageFormat storageFormat = storageFormatMongoRepository.findByUnitIdAndName(organizationId, storageFormatDTO.getName());
         if (Optional.ofNullable(storageFormat).isPresent()) {
             if (id.equals(storageFormat.getId())) {
                 return storageFormatDTO;

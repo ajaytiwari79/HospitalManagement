@@ -49,7 +49,7 @@ public class DataSubjectMappingController {
     @ApiOperation("get all data Subject mapping ")
     @GetMapping("/dataSubject_mapping/all")
     public ResponseEntity<Object> getAllDataSubjectWithDataCategoryAndElements(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getAllDataSubjectAndMappingWithData(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dataSubjectMappingService.getAllDataSubjectWithDataCategoryByCountryId(countryId));
     }
 
     @ApiOperation("update data Subject mapping ")

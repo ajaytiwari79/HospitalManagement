@@ -123,8 +123,4 @@ public class OrganizationServiceController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServices);
     }
 
-
-
-
-
-}
+    }

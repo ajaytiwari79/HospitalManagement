@@ -13,6 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
@@ -32,6 +34,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableAspectJAutoProxy
 @EnableCircuitBreaker
 @SpringBootApplication
+@EnableAsync
 @EnableMongoRepositories(basePackages = "com.kairos.persistence.repository", repositoryBaseClass = MongoBaseRepositoryImpl.class)
 public class KairosGdprApplication {
 
@@ -47,6 +50,8 @@ public class KairosGdprApplication {
         SpringApplication.run(KairosGdprApplication.class, args);
 
     }
+
+
 
     @Bean
     @Primary
@@ -81,6 +86,7 @@ public class KairosGdprApplication {
     }
 
     @Profile({"development", "qa", "production"})
+    @LoadBalanced
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
@@ -93,6 +99,7 @@ public class KairosGdprApplication {
 
 
     @Profile("local")
+    @LoadBalanced
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {

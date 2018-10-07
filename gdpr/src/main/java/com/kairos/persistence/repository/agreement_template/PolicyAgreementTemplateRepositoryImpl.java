@@ -21,7 +21,6 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.constants.AppConstant.DELETED;
-import static com.kairos.constants.AppConstant.ORGANIZATION_ID;
 import static com.kairos.constants.AppConstant.COUNTRY_ID;
 
 
@@ -90,6 +89,21 @@ public class PolicyAgreementTemplateRepositoryImpl implements CustomPolicyAgreem
         );
 
         AggregationResults<PolicyAgreementTemplateResponseDTO> result = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, PolicyAgreementTemplateResponseDTO.class);
+        return result.getMappedResults();
+    }
+
+
+    @Override
+    public List<PolicyAgreementTemplate> findAgreementTemplatesByCurrentClauseIdAndCountryId(Long countryId, BigInteger clauseId) {
+        String projectionOperation="{'$project':{ '_id':1,'name':1 }}";
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
+                lookup("agreement_section", "agreementSections", "_id", "agreementSections"),
+                match(Criteria.where("agreementSections.clauseIdOrderedIndex").is(clauseId).and("agreementSections.deleted").is(false)),
+                new CustomAggregationOperation(Document.parse(projectionOperation))
+        );
+
+        AggregationResults<PolicyAgreementTemplate> result = mongoTemplate.aggregate(aggregation, PolicyAgreementTemplate.class, PolicyAgreementTemplate.class);
         return result.getMappedResults();
 
     }
