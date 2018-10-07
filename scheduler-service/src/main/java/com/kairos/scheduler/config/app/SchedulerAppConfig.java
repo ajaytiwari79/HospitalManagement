@@ -153,17 +153,16 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
         return template;
     }
 
-    @Profile({"development","qa","production"})
+   /* @Profile({"development","qa","production"})
     @LoadBalanced
     @Bean(name="schedulerServiceRestTemplate")
     public RestTemplate getRestTemplateWithoutUserContext(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
 
         RestTemplate template =restTemplateBuilder
-                .interceptors(new SchedulerUserContextInterceptor(authorization))
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
         return template;
-    }
+    }*/
 
     @Profile({"development","qa","production"})
     @LoadBalanced

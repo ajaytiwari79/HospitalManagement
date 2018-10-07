@@ -42,16 +42,20 @@ public class UserIntegrationService {
 
     }
 
-    public String getAuthToken(Long unitId) {
+    public String getAuthToken() {
 
         MultiValueMap<String,String> formParameters = new LinkedMultiValueMap<String,String>();
         formParameters.add("username",envConfig.getUserServiceAuthUsername());
         formParameters.add("password",envConfig.getUserServiceAuthPassword());
         formParameters.add("grant_type","password");
-        AccessTokenDTO accessTokenDTO = userRestClientAuth.publishRequest(null,null,false,IntegrationOperation.CREATE,new ParameterizedTypeReference<RestTemplateResponseEnvelope<AccessTokenDTO>>() {
-        },formParameters);
+        Map<String,Object> accessTokenMap = userRestClientAuth.publishRequest(null,false,IntegrationOperation.CREATE,formParameters);
 
-        return accessTokenDTO.getAccess_token();
+        if(accessTokenMap.containsKey("access_token")) {
+            return (String)accessTokenMap.get("access_token");
+        }
+        else {
+            return null;
+        }
     }
 
 

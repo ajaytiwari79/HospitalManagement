@@ -1,7 +1,6 @@
 package com.kairos.scheduler.controller;
 
-import com.kairos.dto.scheduler.LocalDateTimeIdDTO;
-import com.kairos.dto.scheduler.SchedulerPanelDTO;
+
 import com.kairos.scheduler.service.UserIntegrationService;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -83,7 +82,7 @@ public class SchedulerPanelController {
     @GetMapping("/authToken")
     @ApiOperation("Get job details ")
     public ResponseEntity<Map<String, Object>> getAuthToken() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userIntegrationService.getAuthToken(2567L));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userIntegrationService.getAuthToken());
     }
     @DeleteMapping("")
     @ApiOperation("Delete Scheduler Panel ")

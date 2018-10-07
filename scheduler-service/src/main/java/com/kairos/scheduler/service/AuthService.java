@@ -10,16 +10,29 @@ import java.util.concurrent.ScheduledFuture;
 @Service
 public class AuthService {
 
+    @Inject
+    private UserIntegrationService userIntegrationService;
+
 
     public String getAuthToken() {
 
-            String authToken = BeanFactoryUtil.getDefaultListableBeanFactory()
+        String authToken;
+        if(BeanFactoryUtil.getDefaultListableBeanFactory().containsBean("authToken")) {
+            authToken = BeanFactoryUtil.getDefaultListableBeanFactory()
                     .getBean("authToken", String.class);
+            return authToken;
 
-            if(Optional.ofNullable(authToken).isPresent()) {
-
-
+        }
+        else {
+                authToken = userIntegrationService.getAuthToken();
+                BeanFactoryUtil.registerSingleton("authToken",authToken);
             }
+        return authToken;
+    }
+    public String getNewAuthToken() {
+        String authToken = userIntegrationService.getAuthToken();
+        BeanFactoryUtil.getDefaultListableBeanFactory().destroySingleton("authToken");
+        BeanFactoryUtil.registerSingleton("authToken",authToken);
         return authToken;
     }
 

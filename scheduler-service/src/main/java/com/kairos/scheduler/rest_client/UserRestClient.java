@@ -3,6 +3,7 @@ package com.kairos.scheduler.rest_client;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.scheduler.config.EnvConfig;
+import com.kairos.scheduler.service.AuthService;
 import com.kairos.scheduler.service.exception.ExceptionService;
 import com.kairos.scheduler.utils.user_context.UserContext;
 import org.apache.http.NameValuePair;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,9 +40,11 @@ public class UserRestClient {
     @Qualifier("restTemplate")
     private RestTemplate restTemplate;
     @Inject
-    @Qualifier("schedulerServiceRestTemplate")
+    @Qualifier("restTemplateWithoutAuth")
     private RestTemplate schedulerServiceRestTemplate;
 
+    @Inject
+    private AuthService authService;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -67,17 +71,33 @@ public class UserRestClient {
         final String baseUrl = getBaseUrl(isUnit,id,env.getUserServiceUrl())+uri;
         String url = baseUrl+getURIWithParam(queryParam).replace("%2C+",",");
         try {
-
-            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange = withoutAuth?
-                    schedulerServiceRestTemplate.exchange(
+            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange;
+            if(withoutAuth) {
+                HttpHeaders headers = new HttpHeaders();
+                headers.add("Authorization","bearer "+authService.getAuthToken());
+                HttpEntity<T> httpEntity= new HttpEntity<T>(t,headers);
+                restExchange = schedulerServiceRestTemplate.exchange(
+                        url,
+                        getHttpMethod(integrationOperation),
+                        httpEntity, typeReference,pathParams);
+                if(restExchange.getStatusCode().value()==401) {
+                    authService.getNewAuthToken();
+                headers.remove("Authorization");
+                headers.add("Authorization","bearer "+authService.getAuthToken());
+                    httpEntity= new HttpEntity<T>(t,headers);
+                    restExchange = schedulerServiceRestTemplate.exchange(
                             url,
                             getHttpMethod(integrationOperation),
-                            new HttpEntity<>(t), typeReference,pathParams):
-                    restTemplate.exchange(
-                            url,
-                            getHttpMethod(integrationOperation),
-                            new HttpEntity<>(t), typeReference,pathParams);
+                            httpEntity, typeReference,pathParams);
+                }
 
+            }
+            else {
+                 restExchange = restTemplate.exchange(
+                        url,
+                        getHttpMethod(integrationOperation),
+                        new HttpEntity<>(t), typeReference, pathParams);
+            }
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 logger.error("not valid code"+restExchange.getStatusCode());
